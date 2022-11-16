@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_LIST))
@@ -52,4 +52,4 @@ foreach ($data['iconmaps'] as $icon_map) {
 	), $row]);
 }
 
-$widget->addItem($table)->show();
+$html_page->addItem($table)->show();

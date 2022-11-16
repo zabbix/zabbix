@@ -28,7 +28,7 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#	include "disk.h"
+#	include "zbxwin32.h"
 #endif
 
 /******************************************************************************
@@ -512,7 +512,7 @@ static int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descri
 	return FAIL;
 }
 
-static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
@@ -590,7 +590,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 			goto err2;
 		}
 
-		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = get_cluster_size(item->path, &error)))
+		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = zbx_get_cluster_size(item->path, &error)))
 		{
 			SET_MSG_RESULT(result, error);
 			list.values_num++;
@@ -689,7 +689,7 @@ err1:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_size_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
@@ -838,9 +838,9 @@ err1:
 }
 #endif
 
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_size, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_size_local, request, result);
 }
 
 #define EVALUATE_DIR_ENTITY()											\
@@ -1050,12 +1050,12 @@ err1:
 	return ret;
 }
 
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_count_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 1);
 }
 
-static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 0);
 }
@@ -1195,23 +1195,23 @@ err1:
 	return ret;
 }
 
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_count_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dir_info(request, result, 1);
 }
 
-static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dir_info(request, result, 0);
 }
 #endif
 
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_count, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_count_local, request, result);
 }
 
-int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_get, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_get_local, request, result);
 }

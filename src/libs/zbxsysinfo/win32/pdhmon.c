@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxthreads.h"
@@ -27,7 +28,7 @@
 
 #include "perfstat.h"
 
-int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*counter, *error = NULL;
@@ -103,7 +104,7 @@ static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_R
 		goto out;
 	}
 
-	if (FAIL == check_counter_path(counterpath, PERF_COUNTER_LANG_DEFAULT == lang))
+	if (FAIL == zbx_check_counter_path(counterpath, PERF_COUNTER_LANG_DEFAULT == lang))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid performance counter path."));
 		goto out;
@@ -124,12 +125,12 @@ out:
 	return ret;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
@@ -254,12 +255,12 @@ err:
 	return ret;
 }
 
-int	PERF_INSTANCE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_INSTANCE_DISCOVERY_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }

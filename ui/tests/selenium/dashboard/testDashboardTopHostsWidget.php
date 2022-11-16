@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @dataSource TopHostsWidget
  *
- * @backup widget, profiles, dashboard, items
+ * @backup widget, profiles
+ *
+ * @onAfter clearData
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
@@ -57,6 +59,28 @@ class testDashboardTopHostsWidget extends CWebTest {
 		return [
 			CMessageBehavior::class
 		];
+	}
+
+	/**
+	 * Get threshold table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getTreshholdTable() {
+		return $this->query('id:thresholds_table')->asMultifieldTable([
+			'mapping' => [
+				'' => [
+					'name' => 'color',
+					'selector' => 'class:color-picker',
+					'class' => 'CColorPickerElement'
+				],
+				'Threshold' => [
+					'name' => 'threshold',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		])->waitUntilVisible()->one();
 	}
 
 	public static function getCreateData() {
@@ -265,9 +289,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						]
 					]
 				]
@@ -285,7 +307,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '5'
+									'threshold' => '5'
 								]
 							]
 						]
@@ -305,13 +327,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1'
+									'threshold' => '1'
 								],
 								[
-									'value' => '100'
+									'threshold' => '100'
 								],
 								[
-									'value' => '1000'
+									'threshold' => '1000'
 								]
 							]
 						]
@@ -331,19 +353,19 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => 'FFEB3B'
 								],
 								[
-									'value' => '100',
+									'threshold' => '100',
 									'color' => 'AAAAAA'
 								],
 								[
-									'value' => '1000',
+									'threshold' => '1000',
 									'color' => 'AAAAAA'
 								],
 								[
-									'value' => '10000',
+									'threshold' => '10000',
 									'color' => ''
 								]
 							]
@@ -362,9 +384,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Host name',
 							'Name' => 'This is host name',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						],
 						[
 							'Data' => 'Host name'
@@ -397,9 +417,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Text',
 							'Text' => 'Here is some text 3',
 							'Name' => 'Text column name 2',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						],
 						[
 							'Data' => 'Item value',
@@ -486,9 +504,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Host name',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -524,9 +540,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Text',
 							'Text' => 'Here is some text',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -699,9 +713,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -722,7 +734,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => '!@#$%^'
 								]
 							]
@@ -746,11 +758,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => '4000FF'
 								],
 								[
-									'value' => '2',
+									'threshold' => '2',
 									'color' => '!@#$%^'
 								]
 							]
@@ -774,7 +786,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => 'zzz',
+									'threshold' => 'zzz',
 									'color' => '4000FF'
 								]
 							]
@@ -875,7 +887,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '100',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'threshold' => '100',
 									'color' => '#$@#$@'
 								]
 							]
@@ -932,13 +946,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '     '
+									'threshold' => '     '
 								]
 							]
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+						'Invalid parameter "/1/thresholds/3/threshold": a number is expected.'
 					]
 				]
 			],
@@ -1072,9 +1086,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '#$%$@@'
-							]
+							'Base color' => '#$%$@@'
 						]
 					],
 					'column_error' => [
@@ -1109,9 +1121,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'Text column changed',
 							'Data' => 'Text',
 							'Text' => 'some text',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						]
 					]
 				]
@@ -1127,9 +1137,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'Host name column update',
 							'Data' => 'Host name',
-							'Base color' => [
-								'id:lbl_base_color' => 'FF8F00'
-							]
+							'Base color' => 'FF8F00'
 						]
 					]
 				]
@@ -1220,16 +1228,18 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '100',
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '20h',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							],
+							'Base color' => '039BE5',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'threshold' => '1',
 									'color' => 'FFEB3B'
 								],
 								[
-									'value' => '100',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'threshold' => '100',
 									'color' => 'AAAAAA'
 								]
 							]
@@ -1464,31 +1474,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
 				$this->assertEquals('Update column', $form_header);
 
-				// Check base color.
-				if (array_key_exists('Base color', $values)) {
-					foreach ($values['Base color'] as $selector => $color) {
-						$this->assertEquals('#'.$color, $this->query($selector)->one()->getAttribute('title'));
-					}
-
-					unset($values['Base color']);
-				}
-
 				// Check Thresholds values.
 				if (array_key_exists('Thresholds', $values)) {
-					foreach ($values['Thresholds'] as $tid => $threshold) {
-						$this->assertEquals($threshold['value'], $column_form->query('id:thresholds_'.$tid.'_threshold')
-								->one()->getAttribute('value')
-						);
-
-						// Check color in Thresholds.
-						if (array_key_exists('color', $threshold)) {
-							$color_hex = ($threshold['color'] !== '') ? '#'.$threshold['color'] : 'Use default';
-							$this->assertEquals($color_hex, $column_form->query('id:lbl_thresholds_'.$tid.'_color')
-									->one()->getAttribute('title')
-							);
-						}
+					foreach($values['Thresholds'] as &$threshold) {
+						unset($threshold['action'], $threshold['index']);
 					}
+					unset($threshold);
 
+					$this->getTreshholdTable()->checkValue($values['Thresholds']);
 					unset($values['Thresholds']);
 				}
 
@@ -1522,32 +1515,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$form->query($selector)->waitUntilClickable()->one()->click();
 			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
 
-			// Fill Base color.
-			if (array_key_exists('Base color', $values)) {
-				foreach ($values['Base color'] as $selector => $color) {
-					$column_form->query($selector)->one()->click();
-					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-				}
-
-				unset($values['Base color']);
-			}
-
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $values)) {
-				foreach ($values['Thresholds'] as $tid => $threshold) {
-					if ($action === 'create' || $column_form->query('xpath:.//table[@id="thresholds_table"]/tbody/tr')->all()->count() < 2) {
-						$column_form->query('button:Add')->one()->click();
-					}
-
-					$column_form->query('id:thresholds_'.$tid.'_threshold')->one()->fill($threshold['value']);
-
-					// Fill Threshold colors.
-					if (array_key_exists('color', $threshold)) {
-						$column_form->query('id:lbl_thresholds_'.$tid.'_color')->one()->click();
-						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
-					}
-				}
-
+				$this->getTreshholdTable()->fill($values['Thresholds']);
 				unset($values['Thresholds']);
 			}
 
@@ -1604,7 +1574,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1627,7 +1597,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '500'
+									'threshold' => '500'
 								]
 							]
 						]
@@ -1650,7 +1620,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1673,7 +1643,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '1500'
+									'threshold' => '1500'
 								]
 							]
 						]
@@ -1700,7 +1670,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '1500'
+									'threshold' => '1500'
 								]
 							]
 						],
@@ -1712,7 +1682,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						],
@@ -1724,7 +1694,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '500'
+									'threshold' => '500'
 								]
 							]
 						],
@@ -1736,7 +1706,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1821,7 +1791,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text'
+							'Item' => 'top_hosts_trap_text'
 						]
 					],
 					'text' => 'Text for text item'
@@ -1836,7 +1806,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'History data' => 'Trends'
 						]
 					],
@@ -1852,7 +1822,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Bar'
 						]
 					]
@@ -1867,7 +1837,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1882,7 +1852,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1897,10 +1867,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
@@ -1916,7 +1886,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log'
+							'Item' => 'top_hosts_trap_log'
 						]
 					],
 					'text' => 'Logs for text item'
@@ -1931,7 +1901,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'History data' => 'Trends'
 						]
 					],
@@ -1947,7 +1917,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Bar'
 						]
 					]
@@ -1962,7 +1932,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1977,7 +1947,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1992,10 +1962,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
@@ -2011,7 +1981,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char'
+							'Item' => 'top_hosts_trap_char'
 						]
 					],
 					'text' => 'characters_here'
@@ -2026,7 +1996,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'History data' => 'Trends'
 						]
 					],
@@ -2042,7 +2012,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Bar'
 						]
 					]
@@ -2057,7 +2027,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Indicators'
 						]
 					]
@@ -2072,7 +2042,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -2087,10 +2057,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
@@ -2135,5 +2105,16 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData() {
+		$dashboardids = CDBHelper::getColumn("SELECT * from dashboard where name LIKE 'top_host_%'", 'dashboardid');
+		CDataHelper::call('dashboard.delete', $dashboardids);
+
+		$itemids = CDBHelper::getColumn("SELECT * FROM items WHERE name LIKE 'top_hosts_trap%'", 'itemid');
+		CDataHelper::call('item.delete', $itemids);
 	}
 }

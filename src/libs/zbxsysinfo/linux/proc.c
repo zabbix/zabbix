@@ -502,7 +502,7 @@ static int	get_total_memory(zbx_uint64_t *total_memory)
 	return ret;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	0
 #define ZBX_RSS		1
@@ -880,7 +880,7 @@ out:
 #undef ZBX_VMPTE
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
 	DIR		*dir;
@@ -1485,7 +1485,7 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
 	char		*errmsg = NULL;
@@ -1749,7 +1749,7 @@ static proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 	return proc_data;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE(param)									\
 	do											\
@@ -1881,11 +1881,12 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != get_cmdline(f_cmd, &cmdline, &l))
 			continue;
 
-		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &prname);
+		if (SUCCEED != read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &prname))
+			continue;
 
 		if ('\0' != *cmdline)
 		{
-			char	*p, *pend, sep;
+			char	*p, *pend, sep = 0;
 			size_t	len;
 
 			if (NULL != (pend = strpbrk(cmdline, " :")))

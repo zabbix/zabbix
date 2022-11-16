@@ -1,0 +1,14 @@
+{
+	"manifest_version": 2.0,
+	"id": "dataover",
+	"type": "widget",
+	"name": "Data overview",
+	"namespace": "DataOver",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.dataover.view": {
+			"class": "WidgetView"
+		}
+	}
+}

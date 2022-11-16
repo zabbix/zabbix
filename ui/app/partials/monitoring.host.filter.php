@@ -116,9 +116,12 @@ $left_column = (new CFormList())
 			->setId('port_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $right_column = (new CFormList())
@@ -178,12 +181,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-hosts'))
+(new CTemplateTag('filter-monitoring-hosts'))
 	->setAttribute('data-template', 'monitoring.host.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))

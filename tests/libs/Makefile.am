@@ -14,4 +14,5 @@ SUBDIRS = \
 	zbxregexp \
 	zbxserver \
 	zbxtrends \
+	zbxtime \
 	zbxeval

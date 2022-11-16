@@ -19,7 +19,7 @@
 
 #include "proxypoller.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -34,10 +34,9 @@
 #include "zbxtime.h"
 #include "proxyconfigread/proxyconfig_read.h"
 #include "zbxversion.h"
+#include "zbx_rtc_constants.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
@@ -644,17 +643,18 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	zbx_ipc_async_socket_t		rtc;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(zbx_get_program_type_cb()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -711,7 +711,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;

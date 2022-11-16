@@ -22,7 +22,7 @@
 
 #include "config.h"
 #include "module.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;

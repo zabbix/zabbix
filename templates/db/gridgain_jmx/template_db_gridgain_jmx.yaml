@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:22Z'
+  date: '2022-11-01T16:08:32Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -865,7 +865,7 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed'
                   event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
+                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Perform Ack to close.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -928,8 +928,8 @@ zabbix_export:
                 -
                   uuid: 23cd9dbb498f4bb095ec8be1693fccf0
                   expression: 'last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m'
-                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted'
-                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime < 10m)'
+                  name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Host has been restarted'
+                  event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: {HOST.NAME} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
@@ -1008,7 +1008,7 @@ zabbix_export:
               uuid: 613114b7abb94bd5bbabc2d1d19975b7
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Communication reconnect rate'
               type: JMX
-              key: 'jmx["{#JMXOBJ}",ReconnectCount]'
+              key: 'jmx["{#JMXOBJ}",ReconnectCount, "maxNumbers"]'
               history: 7d
               value_type: FLOAT
               username: '{$GRIDGAIN.USER}'
@@ -1118,7 +1118,7 @@ zabbix_export:
                   name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed'
                   event_name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed (new version: {ITEM.VALUE})'
                   priority: WARNING
-                  description: 'GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.'
+                  description: 'The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Perform Ack to close.'
                   manual_close: 'YES'
                   tags:
                     -

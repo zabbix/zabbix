@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -352,9 +353,29 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$this->zbxTestTextPresent('URL');
+		$form = $this->query('id:triggers-prototype-form')->asForm()->one();
+		$entry_name = $form->getField('Menu entry name');
+
+		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
+			$this->assertEquals($value, $entry_name->getAttribute($attribute));
+		}
+
+		// Check hintbox.
+		$this->query('class:icon-help-hint')->one()->click();
+		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
+
+		// Assert text.
+		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
+				$hint->getText()
+		);
+
+		// Press Escape key to close hintbox.
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
+		$hint->waitUntilNotVisible();
+
+		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 2048);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -506,79 +527,80 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_sysUptime',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '1234567890',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '([)$^',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_generalCheck',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url_name' => 'Trigger context menu name for trigger URL.',
 					'url' => 'http://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
@@ -588,7 +610,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckUrl',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<5',
+					'url_name' => 'MyTrigger: menu name',
 					'url' => 'index.php'
 				]
 			],
@@ -630,10 +653,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0 or {#MACRO}',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0 or {#MACRO}',
 					'constructor' => [
 						'text' => ['A or B', 'A', 'B'],
-						'elements' => ['expr_0_53', 'expr_58_65']
+						'elements' => ['expr_0_61', 'expr_66_73']
 					]
 				]
 			],
@@ -789,7 +812,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		if (isset($data['expression'])) {
 			switch ($data['expression']) {
 				case 'default':
-					$expression = 'last(/'.$this->host.'/'.$this->itemKey.',#1)=0';
+					$expression = 'last(/'.$this->host.'/'.$this->itemKey.'[{#KEY}],#1)=0';
 					$this->zbxTestInputType('expression', $expression);
 					break;
 				default:
@@ -805,6 +828,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['comments'])) {
 			$this->zbxTestInputType('comments', $data['comments']);
+		}
+
+		if (isset($data['url_name'])) {
+			$this->zbxTestInputType('url_name', $data['url_name']);
 		}
 
 		if (isset($data['url'])) {

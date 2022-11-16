@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::DATA_COLLECTION_HOST_ITEM_PROTOTYPE_LIST
@@ -151,7 +151,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
+	$item_menu = CMenuPopupHelper::getItemPrototype([
 		'itemid' => $item['itemid'],
 		'context' => $data['context'],
 		'backurl' => (new CUrl('disc_prototypes.php'))
@@ -226,7 +226,6 @@ $itemForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();

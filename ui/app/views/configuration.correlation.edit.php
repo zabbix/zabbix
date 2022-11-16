@@ -26,7 +26,7 @@
 $this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT));
 
@@ -37,7 +37,7 @@ $form = (new CForm())
 		->setArgument('action', 'correlation.condition.add')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);
@@ -141,22 +141,25 @@ $form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	)
-	->addRow(
-		_('Operations'),
-		(new CList())
-			->addItem(
-				(new CCheckBox('op_close_old'))
-					->setChecked($data['op_close_old'])
-					->setId('operation_0_type')
-					->setLabel(_('Close old events'))
-			)
-			->addItem(
-				(new CCheckBox('op_close_new'))
-					->setChecked($data['op_close_new'])
-					->setId('operation_1_type')
-					->setLabel(_('Close new event'))
-			)
-			->addClass(ZBX_STYLE_CHECKBOX_LIST)
+	->addRow(_('Operations'),
+		(new CCheckBoxList())
+			->setVertical(true)
+			->setOptions([
+				[
+					'label' => _('Close old events'),
+					'checked' => $data['op_close_old'],
+					'name' => 'op_close_old',
+					'id' => 'operation_0_type',
+					'value' => '1'
+				],
+				[
+					'label' => _('Close new event'),
+					'checked' => $data['op_close_new'],
+					'name' => 'op_close_new',
+					'id' => 'operation_1_type',
+					'value' => '1'
+				]
+			])
 	)
 	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())))
 	->addRow(_('Enabled'),
@@ -193,6 +196,6 @@ else {
 
 $form->addItem($correlation_tabs);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();
