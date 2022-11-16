@@ -1245,14 +1245,12 @@ form.is-loading {
     line-height: 1;
     vertical-align: middle;
     white-space: nowrap; }
-    .list-table.compact-view td [class*='icon-'] {
-      vertical-align: middle; }
-      .list-table.compact-view td [class*='icon-']::after {
-        margin: 0;
-        line-height: 14px;
-        top: 0; }
-      .list-table.compact-view td [class*='icon-']:last-of-type {
-        margin-right: 0; }
+    .list-table.compact-view td [class*='icon-']::after {
+      margin: 0;
+      line-height: 14px;
+      top: 0; }
+    .list-table.compact-view td [class*='icon-']:last-of-type {
+      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {

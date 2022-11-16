@@ -928,6 +928,31 @@ out:
 #undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
 #undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
+
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where "
+				"hypertable_name in (%s) and compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = DBselect("select hypertable_name from timescaledb_information.chunks where hypertable_name "
+			"in (%s) and is_compressed='t'", table_names);
+	}
+
+	if (NULL != DBfetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+
+	return ret;
+}
 #endif
 
 #define MAX_EXPRESSIONS	950
@@ -3639,4 +3664,7 @@ char	*zbx_db_get_schema_esc(void)
 
 	return name;
 }
+
+
+
 #endif
