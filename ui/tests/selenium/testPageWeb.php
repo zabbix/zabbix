@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageWeb extends CWebTest {
 
+	private static $hostid;
+
 	public function prepareHostWebData() {
 		CDataHelper::call('hostgroup.create', [
 			[
@@ -54,12 +56,12 @@ class testPageWeb extends CWebTest {
 				'port' => '10050'
 			]
 		]);
-		$hostid = CDataHelper::getIds('host');
+		self::$hostid = CDataHelper::getIds('host');
 
 		CDataHelper::call('httptest.create', [
 			[
 				'name' => 'Web scenario 1 step',
-				'hostid' => $hostid['WebData Host'],
+				'hostid' => self::$hostid['WebData Host'],
 				'steps' => [
 					[
 						'name' => 'Homepage',
@@ -70,7 +72,7 @@ class testPageWeb extends CWebTest {
 			],
 			[
 				'name' => 'Web scenario 2 step',
-				'hostid' => $hostid['WebData Host'],
+				'hostid' => self::$hostid['WebData Host'],
 				'steps' => [
 					[
 						'name' => 'Homepage1',
@@ -86,7 +88,7 @@ class testPageWeb extends CWebTest {
 			],
 			[
 				'name' => 'Web scenario 3 step',
-				'hostid' => $hostid['WebData Host'],
+				'hostid' => self::$hostid['WebData Host'],
 				'steps' => [
 					[
 						'name' => 'Homepage1',
@@ -111,7 +113,7 @@ class testPageWeb extends CWebTest {
 	use TableTrait;
 
 	/**
-	 * Function checks the layout of Web page.
+	 * Function which checks the layout of Web page.
 	 */
 	public function testPageWeb_CheckLayout() {
 		// Logins directly into required page.
@@ -255,13 +257,14 @@ class testPageWeb extends CWebTest {
 					'expected' => [
 						'Web ZBX6663 Second',
 						'Web ZBX6663',
-						'Web scenario 3 step',
-						'Web scenario 2 step',
-						'Web scenario 1 step',
 						'testInheritanceWeb4',
 						'testInheritanceWeb3',
 						'testInheritanceWeb2',
-						'testInheritanceWeb1'
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			]
@@ -274,27 +277,18 @@ class testPageWeb extends CWebTest {
 	 * @dataProvider getDisabledServiceData
 	 */
 	public function testPageWeb_CheckDisabledWebServices($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'Simple form test host');
-		$row->query('link', 'Simple form test host')->one()->click();
-		$this->page->waitUntilReady();
-		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-		$popup->query('xpath://a[@aria-label="Host, Configuration"]')->one()->click();
-
-		// Check if Host is opened.
-		$this->page->assertTitle('Configuration of hosts');
-		$this->page->assertHeader('Hosts');
-		$this->query('xpath://a[normalize-space()="Web scenarios"]')->one()->click();
-		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
+		// Direct link to web services
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host']);
 
 		// Turn off web services
+		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 		$this->query('xpath://button[normalize-space()="Disable"]')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
 		$this->assertTableDataColumn($data['expected']);
 
 		// Turn back on disbabled web services.
-		$this->page->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D=40001');
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host']);
 		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 		$this->query('xpath://button[normalize-space()="Enable"]')->one()->click();
 		$this->page->acceptAlert();
@@ -347,7 +341,7 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
-	 * Function that checks sorting by Name column.
+	 * Function which checks sorting by Name column.
 	 */
 	public function testPageWeb_CheckSorting() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
@@ -367,7 +361,7 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
-	 * Test that title field disappears while Kioskmode is active.
+	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
 	public function testPageWeb_CheckKioskMode() {
 		$this->page->login()->open('zabbix.php?action=web.view');
@@ -380,7 +374,7 @@ class testPageWeb extends CWebTest {
 	}
 
 	/**
-	 * Test that links to web service names are working properly and directed to needed form.
+	 * Function which checks links to "Details of Web scenario".
 	 */
 	public function testPageWeb_CheckLinks() {
 		$this->page->login()->open('zabbix.php?action=web.view');
