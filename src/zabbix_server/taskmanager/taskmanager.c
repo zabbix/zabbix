@@ -1364,6 +1364,10 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
+			case ZBX_TM_PROXYDATA:
+				if (ZBX_TM_PROXYDATA == type)
+					goto proxydata;
+
 				task_data_type = tm_get_task_data_type(taskid);
 
 				if (ZBX_TM_DATA_TYPE_RANK_EVENT != task_data_type)
@@ -1388,7 +1392,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 						break;
 					}
 				}
-			case ZBX_TM_PROXYDATA:
+proxydata:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
