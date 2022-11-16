@@ -37,7 +37,7 @@ class CUser extends CApiService {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
-	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
+	protected $sortColumns = ['userid', 'username'];
 
 	/**
 	 * Get users data.
@@ -51,7 +51,7 @@ class CUser extends CApiService {
 	 * @param bool   $options['count']			output only count of objects in result. (result returned in property 'rowscount')
 	 * @param string $options['pattern']		filter by Host name containing only give pattern
 	 * @param int    $options['limit']			output will be limited to given number
-	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username', 'alias']
+	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username']
 	 * @param string $options['sortorder']		output will be sorted in given order ['ASC', 'DESC']
 	 *
 	 * @return array
@@ -178,20 +178,6 @@ class CUser extends CApiService {
 
 		$userIds = [];
 
-		if (is_array($options['output']) && in_array('alias', $options['output'])) {
-			$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/output/alias'));
-			$options['output'][] = 'username';
-		}
-
-		if ($options['sortfield']) {
-			$options['sortfield'] = (array) $options['sortfield'];
-			if (in_array('alias', $options['sortfield'])) {
-				$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/sortfield/alias'));
-				$options['sortfield'][] = 'username';
-				$options['sortfield'] = array_unique(array_diff($options['sortfield'], ['alias']));
-			}
-		}
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -292,9 +278,8 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username'], ['alias']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => ['username'], 'fields' => [
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
@@ -331,24 +316,11 @@ class CUser extends CApiService {
 			$users = [$users];
 		}
 
-		foreach ($users as $index => $user) {
-			if (array_key_exists('alias', $user)) {
-				if (array_key_exists('username', $user)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'alias'));
-				}
-
-				$users[$index]['username'] = $user['alias'];
-			}
-		}
-
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		foreach ($users as $i => &$user) {
-			if (array_key_exists('alias', $user)) {
-				unset($user['alias']);
-			}
 
 			if (array_key_exists('user_medias', $user)) {
 				if (array_key_exists('medias', $user)) {
@@ -446,10 +418,9 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias'], ['username']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['username']], 'fields' => [
 			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
@@ -486,16 +457,6 @@ class CUser extends CApiService {
 			$users = [$users];
 		}
 
-		foreach ($users as $index => $user) {
-			if (array_key_exists('alias', $user)) {
-				if (array_key_exists('username', $user)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'alias'));
-				}
-
-				$users[$index]['username'] = $user['alias'];
-			}
-		}
-
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -530,9 +491,6 @@ class CUser extends CApiService {
 		$check_roleids = [];
 
 		foreach ($users as $i => &$user) {
-			if (array_key_exists('alias', $user)) {
-				unset($user['alias']);
-			}
 
 			if (array_key_exists('user_medias', $user)) {
 				if (array_key_exists('medias', $user)) {
@@ -1429,25 +1387,12 @@ class CUser extends CApiService {
 	public function login(array $user) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'userData' =>	['type' => API_FLAG]
 		]];
 
-		if (array_key_exists('user', $user)) {
-			if (array_key_exists('username', $user)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parameter "%1$s" is deprecated.', 'user'));
-			}
-
-			$user['username'] = $user['user'];
-		}
-
 		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (array_key_exists('user', $user)) {
-			unset($user['user']);
 		}
 
 		$group_to_auth_map = [
