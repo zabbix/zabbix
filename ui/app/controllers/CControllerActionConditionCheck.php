@@ -80,8 +80,8 @@ class CControllerActionConditionCheck extends CController {
 	 * @throws JsonException
 	 */
 	protected function doAction(): void {
-		$value = $this->hasInput('value') ? $this->getInput('value') : '';
-		$value2 = $this->hasInput('value2') ? $this->getInput('value2') : '';
+		$value = $this->getInput('value', '');
+		$value2 = $this->getInput('value2', '');
 		$condition = [
 			'conditiontype' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),

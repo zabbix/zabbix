@@ -73,9 +73,7 @@ class CControllerPopupActionOperationGet extends CController {
 
 	protected function doAction(): void {
 		$data = [];
-		$data['esc_period'] = $this->hasInput('esc_period')
-			? $this->getInput('esc_period')
-			: DB::getDefault('actions', 'esc_period');
+		$data['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
 
 		$eventsource = $this->getInput('eventsource');
 		$new_operation = $this->hasInput('new_operation') ? $this->getInput('new_operation')['operation'] : null;

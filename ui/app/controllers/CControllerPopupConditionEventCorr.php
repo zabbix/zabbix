@@ -62,11 +62,11 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		$is_valid = $validator->validate([
 			'type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
-			'tag' => $this->hasInput('tag') ? $this->getInput('tag') : '',
-			'oldtag' => $this->hasInput('oldtag') ? $this->getInput('oldtag') : '',
-			'newtag' => $this->hasInput('newtag') ? $this->getInput('newtag') : '',
-			'value' => $this->hasInput('value') ? $this->getInput('value') : '',
-			'groupids' => $this->hasInput('groupids') ? $this->getInput('groupids') : ''
+			'tag' => $this->getInput('tag', ''),
+			'oldtag' => $this->getInput('oldtag', ''),
+			'newtag' => $this->getInput('newtag', ''),
+			'value' => $this->getInput('value', ''),
+			'groupids' => $this->getInput('groupids', '')
 		]);
 
 		if (!$is_valid) {
@@ -86,13 +86,13 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'inputs' => [
 				'type' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
-				'tag' => $this->hasInput('tag') ? $this->getInput('tag') : '',
-				'oldtag' => $this->hasInput('oldtag') ? $this->getInput('oldtag') : '',
-				'newtag' => $this->hasInput('newtag') ? $this->getInput('newtag') : '',
-				'value' => $this->hasInput('value') ? $this->getInput('value') : '',
+				'tag' => $this->getInput('tag', ''),
+				'oldtag' => $this->getInput('oldtag', ''),
+				'newtag' => $this->getInput('newtag', ''),
+				'value' => $this->getInput('value', ''),
 				'groupids' => $this->hasInput('groupids') ? $this->getGroupId() : '',
 				'operator_name' => $this->getLabelByOperator(),
-				'row_index' => $this->hasInput('row_index') ? $this->getInput('row_index') : 0
+				'row_index' => $this->getInput('row_index', 0)
 			]
 		];
 	}
@@ -128,7 +128,7 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		return [
 			'title' => _('New condition'),
 			'command' => '',
-			'row_index' => $this->hasInput('row_index')? $this->getInput('row_index') : 0,
+			'row_index' => $this->getInput('row_index', 0),
 			'message' => '',
 			'errors' => null,
 			'action' => $this->getAction(),

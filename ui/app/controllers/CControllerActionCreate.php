@@ -93,7 +93,7 @@ class CControllerActionCreate extends CController {
 			'eventsource' => $eventsource,
 			'operations' => $this->getInput('operations', []),
 			'recovery_operations' => $this->getInput('recovery_operations', []),
-			'update_operations' => $this->getInput('update_operations', []),
+			'update_operations' => $this->getInput('update_operations', [])
 		];
 
 		$filter = [
