@@ -248,7 +248,7 @@ window.action_edit_popup = new class {
 				let element = {...input, name: input.name[index], value: input.value[index]};
 				let has_row = this._checkConditionRow(element);
 
-				const result = [has_row.some(it => it === true)]
+				const result = [has_row.some(element => element === true)]
 				if (result[0] === true) {
 					return;
 				}
@@ -269,7 +269,7 @@ window.action_edit_popup = new class {
 		}
 		else {
 			let has_row = this._checkConditionRow(input);
-			const result = [has_row.some(it => it === true)];
+			const result = [has_row.some(element => element === true)];
 
 			if (result[0] === true) {
 				return;
@@ -478,7 +478,7 @@ window.action_edit_popup = new class {
 			.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 
 		document.querySelector('#evaltype').onchange = function() {
-			this.show_formula = +document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
+			this.show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 
 			document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 			document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';

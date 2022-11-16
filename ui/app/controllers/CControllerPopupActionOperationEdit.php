@@ -84,7 +84,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		$operation = $this->getInput('data', []) + $this->defaultOperationObject();
 		$eventsource = (int) $this->getInput('eventsource');
 		$recovery = (int) $this->getInput('recovery');
-		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery)['options'];
+		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery);
 
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
@@ -307,11 +307,6 @@ class CControllerPopupActionOperationEdit extends CController {
 			}
 		}
 
-		return [
-			'options' => $operation_type_options,
-			'selected' => ($operation['opcommand']['scriptid'] == 0)
-				? 'cmd['.$operation['operationtype'].']'
-				: 'scriptid['.$operation['opcommand']['scriptid'].']'
-		];
+		return  $operation_type_options;
 	}
 }

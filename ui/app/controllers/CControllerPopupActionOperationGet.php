@@ -92,7 +92,7 @@ class CControllerPopupActionOperationGet extends CController {
 				$data['operations'] = $this->getInput('update_operations', []);
 			}
 
-			if ((int) $new_operation['row_index'] !== -1) {
+			if ($new_operation['row_index'] != -1) {
 				$data['operations'][(int) $new_operation['row_index']] = $new_operation;
 			}
 			else {

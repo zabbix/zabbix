@@ -39,7 +39,7 @@ window.operation_popup = new class {
 		this._processTypeOfCalculation();
 
 		if (data.opconditions.length > 0) {
-			data?.opconditions.map((row, index) => {
+			data.opconditions.map((row, index) => {
 				this._createOperationConditionsRow(row, index);
 			})
 		}
@@ -409,7 +409,7 @@ window.operation_popup = new class {
 	_createOperationConditionsRow(input, row_index) {
 		let has_row = this._checkConditionRow(input);
 
-		const result = [has_row.some(it => it === true)]
+		const result = [has_row.some(element => element === true)]
 		if (result[0] === true) {
 			return;
 		}
