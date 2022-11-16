@@ -81,7 +81,7 @@ zbx_selfmon_collector_t;
 
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
-static const int		(*config_forks)[ZBX_PROCESS_TYPE_COUNT];
+static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
 #	define LOCK_SM		zbx_mutex_lock(sm_lock)
 #	define UNLOCK_SM	zbx_mutex_unlock(sm_lock)
@@ -98,7 +98,7 @@ extern unsigned char	program_type;
  *          for self-monitoring collector                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_selfmon_collector(process_forks_t forks, char **error)
+int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **error)
 {
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
@@ -107,12 +107,12 @@ int	zbx_init_selfmon_collector(process_forks_t forks, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	config_forks = forks;
+	get_config_forks_cb = get_config_forks;
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
-		sz_total += sz_process[proc_type] = sizeof(zbx_stat_process_t) * *config_forks[proc_type];
+		sz_total += sz_process[proc_type] = sizeof(zbx_stat_process_t) * get_config_forks_cb(proc_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)sz_total);
 
@@ -148,7 +148,7 @@ int	zbx_init_selfmon_collector(process_forks_t forks, char **error)
 		collector->process[proc_type] = (zbx_stat_process_t *)p; p += sz_process[proc_type];
 		memset(collector->process[proc_type], 0, sz_process[proc_type]);
 
-		process_forks = *config_forks[proc_type];
+		process_forks = get_config_forks_cb(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_IDLE;
@@ -293,7 +293,7 @@ static void	collect_selfmon_stats(void)
 
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 	{
-		process_forks = *config_forks[proc_type];
+		process_forks = get_config_forks_cb(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			process = &collector->process[proc_type][proc_num];
@@ -350,7 +350,7 @@ void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	process_forks = *config_forks[proc_type];
+	process_forks = get_config_forks_cb(proc_type);
 
 	switch (aggr_func)
 	{
@@ -453,7 +453,7 @@ int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 				total_max = 0, counter_max_busy = 0, counter_max_idle = 0,
 				total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
 
-		stats[proc_type].count = *config_forks[proc_type];
+		stats[proc_type].count = get_config_forks_cb(proc_type);
 
 		for (proc_num = 0; proc_num < stats[proc_type].count; proc_num++)
 		{

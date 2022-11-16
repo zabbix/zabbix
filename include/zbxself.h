@@ -48,11 +48,9 @@ zbx_process_info_t;
 #include "zbxcommon.h"
 #include "zbxthreads.h"
 
-typedef const int (*process_forks_t)[ZBX_PROCESS_TYPE_COUNT];
-
 ZBX_THREAD_ENTRY(zbx_selfmon_thread, args);
 
-int	zbx_init_selfmon_collector(process_forks_t process_forks, char **error);
+int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **error);
 void	zbx_free_selfmon_collector(void);
 void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char state);
 void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,

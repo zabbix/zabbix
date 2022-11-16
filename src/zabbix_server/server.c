@@ -230,6 +230,14 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	1 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
 };
 
+static int	get_config_forks(unsigned char process_type)
+{
+	if (ZBX_PROCESS_TYPE_COUNT > process_type)
+		return CONFIG_FORKS[process_type];
+
+	return 0;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
@@ -1312,7 +1320,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_init_selfmon_collector((process_forks_t)&CONFIG_FORKS, &error))
+	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
