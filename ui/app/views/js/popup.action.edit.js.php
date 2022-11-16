@@ -326,7 +326,7 @@ window.action_edit_popup = new class {
 					result.push(input.conditiontype === conditiontype);
 				}
 				else {
-					if (input.value2) {
+					if (input.value2 !== '') {
 						result.push(
 							input.conditiontype === conditiontype && input.value === value && input.value2 === value2
 						)

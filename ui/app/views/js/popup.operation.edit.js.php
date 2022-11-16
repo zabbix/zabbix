@@ -38,7 +38,7 @@ window.operation_popup = new class {
 		this._loadViews();
 		this._processTypeOfCalculation();
 
-		if (data?.opconditions) {
+		if (data.opconditions.length > 0) {
 			data?.opconditions.map((row, index) => {
 				this._createOperationConditionsRow(row, index);
 			})

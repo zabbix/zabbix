@@ -82,35 +82,21 @@ class CControllerPopupActionOperationGet extends CController {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
 				$data['recovery'] = ACTION_OPERATION;
 				$data['operations'] = $this->getInput('operations', []);
-
-				if ((int) $new_operation['row_index'] !== -1) {
-					$data['operations'][(int) $new_operation['row_index']] = $new_operation;
-				}
-				else {
-					$data['operations'][] = $new_operation;
-				}
 			}
 			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['recovery'] = ACTION_RECOVERY_OPERATION;
 				$data['operations'] = $this->getInput('recovery_operations', []);
-
-				if ((int) $new_operation['row_index'] !== -1) {
-					$data['operations'][(int) $new_operation['row_index']] = $new_operation;
-				}
-				else {
-					$data['operations'][] = $new_operation;
-				}
 			}
 			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['recovery'] = ACTION_UPDATE_OPERATION;
 				$data['operations'] = $this->getInput('update_operations', []);
+			}
 
-				if ((int) $new_operation['row_index'] !== -1) {
-					$data['operations'][$new_operation['row_index']] = $new_operation;
-				}
-				else {
-					$data['operations'][] = $new_operation;
-				}
+			if ((int) $new_operation['row_index'] !== -1) {
+				$data['operations'][(int) $new_operation['row_index']] = $new_operation;
+			}
+			else {
+				$data['operations'][] = $new_operation;
 			}
 		}
 		else {
