@@ -206,7 +206,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			$value_clock = $in_closing ? time() : $problem['clock'];
 		}
 
-		$value_str = getEventStatusString($in_closing, $problem, $data['tasks']);
+		$value_str = getEventStatusString($in_closing, $problem);
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
 

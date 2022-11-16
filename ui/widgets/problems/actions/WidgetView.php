@@ -165,8 +165,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$data['tasks'] = getActiveTasksByEventAcknowledges($data['problems'] + $symptom_data['problems']);
-
 		if ($this->fields_values['show_tags']) {
 			$data['tags'] = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
 				$this->fields_values['show_tags'], $this->fields_values['tags'], null,

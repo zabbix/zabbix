@@ -258,18 +258,17 @@ function make_event_details(array $event, array $allowed) {
 }
 
 /**
- * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges and tasks.
+ * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges task ID.
  *
  * @param bool   $in_closing                         True if problem is in CLOSING state.
  * @param array  $event                              Event data.
  * @param array  $event['acknowledges']              List of event acknowledges.
  * @param int    $event['acknowledges'][]['action']  Event action type.
  * @param string $event['acknowledges'][]['taskid']  Task ID.
- * @param array  $tasks                              List of tasks.
  *
  * @return string
  */
-function getEventStatusString(bool $in_closing, array $event, array $tasks): string {
+function getEventStatusString(bool $in_closing, array $event): string {
 	if ($event['r_eventid'] != 0) {
 		$value_str = _('RESOLVED');
 	}
@@ -286,8 +285,8 @@ function getEventStatusString(bool $in_closing, array $event, array $tasks): str
 						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
 						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
 
-					// If currently is symptom.
-					if (array_key_exists($acknowledge['taskid'], $tasks)) {
+					// If currently is symptom and there is an active task.
+					if ($acknowledge['taskid'] != 0) {
 						$in_updating = true;
 						break;
 					}
@@ -299,52 +298,6 @@ function getEventStatusString(bool $in_closing, array $event, array $tasks): str
 	}
 
 	return $value_str;
-}
-
-/**
- * Get current event tasks depeding on its acknowledges.
- *
- * @param array  $events                                List of events.
- * @param array  $events[]['acknowledges']              List of event acknowledges.
- * @param int    $events[]['acknowledges'][]['action']  Acknowledge action type.
- * @param string $events[]['acknowledges'][]['taskid']  Acknowledge task ID.
- *
- * @return array
- */
-function getActiveTasksByEventAcknowledges(array $events): array {
-	$tasks = [];
-	$taskids = [];
-
-	foreach ($events as $event) {
-		foreach ($event['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) ==
-					ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
-					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
-					ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
-				$taskids[] = $acknowledge['taskid'];
-			}
-		}
-	}
-
-	if ($taskids) {
-		$tasks = API::Task()->get([
-			'output' => ['status'],
-			'taskids' => $taskids,
-			'preservekeys' => true
-		]);
-
-		if ($tasks) {
-			$tasks = array_filter($tasks, function($value) {
-				return ($value['status'] == ZBX_TM_STATUS_NEW || $value['status'] == ZBX_TM_STATUS_INPROGRESS);
-			});
-		}
-		else {
-			// If user has no permissions to execute this API, it will return boolean, but function must return array.
-			$tasks = [];
-		}
-	}
-
-	return $tasks;
 }
 
 /**
@@ -435,8 +388,6 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'preservekeys' => true
 	]);
 
-	$tasks = getActiveTasksByEventAcknowledges($events);
-
 	foreach ($events as $event) {
 		$duration = ($event['r_eventid'] != 0)
 			? zbx_date2age($event['clock'], $event['r_clock'])
@@ -461,7 +412,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			$value_clock = $in_closing ? time() : $event['clock'];
 		}
 
-		$value_str = getEventStatusString($in_closing, $event, $tasks);
+		$value_str = getEventStatusString($in_closing, $event);
 		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
 

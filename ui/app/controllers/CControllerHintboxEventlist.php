@@ -170,8 +170,6 @@ class CControllerHintboxEventlist extends CController {
 		}
 		unset($problem);
 
-		$tasks = getActiveTasksByEventAcknowledges($problems);
-
 		$this->setResponse(new CControllerResponseData([
 			'trigger' => array_intersect_key($trigger, array_flip(['triggerid', 'comments', 'url'])),
 			'problems' => $problems,
@@ -187,8 +185,7 @@ class CControllerHintboxEventlist extends CController {
 			'allowed_close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 				&& $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 			),
-			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
-			'tasks' => $tasks
+			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 		]));
 	}
 }

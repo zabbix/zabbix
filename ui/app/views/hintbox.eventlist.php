@@ -111,7 +111,7 @@ if (array_key_exists('problems', $data)) {
 			$value_clock = $in_closing ? time() : $problem['clock'];
 		}
 
-		$value_str = getEventStatusString($in_closing, $problem, $data['tasks']);
+		$value_str = getEventStatusString($in_closing, $problem);
 
 		$cell_clock = ($problem['clock'] >= $today)
 			? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])

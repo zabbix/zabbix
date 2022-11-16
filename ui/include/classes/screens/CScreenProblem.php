@@ -948,8 +948,6 @@ class CScreenProblem extends CScreenBase {
 			? OPERATIONAL_DATA_SHOW_NONE
 			: $this->data['filter']['show_opdata'];
 
-		$tasks = getActiveTasksByEventAcknowledges($data['problems'] + $symptom_data['problems']);
-
 		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
@@ -1110,7 +1108,6 @@ class CScreenProblem extends CScreenBase {
 			$data += [
 				'today' => strtotime('today'),
 				'allowed' => $allowed,
-				'tasks' => $tasks,
 				'dependencies' => $dependencies,
 				'show_opdata' =>  $show_opdata,
 				'show_three_columns' => $do_causes_have_symptoms,
@@ -1187,7 +1184,7 @@ class CScreenProblem extends CScreenBase {
 				$in_closing = hasEventCloseAction($problem['acknowledges']);
 			}
 
-			$value_str = getEventStatusString($in_closing, $problem, $tasks);
+			$value_str = getEventStatusString($in_closing, $problem);
 
 			$hosts = [];
 			foreach ($triggers_hosts[$trigger['triggerid']] as $trigger_host) {
@@ -1276,7 +1273,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data                                  Additional data to build the table.
 	 * @param array      $data['triggers']                      List of triggers.
 	 * @param int        $data['today']                         Timestamp of today's date.
-	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
 	 * @param array      $data['users']                         List of users.
 	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['dependencies']                  List of trigger dependencies.
@@ -1352,7 +1348,7 @@ class CScreenProblem extends CScreenBase {
 				$value_clock = $in_closing ? time() : $problem['clock'];
 			}
 
-			$value_str = getEventStatusString($in_closing, $problem, $data['tasks']);
+			$value_str = getEventStatusString($in_closing, $problem);
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 			$cell_status = new CSpan($value_str);
 
