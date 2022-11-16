@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-11-16T21:11:27Z'
   template_groups:
     -
