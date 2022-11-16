@@ -205,7 +205,7 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
 	unsigned int		scope = 0;
-	int			res = FAIL;
+	int			ret = FAIL;
 
 	if (FAIL == zbx_json_open(data, &jp) ||
 			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SECTION, buf, sizeof(buf), NULL))
@@ -221,23 +221,23 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
 	{
 		scope = 1 << ZBX_DIAGINFO_VALUECACHE;
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_LLD))
 	{
 		scope = 1 << ZBX_DIAGINFO_LLD;
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 	else if (0 == strcmp(buf, ZBX_DIAG_ALERTING))
 	{
 		scope = 1 << ZBX_DIAGINFO_ALERTING;
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 
 	if (0 != scope)
 		zbx_diag_log_info(scope, result);
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
