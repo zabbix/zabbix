@@ -64,8 +64,8 @@ class CControllerActionConditionCheck extends CController {
 		$validator = new CActionCondValidator();
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
-			'value' => $this->getInput('value', null),
-			'value2' => $this->getInput('value2', null),
+			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
+			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
 			'operator' => $this->getInput('operator')
 		]);
 
