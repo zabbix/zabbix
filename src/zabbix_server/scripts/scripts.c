@@ -33,6 +33,7 @@
 #include "zbxsysinfo.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)

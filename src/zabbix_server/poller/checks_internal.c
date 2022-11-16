@@ -31,6 +31,7 @@
 #include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {

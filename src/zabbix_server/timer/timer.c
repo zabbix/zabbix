@@ -30,7 +30,8 @@
 
 #define ZBX_EVENT_BATCH_SIZE	1000
 
-extern unsigned char			program_type;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct

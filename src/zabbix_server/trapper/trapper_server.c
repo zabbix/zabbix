@@ -30,6 +30,8 @@
 #include "zbxnum.h"
 #include "proxyconfigread/proxyconfig_read.h"
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	zbx_user_t		user;

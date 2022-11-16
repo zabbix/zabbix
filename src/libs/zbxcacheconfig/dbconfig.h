@@ -953,6 +953,7 @@ ZBX_DC_CONFIG;
 extern int	sync_in_progress;
 extern ZBX_DC_CONFIG	*config;
 extern zbx_rwlock_t	config_lock;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)

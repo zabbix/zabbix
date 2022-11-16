@@ -31,6 +31,8 @@
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 static void	dump_item(const DC_ITEM *item)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "key:'%s'", item->key);

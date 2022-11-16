@@ -42,6 +42,8 @@ zbx_vmcheck_t;
 #	define VMCHECK_FUNC(func)	NULL
 #endif
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"alarms.get", VMCHECK_FUNC(check_vcenter_alarms_get)},

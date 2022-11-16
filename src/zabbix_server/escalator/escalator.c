@@ -34,6 +34,8 @@
 #include "zbxexpr.h"
 #include "zbxdbwrap.h"
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
 #define ZBX_ESCALATION_SOURCE_DEFAULT	0

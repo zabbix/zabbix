@@ -47,6 +47,7 @@
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
 extern unsigned char			program_type;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* report manager data */
 typedef struct

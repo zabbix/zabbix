@@ -22,6 +22,8 @@
 
 #include "zbxthreads.h"
 
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 ZBX_THREAD_ENTRY(alert_manager_thread, args);
 
 #endif

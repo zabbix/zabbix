@@ -30,6 +30,7 @@
 #include "zbxsysinfo.h"
 
 extern unsigned char			program_type;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_PREPROCESSING_MANAGER_DELAY	1
 

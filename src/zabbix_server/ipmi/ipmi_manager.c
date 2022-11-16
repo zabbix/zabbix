@@ -38,7 +38,8 @@
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
-extern unsigned char			program_type;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_IPMI_POLLER_INIT		0
 #define ZBX_IPMI_POLLER_READY		1

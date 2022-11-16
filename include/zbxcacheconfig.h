@@ -66,7 +66,6 @@ zbx_session_type_t;
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
-extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
