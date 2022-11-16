@@ -76,8 +76,8 @@ window.operation_popup = new class {
 	_changeView(operation_type) {
 		let type = parseInt(operation_type.replace(/\D/g, ''));
 
-		if ((/\b(scriptid)\b/g).test(operation_type)){
-			type = <?= 	OPERATION_TYPE_COMMAND ?>;
+		if ((/\b(scriptid)\b/g).test(operation_type)) {
+			type = <?= OPERATION_TYPE_COMMAND ?>;
 		}
 
 		switch (type) {

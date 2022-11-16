@@ -126,15 +126,15 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 
 		foreach ($data['operations'] as $operation) {
-			if ((int) $operation['recovery'] === ACTION_OPERATION) {
+			if ($operation['recovery'] == ACTION_OPERATION) {
 				$data['action']['operations'][] = $operation;
 				sortOperations($eventsource, $data['action']['operations']);
 			}
-			if ((int) $operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+			elseif ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['action']['recovery_operations'][] = $operation;
 				CArrayHelper::sort($data['action']['recovery_operations'], ['operationtype']);
 			}
-			if ((int) $operation['recovery'] == ACTION_UPDATE_OPERATION) {
+			elseif ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['action']['update_operations'][] = $operation;
 				CArrayHelper::sort($data['action']['update_operations'], ['operationtype']);
 			}
