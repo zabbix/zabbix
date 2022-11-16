@@ -564,13 +564,13 @@ function getActionOperationData(array $actions, int $type) {
 /**
  *  Formats the HTML representation of action operation values according to action operation type.
  *
- * @param array $actions            Array of actions.
- * @param int   $type               Operations recovery type.
+ * @param array $operations         Array of operations.
+ * @param int   $eventsource        Actions eventsource.
  * @param array $operation_values   All processed data of operation values.
  *
  * @return array Returns an array of actions operation descriptions.
  */
-function getActionOperationDescriptions(array $actions, int $type, array $operation_values): array {
+function getActionOperationDescriptions(array $operations, int $eventsource, array $operation_values): array {
 	$result = [];
 
 	$mediatypes = array_key_exists('mediatypes', $operation_values) ? $operation_values['mediatypes'] : [];
@@ -580,289 +580,180 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 	$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
 	$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
 
-	foreach ($actions as $i => $action) {
-		$eventsource = $action['eventsource'];
+	foreach ($operations as $i => $operation) {
+		switch ($operation['operationtype']) {
+			case OPERATION_TYPE_MESSAGE:
+				$mediatype = _('all media');
+				$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-		if ($type == ACTION_OPERATION) {
-			foreach ($action['operations'] as $j => $operation) {
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$mediatype = _('all media');
-						$mediatypeid = $operation['opmessage']['mediatypeid'];
+				if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
+					$mediatype = $mediatypes[$mediatypeid]['name'];
+				}
 
-						if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
-							$mediatype = $mediatypes[$mediatypeid]['name'];
+				if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+					$user_names_list = [];
+
+					foreach ($operation['opmessage_usr'] as $user) {
+						if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
+							$user_names_list[] = $operation_values['users']['fullnames'][$user['userid']];
 						}
+					}
 
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							$user_names_list = [];
+					order_result($user_names_list);
 
-							foreach ($operation['opmessage_usr'] as $user) {
-								if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
-									$user_names_list[] = $operation_values['users']['fullnames'][$user['userid']];
-								}
-							}
+					$result[$i][] = bold(_('Send message to users').': ');
+					$result[$i][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $mediatype];
+					$result[$i][] = BR();
+				}
 
-							order_result($user_names_list);
+				if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+					$user_groups_list = [];
 
-							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $mediatype];
-							$result[$i][$j][] = BR();
+					foreach ($operation['opmessage_grp'] as $userGroup) {
+						if (isset($user_groups[$userGroup['usrgrpid']])) {
+							$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
 						}
+					}
 
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							$user_groups_list = [];
+					order_result($user_groups_list);
 
-							foreach ($operation['opmessage_grp'] as $userGroup) {
-								if (isset($user_groups[$userGroup['usrgrpid']])) {
-									$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
-								}
-							}
+					$result[$i][] = bold(_('Send message to user groups').': ');
+					$result[$i][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $mediatype];
+					$result[$i][] = BR();
+				}
+				break;
 
-							order_result($user_groups_list);
+			case OPERATION_TYPE_COMMAND:
+				$scriptid = $operation['opcommand']['scriptid'];
 
-							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $mediatype];
-							$result[$i][$j][] = BR();
-						}
-						break;
+				if ($eventsource == EVENT_SOURCE_SERVICE) {
+					$result[$i][] = [
+						bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+						BR()
+					];
 
-					case OPERATION_TYPE_COMMAND:
-						$scriptid = $operation['opcommand']['scriptid'];
+					break;
+				}
 
-						if ($eventsource == EVENT_SOURCE_SERVICE) {
-							$result[$i][$j][] = [
-								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+				if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+					$host_list = [];
+
+					foreach ($operation['opcommand_hst'] as $host) {
+						if ($host['hostid'] == 0) {
+							$result[$i][] = [
+								bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
 								BR()
 							];
-
-							break;
 						}
-
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							$host_list = [];
-
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] == 0) {
-									$result[$i][$j][] = [
-										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
-										BR()
-									];
-								}
-								elseif (isset($hosts[$host['hostid']])) {
-									$host_list[] = $hosts[$host['hostid']]['name'];
-								}
-							}
-
-							if ($host_list) {
-								order_result($host_list);
-
-								$result[$i][$j][] = bold(
-									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
-								);
-								$result[$i][$j][] = [implode(', ', $host_list), BR()];
-							}
+						elseif (isset($hosts[$host['hostid']])) {
+							$host_list[] = $hosts[$host['hostid']]['name'];
 						}
+					}
 
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							$host_group_list = [];
+					if ($host_list) {
+						order_result($host_list);
 
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								if (isset($host_groups[$host_group['groupid']])) {
-									$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
-								}
-							}
-
-							order_result($host_group_list);
-
-							$result[$i][$j][] = bold(
-								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
-							);
-							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
-						}
-						break;
-
-					case OPERATION_TYPE_HOST_ADD:
-						$result[$i][$j][] = [bold(_('Add host')), BR()];
-						break;
-
-					case OPERATION_TYPE_HOST_REMOVE:
-						$result[$i][$j][] = [bold(_('Remove host')), BR()];
-						break;
-
-					case OPERATION_TYPE_HOST_ENABLE:
-						$result[$i][$j][] = [bold(_('Enable host')), BR()];
-						break;
-
-					case OPERATION_TYPE_HOST_DISABLE:
-						$result[$i][$j][] = [bold(_('Disable host')), BR()];
-						break;
-
-					case OPERATION_TYPE_GROUP_ADD:
-					case OPERATION_TYPE_GROUP_REMOVE:
-						$host_group_list = [];
-
-						foreach ($operation['opgroup'] as $groupid) {
-							if (array_key_exists($groupid['groupid'], $host_groups)) {
-								$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
-							}
-						}
-
-						order_result($host_group_list);
-
-						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
-							$result[$i][$j][] = bold(_('Add to host groups').': ');
-						}
-						else {
-							$result[$i][$j][] = bold(_('Remove from host groups').': ');
-						}
-
-						$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
-						break;
-
-					case OPERATION_TYPE_TEMPLATE_ADD:
-					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						$template_list = [];
-
-						foreach ($operation['optemplate'] as $templateid) {
-							if (array_key_exists($templateid['templateid'], $templates)) {
-								$template_list[] = $templates[$templateid['templateid']]['name'];
-							}
-						}
-
-						order_result($template_list);
-
-						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
-							$result[$i][$j][] = bold(_('Link to templates').': ');
-						}
-						else {
-							$result[$i][$j][] = bold(_('Unlink from templates').': ');
-						}
-
-						$result[$i][$j][] = [implode(', ', $template_list), BR()];
-						break;
-
-					case OPERATION_TYPE_HOST_INVENTORY:
-						$host_inventory_modes = getHostInventoryModes();
-						$result[$i][$j][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
-						$result[$i][$j][] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']], BR()];
-						break;
+						$result[$i][] = bold(
+							_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+						);
+						$result[$i][] = [implode(', ', $host_list), BR()];
+					}
 				}
-			}
-		}
-		else {
-			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
-				? 'recovery_operations'
-				: 'update_operations';
 
-			foreach ($action[$operations_key] as $j => $operation) {
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$mediatype = _('all media');
-						$mediatypeid = $operation['opmessage']['mediatypeid'];
+				if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+					$host_group_list = [];
 
-						if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
-							$mediatype = $mediatypes[$mediatypeid]['name'];
+					foreach ($operation['opcommand_grp'] as $host_group) {
+						if (isset($host_groups[$host_group['groupid']])) {
+							$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
 						}
+					}
 
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							$user_names_list = [];
+					order_result($host_group_list);
 
-							foreach ($operation['opmessage_usr'] as $user) {
-								if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
-									$user_names_list[] =$operation_values['users']['fullnames'][$user['userid']];
-								}
-							}
-
-							order_result($user_names_list);
-
-							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $mediatype];
-							$result[$i][$j][] = BR();
-						}
-
-
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							$user_groups_list = [];
-
-							foreach ($operation['opmessage_grp'] as $userGroup) {
-								if (isset($user_groups[$userGroup['usrgrpid']])) {
-									$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
-								}
-							}
-
-							order_result($user_groups_list);
-
-							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $mediatype];
-							$result[$i][$j][] = BR();
-						}
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						$scriptid = $operation['opcommand']['scriptid'];
-
-						if ($eventsource == EVENT_SOURCE_SERVICE) {
-							$result[$i][$j][] = [
-								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])), BR()
-							];
-
-							break;
-						}
-
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							$host_list = [];
-
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] == 0) {
-									$result[$i][$j][] = [
-										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])), BR()
-									];
-								}
-								elseif (isset($hosts[$host['hostid']])) {
-									$host_list[] = $hosts[$host['hostid']]['name'];
-								}
-							}
-
-							if ($host_list) {
-								order_result($host_list);
-
-								$result[$i][$j][] = bold(
-									_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
-								);
-								$result[$i][$j][] = [implode(', ', $host_list), BR()];
-							}
-						}
-
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							$host_group_list = [];
-
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								if (isset($host_groups[$host_group['groupid']])) {
-									$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
-								}
-							}
-
-							order_result($host_group_list);
-
-							$result[$i][$j][] = bold(
-								_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
-							);
-							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
-						}
-						break;
-
-					case OPERATION_TYPE_RECOVERY_MESSAGE:
-					case OPERATION_TYPE_UPDATE_MESSAGE:
-						$result[$i][$j][] = bold(_('Notify all involved'));
-						break;
+					$result[$i][] = bold(
+						_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+					);
+					$result[$i][] = [implode(', ', $host_group_list), BR()];
 				}
-			}
+				break;
+
+			case OPERATION_TYPE_HOST_ADD:
+				$result[$i][] = [bold(_('Add host')), BR()];
+				break;
+
+			case OPERATION_TYPE_HOST_REMOVE:
+				$result[$i][] = [bold(_('Remove host')), BR()];
+				break;
+
+			case OPERATION_TYPE_HOST_ENABLE:
+				$result[$i][] = [bold(_('Enable host')), BR()];
+				break;
+
+			case OPERATION_TYPE_HOST_DISABLE:
+				$result[$i][] = [bold(_('Disable host')), BR()];
+				break;
+
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				$host_group_list = [];
+
+				foreach ($operation['opgroup'] as $groupid) {
+					if (array_key_exists($groupid['groupid'], $host_groups)) {
+						$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
+					}
+				}
+
+				order_result($host_group_list);
+
+				if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
+					$result[$i][] = bold(_('Add to host groups').': ');
+				}
+				else {
+					$result[$i][] = bold(_('Remove from host groups').': ');
+				}
+
+				$result[$i][] = [implode(', ', $host_group_list), BR()];
+				break;
+
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				$template_list = [];
+
+				foreach ($operation['optemplate'] as $templateid) {
+					if (array_key_exists($templateid['templateid'], $templates)) {
+						$template_list[] = $templates[$templateid['templateid']]['name'];
+					}
+				}
+
+				order_result($template_list);
+
+				if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
+					$result[$i][] = bold(_('Link to templates').': ');
+				}
+				else {
+					$result[$i][] = bold(_('Unlink from templates').': ');
+				}
+
+				$result[$i][] = [implode(', ', $template_list), BR()];
+				break;
+
+			case OPERATION_TYPE_HOST_INVENTORY:
+				$host_inventory_modes = getHostInventoryModes();
+				$result[$i][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
+				$result[$i][] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']], BR()];
+				break;
+
+			case OPERATION_TYPE_RECOVERY_MESSAGE:
+			case OPERATION_TYPE_UPDATE_MESSAGE:
+				$result[$i][] = bold(_('Notify all involved'));
+				break;
 		}
 	}
 
 	return $result;
 }
+
 
 /**
  * Return an array of action conditions supported by the given event source.

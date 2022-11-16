@@ -28,11 +28,10 @@ $operations_table = (new CTable())
 	->setId('rec-table')
 	->setAttribute('style', 'width: 100%;');
 
-$operations = $data['action']['recovery_operations'];
 $operations_table->setHeader([_('Details'), _('Action')]);
 
 $i = 0;
-foreach ($operations as $operationid => $operation) {
+foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
 		continue;
 	}
@@ -63,8 +62,8 @@ foreach ($operations as $operationid => $operation) {
 	}
 
 	$details_column = getActionOperationDescriptions(
-		[$data['action']], ACTION_RECOVERY_OPERATION, $data['descriptions']
-	)[0][$i];
+		$data['action']['recovery_operations'], $data['eventsource'], $data['descriptions']
+	)[$i];
 
 	// Create hidden input fields for each row.
 	$hidden_data = array_filter($operation, function ($key) {

@@ -132,11 +132,9 @@ if ($data['actions']) {
 			$conditions[] = BR();
 		}
 
-		foreach ($action['operations'] as $oIdx => $operation) {
-			$operations[] = getActionOperationDescriptions(
-				$data['actions'], ACTION_OPERATION, $data['operation_descriptions']
-			)[$aIdx][$oIdx];
-		}
+		$operations[] = getActionOperationDescriptions(
+			$data['actions'][$aIdx]['operations'],$data['eventsource'], $data['operation_descriptions']
+		);
 
 		$status = ($action['status'] == ACTION_STATUS_ENABLED)
 			? (new CLink(_('Enabled')))
