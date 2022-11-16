@@ -2520,7 +2520,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2537,13 +2537,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2561,13 +2561,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2585,7 +2585,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
@@ -2597,7 +2597,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2614,13 +2614,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2638,13 +2638,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2662,13 +2662,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2686,7 +2686,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
@@ -2698,7 +2698,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2715,13 +2715,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2739,13 +2739,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2763,7 +2763,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'HAProxy by HTTP'

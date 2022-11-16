@@ -1419,7 +1419,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -1436,7 +1436,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'D-Link DES_DGS Switch by SNMP'

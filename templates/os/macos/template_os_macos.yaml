@@ -550,7 +550,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '24'
                   height: '5'
                   fields:
@@ -565,7 +565,7 @@ zabbix_export:
                         host: macOS
                         name: 'CPU load'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '24'
                   height: '5'

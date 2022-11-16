@@ -761,7 +761,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -776,7 +776,7 @@ zabbix_export:
                         host: 'OpenBSD by Zabbix agent'
                         name: 'CPU load'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -792,7 +792,7 @@ zabbix_export:
                         host: 'OpenBSD by Zabbix agent'
                         name: 'CPU utilization'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -808,7 +808,7 @@ zabbix_export:
                         host: 'OpenBSD by Zabbix agent'
                         name: 'Memory usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'

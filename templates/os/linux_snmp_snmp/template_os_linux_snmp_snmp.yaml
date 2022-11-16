@@ -2083,7 +2083,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2100,7 +2100,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
@@ -2112,7 +2112,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2127,7 +2127,7 @@ zabbix_export:
                         host: 'Linux by SNMP'
                         name: 'System load'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2145,13 +2145,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: 'CPU usage{#SINGLETON}'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2167,7 +2167,7 @@ zabbix_export:
                         host: 'Linux by SNMP'
                         name: 'Memory usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2184,7 +2184,7 @@ zabbix_export:
                         host: 'Linux by SNMP'
                         name: 'Swap usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2202,13 +2202,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: '{#FSNAME}: Disk space usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2226,13 +2226,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by SNMP'
                         name: '{#DEVNAME}: Disk read/write rates'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -2256,7 +2256,7 @@ zabbix_export:
                         host: 'Linux by SNMP'
                         key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '25'
                   width: '24'
                   height: '5'
@@ -2274,7 +2274,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by SNMP'

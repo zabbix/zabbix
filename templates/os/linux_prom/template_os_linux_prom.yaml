@@ -2388,7 +2388,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2405,7 +2405,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'
@@ -2417,7 +2417,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2432,7 +2432,7 @@ zabbix_export:
                         host: 'Linux by Prom'
                         name: 'System load'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2448,7 +2448,7 @@ zabbix_export:
                         host: 'Linux by Prom'
                         name: 'CPU usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2464,7 +2464,7 @@ zabbix_export:
                         host: 'Linux by Prom'
                         name: 'Memory usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2481,7 +2481,7 @@ zabbix_export:
                         host: 'Linux by Prom'
                         name: 'Swap usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2499,13 +2499,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'
                         name: '{#FSNAME}: Disk space usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2523,13 +2523,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk read/write rates'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -2547,13 +2547,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk average waiting time'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '25'
                   width: '24'
                   height: '5'
@@ -2571,13 +2571,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk utilization and queue'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '30'
                   width: '24'
                   height: '5'
@@ -2595,7 +2595,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Linux by Prom'

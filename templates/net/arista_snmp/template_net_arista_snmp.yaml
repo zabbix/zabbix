@@ -2060,7 +2060,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2077,7 +2077,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Arista by SNMP'
@@ -2089,7 +2089,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2104,7 +2104,7 @@ zabbix_export:
                         host: 'Arista by SNMP'
                         name: 'CPU utilization'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2122,13 +2122,13 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Arista by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -2146,7 +2146,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: GRAPH_PROTOTYPE
+                      type: graphprototype
                       name: graphid
                       value:
                         host: 'Arista by SNMP'
