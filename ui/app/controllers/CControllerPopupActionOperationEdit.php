@@ -172,9 +172,9 @@ class CControllerPopupActionOperationEdit extends CController {
 			foreach ($users as $user) {
 				$fullnames[$user['userid']] = getUserFullname($user);
 				$user['name'] = $fullnames[$user['userid']];
-
 				$result['users'][] = $user;
 			}
+			CArrayHelper::sort($result['users'], ['name']);
 		}
 
 		if ($operation['opcommand_hst']) {
