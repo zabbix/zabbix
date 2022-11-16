@@ -3364,7 +3364,7 @@ form.is-loading {
   .list-table td .icon-ackn {
     margin: 0 4px -3px 0; }
   .list-table td .tag, .list-table td .btn-tag {
-    margin-top: -2px; }
+    margin-top: -1px; }
   .list-table td .checkbox-radio + label span {
     margin-top: 1px; }
   .list-table td .btn-widget-expand, .list-table td .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table td .list-accordion-item-toggle,
@@ -3372,19 +3372,23 @@ form.is-loading {
   .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
   .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
     background-color: #000000;
-    position: relative;
-    top: -3px;
     width: 18px;
     height: 18px;
     background-position-x: -9px;
     background-position-y: -693px;
-    margin: 0;
+    margin: 7px 0 0 0;
     opacity: 1; }
   .list-table .second-col {
     padding-left: 0;
     padding-right: 0; }
+    .list-table .second-col .icon-action-symptom {
+      margin-right: 0; }
   .list-table .third-col {
+    padding-top: 0;
     padding-left: 2px; }
+    .list-table .third-col .icon-action-symptom {
+      margin-top: 6px;
+      margin-right: 0; }
   .list-table .symptom-limit-td {
     padding-top: 0;
     padding-bottom: 0; }

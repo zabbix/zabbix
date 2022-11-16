@@ -343,11 +343,12 @@ form {
 			margin: 0 4px -3px 0;
 		}
 
+		// Align tags and checkboxes. Tags are too low.
 		.tag {
-			margin-top: -2px;
+			margin-top: -1px;
 		}
 
-		// Align tags and checkboxes.
+		// Checkboxes are too high up.
 		.checkbox-radio {
 			& + label {
 				span {
@@ -359,13 +360,11 @@ form {
 		.btn-widget-expand,
 		.btn-widget-collapse {
 			background-color: $ui-bg-color;
-			position: relative;
-			top: -3px;
 			width: 18px;
 			height: 18px;
 			background-position-x: -9px;
 			background-position-y: -693px;
-			margin: 0;
+			margin: 7px 0 0 0;
 			opacity: 1;
 		}
 	}
@@ -373,12 +372,27 @@ form {
 	.second-col {
 		padding-left: 0;
 		padding-right: 0;
+
+		// Default icon marging makes the cell too wide.
+		.icon-action-symptom {
+			margin-right: 0;
+		}
 	}
 
 	.third-col {
+		// Padding top removed because it pushes the collapse and expand icon too far down.
+		padding-top: 0;
 		padding-left: 2px;
+
+		.icon-action-symptom {
+			// Align the symptom icon in the third column, since padding is removed.
+			margin-top: 6px;
+			// Default icon marging makes the cell too wide.
+			margin-right: 0;
+		}
 	}
 
+	// Make the row more narrow.
 	.symptom-limit-td {
 		padding-top: 0;
 		padding-bottom: 0;

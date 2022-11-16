@@ -156,15 +156,15 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			return false;
 		}
 
-		$eventids = $this->getInput('eventids');
+		$eventids = array_flip($this->getInput('eventids'));
 
 		if ($this->hasInput('cause_eventid')) {
-			$eventids[] = $this->getInput('cause_eventid');
+			$eventids[$this->getInput('cause_eventid')] = true;
 		}
 
 		$events = API::Event()->get([
 			'countOutput' => true,
-			'eventids' => $eventids,
+			'eventids' => array_keys($eventids),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER
 		]);
