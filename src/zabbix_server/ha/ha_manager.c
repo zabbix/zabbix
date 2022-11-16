@@ -1811,10 +1811,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
-	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* triple the initial database check delay in standby mode to avoid the same node becoming active */
 	/* immediately after switching to standby mode or crashing and being restarted                    */
 	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
-		nextcheck *= 2;
+		nextcheck *= 3;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
