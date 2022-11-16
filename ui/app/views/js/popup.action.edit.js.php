@@ -43,22 +43,16 @@ window.action_edit_popup = new class {
 		}
 
 		// Reload operation table when esc_period is changed.
-		let esc_period = document.querySelector('#esc_period');
+		const esc_period = document.querySelector('#esc_period');
 		if (esc_period) {
-			esc_period.addEventListener('change', (e) => {
-				this._loadOperationTable(e);
+			esc_period.addEventListener('change', () => {
+				this.recovery = <?= ACTION_OPERATION ?>;
+				this._loadOperationTable();
 			});
 		}
 	}
 
-	_loadOperationTable(e = null) {
-		if (e.type === 'change') {
-			this.recovery = <?= ACTION_OPERATION ?>;
-		}
-		else if (e && e.type !== 'change') {
-			this.recovery = parseInt(e.detail.operation.recovery);
-		}
-
+	_loadOperationTable(new_operation = {}) {
 		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.$operation_table = $('#recovery-operations-container');
 		}
@@ -67,11 +61,6 @@ window.action_edit_popup = new class {
 		}
 		else {
 			this.$operation_table = $('#operations-container');
-		}
-
-		let new_operation = {};
-		if (e) {
-			new_operation = e.detail;
 		}
 
 		const fields = getFormFields(this.form);
@@ -201,7 +190,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._loadOperationTable(e);
+			this._loadOperationTable(e.detail);
 		});
 	}
 
@@ -219,7 +208,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._loadOperationTable(e);
+			this._loadOperationTable(e.detail);
 		});
 	}
 

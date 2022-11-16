@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-$operations = $data['action']['operations'];
 $operations_table = (new CTable())
 	->setId('op-table')
 	->setAttribute('style', 'width: 100%;');
@@ -37,7 +36,7 @@ else {
 }
 
 $i = 0;
-foreach ($operations as $operation) {
+foreach ($data['action']['operations'] as $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 		continue;
 	}
