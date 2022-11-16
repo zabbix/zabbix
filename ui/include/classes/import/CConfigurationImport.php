@@ -1183,7 +1183,7 @@ class CConfigurationImport {
 						$item_prototypeid = $this->referencer->findItemidByUuid($item_prototype['uuid']);
 					}
 
-					if($item_prototypeid === null) {
+					if ($item_prototypeid === null) {
 						$item_prototypeid = $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 					}
 
@@ -1265,7 +1265,7 @@ class CConfigurationImport {
 						$host_prototypeid = $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid']);
 					}
 
-					if($host_prototypeid === null) {
+					if ($host_prototypeid === null) {
 						$host_prototypeid = $this->referencer->findHostPrototypeidByHost($hostid, $itemid,
 							$host_prototype['host']
 						);
@@ -1347,7 +1347,7 @@ class CConfigurationImport {
 						$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
 					}
 
-					if($host_prototypeid === null) {
+					if ($host_prototypeid === null) {
 						$triggerid = $this->referencer->findTriggeridByName($trigger['description'],
 							$trigger['expression'], $trigger['recovery_expression']
 						);
@@ -1434,7 +1434,7 @@ class CConfigurationImport {
 						$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
 					}
 
-					if($host_prototypeid === null) {
+					if ($host_prototypeid === null) {
 						$graphid = $this->referencer->findGraphidByName($hostid, $graph['name']);
 					}
 
