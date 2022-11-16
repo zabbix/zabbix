@@ -507,7 +507,6 @@ function getActionOperationData(array $actions, int $type) {
 	}
 
 	if (array_key_exists('userids', $data)) {
-
 		$result['users'] = API::User()->get([
 			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => $data['userids']

@@ -58,6 +58,10 @@ foreach ($operations as $operationid => $operation) {
 		}
 	}
 
+	if (array_key_exists('recovery', $data['descriptions'])) {
+		$data['descriptions'] = $data['descriptions']['recovery'];
+	}
+
 	$details_column = getActionOperationDescriptions(
 		[$data['action']], ACTION_RECOVERY_OPERATION, $data['descriptions']
 	)[0][$i];

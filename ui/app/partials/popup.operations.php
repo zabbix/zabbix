@@ -74,6 +74,10 @@ foreach ($operations as $operation) {
 			);
 	}
 
+	if (array_key_exists('operation', $data['descriptions'])) {
+		$data['descriptions'] = $data['descriptions']['operation'];
+	}
+
 	$details_column = getActionOperationDescriptions([$data['action']], ACTION_OPERATION, $data['descriptions'])[0][$i];
 
 	// Create hidden input fields for each row.
