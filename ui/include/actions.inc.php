@@ -395,10 +395,10 @@ function getActionOperationData(array $actions, int $type) {
 			foreach ($action['operations'] as $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
-						$data['media_typeid'] = $operation['opmessage']['mediatypeid'];
+						$data['mediatypeid'] = $operation['opmessage']['mediatypeid'];
 
-						if ($data['media_typeid'] != 0) {
-							$data['media_typeids'][$data['media_typeid']] = $data['media_typeid'];
+						if ($data['mediatypeid'] != 0) {
+							$data['mediatypeids'][$data['mediatypeid']] = $data['mediatypeid'];
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -456,10 +456,10 @@ function getActionOperationData(array $actions, int $type) {
 			foreach ($action[$operations_key] as $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
-						$media_typeid = $operation['opmessage']['mediatypeid'];
+						$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-						if ($media_typeid != 0) {
-							$data['media_typeids'][$media_typeid] = $media_typeid;
+						if ($mediatypeid != 0) {
+							$data['mediatypeids'][$mediatypeid] = $mediatypeid;
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -498,10 +498,10 @@ function getActionOperationData(array $actions, int $type) {
 	}
 
 	$result = [];
-	if (array_key_exists('media_typeids', $data)) {
-		$result['media_types'] = API::Mediatype()->get([
+	if (array_key_exists('mediatypeids', $data)) {
+		$result['mediatypes'] = API::Mediatype()->get([
 			'output' => ['name'],
-			'mediatypeids' => $data['media_typeids'],
+			'mediatypeids' => $data['mediatypeids'],
 			'preservekeys' => true
 		]);
 	}
@@ -563,7 +563,7 @@ function getActionOperationData(array $actions, int $type) {
 }
 
 /**
- *  returns the HTML representation of action operation values according to action operation type.
+ *  Formats the HTML representation of action operation values according to action operation type.
  *
  * @param array $actions            Array of actions.
  * @param int   $type               Operations recovery type.
@@ -574,14 +574,13 @@ function getActionOperationData(array $actions, int $type) {
 function getActionOperationDescriptions(array $actions, int $type, array $operation_values): array {
 	$result = [];
 
-	$media_types = array_key_exists('media_types', $operation_values) ? $operation_values['media_types'] : [];
+	$mediatypes = array_key_exists('mediatypes', $operation_values) ? $operation_values['mediatypes'] : [];
 	$user_groups = array_key_exists('user_groups', $operation_values) ? $operation_values['user_groups'] : [];
 	$hosts = array_key_exists('hosts', $operation_values) ? $operation_values['hosts'] : [];
 	$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
 	$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
 	$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
 
-	// Format the HTML output.
 	foreach ($actions as $i => $action) {
 		$eventsource = $action['eventsource'];
 
@@ -589,11 +588,11 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 			foreach ($action['operations'] as $j => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
-						$media_type = _('all media');
-						$media_typeid = $operation['opmessage']['mediatypeid'];
+						$mediatype = _('all media');
+						$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
-							$media_type = $media_types[$media_typeid]['name'];
+						if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
+							$mediatype = $mediatypes[$mediatypeid]['name'];
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -608,9 +607,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 							order_result($user_names_list);
 
 							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), SPACE, _('via'), SPACE,
-								$media_type
-							];
+							$result[$i][$j][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $mediatype];
 							$result[$i][$j][] = BR();
 						}
 
@@ -626,9 +623,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 							order_result($user_groups_list);
 
 							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), SPACE, _('via'), SPACE,
-								$media_type
-							];
+							$result[$i][$j][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $mediatype];
 							$result[$i][$j][] = BR();
 						}
 						break;
@@ -751,10 +746,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 					case OPERATION_TYPE_HOST_INVENTORY:
 						$host_inventory_modes = getHostInventoryModes();
 						$result[$i][$j][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
-						$result[$i][$j][] = [
-							$host_inventory_modes[$operation['opinventory']['inventory_mode']],
-							BR()
-						];
+						$result[$i][$j][] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']], BR()];
 						break;
 				}
 			}
@@ -767,11 +759,11 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 			foreach ($action[$operations_key] as $j => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
-						$media_type = _('all media');
-						$media_typeid = $operation['opmessage']['mediatypeid'];
+						$mediatype = _('all media');
+						$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
-							$media_type = $media_types[$media_typeid]['name'];
+						if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
+							$mediatype = $mediatypes[$mediatypeid]['name'];
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -786,9 +778,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 							order_result($user_names_list);
 
 							$result[$i][$j][] = bold(_('Send message to users').': ');
-							$result[$i][$j][] = [implode(', ', $user_names_list), SPACE, _('via'), SPACE,
-								$media_type
-							];
+							$result[$i][$j][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $mediatype];
 							$result[$i][$j][] = BR();
 						}
 
@@ -805,9 +795,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 							order_result($user_groups_list);
 
 							$result[$i][$j][] = bold(_('Send message to user groups').': ');
-							$result[$i][$j][] = [implode(', ', $user_groups_list), SPACE, _('via'), SPACE,
-								$media_type
-							];
+							$result[$i][$j][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $mediatype];
 							$result[$i][$j][] = BR();
 						}
 						break;
@@ -817,8 +805,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 
 						if ($eventsource == EVENT_SOURCE_SERVICE) {
 							$result[$i][$j][] = [
-								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
-								BR()
+								bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])), BR()
 							];
 
 							break;
@@ -830,8 +817,7 @@ function getActionOperationDescriptions(array $actions, int $type, array $operat
 							foreach ($operation['opcommand_hst'] as $host) {
 								if ($host['hostid'] == 0) {
 									$result[$i][$j][] = [
-										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
-										BR()
+										bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])), BR()
 									];
 								}
 								elseif (isset($hosts[$host['hostid']])) {

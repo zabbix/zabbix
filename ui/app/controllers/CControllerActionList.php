@@ -122,6 +122,11 @@ class CControllerActionList extends CController {
 
 		order_result($data['actions'], $sort_field, $sort_order);
 
+		foreach ($data['actions'] as &$action) {
+			order_result($action['filter']['conditions'], 'conditiontype');
+		}
+		unset ($action);
+
 		// pager
 		if (hasRequest('page')) {
 			$page_num = getRequest('page');
