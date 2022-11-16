@@ -124,7 +124,7 @@ if ($operation['opmessage_grp']) {
 }
 
 $form_grid->addItem([
-	(new CLabel(_('Add to user groups'),'operation-message-user-groups'))
+	(new CLabel(_('Send to user groups'),'operation-message-user-groups'))
 		->setId('user-groups-label'),
 	(new CFormField(
 		(new CMultiSelect([
@@ -139,7 +139,6 @@ $form_grid->addItem([
 					'dstfrm' => $form->getName(),
 					'dstfld1'=> 'operation_opmessage_grp__usrgrpid',
 					'editable' => '1',
-					'disableids' => array_column($multiselect_values_usergroups, 'id')
 				]
 			]
 		]))
@@ -175,7 +174,6 @@ $form_grid->addItem([
 					'dstfrm' => $form->getName(),
 					'dstfld1'=> 'operation_opmessage_usr__userid',
 					'editable' => '1',
-					'disableids' => array_column($multiselect_values_users, 'id')
 				]
 			]
 		]))
@@ -318,7 +316,6 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 								'dstfrm' => 'action.edit',
 								'dstfld1' => 'operation_opcommand_hst__hostid',
 								'editable' => '1',
-								'disableids' => array_column($multiselect_values_host, 'id')
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -337,7 +334,6 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 								'dstfrm' => 'action.edit',
 								'dstfld1' => 'operation_opcommand_grp__groupid',
 								'editable' => '1',
-								'disableids' => array_column($multiselect_values_host_grp, 'id')
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -376,7 +372,6 @@ $form_grid->addItem([
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_opgroup__groupid',
 					'editable' => '1',
-					'disableids' => array_column($multiselect_values_ophost_grp, 'id')
 				]
 			]
 		]))
@@ -410,7 +405,6 @@ $form_grid->addItem([
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_optemplate__templateid',
 					'editable' => '1',
-					'disableids' => array_column($multiselect_values_optemplate, 'id')
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

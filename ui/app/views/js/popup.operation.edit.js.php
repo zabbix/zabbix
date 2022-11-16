@@ -151,28 +151,39 @@ window.operation_popup = new class {
 		document.getElementById('operation-attr-hostgroups').style.display='';
 		document.getElementById('operation-attr-hostgroups-label').style.display='';
 
-		const $hostgroup_ms = $('#operation_opgroup__groupid');
 		this._enableFormFields(['operation-attr-hostgroups']);
-
-		$hostgroup_ms.on('change', () => {
-			$hostgroup_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[opgroup]["]')].map((input) => input.value)
-			);
+		this._updateHostGroupMs();
+		this.hostgroup_ms.on('change', () => {
+			this._updateHostGroupMs();
 		});
+	}
+
+	_updateHostGroupMs() {
+		this.hostgroup_ms = $('#operation_opgroup__groupid');
+
+		this.hostgroup_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[opgroup]["]')].map((input) => input.value)
+		);
 	}
 
 	_templateFields() {
 		document.getElementById('operation-attr-templates').style.display='';
 		document.getElementById('operation-attr-templates-label').style.display='';
 
-		const $template_ms = $('#operation_optemplate__templateid');
 		this._enableFormFields(['operation-attr-templates']);
+		this._updateTemplateMs();
 
-		$template_ms.on('change', () => {
-			$template_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[optemplate]["]')].map((input) => input.value)
-			);
+		this.template_ms.on('change', () => {
+			this._updateTemplateMs();
 		});
+	}
+
+	_updateTemplateMs() {
+		this.template_ms = $('#operation_optemplate__templateid');
+
+		this.template_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[optemplate]["]')].map((input) => input.value)
+		);
 	}
 
 	_removeAllFields() {
@@ -248,21 +259,32 @@ window.operation_popup = new class {
 		}
 
 		this._enableFormFields(this.fields);
+		this._updateUserGroupMs();
+		this._updateUserMs()
 
-		const $usergroup_ms = $('#operation_opmessage_grp__usrgrpid');
-		const $user_ms = $('#operation_opmessage_usr__userid');
-
-		$usergroup_ms.on('change', () => {
-			$usergroup_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[opmessage_grp]["]')].map((input) => input.value)
-			);
+		this.usergroup_ms.on('change', () => {
+			this._updateUserGroupMs();
 		});
 
-		$user_ms.on('change', () => {
-			$user_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[opmessage_usr]["]')].map((input) => input.value)
-			);
+		this.user_ms.on('change', () => {
+			this._updateUserMs();
 		});
+	}
+
+	_updateUserGroupMs() {
+		this.usergroup_ms = $('#operation_opmessage_grp__usrgrpid');
+
+		this.usergroup_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[opmessage_grp]["]')].map((input) => input.value)
+		);
+	}
+
+	_updateUserMs() {
+		this.user_ms = $('#operation_opmessage_usr__userid');
+
+		this.user_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[opmessage_usr]["]')].map((input) => input.value)
+		);
 	}
 
 	_enableFormFields(fields = []) {
@@ -328,21 +350,32 @@ window.operation_popup = new class {
 
 		this._enableFormFields(fields);
 
-		const $host_ms = $('#operation_opcommand_hst__hostid');
+		this._updateOperationHostMs();
+		this._updateOperationHostGroupMs();
 
-		$host_ms.on('change', () => {
-			$host_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[opcommand_hst]["]')].map((input) => input.value)
-			);
+		this.host_ms.on('change', () => {
+			this._updateOperationHostMs();
 		});
 
-		const $hostgroup_ms = $('#operation_opcommand_grp__groupid');
-
-		$hostgroup_ms.on('change', () => {
-			$hostgroup_ms.multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="operation[opcommand_grp]["]')].map((input) => input.value)
-			);
+		this.hostgroup_ms.on('change', () => {
+			this._updateOperationHostGroupMs();
 		});
+	}
+
+	_updateOperationHostMs() {
+		this.host_ms = $('#operation_opcommand_hst__hostid');
+
+		this.host_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[opcommand_hst]["]')].map((input) => input.value)
+		);
+	}
+
+	_updateOperationHostGroupMs() {
+		this.hostgroup_ms = $('#operation_opcommand_grp__groupid');
+
+		this.hostgroup_ms.multiSelect('setDisabledEntries',
+			[... this.form.querySelectorAll('[name^="operation[opcommand_grp]["]')].map((input) => input.value)
+		);
 	}
 
 	_createHiddenInput(name, value) {
