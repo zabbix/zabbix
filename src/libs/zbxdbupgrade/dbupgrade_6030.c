@@ -747,7 +747,7 @@ static int	DBpatch_6030079(void)
 	return DBcreate_index("widget_field", "widget_field_10", "value_actionid", 0);
 }
 
-static int	DBpatch_6030090(void)
+static int	DBpatch_6030080(void)
 {
 	const ZBX_FIELD	field = {"value_actionid", NULL, "actions", "actionid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
