@@ -435,7 +435,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HOST-RESOURCES-MIB by SNMP'
@@ -459,7 +459,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HOST-RESOURCES-MIB by SNMP'

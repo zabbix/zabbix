@@ -2045,7 +2045,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'MikroTik CCR1009-7G-1C-1S by SNMP'

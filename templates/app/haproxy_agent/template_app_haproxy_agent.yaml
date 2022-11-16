@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:33:23Z'
   template_groups:
     -
@@ -2518,7 +2518,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2542,7 +2542,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2566,7 +2566,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2595,7 +2595,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2619,7 +2619,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2643,7 +2643,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2667,7 +2667,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2696,7 +2696,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2720,7 +2720,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'
@@ -2744,7 +2744,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HAProxy by Zabbix agent'

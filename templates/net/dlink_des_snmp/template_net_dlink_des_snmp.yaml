@@ -1436,7 +1436,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'D-Link DES_DGS Switch by SNMP'

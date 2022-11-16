@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:33:12Z'
   template_groups:
     -
@@ -2592,7 +2592,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'CockroachDB by HTTP'
@@ -2685,7 +2685,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'CockroachDB by HTTP'
@@ -2757,7 +2757,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'CockroachDB by HTTP'
@@ -3197,7 +3197,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'CockroachDB by HTTP'
@@ -3221,7 +3221,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'CockroachDB by HTTP'

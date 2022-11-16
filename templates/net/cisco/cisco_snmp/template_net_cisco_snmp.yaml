@@ -1612,7 +1612,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco IOS by SNMP'
@@ -5038,7 +5038,7 @@ zabbix_export:
                       name: rows
                       value: '1'
                     -
-                      type: graphprototype
+                      type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP'
