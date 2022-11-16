@@ -154,6 +154,30 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+char	*CONFIG_SOURCE_IP = NULL;
+static const char	*get_source_ip(void)
+{
+	return CONFIG_SOURCE_IP;
+}
+
+char	*CONFIG_TMPDIR	= NULL;
+static const char	*get_tmpdir(void)
+{
+	return CONFIG_TMPDIR;
+}
+
+char	*CONFIG_FPING_LOCATION	= NULL;
+static const char	*get_fping_location(void)
+{
+	return CONFIG_FPING_LOCATION;
+}
+
+char	*CONFIG_FPING6_LOCATION		= NULL;
+static const char	*get_fping6_location(void)
+{
+	return CONFIG_FPING6_LOCATION;
+}
+
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -190,7 +214,6 @@ int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
@@ -227,9 +250,6 @@ int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-char	*CONFIG_TMPDIR			= NULL;
-char	*CONFIG_FPING_LOCATION		= NULL;
-char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -1014,7 +1034,14 @@ static void	zbx_on_exit(int ret)
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	static zbx_config_icmpping_t	config_icmpping;
+	static zbx_config_icmpping_t	config_icmpping = {
+		get_source_ip,
+		get_fping_location,
+#ifdef HAVE_IPV6
+		get_fping6_location,
+#endif
+		get_tmpdir};
+
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
 	char				ch;
 	int				opt_c = 0, opt_r = 0;
@@ -1100,13 +1127,6 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 
 	zbx_load_config(&t);
-
-	config_icmpping.source_ip = CONFIG_SOURCE_IP;
-	config_icmpping.fping_location = CONFIG_FPING_LOCATION;
-#ifdef HAVE_IPV6
-	config_icmpping.fping6_location = CONFIG_FPING6_LOCATION;
-#endif
-	config_icmpping.tmpdir = CONFIG_TMPDIR;
 
 	zbx_init_library_icmpping(&config_icmpping);
 
