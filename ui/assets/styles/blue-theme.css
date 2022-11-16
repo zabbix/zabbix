@@ -3515,7 +3515,8 @@ form.is-loading {
     .list-table.compact-view td .btn-widget-collapse,
     .list-table.compact-view td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
     .list-vertical-accordion .list-accordion-item-opened .list-table.compact-view td .list-accordion-item-toggle {
-      top: -2px; }
+      vertical-align: top;
+      margin: 0; }
   .list-table thead th {
     color: #768d99;
     height: 100%;
