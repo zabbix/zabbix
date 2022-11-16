@@ -310,7 +310,7 @@ class testPageWeb extends CWebTest {
 		// Open hosts Web scenarios tags.
 		$this->query('xpath://a[normalize-space()="Web scenario 3 step"]')->one()->click();
 		$this->query('xpath://a[@id="tab_tags-tab"]')->one()->click();
-		$form = $this->query('id:http-form')->asForm()->one();T
+		$form = $this->query('id:http-form')->asForm()->one();
 		$form->query('id:tags_0_tag')->one()->fill('Web service Tag');
 		$form->query('id:tags_0_value')->one()->fill('Tag value 1');
 		$this->query('xpath://button[@id="update"]')->one()->click();
