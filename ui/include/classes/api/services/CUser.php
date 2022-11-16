@@ -722,6 +722,7 @@ class CUser extends CApiService {
 	 * Check is it allowed to have 'password' field empty.
 	 *
 	 * @param array $users
+	 * @param int   $users[]['userid']          (optional)
 	 * @param array $users[]['passwd']          (optional)
 	 * @param array $users[]['usrgrps']         (optional)
 	 * @param int   $users[]['userdirectoryid]  (optional)
@@ -760,23 +761,18 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $user) {
-			// It is allowed to do not have password for provisioned user.
-			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid']) {
-				continue;
-			}
-
-			if (array_key_exists('passwd', $user)) {
-				$passwd = $user['passwd'];
-			}
-			elseif (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
-				$passwd = $db_users[$user['userid']]['passwd'];
+			if (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
+				$user += $db_users[$user['userid']];
 			}
 			else {
-				$passwd = '';
+				$user += ['userdirectoryid' => 0, 'passwd' => ''];
 			}
 
-			// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
-			if ($passwd === '' && self::hasInternalAuth($user, $db_usrgrps)) {
+			/**
+			 * Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL except provisioned users.
+			 * Only groups passed in 'usrgrps' property will be checked for frontend access.
+			 */
+			if ($user['passwd'] === '' && self::hasInternalAuth($user, $db_usrgrps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 				);
@@ -827,6 +823,7 @@ class CUser extends CApiService {
 	 * If user is without user gorups default frontend access method is checked.
 	 *
 	 * @param array  $user
+	 * @param int    $user['userdirectoryid']
 	 * @param array  $user['usrgrps']                     (optional)
 	 * @param string $user['usrgrps'][]['usrgrpid']
 	 * @param array  $db_usrgrps
@@ -835,6 +832,10 @@ class CUser extends CApiService {
 	 * @return bool
 	 */
 	private static function hasInternalAuth($user, $db_usrgrps) {
+		if ($user['userdirectoryid']) {
+			return false;
+		}
+
 		$system_gui_access =
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL
