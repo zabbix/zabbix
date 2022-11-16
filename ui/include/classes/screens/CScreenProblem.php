@@ -864,7 +864,7 @@ class CScreenProblem extends CScreenBase {
 
 					$problem['symptom_count'] = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
 						? API::Event()->get($options)
-						: API::Problem()->get($options);
+						: API::Problem()->get($options + ['recent' => true]);
 
 					if ($problem['symptom_count'] > 0) {
 						$do_causes_have_symptoms = true;

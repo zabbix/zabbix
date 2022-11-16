@@ -102,7 +102,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					$problem['symptom_count'] = ($this->fields_values['show'] == TRIGGERS_OPTION_ALL)
 						? API::Event()->get($options)
-						: API::Problem()->get($options);
+						: API::Problem()->get($options + ['recent' => true]);
 
 					if ($problem['symptom_count'] > 0) {
 						$data['show_three_columns'] = true;
