@@ -7739,7 +7739,7 @@ int	init_configuration_cache(char **error)
 	}
 
 	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
-			CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] * sizeof(zbx_vector_ptr_t));
+			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] * sizeof(zbx_vector_ptr_t));
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
 														\

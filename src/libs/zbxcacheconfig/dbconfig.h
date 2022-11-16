@@ -993,7 +993,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 
 /* number of slots to store maintenance update flags */
 #define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+		((((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER]) + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
