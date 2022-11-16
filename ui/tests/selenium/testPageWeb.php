@@ -25,24 +25,107 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts, httptest
+ *
+ * @onBefore prepareHostWebData
  */
 class testPageWeb extends CWebTest {
+
+	private static $hostid;
+
+	public function prepareHostWebData() {
+		CDataHelper::call('hostgroup.create', [
+			[
+				'name' => 'WebData HostGroup'
+			]
+		]);
+		$hostgrpid = CDataHelper::getIds('name');
+
+		CDataHelper::call('host.create', [
+			'host' => 'WebData Host',
+			'groups' => [
+				[
+					'groupid' => $hostgrpid['WebData HostGroup']
+				]
+			],
+			'interfaces' => [
+				'type'=> 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '192.168.3.217',
+				'dns' => '',
+				'port' => '10050'
+			]
+		]);
+		self::$hostid = CDataHelper::getIds('host');
+
+		CDataHelper::call('httptest.create', [
+			[
+				'name' => 'Web scenario 1 step',
+				'hostid' => self::$hostid['WebData Host'],
+				'steps' => [
+					[
+						'name' => 'Homepage',
+						'url' => 'http://zabbix.com',
+						'no' => 1
+					]
+				]
+			],
+			[
+				'name' => 'Web scenario 2 step',
+				'hostid' => self::$hostid['WebData Host'],
+				'steps' => [
+					[
+						'name' => 'Homepage1',
+						'url' => 'http://example.com',
+						'no' => 1
+					],
+					[
+						'name' => 'Homepage2',
+						'url' => 'http://example.com',
+						'no' => 2
+					]
+				]
+			],
+			[
+				'name' => 'Web scenario 3 step',
+				'hostid' => self::$hostid['WebData Host'],
+				'steps' => [
+					[
+						'name' => 'Homepage1',
+						'url' => 'http://example.com',
+						'no' => 1
+					],
+					[
+						'name' => 'Homepage2',
+						'url' => 'http://example.com',
+						'no' => 2
+					],
+					[
+						'name' => 'Homepage3',
+						'url' => 'http://example.com',
+						'no' => 3
+					]
+				]
+			]
+		]);
+	}
 
 	use TableTrait;
 
 	/**
-	* Function checks the layout of Web page.
-	*/
+	 * Function which checks the layout of Web page.
+	 */
 	public function testPageWeb_CheckLayout() {
 		// Logins directly into required page.
 		$this->page->login()->open('zabbix.php?action=web.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Checks Title, Header, and column names.
+		// Checks Title, Header, and column names, and filter labels.
 		$this->page->assertTitle('Web monitoring');
 		$this->page->assertHeader('Web monitoring');
 		$this->assertEquals(['Host', 'Name', 'Number of steps', 'Last check', 'Status', 'Tags'], $table->getHeadersText());
+		$this->assertEquals(['Host groups', 'Hosts', 'Tags'], $form->getLabels()->asText());$this->assertEquals(['Host', 'Name', 'Number of steps', 'Last check', 'Status', 'Tags'], $table->getHeadersText());
 
 		// Check if Apply and Reset button are clickable.
 		foreach(['Apply', 'Reset'] as $button) {
@@ -51,7 +134,9 @@ class testPageWeb extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
-			$this->assertTrue($this->query('xpath://li[@aria-expanded="'.$status.'"]')->one()->isPresent());
+			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
+				->one()->isPresent()
+			);
 			$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
 		}
 
@@ -66,43 +151,242 @@ class testPageWeb extends CWebTest {
 			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
-		// Check if Kioskmode button is clickable.
-		$this->assertTrue($this->query('class:header-controls')->one()->isClickable());
-
-		// Check if rows are correctly displayed.
+		// Check if the correct amount of rows is displayed.
 		$this->assertTableStats($table->getRows()->count());
+	}
 
-		// Checks if it's possible to order Host names and Web names by ascending and descending order.
-		foreach (['ASC', 'DESC'] as $order) {
-		$table->query('xpath://a[@href="zabbix.php?action=web.view&sort=hostname&sortorder='.$order.'"]')
-			->one()->click();
-			}
-		foreach (['ASC', 'DESC'] as $order) {
-		$table->query('xpath://a[@href="zabbix.php?action=web.view&sort=name&sortorder='.$order.'"]')
-			->one()->click();
+	public static function getHostContextMenuData() {
+		return [
+			[
+				[
+					'name' => 'Template inheritance test host',
+					'disabled' => ['Dashboards'],
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Dashboards',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
+						'Traceroute'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Simple form test host',
+					'disabled' => ['Dashboards'],
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Dashboards',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
+						'Traceroute'
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Host ZBX6663',
+					'disabled' => ['Dashboards'],
+					'titles' => [
+						'Inventory',
+						'Latest data',
+						'Problems',
+						'Graphs',
+						'Dashboards',
+						'Web',
+						'Configuration',
+						'Detect operating system',
+						'Ping',
+						'Script for Clone',
+						'Script for Delete',
+						'Script for Update',
+						'Traceroute'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function which checks Hosts context menu.
+	 *
+	 * @dataProvider getHostContextMenuData
+	 */
+	public function testPageWeb_CheckHostContextMenu($data) {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', $data['name']);
+		$row->query('link', $data['name'])->one()->click();
+		$this->page->waitUntilReady();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+		$this->assertTrue($popup->hasItems($data['titles']));
+		foreach ($data['disabled'] as $disabled) {
+			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
+				$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
 		}
 	}
 
 	/**
-	 * Test Web sorting by Name column.
+	 * Function which resets data provided to filter.
+	 */
+	private function resetFilter() {
+		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+	}
+
+	public static function getDisabledServiceData() {
+		return [
+			[
+				[
+					'expected' => [
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Function which checks if disabled web services aren't displayed.
+	 *
+	 * @dataProvider getDisabledServiceData
+	 */
+	public function testPageWeb_CheckDisabledWebServices($data) {
+		// Direct link to web services
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
+
+		// Turn off web services
+		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
+		$this->query('xpath://button[normalize-space()="Disable"]')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->assertTableDataColumn($data['expected']);
+
+		// Turn back on disbabled web services.
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
+		$this->query('xpath://input[@id="all_httptests"]')->one()->click();
+		$this->query('xpath://button[normalize-space()="Enable"]')->one()->click();
+		$this->page->acceptAlert();
+	}
+
+	/**
+	 * Function which checks if Web service tags are properly displayed.
+	 */
+	public function testPageWeb_CheckTags() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$tag_before = $row->getColumn('Tags')->getText();
+		$this->assertEquals(null, $tag_before);
+
+		// Create tag for web service
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
+
+		// Open hosts Web scenarios tags.
+		$this->query('xpath://a[normalize-space()="Web scenario 3 step"]')->one()->click();
+		$this->query('xpath://a[@id="tab_tags-tab"]')->one()->click();
+		$form = $this->query('id:http-form')->asForm()->one();
+		//$form->fill(['Name' => 'Web service Tag', 'Value' => 'Tag value 1'])->submit();
+		$form->query('id:tags_0_tag')->one()->fill('Web service Tag');
+		$form->query('id:tags_0_value')->one()->fill('Tag value 1');
+		$this->query('xpath://button[@id="update"]')->one()->click();
+
+		// Check if tag is properly displayed
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$tag_after = $row->getColumn('Tags')->getText();
+		$this->assertNotEquals($tag_before, $tag_after);
+		$this->resetFilter();
+	}
+
+	/**
+	 * Function which checks number of steps for web services displayed.
+	 */
+	public function testPageWeb_CheckWebServiceNumberOfSteps() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$count_before = $row->getColumn('Number of steps')->getText();
+		$this->assertEquals('3', $count_before);
+
+		// Direct link to web services
+		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'].'&context=host');
+
+		// Open hosts Web scenarios steps.
+		$this->query('xpath://a[normalize-space()="Web scenario 3 step"]')->one()->click();
+		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
+
+		// Add one more Web Scenarios step.
+		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
+		$this->page->waitUntilReady();
+		$form = $this->query('id:http_step')->asForm()->one();
+		$form->fill(['Name' => 'Step number 4']);
+		$form->query('id:url')->one()->fill('test.com');
+		$form->submit();
+		$this->query('xpath://button[@id="update"]')->one()->click();
+
+		// Check that successfully step was added without unexpected errors.
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Web scenario updated', $message->getTitle());
+
+		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$count_after = $row->getColumn('Number of steps')->getText();
+		$this->assertEquals('4', $count_after);
+		$this->resetFilter();
+	}
+
+	/**
+	 * Function which checks sorting by Name column.
 	 */
 	public function testPageWeb_CheckSorting() {
-		$this->page->login()->open('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table_names = $this->getTableResult('Name');
+		foreach (['Host', 'Name'] as $column_name) {
+			if ($column_name === 'Name') {
+				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
+			}
+			$column_values = $this->getTableResult($column_name);
 
-		foreach(['asc', 'desc'] as $sorting) {
-			$expected = ($sorting === 'desc') ? $table_names : array_reverse($table_names);
-			$values = [];
+			foreach(['asc', 'desc'] as $sorting) {
+				$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
+				$this->assertEquals($expected, $this->getTableResult($column_name));
+				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
+			}
 		}
-		foreach ($table->getRows() as $row) {
-			$values[] = $row->getColumn('Name')->getText();
-		}
-		$this->assertEquals($expected, $values);
 	}
 
 	/**
-	 * Test that title field disappears while Kioskmode is active.
+	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
 	public function testPageWeb_CheckKioskMode() {
 		$this->page->login()->open('zabbix.php?action=web.view');
@@ -111,17 +395,18 @@ class testPageWeb extends CWebTest {
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
 		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 	}
 
 	/**
-	 * Test that links to web service names are working properly and directed to needed form.
+	 * Function which checks links to "Details of Web scenario".
 	 */
 	public function testPageWeb_CheckLinks() {
 		$this->page->login()->open('zabbix.php?action=web.view');
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1');
-		$row->query('link', 'testFormWeb1')->one()->click();
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1')
+			->query('link', 'testFormWeb1')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertEquals('Details of web scenario: testFormWeb1', $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
+		$this->page->assertHeader('Details of web scenario: testFormWeb1');
 	}
 
 	public static function getCheckFilterData() {
@@ -132,16 +417,16 @@ class testPageWeb extends CWebTest {
 						'Host groups' => 'Zabbix servers'
 					],
 					'expected' => [
-							'Web ZBX6663 Second',
-							'Web ZBX6663',
-							'testInheritanceWeb4',
-							'testInheritanceWeb3',
-							'testInheritanceWeb2',
-							'testInheritanceWeb1',
-							'testFormWeb4',
-							'testFormWeb3',
-							'testFormWeb2',
-							'testFormWeb1'
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
@@ -151,10 +436,10 @@ class testPageWeb extends CWebTest {
 						'Hosts' => 'Simple form test host'
 					],
 					'expected' => [
-							'testFormWeb4',
-							'testFormWeb3',
-							'testFormWeb2',
-							'testFormWeb1'
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
@@ -165,8 +450,8 @@ class testPageWeb extends CWebTest {
 						'Hosts' => 'Host ZBX6663'
 					],
 					'expected' => [
-							'Web ZBX6663 Second',
-							'Web ZBX6663'
+						'Web ZBX6663 Second',
+						'Web ZBX6663'
 					]
 				]
 			],
@@ -180,19 +465,18 @@ class testPageWeb extends CWebTest {
 						]
 					],
 					'expected' => [
-							'Web ZBX6663 Second',
-							'Web ZBX6663',
-							'testFormWeb4',
-							'testFormWeb3',
-							'testFormWeb2',
-							'testFormWeb1'
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
 					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Zabbix servers',
 						'Hosts' => [
 							'Host ZBX6663',
 							'Simple form test host',
@@ -201,15 +485,76 @@ class testPageWeb extends CWebTest {
 					],
 					'expected' => [
 						'Web ZBX6663 Second',
-							'Web ZBX6663',
-							'testInheritanceWeb4',
-							'testInheritanceWeb3',
-							'testInheritanceWeb2',
-							'testInheritanceWeb1',
-							'testFormWeb4',
-							'testFormWeb3',
-							'testFormWeb2',
-							'testFormWeb1'
+						'Web ZBX6663',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => 'WebData HostGroup',
+						'Hosts' => ['WebData Host']
+					],
+					'expected' => [
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'Host ZBX6663',
+							'Simple form test host',
+							'Template inheritance test host',
+							'WebData Host'
+						]
+					],
+					'expected' => [
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => [
+							'WebData HostGroup',
+							'Zabbix servers'
+						],
+						'Hosts' => [
+							'Host ZBX6663',
+							'WebData Host'
+						]
+					],
+					'expected' => [
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step'
 					]
 				]
 			]
@@ -221,9 +566,9 @@ class testPageWeb extends CWebTest {
 	 */
 	public function testPageWeb_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['filter'])->submit();
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn($data['expected']);
+		$this->resetFilter();
 	}
 }
