@@ -129,6 +129,7 @@ class Group extends ScimApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function post(array $options): array {
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$this->validatePost($options);
 
 		$db_scim_groups = DB::select('scim_group', [
@@ -140,8 +141,6 @@ class Group extends ScimApiService {
 			$options['id'] = $db_scim_groups[0]['scim_groupid'];
 			return $this->put($options);
 		}
-
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 		[$scim_groupid] = DB::insert('scim_group', [['name' => $options['displayName']]]);
 
@@ -213,9 +212,9 @@ class Group extends ScimApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function put(array $options): array {
-		$this->validatePut($options);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+		$this->validatePut($options);
 
 		$db_scim_groups = DB::select('scim_group', [
 			'output' => ['name'],
@@ -310,6 +309,8 @@ class Group extends ScimApiService {
 	 * @return array                Returns schema parameter in the array if the deletion was successful.
 	 */
 	public function delete(array $options): array {
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
+
 		$this->validateDelete($options);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
@@ -318,8 +319,6 @@ class Group extends ScimApiService {
 		]);
 
 		DB::delete('scim_group', ['scim_groupid' => $options['id']]);
-
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 		foreach (array_column($db_scim_group_members, 'userid') as $userid) {
 			$this->updateProvisionedUsersGroup($userid, $userdirectoryid);

@@ -60,9 +60,9 @@ class User extends ScimApiService {
 	 * @throws Exception
 	 */
 	public function get(array $options = []): array {
-		$this->validateGet($options);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryId();
+		$this->validateGet($options);
 
 		if (array_key_exists('userName', $options)) {
 			$users = APIRPC::User()->get([
@@ -171,6 +171,8 @@ class User extends ScimApiService {
 	 * @return array                       Returns SCIM data that is necessary for POST request response.
 	 */
 	public function post(array $options): array {
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
+
 		$this->validatePost($options);
 
 		$db_users = APIRPC::User()->get([
@@ -178,7 +180,6 @@ class User extends ScimApiService {
 			'filter' => ['username' => $options['userName']]
 		]);
 
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 
 		$user_data['userdirectoryid'] = $userdirectoryid;
@@ -302,7 +303,7 @@ class User extends ScimApiService {
 			'output' => ['userid', 'userdirectoryid'],
 			'userids' => $options['id']
 		]);
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
 		if (!$db_user) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
@@ -358,7 +359,7 @@ class User extends ScimApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
 		$db_users = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],

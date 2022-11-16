@@ -87,6 +87,26 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 		if (!$userdirectoryid) {
 			throw new Exception(_('Unable to find SAML userdirectory.'));
 		}
+
+		return $userdirectoryid[0]['userdirectoryid'];
+	}
+
+	/**
+	 * Returns SAML userdirectoryid if 'scim_status' is enabled.
+	 *
+	 * @return string
+	 *
+	 */
+	public static function getSamlUserdirectoryidForScim(): string {
+		$userdirectoryid = API::getApiService('userdirectory')->get([
+			'output' => ['userdirectoryid', 'scim_status'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
+
+		if (!$userdirectoryid || $userdirectoryid[0]['scim_status'] == 0) {
+			throw new Exception(_('Unable to find SAML userdirectory.'));
+		}
+
 		return $userdirectoryid[0]['userdirectoryid'];
 	}
 
