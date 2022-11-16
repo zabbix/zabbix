@@ -49,7 +49,7 @@ void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
  * Parameters: json             - [OUT] the json data                         *
- *             zbx_config_comms - [IN] Zabbix server/proxy config             *
+ *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms)

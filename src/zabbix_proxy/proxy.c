@@ -1202,9 +1202,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
-							CONFIG_TIMEOUT};
-
+	zbx_config_comms_args_t			zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
+								CONFIG_TIMEOUT};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
