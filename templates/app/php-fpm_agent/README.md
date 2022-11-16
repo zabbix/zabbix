@@ -71,9 +71,9 @@ This template was tested on:
 
   ```curl -L 127.0.0.1/status```
 
-If you use another location of the status/ping page, don't forget to change the {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
+If you use another location of the status/ping page, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
 
-If you use an atypical location for the PHP-FPM status-page, don't forget to change the macro {$PHP_FPM.PORT}.
+If you use an atypical location for the PHP-FPM status-page, don't forget to change the macro `{$PHP_FPM.PORT}`.
 
 
 ## Zabbix configuration
@@ -87,8 +87,8 @@ No specific Zabbix configuration is required.
 |{$PHP_FPM.HOST} |<p>The Hostname or an IP address of the PHP-FPM status for a host or container.</p> |`localhost` |
 |{$PHP_FPM.PING.PAGE} |<p>The path of the PHP-FPM ping page.</p> |`ping` |
 |{$PHP_FPM.PING.REPLY} |<p>The expected reply to the ping.</p> |`pong` |
-|{$PHP_FPM.PORT} |<p>The port of PHP-FPM status host or container.</p> |`80` |
-|{$PHP_FPM.PROCESS_NAME} |<p>the name of the PHP-FPM process.</p> |`php-fpm` |
+|{$PHP_FPM.PORT} |<p>The port of the PHP-FPM status host or container.</p> |`80` |
+|{$PHP_FPM.PROCESS_NAME} |<p>The name of the PHP-FPM process.</p> |`php-fpm` |
 |{$PHP_FPM.QUEUE.WARN.MAX} |<p>The maximum percent of the PHP-FPM queue usage for a trigger expression.</p> |`80` |
 |{$PHP_FPM.STATUS.PAGE} |<p>The path of the PHP-FPM status page.</p> |`status` |
 
@@ -137,7 +137,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|PHP-FPM: Version has changed |<p>The PHP-FPM version has changed. `Ack` to close manually.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Version has changed |<p>The PHP-FPM version has changed. Acknowledge (Ack) to close manually.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Pool has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Queue utilization is high |<p>The queue for this pool has reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
 |PHP-FPM: Manager  changed |<p>The PHP-FPM manager has changed. `Ack` to close manually.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
