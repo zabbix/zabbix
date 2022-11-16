@@ -538,14 +538,14 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
  * Purpose: retrieve item maintenances information from configuration cache   *
  *                                                                            *
  * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
- *             errcodes - [IN] SUCCEED if record located and FAIL otherwise   *
+ *             errcodes - [IN/OUT] SUCCEED if record located, FAIL otherwise  *
  *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
  * NOTE: Maintenances can be dynamically updated by timer processes that      *
  *       currently only lock configuration cache.                             *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, size_t num,
+static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, int *errcodes, size_t num,
 		int maintenances_num)
 {
 	size_t			i;
@@ -578,6 +578,7 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
 					&items[i].host.hostid)))
 			{
+				errcodes[i] = FAIL;
 				continue;
 			}
 		}
