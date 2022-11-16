@@ -140,7 +140,7 @@ function BR() {
 
 function get_icon($type, $params = []) {
 	switch ($type) {
-		case 'favourite':
+		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
@@ -806,11 +806,11 @@ function makePageFooter($with_version = true) {
 /**
  * Get drop-down submenu item list for the User settings section.
  *
- * @return array|null  Menu definition for CWidget::setTitleSubmenu.
+ * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
-function getUserSettingsSubmenu(): ?array {
+function getUserSettingsSubmenu(): array {
 	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-		return null;
+		return [];
 	}
 
 	$profile_url = (new CUrl('zabbix.php'))
@@ -834,7 +834,7 @@ function getUserSettingsSubmenu(): ?array {
 /**
  * Get drop-down submenu item list for the Administration->General section.
  *
- * @return array  Menu definition for CWidget::setTitleSubmenu.
+ * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu() {
 	$gui_url = (new CUrl('zabbix.php'))

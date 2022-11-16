@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.autoreg.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Autoregistration'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTOREG_EDIT));
@@ -37,7 +37,7 @@ $autoreg_form = (new CForm())
 		->setArgument('action', 'autoreg.edit')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('tls_accept', $data['tls_accept']);
 
 $autoreg_tab = (new CFormList())
@@ -92,6 +92,6 @@ $autoreg_view = (new CTabView())
 
 $autoreg_form->addItem($autoreg_view);
 
-$widget
+$html_page
 	->addItem($autoreg_form)
 	->show();

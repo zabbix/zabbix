@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('discovery');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_LIST))
 	->setControls(
@@ -121,7 +121,6 @@ $discoveryForm->addItem([
 	], 'discovery')
 ]);
 
-// append form to widget
-$widget->addItem($discoveryForm);
-
-$widget->show();
+$html_page
+	->addItem($discoveryForm)
+	->show();

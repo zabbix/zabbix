@@ -24,7 +24,7 @@
 #include "module.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/

@@ -441,7 +441,7 @@ class CHostPrototype extends CHostBase {
 		$this->validateCreate($host_prototypes);
 
 		$this->createForce($host_prototypes);
-		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
+		[$tpl_host_prototypes] = self::getTemplatedObjects($host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes);
@@ -547,7 +547,7 @@ class CHostPrototype extends CHostBase {
 		$this->updateForce($host_prototypes, $db_host_prototypes);
 
 		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
-			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
+			self::getTemplatedObjects($host_prototypes, $db_host_prototypes);
 
 		if ($tpl_host_prototypes) {
 			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
@@ -730,28 +730,28 @@ class CHostPrototype extends CHostBase {
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3AuthProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'authpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& in_array($data['securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'authpassphrase')],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privprotocol' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_INT32, 'in' => implode(',', array_keys(getSnmpV3PrivProtocols()))],
 												['else' => true, 'type' => API_UNEXPECTED]
 						]],
 						'privpassphrase' =>	['type' => API_MULTIPLE, 'rules' => [
-												['if' => function (array $data): bool {
+												['if' => static function (array $data): bool {
 													return $data['version'] == SNMP_V3
 														&& $data['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
 												}, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('interface_snmp', 'privpassphrase')],
@@ -769,7 +769,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $host_prototypes
 	 * @param array $db_host_prototypes
 	 */
-	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
+	public function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
 		$upd_host_prototypes = [];
 
 		// save the host prototypes
@@ -919,7 +919,7 @@ class CHostPrototype extends CHostBase {
 
 		$options = [
 			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
+			'filter' => ['hostid' => $hostids, 'groupid' => 0]
 		];
 		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
 
@@ -1647,6 +1647,46 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * @param array $ruleids
+	 */
+	public static function unlinkTemplateObjects(array $ruleids): void {
+		$result = DBselect(
+			'SELECT hd.hostid,h.status AS host_status'.
+			' FROM host_discovery hd,items i,hosts h'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
+		);
+
+		$upd_host_prototypes = [];
+		$hostids = [];
+
+		while ($row = DBfetch($result)) {
+			$upd_host_prototype = ['templateid' => 0];
+
+			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
+				$upd_host_prototype += ['uuid' => generateUuidV4()];
+			}
+
+			$upd_host_prototypes[$row['hostid']] = [
+				'values' => $upd_host_prototype,
+				'where' => ['hostid' => $row['hostid']]
+			];
+
+			$hostids[] = $row['hostid'];
+		}
+
+		if ($upd_host_prototypes) {
+			DB::update('hosts', $upd_host_prototypes);
+
+			DB::update('group_prototype', [
+				'values' => ['templateid' => 0],
+				'where' => ['hostid' => $hostids]
+			]);
+		}
+	}
+
+	/**
 	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
 	 *
 	 * @param array      $host_prototypes
@@ -1697,7 +1737,7 @@ class CHostPrototype extends CHostBase {
 			$this->createForce($ins_host_prototypes, true);
 		}
 
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
+		[$tpl_host_prototypes, $tpl_db_host_prototypes] = self::getTemplatedObjects(
 			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
 		);
 

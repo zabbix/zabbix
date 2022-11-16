@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,9 +19,11 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
 class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setExValidationRules(

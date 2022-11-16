@@ -41,6 +41,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.correlation.filter.active':
 				case 'web.dashboard.filter.active':
 				case 'web.dashboard.hostid':
+				case 'web.dashboard.last_widget_type':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
 				case 'web.hostgroups.filter.active':
@@ -63,9 +64,9 @@ class CControllerProfileUpdate extends CController {
 				case 'web.proxies.filter.active':
 				case 'web.scheduledreport.filter.active':
 				case 'web.scripts.filter.active':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state':
-				case 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTS.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state':
+				case 'web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state':
 				case 'web.service.filter.active':
 				case 'web.service_actions.filter.active':
 				case 'web.sidebar.mode':
@@ -81,8 +82,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state':
-				case 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state':
+				case 'web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state':
 				case 'web.user.filter.active':
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
@@ -104,6 +105,7 @@ class CControllerProfileUpdate extends CController {
 
 		if ($ret) {
 			switch ($this->getInput('idx')) {
+				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
 					$ret = $this->hasInput('value_str');
@@ -132,6 +134,15 @@ class CControllerProfileUpdate extends CController {
 		DBstart();
 		switch ($idx) {
 			// PROFILE_TYPE_STR
+			case 'web.dashboard.last_widget_type':
+				$value_str = $this->getInput('value_str');
+				if ($value_str === '') {
+					CProfile::delete($idx);
+				}
+				else {
+					CProfile::update($idx, $value_str, PROFILE_TYPE_STR);
+				}
+				break;
 			case 'web.dashboard.widget.geomap.default_view':
 			case 'web.dashboard.widget.geomap.severity_filter':
 				$value_str = $this->getInput('value_str');

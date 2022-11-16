@@ -226,8 +226,11 @@ class CDataHelper extends CAPIHelper {
 					if (array_key_exists($host, $interfaces['default_interfaces'])) {
 						$interface_type = null;
 						switch (CTestArrayHelper::get($item, 'type')) {
-							case ITEM_TYPE_ZABBIX:
 							case ITEM_TYPE_ZABBIX_ACTIVE:
+								$interface_type = 0;
+								break;
+
+							case ITEM_TYPE_ZABBIX:
 								$interface_type = 1;
 								break;
 

@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxnix.h"
-#include "zbxdbwrap.h"
+#include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtime.h"
 

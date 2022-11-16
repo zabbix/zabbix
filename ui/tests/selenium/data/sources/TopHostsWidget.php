@@ -37,22 +37,22 @@ class TopHostsWidget {
 		// Create items with value type - text, log, character.
 		CDataHelper::call('item.create', [
 			[
-				'name' => 'trap_text',
-				'key_' => 'trap_text',
+				'name' => 'top_hosts_trap_text',
+				'key_' => 'top_hosts_trap_text',
 				'hostid' => 10084,
 				'type' => 2,
 				'value_type' => 4
 			],
 			[
-				'name' => 'trap_log',
-				'key_' => 'trap_log',
+				'name' => 'top_hosts_trap_log',
+				'key_' => 'top_hosts_trap_log',
 				'hostid' => 10084,
 				'type' => 2,
 				'value_type' => 2
 			],
 			[
-				'name' => 'trap_char',
-				'key_' => 'trap_char',
+				'name' => 'top_hosts_trap_char',
+				'key_' => 'top_hosts_trap_char',
 				'hostid' => 10084,
 				'type' => 2,
 				'value_type' => 1
@@ -63,9 +63,9 @@ class TopHostsWidget {
 
 		// Add value to item displayed in Top Hosts widget.
 		CDataHelper::addItemData(99086, 1000);
-		CDataHelper::addItemData(self::$itemids['trap_text'], 'Text for text item');
-		CDataHelper::addItemData(self::$itemids['trap_log'], 'Logs for text item');
-		CDataHelper::addItemData(self::$itemids['trap_char'], 'characters_here');
+		CDataHelper::addItemData(self::$itemids['top_hosts_trap_text'], 'Text for text item');
+		CDataHelper::addItemData(self::$itemids['top_hosts_trap_log'], 'Logs for text item');
+		CDataHelper::addItemData(self::$itemids['top_hosts_trap_char'], 'characters_here');
 
 		// Create dashboards for Top host widget testing.
 		CDataHelper::call('dashboard.create', [
@@ -129,7 +129,7 @@ class TopHostsWidget {
 									[
 										'type' => 0,
 										'name' => 'column',
-										'value' => 0
+										'value' => 1
 									],
 									[
 										'type' => 1,

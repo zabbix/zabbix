@@ -29,7 +29,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbx_trigger_constants.h"
 
 extern unsigned char			program_type;
@@ -969,14 +969,14 @@ static void	update_action_formula(zbx_service_action_t *action)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
 
-	if (0 == action->conditions.values_num || ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (0 == action->conditions.values_num || ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		goto out;
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_service_action_condition_t *)action->conditions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		{
 			if (last_type != condition->conditiontype)
 			{
@@ -1003,7 +1003,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		last_type = condition->conditiontype;
 	}
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ')');
 
 	zbx_free(action->formula);

@@ -21,7 +21,7 @@
 #define ZABBIX_DBWRAP_H
 
 #include "zbxdbhigh.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
@@ -118,5 +118,24 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(ZBX_DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
+
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
+
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
+		const zbx_timespec_t *, char **);
+
+void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
+		zbx_trigger_func_t eval_func_cb, int recovery);
+void	zbx_db_trigger_get_function_value(const ZBX_DB_TRIGGER *trigger, int index, char **value,
+		zbx_trigger_func_t eval_func_cb, int recovery);
 
 #endif /* ZABBIX_DBWRAP_H */
