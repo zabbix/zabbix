@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/* strptime() */
+#define _XOPEN_SOURCE
+
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
@@ -32,7 +35,9 @@
 #       include <sys/utsname.h>
 #endif
 
-#define TIME_FMT	"%b %d %H:%M:%S %Y %Z"
+#define TIME_FMT	"%a %b %d %H:%M:%S %Y"
+
+#define DETAIL_BUF	128
 
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -177,7 +182,7 @@ static void	dpkg_details(const char *manager, const char *line, const char *rege
 {
 	static char	fmt[64] = "";
 
-	char		status[64] = "", name[64] = "", version[64] = "", arch[64] = "";
+	char		status[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "";
 	zbx_uint64_t	size;
 	int		rv;
 
@@ -220,7 +225,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 {
 	static char	fmt[64] = "";
 
-	char		name[128] = "", version[64] = "", arch[32] = "", buildtime_value[32], installtime_value[32];
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
+			installtime_value[DETAIL_BUF];
 	zbx_uint64_t	size, buildtime_timestamp, installtime_timestamp;
 	int		rv;
 
@@ -242,7 +248,7 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, &size, &buildtime_timestamp,
 			&installtime_timestamp)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "could only collect %d (expected %d) values from line \"%s\", ignoring",
+		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
 				rv, NUM_FIELDS, line);
 		return;
 	}
@@ -253,6 +259,125 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 
 	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
 	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
+
+	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
+			installtime_value, installtime_timestamp);
+}
+
+static void	pacman_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			size_str[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF] = "", installtime_value[DETAIL_BUF],
+			*suffix;
+	const char	*p;
+	zbx_uint64_t	size, buildtime_timestamp, installtime_timestamp;
+	struct tm	tm;
+	double		size_double;
+	int		rv;
+
+	/* e. g. " tpm2-tss, 3.2.0-3, x86_64, 2.86 MiB, Tue Nov 1 20:46:18 2022, Sun Nov 6 00:04:09 2022" */
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,]",
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1),
+				(zbx_fs_size_t)(sizeof(size_str) - 1),
+				(zbx_fs_size_t)(sizeof(buildtime_value) - 1),
+				(zbx_fs_size_t)(sizeof(installtime_value) - 1));
+	}
+
+#define NUM_FIELDS	6
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, size_str, buildtime_value, installtime_value)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
+				rv, NUM_FIELDS, line);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	if (NULL == (suffix = strchr(size_str, ' ')))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Installed Size \"%s\" (expected whitespace) at line \"%s\""
+				", ignoring", size_str, line);
+	}
+
+	*suffix++ = '\0';
+
+	if (SUCCEED != zbx_is_double(size_str, &size_double))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Installed Size \"%s\" (expected type double) at line \"%s\""
+				", ignoring", size_str, line);
+	}
+
+	/* pacman supports the following labels:                       */
+	/* "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" */
+	if (0 == strcmp(suffix, "B"))
+	{
+		size = (zbx_uint64_t)size_double;
+	}
+	else if (0 == strcmp(suffix, "KiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_KIBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "MiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_MEBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "GiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_GIBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "TiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_TEBIBYTE);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unrecognized Installed Size suffix \"%s %s\" at line \"%s\", ignoring",
+				size_str, suffix, line);
+	}
+
+	zabbix_log(LOG_LEVEL_CRIT, "size_str=%s %s", size_str, suffix);
+
+	/* tell mktime() to determine whether daylight saving time is in effect */
+	tm.tm_isdst = -1;
+
+	if (NULL == (p = strptime(buildtime_value, TIME_FMT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Build Date \"%s\" in \"%s\", ignoring", buildtime_value,
+				line);
+		return;
+	}
+
+	if ('\0' != *p)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Build Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
+				" in \"%s\", ignoring", p, line);
+		return;
+	}
+
+	buildtime_timestamp = mktime(&tm);
+
+	if (NULL == strptime(installtime_value, TIME_FMT, &tm))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Install Date \"%s\" in \"%s\", ignoring", installtime_value,
+				line);
+		return;
+	}
+
+	installtime_timestamp = mktime(&tm);
 
 	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
 			installtime_value, installtime_timestamp);
@@ -311,7 +436,14 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		NULL,
 		rpm_details
 	},
-	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL, NULL, NULL},
+	{
+		"pacman",
+		"pacman --version 2> /dev/null",
+		"pacman -Q",
+		"pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)' | cut -f2- -d: | paste -d, - - - - - -",
+		NULL,
+		pacman_details
+	},
 	{NULL}
 };
 
