@@ -30,12 +30,12 @@ zabbix_export:
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           item_prototypes:
             -
               uuid: 7d0ed5b91e844c5ba5bd31860f4eaee5

@@ -1,0 +1,22 @@
+{
+	"manifest_version": 2.0,
+	"id": "graph",
+	"type": "widget",
+	"name": "Graph (classic)",
+	"namespace": "Graph",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_support": true,
+		"js_class": "CWidgetGraph",
+		"use_time_selector": true
+	},
+	"actions": {
+		"widget.graph.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

@@ -758,7 +758,18 @@ class CConfigurationImport {
 			foreach ($order_tree[$host] as $item_key => $level) {
 				$item = $items[$item_key];
 				$item['hostid'] = $hostid;
+				unset($item['triggers']);
+
 				$levels[$level] = true;
+
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (!in_array($item['type'], $delay_types)) {
+					unset($item['delay']);
+				}
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
@@ -771,6 +782,7 @@ class CConfigurationImport {
 
 					$item['interfaceid'] = $interfaceid;
 				}
+				unset($item['interface_ref']);
 
 				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
@@ -785,8 +797,8 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valuemapid;
-					unset($item['valuemap']);
 				}
+				unset($item['valuemap']);
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $item[$master_item_key])) {
@@ -837,17 +849,9 @@ class CConfigurationImport {
 				if ($itemid !== null) {
 					$item['itemid'] = $itemid;
 
-					if (!array_key_exists($level, $items_to_update)) {
-						$items_to_update[$level] = [];
-					}
-
 					$items_to_update[$level][] = $item;
 				}
 				else {
-					if (!array_key_exists($level, $items_to_create)) {
-						$items_to_create[$level] = [];
-					}
-
 					$items_to_create[$level][] = $item;
 				}
 			}
@@ -908,7 +912,7 @@ class CConfigurationImport {
 	 * Update CItem or CItemPrototype with dependency.
 	 *
 	 * @param array $items_by_level              Associative array of entities where key is entity dependency
-	 *                                             level and value is array of entities for this level.
+	 *                                           level and value is array of entities for this level.
 	 * @param string $master_item_key            Master entity array key in xml parsed data.
 	 * @param CItem|CItemPrototype $api_service  Entity service which is capable to proceed with entity update.
 	 *
@@ -917,6 +921,8 @@ class CConfigurationImport {
 	protected function updateItemsWithDependency(array $items_by_level, string $master_item_key,
 			CItemGeneral $api_service): void {
 		foreach ($items_by_level as $items_to_update) {
+			$hostids = [];
+
 			foreach ($items_to_update as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
@@ -930,15 +936,19 @@ class CConfigurationImport {
 					}
 					unset($item[$master_item_key]);
 				}
+
+				unset($item['uuid']);
+
+				$hostids[] = $item['hostid'];
+				unset($item['hostid']);
 			}
 			unset($item);
 
-			$updated_items = $api_service->update(array_map(function($item) {
-				unset($item['uuid']);
-				return $item;
-			}, $items_to_update));
+			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
+				$item['hostid'] = array_shift($hostids);
+
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
 			}
 		}
@@ -1138,7 +1148,18 @@ class CConfigurationImport {
 				foreach ($item_prototypes as $index => $level) {
 					$item_prototype = $discovery_rule['item_prototypes'][$index];
 					$item_prototype['hostid'] = $hostid;
+					unset($item_prototype['trigger_prototypes']);
+
 					$levels[$level] = true;
+
+					$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+						ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+						ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+					];
+
+					if (!in_array($item_prototype['type'], $delay_types)) {
+						unset($item_prototype['delay']);
+					}
 
 					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
 						$interfaceid = $this->referencer->findInterfaceidByRef($hostid,
@@ -1158,6 +1179,7 @@ class CConfigurationImport {
 							));
 						}
 					}
+					unset($item_prototype['interface_ref']);
 
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
@@ -1175,8 +1197,8 @@ class CConfigurationImport {
 						}
 
 						$item_prototype['valuemapid'] = $valuemapid;
-						unset($item_prototype['valuemap']);
 					}
+					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
@@ -1220,11 +1242,9 @@ class CConfigurationImport {
 						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
 						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 
-					$item_prototype['rule'] = [
-						'hostid' => $hostid,
-						'key' => $discovery_rule['key_']
-					];
-					$item_prototype['ruleid'] = $itemid;
+					if ($item_prototypeid === null) {
+						$item_prototype['ruleid'] = $itemid;
+					}
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
 						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
@@ -2701,23 +2721,17 @@ class CConfigurationImport {
 		$parent_item_keys = [];
 		$resolved_masters_cache = [];
 
-		$host_name_to_hostid = array_fill_keys(array_keys($items_by_hosts), null);
-
-		foreach ($host_name_to_hostid as $host_name => &$hostid) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-		}
-		unset($hostid);
+		$host_name_to_hostid = [];
 
 		foreach ($items_by_hosts as $host_name => $items) {
-			if (!array_key_exists($host_name, $host_name_to_hostid)) {
-				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'host',
-					_s('value "%1$s" not found', $host_name)
-				));
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
+
+			if ($hostid === null) {
+				unset($items_by_hosts[$host_name]);
+				continue;
 			}
 
-			if (!array_key_exists($host_name, $resolved_masters_cache)) {
-				$resolved_masters_cache[$host_name] = [];
-			}
+			$host_name_to_hostid[$host_name] = $hostid;
 
 			// Cache input array entities.
 			foreach ($items as $item) {
@@ -2727,7 +2741,7 @@ class CConfigurationImport {
 				];
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('key', $item[$master_item_key])) {
-					$parent_item_hostids[$host_name_to_hostid[$host_name]] = true;
+					$parent_item_hostids[$hostid] = true;
 					$parent_item_keys[$item[$master_item_key]['key']] = true;
 				}
 			}

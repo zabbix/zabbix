@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0beta3');
+define('ZABBIX_VERSION',		'6.4.0beta4');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030061);
+define('ZABBIX_DB_VERSION',		6030073);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -133,9 +133,6 @@ define('ZBX_FLAG_DISCOVERY_CREATED',	0x4);
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
-
-define('WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS',	0);
-define('WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS',	1);
 
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
@@ -860,7 +857,7 @@ define('SCREEN_SORT_TRIGGERS_NAME_DESC',			16);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
-define('SCREEN_MODE_SLIDESHOW',		2);
+define('SCREEN_MODE_SLIDESHOW',	2);
 define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
@@ -1177,7 +1174,8 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_CUSTOM_TIME', 1);
+define('SVG_GRAPH_CUSTOM_TIME_OFF',	0);
+define('SVG_GRAPH_CUSTOM_TIME_ON',	1);
 
 define('SVG_GRAPH_LEGEND_OFF',	0);
 define('SVG_GRAPH_LEGEND_ON',	1);
@@ -1191,11 +1189,13 @@ define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
 define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
 define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
 
-define('SVG_GRAPH_PROBLEMS_SHOW', 1);
+define('SVG_GRAPH_PROBLEMS_OFF',	0);
+define('SVG_GRAPH_PROBLEMS_ON',		1);
 
 define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
-define('SVG_GRAPH_AXIS_SHOW', 1);
+define('SVG_GRAPH_AXIS_OFF',	0);
+define('SVG_GRAPH_AXIS_ON',		1);
 
 define('SVG_GRAPH_AXIS_UNITS_AUTO',		0);
 define('SVG_GRAPH_AXIS_UNITS_STATIC',	1);
@@ -1291,6 +1291,9 @@ define('ZBX_FUNCTION_TYPE_MATH',		4);
 define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
+
+define('ZBX_TIMELINE_OFF',	0);
+define('ZBX_TIMELINE_ON',	1);
 
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
@@ -1436,6 +1439,10 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 define('API_FILTER_VALUES',			59);
+
+// any type
+define('API_ANY',					61);
+
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1478,6 +1485,13 @@ define('API_TIMESTAMP',				55);
 define('API_TG_NAME',				56);
 define('API_COLORS',				57);
 define('API_FILTER',				58);
+define('API_ITEM_KEY',				62);
+define('API_ITEM_DELAY',			63);
+define('API_JSON',					64);
+define('API_XML',					65);
+define('API_PREPROC_PARAMS',		66);
+define('API_PROMETHEUS_PATTERN',	67);
+define('API_PROMETHEUS_LABEL',		68);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1598,94 +1612,28 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
-// dashboard widgets
-define('WIDGET_ACTION_LOG',			'actionlog');
+// Dashboard widget types supported in templates (used only in import converters).
 define('WIDGET_CLOCK',				'clock');
-define('WIDGET_DISCOVERY',			'discovery');
-define('WIDGET_FAV_GRAPHS',			'favgraphs');
-define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_GEOMAP',				'geomap');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
-define('WIDGET_HOST_AVAIL',			'hostavail');
-define('WIDGET_MAP',				'map');
-define('WIDGET_NAV_TREE',			'navtree');
-define('WIDGET_PLAIN_TEXT',			'plaintext');
-define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
-define('WIDGET_PROBLEMS',			'problems');
-define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
-define('WIDGET_SLA_REPORT',			'slareport');
-define('WIDGET_SVG_GRAPH',			'svggraph');
-define('WIDGET_SYSTEM_INFO',		'systeminfo');
-define('WIDGET_TOP_HOSTS',			'tophosts');
-define('WIDGET_TRIG_OVER',			'trigover');
-define('WIDGET_URL',				'url');
-define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
-// Deprecated widgets
-define('WIDGET_DATA_OVER',			'dataover');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_URL',				'url');
 
-// Clock widget type
-define('WIDGET_CLOCK_TYPE_ANALOG',	0);
-define('WIDGET_CLOCK_TYPE_DIGITAL',	1);
+// Inaccessible widget type.
+define('ZBX_WIDGET_INACCESSIBLE',	'inaccessible');
 
-// Clock time zone format
-define('WIDGET_CLOCK_TIMEZONE_SHORT',	0);
-define('WIDGET_CLOCK_TIMEZONE_FULL',	1);
+// event details sections
+define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');
+define('SECTION_HAT_EVENTDETAILS',		'hat_eventdetails');
+define('SECTION_HAT_EVENTACTIONS',		'hat_eventactions');
+define('SECTION_HAT_EVENTLIST',			'hat_eventlist');
 
-// Clock widget time format
-define('WIDGET_CLOCK_HOUR_TWENTY_FOUR',	0);
-define('WIDGET_CLOCK_HOUR_TWELVE',		1);
-
-// Item widget object positions.
-define('WIDGET_ITEM_POS_LEFT',		0);
-define('WIDGET_ITEM_POS_CENTER',	1);
-define('WIDGET_ITEM_POS_RIGHT',		2);
-
-define('WIDGET_ITEM_POS_TOP',		0);
-define('WIDGET_ITEM_POS_MIDDLE',	1);
-define('WIDGET_ITEM_POS_BOTTOM',	2);
-
-define('WIDGET_ITEM_POS_BEFORE',	0);
-define('WIDGET_ITEM_POS_ABOVE',		1);
-define('WIDGET_ITEM_POS_AFTER',		2);
-define('WIDGET_ITEM_POS_BELOW',		3);
-
-// sysmap widget source types
-define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
-define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
-
-// widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
-
-// max depth of navigation tree
-define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
-
-// event details widgets
-define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
-define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
-define('WIDGET_HAT_EVENTACTIONS',		'hat_eventactions');
-define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
-// search widget
-define('WIDGET_SEARCH_HOSTS',			'search_hosts');
-define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
-define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
-define('WIDGET_SEARCH_TEMPLATEGROUP',	'search_templategroup');
-
-// dashboard widget dynamic state
-define('WIDGET_SIMPLE_ITEM',	0);
-define('WIDGET_DYNAMIC_ITEM',	1);
-
-// clock widget blocks
-define('WIDGET_CLOCK_SHOW_DATE', 1);
-define('WIDGET_CLOCK_SHOW_TIME', 2);
-define('WIDGET_CLOCK_SHOW_TIMEZONE', 3);
-
-// item widget blocks
-define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
-define('WIDGET_ITEM_SHOW_VALUE',			2);
-define('WIDGET_ITEM_SHOW_TIME',				3);
-define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
+// search sections
+define('SECTION_SEARCH_HOSTS',			'search_hosts');
+define('SECTION_SEARCH_HOSTGROUP',		'search_hostgroup');
+define('SECTION_SEARCH_TEMPLATES',		'search_templates');
+define('SECTION_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);
@@ -1711,9 +1659,6 @@ define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
-
-// top hosts widget
-define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1884,7 +1829,6 @@ define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
-define('ZBX_STYLE_CHECKBOX_LIST', 'checkbox-list');
 define('ZBX_STYLE_CLOCK_SVG', 'clock-svg');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
@@ -1910,7 +1854,6 @@ define('ZBX_STYLE_DASHBOARD_NEXT_PAGE', 'dashboard-next-page');
 define('ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW', 'dashboard-toggle-slideshow');
 define('ZBX_STYLE_DASHBOARD_WIDGET', 'dashboard-widget');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
-define('ZBX_STYLE_DASHBOARD_WIDGET_FLUID', 'dashboard-widget-fluid');
 define('ZBX_STYLE_DASHBOARD_WIDGET_HEAD', 'dashboard-widget-head');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FOOT', 'dashboard-widget-foot');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
@@ -2053,7 +1996,6 @@ define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
-define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PAGE_TITLE_SUBMENU', 'page-title-submenu');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_RED_BG', 'red-bg');

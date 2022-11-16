@@ -114,7 +114,7 @@ $form = (new CForm())
 			->setArgument('action', 'geomaps.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('geomaps_tab', _('Geographical maps'), $form_grid)
@@ -123,7 +123,7 @@ $form = (new CForm())
 			))
 	);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Geographical maps'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GEOMAPS_EDIT))
@@ -131,7 +131,7 @@ $form = (new CForm())
 	->show();
 
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'tile_providers' => $data['tile_providers']
 	]).');'
 ))

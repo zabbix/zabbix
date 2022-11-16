@@ -10,6 +10,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \

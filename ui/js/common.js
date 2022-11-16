@@ -361,7 +361,16 @@ function PopUp(action, parameters, {
 		.then(function(resp) {
 			if ('error' in resp) {
 				overlay.setProperties({
-					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false)
+					title: resp.header !== undefined ? resp.header : '',
+					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false),
+					buttons: [
+						{
+							'title': t('Cancel'),
+							'class': 'btn-alt js-cancel',
+							'cancel': true,
+							'action': function() {}
+						}
+					]
 				});
 			}
 			else {
@@ -398,6 +407,26 @@ function PopUp(action, parameters, {
 					data: resp.data || null
 				});
 			}
+
+			overlay.recoverFocus();
+			overlay.containFocus();
+		})
+		.fail((resp) => {
+			const error = resp.responseJSON !== undefined && resp.responseJSON.error !== undefined
+				? resp.responseJSON.error
+				: {title: t('Unexpected server error.')};
+
+			overlay.setProperties({
+				content: makeMessageBox('bad', error.messages, error.title, false),
+				buttons: [
+					{
+						'title': t('Cancel'),
+						'class': 'btn-alt js-cancel',
+						'cancel': true,
+						'action': function() {}
+					}
+				]
+			});
 
 			overlay.recoverFocus();
 			overlay.containFocus();
@@ -522,15 +551,18 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null;
-
 	if (return_focus !== false) {
 		return_focus = true;
 	}
 
-	overlay = overlays_stack.removeById(dialogueid);
+	const overlay = overlays_stack.removeById(dialogueid);
+
 	if (overlay && return_focus) {
-		jQuery(overlay.element).focus();
+		if (overlay.element !== undefined) {
+			const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
+
+			element.focus({preventScroll: true});
+		}
 	}
 
 	// Remove event listener.

@@ -12,8 +12,11 @@ DIST_SUBDIRS = \
 	zbxcrypto \
 	zbxcyberark \
 	zbxdb \
-	zbxdbcache \
+	zbxcacheconfig \
+	zbxcachehistory \
+	zbxcachevalue \
 	zbxdbhigh \
+	zbxdbwrap \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -67,8 +70,11 @@ SERVER_SUBDIRS = \
 	zbxcompress \
 	zbxcyberark \
 	zbxdb \
-	zbxdbcache \
+	zbxcacheconfig \
+	zbxcachehistory \
+	zbxcachevalue \
 	zbxdbhigh \
+	zbxdbwrap \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -109,8 +115,11 @@ PROXY_SUBDIRS = \
 	zbxcompress \
 	zbxcyberark \
 	zbxdb \
-	zbxdbcache \
+	zbxcacheconfig \
+	zbxcachehistory \
+	zbxcachevalue \
 	zbxdbhigh \
+	zbxdbwrap \
 	zbxdbschema \
 	zbxdbupgrade \
 	zbxdiag \
@@ -180,4 +189,5 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	zbxsymbols \
-	zbxwin32
+	zbxwin32 \
+	zbxwinservice

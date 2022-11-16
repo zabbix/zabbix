@@ -20,7 +20,8 @@
 #include "zbxstats.h"
 
 #include "zbxcommon.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
+#include "zbxcacheconfig.h"
 #include "zbxself.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"

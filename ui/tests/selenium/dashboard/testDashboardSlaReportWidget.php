@@ -1489,7 +1489,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'From' => 'today - 6 months'
+						'From' => 'first day of this month - 6 months'
 					],
 					'reporting_period' => 'Quarterly'
 				]
@@ -1619,7 +1619,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
-						'From' => 'today - 3 months',
+						'From' => 'first day of this month - 3 months',
 						'Show periods' => 4
 					],
 					'reporting_period' => 'Quarterly'
@@ -1629,7 +1629,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
-						'To' => 'today - 1 month'
+						'To' => 'first day of this month - 1 month'
 					],
 					'reporting_period' => 'Quarterly'
 				]
@@ -1951,16 +1951,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
+			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => 'now-1d-1w-1M-1y',
+						'From' => 'now-1d-1w-1y',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => 'today - 1 day - 1 week - 1 month - 1 year'
+						'From' => 'today - 1 day - 1 week - 1 year'
 					]
 				]
 			],
@@ -2030,16 +2031,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
+			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => 'now-1d-1w-1M-1y',
+						'To' => 'now-1d-1w-1y',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => 'today - 1 day - 1 week - 1 month - 1 year'
+						'To' => 'now - 1 day - 1 week - 1 year'
 					]
 				]
 			],
@@ -2284,8 +2286,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		// By default the last 20 periods are displayed.
 		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
 
-
-
 		if (array_key_exists('To', $data['fields'])) {
 			$to_date = $data['fields']['To'];
 		}
@@ -2330,7 +2330,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 			case 'Monthly':
 				for ($i = 0; $i < $show_periods; $i++) {
-					$period_values[] = date('Y-m', strtotime($to_date.' '.-$i.' month'));
+					$period_values[] = date('Y-m', strtotime(date('Y-m-01', strtotime($to_date)).' '.-$i.' month'));
 				}
 				break;
 

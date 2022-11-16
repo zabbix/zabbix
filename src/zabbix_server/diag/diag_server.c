@@ -20,7 +20,7 @@
 #include "zbxdiag.h"
 #include "diag_server.h"
 
-#include "../../libs/zbxdbcache/valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxlld.h"
 #include "zbxalert.h"
 #include "zbxtime.h"

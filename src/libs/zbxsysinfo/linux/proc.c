@@ -1881,11 +1881,12 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != get_cmdline(f_cmd, &cmdline, &l))
 			continue;
 
-		read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &prname);
+		if (SUCCEED != read_value_from_proc_file(f_status, 0, "Name", PROC_VAL_TYPE_TEXT, NULL, &prname))
+			continue;
 
 		if ('\0' != *cmdline)
 		{
-			char	*p, *pend, sep;
+			char	*p, *pend, sep = 0;
 			size_t	len;
 
 			if (NULL != (pend = strpbrk(cmdline, " :")))

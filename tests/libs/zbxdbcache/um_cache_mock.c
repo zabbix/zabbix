@@ -24,8 +24,9 @@
 
 #include "zbxnum.h"
 #include "zbxalgo.h"
-#include "zbxdbcache/user_macro.h"
+#include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
+#include "zbxshmem.h"
 
 ZBX_PTR_VECTOR_IMPL(um_mock_macro, zbx_um_mock_macro_t *)
 

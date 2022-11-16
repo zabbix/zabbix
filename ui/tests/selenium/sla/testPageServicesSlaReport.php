@@ -661,7 +661,7 @@ class testPageServicesSlaReport extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
-						'From' => 'today - 2 months'
+						'From' => 'first day of this month - 2 months'
 					],
 					'reporting_period' => 'Monthly'
 				]
@@ -761,7 +761,7 @@ class testPageServicesSlaReport extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Monthly',
-						'From' => 'today - 2 months'
+						'From' => 'first day of this month - 2 months'
 					],
 					'reporting_period' => 'Monthly'
 				]
@@ -865,7 +865,7 @@ class testPageServicesSlaReport extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'From' => 'today - 6 months'
+						'From' => 'first day of this month - 6 months'
 					],
 					'reporting_period' => 'Quarterly'
 				]
@@ -964,7 +964,7 @@ class testPageServicesSlaReport extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
-						'From' => 'today - 6 months'
+						'From' => 'first day of this month - 6 months'
 					],
 					'reporting_period' => 'Quarterly'
 				]

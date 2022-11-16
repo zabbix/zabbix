@@ -46,7 +46,8 @@ int	ZBX_EXIT_STATUS(void);
 typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg);
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		const char *config_log_file);
 void	zbx_daemon_stop(void);
 
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);

@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$auditWidget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Action log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITACTS_LIST));
 
@@ -47,7 +47,7 @@ $filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
 	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 ]);
 
-$auditWidget->addItem(
+$html_page->addItem(
 	(new CFilter())
 		->setResetUrl(new CUrl('auditacts.php'))
 		->setProfile($data['timeline']['profileIdx'])
@@ -141,7 +141,6 @@ $objData = [
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
 
-// append form to widget
-$auditWidget->addItem($auditForm);
-
-$auditWidget->show();
+$html_page
+	->addItem($auditForm)
+	->show();

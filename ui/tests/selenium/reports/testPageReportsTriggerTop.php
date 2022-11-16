@@ -49,6 +49,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	 *
 	 * @var int
 	 */
+	protected static $time;
 	protected static $one_year_ago_approx;
 	protected static $two_years_ago_approx;
 	protected static $three_months_ago_approx;
@@ -87,67 +88,81 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		$this->assertArrayHasKey('itemids', $items);
 
 		// Create triggers based on items.
-		$triggers_data = [];
-		foreach ($item_names as $i => $item) {
-			$triggers_data[] = [
-				'description' => 'Reports trigger '.$i,
-				'expression' => 'last(/Host for Reports Trigger/'.$item.')=0',
-				'priority' => $i
-			];
-		}
+		$triggers = CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Problem 1 year ago',
+				'expression' => 'last(/Host for Reports Trigger/float)=0',
+				'priority' => 0
+			],
+			[
+				'description' => 'Problem 2 years ago',
+				'expression' => 'last(/Host for Reports Trigger/char)=0',
+				'priority' => 1
+			],
+			[
+				'description' => 'Problem 3 months ago',
+				'expression' => 'last(/Host for Reports Trigger/log)=0',
+				'priority' => 2
+			],
+			[
+				'description' => 'Problem 2 months ago',
+				'expression' => 'last(/Host for Reports Trigger/unsigned)=0',
+				'priority' => 3
+			]
+		]);
 
-		$triggers = CDataHelper::call('trigger.create', $triggers_data);
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
+		self::$time = time();
 		// Make timestamp a little less 1 year ago.
-		self::$one_year_ago_approx = time()-31449600;
+		self::$one_year_ago_approx = self::$time - 31556952;
 
 		// Make timestamp a little less than 2 years ago.
-		self::$two_years_ago_approx = time()-62985600;
-
-		// Make timestamp a little less than 3 months ago.
-		self::$three_months_ago_approx = time()-7872000;
+		self::$two_years_ago_approx = self::$time - 62985600;
 
 		// Make timestamp a little less than 2 months ago.
-		self::$two_months_ago_approx = time()-5184000;
+		self::$two_months_ago_approx = self::$time - 5097600;
+
+		// Make timestamp a little less than 3 months ago.
+		self::$three_months_ago_approx = self::$time - 7689600;
 
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 0']).', '.self::$one_year_ago_approx.', 0, 1, '.zbx_dbstr('Reports trigger 0').', 0)'
+				zbx_dbstr(self::$triggerids['Problem 1 year ago']).', '.self::$one_year_ago_approx.', 0, 1, '.zbx_dbstr('Problem 1 year ago').', 0)'
 		);
 
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 1']).', '.self::$two_years_ago_approx.', 0, 1, '.zbx_dbstr('Reports trigger 1').', 1)'
+				zbx_dbstr(self::$triggerids['Problem 2 years ago']).', '.self::$two_years_ago_approx.', 0, 1, '.zbx_dbstr('Problem 2 years ago').', 1)'
 		);
 
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005502, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 2']).', '.self::$three_months_ago_approx.', 0, 1, '.zbx_dbstr('Reports trigger 2').', 2)'
+				zbx_dbstr(self::$triggerids['Problem 3 months ago']).', '.self::$three_months_ago_approx.', 0, 1, '.zbx_dbstr('Problem 3 months ago').', 2)'
 		);
 
 		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005503, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 3']).', '.self::$two_months_ago_approx.', 0, 1, '.zbx_dbstr('Reports trigger 3').', 3)'
+				zbx_dbstr(self::$triggerids['Problem 2 months ago']).', '.self::$two_months_ago_approx.', 0, 1, '.zbx_dbstr('Problem 2 months ago').', 3)'
 		);
 
 		// Create problems.
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 0']).', '.self::$one_year_ago_approx.', 0, '.zbx_dbstr('Reports trigger 0').', 0)'
+				zbx_dbstr(self::$triggerids['Problem 1 year ago']).', '.self::$one_year_ago_approx.', 0, '.zbx_dbstr('Problem 1 year ago').', 0)'
 		);
 
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 1']).', '.self::$two_years_ago_approx.', 0, '.zbx_dbstr('Reports trigger 1').', 1)'
+				zbx_dbstr(self::$triggerids['Problem 2 years ago']).', '.self::$two_years_ago_approx.', 0, '.zbx_dbstr('Problem 2 years ago').', 1)'
 		);
 
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005502, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 2']).', '.self::$three_months_ago_approx.', 0, '.zbx_dbstr('Reports trigger 2').', 2)'
+				zbx_dbstr(self::$triggerids['Problem 3 months ago']).', '.self::$three_months_ago_approx.', 0, '.zbx_dbstr('Problem 3 months ago').', 2)'
 		);
 
 		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005503, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Reports trigger 3']).', '.self::$two_months_ago_approx.', 0, '.zbx_dbstr('Reports trigger 3').', 3)'
+				zbx_dbstr(self::$triggerids['Problem 2 months ago']).', '.self::$two_months_ago_approx.', 0, '.zbx_dbstr('Problem 2 months ago').', 3)'
 		);
 
 		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Reports trigger 0').', '.
-				zbx_dbstr('Reports trigger 1').', '.zbx_dbstr('Reports trigger 2').', '.zbx_dbstr('Reports trigger 3').')'
+		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Problem 1 year ago').', '.
+				zbx_dbstr('Problem 2 year ago').', '.zbx_dbstr('Problem 3 months ago').', '.zbx_dbstr('Problem 2 months ago').')'
 		);
 	}
 
@@ -187,8 +202,10 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'to' => 'now'
 					],
 					'result' => [
-						'Reports trigger 0',
-						'Reports trigger 1'
+						'Problem 1 year ago',
+						'Problem 2 months ago',
+						'Problem 2 years ago',
+						'Problem 3 months ago'
 					]
 				]
 			],
@@ -210,12 +227,15 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
+						'relative' => true,
 						// Time is now - 2 years exactly.
-						'from' => date('Y-m-d H:i', time()-62985600)
+						'from' => 62985600
 					],
 					'result' => [
-						'Reports trigger 0',
-						'Reports trigger 1'
+						'Problem 1 year ago',
+						'Problem 2 months ago',
+						'Problem 2 years ago',
+						'Problem 3 months ago'
 					]
 				]
 			],
@@ -238,12 +258,13 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
+						'relative' => true,
 						// Time around 1 year ago.
-						'from' => date('Y-m-d H:i', time()-31449700),
-						'to' => date('Y-m-d H:i', time()-31449500)
+						'from' => 31556990,
+						'to' => 31556900
 					],
 					'result' => [
-						'Reports trigger 0'
+						'Problem 1 year ago'
 					]
 				]
 			],
@@ -254,7 +275,9 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
-						'from' => date('Y-m-d H:i', time()-5183000),
+						'relative' => true,
+						// Less thant 2 month ago.
+						'from' => 501120,
 						'to' => 'now-1d/d'
 					]
 				]
@@ -262,12 +285,13 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'date' => [
+						'relative' => true,
 						// Time around 3 months ago.
-						'from' => date('Y-m-d H:i', time()-7872400),
-						'to' => date('Y-m-d H:i', time()-7870800)
+						'from' => 7689700,
+						'to' => 7689500
 					],
 					'result' => [
-						'Reports trigger 2'
+						'Problem 3 months ago'
 					]
 				]
 			],
@@ -284,7 +308,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 						'from' => 'now-2y'
 					],
 					'result' => [
-						'Reports trigger 2'
+						'Problem 3 months ago'
 					]
 				]
 			],
@@ -304,13 +328,14 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'date' => [
-						// Time interval 3 -2 months ago.
-						'from' => date('Y-m-d H:i', time()-7872400),
-						'to' => date('Y-m-d H:i', time()-5183000)
+						'relative' => true,
+						// Time interval 3 - 2 months ago.
+						'from' => 7872400,
+						'to' => 5011200
 					],
 					'result' => [
-						'Reports trigger 2',
-						'Reports trigger 3'
+						'Problem 2 months ago',
+						'Problem 3 months ago'
 					]
 				]
 			]
@@ -353,6 +378,18 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 
 		// Fill in the date in filter.
 		if (array_key_exists('date', $data)) {
+			if (CTestArrayHelper::get($data['date'], 'relative')) {
+				if (array_key_exists('from', $data['date'])) {
+					$data['date']['from'] = date('Y-m-d H:i', self::$time - $data['date']['from']);
+				}
+
+				if (array_key_exists('to', $data['date']) && is_int($data['date']['to'])) {
+					$data['date']['to'] = date('Y-m-d H:i', self::$time - $data['date']['to']);
+				}
+
+				array_shift($data['date']);
+			}
+
 			$this->zbxTestExpandFilterTab('Time');
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);
