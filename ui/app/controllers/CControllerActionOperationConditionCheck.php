@@ -30,15 +30,12 @@ class CControllerActionOperationConditionCheck extends CController {
 		$fields = [
 			'actionid' =>		'db actions.actionid',
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' =>			'required|in '. EVENT_SOURCE_TRIGGERS,
-			'condition_type' =>	'in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-			'operator' =>		'in '.implode(',', [
-									CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-									CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
-									CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES,
-									CONDITION_OPERATOR_NO, CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
+			'source' =>			'db actions.eventsource|required|in '. EVENT_SOURCE_TRIGGERS,
+			'condition_type' =>	'db opconditions.conditiontype|in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'operator' =>		'db opconditions.conditiontype|in '.implode(',', [
+									CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL
 								]),
-			'value' =>			'not_empty',
+			'value' =>			'db opconditions.value|not_empty',
 			'row_index' =>		'int32'
 		];
 

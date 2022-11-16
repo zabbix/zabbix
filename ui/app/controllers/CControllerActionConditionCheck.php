@@ -30,7 +30,7 @@ class CControllerActionConditionCheck extends CController {
 		$fields = [
 			'row_index' =>			'required|int32',
 			'type' =>				'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
-			'source' =>				'required|in '.implode(',', [
+			'source' =>				'db actions.eventsource|required|in '.implode(',', [
 										EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 										EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 									]),
@@ -64,8 +64,8 @@ class CControllerActionConditionCheck extends CController {
 		$validator = new CActionCondValidator();
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
-			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
-			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
+			'value' => $this->getInput('value', null),
+			'value2' => $this->getInput('value2', null),
 			'operator' => $this->getInput('operator')
 		]);
 

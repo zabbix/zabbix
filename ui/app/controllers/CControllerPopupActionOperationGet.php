@@ -27,18 +27,16 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
-
 		$fields = [
 			'esc_period' =>			'db actions.esc_period|not_empty',
 			'operations'=>			'array',
 			'recovery_operations'=>	'array',
 			'update_operations'=>	'array',
 			'new_operation' =>		'array',
-			'eventsource' =>		'required|db actions.eventsource|in '.implode(',', $eventsource),
+			'eventsource' =>		'required|db actions.eventsource|in '.implode(',', [
+										EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+										EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+									]),
 			'actionid'=>			'db actions.actionid'
 		];
 
@@ -74,6 +72,7 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function doAction(): void {
+		$data = [];
 		$data['esc_period'] = $this->hasInput('esc_period')
 			? $this->getInput('esc_period')
 			: DB::getDefault('actions', 'esc_period');
@@ -84,7 +83,7 @@ class CControllerPopupActionOperationGet extends CController {
 		if ($new_operation) {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
 				$data['recovery'] = ACTION_OPERATION;
-				$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
+				$data['operations'] = $this->getInput('operations', []);
 
 				if ((int) $new_operation['row_index'] !== -1) {
 					$data['operations'][(int) $new_operation['row_index']] = $new_operation;
@@ -95,9 +94,7 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['recovery'] = ACTION_RECOVERY_OPERATION;
-				$data['operations'] = $this->hasInput('recovery_operations')
-					? $this->getInput('recovery_operations')
-					: [];
+				$data['operations'] = $this->getInput('recovery_operations', []);
 
 				if ((int) $new_operation['row_index'] !== -1) {
 					$data['operations'][(int) $new_operation['row_index']] = $new_operation;
@@ -108,9 +105,7 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['recovery'] = ACTION_UPDATE_OPERATION;
-				$data['operations'] = $this->hasInput('update_operations')
-					? $this->getInput('update_operations')
-					: [];
+				$data['operations'] = $this->getInput('update_operations', []);
 
 				if ((int) $new_operation['row_index'] !== -1) {
 					$data['operations'][$new_operation['row_index']] = $new_operation;
@@ -122,7 +117,7 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 		else {
 			$data['recovery'] = ACTION_OPERATION;
-			$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
+			$data['operations'] = $this->getInput('operations', []);
 		}
 
 		foreach ($data['operations'] as $operation) {
