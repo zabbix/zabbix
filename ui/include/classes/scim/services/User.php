@@ -238,10 +238,9 @@ class User extends ScimApiService {
 		$db_user = $this->validatePut($options);
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
-		$group_attribute = $provisioning->getGroupIdpAttributes()[0];
 
-		$user_group_names = array_key_exists($group_attribute, $options)
-			? array_column($options[$group_attribute], 'display')
+		$user_group_names = array_key_exists('groups', $options)
+			? array_column($options['groups'], 'display')
 			: [];
 
 		// In case some IdPs do not send attribute 'active'.
