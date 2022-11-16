@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+For Zabbix version: 6.2 and higher.
 New official Linux template. Requires agent of Zabbix 3.0.14, 3.4.5 and 4.0.0 or newer.
 
 ## Setup
@@ -22,27 +22,27 @@ No specific Zabbix configuration is required.
 |{$AGENT.TIMEOUT} |<p>Timeout after which agent is considered unavailable.</p> |`5m` |
 |{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
 |{$IF.ERRORS.WARN} |<p>-</p> |`2` |
-|{$IF.UTIL.MAX} |<p>This macro is used as a threshold in interface utilization trigger.</p> |`90` |
+|{$IF.UTIL.MAX} |<p>This macro is used as a threshold in the interface utilization trigger.</p> |`90` |
 |{$IFCONTROL} |<p>-</p> |`1` |
 |{$KERNEL.MAXFILES.MIN} |<p>-</p> |`256` |
 |{$KERNEL.MAXPROC.MIN} |<p>-</p> |`1024` |
-|{$LOAD_AVG_PER_CPU.MAX.WARN} |<p>Load per CPU considered sustainable. Tune if needed.</p> |`1.5` |
-|{$MEMORY.AVAILABLE.MIN} |<p>This macro is used as a threshold in memory available trigger.</p> |`20M` |
-|{$MEMORY.UTIL.MAX} |<p>This macro is used as a threshold in memory utilization trigger.</p> |`90` |
+|{$LOAD_AVG_PER_CPU.MAX.WARN} |<p>CPU load per core is considered sustainable. If necessary, it can be tuned.</p> |`1.5` |
+|{$MEMORY.AVAILABLE.MIN} |<p>This macro is used as a threshold in the memory available trigger.</p> |`20M` |
+|{$MEMORY.UTIL.MAX} |<p>This macro is used as a threshold in the memory utilization trigger.</p> |`90` |
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
+|{$NET.IF.IFNAME.NOT_MATCHES} |<p>It filters out loopbacks, nulls, docker veth links and docker0 bridge by default.</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 |{$SWAP.PFREE.MIN.WARN} |<p>-</p> |`50` |
 |{$SYSTEM.FUZZYTIME.MAX} |<p>-</p> |`60` |
-|{$VFS.DEV.DEVNAME.MATCHES} |<p>This macro is used in block devices discovery. Can be overridden on the host or linked template level</p> |`.+` |
-|{$VFS.DEV.DEVNAME.NOT_MATCHES} |<p>This macro is used in block devices discovery. Can be overridden on the host or linked template level</p> |`^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)` |
-|{$VFS.DEV.READ.AWAIT.WARN} |<p>Disk read average response time (in ms) before the trigger would fire</p> |`20` |
-|{$VFS.DEV.WRITE.AWAIT.WARN} |<p>Disk write average response time (in ms) before the trigger would fire</p> |`20` |
-|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold of the filesystem utilization.</p> |`5G` |
-|{$VFS.FS.FREE.MIN.WARN} |<p>The warning threshold of the filesystem utilization.</p> |`10G` |
-|{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`.+` |
-|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
-|{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$` |
-|{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level</p> |`^\s$` |
+|{$VFS.DEV.DEVNAME.MATCHES} |<p>This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.</p> |`.+` |
+|{$VFS.DEV.DEVNAME.NOT_MATCHES} |<p>This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.</p> |`^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)` |
+|{$VFS.DEV.READ.AWAIT.WARN} |<p>The average response time (in ms) of disk read before the trigger would fire.</p> |`20` |
+|{$VFS.DEV.WRITE.AWAIT.WARN} |<p>The average response time (in ms) of disk write before the trigger would fire.</p> |`20` |
+|{$VFS.FS.FREE.MIN.CRIT} |<p>The critical threshold for utilization of the filesystem.</p> |`5G` |
+|{$VFS.FS.FREE.MIN.WARN} |<p>The critical threshold for utilization of the filesystem.</p> |`10G` |
+|{$VFS.FS.FSNAME.MATCHES} |<p>This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.</p> |`.+` |
+|{$VFS.FS.FSNAME.NOT_MATCHES} |<p>This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.</p> |`^(/dev|/sys|/run|/proc|.+/shm$)` |
+|{$VFS.FS.FSTYPE.MATCHES} |<p>This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.</p> |`^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$` |
+|{$VFS.FS.FSTYPE.NOT_MATCHES} |<p>This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.</p> |`^\s$` |
 |{$VFS.FS.INODE.PFREE.MIN.CRIT} |<p>-</p> |`10` |
 |{$VFS.FS.INODE.PFREE.MIN.WARN} |<p>-</p> |`20` |
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>-</p> |`90` |
@@ -58,7 +58,7 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 |Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |ZABBIX_ACTIVE |vfs.fs.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
-|Network interface discovery |<p>Discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
+|Network interface discovery |<p>The discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -89,7 +89,7 @@ There are no template links in this template.
 |General |System local time |<p>The local system time of the host.</p> |ZABBIX_ACTIVE |system.localtime |
 |General |System name |<p>The host name of the system.</p> |ZABBIX_ACTIVE |system.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
 |General |System description |<p>The information as normally returned by 'uname -a'.</p> |ZABBIX_ACTIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|General |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_ACTIVE |system.users.num |
+|General |Number of logged in users |<p>The number of users who are currently logged in.</p> |ZABBIX_ACTIVE |system.users.num |
 |General |Maximum number of open file descriptors |<p>It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxfiles<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.</p> |ZABBIX_ACTIVE |kernel.maxproc<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Number of processes |<p>-</p> |ZABBIX_ACTIVE |proc.num |
@@ -97,7 +97,7 @@ There are no template links in this template.
 |Inventory |Operating system |<p>-</p> |ZABBIX_ACTIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the host's operating system.</p> |ZABBIX_ACTIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Software installed |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Memory |Memory utilization |<p>Memory used percentage is calculated as (100-pavailable)</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
+|Memory |Memory utilization |<p>The percentage of used memory is calculated as 100-pavailable.</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
 |Memory |Available memory in % |<p>The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</p> |ZABBIX_ACTIVE |vm.memory.size[pavailable] |
 |Memory |Total memory |<p>The total memory expressed in Bytes.</p> |ZABBIX_ACTIVE |vm.memory.size[total] |
 |Memory |Available memory |<p>The available memory:</p><p> - in Linux - available = free + buffers + cache;</p><p> - on other platforms calculation may vary.</p><p>See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.</p> |ZABBIX_ACTIVE |vm.memory.size[available] |
@@ -114,20 +114,20 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}: Outbound packets discarded |<p>-</p> |ZABBIX_ACTIVE |net.if.out["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Network interfaces |Interface {#IFNAME}: Inbound packets discarded |<p>-</p> |ZABBIX_ACTIVE |net.if.in["{#IFNAME}",dropped]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |Network interfaces |Interface {#IFNAME}: Operational status |<p>Reference: https://www.kernel.org/doc/Documentation/networking/operstates.txt</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Network interfaces |Interface {#IFNAME}: Interface type |<p>Indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Network interfaces |Interface {#IFNAME}: Speed |<p>Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.</p><p>This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Network interfaces |Interface {#IFNAME}: Interface type |<p>It indicates the interface protocol type as a decimal value.</p><p>See include/uapi/linux/if_arp.h for all possible values.</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/type"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Network interfaces |Interface {#IFNAME}: Speed |<p>It indicates the latest or current speed value of the interface. The value is an integer representing the link speed expressed in bits/sec.</p><p>This attribute is only valid for the interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).</p><p>Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net</p> |ZABBIX_ACTIVE |vfs.file.contents["/sys/class/net/{#IFNAME}/speed"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_ACTIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>The system uptime expressed in the following format:'N days, hh:mm:ss'.</p> |ZABBIX_ACTIVE |system.uptime |
 |Status |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_ACTIVE |agent.ping |
-|Storage |{#DEVNAME}: Disk read rate |<p>r/s. The number (after merges) of read requests completed per second for the device.</p> |DEPENDENT |vfs.dev.read.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[0]`</p><p>- CHANGE_PER_SECOND</p> |
-|Storage |{#DEVNAME}: Disk write rate |<p>w/s. The number (after merges) of write requests completed per second for the device.</p> |DEPENDENT |vfs.dev.write.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[4]`</p><p>- CHANGE_PER_SECOND</p> |
-|Storage |{#DEVNAME}: Disk read request avg waiting time (r_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.read.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.read.time.rate[{#DEVNAME}])/(last(//vfs.dev.read.rate[{#DEVNAME}])+(last(//vfs.dev.read.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.read.rate[{#DEVNAME}]) > 0)` |
-|Storage |{#DEVNAME}: Disk write request avg waiting time (w_await) |<p>This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.</p> |CALCULATED |vfs.dev.write.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.write.time.rate[{#DEVNAME}])/(last(//vfs.dev.write.rate[{#DEVNAME}])+(last(//vfs.dev.write.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.write.rate[{#DEVNAME}]) > 0)` |
+|Storage |{#DEVNAME}: Disk read rate |<p>r/s (read operations per second) - the number (after merges) of read requests completed per second for the device.</p> |DEPENDENT |vfs.dev.read.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[0]`</p><p>- CHANGE_PER_SECOND</p> |
+|Storage |{#DEVNAME}: Disk write rate |<p>w/s (write operations per second) - the number (after merges) of write requests completed per second for the device.</p> |DEPENDENT |vfs.dev.write.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[4]`</p><p>- CHANGE_PER_SECOND</p> |
+|Storage |{#DEVNAME}: Disk read request avg waiting time (r_await) |<p>This formula contains two boolean expressions that evaluate to 1 or 0 in order to set the calculated metric to zero and to avoid the exception - division by zero.</p> |CALCULATED |vfs.dev.read.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.read.time.rate[{#DEVNAME}])/(last(//vfs.dev.read.rate[{#DEVNAME}])+(last(//vfs.dev.read.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.read.rate[{#DEVNAME}]) > 0)` |
+|Storage |{#DEVNAME}: Disk write request avg waiting time (w_await) |<p>This formula contains two boolean expressions that evaluate to 1 or 0 in order to set the calculated metric to zero and to avoid the exception - division by zero.</p> |CALCULATED |vfs.dev.write.await[{#DEVNAME}]<p>**Expression**:</p>`(last(//vfs.dev.write.time.rate[{#DEVNAME}])/(last(//vfs.dev.write.rate[{#DEVNAME}])+(last(//vfs.dev.write.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.write.rate[{#DEVNAME}]) > 0)` |
 |Storage |{#DEVNAME}: Disk average queue size (avgqu-sz) |<p>The current average disk queue; the number of requests outstanding on the disk while the performance data is being collected.</p> |DEPENDENT |vfs.dev.queue_size[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[10]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 |Storage |{#DEVNAME}: Disk utilization |<p>This item is the percentage of elapsed time during which the selected disk drive was busy while servicing read or write requests.</p> |DEPENDENT |vfs.dev.util[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[9]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.1`</p> |
-|Zabbix raw items |{#DEVNAME}: Get stats |<p>Get contents of /sys/block/{#DEVNAME}/stat for disk stats.</p> |ZABBIX_ACTIVE |vfs.file.contents[/sys/block/{#DEVNAME}/stat]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.trim().split(/ +/));`</p> |
-|Zabbix raw items |{#DEVNAME}: Disk read time (rate) |<p>Rate of total read time counter. Used in r_await calculation</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
-|Zabbix raw items |{#DEVNAME}: Disk write time (rate) |<p>Rate of total write time counter. Used in w_await calculation</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
+|Zabbix raw items |{#DEVNAME}: Get stats |<p>The contents of get /sys/block/{#DEVNAME}/stat to get the disk statistics.</p> |ZABBIX_ACTIVE |vfs.file.contents[/sys/block/{#DEVNAME}/stat]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(value.trim().split(/ +/));`</p> |
+|Zabbix raw items |{#DEVNAME}: Disk read time (rate) |<p>The rate of total read time counter; used in r_await calculation.</p> |DEPENDENT |vfs.dev.read.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[3]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
+|Zabbix raw items |{#DEVNAME}: Disk write time (rate) |<p>The rate of total write time counter; used in w_await calculation.</p> |DEPENDENT |vfs.dev.write.time.rate[{#DEVNAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$[7]`</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `0.001`</p> |
 
 ## Triggers
 

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.4'
-  date: '2022-11-16T20:15:25Z'
+  version: '6.2'
+  date: '2022-11-16T21:11:22Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -78,7 +78,7 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: '(last(//vfs.dev.read.time.rate[{#DEVNAME}])/(last(//vfs.dev.read.rate[{#DEVNAME}])+(last(//vfs.dev.read.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.read.rate[{#DEVNAME}]) > 0)'
-              description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
+              description: 'This formula contains two boolean expressions that evaluate to 1 or 0 in order to set the calculated metric to zero and to avoid the exception - division by zero.'
               tags:
                 -
                   tag: component
@@ -95,7 +95,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!r/s'
-              description: 'r/s. The number (after merges) of read requests completed per second for the device.'
+              description: 'r/s (read operations per second) - the number (after merges) of read requests completed per second for the device.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -122,7 +122,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of total read time counter. Used in r_await calculation'
+              description: 'The rate of total read time counter; used in r_await calculation.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -186,7 +186,7 @@ zabbix_export:
               value_type: FLOAT
               units: '!ms'
               params: '(last(//vfs.dev.write.time.rate[{#DEVNAME}])/(last(//vfs.dev.write.rate[{#DEVNAME}])+(last(//vfs.dev.write.rate[{#DEVNAME}])=0)))*1000*(last(//vfs.dev.write.rate[{#DEVNAME}]) > 0)'
-              description: 'This formula contains two boolean expressions that evaluates to 1 or 0 in order to set calculated metric to zero and to avoid division by zero exception.'
+              description: 'This formula contains two boolean expressions that evaluate to 1 or 0 in order to set the calculated metric to zero and to avoid the exception - division by zero.'
               tags:
                 -
                   tag: component
@@ -203,7 +203,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!w/s'
-              description: 'w/s. The number (after merges) of write requests completed per second for the device.'
+              description: 'w/s (write operations per second) - the number (after merges) of write requests completed per second for the device.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -230,7 +230,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of total write time counter. Used in w_await calculation'
+              description: 'The rate of total write time counter; used in w_await calculation.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -261,7 +261,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get contents of /sys/block/{#DEVNAME}/stat for disk stats.'
+              description: 'The contents of get /sys/block/{#DEVNAME}/stat to get the disk statistics.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -343,19 +343,19 @@ zabbix_export:
         -
           macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.DEV.READ.AWAIT.WARN}'
           value: '20'
-          description: 'Disk read average response time (in ms) before the trigger would fire'
+          description: 'The average response time (in ms) of disk read before the trigger would fire.'
         -
           macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
-          description: 'Disk write average response time (in ms) before the trigger would fire'
+          description: 'The average response time (in ms) of disk write before the trigger would fire.'
     -
       uuid: da53e44145304098b4c3ff749996e3e7
       template: 'Linux CPU by Zabbix agent active'
@@ -625,7 +625,7 @@ zabbix_export:
         -
           macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
           value: '1.5'
-          description: 'Load per CPU considered sustainable. Tune if needed.'
+          description: 'CPU load per core is considered sustainable. If necessary, it can be tuned.'
     -
       uuid: c626d864a2894d29a9d661d6025536ff
       template: 'Linux filesystems by Zabbix agent active'
@@ -848,27 +848,27 @@ zabbix_export:
         -
           macro: '{$VFS.FS.FREE.MIN.CRIT}'
           value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
+          description: 'The critical threshold for utilization of the filesystem.'
         -
           macro: '{$VFS.FS.FREE.MIN.WARN}'
           value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
+          description: 'The critical threshold for utilization of the filesystem.'
         -
           macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+          description: 'This macro is used for discovery of the filesystems. It can be overridden on host level or its linked template level.'
         -
           macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
           value: '10'
@@ -1175,7 +1175,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: system.users.num
           history: 7d
-          description: 'Number of users who are currently logged in.'
+          description: 'The number of users who are currently logged in.'
           tags:
             -
               tag: component
@@ -1331,7 +1331,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Memory used percentage is calculated as (100-pavailable)'
+          description: 'The percentage of used memory is calculated as 100-pavailable.'
           preprocessing:
             -
               type: JAVASCRIPT
@@ -1366,11 +1366,11 @@ zabbix_export:
         -
           macro: '{$MEMORY.AVAILABLE.MIN}'
           value: 20M
-          description: 'This macro is used as a threshold in memory available trigger.'
+          description: 'This macro is used as a threshold in the memory available trigger.'
         -
           macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
-          description: 'This macro is used as a threshold in memory utilization trigger.'
+          description: 'This macro is used as a threshold in the memory utilization trigger.'
         -
           macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
@@ -1401,7 +1401,7 @@ zabbix_export:
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery of network interfaces.'
+          description: 'The discovery of network interfaces.'
           item_prototypes:
             -
               uuid: 62c1ecd956cb496b9d5257dad026add5
@@ -1606,8 +1606,8 @@ zabbix_export:
               trends: 0d
               units: bps
               description: |
-                Indicates the interface latest or current speed value. Value is an integer representing the link speed in bits/sec.
-                This attribute is only valid for interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).
+                It indicates the latest or current speed value of the interface. The value is an integer representing the link speed expressed in bits/sec.
+                This attribute is only valid for the interfaces that implement the ethtool get_link_ksettings method (mostly Ethernet).
                 
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
               preprocessing:
@@ -1635,7 +1635,7 @@ zabbix_export:
               history: 7d
               trends: 0d
               description: |
-                Indicates the interface protocol type as a decimal value.
+                It indicates the interface protocol type as a decimal value.
                 See include/uapi/linux/if_arp.h for all possible values.
                 Reference: https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
               valuemap:
@@ -1784,7 +1784,7 @@ zabbix_export:
         -
           macro: '{$IF.UTIL.MAX}'
           value: '90'
-          description: 'This macro is used as a threshold in interface utilization trigger.'
+          description: 'This macro is used as a threshold in the interface utilization trigger.'
         -
           macro: '{$IFCONTROL}'
           value: '1'
@@ -1794,7 +1794,7 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+          description: 'It filters out loopbacks, nulls, docker veth links and docker0 bridge by default.'
       dashboards:
         -
           uuid: 4c72409900b84a29bfcfd02648535a2b
