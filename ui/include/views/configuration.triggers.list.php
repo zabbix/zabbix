@@ -70,7 +70,13 @@ $filter_column1 = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(_('Severity'),	(new CSeverityCheckBoxList('filter_priority'))->setChecked($data['filter_priority']));
+	->addRow(_('Severity'),
+		(new CCheckBoxList('filter_priority'))
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['filter_priority'])
+			->setColumns(3)
+			->setVertical(true)
+	);
 
 if ($data['context'] === 'host') {
 	$filter_column1->addRow(_('State'),

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:58:08Z'
+  date: '2022-10-27T12:09:26Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 4cb1aabe2b704b5c882963c2ef87d8f6
-      template: 'Generic SNMP'
-      name: 'Generic SNMP'
+      template: 'Generic by SNMP'
+      name: 'Generic by SNMP'
       description: |
         Template Module Generic
         
@@ -40,7 +40,7 @@ zabbix_export:
           triggers:
             -
               uuid: 085d6f785f1e46faa447d6921036d01d
-              expression: 'max(/Generic SNMP/icmpping,#3)=0'
+              expression: 'max(/Generic by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -66,14 +66,14 @@ zabbix_export:
           triggers:
             -
               uuid: d1bd868814ba4ace9b5034ac4e303259
-              expression: 'min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Generic by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
+                  expression: 'max(/Generic by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -99,17 +99,17 @@ zabbix_export:
           triggers:
             -
               uuid: ecd74ec29b484a499414293bf671160b
-              expression: 'avg(/Generic SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Generic by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Generic SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Generic by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Generic by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
+                  expression: 'max(/Generic by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -255,7 +255,7 @@ zabbix_export:
           triggers:
             -
               uuid: 072bf35ea9d04c559ada5cb13d4b6802
-              expression: 'last(/Generic SNMP/system.name,#1)<>last(/Generic SNMP/system.name,#2) and length(last(/Generic SNMP/system.name))>0'
+              expression: 'last(/Generic by SNMP/system.name,#1)<>last(/Generic by SNMP/system.name,#2) and length(last(/Generic by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -336,7 +336,7 @@ zabbix_export:
           triggers:
             -
               uuid: d3aba975ec574b258c7f971152c5d4cd
-              expression: 'max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Generic by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -344,7 +344,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Generic SNMP/icmpping,#3)=0'
+                  expression: 'max(/Generic by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -386,7 +386,7 @@ zabbix_export:
   triggers:
     -
       uuid: 6f00359af55f45909bdecbad234c7654
-      expression: '(last(/Generic SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Generic SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Generic SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Generic SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Generic by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Generic by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -395,7 +395,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Generic SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Generic by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

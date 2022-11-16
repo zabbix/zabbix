@@ -503,7 +503,7 @@ class CHost extends CHostGeneral {
 		/*
 		 * Cleaning the output from write-only properties.
 		 */
-		$write_only_keys = ['tls_psk_identity', 'tls_psk'];
+		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
@@ -555,6 +555,13 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($result) {
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$row) {
+					unset($row['name_upper']);
+				}
+				unset($row);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 		}
 
@@ -594,6 +601,12 @@ class CHost extends CHostGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {

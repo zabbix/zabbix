@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:57:02Z'
+  date: '2022-10-27T11:34:35Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 3a71dcdcfe0b4a0e8284d8939d335cce
-      template: 'ZYXEL AAM1212-51 IES-612 SNMP'
-      name: 'ZYXEL AAM1212-51 IES-612 SNMP'
+      template: 'ZYXEL AAM1212-51 IES-612 by SNMP'
+      name: 'ZYXEL AAM1212-51 IES-612 by SNMP'
       description: |
         ZYXEL AAM1212-51 / IES-612
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 40839f3008b84e3c9ffa8858bd2ab616
-              expression: 'max(/ZYXEL AAM1212-51 IES-612 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL AAM1212-51 IES-612 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL AAM1212-51 / IES-612: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -111,7 +111,7 @@ zabbix_export:
           triggers:
             -
               uuid: 02ba3941993f48ca8d5f40b3b19804e8
-              expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.fwversion,#1)<>last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.fwversion,#2) and length(last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.fwversion))>0'
+              expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion,#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion,#2) and length(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion))>0'
               name: 'ZYXEL AAM1212-51 / IES-612: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -234,7 +234,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5a3f459afc4f42fb90849e98c7639a96
-              expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.model)<>"AAM1212-51 / IES-612"'
+              expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.model)<>"AAM1212-51 / IES-612"'
               name: 'ZYXEL AAM1212-51 / IES-612: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel AAM1212-51 / IES-612, but connected to {ITEM.VALUE}'
@@ -317,7 +317,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7528520bca7c4524b7451aeaca440cc5
-              expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber,#1)<>last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber,#2) and length(last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.serialnumber))>0'
+              expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber,#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber,#2) and length(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber))>0'
               name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced'
               event_name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced (new serial number received)'
               priority: INFO
@@ -400,7 +400,7 @@ zabbix_export:
           triggers:
             -
               uuid: eec541b07a434770b2a3301825cc5e82
-              expression: 'find(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.slot.alarm,,"like","moduleNoDefect")=0'
+              expression: 'find(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.slot.alarm,,"like","moduleNoDefect")=0'
               name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX} alarm'
               priority: AVERAGE
               description: 'The slot reported an error.'
@@ -498,7 +498,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0c78247a1003496abab584a526777a40
-                  expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
                   name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
                   event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
@@ -575,7 +575,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 14cbae6c16c245b09ed46e0cc01a556c
-                  expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
                   name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
                   event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
@@ -620,7 +620,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e917c9a8d6bb4af3a40c6c5b41f90c22
-                  expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
                   name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
                   event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
@@ -697,7 +697,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 125b08332e2f409985cade88ab3842f1
-                  expression: 'min(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
                   name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
                   event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
@@ -796,9 +796,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 956fc99c2c5341a2b29ba2f302cc0a3a
-                  expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -853,13 +853,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.net.adsl.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.net.adsl.out.traffic[{#SNMPINDEX}]'
           overrides:
             -
@@ -877,7 +877,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 8e327f4a888b417db390148e7a894d10
@@ -1022,9 +1021,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 805f49836f794aad9ee00f66dd90ffc1
-                  expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1079,13 +1078,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.net.if.out.traffic[{#SNMPINDEX}]'
           overrides:
             -
@@ -1103,7 +1102,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 4bc61b4441a840a79bbd118a1d3cf66e
@@ -1140,7 +1138,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 321b2efb6e8e4117949b3644cc101ff2
-                  expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL AAM1212-51 / IES-612: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1157,7 +1155,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.temp[{#SNMPINDEX}]'
         -
           uuid: fbb48a267b7646a98246da0357a1ee95
@@ -1199,7 +1197,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a7aa1ae207bb462bb23d3f2fca2c3533
-                  expression: 'last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL AAM1212-51 / IES-612: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1216,7 +1214,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL AAM1212-51 IES-612 SNMP'
+                    host: 'ZYXEL AAM1212-51 IES-612 by SNMP'
                     key: 'zyxel.aam1212.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1327,7 +1325,7 @@ zabbix_export:
   triggers:
     -
       uuid: 819190f68248439292fc4622c3eec5a9
-      expression: '(last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)>0 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)<10m) or (last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.hw.uptime)=0 and last(/ZYXEL AAM1212-51 IES-612 SNMP/zyxel.aam1212.net.uptime)<10m)'
+      expression: '(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)>0 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)<10m) or (last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)=0 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.uptime)<10m)'
       name: 'ZYXEL AAM1212-51 / IES-612: Host has been restarted'
       event_name: 'ZYXEL AAM1212-51 / IES-612: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO

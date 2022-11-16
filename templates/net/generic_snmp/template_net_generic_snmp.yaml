@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:09:14Z'
+  date: '2022-10-27T11:31:47Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 67332e679035423f85090aa985947c36
-      template: 'Network Generic Device SNMP'
-      name: 'Network Generic Device SNMP'
+      template: 'Network Generic Device by SNMP'
+      name: 'Network Generic Device by SNMP'
       description: |
         Template Net Network Generic Device
         
@@ -42,7 +42,7 @@ zabbix_export:
           triggers:
             -
               uuid: d08cae0e7fa54dfea41449f0adabe05d
-              expression: 'max(/Network Generic Device SNMP/icmpping,#3)=0'
+              expression: 'max(/Network Generic Device by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -68,14 +68,14 @@ zabbix_export:
           triggers:
             -
               uuid: d70eb18878114ae69e5f5f95f4b898cc
-              expression: 'min(/Network Generic Device SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Network Generic Device SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Network Generic Device by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Network Generic Device by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Network Generic Device SNMP/icmpping,#3)=0'
+                  expression: 'max(/Network Generic Device by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -101,17 +101,17 @@ zabbix_export:
           triggers:
             -
               uuid: 09bcfc7a9e3d45d99d37b56a404df610
-              expression: 'avg(/Network Generic Device SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Network Generic Device by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Network Generic Device SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Network Generic Device SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Network Generic Device by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Network Generic Device by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Network Generic Device SNMP/icmpping,#3)=0'
+                  expression: 'max(/Network Generic Device by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -257,7 +257,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5f11afa80f534add85dd03e06466fbc9
-              expression: 'last(/Network Generic Device SNMP/system.name,#1)<>last(/Network Generic Device SNMP/system.name,#2) and length(last(/Network Generic Device SNMP/system.name))>0'
+              expression: 'last(/Network Generic Device by SNMP/system.name,#1)<>last(/Network Generic Device by SNMP/system.name,#2) and length(last(/Network Generic Device by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -338,7 +338,7 @@ zabbix_export:
           triggers:
             -
               uuid: d534ea9f1ad34633bdd361f20733b749
-              expression: 'max(/Network Generic Device SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Network Generic Device by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -346,7 +346,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Network Generic Device SNMP/icmpping,#3)=0'
+                  expression: 'max(/Network Generic Device by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -643,9 +643,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9b5fdc0da9fa49918b3986d1eee02cfc
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFDESCR}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -696,21 +696,21 @@ zabbix_export:
             -
               uuid: f06a612448bc4cc2b0b5641708e9153a
               expression: |
-                change(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                change(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Network Generic Device SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Network Generic Device by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -719,8 +719,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -728,13 +728,13 @@ zabbix_export:
             -
               uuid: e0b02506b47145a8bde6a19890a2e32b
               expression: |
-                (avg(/Network Generic Device SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/Network Generic Device SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/Network Generic Device by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
+                avg(/Network Generic Device by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
+                last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Network Generic Device SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/Network Generic Device SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/Network Generic Device by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
+                avg(/Network Generic Device by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFDESCR}: High bandwidth usage'
               event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -744,8 +744,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -753,12 +753,12 @@ zabbix_export:
             -
               uuid: 1a2e2ea2ecf047a68168bdcceb8d1e39
               expression: |
-                min(/Network Generic Device SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Network Generic Device SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Network Generic Device by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Network Generic Device by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Network Generic Device SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Network Generic Device SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Network Generic Device by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Network Generic Device by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFDESCR}: High error rate'
               event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -768,8 +768,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Network Generic Device SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Network Generic Device by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -783,42 +783,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Network Generic Device SNMP'
+                    host: 'Network Generic Device by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: f6784e45dac14c91bea4ffb14d4793e9
@@ -888,7 +888,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 58acb95392e845bdb2a7064af0228208
-                  expression: 'last(/Network Generic Device SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Network Generic Device by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1003,7 +1003,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Network Generic Device SNMP'
+                        host: 'Network Generic Device by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
@@ -1929,7 +1929,7 @@ zabbix_export:
   triggers:
     -
       uuid: 536fafc0bb664fcb8b4c8acc18fe5c29
-      expression: '(last(/Network Generic Device SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Network Generic Device SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Network Generic Device SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Network Generic Device SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Network Generic Device by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Network Generic Device by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -1938,7 +1938,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Network Generic Device SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Network Generic Device by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

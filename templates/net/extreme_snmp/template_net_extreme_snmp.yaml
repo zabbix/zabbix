@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:09:10Z'
+  date: '2022-10-27T11:34:44Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 861dbdece18f4b8f85214a319995eb3e
-      template: 'Extreme EXOS SNMP'
-      name: 'Extreme EXOS SNMP'
+      template: 'Extreme EXOS by SNMP'
+      name: 'Extreme EXOS by SNMP'
       description: |
         Template Extreme EXOS
         
@@ -45,7 +45,7 @@ zabbix_export:
           triggers:
             -
               uuid: 445766fc99c1480eac4d3d403c3ede2b
-              expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+              expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -71,14 +71,14 @@ zabbix_export:
           triggers:
             -
               uuid: fb0abe322fd644b4bb3c1255d564bb47
-              expression: 'min(/Extreme EXOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Extreme EXOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -104,17 +104,17 @@ zabbix_export:
           triggers:
             -
               uuid: d29defd9360c489a892821989eeda10c
-              expression: 'avg(/Extreme EXOS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Extreme EXOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Extreme EXOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Extreme EXOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -160,9 +160,9 @@ zabbix_export:
           triggers:
             -
               uuid: 54362c94be0243ffb907905def0ad06a
-              expression: 'avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_WARN}'
+              expression: 'avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_WARN}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_WARN}-3'
+              recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_WARN}-3'
               name: 'Device: Temperature is above warning threshold'
               event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -172,10 +172,10 @@ zabbix_export:
                 -
                   name: 'Device: Temperature is above critical threshold'
                   expression: |
-                    avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
+                    avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
                     or
-                    last(/Extreme EXOS SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
-                  recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
+                    last(/Extreme EXOS by SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
+                  recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
               tags:
                 -
                   tag: scope
@@ -185,9 +185,9 @@ zabbix_export:
                   value: performance
             -
               uuid: 91a10b28c7a14dd09110448a28a328f9
-              expression: 'avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT_LOW}'
+              expression: 'avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT_LOW}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'min(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT_LOW}+3'
+              recovery_expression: 'min(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT_LOW}+3'
               name: 'Device: Temperature is too low'
               event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -255,7 +255,7 @@ zabbix_export:
           triggers:
             -
               uuid: a77bbfe0755f4901b67a7957805bc566
-              expression: 'min(/Extreme EXOS SNMP/system.cpu.util[extremeCpuMonitorTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Extreme EXOS by SNMP/system.cpu.util[extremeCpuMonitorTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -312,7 +312,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd9fbc501f9047fd8fae9dfd741e3778
-              expression: 'last(/Extreme EXOS SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS SNMP/system.hw.firmware,#2) and length(last(/Extreme EXOS SNMP/system.hw.firmware))>0'
+              expression: 'last(/Extreme EXOS by SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS by SNMP/system.hw.firmware,#2) and length(last(/Extreme EXOS by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -367,7 +367,7 @@ zabbix_export:
           triggers:
             -
               uuid: db1760a34c884b1aa36e4fc4639791dd
-              expression: 'last(/Extreme EXOS SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS SNMP/system.hw.serialnumber,#2) and length(last(/Extreme EXOS SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Extreme EXOS by SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS by SNMP/system.hw.serialnumber,#2) and length(last(/Extreme EXOS by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -474,7 +474,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2923c342e8474e3ea3d7411c104a6988
-              expression: 'last(/Extreme EXOS SNMP/system.name,#1)<>last(/Extreme EXOS SNMP/system.name,#2) and length(last(/Extreme EXOS SNMP/system.name))>0'
+              expression: 'last(/Extreme EXOS by SNMP/system.name,#1)<>last(/Extreme EXOS by SNMP/system.name,#2) and length(last(/Extreme EXOS by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -559,7 +559,7 @@ zabbix_export:
           triggers:
             -
               uuid: af6a823b8f2d4fddae970828d0a3a9c9
-              expression: 'last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2) and length(last(/Extreme EXOS SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
+              expression: 'last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2) and length(last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -567,7 +567,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Extreme EXOS SNMP/system.name,#1)<>last(/Extreme EXOS SNMP/system.name,#2) and length(last(/Extreme EXOS SNMP/system.name))>0'
+                  expression: 'last(/Extreme EXOS by SNMP/system.name,#1)<>last(/Extreme EXOS by SNMP/system.name,#2) and length(last(/Extreme EXOS by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -596,7 +596,7 @@ zabbix_export:
           triggers:
             -
               uuid: ecc42656a3d845ee8ad42d0fe45319c2
-              expression: 'max(/Extreme EXOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Extreme EXOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -604,7 +604,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Extreme EXOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -653,7 +653,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bd0c753f33c441a0bf4567f8b81186d6
-                  expression: 'count(/Extreme EXOS SNMP/sensor.fan.status[extremeFanOperational.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Extreme EXOS by SNMP/sensor.fan.status[extremeFanOperational.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: 'Fan {#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -730,7 +730,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 50733fd8b4a641708e3a90292f182f20
-                  expression: 'min(/Extreme EXOS SNMP/vm.memory.util[{#SNMPVALUE}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Extreme EXOS by SNMP/vm.memory.util[{#SNMPVALUE}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization'
                   event_name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -752,14 +752,14 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'vm.memory.total[extremeMemoryMonitorSystemTotal.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'vm.memory.available[extremeMemoryMonitorSystemFree.{#SNMPINDEX}]'
             -
               uuid: 886d032483584e379210c9f05f65b98e
@@ -771,7 +771,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'vm.memory.util[{#SNMPVALUE}]'
         -
           uuid: ddc38e480b404039807079963eb247f9
@@ -1077,9 +1077,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 706148cec9f24e81a96f44484d3829d3
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1130,21 +1130,21 @@ zabbix_export:
             -
               uuid: eb704d12b7ef450a85a805392adb2e6b
               expression: |
-                change(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Extreme EXOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Extreme EXOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1153,8 +1153,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1162,13 +1162,13 @@ zabbix_export:
             -
               uuid: f61f3c59c1aa488d9ef19a67d46fb5e8
               expression: |
-                (avg(/Extreme EXOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Extreme EXOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Extreme EXOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Extreme EXOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Extreme EXOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Extreme EXOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Extreme EXOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Extreme EXOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Extreme EXOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Extreme EXOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1178,8 +1178,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1187,12 +1187,12 @@ zabbix_export:
             -
               uuid: ccf92f29e2564c0bbef6baf6daf93d86
               expression: |
-                min(/Extreme EXOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Extreme EXOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Extreme EXOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Extreme EXOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Extreme EXOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Extreme EXOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Extreme EXOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Extreme EXOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1202,8 +1202,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Extreme EXOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Extreme EXOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1220,42 +1220,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Extreme EXOS SNMP'
+                    host: 'Extreme EXOS by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 63835abf440b4d6b879bfe0ba5cfa576
@@ -1325,7 +1325,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f82c0234ebbd4f2686ce97642f7bbcf8
-                  expression: 'last(/Extreme EXOS SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Extreme EXOS by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1382,7 +1382,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 710f1bf31381470f9a13c45f887bda4e
-                  expression: 'count(/Extreme EXOS SNMP/sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Extreme EXOS by SNMP/sensor.psu.status[extremePowerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: 'PSU {#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1515,7 +1515,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Extreme EXOS SNMP'
+                        host: 'Extreme EXOS by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2478,11 +2478,11 @@ zabbix_export:
     -
       uuid: 132d3e7a1fab4cc08fcbb12eef4e9494
       expression: |
-        avg(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
+        avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
         or
-        last(/Extreme EXOS SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
+        last(/Extreme EXOS by SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
       recovery_mode: RECOVERY_EXPRESSION
-      recovery_expression: 'max(/Extreme EXOS SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
+      recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
       name: 'Device: Temperature is above critical threshold'
       event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT}'
       opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -2497,7 +2497,7 @@ zabbix_export:
           value: performance
     -
       uuid: bb967f81aaad4a00ae7916ea80574ae0
-      expression: '(last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Extreme EXOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Extreme EXOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Extreme EXOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2506,7 +2506,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Extreme EXOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Extreme EXOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2522,5 +2522,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Extreme EXOS SNMP'
+            host: 'Extreme EXOS by SNMP'
             key: 'system.cpu.util[extremeCpuMonitorTotalUtilization.0]'

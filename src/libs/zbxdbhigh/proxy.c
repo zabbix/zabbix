@@ -1512,6 +1512,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "macro");
 	}
+	else if (0 == strcmp("hstgrp", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
+	}
 	else if (0 == strcmp("items", table->table))
 	{
 		move_out = 1;
@@ -3525,7 +3530,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
 
 	sec = zbx_time();

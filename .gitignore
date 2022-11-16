@@ -144,6 +144,7 @@ tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_get_week_number
 tests/libs/zbxcommon/zbx_interval_preproc
+tests/libs/zbxcommon/zbx_iso8601_utc
 tests/libs/zbxcommon/zbx_json_to_xml
 tests/libs/zbxcommon/zbx_ltrim_utf8
 tests/libs/zbxcommon/zbx_rtrim_utf8
@@ -190,8 +191,8 @@ tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_json_open_path
+tests/libs/zbxjson/zbx_jsonobj_query
 tests/libs/zbxjson/zbx_jsonpath_compile
-tests/libs/zbxjson/zbx_jsonpath_query
 tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
@@ -225,6 +226,7 @@ tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtime/zbx_iso8601_utc
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http

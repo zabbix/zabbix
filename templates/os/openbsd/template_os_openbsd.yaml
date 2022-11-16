@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-22T15:33:34Z'
+  date: '2022-10-24T17:40:32Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'OpenBSD by Zabbix agent'
       name: 'OpenBSD by Zabbix agent'
       description: |
-        Official OpenBSD template. Requires agent of Zabbix 6.0 or newer.
+        It is an Official OpenBSD template. It requires Zabbix agent 6.0 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -42,7 +42,7 @@ zabbix_export:
           name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -72,7 +72,7 @@ zabbix_export:
           key: kernel.maxfiles
           delay: 1h
           history: 1w
-          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -96,7 +96,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 1w
-          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -119,7 +119,7 @@ zabbix_export:
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 1w
-          description: 'Number of processes in running state.'
+          description: 'The number of processes in a running state.'
           tags:
             -
               tag: component
@@ -139,7 +139,7 @@ zabbix_export:
           name: 'Number of processes'
           key: 'proc.num[]'
           history: 1w
-          description: 'Total number of processes in any state.'
+          description: 'The total number of processes in any state.'
           tags:
             -
               tag: component
@@ -186,7 +186,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg1]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -207,7 +207,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg5]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -218,7 +218,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg15]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -306,7 +306,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'System host name.'
+          description: 'A host name of the system.'
           inventory_link: NAME
           preprocessing:
             -
@@ -391,7 +391,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by ''uname -a''.'
+          description: 'The information as normally returned by the ''uname -a''.'
           inventory_link: OS
           preprocessing:
             -
@@ -438,7 +438,7 @@ zabbix_export:
           name: 'Number of logged in users'
           key: system.users.num
           history: 1w
-          description: 'Number of users who are currently logged in.'
+          description: 'The number of users who are currently logged in.'
           tags:
             -
               tag: component
@@ -450,10 +450,15 @@ zabbix_export:
           uuid: f11f6e3539a244409f1c72dbd6f16b76
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 1w
           trends: '0'
           value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             -
               tag: component
@@ -474,7 +479,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 1w
           units: B
-          description: 'Available memory is defined as free+cached+buffers memory.'
+          description: 'The available memory is defined as free+cached+buffers memory.'
           tags:
             -
               tag: component
@@ -509,7 +514,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring agent availability status'
+          description: 'Monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -523,7 +528,7 @@ zabbix_export:
               name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
               manual_close: 'YES'
               tags:
                 -
@@ -541,7 +546,7 @@ zabbix_export:
                 macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
                 formulaid: A
-          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          description: 'The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".'
           item_prototypes:
             -
               uuid: 81dec4b8de8c4ab68aef26d9f00aee87
@@ -617,7 +622,7 @@ zabbix_export:
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
           item_prototypes:
             -
               uuid: c29bc3c6bd844242b9165251dd3266bb
@@ -747,7 +752,7 @@ zabbix_export:
         -
           macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+          description: 'The timeout after which the agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
       dashboards:
         -
           uuid: b4606920366049bd98e2e6d31c602d67
