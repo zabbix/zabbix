@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-15T20:00:09Z'
+  date: '2022-11-16T10:58:54Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -27,7 +27,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.ack
           delay: '0'
           history: 7d
-          description: 'Number of messages delivered to clients and acknowledged'
+          description: 'The number of messages delivered to clients and acknowledged.'
           preprocessing:
             -
               type: JSONPATH
@@ -49,7 +49,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages delivered to clients and acknowledged per second'
+          description: 'The rate of messages delivered to clients and acknowledged per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -70,7 +70,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.confirm
           delay: '0'
           history: 7d
-          description: 'Count of messages confirmed'
+          description: 'The count of messages confirmed.'
           preprocessing:
             -
               type: JSONPATH
@@ -92,7 +92,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages confirmed per second'
+          description: 'The rate of messages confirmed per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -113,7 +113,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.deliver_get
           delay: '0'
           history: 7d
-          description: 'Sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+          description: 'The sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
           preprocessing:
             -
               type: JSONPATH
@@ -135,7 +135,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+          description: 'The rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
           preprocessing:
             -
               type: JSONPATH
@@ -156,7 +156,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.publish
           delay: '0'
           history: 7d
-          description: 'Count of messages published'
+          description: 'The count of messages published.'
           preprocessing:
             -
               type: JSONPATH
@@ -178,7 +178,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages published per second'
+          description: 'The rate of messages published per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -199,7 +199,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.publish_in
           delay: '0'
           history: 7d
-          description: 'Count of messages published from channels into this overview'
+          description: 'The count of messages published from channels into this overview.'
           preprocessing:
             -
               type: JSONPATH
@@ -221,7 +221,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages published from channels into this overview per sec'
+          description: 'The rate of messages published from channels into this overview per sec.'
           preprocessing:
             -
               type: JSONPATH
@@ -242,7 +242,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.publish_out
           delay: '0'
           history: 7d
-          description: 'Count of messages published from this overview into queues'
+          description: 'The count of messages published from this overview into queues.'
           preprocessing:
             -
               type: JSONPATH
@@ -264,7 +264,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate'
+          description: 'The rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate.'
           preprocessing:
             -
               type: JSONPATH
@@ -285,7 +285,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.redeliver
           delay: '0'
           history: 7d
-          description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
+          description: 'The count of subset of messages in deliver_get which had the redelivered flag set.'
           preprocessing:
             -
               type: JSONPATH
@@ -307,7 +307,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of subset of messages in deliver_get which had the redelivered flag set per second'
+          description: 'The rate of subset of messages in deliver_get which had the redelivered flag set per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -328,7 +328,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.return_unroutable
           delay: '0'
           history: 7d
-          description: 'Count of messages returned to publisher as unroutable'
+          description: 'The count of messages returned to publisher as unroutable.'
           preprocessing:
             -
               type: JSONPATH
@@ -350,7 +350,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Rate of messages returned to publisher as unroutable per second'
+          description: 'The rate of messages returned to publisher as unroutable per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -371,7 +371,7 @@ zabbix_export:
           key: rabbitmq.overview.object_totals.channels
           delay: '0'
           history: 7d
-          description: 'Total number of channels'
+          description: 'The total number of channels.'
           preprocessing:
             -
               type: JSONPATH
@@ -390,7 +390,7 @@ zabbix_export:
           key: rabbitmq.overview.object_totals.connections
           delay: '0'
           history: 7d
-          description: 'Total number of connections'
+          description: 'The total number of connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -409,7 +409,7 @@ zabbix_export:
           key: rabbitmq.overview.object_totals.consumers
           delay: '0'
           history: 7d
-          description: 'Total number of consumers'
+          description: 'The total number of consumers.'
           preprocessing:
             -
               type: JSONPATH
@@ -428,7 +428,7 @@ zabbix_export:
           key: rabbitmq.overview.object_totals.exchanges
           delay: '0'
           history: 7d
-          description: 'Total number of exchanges'
+          description: 'The total number of exchanges.'
           preprocessing:
             -
               type: JSONPATH
@@ -447,7 +447,7 @@ zabbix_export:
           key: rabbitmq.overview.object_totals.queues
           delay: '0'
           history: 7d
-          description: 'Total number of queues'
+          description: 'The total number of queues.'
           preprocessing:
             -
               type: JSONPATH
@@ -466,7 +466,7 @@ zabbix_export:
           key: rabbitmq.overview.queue_totals.messages
           delay: '0'
           history: 7d
-          description: 'Total number of messages (ready plus unacknowledged)'
+          description: 'The total number of messages (ready plus unacknowledged).'
           preprocessing:
             -
               type: JSONPATH
@@ -485,7 +485,7 @@ zabbix_export:
           key: rabbitmq.overview.queue_totals.messages.ready
           delay: '0'
           history: 7d
-          description: 'Number of messages ready for deliver'
+          description: 'The number of messages ready for deliver.'
           preprocessing:
             -
               type: JSONPATH
@@ -504,7 +504,7 @@ zabbix_export:
           key: rabbitmq.overview.queue_totals.messages.unacknowledged
           delay: '0'
           history: 7d
-          description: 'Number of unacknowledged messages'
+          description: 'The number of unacknowledged messages.'
           preprocessing:
             -
               type: JSONPATH
@@ -594,7 +594,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages delivered to clients and acknowledged per second'
+              description: 'The rate of messages delivered to clients and acknowledged per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -624,7 +624,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.ack["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Number of messages delivered to clients and acknowledged'
+              description: 'The number of messages delivered to clients and acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -655,7 +655,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages confirmed per second'
+              description: 'The rate of messages confirmed per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -685,7 +685,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages confirmed'
+              description: 'The count of messages confirmed.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -716,7 +716,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+              description: 'The rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -746,7 +746,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.deliver_get["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+              description: 'The sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
               preprocessing:
                 -
                   type: JSONPATH
@@ -777,7 +777,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages published per second'
+              description: 'The rate of messages published per second'
               preprocessing:
                 -
                   type: JSONPATH
@@ -807,7 +807,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.publish["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages published'
+              description: 'The count of messages published.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -838,7 +838,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages published from channels into this overview per sec'
+              description: 'The rate of messages published from channels into this overview per sec.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -868,7 +868,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.publish_in["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages published from channels into this overview'
+              description: 'The count of messages published from channels into this overview.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -899,7 +899,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate'
+              description: 'The rate of published messages (per second) from this overview into queues.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -929,7 +929,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.publish_out["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages published from this overview into queues'
+              description: 'The count of messages published from this overview into queues.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -960,7 +960,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of subset of messages in deliver_get which had the redelivered flag set per second'
+              description: 'The rate of subset of messages in deliver_get which had the redelivered flag set per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -990,7 +990,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.redeliver["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
+              description: 'THe count of subset of messages in deliver_get which had the redelivered flag set.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1021,7 +1021,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate of messages returned to publisher as unroutable per second'
+              description: 'The rate of messages returned to publisher as unroutable per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1051,7 +1051,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.return_unroutable["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages returned to publisher as unroutable'
+              description: 'The count of messages returned to publisher as unroutable.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1134,7 +1134,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks the active alarms in the cluster via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -1165,14 +1165,14 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.CLUSTER_HOST}'
           value: 127.0.0.1
-          description: 'The hostname or IP of RabbitMQ cluster API endpoint.'
+          description: 'The hostname or an IP of RabbitMQ cluster for an API endpoint.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         -
           macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
-          description: 'The port of RabbitMQ API endpoint.'
+          description: 'The port of the RabbitMQ API endpoint.'
         -
           macro: '{$RABBITMQ.API.SCHEME}'
           value: http
@@ -1183,11 +1183,11 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable exchanges.'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered exchanges.'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host or its linked template level.'
       dashboards:
         -
           uuid: a886a871a00d47e28b8648cadae3bc99
