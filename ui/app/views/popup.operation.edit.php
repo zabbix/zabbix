@@ -273,12 +273,10 @@ $hosts = [];
 
 if ($operation['opcommand_hst']) {
 	foreach($operation['opcommand_hst'] as $host) {
-		if (array_key_exists('0', $host)) {
-			foreach ($host as $h) {
-				$hosts['id'] = $h['hostid'];
-				$hosts['name'] = $h['name'];
-				$multiselect_values_host[] = $hosts;
-			}
+		if (array_key_exists('name', $host)) {
+			$hosts['id'] = $host['hostid'];
+			$hosts['name'] = $host['name'];
+			$multiselect_values_host[] = $hosts;
 		}
 	}
 }

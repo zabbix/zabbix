@@ -120,15 +120,15 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if (array_key_exists('opcommand_grp', $operation_data)) {
-			$operation['opcommand_grp'] = $operation_data['opcommand_grp'][0];
+			$operation['opcommand_grp'] = $operation_data['opcommand_grp'];
 		}
 
 		if (array_key_exists('opgroup', $operation_data)) {
-			$operation['opgroup'] = $operation_data['opgroup'][0];
+			$operation['opgroup'] = $operation_data['opgroup'];
 		}
 
 		if (array_key_exists('optemplate', $operation_data)) {
-			$operation['optemplate'] = $operation_data['optemplate'][0];
+			$operation['optemplate'] = $operation_data['optemplate'];
 		}
 
 		$data = [
@@ -154,36 +154,19 @@ class CControllerPopupActionOperationEdit extends CController {
 		$result = [];
 
 		if ($operation['opmessage_grp']) {
-			$groupids = [];
-
-			foreach ($operation['opmessage_grp'] as $group) {
-				$groupids[] = $group['usrgrpid'];
-			}
-
-			$i = 0;
-
 			$user_groups = API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => array_values($groupids),
-				'preservekeys' => true
+				'usrgrpids' => array_column($operation['opmessage_grp'], 'usrgrpid'),
 			]);
+			CArrayHelper::sort($user_groups, ['name']);
 
-			foreach ($user_groups as $user_group) {
-				$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
-				$i++;
-				$result['user_group'][] = $user_group;
-			}
+			$result['user_group'] = array_values($user_groups);
 		}
 
 		if ($operation['opmessage_usr']) {
-			foreach ($operation['opmessage_usr'] as $opmessage_usr) {
-				$userids[] = $opmessage_usr['userid'];
-			}
-
 			$users = API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => $userids,
-				'preservekeys' => true
+				'userids' => array_column($operation['opmessage_usr'], 'userid'),
 			]);
 
 			$fullnames = [];
@@ -197,55 +180,43 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if ($operation['opcommand_hst']) {
-			foreach ($operation['opcommand_hst'] as $opcommand_host) {
-				$hostids[] = $opcommand_host['hostid'];
-			}
-
 			$host = API::Host()->get([
 				'output' => ['hostid', 'name'],
-				'hostids' => $hostids
+				'hostids' => array_column($operation['opcommand_hst'], 'hostid')
 			]);
+			CArrayHelper::sort($host, ['name']);
 
-			$result['opcommand_hst'][] = $host;
+			$result['opcommand_hst'] = array_values($host);
 		}
 
 		if ($operation['opcommand_grp']) {
-			foreach ($operation['opcommand_grp'] as $opcommand_group) {
-				$groupids[] = $opcommand_group['groupid'];
-			}
-
 			$group = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $groupids
+				'groupids' => array_column($operation['opcommand_grp'], 'groupid')
 			]);
+			CArrayHelper::sort($group, ['name']);
 
-			$result['opcommand_grp'][] = $group;
+			$result['opcommand_grp'] = array_values($group);
 		}
 
 		if ($operation['opgroup']) {
-			foreach ($operation['opgroup'] as $opgroup) {
-				$groupids[] = $opgroup['groupid'];
-			}
-
 			$group = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $groupids
+				'groupids' => array_column($operation['opgroup'], 'groupid')
 			]);
+			CArrayHelper::sort($group, ['name']);
 
-			$result['opgroup'][] = $group;
+			$result['opgroup'] = array_values($group);
 		}
 
 		if ($operation['optemplate']) {
-			foreach ($operation['optemplate'] as $optemplate) {
-				$templateids[] = $optemplate['templateid'];
-			}
-
 			$template = API::Template()->get([
 				'output' => ['templateid', 'name'],
-				'templateids' => $templateids
+				'templateids' => array_column($operation['optemplate'], 'templateid')
 			]);
+			CArrayHelper::sort($template, ['name']);
 
-			$result['optemplate'][] = $template;
+			$result['optemplate'] = array_values($template);
 		}
 
 		return $result;
