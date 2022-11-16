@@ -242,7 +242,7 @@ out:
  *               FAIL    - IPv6 is not supported                              *
  *                                                                            *
  ******************************************************************************/
-static int	get_ipv6_support(const char * fping, const char *dst)
+static int	get_ipv6_support(const char *fping, const char *dst)
 {
 	int	ret;
 	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
@@ -756,7 +756,8 @@ int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, error, max_error_len)))
+	if (NOTSUPPORTED == (ret = process_ping(hosts, hosts_count, count, period, size, timeout, error,
+			max_error_len)))
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
