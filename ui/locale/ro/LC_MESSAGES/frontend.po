@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-21 12:43+0000\n"
-"Last-Translator: altmir <rmircea@birotec.ro>\n"
+"PO-Revision-Date: 2022-11-09 14:27+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +20,14 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" data trebuie sa fie mai putin de \"%2$s\"  data"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" in loc de \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -45,44 +45,44 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" se asteapta"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" trebuie sa fie un sir gol sau mai mare de \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "Valoarea \"%1$s\" trebuie sa fie mai putin sau egal cu valoarea \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "se asteapta o pereche"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "al elementului master si dependent trebuie sa se potriveasca"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"regula\" elementul dependent si master trebuie sa se potriveasca"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr " $.path.to.node calea catre nod"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d caracterele depasesc lungimea maxima de %2$d de caractere"
 
 #: include/func.inc.php:488
 #, c-format
@@ -96,15 +96,15 @@ msgstr[2] "%1$d zile"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d am gasit portiviri pentru %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d de %3$d%2$s problema afisata"
+msgstr[1] "%1$d de %3$d%2$s probleme afisata"
+msgstr[2] "%1$d de %3$d%2$s probleme afisata"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
@@ -119,57 +119,57 @@ msgstr "%1$s (anul %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - aruncat de modulul localizat la %2$s"
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Linia:%2$s | Coloana: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s acţiune"
+msgstr[1] "%1$s acţiune"
+msgstr[2] "%1$s acţiune"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s caractere"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s caractere rămase"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s eveniment"
+msgstr[1] "%1$s eveniment"
+msgstr[2] "%1$s evenimente"
 
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s host in mentenanţă"
+msgstr[1] "%1$s host în mentenanţă"
+msgstr[2] "%1$s hosturi în mentenanţă"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s Oră"
+msgstr[1] "%1$s ore"
+msgstr[2] "%1$s ore"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -177,18 +177,18 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s item"
+msgstr[1] "%1$s articole"
+msgstr[2] "%1$s articole"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s mesaj"
+msgstr[1] "%1$s mesaje"
+msgstr[2] "%1$s mesaje"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -198,40 +198,40 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s minut"
+msgstr[1] "%1$s minute"
+msgstr[2] "%1$s minute"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s de %2$s element problematic"
+msgstr[1] "%1$s de %2$s elemente problematice"
+msgstr[2] "%1$s de %2$s elemente cu probleme"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s preselecteaya, foloseşte săgeata jos, sus  si cu Enter selectează"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s problemă"
+msgstr[1] "%1$s probleme"
+msgstr[2] "%1$s probleme"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s probleme în total"
+msgstr[1] "%1$s probleme in total"
+msgstr[2] "%1$s probleme in total"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -239,9 +239,9 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s încercări rămase"
+msgstr[1] "%1$s încercări rămase"
+msgstr[2] "%1$s încercări ramase"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -250,57 +250,57 @@ msgstr[2] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s secundă"
+msgstr[1] "%1$s secunde"
+msgstr[2] "%1$s secunde"
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s problemă nevalidată"
+msgstr[1] "%1$s probleme nevalidate"
+msgstr[2] "%1$s probleme nevalidate"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Sevritate, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, doar citire"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, selectat"
 
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s.%2$sŞ%3$s.%4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%1$s.php lass trebuie extins %2$s pentru modulul localiza al %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s:%2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s th percentilă: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -326,11 +326,11 @@ msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinit)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - utilizați acțiunea implicită)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
@@ -340,7 +340,7 @@ msgstr "(Numai super administratorii pot creea grupuri)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(creat de descoperirea gazdei)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -2209,6 +2209,11 @@ msgstr ""
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
 msgstr ""
 
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
@@ -2428,9 +2433,9 @@ msgstr "Nu se poate șterge dependința"
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Nu se poate șterge regula de detecție"
-msgstr[1] "Nu se poate șterge regula de detecție"
-msgstr[2] ""
+msgstr[0] "Nu pot șterge regula de descoperire"
+msgstr[1] "Nu pot sterge regulile de descoperire"
+msgstr[2] "Nu pot șterge regulile de descoperire"
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2455,9 +2460,9 @@ msgstr "Nu se pot șterge graficele"
 #: hostgroups.php:134 hostgroups.php:156
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
-msgstr[0] "Nu se poate șterge grupul"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu pot șterge grupul  "
+msgstr[1] "Nu pot șterge grupurile"
+msgstr[2] "Nu pot șterge grupurile  "
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
@@ -2535,9 +2540,9 @@ msgstr "Nu se poate șterge mentenanța"
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] "Nu se poate șterge tipul media"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu pot șterge tipul media"
+msgstr[1] "Nu pot șterge tipurile media"
+msgstr[2] "Nu pot șterge tipurile media"
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
@@ -2558,9 +2563,9 @@ msgstr ""
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] "Nu se poate șterge proxy-ul"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu pot șterge proxy-ul "
+msgstr[1] "Nu pot șterge proxy-urile "
+msgstr[2] "Nu pot șterge proxy-urile "
 
 #: include/classes/api/services/CRole.php:369
 #, c-format
@@ -2584,9 +2589,9 @@ msgstr[2] ""
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
-msgstr[0] "Nu se poate șterge scriptul"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu pot șterge scriptul "
+msgstr[1] "Nu pot șterge scripturile "
+msgstr[2] "Nu pot șterge scripturile "
 
 #: include/classes/api/services/CScript.php:877
 #, c-format
@@ -2600,9 +2605,9 @@ msgstr "Nu se pot șterge acțiunile selectate"
 #: app/controllers/CControllerServiceDelete.php:78
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
-msgstr[0] "Nu se poate șterge serviciul"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nu pot șterge serviciul "
+msgstr[1] "Nu pot șterge serviciile "
+msgstr[2] "Nu pot șterge serviciile "
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -3097,6 +3102,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3111,6 +3121,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:770
@@ -3144,6 +3159,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3158,6 +3178,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:776
@@ -3758,12 +3783,11 @@ msgid "Cannot update host group"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
-msgstr[0] "Nu se poate actualiza prototipul de server"
-msgstr[1] "Nu se poate actualiza prototipul de server"
-msgstr[2] "Nu se poate actualiza prototipul de server"
+msgstr[0] "Nu pot actualiza prototipul server"
+msgstr[1] "Nu pot actualiza prototipul server"
+msgstr[2] "Nu pot actualiza prototipul server"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:465
 msgid "Cannot update hosts"
@@ -3789,12 +3813,11 @@ msgid "Cannot update item"
 msgstr "Nu se poate actualiza elementul"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
-msgstr[0] "Nu se poate actualiza prototipul item"
-msgstr[1] "Nu se poate actualiza prototipul item"
-msgstr[2] "Nu se poate actualiza prototipul item"
+msgstr[0] "Nu pot actualiza prototipul articol"
+msgstr[1] "Nu pot actualiza prototipul articol"
+msgstr[2] "Nu pot actualiza prototipul item"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:316
 msgid "Cannot update item prototypes"
@@ -3910,12 +3933,11 @@ msgstr ""
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "Nu se poate actualiza prototipul trigger"
-msgstr[1] "Nu se poate actualiza prototipul trigger"
-msgstr[2] "Nu se poate actualiza prototipul trigger"
+msgstr[0] "Nu pot actualiza prototipul trigger"
+msgstr[1] "Nu pot actualiza prototipul trigger"
+msgstr[2] "Nu pot actualiza prototipul trigger"
 
 #: include/classes/api/services/CTriggerGeneral.php:1721
 #, c-format
@@ -6516,9 +6538,9 @@ msgstr "Regulă de detecție creată"
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] "Regulă de detecție ștearsă"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Regula de descoperire ștearsă"
+msgstr[1] "Regulile de descoperire ștearse"
+msgstr[2] "Regulile de descoperire șterse"
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -8317,9 +8339,9 @@ msgstr "Grup adăugat"
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
-msgstr[0] "Grup șters"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Grupul a fost șters"
+msgstr[1] "Grupurile șterse "
+msgstr[2] "Grupurile șterse "
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8647,12 +8669,11 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:167
 #: include/views/reports.toptriggers.php:86 jsLoader.php:182 jsLoader.php:265
 #: jsLoader.php:373 report2.php:509
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
-msgstr[0] "Server"
-msgstr[1] "Server"
-msgstr[2] "Server"
+msgstr[0] "Host"
+msgstr[1] "Hosturi"
+msgstr[2] "Hosturi"
 
 #: app/views/monitoring.widget.problems.view.php:66
 #: app/views/monitoring.widget.problems.view.php:67
@@ -8919,12 +8940,11 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] "Server prototip actualizat"
-msgstr[1] "Server prototip actualizat"
-msgstr[2] "Server prototip actualizat"
+msgstr[0] "Prototip host updatat"
+msgstr[1] "Prototip Host actualizat"
+msgstr[2] "Prototip Host actualizat"
 
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
@@ -11139,12 +11159,11 @@ msgid "Item prototype deleted"
 msgstr "Prototip item șters"
 
 #: disc_prototypes.php:556 disc_prototypes.php:582 disc_prototypes.php:616
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "Prototip item actualizat"
-msgstr[1] "Prototip item actualizat"
-msgstr[2] "Prototip item actualizat"
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/classes/api/services/CDashboardGeneral.php:474
 #: include/classes/api/services/CDashboardGeneral.php:482
@@ -12395,8 +12414,8 @@ msgstr "Tipul media adăugat"
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipul media șters"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "Tipurile media șterse"
+msgstr[2] "Tipurile media au fost șterse "
 
 #: app/controllers/CControllerMediatypeDisable.php:72
 msgid "Media type disabled"
@@ -15503,9 +15522,9 @@ msgstr ""
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] "Proxy șters"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Proxy-ul a fost șters"
+msgstr[1] "Proxyurile  au fost șterse"
+msgstr[2] "Proxyurile au fost șterse"
 
 #: app/views/administration.proxy.edit.php:72
 msgid "Proxy mode"
@@ -16939,8 +16958,8 @@ msgstr "Script adăugat"
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Script șters"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "Scripturile șterse"
+msgstr[2] "Scripturile șterse"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -17251,8 +17270,8 @@ msgstr ""
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Serviciu șters"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "Serviciile au fost șterse"
+msgstr[2] "Serviciile șterse"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -19489,12 +19508,11 @@ msgstr "Prototip trigger șters"
 
 #: trigger_prototypes.php:362 trigger_prototypes.php:439
 #: trigger_prototypes.php:487
-#, fuzzy
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] "Prototip trigger actualizat"
-msgstr[1] "Prototip trigger actualizat"
-msgstr[2] "Prototip trigger actualizat"
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/controllers/CControllerPopupImportCompare.php:174

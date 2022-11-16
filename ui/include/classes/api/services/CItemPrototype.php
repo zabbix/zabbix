@@ -309,10 +309,16 @@ class CItemPrototype extends CItemGeneral {
 			return $result;
 		}
 
-		// add other related objects
 		if ($result) {
 			if (self::dbDistinct($sqlParts)) {
 				$result = $this->addNclobFieldValues($options, $result);
+			}
+
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$row) {
+					unset($row['name_upper']);
+				}
+				unset($row);
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
@@ -1366,6 +1372,12 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {

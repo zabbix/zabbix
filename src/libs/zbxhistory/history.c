@@ -256,7 +256,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
  *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type)
+void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t *value, int value_type)
 {
 	switch (value_type)
 	{
@@ -285,7 +285,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *val
  * Return value: The value in text format.                                    *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type)
+char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type)
 {
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
@@ -319,7 +319,7 @@ char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type)
  *             value_type - [IN] the history value type                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *value, int value_type)
+void	zbx_history_value_print(char *buffer, size_t size, const zbx_history_value_t *value, int value_type)
 {
 	if (ITEM_VALUE_TYPE_FLOAT == value_type)
 		zbx_print_double(buffer, size, value->dbl);
@@ -410,7 +410,7 @@ int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const z
  *             var        - [IN] the output value                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_value2variant(const history_value_t *value, unsigned char value_type, zbx_variant_t *var)
+void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char value_type, zbx_variant_t *var)
 {
 	switch (value_type)
 	{

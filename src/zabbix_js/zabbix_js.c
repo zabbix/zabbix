@@ -69,7 +69,7 @@ struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "s:i:p:hVl:t";
+static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -119,15 +119,16 @@ static char	*read_file(const char *filename, char **error)
 
 int	main(int argc, char **argv)
 {
-	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
-	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
-		*result = NULL, script_error[MAX_STRING_LEN];
+	int			ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
+	char			*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL,
+				*error = NULL, *result = NULL, script_error[MAX_STRING_LEN];
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
 
 	/* see description of 'optarg' in 'man 3 getopt' */
-	char		*zbx_optarg = NULL;
+	char			*zbx_optarg = NULL;
 
 	/* see description of 'optind' in 'man 3 getopt' */
-	int		zbx_optind = 0;
+	int			zbx_optind = 0;
 
 	progname = get_program_name(argv[0]);
 
@@ -175,7 +176,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, loglevel, NULL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, loglevel, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;

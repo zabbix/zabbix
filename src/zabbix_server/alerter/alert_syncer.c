@@ -25,7 +25,7 @@
 #include "log.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"

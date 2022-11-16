@@ -27,8 +27,8 @@
 /* the item history value */
 typedef struct
 {
-	zbx_timespec_t	timestamp;
-	history_value_t	value;
+	zbx_timespec_t		timestamp;
+	zbx_history_value_t	value;
 }
 zbx_history_record_t;
 
@@ -43,10 +43,10 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);
 int	zbx_history_record_compare_asc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
 int	zbx_history_record_compare_desc_func(const zbx_history_record_t *d1, const zbx_history_record_t *d2);
 
-void	zbx_history_value2str(char *buffer, size_t size, const history_value_t *value, int value_type);
-char	*zbx_history_value2str_dyn(const history_value_t *value, int value_type);
-void	zbx_history_value_print(char *buffer, size_t size, const history_value_t *value, int value_type);
-void	zbx_history_value2variant(const history_value_t *value, unsigned char value_type, zbx_variant_t *var);
+void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t *value, int value_type);
+char	*zbx_history_value2str_dyn(const zbx_history_value_t *value, int value_type);
+void	zbx_history_value_print(char *buffer, size_t size, const zbx_history_value_t *value, int value_type);
+void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char value_type, zbx_variant_t *var);
 
 /* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
 /* value vector filled by zbx_vc_get_value* functions. This define simply better          */
@@ -66,5 +66,19 @@ void	zbx_history_check_version(struct zbx_json *json, int *result);
 #define FLUSH_SUCCEED		0
 #define FLUSH_FAIL		-1
 #define FLUSH_DUPL_REJECTED	-2
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_history_value_t	value;
+	zbx_uint64_t		lastlogsize;
+	zbx_timespec_t		ts;
+	int			mtime;
+	unsigned char		value_type;
+	unsigned char		flags;		/* see ZBX_DC_FLAG_* */
+	unsigned char		state;
+	int			ttl;		/* time-to-live of the history value */
+}
+ZBX_DC_HISTORY;
 
 #endif

@@ -17,18 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DBCACHE_H
-#define ZABBIX_DBCACHE_H
+#ifndef ZABBIX_CACHECONFIG_H
+#define ZABBIX_CACHECONFIG_H
 
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
-#include "zbxshmem.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
 #include "zbxversion.h"
-
-#define ZBX_SYNC_DONE		0
-#define	ZBX_SYNC_MORE		1
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -60,10 +56,6 @@ zbx_session_type_t;
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
-#define ZBX_IPC_SERVICE_CONFIG		"config"
-#define ZBX_IPC_CONFIG_RELOAD_REQUEST	1
-#define ZBX_IPC_CONFIG_RELOAD_RESPONSE	2
-
 #define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
 #define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
 #define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
@@ -74,9 +66,6 @@ zbx_session_type_t;
 extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
 
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -283,14 +272,6 @@ typedef struct _DC_TRIGGER
 }
 DC_TRIGGER;
 
-/* needed to collect and pass data about items that are involved in generating problem events */
-typedef struct
-{
-	zbx_uint64_t		triggerid;
-	zbx_vector_uint64_t	itemids;
-}
-zbx_trigger_items_t;
-
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -327,20 +308,6 @@ typedef struct
 }
 DC_PROXY;
 
-typedef struct
-{
-	zbx_uint64_t	autoreg_hostid;
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*ip;
-	char		*dns;
-	char		*host_metadata;
-	int		now;
-	unsigned short	port;
-	unsigned short	flag;
-	unsigned int	connection_type;
-}
-zbx_autoreg_host_t;
 
 #define ZBX_ACTION_OPCLASS_NONE			0
 #define ZBX_ACTION_OPCLASS_NORMAL		1
@@ -514,48 +481,6 @@ typedef struct
 }
 zbx_correlation_rules_t;
 
-/* value_avg_t structure is used for item average value trend calculations. */
-/*                                                                          */
-/* For double values the average value is calculated on the fly with the    */
-/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
-/* into dbl member.                                                         */
-/* For uint64 values the item values are summed into ui64 member and the    */
-/* average value is calculated before flushing trends to database:          */
-/* avg = ui64 / count                                                       */
-typedef union
-{
-	double		dbl;
-	zbx_uint128_t	ui64;
-}
-value_avg_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	history_value_t	value_min;
-	value_avg_t	value_avg;
-	history_value_t	value_max;
-	int		clock;
-	int		num;
-	int		disable_from;
-	unsigned char	value_type;
-}
-ZBX_DC_TREND;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	history_value_t	value;
-	zbx_uint64_t	lastlogsize;
-	zbx_timespec_t	ts;
-	int		mtime;
-	unsigned char	value_type;
-	unsigned char	flags;		/* see ZBX_DC_FLAG_* */
-	unsigned char	state;
-	int		ttl;		/* time-to-live of the history value */
-}
-ZBX_DC_HISTORY;
-
 /* item queue data */
 typedef struct
 {
@@ -579,13 +504,6 @@ typedef struct
 	zbx_counter_value_t	counter_value;
 }
 zbx_proxy_counter_t;
-
-typedef enum
-{
-	ZBX_COUNTER_TYPE_UI64,
-	ZBX_COUNTER_TYPE_DBL
-}
-zbx_counter_type_t;
 
 typedef struct
 {
@@ -623,31 +541,6 @@ typedef struct
 }
 zbx_config_cache_info_t;
 
-typedef struct
-{
-	zbx_uint64_t	history_counter;	/* the total number of processed values */
-	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
-	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
-	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
-	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
-	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
-	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
-}
-ZBX_DC_STATS;
-
-/* the write cache statistics */
-typedef struct
-{
-	ZBX_DC_STATS	stats;
-	zbx_uint64_t	history_free;
-	zbx_uint64_t	history_total;
-	zbx_uint64_t	index_free;
-	zbx_uint64_t	index_total;
-	zbx_uint64_t	trend_free;
-	zbx_uint64_t	trend_total;
-}
-zbx_wcache_info_t;
-
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
@@ -655,45 +548,9 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
-void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
-void	zbx_log_sync_history_cache_progress(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
-
-int	init_database_cache(char **error);
-void	free_database_cache(int);
-
-void	change_proxy_history_count(int change_count);
-void	reset_proxy_history_count(int reset);
-int	get_proxy_history_count(void);
-
-#define ZBX_STATS_HISTORY_COUNTER	0
-#define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
-#define ZBX_STATS_HISTORY_UINT_COUNTER	2
-#define ZBX_STATS_HISTORY_STR_COUNTER	3
-#define ZBX_STATS_HISTORY_LOG_COUNTER	4
-#define ZBX_STATS_HISTORY_TEXT_COUNTER	5
-#define ZBX_STATS_NOTSUPPORTED_COUNTER	6
-#define ZBX_STATS_HISTORY_TOTAL		7
-#define ZBX_STATS_HISTORY_USED		8
-#define ZBX_STATS_HISTORY_FREE		9
-#define ZBX_STATS_HISTORY_PUSED		10
-#define ZBX_STATS_HISTORY_PFREE		11
-#define ZBX_STATS_TREND_TOTAL		12
-#define ZBX_STATS_TREND_USED		13
-#define ZBX_STATS_TREND_FREE		14
-#define ZBX_STATS_TREND_PUSED		15
-#define ZBX_STATS_TREND_PFREE		16
-#define ZBX_STATS_HISTORY_INDEX_TOTAL	17
-#define ZBX_STATS_HISTORY_INDEX_USED	18
-#define ZBX_STATS_HISTORY_INDEX_FREE	19
-#define ZBX_STATS_HISTORY_INDEX_PUSED	20
-#define ZBX_STATS_HISTORY_INDEX_PFREE	21
-void	*DCget_stats(int request);
-void	DCget_stats_all(zbx_wcache_info_t *wcache_info);
-
-zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 /* initial sync, get all data */
 #define ZBX_DBSYNC_INIT		0
@@ -800,8 +657,6 @@ void	DCrequeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 void	DCpoller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
-int	DCconfig_activate_host(DC_ITEM *item);
-int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
@@ -898,7 +753,6 @@ void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_m
 int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
-void	DCupdate_interfaces_availability(void);
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
@@ -927,13 +781,13 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 
 typedef struct zbx_hc_data
 {
-	history_value_t	value;
-	zbx_uint64_t	lastlogsize;
-	zbx_timespec_t	ts;
-	int		mtime;
-	unsigned char	value_type;
-	unsigned char	flags;
-	unsigned char	state;
+	zbx_history_value_t	value;
+	zbx_uint64_t		lastlogsize;
+	zbx_timespec_t		ts;
+	int			mtime;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
 
 	struct zbx_hc_data	*next;
 }
@@ -953,7 +807,6 @@ zbx_hc_item_t;
 void	zbx_free_item_tag(zbx_item_tag_t *item_tag);
 
 int	zbx_dc_get_active_proxy_by_name(const char *name, DC_PROXY *proxy, char **error);
-void	zbx_dc_update_proxy_version(zbx_uint64_t hostid, int version);
 
 typedef struct
 {
@@ -1088,11 +941,6 @@ void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t
 
 const char	*zbx_dc_get_instanceid(void);
 
-/* diagnostic data */
-void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
-void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
-void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
-
 typedef struct
 {
 	zbx_uint64_t		objectid;
@@ -1116,20 +964,7 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
 		const zbx_vector_ptr_t *timers);
 void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 
-int	zbx_db_trigger_queue_locked(void);
-void	zbx_db_trigger_queue_unlock(void);
-
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
-
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
-
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
-		const zbx_timespec_t *, char **);
-
-void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
-		zbx_trigger_func_t eval_func_cb, int recovery);
-void	zbx_db_trigger_get_function_value(const ZBX_DB_TRIGGER *trigger, int index, char **value,
-		zbx_trigger_func_t eval_func_cb, int recovery);
 
 /* external user macro cache API */
 
