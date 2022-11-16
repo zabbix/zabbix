@@ -134,12 +134,13 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
+ *             mode     - [IN] specify whether hostname should be retrieved   *
  *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other. Item can only be processed by one history       *
- *       syncer at a time, thus it is safe to read dynamic data such as error *
- *       as no other process will update it.                                  *
+ * Comments: Item and host is retrieved using history read lock that must be  *
+ *           write locked only when configuration sync occurs to avoid        *
+ *           processes blocking each other. Item can only be processed by     *
+ *           one history syncer at a time, thus it is safe to read dynamic    *
+ *           data such as error as no other process will update it.           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
@@ -223,9 +224,9 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
  *                                                                            *
- * NOTE: Data is retrieved using history read lock that must be write locked  *
- *       only when configuration sync occurs to avoid processes blocking      *
- *       each other.                                                          *
+ * Comments: Data is retrieved using history read lock that must be write     *
+ *           locked only when configuration sync occurs to avoid processes    *
+ *           blocking each other.                                             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids,
@@ -255,11 +256,11 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functi
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
  *                                                                            *
- * NOTE: Trigger is retrieved using history read lock that must be            *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other. Trigger can only be processed by one process at *
- *       a time, thus it is safe to read dynamic data such as error as no     *
- *       other process will update it.                                        *
+ * Comments: Trigger is retrieved using history read lock that must be        *
+ *           write locked only when configuration sync occurs to avoid        *
+ *           processes blocking each other. Trigger can only be processed by  *
+ *           one process at a time, thus it is safe to read dynamic data such *
+ *           as error as no other process will update it.                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
@@ -537,12 +538,15 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
  *                                                                            *
  * Purpose: retrieve item maintenances information from configuration cache   *
  *                                                                            *
- * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
- *             errcodes - [IN/OUT] SUCCEED if record located, FAIL otherwise  *
- *             num      - [IN] number of elements in items, keys, errcodes    *
+ * Parameters: items            - [OUT] pointer to array of structures        *
+ *             errcodes         - [IN/OUT] SUCCEED if record located, FAIL    *
+ *                                         otherwise                          *
+ *             num              - [IN] number of elements in items, keys,     *
+ *                                     errcodes                               *
+ *             maintenances_num - [IN] maintenances count                     *
  *                                                                            *
- * NOTE: Maintenances can be dynamically updated by timer processes that      *
- *       currently only lock configuration cache.                             *
+ * Comments: Maintenances can be dynamically updated by timer processes that  *
+ *           currently only lock configuration cache.                         *
  *                                                                            *
  ******************************************************************************/
 static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, int *errcodes, size_t num,
@@ -595,14 +599,14 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
  *                                                                            *
  * Purpose: locate item in configuration cache by host and key                *
  *                                                                            *
- * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ * Parameters: items    - [OUT] pointer to array of structures                *
  *             keys     - [IN] list of item keys with host names              *
  *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
  *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other.                                                 *
+ * Comments: Item and host is retrieved using history read lock that must be  *
+ *           write locked only when configuration sync occurs to avoid        *
+ *           processes blocking each other.                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
@@ -644,10 +648,12 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
+ *             mode     - [IN] mode of usage to avoid retrieving unnecessary  *
+ *                             information                                    *
  *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other.                                                 *
+ * Comments: Item and host is retrieved using history read lock that must be  *
+ *           write locked only when configuration sync occurs to avoid        *
+ *           processes blocking each other.                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
