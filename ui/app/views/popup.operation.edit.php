@@ -164,7 +164,7 @@ $form_grid->addItem([
 	(new CFormField(
 		(new CMultiSelect([
 			'name' => 'operation[opmessage_usr][][userid]',
-			'object_name' => 'usersGroups',
+			'object_name' => 'users',
 			'data' => $multiselect_values_users,
 			'popup' => [
 				'parameters' => [
