@@ -853,6 +853,7 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
 						'data' => json_encode([
 							'acknowledgeid' => $id,
+							'action' => $acknowledgement['action'],
 							'eventid' => $tasks_update_event_rank_cause[$k]['eventid'],
 							'userid' => $acknowledgement['userid']
 						])
@@ -902,6 +903,7 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
 						'data' => json_encode([
 							'acknowledgeid' => $id,
+							'action' => $acknowledgement['action'],
 							'eventid' => $tasks_update_event_rank_symptom[$k]['eventid'],
 							'cause_eventid' => $tasks_update_event_rank_symptom[$k]['cause_eventid'],
 							'userid' => $acknowledgement['userid']
