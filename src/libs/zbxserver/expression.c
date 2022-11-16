@@ -2320,7 +2320,7 @@ static void	get_event_value(const char *macro, const ZBX_DB_EVENT *event, char *
  * Purpose: free memory allocated for temporary event data                    *
  *                                                                            *
  ******************************************************************************/
-void	eventdata_free(zbx_eventdata_t *eventdata)
+static void	eventdata_free(zbx_eventdata_t *eventdata)
 {
 	zbx_free(eventdata->host);
 	zbx_free(eventdata->severity);
@@ -2403,7 +2403,6 @@ static void	eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **rep
 static void	get_rootcause(const ZBX_DB_SERVICE *service, char **replace_to)
 {
 	int			i;
-	char			*d = "";
 	zbx_vector_eventdata_t	rootcauses;
 
 	zbx_vector_eventdata_create(&rootcauses);
@@ -2934,7 +2933,6 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 		const zbx_uint64_t *recipient_userid, const zbx_service_alarm_t *service_alarm,
 		const DB_ACKNOWLEDGE *ack, const char *tz, int macro_type, char *error, int maxerrlen)
 {
-	zbx_uint64_t			r_eventid;
 	const ZBX_DB_EVENT		*cause_event, *r_event, *c_event;
 	zbx_vector_uint64_t		eventids, r_eventids;
 	zbx_vector_ptr_t		events, r_events;
@@ -2961,14 +2959,12 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 
 	if (r_eventids.values_num == 0)
 	{
-		r_eventid = 0;
 		c_event = cause_event;
 	}
 	else
 	{
 		zbx_db_get_events_by_eventids(&r_eventids, &r_events);
 		r_event = r_events.values[0];
-		r_eventid = r_event->eventid;
 		c_event = r_event;
 	}
 
