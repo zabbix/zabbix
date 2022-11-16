@@ -15,6 +15,11 @@
 		"js_class": "CWidgetClock",
 		"refresh_rate": 900
 	},
+	"actions": {
+		"widget.clock.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

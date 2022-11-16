@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_DB_H
 #define ZABBIX_CHECKS_DB_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #ifdef HAVE_UNIXODBC
 int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result);

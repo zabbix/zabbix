@@ -326,23 +326,6 @@ static int	DBpatch_5010036(void)
 	return DBadd_field("triggers", &field);
 }
 
-static int	DBpatch_5010037(void)
-{
-	const ZBX_TABLE	table =
-			{"trigger_queue", "", 0,
-				{
-					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
-}
-
 static int	DBpatch_5010038(void)
 {
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -1827,7 +1810,6 @@ DBPATCH_ADD(5010033, 0, 1)
 DBPATCH_ADD(5010034, 0, 1)
 DBPATCH_ADD(5010035, 0, 1)
 DBPATCH_ADD(5010036, 0, 1)
-DBPATCH_ADD(5010037, 0, 1)
 DBPATCH_ADD(5010038, 0, 1)
 DBPATCH_ADD(5010039, 0, 1)
 DBPATCH_ADD(5010040, 0, 1)

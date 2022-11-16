@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerDashboardConfigurationHashGet extends CController {
+class CControllerDashboardConfigHash extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -50,6 +50,10 @@ class CControllerDashboardConfigurationHashGet extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		/*
+		 * Permission check errors (e.g. expired sessions) must be ignored by the frontend and must not cause dashboard
+		 * reload.
+		 */
 		return true;
 	}
 
@@ -59,7 +63,8 @@ class CControllerDashboardConfigurationHashGet extends CController {
 	protected function doAction(): void {
 		$configuration_hash = null;
 
-		if ($this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
+		if (($this->hasInput('templateid') && $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS))
+				|| (!$this->hasInput('templateid') && $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD))) {
 			if ($this->hasInput('templateid')) {
 				$db_dashboards = API::TemplateDashboard()->get([
 					'output' => ['name', 'display_period', 'auto_start'],

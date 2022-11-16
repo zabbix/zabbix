@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxnum.h"
-#include "zbxdbcache/user_macro.h"
+#include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
 
 static void	mock_get_hostids(zbx_vector_uint64_t *hostids, zbx_mock_handle_t handle)

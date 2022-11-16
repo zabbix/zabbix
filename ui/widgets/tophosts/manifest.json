@@ -7,6 +7,9 @@
 	"version": "1.0",
 	"author": "Zabbix SIA",
 	"actions": {
+		"widget.tophosts.view": {
+			"class": "WidgetView"
+		},
 		"widget.tophosts.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",

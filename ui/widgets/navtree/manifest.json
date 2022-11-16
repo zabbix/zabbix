@@ -7,6 +7,9 @@
 	"version": "1.0",
 	"author": "Zabbix SIA",
 	"actions": {
+		"widget.navtree.view": {
+			"class": "WidgetView"
+		},
 		"widget.navtree.item.edit": {
 			"class": "NavTreeItemEdit",
 			"view": "navtreeitem.edit",

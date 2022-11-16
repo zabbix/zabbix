@@ -17,15 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcacheconfig.h"
 #include "dbconfig.h"
+#include "dbsync.h"
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
-#include "dbsync.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxexpr.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

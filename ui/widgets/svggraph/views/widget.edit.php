@@ -147,7 +147,7 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 			(new CWidgetFieldDatePickerView($fields['time_to']))
 				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-		),
+		)
 	]);
 }
 

@@ -85,7 +85,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			new CTemplateTag('dataset-single-item-tmpl',
 				$this->getGraphDataSetLayout($value, CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM, true)
 			),
-			new CTemplateTag('dataset-item-row-tmpl', $this->getItemRowTemplate()),
+			new CTemplateTag('dataset-item-row-tmpl', $this->getItemRowTemplate())
 		];
 	}
 

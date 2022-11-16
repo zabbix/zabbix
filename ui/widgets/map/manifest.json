@@ -14,6 +14,11 @@
 		"js_class": "CWidgetMap",
 		"refresh_rate": 900
 	},
+	"actions": {
+		"widget.map.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

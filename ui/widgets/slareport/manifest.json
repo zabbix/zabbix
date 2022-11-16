@@ -8,5 +8,10 @@
 	"author": "Zabbix SIA",
 	"widget": {
 		"refresh_rate": 0
+	},
+	"actions": {
+		"widget.slareport.view": {
+			"class": "WidgetView"
+		}
 	}
 }

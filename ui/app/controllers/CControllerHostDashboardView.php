@@ -45,7 +45,7 @@ class CControllerHostDashboardView extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)) {
 			return false;
 		}
 

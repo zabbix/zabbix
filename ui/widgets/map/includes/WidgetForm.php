@@ -28,14 +28,11 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldRadioButtonList,
-	CWidgetFieldReference,
 	CWidgetFieldSelectResource,
 	CWidgetFieldWidgetSelect
 };
 
 use Widgets\Map\Widget;
-
-use Zabbix\Core\CWidget;
 
 /**
  * Map widget form.

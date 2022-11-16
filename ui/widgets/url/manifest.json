@@ -11,6 +11,11 @@
 		"template_support": true,
 		"refresh_rate": 0
 	},
+	"actions": {
+		"widget.url.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

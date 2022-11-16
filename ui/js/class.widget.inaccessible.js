@@ -37,7 +37,11 @@ class CWidgetInaccessible extends CWidget {
 	setEditMode() {
 		super.setEditMode();
 
-		this._updateButtons();
+		const state = this.getState();
+
+		if (state === WIDGET_STATE_ACTIVE || state === WIDGET_STATE_INACTIVE) {
+			this._updateButtons();
+		}
 	}
 
 	_promiseUpdate() {

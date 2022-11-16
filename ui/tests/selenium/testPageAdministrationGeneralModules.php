@@ -88,16 +88,13 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Create an array with widgt modules that should be present by default.
 		$widget_modules = [];
-		$i = 0;
 
-		foreach (self::$widget_names as $name) {
+		foreach (self::$widget_names as $i => $name) {
 			$widget_modules[$i]['Name'] = $name;
 			$widget_modules[$i]['Version'] = '1.0';
 			$widget_modules[$i]['Author'] = 'Zabbix SIA';
 			$widget_modules[$i]['Description'] = '';
 			$widget_modules[$i]['Status'] = 'Enabled';
-
-			$i++;
 		}
 
 		// Open modules page and check header.
@@ -611,7 +608,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
 				$message = CMessageElement::find()->one();
-				$this->assertStringContainsString('Class not found', $message->getText());
+				$this->assertStringContainsString('Page not found', $message->getText());
 				$this->page->open('zabbix.php?action=module.list');
 			}
 		}

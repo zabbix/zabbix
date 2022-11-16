@@ -7697,19 +7697,19 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_vmware_rpool_chunk_create(&rp_chunks);
-	zbx_vector_ptr_create(&cl_chunks);
-
 	if (SUCCEED != zbx_property_collection_init(easyhandle, ZBX_POST_VCENTER_CLUSTER, "propertyCollector",
 			__func__, &iter, &cluster_data, error))
 	{
 		goto out;
 	}
 
+	zbx_vector_vmware_rpool_chunk_create(&rp_chunks);
+	zbx_vector_ptr_create(&cl_chunks);
+
 	if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks, &rp_chunks,
 			alarms_data, error))
 	{
-		goto out;
+		goto clean;
 	}
 
 	while (NULL != iter->token)
@@ -7718,16 +7718,15 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		cluster_data = NULL;
 
 		if (SUCCEED != zbx_property_collection_next(__func__, iter, &cluster_data, error))
-			goto out;
+			goto clean;
 
 		if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks,
 				&rp_chunks, alarms_data, error))
 		{
-			goto out;
+			goto clean;
 		}
 	}
 
-	zbx_property_collection_free(iter);
 	zbx_vector_vmware_rpool_chunk_sort(&rp_chunks, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	for (i = 0; i < rp_chunks.values_num; i++)
@@ -7767,6 +7766,10 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 			rpool->path = zbx_dsprintf(rpool->path, "%s/%s", rp_next->name, rpool->path);
 			rp_parent.id = rp_next->first_parentid;
 		}
+
+		/* free rpool if it was not added to resourcepool vector */
+		if (NULL == rp_chunk->path)
+			vmware_resourcepool_free(rpool);
 	}
 
 	zbx_vector_vmware_resourcepool_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
@@ -7777,19 +7780,21 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t*)(cl_chunks.values[i]);
 
 		if (SUCCEED != vmware_service_get_cluster_state(easyhandle, datastores, cluster, cq_values, error))
-			goto out;
+			goto clean;
 
 		zbx_vector_ptr_append(clusters, cluster);
 		zbx_vector_ptr_remove_noorder(&cl_chunks, i);
 	}
 
 	ret = SUCCEED;
-out:
+clean:
 	zbx_xml_free_doc(cluster_data);
 	zbx_vector_vmware_rpool_chunk_clear_ext(&rp_chunks, vmware_rp_chunk_free);
 	zbx_vector_vmware_rpool_chunk_destroy(&rp_chunks);
 	zbx_vector_ptr_clear_ext(&cl_chunks, (zbx_clean_func_t)vmware_cluster_free);
 	zbx_vector_ptr_destroy(&cl_chunks);
+out:
+	zbx_property_collection_free(iter);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found cl:%d rp:%d", __func__, zbx_result_string(ret),
 			clusters->values_num, resourcepools->values_num);

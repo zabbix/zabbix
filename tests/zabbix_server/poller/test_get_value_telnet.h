@@ -20,7 +20,7 @@
 #ifndef POLLER_GET_VALUE_TELNET_TEST_H
 #define POLLER_GET_VALUE_TELNET_TEST_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error);
 

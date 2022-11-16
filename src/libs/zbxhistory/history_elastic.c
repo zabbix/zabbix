@@ -22,8 +22,10 @@
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxvariant.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
@@ -91,9 +93,9 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
-static history_value_t	history_str2value(char *str, unsigned char value_type)
+static zbx_history_value_t	history_str2value(char *str, unsigned char value_type)
 {
-	history_value_t	value;
+	zbx_history_value_t	value;
 
 	switch (value_type)
 	{
