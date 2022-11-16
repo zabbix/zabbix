@@ -946,8 +946,6 @@ class CConfigurationImport {
 					unset($item[$master_item_key]);
 				}
 
-				unset($item['uuid']);
-
 				$hostids[] = $item['hostid'];
 				unset($item['hostid']);
 			}
