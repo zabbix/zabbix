@@ -135,7 +135,7 @@ class testPageWeb extends CWebTest {
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
 			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
-					->one()->isPresent()
+						->one()->isPresent()
 			);
 			$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
 		}
@@ -238,7 +238,7 @@ class testPageWeb extends CWebTest {
 		$this->assertTrue($popup->hasItems($data['titles']));
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-				$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+					$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
 		}
 	}
 
