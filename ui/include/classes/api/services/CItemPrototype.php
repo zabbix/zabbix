@@ -339,9 +339,9 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
-	 * @param bool $allowed_uuid_update
+	 * @param array $items
+	 * @param bool  $update
+	 * @param bool  $allowed_uuid_update
 	 */
 	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false) {
 		parent::checkInput($items, $update, $allowed_uuid_update);

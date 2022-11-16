@@ -79,7 +79,7 @@ class CConfigurationImportcompare {
 			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
 			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
 			'host_prototypes' => ['host'],
-			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
+			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
 
 		];
 
@@ -169,7 +169,7 @@ class CConfigurationImportcompare {
 			$object['after'] = $after;
 		}
 
-		if($object) {
+		if ($object) {
 			// Insert 'before' and/or 'after' at the beginning of array.
 			$result = array_merge($object, $result);
 		}

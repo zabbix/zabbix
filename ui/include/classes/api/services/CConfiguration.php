@@ -337,17 +337,16 @@ class CConfiguration extends CApiService {
 			switch ($entity) {
 				case 'groups':
 					$imported_ids['groups'] = API::HostGroup()->get([
+						'output' => ['groupid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
 						],
 						'preservekeys' => true,
 						'searchByAny' => true
-
 					]);
 
 					$imported_ids['groups'] = array_keys($imported_ids['groups']);
-
 					break;
 
 				case 'templates':

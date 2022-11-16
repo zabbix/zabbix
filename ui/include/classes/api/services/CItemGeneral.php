@@ -611,11 +611,13 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items_to_create
 	 * @param array $db_hosts
-	 * @param bool $is_update
+	 * @param bool  $is_update
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update, bool $allowed_uuid_update): void {
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update,
+			bool $allowed_uuid_update): void {
 		if ($is_update) {
 			if ($allowed_uuid_update) {
 				return;

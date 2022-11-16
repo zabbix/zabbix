@@ -608,7 +608,7 @@ class CConfigurationExport {
 
 			foreach ($inherited_items as $itemid => $item) {
 				foreach ($this->unlink_templates_data as $templates_data) {
-					if($item['hostid'] == $templates_data['templateid']
+					if ($item['hostid'] == $templates_data['templateid']
 							&& !in_array($item['templateid'], $templates_data['unlink_itemids'])) {
 						unset($inherited_items[$itemid]);
 					}
@@ -725,7 +725,7 @@ class CConfigurationExport {
 
 			foreach ($inherited_discovery_rules as $id => $discovery_rule) {
 				foreach ($this->unlink_templates_data as $templates_data) {
-					if($discovery_rule['hostid'] == $templates_data['templateid']
+					if ($discovery_rule['hostid'] == $templates_data['templateid']
 							&& !in_array($discovery_rule['templateid'], $templates_data['unlink_discoveries'])) {
 						unset($discovery_rule[$id]);
 					}
@@ -1070,14 +1070,14 @@ class CConfigurationExport {
 			$inherit_options = [
 				'output' => array_merge($this->dataFields['httptests'], ['templateid']),
 				'templateids' => $templateids,
-				'inherited' => true,
+				'inherited' => true
 			];
 
 			$inherited_httptests = API::HttpTest()->get($options + $inherit_options);
 
 			foreach ($inherited_httptests as $id => $httptest) {
 				foreach ($this->unlink_templates_data as $templates_data) {
-					if($httptest['hostid'] == $templates_data['templateid']
+					if ($httptest['hostid'] == $templates_data['templateid']
 							&& !in_array($httptest['templateid'], $templates_data['unlink_httptests'])) {
 						unset($inherited_httptests[$id]);
 					}
@@ -1088,7 +1088,7 @@ class CConfigurationExport {
 		$options += [
 			'output' => $this->dataFields['httptests'],
 			'hostids' => array_keys($hosts),
-			'inherited' => false,
+			'inherited' => false
 		];
 
 		$httptests = API::HttpTest()->get($options);
@@ -1138,7 +1138,7 @@ class CConfigurationExport {
 
 			foreach ($inherited_graphs as $id => $graph) {
 				foreach ($this->unlink_templates_data as $templates_data) {
-					if(in_array($templates_data['templateid'], $graph['hosts'])
+					if (in_array($templates_data['templateid'], $graph['hosts'])
 							&& !in_array($graph['templateid'], $templates_data['unlink_graphs'])) {
 						unset($inherited_graphs[$id]);
 					}
@@ -1283,7 +1283,7 @@ class CConfigurationExport {
 
 			foreach ($inherited_triggers as $id => $trigger) {
 				foreach ($this->unlink_templates_data as $templates_data) {
-					if(in_array($templates_data['templateid'], $trigger['hosts'])
+					if (in_array($templates_data['templateid'], $trigger['hosts'])
 							&& !in_array($trigger['templateid'], $templates_data['unlink_triggers'])) {
 						unset($inherited_triggers[$id]);
 					}

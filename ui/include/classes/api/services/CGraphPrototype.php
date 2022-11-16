@@ -456,7 +456,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @param array $dbGraphs
 	 * @param bool  $allowed_uuid_update
 	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update = false) {
+	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update) {
 		// check for "itemid" when updating graph prototype with only "gitemid" passed
 		foreach ($graphs as &$graph) {
 			if (isset($graph['gitems'])) {

@@ -372,4 +372,3 @@ class CArrayHelper {
 		return $result;
 	}
 }
-
