@@ -376,7 +376,6 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_ITEM_NEW			0x20
 
-
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface)
 {
 	switch (item->type)

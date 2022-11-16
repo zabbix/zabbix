@@ -1298,7 +1298,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->zbx_config_comms->config_timeout, &rtc);
 #endif
 
 	while (ZBX_IS_RUNNING())
@@ -1318,7 +1318,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				trapper_args_in->config_timeout);
+				trapper_args_in->zbx_config_comms->config_timeout);
 		zbx_update_env(zbx_time());
 
 		if (SUCCEED == ret)
