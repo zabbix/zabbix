@@ -407,7 +407,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Update DiscoveryRule.
 	 *
 	 * @param array $items
-	 * @param bool $allowed_uuid_update
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
@@ -1531,7 +1531,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array $dbItems
 	 *
 	 */
-	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false, array $dbItems = []) {
+	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false,
+			array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;

@@ -203,7 +203,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @return array
 	 */
-	public function update(array $dashboards, bool $allowed_uuid_update): array {
+	public function update(array $dashboards, bool $allowed_uuid_update = false): array {
 		$this->validateUpdate($dashboards, $db_dashboards, $allowed_uuid_update);
 
 		$upd_dashboards = [];
@@ -322,7 +322,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null, bool $allowed_uuid_update): void {
+	protected function validateUpdate(array &$dashboards, array &$db_dashboards = null,
+			bool $allowed_uuid_update): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['dashboardid']], 'fields' => [
 			'dashboardid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('dashboard', 'name')],

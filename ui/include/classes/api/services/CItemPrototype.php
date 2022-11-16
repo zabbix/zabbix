@@ -331,6 +331,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -339,9 +340,9 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
-	 * @param bool $allowed_uuid_update
+	 * @param array $items
+	 * @param bool  $update
+	 * @param bool  $allowed_uuid_update
 	 */
 	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false) {
 		parent::checkInput($items, $update, $allowed_uuid_update);

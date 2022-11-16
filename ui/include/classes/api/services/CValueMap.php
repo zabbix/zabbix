@@ -156,7 +156,7 @@ class CValueMap extends CApiService {
 
 	/**
 	 * @param array $valuemap
-	 * @param bool $allowed_uuid_update
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
@@ -458,7 +458,7 @@ class CValueMap extends CApiService {
 	/**
 	 * @param array $valuemaps
 	 * @param array $db_valuemaps
-	 * @param bool $allowed_uuid_update
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

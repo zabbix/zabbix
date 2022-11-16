@@ -96,7 +96,7 @@ $rules_table->addRow([
 		)
 	)
 		->addClass(ZBX_STYLE_CENTER)
-		: null,
+		: null
 ]);
 
 foreach ($titles as $key => $title) {

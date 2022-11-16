@@ -30,6 +30,10 @@ class CConfiguration extends CApiService {
 		'importcompare' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
+	private const VERSIONS = ['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0',
+		'6.2'
+	];
+
 	/**
 	 * @param array $params
 	 * @param bool  $allow_unlink_parent_templates
@@ -223,7 +227,7 @@ class CConfiguration extends CApiService {
 			->setStrict(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
+		foreach (self::VERSIONS as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -293,7 +297,7 @@ class CConfiguration extends CApiService {
 			->setPreview(true)
 			->validate($data, '/');
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'] as $version) {
+		foreach (self::VERSIONS as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
@@ -346,6 +350,7 @@ class CConfiguration extends CApiService {
 			switch ($entity) {
 				case 'host_groups':
 					$imported_ids['host_groups'] = API::HostGroup()->get([
+						'output' => ['groupid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
@@ -355,22 +360,20 @@ class CConfiguration extends CApiService {
 					]);
 
 					$imported_ids['host_groups'] = array_keys($imported_ids['host_groups']);
-
 					break;
 
 				case 'template_groups':
 					$imported_ids['template_groups'] = API::TemplateGroup()->get([
+						'output' => ['groupid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'name' => $data['name']
 						],
 						'preservekeys' => true,
 						'searchByAny' => true
-
 					]);
 
 					$imported_ids['template_groups'] = array_keys($imported_ids['template_groups']);
-
 					break;
 
 				case 'templates':
@@ -386,7 +389,6 @@ class CConfiguration extends CApiService {
 					]);
 
 					$imported_ids['templates'] = array_keys($templates_to_export);
-
 					break;
 
 				default:

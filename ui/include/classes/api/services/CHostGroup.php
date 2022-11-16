@@ -401,8 +401,8 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array  $groups
-	 * @param bool   $allowed_uuid_update
+	 * @param array $groups
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
@@ -566,13 +566,13 @@ class CHostGroup extends CApiService {
 	/**
 	 * Validates input data for update method.
 	 *
-	 * @param array $groups     [IN/OUT]
-	 * @param array $db_groups  [OUT]
+	 * @param array $groups
+	 * @param array $db_groups
 	 * @param bool  $allowed_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$groups, array &$db_groups = null, bool $allowed_uuid_update = false): void {
+	protected function validateUpdate(array &$groups, array &$db_groups = null, bool $allowed_uuid_update): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
