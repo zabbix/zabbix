@@ -1448,16 +1448,17 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 {
 	zbx_history_sync_item_t	*items;
 	zbx_vector_uint64_t	itemids;
-	int			*errcodes, i, num;
+	int			*errcodes;
+	size_t			i, num;
 
 	zabbix_log(LOG_LEVEL_WARNING, "exporting trend data...");
 
 	while (0 < trends_num)
 	{
-		num = MIN(ZBX_HC_SYNC_MAX, trends_num);
+		num = (size_t)MIN(ZBX_HC_SYNC_MAX, trends_num);
 
-		items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) * (size_t)num);
-		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)num);
+		items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) * num);
+		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, num);
@@ -1470,7 +1471,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, num,
 				ZBX_ITEM_GET_SYNC_EXPORT);
 
-		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, num);
+		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num);
 
 		zbx_dc_config_clean_history_sync_items(items, errcodes, num);
 		zbx_vector_uint64_destroy(&itemids);
@@ -1478,7 +1479,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_free(errcodes);
 
 		trends += num;
-		trends_num -= num;
+		trends_num -= (int)num;
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "exporting trend data done");
@@ -3083,7 +3084,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 	items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
-	zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+	zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, (size_t)itemids.values_num,
 			ZBX_ITEM_GET_SYNC);
 
 	for (i = 0; i < history_num; i++)
@@ -3117,7 +3118,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 		history[i].flags |= ZBX_DC_FLAG_NOVALUE;
 	}
 
-	zbx_dc_config_clean_history_sync_items(items, errcodes, history_num);
+	zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
 	zbx_free(items);
 	zbx_free(errcodes);
 	zbx_vector_uint64_destroy(&itemids);
@@ -3356,8 +3357,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			for (i = 0; i < history_num; i++)
 				zbx_vector_uint64_append(&itemids, history[i].itemid);
 
-			zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, history_num,
-					item_retrieve_mode);
+			zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes,
+					(size_t)history_num, item_retrieve_mode);
 
 			um_handle = zbx_dc_open_user_macros();
 
@@ -3542,7 +3543,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		if (0 != history_num)
 		{
 			zbx_free(trends);
-			zbx_dc_config_clean_history_sync_items(items, errcodes, history_num);
+			zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
 
 			zbx_vector_ptr_clear(&history_items);
 			hc_free_item_values(history, history_num);

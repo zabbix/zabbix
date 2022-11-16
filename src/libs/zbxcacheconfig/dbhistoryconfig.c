@@ -143,9 +143,9 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
-		int *errcodes, int num, unsigned int mode)
+		int *errcodes, size_t num, unsigned int mode)
 {
-	int			i;
+	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
 	zbx_config_hk_t		config_hk;
@@ -332,7 +332,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 	zbx_condition_t			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
-	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
+	zbx_vector_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
 
 	for (i = 0; i < dc_action->conditions.values_num; i++)
 	{
@@ -545,10 +545,10 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
  *       currently only lock configuration cache.                             *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, int num,
+static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, size_t num,
 		int maintenances_num)
 {
-	int			i;
+	size_t			i;
 	const ZBX_DC_HOST	*dc_host = NULL;
 
 	if (0 == maintenances_num)
@@ -607,7 +607,8 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num)
 {
-	int			i, maintenances_num;
+	int			maintenances_num;
+	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
@@ -649,9 +650,10 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
-		int *errcodes, int num, unsigned int mode)
+		int *errcodes, size_t num, unsigned int mode)
 {
-	int			i, maintenances_num;
+	int			maintenances_num;
+	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
 

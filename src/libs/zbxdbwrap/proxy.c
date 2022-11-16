@@ -1798,7 +1798,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		zbx_dc_config_history_recv_get_items_by_itemids(items, itemids, errcodes, values_num, mode);
+		zbx_dc_config_history_recv_get_items_by_itemids(items, itemids, errcodes, (size_t)values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -1995,7 +1995,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 	while (SUCCEED == parse_history_data(jp_data, &pnext, values, hostkeys, &values_num, &read_num,
 			&unique_shift) && 0 != values_num)
 	{
-		zbx_dc_config_history_recv_get_items_by_keys(items, hostkeys, errcodes, values_num);
+		zbx_dc_config_history_recv_get_items_by_keys(items, hostkeys, errcodes, (size_t)values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
