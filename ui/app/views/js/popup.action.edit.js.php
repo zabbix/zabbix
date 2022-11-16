@@ -53,10 +53,10 @@ window.action_edit_popup = new class {
 	}
 
 	_loadOperationTable(new_operation = {}) {
-		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
+		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.$operation_table = $('#recovery-operations-container');
 		}
-		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
 			this.$operation_table = $('#update-operations-container');
 		}
 		else {
@@ -190,6 +190,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+			this.recovery = e.detail.operation.recovery;
 			this._loadOperationTable(e.detail);
 		});
 	}
@@ -208,6 +209,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+			this.recovery = e.detail.operation.recovery;
 			this._loadOperationTable(e.detail);
 		});
 	}
