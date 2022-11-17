@@ -812,7 +812,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 	if (0 == triggerids_serviced.values_num)
 	{
 		ret = SUCCEED;
-		goto out;
+		goto cleanup;
 	}
 
 	for (i = 0; i < triggerids_serviced.values_num; i++)
@@ -832,7 +832,7 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 		ret = SUCCEED;
 out:
 	UNLOCK_ITSERVICES;
-
+cleanup:
 	zbx_free(sql);
 	zbx_vector_ptr_clear_ext(&updates, (zbx_clean_func_t)zbx_status_update_free);
 	zbx_vector_ptr_destroy(&updates);
