@@ -2221,7 +2221,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
