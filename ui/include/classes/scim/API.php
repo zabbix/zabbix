@@ -21,13 +21,13 @@
 
 namespace SCIM;
 
-use API as APIRPC;
 use Exception;
 use CHttpRequest;
 use CApiClientResponse;
 use SCIM\clients\ScimApiClient;
 
 class API {
+
 	/**
 	 * Executes received request.
 	 *
@@ -37,10 +37,13 @@ class API {
 	 * @return HttpResponse
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
-		[$input, $auth, $class] = $this->parseRequestData($request);
+		[, $class] = explode('/', $request->header('PATH-INFO'), 3) + ['', ''];
+		$class = strtolower($class);
+		$action = strtolower($request->method());
+		$input = $this->parseRequestData($request);
 
 		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($class, strtolower($request->method()), $input, $auth);
+		$response = $client->callMethod($class, $action, $input, $request->getAuthBearerValue());
 
 		if ($response->errorCode !== null) {
 			throw new Exception($response->errorMessage, $response->errorCode);
@@ -50,26 +53,18 @@ class API {
 	}
 
 	/**
-	 * Parses the information sent in request and returns specific data.
+	 * Parse request body data adding supported GET parameters, return parsed parameters as array.
 	 *
 	 * @param CHttpRequest $request
 	 *
-	 * @return array with input, authorisation token, class and id.
+	 * @return array
 	 */
 	private function parseRequestData(CHttpRequest $request): array {
 		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
-
-		[, $auth] = explode('Bearer ', $request->header('AUTHORIZATION'), 2) + ['', ''];
-		[, $class, $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
+		[, , $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
 
 		if ($id !== '') {
 			$input['id'] = $id;
-		}
-
-		$class = strtolower($class);
-
-		if ($class === 'serviceproviderconfig' && $request->method() === 'GET') {
-			$auth = null;
 		}
 
 		if (array_key_exists('filter', $_GET)) {
@@ -91,7 +86,7 @@ class API {
 			$input['count'] = $_GET['count'];
 		}
 
-		return [$input, $auth, $class];
+		return $input;
 	}
 
 }
