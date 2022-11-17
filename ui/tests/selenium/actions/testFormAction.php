@@ -1028,10 +1028,10 @@ class testFormAction extends CLegacyWebTest {
 				'Send to user groups', 'User group', 'Action',
 				'Send to users'
 			]);
-			$this->zbxTestAssertVisibleXpath('//button[@class="btn-link operation-message-user-groups-footer"]');
-			$this->zbxTestAssertElementText('//button[@class="btn-link operation-message-user-groups-footer"]', 'Add');
-			$this->zbxTestAssertVisibleXpath('//button[@class="btn-link operation-message-users-footer"]');
-			$this->zbxTestAssertElementText('//button[@class="btn-link operation-message-users-footer"]', 'Add');
+			$this->zbxTestAssertVisibleXpath('//div[@id="operation-message-user-groups"]//button');
+			$this->zbxTestAssertElementText('//div[@id="operation-message-user-groups"]//button', 'Select');
+			$this->zbxTestAssertVisibleXpath('//div[@id="operation-message-users"]//button');
+			$this->zbxTestAssertElementText('//div[@id="operation-message-users"]//button', 'Select');
 
 			$this->zbxTestTextPresent('Send only to');
 			$this->zbxTestAssertVisibleId('operation-message-mediatype-only-label');
@@ -1511,7 +1511,7 @@ class testFormAction extends CLegacyWebTest {
 						$field = 'Send to users';
 						$value = 'Admin';
 					}
-					$operation_form->getField($field)->query('button:Add')->one()->click();
+					$operation_form->getField($field)->query('button:Select')->one()->click();
 					$list = COverlayDialogElement::find()->all()->last();
 					$list->query('link', $value)->waitUntilClickable()->one()->click();
 				}
@@ -1618,13 +1618,13 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Operations');
 		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
 
-		$this->zbxTestClickXpathWait('//button[@class="btn-link operation-message-user-groups-footer"]');
+		$this->zbxTestClickXpathWait('//div[@id="operation-message-user-groups"]//button[text()="Select"]');
 		$this->zbxTestLaunchOverlayDialog('User groups');
 		$this->zbxTestCheckboxSelect('item_7');
 		$this->zbxTestCheckboxSelect('item_11');
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
-		$this->zbxTestClickXpathWait('//button[@class="btn-link operation-message-users-footer"]');
+		$this->zbxTestClickXpathWait('//div[@id="operation-message-users"]//button[text()="Select"]');
 		$this->zbxTestLaunchOverlayDialog('Users');
 		$this->zbxTestCheckboxSelect('item_1');
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
@@ -1693,7 +1693,7 @@ class testFormAction extends CLegacyWebTest {
 		);
 
 		$this->zbxTestAssertElementValue('esc_period', '123');
-		$form->submit();
+		$form->submit()->waitUntilNotVisible();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";

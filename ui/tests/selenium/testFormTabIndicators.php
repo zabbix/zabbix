@@ -726,8 +726,8 @@ class testFormTabIndicators extends CWebTest {
 		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
 			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
 			$operations_overlay = COverlayDialogElement::find()->asForm()->one();
-			$operations_overlay->query('xpath://button[@class="btn-link operation-message-users-footer"]')->one()->click();
-
+			$operations_overlay->query('xpath://div[@id="operation-message-users"]'.
+					'//button[text()="Select"]')->one()->click();
 			$users_overlay = COverlayDialogElement::find()->all()->asForm()->last();
 			$users_overlay->query('id:item_1')->asCheckbox()->one()->check();
 			$users_overlay->submit();
