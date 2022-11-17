@@ -3,6 +3,8 @@
 noinst_LIBRARIES = libzbxdbcache.a
 
 libzbxdbcache_a_SOURCES = \
+	dbhistoryconfig.c \
+	dbhistoryconfig.h \
 	dbcache.c \
 	dbconfig.c \
 	dbconfig.h \

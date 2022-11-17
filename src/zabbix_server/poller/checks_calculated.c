@@ -251,9 +251,16 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
+		DC_EVALUATE_ITEM	evaluate_item;
+
+		evaluate_item.itemid = items[i].itemid;
+		evaluate_item.value_type = items[i].value_type;
+		evaluate_item.proxy_hostid = items[i].host.proxy_hostid;
+		evaluate_item.host = items[i].host.host;
+		evaluate_item.key_orig = items[i].key_orig;
 
 		if (0 == ret_unknown &&
-				SUCCEED != evaluate_function(&(f->value), &items[i], f->func, f->params, &ts, &errstr))
+				SUCCEED != evaluate_function(&(f->value), &evaluate_item, f->func, f->params, &ts, &errstr))
 		{
 			/* compose and store error message for future use */
 			if (NULL != errstr)
