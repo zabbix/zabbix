@@ -279,44 +279,44 @@ function actionConditionValueToString(array $actions) {
 
 				switch ($condition['conditiontype']) {
 					case CONDITION_TYPE_HOST_GROUP:
-						if (isset($groups[$id])) {
+						if (array_key_exists($id, $groups)) {
 							$result[$i][$j] = $groups[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_TRIGGER:
-						if (isset($triggers[$id])) {
+						if (array_key_exists($id, $triggers)) {
 							$host = reset($triggers[$id]['hosts']);
 							$result[$i][$j] = $host['name'].NAME_DELIMITER.$triggers[$id]['description'];
 						}
 						break;
 
 					case CONDITION_TYPE_HOST:
-						if (isset($hosts[$id])) {
+						if (array_key_exists($id, $hosts)) {
 							$result[$i][$j] = $hosts[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_TEMPLATE:
-						if (isset($templates[$id])) {
+						if (array_key_exists($id, $templates)) {
 							$result[$i][$j] = $templates[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_PROXY:
-						if (isset($proxies[$id])) {
+						if (array_key_exists($id, $proxies)) {
 							$result[$i][$j] = $proxies[$id]['host'];
 						}
 						break;
 
 					case CONDITION_TYPE_DRULE:
-						if (isset($dRules[$id])) {
+						if (array_key_exists($id, $dRules)) {
 							$result[$i][$j] = $dRules[$id]['name'];
 						}
 						break;
 
 					case CONDITION_TYPE_DCHECK:
-						if (isset($dChecks[$id])) {
+						if (array_key_exists($id, $dChecks)) {
 							$drule = reset($dChecks[$id]['drules']);
 							$type = $dChecks[$id]['type'];
 							$key_ = $dChecks[$id]['key_'];
@@ -329,7 +329,7 @@ function actionConditionValueToString(array $actions) {
 						break;
 
 					case CONDITION_TYPE_SERVICE:
-						if (isset($services[$id])) {
+						if (array_key_exists($id, $services)) {
 							$result[$i][$j] = $services[$id]['name'];
 						}
 						break;
@@ -533,7 +533,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 				$mediatype = _('all media');
 				$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-				if ($mediatypeid != 0 && isset($mediatypes[$mediatypeid])) {
+				if ($mediatypeid != 0 && array_key_exists($mediatypeid, $mediatypes)) {
 					$mediatype = $mediatypes[$mediatypeid]['name'];
 				}
 
@@ -557,7 +557,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					$user_groups_list = [];
 
 					foreach ($operation['opmessage_grp'] as $userGroup) {
-						if (isset($user_groups[$userGroup['usrgrpid']])) {
+						if (array_key_exists($userGroup['usrgrpid'], $user_groups)) {
 							$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
 						}
 					}
@@ -592,7 +592,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 								BR()
 							];
 						}
-						elseif (isset($hosts[$host['hostid']])) {
+						elseif (array_key_exists($host['hostid'], $hosts)) {
 							$host_list[] = $hosts[$host['hostid']]['name'];
 						}
 					}
@@ -611,7 +611,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					$host_group_list = [];
 
 					foreach ($operation['opcommand_grp'] as $host_group) {
-						if (isset($host_groups[$host_group['groupid']])) {
+						if (array_key_exists($host_group['groupid'], $host_groups)) {
 							$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
 						}
 					}
@@ -753,7 +753,7 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_EVENT_TAG_VALUE
 	];
 
-	if (isset($conditions[$eventsource])) {
+	if (array_key_exists($eventsource, $conditions)) {
 		return $conditions[$eventsource];
 	}
 
@@ -766,7 +766,7 @@ function get_opconditions_by_eventsource($eventsource) {
 		EVENT_SOURCE_DISCOVERY => []
 	];
 
-	if (isset($conditions[$eventsource])) {
+	if (array_key_exists($eventsource, $conditions)) {
 		return $conditions[$eventsource];
 	}
 }
@@ -871,7 +871,7 @@ function operation_type2str($type) {
 	if (is_null($type)) {
 		return order_result($types);
 	}
-	elseif (isset($types[$type])) {
+	elseif (array_key_exists($type, $types)) {
 		return $types[$type];
 	}
 	else {
@@ -1028,7 +1028,7 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_NOT_LIKE
 	];
 
-	if (isset($operators[$conditiontype])) {
+	if (array_key_exists($conditiontype,  $operators)) {
 		return $operators[$conditiontype];
 	}
 
