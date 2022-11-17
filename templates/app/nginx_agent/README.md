@@ -33,7 +33,6 @@ See the setup instructions for [ngx_http_stub_status_module](https://nginx.ru/en
 Test the availability of the `http_stub_status_module` with `nginx -V 2>&1 | grep -o with-http_stub_status_module`.
 
 Example configuration of Nginx:
-
 ```text
 location = /basic_status {
     stub_status;
@@ -95,7 +94,7 @@ There are no template links in this template.
 |Nginx |Nginx: Memory usage (rss) |<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |nginx.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Nginx |Nginx: Memory usage, % |<p>The percentage of real memory used by a process {#NAME}.</p> |DEPENDENT |nginx.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Nginx |Nginx: Number of running processes |<p>The number of running processes {#NAME}.</p> |DEPENDENT |nginx.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Nginx: Get stub status page |<p>The following status information is provided:</p><p>`Active connections` - the current number of active client connections including waiting connections.</p><p>`Accepted` - the total number of accepted client connections.</p><p>`Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).</p><p>`Requests` - the total number of client requests.</p><p>`Reading` - the current number of connections where Nginx is reading the request header.</p><p>`Writing` - the current number of connections where Nginx is writing a response back to the client.</p><p>`Waiting` - the current number of idle client connections waiting for a request.</p><p>For more details see also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).</p> |ZABBIX_PASSIVE |web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"] |
+|Zabbix raw items |Nginx: Get stub status page |<p>The following status information is provided:</p><p> `Active connections` - the current number of active client connections including waiting connections.</p><p> `Accepted` - the total number of accepted client connections.</p><p> `Handled` - the total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections` limit).</p><p> `Requests` - the total number of client requests.</p><p> `Reading` - the current number of connections where Nginx is reading the request header.</p><p> `Writing` - the current number of connections where Nginx is writing a response back to the client.</p><p> `Waiting` - the current number of idle client connections waiting for a request.</p><p> See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).</p> |ZABBIX_PASSIVE |web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"] |
 
 ## Triggers
 

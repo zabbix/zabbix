@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T13:38:22Z'
+  date: '2022-11-17T11:59:28Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -30,7 +30,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total bytes served.'
+          description: 'The total bytes served.'
           preprocessing:
             -
               type: JSONPATH
@@ -57,7 +57,7 @@ zabbix_export:
           units: Bps
           description: |
             It is calculated as a rate of change for total bytes statistics.
-            ReqPerSec is not used, as it counts the average since the last Apache server start.
+            `ReqPerSec` is not used, as it counts the average since the last Apache server start.
           preprocessing:
             -
               type: JSONPATH
@@ -104,9 +104,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: |
-            Calculated as change rate for 'Total requests' stat.
-            ReqPerSec is not used, as it counts average since last Apache server start.
+          description: 'It is calculated as a rate of change for the "Total requests" statistics.</p><p>`ReqPerSec` is not used, as it counts the average since the last Apache server start.'
           preprocessing:
             -
               type: JSONPATH
@@ -219,7 +217,7 @@ zabbix_export:
           key: apache.workers.closing
           delay: '0'
           history: 7d
-          description: 'The number of workers in a closing state.'
+          description: 'The number of workers in closing state.'
           preprocessing:
             -
               type: JSONPATH
@@ -238,7 +236,7 @@ zabbix_export:
           key: apache.workers.dnslookup
           delay: '0'
           history: 7d
-          description: 'The number of workers in dnslookup state.'
+          description: 'The number of workers in `dnslookup` state.'
           preprocessing:
             -
               type: JSONPATH
@@ -276,7 +274,7 @@ zabbix_export:
           key: apache.workers.keepalive
           delay: '0'
           history: 7d
-          description: 'The number of workers in keepalive state.'
+          description: 'The number of workers in `keepalive` state.'
           preprocessing:
             -
               type: JSONPATH
@@ -584,7 +582,7 @@ zabbix_export:
               key: 'apache.connections[async_closing{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'The number of asynchronous connections in a closing state (applicable only to the event MPM).'
+              description: 'The number of asynchronous connections in closing state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -603,7 +601,7 @@ zabbix_export:
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'The number of asynchronous connections in a keepalive state (applicable only to the event MPM).'
+              description: 'The number of asynchronous connections in keepalive state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -622,7 +620,7 @@ zabbix_export:
               key: 'apache.connections[async_writing{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'The number of asynchronous connections in a writing state (applicable only to the event MPM).'
+              description: 'The number of asynchronous connections in writing state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -737,7 +735,7 @@ zabbix_export:
                 macro: '{#NAME}'
                 value: '{$APACHE.PROCESS_NAME}'
                 formulaid: A
-          description: 'The discovery summary of Apache process.'
+          description: 'The discovery of the Apache process summary.'
           item_prototypes:
             -
               uuid: 458bfecc83f64540838e3ffc3a7f3cb1
@@ -954,11 +952,11 @@ zabbix_export:
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'The maximum Apache response time in seconds for a trigger expression.'
+          description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
         -
           macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'The Hostname or IP address of the Apache status page.'
+          description: 'The Hostname or an IP address of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
@@ -966,11 +964,11 @@ zabbix_export:
         -
           macro: '{$APACHE.STATUS.PORT}'
           value: '80'
-          description: 'The port of Apache status page.'
+          description: 'The port of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.SCHEME}'
           value: http
-          description: 'The request scheme which may be either HTTP or HTTPS.'
+          description: 'The request scheme, which may be either HTTP or HTTPS.'
       dashboards:
         -
           uuid: c27c68fb9c234a09b4023076b45affc1

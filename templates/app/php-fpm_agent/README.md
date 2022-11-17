@@ -14,6 +14,7 @@ Note that this template doesn't support HTTPS and redirects (limitations of `web
 
 It also uses Zabbix agent to collect `PHP-FPM` Linux process statistics, such as CPU usage, memory usage, and whether the process is running or not.
 
+
 This template was tested on:
 
 - PHP, version 7
@@ -125,7 +126,7 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Listen queue, len |<p>The size of the socket queue of pending connections.</p> |DEPENDENT |php-fpm.listen_queue_len<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue len']`</p> |
 |PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that `pm.max_children` has been reached since the PHP-FPM pool was started.</p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE</p> |
 |PHP-FPM |PHP-FPM: Get process data |<p>The summary metrics aggregated by a process `{#NAME}`.</p> |DEPENDENT |php-fpm.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
-|PHP-FPM |PHP-FPM: Memory usage (rss) |<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |php-fpm.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|PHP-FPM |PHP-FPM: Memory usage (rss) |<p>The summary of resident set size memory used by a process `{#NAME}` expressed in bytes.</p> |DEPENDENT |php-fpm.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |PHP-FPM |PHP-FPM: Memory usage (vsize) |<p>The summary of virtual memory used by a process `{#NAME}` expressed in bytes.</p> |DEPENDENT |php-fpm.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |PHP-FPM |PHP-FPM: Memory usage, % |<p>The percentage of real memory used by a process `{#NAME}`.</p> |DEPENDENT |php-fpm.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |PHP-FPM |PHP-FPM: Number of running processes |<p>The number of running processes `{#NAME}`.</p> |DEPENDENT |php-fpm.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |

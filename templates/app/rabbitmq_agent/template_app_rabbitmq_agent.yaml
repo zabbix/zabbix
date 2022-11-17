@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-16T10:58:54Z'
+  date: '2022-11-17T12:02:01Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -49,7 +49,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages delivered to clients and acknowledged per second.'
+          description: 'The rate of messages (per second) delivered to clients and acknowledged.'
           preprocessing:
             -
               type: JSONPATH
@@ -70,7 +70,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.confirm
           delay: '0'
           history: 7d
-          description: 'The count of messages confirmed.'
+          description: 'The count of confirmed messages.'
           preprocessing:
             -
               type: JSONPATH
@@ -92,7 +92,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages confirmed per second.'
+          description: 'The rate of confirmed messages per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -113,7 +113,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.deliver_get
           delay: '0'
           history: 7d
-          description: 'The sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
+          description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -135,7 +135,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
+          description: 'The rate of the sum of messages (per second) delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
           preprocessing:
             -
               type: JSONPATH
@@ -156,7 +156,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.publish
           delay: '0'
           history: 7d
-          description: 'The count of messages published.'
+          description: 'The count of published messages.'
           preprocessing:
             -
               type: JSONPATH
@@ -178,7 +178,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages published per second.'
+          description: 'The rate of published messages per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -199,7 +199,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.publish_in
           delay: '0'
           history: 7d
-          description: 'The count of messages published from channels into this overview.'
+          description: 'The count of messages published from the channels into this overview.'
           preprocessing:
             -
               type: JSONPATH
@@ -221,7 +221,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages published from channels into this overview per sec.'
+          description: 'The rate of messages (per second) published from the channels into this overview.'
           preprocessing:
             -
               type: JSONPATH
@@ -264,7 +264,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate.'
+          description: 'The rate of messages (per second) published from this overview into queues.'
           preprocessing:
             -
               type: JSONPATH
@@ -285,7 +285,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.redeliver
           delay: '0'
           history: 7d
-          description: 'The count of subset of messages in deliver_get which had the redelivered flag set.'
+          description: 'The count of subset of messages in the `deliver_get`, which had the `redelivered` flag set.'
           preprocessing:
             -
               type: JSONPATH
@@ -307,7 +307,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of subset of messages in deliver_get which had the redelivered flag set per second.'
+          description: 'The rate of subset of messages (per second) in the `deliver_get`, which had the `redelivered` flag set.'
           preprocessing:
             -
               type: JSONPATH
@@ -328,7 +328,7 @@ zabbix_export:
           key: rabbitmq.overview.messages.return_unroutable
           delay: '0'
           history: 7d
-          description: 'The count of messages returned to publisher as unroutable.'
+          description: 'The count of messages returned to a publisher as unroutable.'
           preprocessing:
             -
               type: JSONPATH
@@ -350,7 +350,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The rate of messages returned to publisher as unroutable per second.'
+          description: 'The rate of messages (per second) returned to a publisher as unroutable.'
           preprocessing:
             -
               type: JSONPATH
@@ -466,7 +466,7 @@ zabbix_export:
           key: rabbitmq.overview.queue_totals.messages
           delay: '0'
           history: 7d
-          description: 'The total number of messages (ready plus unacknowledged).'
+          description: 'The total number of messages (ready, plus unacknowledged).'
           preprocessing:
             -
               type: JSONPATH
@@ -485,7 +485,7 @@ zabbix_export:
           key: rabbitmq.overview.queue_totals.messages.ready
           delay: '0'
           history: 7d
-          description: 'The number of messages ready for deliver.'
+          description: 'The number of messages ready for delivery.'
           preprocessing:
             -
               type: JSONPATH
@@ -523,7 +523,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          description: 'The HTTP API endpoint that returns exchanges metrics'
+          description: 'The HTTP API endpoint that returns exchanges metrics.'
           preprocessing:
             -
               type: REGEX
@@ -584,7 +584,7 @@ zabbix_export:
                 value: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Individual exchange metrics'
+          description: 'The metrics for an individual exchange.'
           item_prototypes:
             -
               uuid: 68892e56e0074516b5d052dd7178955f
@@ -594,7 +594,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of messages delivered to clients and acknowledged per second.'
+              description: 'The rate of messages (per second) delivered to clients and acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -685,7 +685,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'The count of messages confirmed.'
+              description: 'The count of confirmed messages.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -716,7 +716,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
+              description: 'The rate of the sum of messages (per second) delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to the `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -746,7 +746,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.deliver_get["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'The sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+              description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to the `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -777,7 +777,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of messages published per second'
+              description: 'The rate of messages published per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -807,7 +807,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.publish["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'The count of messages published.'
+              description: 'The count of published messages.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -838,7 +838,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of messages published from channels into this overview per sec.'
+              description: 'The rate of messages (per second) published from the channels into this overview.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -868,7 +868,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.publish_in["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'The count of messages published from channels into this overview.'
+              description: 'The count of messages published from the channels into this overview.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -899,7 +899,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of published messages (per second) from this overview into queues.'
+              description: 'The rate of messages (per second) published from this overview into queues.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -960,7 +960,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of subset of messages in deliver_get which had the redelivered flag set per second.'
+              description: 'The rate of subset of messages (per second) in the `deliver_get`, which had the `redelivered` flag set.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -990,7 +990,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.redeliver["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'THe count of subset of messages in deliver_get which had the redelivered flag set.'
+              description: 'The count of subset of messages in the `deliver_get`, which had the `redelivered` flag set.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1021,7 +1021,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of messages returned to publisher as unroutable per second.'
+              description: 'The rate of messages (per second) returned to a publisher as unroutable.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1051,7 +1051,7 @@ zabbix_export:
               key: 'rabbitmq.exchange.messages.return_unroutable["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: 7d
-              description: 'The count of messages returned to publisher as unroutable.'
+              description: 'The count of messages returned to a publisher as unroutable.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1092,14 +1092,14 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.healthcheck.v3810.discovery
           delay: '0'
-          description: 'Version 3.8.10+ specific metrics'
+          description: 'Specific metrics for the versions: up to and including 3.8.10.'
           item_prototypes:
             -
               uuid: 4c93b04164d24eb8b9dbdab652afc7bc
               name: 'RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]'
               history: 7d
-              description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
+              description: 'It responds with a status code`200 OK` if there are no alarms in effect in the cluster. Otherwise, it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1134,7 +1134,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks the active alarms in the cluster via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -1165,7 +1165,7 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.CLUSTER_HOST}'
           value: 127.0.0.1
-          description: 'The hostname or an IP of RabbitMQ cluster for an API endpoint.'
+          description: 'The hostname or an IP of the API endpoint for the RabbitMQ cluster.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
@@ -1183,11 +1183,11 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the discovery of exchanges. It can be overridden at host or its linked template level.'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the discovery of exchanges. It can be overridden at host or its linked template level.'
+          description: 'This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.'
       dashboards:
         -
           uuid: a886a871a00d47e28b8648cadae3bc99
@@ -1430,7 +1430,7 @@ zabbix_export:
           key: rabbitmq.node.fd_used
           delay: '0'
           history: 7d
-          description: 'Used file descriptors.'
+          description: 'The descriptors of the used file.'
           preprocessing:
             -
               type: JSONPATH
@@ -1554,7 +1554,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The version of RabbitMQ on the node which processed this request.'
+          description: 'The version of the RabbitMQ on the node, which processed this request.'
           preprocessing:
             -
               type: JSONPATH
@@ -1590,7 +1590,7 @@ zabbix_export:
           key: rabbitmq.node.partitions
           delay: '0'
           history: 7d
-          description: 'The number of network partitions this node "sees".'
+          description: 'The number of network partitions, which this node "sees".'
           preprocessing:
             -
               type: JSONPATH
@@ -1807,7 +1807,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]'
               history: 7h
-              description: 'It checks whether the the RabbitMQ application is running; and the channels and queues can be listed successfully; and that no alarms are in effect.'
+              description: 'It checks whether the the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1873,7 +1873,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]'
               history: 7d
-              description: 'It checks the expiration date on the certificates for every listener configured to use the Transport Layer Security (TLS). It responds with a status code -200 OK- if all the certificates are valid (have not expired); otherwise it responds with a status code -503 Service Unavailable.'
+              description: 'It checks the expiration date on the certificates for every listener configured to use the Transport Layer Security (TLS). It responds with a status code `200 OK` if all the certificates are valid (have not expired). Otherwise, it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1908,7 +1908,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are valid TLS certificates expiring in the next month. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -1918,7 +1918,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]'
               history: 7d
-              description: 'It responds with a status code - 200 OK- if there are no local alarms in effect on the target node; otherwise it responds with a status code - 503 Service Unavailable.'
+              description: 'It responds with a status code `200 OK` if there are no local alarms in effect on the target node. Otherwise, it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1953,7 +1953,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks the active alarms in the nodes via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -1963,7 +1963,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]'
               history: 7d
-              description: 'It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). It responds with a status code -200 OK- if there are no such classic mirrored queues; otherwise it responds with a status code -503 Service Unavailable.'
+              description: 'It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). It responds with a status code `200 OK` if there are no such classic mirrored queues. Otherwise, it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -1998,7 +1998,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -2008,7 +2008,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]'
               history: 7d
-              description: 'It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). It responds with a status code -200 OK- if there are no such quorum queues; otherwise it responds with a status code -503 Service Unavailable.'
+              description: 'It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). It responds with a status code `200 OK` if there are no such quorum queues. Otherwise, it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -2043,7 +2043,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -2053,7 +2053,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]'
               history: 7d
-              description: 'It responds with It responds with a status code -200 OK- if all virtual hosts are running on the target node; otherwise it responds with a status code -503 Service Unavailable.'
+              description: 'It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node. Otherwise it responds with a status code `503 Service Unavailable`.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
@@ -2088,7 +2088,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are not running virtual hosts via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     -
                       tag: scope
@@ -2121,7 +2121,7 @@ zabbix_export:
                 macro: '{#NAME}'
                 value: '{$RABBITMQ.PROCESS_NAME}'
                 formulaid: A
-          description: 'The discovery of RabbitMQ summary processes.'
+          description: 'The discovery of the RabbitMQ summary processes.'
           item_prototypes:
             -
               uuid: 0b195bf594c44b1f869b4a7671f61453
@@ -2421,7 +2421,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of messages per second delivered to clients and acknowledged.'
+              description: 'The number of messages (per second) delivered to clients and acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2476,7 +2476,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The count of messages per second delivered to consumers in acknowledgement mode.'
+              description: 'The count of messages (per second) delivered to consumers in acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2531,7 +2531,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate of delivery per second. The sum of messages per second delivered to consumers in acknowledgement mode, in no-acknowledgement mode; in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
+              description: 'The rate of delivery per second. The sum of messages delivered (per second) to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2558,7 +2558,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.deliver_get["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'The sum of messages delivered to consumers in acknowledgement mode, in no-acknowledgement mode; in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
+              description: 'The sum of messages delivered to consumers: in acknowledgement mode and in no-acknowledgement mode; delivered to consumers in response to `basic.get`: in acknowledgement mode and in no-acknowledgement mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2586,7 +2586,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The rate per second of published messages.'
+              description: 'The rate of published messages per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2694,7 +2694,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'The count of subset of messages in the deliver_get queue with the redelivered flag set.'
+              description: 'The count of subset of messages in the `deliver_get` queue with the `redelivered` flag set.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2979,41 +2979,41 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.HOST}'
           value: 127.0.0.1
-          description: 'The hostname or IP of RabbitMQ API endpoint'
+          description: 'The hostname or an IP of the API endpoint for the RabbitMQ.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         -
           macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
-          description: 'The port of RabbitMQ API endpoint'
+          description: 'The port of the RabbitMQ API endpoint.'
         -
           macro: '{$RABBITMQ.API.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be HTTP or HTTPS.'
         -
           macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
         -
           macro: '{$RABBITMQ.CLUSTER.NAME}'
           value: rabbit
-          description: 'The name of RabbitMQ cluster'
+          description: 'The name of the RabbitMQ cluster.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in the discovery of queues. It can be overridden at host or its linked template level.'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in the discovery of queues. It can be overridden at host or its linked template level.'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.'
         -
           macro: '{$RABBITMQ.MESSAGES.MAX.WARN}'
           value: '1000'
-          description: 'Maximum number of messages in the queue for trigger expression'
+          description: 'The maximum number of messages in the queue for a trigger expression.'
         -
           macro: '{$RABBITMQ.PROCESS_NAME}'
           value: beam.smp
-          description: 'RabbitMQ server process name'
+          description: 'The name of the RabbitMQ server process.'
         -
           macro: '{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
           value: '10'
