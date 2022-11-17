@@ -1752,7 +1752,7 @@ zabbix_export:
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
         -
           macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          value: ^(/dev|/sys|/run|/proc|.+/shm)$
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
         -
           macro: '{$VFS.FS.FSTYPE.MATCHES}'
