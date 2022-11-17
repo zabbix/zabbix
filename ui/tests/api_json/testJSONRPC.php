@@ -379,34 +379,6 @@ class testJSONRPC extends CAPITest {
 				],
 				'auth' => true,
 				'token' => null
-			],
-			// rpc call without required auth
-			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "id": 5}',
-				'result' => [
-					'jsonrpc' => '2.0',
-					'error' => [
-						'code' => -32602,
-						'message' => 'Invalid params.',
-						'data' => 'Not authorized.'
-					],
-					'id' => 5
-				],
-				'auth' => false
-			],
-			// rpc call auth params
-			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {"output":["hostid"]}, "auth": "token", "id": 5}',
-				'result' => [
-					'jsonrpc' => '2.0',
-					'error' => [
-						'code' => -32602,
-						'message' => 'Invalid params.',
-						'data' => 'Session terminated, re-login, please.'
-					],
-					'id' => 5
-				],
-				'auth' => false
 			]
 		];
 	}
@@ -419,6 +391,7 @@ class testJSONRPC extends CAPITest {
 			CAPIHelper::setAuth($auth);
 			CAPIHelper::setSessionId($token);
 		}
+
 		$this->assertSame($expected_result, $this->callRaw($request));
 	}
 }
