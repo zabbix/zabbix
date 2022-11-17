@@ -46,19 +46,20 @@ class CControllerPopupActionEdit extends CController {
 				break;
 
 			case EVENT_SOURCE_DISCOVERY:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
+				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
 				break;
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
+				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
 				break;
 
 			case EVENT_SOURCE_INTERNAL:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
+				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
 				break;
 
 			case EVENT_SOURCE_SERVICE:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+				$has_permission =
+					$this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 				break;
 		}
 
@@ -109,13 +110,13 @@ class CControllerPopupActionEdit extends CController {
 					'update_operations' => $this->action['update_operations'],
 					'filter' => $this->action['filter'],
 					'pause_suppressed' => $this->action['pause_suppressed'],
-					'notify_if_canceled' =>  $this->action['notify_if_canceled']
+					'notify_if_canceled' => $this->action['notify_if_canceled']
 				],
 				'formula' => $formula,
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 
-			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
+			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);
 				$data['condition_name'][] = $condition_names[0][$row_index];
 				$condition += [
@@ -166,7 +167,7 @@ class CControllerPopupActionEdit extends CController {
 						'evaltype' => ''
 					],
 					'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-					'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+					'notify_if_canceled' => ACTION_NOTIFY_IF_CANCELED_TRUE
 				],
 				'formula' => $this->getInput('formula', ''),
 				'allowedOperations' => getAllowedOperations($eventsource)

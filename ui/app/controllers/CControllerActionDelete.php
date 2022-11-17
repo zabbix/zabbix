@@ -79,7 +79,7 @@ class CControllerActionDelete extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = (_n('Action deleted', 'Actions deleted', $actions_count));
+			$output['success']['title'] = _n('Action deleted', 'Actions deleted', $actions_count);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');

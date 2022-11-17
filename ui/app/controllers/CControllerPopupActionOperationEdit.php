@@ -131,7 +131,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		$data = [
 			'eventsource' => $eventsource,
-			'actionid' => $this->getInput('actionid', []),
+			'actionid' => $this->getInput('actionid', 0),
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
@@ -306,6 +306,6 @@ class CControllerPopupActionOperationEdit extends CController {
 			}
 		}
 
-		return  $operation_type_options;
+		return $operation_type_options;
 	}
 }

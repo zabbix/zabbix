@@ -143,7 +143,7 @@ class CControllerActionConditionCheck extends CController {
 			'update_operations' => [],
 			'filter' => [],
 			'pause_suppressed' => '',
-			'notify_if_canceled' =>  ''
+			'notify_if_canceled' => ''
 		];
 	}
 }

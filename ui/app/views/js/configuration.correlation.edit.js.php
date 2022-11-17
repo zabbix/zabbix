@@ -50,7 +50,7 @@
 
 	function processTypeOfCalculation() {
 		const show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		const labels = jQuery('#condition_table .label')
+		const labels = jQuery('#condition_table .label');
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
 		document.querySelector('#expression').style.display = show_formula ? 'none' : '';
@@ -123,7 +123,7 @@
 
 						document
 							.querySelector('#condition_table tbody')
-							.insertAdjacentHTML('beforeend', template.evaluate(element))
+							.insertAdjacentHTML('beforeend', template.evaluate(element));
 					}
 					this.processTypeOfCalculation();
 				}

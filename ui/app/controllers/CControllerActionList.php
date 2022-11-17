@@ -36,7 +36,8 @@ class CControllerActionList extends CController {
 			'filter_name' =>	'string',
 			'filter_status' =>	'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 			'sort' =>			'in '.implode(',', ['name', 'status']),
-			'sortorder' =>		'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN])
+			'sortorder' =>		'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -131,15 +132,8 @@ class CControllerActionList extends CController {
 		}
 
 		// pager
-		if (hasRequest('page')) {
-			$page_num = getRequest('page');
-		}
-		elseif (isRequestMethod('get') && !hasRequest('cancel')) {
-			$page_num = 1;
-		}
-		else {
-			$page_num = $this->getInput('page', 1);
-		}
+		$page_num = $this->getInput('page', 1);
+		CPagerHelper::savePage('action.list', $page_num);
 
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'action.list')

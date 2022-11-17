@@ -107,7 +107,7 @@ window.action_edit_popup = new class {
 				}
 				else {
 					this.$operation_table.empty();
-					this.$operation_table.append(response.body)
+					this.$operation_table.append(response.body);
 				}
 			})
 			.catch((exception) => {
@@ -252,15 +252,15 @@ window.action_edit_popup = new class {
 				}
 				else {
 					element.condition_name = this.condition_types[element.conditiontype] + ' ' +
-						this.condition_operators[element.operator] + ' '
-					element.data = element.name
+						this.condition_operators[element.operator] + ' ';
+					element.data = element.name;
 					element.label = num2letter(element.row_index);
 					input.row_index ++;
 					template = new Template(document.getElementById('condition-row-tmpl').innerHTML)
 
 					document
 						.querySelector('#conditionTable tbody')
-						.insertAdjacentHTML('beforeend', template.evaluate(element))
+						.insertAdjacentHTML('beforeend', template.evaluate(element));
 				}
 				this._processTypeOfCalculation();
 			})
@@ -279,27 +279,27 @@ window.action_edit_popup = new class {
 					case <?= CONDITION_TYPE_SUPPRESSED ?>:
 						input.condition_name = input.operator == <?= CONDITION_OPERATOR_YES ?>
 							? <?= json_encode(_('Problem is suppressed')) ?>
-							: <?= json_encode(_('Problem is not suppressed')) ?>
+							: <?= json_encode(_('Problem is not suppressed')) ?>;
 
 						template = new Template(document.getElementById('condition-suppressed-row-tmpl').innerHTML);
 						break;
 
 					case <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>:
-						input.operator_name = this.condition_operators[input.operator]
+						input.operator_name = this.condition_operators[input.operator];
 
 						template = new Template(document.getElementById('condition-tag-value-row-tmpl').innerHTML);
 						break;
 
 					default:
 						input.condition_name = this.condition_types[input.conditiontype] + ' ' +
-							this.condition_operators[input.operator] + ' '
-						input.data = input.name
+							this.condition_operators[input.operator] + ' ';
+						input.data = input.name;
 
 						template = new Template(document.getElementById('condition-row-tmpl').innerHTML);
 				}
 				document
 					.querySelector('#conditionTable tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(input))
+					.insertAdjacentHTML('beforeend', template.evaluate(input));
 			}
 			this._processTypeOfCalculation();
 		}

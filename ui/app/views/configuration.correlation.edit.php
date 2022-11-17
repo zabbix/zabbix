@@ -276,7 +276,6 @@ $form_list
 			->setAriaRequired()
 	);
 
-
 $form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))

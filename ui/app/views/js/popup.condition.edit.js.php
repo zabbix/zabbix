@@ -54,7 +54,7 @@ window.condition_popup = new class {
 			}
 			if (document.querySelector('#trigger_context')) {
 				document.querySelector('#trigger_context').onchange = function() {
-					reloadPopup(e.target.closest("form"), 'popup.condition.edit')
+					reloadPopup(e.target.closest("form"), 'popup.condition.edit');
 				}
 			}
 		})
@@ -68,7 +68,7 @@ window.condition_popup = new class {
 
 		if (this.overlay == overlays_stack.getById('event_corr_condition')) {
 			curl.setArgument('action', 'popup.condition.event.corr');
-			curl.setArgument('validate', '1')
+			curl.setArgument('validate', '1');
 		}
 		else if (this.overlay == overlays_stack.getById('operation-condition')) {
 			curl.setArgument('action', 'action.operation.condition.check');
@@ -141,15 +141,15 @@ window.condition_popup = new class {
 			multiselect.on('change', () => {
 				multiselect.multiSelect('setDisabledEntries',
 					[... this.form.querySelectorAll('[name^="value["]')].map((input) => input.value)
-				);
-			});
+				)
+			})
 		})
 
 		$event_ms.on('change', () => {
 			$event_ms.multiSelect('setDisabledEntries',
 				[... this.form.querySelectorAll('[name^="groupids[]"]')].map((input) => input.value)
-			);
-		});
+			)
+		})
 	}
 
 	selectServices() {

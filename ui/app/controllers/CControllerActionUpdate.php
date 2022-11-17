@@ -261,12 +261,10 @@ class CControllerActionUpdate extends CController {
 				break;
 		}
 
-		DBstart();
 		$result = API::Action()->update($action);
-		$result = DBend($result);
 
 		if ($result) {
-			$output['success']['title'] =  _('Action updated');
+			$output['success']['title'] = _('Action updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');

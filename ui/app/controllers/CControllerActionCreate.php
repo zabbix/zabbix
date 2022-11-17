@@ -249,12 +249,11 @@ class CControllerActionCreate extends CController {
 
 			case EVENT_SOURCE_INTERNAL:
 				unset($action['update_operations']);
+				unset($action['update_operations']);
 				break;
 		}
 
-		DBstart();
 		$result = API::Action()->create($action);
-		$result = DBend($result);
 
 		if ($result) {
 			$output['success']['title'] = _('Action added');
