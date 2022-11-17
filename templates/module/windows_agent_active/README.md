@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -53,13 +53,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows memory by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -107,19 +107,19 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |High memory utilization |<p>The system is running out of free memory.</p> |`min(/Windows memory by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|High swap space usage |<p>This trigger is ignored, if there is no swap configured</p> |`min(/Windows memory by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent active/system.swap.size[,total])>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
+|High swap space usage |<p>This trigger is ignored, if there is no swap configured</p> |`max(/Windows memory by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent active/system.swap.size[,total])>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
 |Number of free system page table entries is too low |<p>The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.</p> |`max(/Windows memory by Zabbix agent active/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
 |The Memory Pages/sec is too high |<p>The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p> |`min(/Windows memory by Zabbix agent active/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows filesystems by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -171,13 +171,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows physical disks by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -230,13 +230,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows generic by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -281,13 +281,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows network by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -347,13 +347,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Windows services by Zabbix agent active
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 Special version of services template that is required for Windows OS.
 
 ## Setup
@@ -397,5 +397,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
