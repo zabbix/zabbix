@@ -412,13 +412,6 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($result) {
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$item) {
-					unset($item['name_upper']);
-				}
-				unset($item);
-			}
-
 			if (self::dbDistinct($sqlParts)) {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
@@ -427,6 +420,7 @@ class CItem extends CItemGeneral {
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
 				$options['output']
 			);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// removing keys (hash -> array)
