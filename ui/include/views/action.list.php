@@ -141,18 +141,18 @@ if ($data['actions']) {
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->addClass('js-disable-action')
-				->setAttribute('actionid', $action['actionid'])
+				->setAttribute('data-actionid', $action['actionid'])
 			: (new CLink(_('Disabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addClass('js-enable-action')
-				->setAttribute('actionid', $action['actionid']);
+				->setAttribute('data-actionid', $action['actionid']);
 
 		$action_list->addRow([
 			new CCheckBox('actionids['.$action['actionid'].']', $action['actionid']),
 			(new CLink($action['name']))
 				->addClass('js-action-edit')
-				->setAttribute('actionid', $action['actionid']),
+				->setAttribute('data-actionid', $action['actionid']),
 			$conditions,
 			$operations,
 			$status

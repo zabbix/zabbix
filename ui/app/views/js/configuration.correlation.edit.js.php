@@ -65,8 +65,8 @@
 		[...labels].forEach(function (label) {
 
 			conditions.push({
-				id: label.getAttribute('data-formulaid'),
-				type: label.getAttribute('data-conditiontype')
+				id: label.dataset.formulaid,
+				type: label.dataset.conditiontype
 			});
 		});
 
@@ -85,8 +85,8 @@
 			[...labels].forEach(function (label) {
 
 				conditions.push({
-					id: label.getAttribute('data-formulaid'),
-					type: label.getAttribute('data-conditiontype')
+					id: label.dataset.formulaid,
+					type: label.dataset.conditiontype
 				});
 			});
 

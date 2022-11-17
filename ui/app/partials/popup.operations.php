@@ -93,7 +93,7 @@ foreach ($data['action']['operations'] as $operation) {
 			(new CSimpleButton(_('Edit')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-edit-operation')
-				->setAttribute('data_operation', json_encode([
+				->setAttribute('data-operation', json_encode([
 					'operationid' => $i,
 					'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
 					'eventsource' => $data['eventsource'],
@@ -102,7 +102,7 @@ foreach ($data['action']['operations'] as $operation) {
 				])),
 			[
 				(new CButton('remove', _('Remove')))
-					->setAttribute('data_operationid', $i)
+					->setAttribute('data-operationid', $i)
 					->addClass('js-remove')
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->removeId(),

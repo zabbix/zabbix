@@ -38,16 +38,16 @@
 					this._edit({eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.getAttribute('actionid'), eventsource: this.eventsource});
+					this._edit({actionid: e.target.dataset.actionid, eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-enable-action')) {
-					this._enable(e.target, [e.target.getAttribute('actionid')]);
+					this._enable(e.target, [e.target.dataset.actionid]);
 				}
 				else if (e.target.classList.contains('js-massenable-action')) {
 					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-disable-action')) {
-					this._disable(e.target, [e.target.getAttribute('actionid')]);
+					this._disable(e.target, [e.target.dataset.actionid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-action')) {
 					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));

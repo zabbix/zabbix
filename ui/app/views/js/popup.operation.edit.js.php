@@ -426,7 +426,7 @@ window.operation_popup = new class {
 
 				result.push(input.conditiontype === conditiontype && input.value === value);
 
-				if (input.row_index == element.getAttribute('data-row_index')) {
+				if (input.row_index == element.dataset.id) {
 					input.row_index ++;
 				}
 			}
@@ -534,8 +534,8 @@ window.operation_popup = new class {
 
 		[...labels].forEach(function (label) {
 			conditions.push({
-				id: label.getAttribute('data-formulaid'),
-				type: label.getAttribute('data-conditiontype')
+				id: label.dataset.formulaid,
+				type: label.dataset.conditiontype
 			});
 		});
 
@@ -548,8 +548,8 @@ window.operation_popup = new class {
 
 			[...labels].forEach(function (label) {
 				conditions.push({
-					id: label.getAttribute('data-formulaid'),
-					type: label.getAttribute('data-conditiontype')
+					id: label.dataset.formulaid,
+					type: label.dataset.conditiontype
 				});
 			});
 

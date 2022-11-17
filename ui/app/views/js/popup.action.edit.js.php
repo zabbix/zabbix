@@ -158,7 +158,7 @@ window.action_edit_popup = new class {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-edit-operation')) {
-				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')));
+				this._openEditOperationPopup(e, JSON.parse(e.target.dataset.operation));
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
@@ -334,7 +334,7 @@ window.action_edit_popup = new class {
 					}
 				}
 
-				if (input.row_index == element.getAttribute('data-row_index')) {
+				if (input.row_index == element.dataset.row_index) {
 					input.row_index ++;
 				}
 			}
@@ -467,8 +467,8 @@ window.action_edit_popup = new class {
 
 		[...labels].forEach(function (label) {
 			conditions.push({
-				id: label.getAttribute('data-formulaid'),
-				type: label.getAttribute('data-conditiontype')
+				id: label.dataset.formulaid,
+				type: label.dataset.conditiontype
 			});
 		});
 
@@ -487,8 +487,8 @@ window.action_edit_popup = new class {
 
 			[...labels].forEach(function (label) {
 				conditions.push({
-					id: label.getAttribute('data-formulaid'),
-					type: label.getAttribute('data-conditiontype')
+					id: label.dataset.formulaid,
+					type: label.dataset.conditiontype
 				});
 			});
 
