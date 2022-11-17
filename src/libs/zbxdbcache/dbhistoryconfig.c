@@ -89,6 +89,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 				dst_item->units = NULL;
 			break;
 		default:
+			dst_item->trends = 0;
 			dst_item->trends_sec = 0;
 			dst_item->units = NULL;
 	}
@@ -642,18 +643,6 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: updates item nextcheck values in configuration cache              *
- *                                                                            *
- * Parameters: items      - [IN] the items to update                          *
- *             values     - [IN] the items values containing new properties   *
- *             errcodes   - [IN] item error codes. Update only items with     *
- *                               SUCCEED code                                 *
- *             values_num - [IN] the number of elements in items,values and   *
- *                               errcodes arrays                              *
- *                                                                            *
- ******************************************************************************/
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dc_items_update_nextcheck                                    *
