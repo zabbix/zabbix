@@ -63,7 +63,7 @@ window.condition_popup = new class {
 	}
 
 	submit() {
-		let curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php', false);
 		const fields = getFormFields(this.form);
 
 		if (this.overlay == overlays_stack.getById('event_corr_condition')) {
@@ -136,7 +136,7 @@ window.condition_popup = new class {
 		const $template_ms = $('#template_new_condition');
 		const $event_ms = $('#event_hostgroup_new_condition');
 
-		let multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms]
+		const multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms]
 		multiselects.forEach((multiselect) => {
 			multiselect.on('change', () => {
 				multiselect.multiSelect('setDisabledEntries',

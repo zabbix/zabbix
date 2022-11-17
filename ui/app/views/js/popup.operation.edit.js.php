@@ -187,7 +187,7 @@ window.operation_popup = new class {
 	}
 
 	_removeAllFields() {
-		for (let field of this.form.getElementsByClassName('form-field')) {
+		for (const field of this.form.getElementsByClassName('form-field')) {
 			if (field.id === 'operation-type') {
 				continue;
 			}
@@ -195,14 +195,14 @@ window.operation_popup = new class {
 			field.getElementsByTagName('input')
 		}
 
-		for (let label of this.form.getElementsByTagName('label')) {
+		for (const label of this.form.getElementsByTagName('label')) {
 			if (label.id === 'operation-type-label') {
 				continue;
 			}
 			label.style.display = 'none';
 		}
 
-		for (let input of this.form.querySelectorAll('input, textarea')) {
+		for (const input of this.form.querySelectorAll('input, textarea')) {
 			if (['operation_eventsource', 'operation_recovery', 'submit'].includes(input.id)) {
 				continue;
 			}
@@ -288,21 +288,21 @@ window.operation_popup = new class {
 	}
 
 	_enableFormFields(fields = []) {
-		for (let field of this.form.getElementsByClassName('form-field')) {
+		for (const field of this.form.getElementsByClassName('form-field')) {
 			if (fields.includes(field.id)) {
 				field.style.display = '';
 
-				for (let input of field.querySelectorAll('input, textarea')) {
+				for (const input of field.querySelectorAll('input, textarea')) {
 					input.removeAttribute('disabled');
 					input.style.display = '';
 				}
-				for (let label of field.querySelectorAll('label')) {
+				for (const label of field.querySelectorAll('label')) {
 					label.style.display = '';
 				}
 			}
 		}
 
-		for (let label of this.form.getElementsByTagName('label')) {
+		for (const label of this.form.getElementsByTagName('label')) {
 			if (fields.includes(label.id.replace('-label', ''))) {
 				label.style.display = '';
 			}
@@ -389,15 +389,13 @@ window.operation_popup = new class {
 
 	_openConditionsPopup(trigger_element) {
 		this._processTypeOfCalculation();
-
-		let parameters;
 		let row_index = 0;
 
 		while (document.querySelector(`#operation-condition-list [data-id="${row_index}"]`) !== null) {
 			row_index++;
 		}
 
-		parameters = {
+		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
 			source: this.eventsource,
 			row_index: row_index
@@ -423,8 +421,8 @@ window.operation_popup = new class {
 			const table_row = element.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
-				let conditiontype = table_row.getElementsByTagName('input')[0].value;
-				let value = table_row.getElementsByTagName('input')[2].value;
+				const conditiontype = table_row.getElementsByTagName('input')[0].value;
+				const value = table_row.getElementsByTagName('input')[2].value;
 
 				result.push(input.conditiontype === conditiontype && input.value === value);
 
@@ -440,7 +438,7 @@ window.operation_popup = new class {
 	}
 
 	_createOperationConditionsRow(input, row_index) {
-		let has_row = this._checkConditionRow(input);
+		const has_row = this._checkConditionRow(input);
 
 		const result = [has_row.some(element => element === true)]
 		if (result[0] === true) {
@@ -458,7 +456,7 @@ window.operation_popup = new class {
 
 			input.label = num2letter(row_index);
 			input.row_index = row_index;
-			let template = new Template(document.getElementById('operation-condition-row-tmpl').innerHTML);
+			const template = new Template(document.getElementById('operation-condition-row-tmpl').innerHTML);
 
 			document
 				.querySelector('#operation-condition-list tbody')
@@ -472,7 +470,7 @@ window.operation_popup = new class {
 		this.form.append(this._createHiddenInput('row_index', this.row_index));
 		this.form.append(this._createHiddenInput('actionid', this.actionid));
 
-		let curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'action.operation.check');
 
 		const fields = getFormFields(this.form);
@@ -524,7 +522,7 @@ window.operation_popup = new class {
 	_processTypeOfCalculation() {
 		let row_count;
 		document.getElementById('operation-condition-list')
-			? row_count = document.getElementById('operation-condition-list').rows.length -2
+			? row_count = document.getElementById('operation-condition-list').rows.length - 2
 			: row_count = 0;
 
 		document.querySelector('#operation-evaltype').style.display = row_count > 1 ? '' : 'none';
@@ -532,7 +530,7 @@ window.operation_popup = new class {
 		document.querySelector('#operation-condition-row').style.display = row_count > 1 ? '' : 'none';
 
 		const labels = document.querySelectorAll('#operation-condition-list .label');
-		let conditions = [];
+		const conditions = [];
 
 		[...labels].forEach(function (label) {
 			conditions.push({
@@ -561,8 +559,8 @@ window.operation_popup = new class {
 	}
 
 	_customMessageFields() {
-		let default_msg = document.querySelector('#operation_opmessage_default_msg');
-		let message_fields = [
+		const default_msg = document.querySelector('#operation_opmessage_default_msg');
+		const message_fields = [
 			'operation-message-subject-label', 'operation-message-subject', 'operation-message-label',
 			'operation-message-body'
 		];

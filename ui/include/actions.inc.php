@@ -391,10 +391,10 @@ function getActionOperationData(array $operations) {
 	foreach ($operations as $operation) {
 		switch ($operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				$data['mediatypeid'] = $operation['opmessage']['mediatypeid'];
+				$mediatypeid = $operation['opmessage']['mediatypeid'];
 
-				if ($data['mediatypeid'] != 0) {
-					$data['mediatypeids'][$data['mediatypeid']] = $data['mediatypeid'];
+				if ($mediatypeid != 0) {
+					$data['mediatypeids'][$mediatypeid] = $mediatypeid;
 				}
 
 				if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -448,7 +448,7 @@ function getActionOperationData(array $operations) {
 	if (array_key_exists('mediatypeids', $data)) {
 		$result['mediatypes'] = API::Mediatype()->get([
 			'output' => ['name'],
-			'mediatypeids' => $data['mediatypeids'],
+			'mediatypeids' => array_keys($data['mediatypeids']),
 			'preservekeys' => true
 		]);
 	}
@@ -456,7 +456,7 @@ function getActionOperationData(array $operations) {
 	if (array_key_exists('userids', $data)) {
 		$result['users'] = API::User()->get([
 			'output' => ['userid', 'username', 'name', 'surname'],
-			'userids' => $data['userids']
+			'userids' => array_keys($data['userids'])
 		]);
 
 		foreach ($result['users'] as $user) {
@@ -467,7 +467,7 @@ function getActionOperationData(array $operations) {
 	if (array_key_exists('usr_grpids', $data)) {
 		$result['user_groups'] = API::UserGroup()->get([
 			'output' => ['name'],
-			'usrgrpids' => $data['usr_grpids'],
+			'usrgrpids' => array_keys($data['usr_grpids']),
 			'preservekeys' => true
 		]);
 	}
@@ -475,7 +475,7 @@ function getActionOperationData(array $operations) {
 	if (array_key_exists('hostids', $data)) {
 		$result['hosts'] = API::Host()->get([
 			'output' => ['name'],
-			'hostids' => $data['hostids'],
+			'hostids' => array_keys($data['hostids']),
 			'preservekeys' => true
 		]);
 	}

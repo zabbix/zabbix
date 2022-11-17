@@ -216,15 +216,13 @@ window.action_edit_popup = new class {
 
 	_openConditionPopup() {
 		this._processTypeOfCalculation();
-
-		let parameters;
 		let row_index = 0;
 
 		while (document.querySelector(`#conditionTable [data-row_index="${row_index}"]`) !== null) {
 			row_index++;
 		}
 
-		parameters = {
+		const parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
 			source: this.eventsource,
 			actionid: this.actionid,
@@ -245,8 +243,8 @@ window.action_edit_popup = new class {
 		let template;
 		if (is_array(input.value)) {
 			input.value.forEach((value, index) => {
-				let element = {...input, name: input.name[index], value: input.value[index]};
-				let has_row = this._checkConditionRow(element);
+				const element = {...input, name: input.name[index], value: input.value[index]};
+				const has_row = this._checkConditionRow(element);
 
 				const result = [has_row.some(element => element === true)]
 				if (result[0] === true) {
@@ -268,7 +266,7 @@ window.action_edit_popup = new class {
 			})
 		}
 		else {
-			let has_row = this._checkConditionRow(input);
+			const has_row = this._checkConditionRow(input);
 			const result = [has_row.some(element => element === true)];
 
 			if (result[0] === true) {
@@ -311,14 +309,14 @@ window.action_edit_popup = new class {
 	 * Check if row with the same conditiontype and value already exists.
 	 */
 	_checkConditionRow(input) {
-		let result = [];
-		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
-			const table_row = it.getElementsByTagName('td')[2];
+		const result = [];
+		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(element => {
+			const table_row = element.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
-				let conditiontype = table_row.getElementsByTagName('input')[0].value;
-				let value = table_row.getElementsByTagName('input')[2].value;
-				let value2 = table_row.getElementsByTagName('input')[3].value
+				const conditiontype = table_row.getElementsByTagName('input')[0].value;
+				const value = table_row.getElementsByTagName('input')[2].value;
+				const value2 = table_row.getElementsByTagName('input')[3].value
 					? table_row.getElementsByTagName('input')[3].value
 					: null;
 
@@ -336,7 +334,7 @@ window.action_edit_popup = new class {
 					}
 				}
 
-				if (input.row_index == it.getAttribute('data-row_index')) {
+				if (input.row_index == element.getAttribute('data-row_index')) {
 					input.row_index ++;
 				}
 			}
@@ -456,7 +454,7 @@ window.action_edit_popup = new class {
 
 	_processTypeOfCalculation() {
 		this.show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		let row_count = document.getElementById('conditionTable').rows.length -2;
+		const row_count = document.getElementById('conditionTable').rows.length - 2;
 
 		document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
 		document.querySelector('#formula').removeAttribute('readonly');
@@ -465,7 +463,7 @@ window.action_edit_popup = new class {
 		document.querySelector('#evaltype-formfield').style.display = row_count > 1 ? '' : 'none';
 
 		const labels = document.querySelectorAll('#conditionTable .label');
-		let conditions = [];
+		const conditions = [];
 
 		[...labels].forEach(function (label) {
 			conditions.push({
@@ -485,7 +483,7 @@ window.action_edit_popup = new class {
 			document.querySelector('#formula').removeAttribute('readonly');
 
 			const labels = document.querySelectorAll('#conditionTable .label');
-			let conditions = [];
+			const conditions = [];
 
 			[...labels].forEach(function (label) {
 				conditions.push({

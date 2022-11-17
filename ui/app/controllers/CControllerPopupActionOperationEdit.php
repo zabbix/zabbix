@@ -84,7 +84,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		$operation = $this->getInput('data', []) + $this->defaultOperationObject();
 		$eventsource = (int) $this->getInput('eventsource');
 		$recovery = (int) $this->getInput('recovery');
-		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery);
+		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
@@ -257,14 +257,13 @@ class CControllerPopupActionOperationEdit extends CController {
 	/**
 	 * Returns "operation type" configuration fields for given operation in given source.
 	 *
-	 * @param array $operation  Operation object.
 	 * @param int $eventsource  Action event source.
 	 * @param int $recovery     Action operation mode. Possible values:
 	 *                          ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
 	 *
 	 * @return array
 	 */
-	private function popupConfigOperationTypes(array $operation, int $eventsource, int $recovery): array {
+	private function popupConfigOperationTypes(int $eventsource, int $recovery): array {
 		$operation_type_options = [];
 		$scripts_allowed = false;
 

@@ -49,8 +49,8 @@
 	}
 
 	function processTypeOfCalculation() {
-		let show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		let labels = jQuery('#condition_table .label')
+		const show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
+		const labels = jQuery('#condition_table .label')
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
 		document.querySelector('#expression').style.display = show_formula ? 'none' : '';
@@ -61,7 +61,7 @@
 			.toggle(show_formula)
 			.prop('disabled', !show_formula);
 
-		let conditions = [];
+		const conditions = [];
 		[...labels].forEach(function (label) {
 
 			conditions.push({
@@ -81,7 +81,7 @@
 			document.querySelector('#formula').removeAttribute('readonly');
 
 			const labels = document.querySelectorAll('#condition_table .label');
-			let conditions = [];
+			const conditions = [];
 			[...labels].forEach(function (label) {
 
 				conditions.push({
@@ -96,7 +96,7 @@
 	}
 
 	function createRow(input) {
-		let row_count = document.querySelector('#condition_table').rows.length -2;
+		let row_count = document.querySelector('#condition_table').rows.length - 2;
 		if (row_count !== 0) {
 			input.row_index = row_count;
 		}
@@ -108,7 +108,7 @@
 					element.groupid = key;
 					let has_row = this.checkConditionRow(element);
 
-					const result = [has_row.some(it => it === true)]
+					const result = [has_row.some(element => element === true)]
 					if (result[0] === true) {
 						return;
 					}
@@ -119,7 +119,7 @@
 						element.label = num2letter(element.row_index);
 						element.groupid = key;
 						input.row_index ++;
-						let template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
+						const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
 
 						document
 							.querySelector('#condition_table tbody')
@@ -133,7 +133,7 @@
 			let has_row = this.checkConditionRow(input);
 			let template;
 
-			const result = [has_row.some(it => it === true)]
+			const result = [has_row.some(element => element === true)]
 			if (result[0] === true) {
 				return;
 			}
@@ -178,8 +178,8 @@
 
 	function checkConditionRow(input) {
 		let result = [];
-		[...document.getElementById('condition_table').getElementsByTagName('tr')].map(it => {
-			const table_row = it.getElementsByTagName('td')[2];
+		[...document.getElementById('condition_table').getElementsByTagName('tr')].map(element => {
+			const table_row = element.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
 				let type = table_row.getElementsByTagName('input')[0].value;
@@ -212,7 +212,7 @@
 						break;
 				}
 
-				if (input.row_index == it.getAttribute('data-row_index')) {
+				if (input.row_index == element.getAttribute('data-row_index')) {
 					input.row_index ++;
 				}
 			}
