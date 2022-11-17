@@ -50,7 +50,7 @@
 
 	function processTypeOfCalculation() {
 		const show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-		const labels = jQuery('#condition_table .label');
+		const labels = document.querySelectorAll('#condition_table .label');
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
 		document.querySelector('#expression').style.display = show_formula ? 'none' : '';
@@ -62,8 +62,8 @@
 			.prop('disabled', !show_formula);
 
 		const conditions = [];
-		[...labels].forEach(function (label) {
 
+		[...labels].forEach(function (label) {
 			conditions.push({
 				id: label.dataset.formulaid,
 				type: label.dataset.conditiontype
@@ -74,16 +74,15 @@
 			.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 
 		document.querySelector('#evaltype').onchange = function() {
-			this.show_formula = +document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
-
+			this.show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 			document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 			document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
 			document.querySelector('#formula').removeAttribute('readonly');
 
 			const labels = document.querySelectorAll('#condition_table .label');
 			const conditions = [];
-			[...labels].forEach(function (label) {
 
+			[...labels].forEach(function (label) {
 				conditions.push({
 					id: label.dataset.formulaid,
 					type: label.dataset.conditiontype
@@ -102,32 +101,32 @@
 		}
 
 		if (input.groupids) {
-			for (const key in input.groupids) {
-				if (input.groupids.hasOwnProperty(key)) {
-					let element = {...input, name: input.groupids[key], value: key};
-					element.groupid = key;
-					let has_row = this.checkConditionRow(element);
+			Object.keys(input.groupids).map(key => {
+				console.log(key, input.groupids[key]);
 
-					const result = [has_row.some(element => element === true)]
-					if (result[0] === true) {
-						return;
-					}
-					else {
-						element.condition_name = getConditionName(input)
-						element.data = element.name
-						element.conditiontype = input.type;
-						element.label = num2letter(element.row_index);
-						element.groupid = key;
-						input.row_index ++;
-						const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
+				let element = {...input, name: input.groupids[key], value: key};
+				element.groupid = key;
+				let has_row = this.checkConditionRow(element);
 
-						document
-							.querySelector('#condition_table tbody')
-							.insertAdjacentHTML('beforeend', template.evaluate(element));
-					}
-					this.processTypeOfCalculation();
+				const result = [has_row.some(element => element === true)];
+				if (result[0] === true) {
+					return;
 				}
-			}
+				else {
+					element.condition_name = getConditionName(input)
+					element.data = element.name
+					element.conditiontype = input.type;
+					element.label = num2letter(element.row_index);
+					element.groupid = key;
+					input.row_index ++;
+					const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
+
+					document
+						.querySelector('#condition_table tbody')
+						.insertAdjacentHTML('beforeend', template.evaluate(element));
+				}
+				this.processTypeOfCalculation();
+			});
 		}
 		else {
 			let has_row = this.checkConditionRow(input);
@@ -177,12 +176,13 @@
 	}
 
 	function checkConditionRow(input) {
-		let result = [];
+		const result = [];
+
 		[...document.getElementById('condition_table').getElementsByTagName('tr')].map(element => {
 			const table_row = element.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
-				let type = table_row.getElementsByTagName('input')[0].value;
+				const type = table_row.getElementsByTagName('input')[0].value;
 				let value;
 				let value2;
 
@@ -212,7 +212,7 @@
 						break;
 				}
 
-				if (input.row_index == element.getAttribute('data-row_index')) {
+				if (input.row_index == element.dataset.row_index) {
 					input.row_index ++;
 				}
 			}
