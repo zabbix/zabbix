@@ -161,6 +161,7 @@ if (array_key_exists('security', $SSO['SETTINGS'])) {
 }
 
 try {
+	CMessageHelper::clear();
 	$auth = new Auth($settings);
 
 	if (hasRequest('metadata')) {
@@ -292,7 +293,7 @@ try {
 					throw new Exception(_('GUI access disabled.'));
 				}
 			}
-			else {
+			else if ($saml_data['provisioned_user']['roleid']) {
 				$saml_data['provisioned_user'] += [
 					'userdirectoryid'	=> $userdirectoryid,
 					'username'			=> $saml_data['username_attribute']
