@@ -458,8 +458,6 @@ class CImportReferencer {
 	 * @param string $uuid
 	 *
 	 * @return string|null
-	 *
-	 * @throws APIException
 	 */
 	public function findTemplateDashboardidByUuid(string $uuid): ?string {
 		if ($this->db_template_dashboards === null) {
@@ -476,13 +474,11 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get template dashboard ID by dashboard name
+	 * Get template dashboard ID by dashboard name.
 	 *
 	 * @param string $name
 	 *
 	 * @return string|null
-	 *
-	 * @throws APIException
 	 */
 	public function findTemplateDashboardidByName(string $name): ?string {
 		if ($this->db_template_dashboards === null) {
@@ -1292,8 +1288,6 @@ class CImportReferencer {
 
 	/**
 	 * Select template dashboard IDs for previously added dashboard names and template IDs.
-	 *
-	 * @throws APIException
 	 */
 	protected function selectTemplateDashboards(): void {
 		$this->db_template_dashboards = [];
