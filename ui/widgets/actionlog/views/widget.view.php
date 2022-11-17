@@ -37,8 +37,8 @@ $table = (new CTableInfo())
 			: _x('Time', 'compact table header'),
 		_x('Action', 'compact table header'),
 		($data['sortfield'] === 'mediatypeid')
-			? [_x('Type', 'compact table header'), $sort_div]
-			: _x('Type', 'compact table header'),
+			? [_x('Media type', 'compact table header'), $sort_div]
+			: _x('Media type', 'compact table header'),
 		($data['sortfield'] === 'sendto')
 			? [_x('Recipient', 'compact table header'), $sort_div]
 			: _x('Recipient', 'compact table header'),
