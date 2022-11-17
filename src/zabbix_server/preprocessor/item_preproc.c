@@ -38,68 +38,270 @@ extern zbx_es_t	es_engine;
 
 typedef struct
 {
+	char	*field_name;
+	char	*oid_prefix;
+}
+zbx_snmp_walk_to_json_param_t;
+
+ZBX_VECTOR_DECL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
+ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
+
+typedef struct
+{
 	char		*key;
 	char		*value;
-	zbx_json_type_t	value_type;
 }
-zbx_preproc_flat_json_input_obj_t;
+zbx_snmp_walk_json_output_value_t;
 
-ZBX_PTR_VECTOR_DECL(flat_json_input_obj, zbx_preproc_flat_json_input_obj_t *)
-ZBX_PTR_VECTOR_IMPL(flat_json_input_obj, zbx_preproc_flat_json_input_obj_t *)
+ZBX_PTR_VECTOR_DECL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
+ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 
 typedef struct
 {
-	char	*field_name;
-	char	*prefix;
+	char						*key;
+	zbx_vector_snmp_walk_to_json_output_val_t	values;
 }
-zbx_preproc_flat_json_param_t;
+zbx_snmp_walk_json_output_obj_t;
 
-ZBX_PTR_VECTOR_DECL(flat_json_param, zbx_preproc_flat_json_param_t *)
-ZBX_PTR_VECTOR_IMPL(flat_json_param, zbx_preproc_flat_json_param_t *)
-
-typedef struct
+static void snmp_walk_json_output_val_free(zbx_snmp_walk_json_output_value_t *v)
 {
-	char					*key;
-	zbx_vector_flat_json_input_obj_t	*values;
+	zbx_free(v->value);
+	zbx_free(v);
 }
-zbx_preproc_flat_json_output_obj_t;
 
-static zbx_hash_t	flat_json_output_obj_hash_func(const void *d)
+static void snmp_walk_json_output_obj_free(zbx_snmp_walk_json_output_obj_t *obj)
 {
-	const zbx_preproc_flat_json_output_obj_t	*s;
-	s = (const zbx_preproc_flat_json_output_obj_t *)d;
+	zbx_free(obj->key);
+	zbx_vector_snmp_walk_to_json_output_val_clear_ext(&obj->values, snmp_walk_json_output_val_free);
+	zbx_vector_snmp_walk_to_json_output_val_destroy(&obj->values);
+}
+
+static zbx_hash_t	snmp_walk_json_output_obj_hash_func(const void *d)
+{
+	const zbx_snmp_walk_json_output_obj_t	*s;
+	s = (const zbx_snmp_walk_json_output_obj_t *)d;
 
 	return ZBX_DEFAULT_STRING_HASH_FUNC(s->key);
 }
 
-static int	flat_json_output_obj_compare_func(const void *d1, const void *d2)
+static int	snmp_walk_json_output_obj_compare_func(const void *d1, const void *d2)
 {
-	const zbx_preproc_flat_json_output_obj_t	*s1 = (const zbx_preproc_flat_json_output_obj_t *)d1;
-	const zbx_preproc_flat_json_output_obj_t	*s2 = (const zbx_preproc_flat_json_output_obj_t *)d2;
+	const zbx_snmp_walk_json_output_obj_t	*s1 = (const zbx_snmp_walk_json_output_obj_t *)d1;
+	const zbx_snmp_walk_json_output_obj_t	*s2 = (const zbx_snmp_walk_json_output_obj_t *)d2;
 
 	return strcmp(s1->key, s2->key);
 }
 
-typedef struct
-{
-	char				*index_name;
-	char				*key_name;
-	char				*value_name;
-	zbx_vector_flat_json_param_t	field_list;
-	zbx_hashset_t			grouped_prefixes; // contains zbx_preproc_flat_json_output_obj_t
-}
-zbx_preproc_flat_json_t;
-
-static void flat_json_param_free(zbx_preproc_flat_json_param_t	*param)
+static void snmp_walk_to_json_param_free(zbx_snmp_walk_to_json_param_t	*param)
 {
 	zbx_free(param->field_name);
-	zbx_free(param->prefix);
+	zbx_free(param->oid_prefix);
 }
 
-static void flat_json_input_obj_free(zbx_preproc_flat_json_input_obj_t	*obj)
+static void snmp_value_pair_free(zbx_snmp_value_pair_t	*p)
 {
-	zbx_free(obj->key);
-	zbx_free(obj->value);
+	zbx_free(p->oid);
+	zbx_free(p->value);
+}
+
+static zbx_hash_t	snmp_cache_pair_hash_func(const void *d)
+{
+	const zbx_snmp_value_pair_t	*s;
+	s = (const zbx_snmp_value_pair_t *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(s->oid);
+}
+
+static int	snmp_cache_pair_compare_func(const void *d1, const void *d2)
+{
+	const zbx_snmp_value_pair_t	*s1 = (const zbx_snmp_value_pair_t *)d1;
+	const zbx_snmp_value_pair_t	*s2 = (const zbx_snmp_value_pair_t *)d2;
+
+	return strcmp(s1->oid, s2->oid);
+}
+
+static char	*snmp_walk_convert_value(const char *raw_value, int to_json)
+{
+	char	*type, *value;
+
+	zbx_strsplit_first(raw_value, ':', &type, &value);
+	zbx_ltrim(type, " ");
+	zbx_ltrim(value, " ");
+
+	if (value == NULL)
+	{
+		return type;
+	}
+	else
+	{
+		char	*formatted_value = NULL;
+
+		zbx_ltrim(value, " ");
+
+		if (0 == strcmp(type, "OID") || 0 == strcmp(type, "IpAddress"))
+		{
+			formatted_value = zbx_dsprintf(formatted_value, "\"%s\"", value);
+
+			zbx_free(value);
+			zbx_free(type);
+
+			return formatted_value;
+		}
+		else if (0 == strcmp(type, "Hex-STRING"))
+		{
+			char	*new_str;
+
+			if (*value == '\0')
+			{
+				zbx_free(type);
+				return value;
+			}
+
+			new_str = zbx_string_replace(value, " ", "\\x");
+
+			if (0 == to_json)
+			{
+				formatted_value = new_str;
+			}
+			else
+				formatted_value = zbx_dsprintf(formatted_value, "\"\\x%s\"", new_str);
+
+			zbx_free(new_str);
+			zbx_free(value);
+			zbx_free(type);
+
+			return formatted_value;
+		}
+		else if (0 == to_json)
+		{
+			zbx_lrtrim(value, "\"");
+		}
+	}
+
+	zbx_free(type);
+	return value;
+}
+
+static int	snmp_value_from_walk(const char *data, const char *oid_needle, char **output, char **error)
+{
+	int	ret = FAIL;
+	char	*data2, *token, *saveptr;
+
+	data2 = zbx_strdup(NULL, data);
+	token = strtok_r(data2, "\n", &saveptr);
+
+	while (NULL != token)
+	{
+		char	*oid, *raw_value;
+
+		zbx_rtrim(token, "\r");
+		zbx_strsplit_first(token, '=', &oid, &raw_value);
+
+		if (NULL == raw_value)
+		{
+			zbx_free(oid);
+			continue;
+		}
+
+		zbx_rtrim(oid, " ");
+
+		if (0 == strcmp(oid_needle, oid))
+		{
+			zbx_free(oid);
+			*output = snmp_walk_convert_value(raw_value, 0);
+			zbx_free(raw_value);
+			ret = SUCCEED;
+			break;
+		}
+
+		zbx_free(oid);
+		zbx_free(raw_value);
+
+		token = strtok_r(NULL, "\n", &saveptr);
+	}
+out:
+	zbx_free(data2);
+
+	if (FAIL == ret)
+		*error = zbx_strdup(NULL, "no data was found");
+
+	return ret;
+}
+
+static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *oid_needle, char **output, char **error)
+{
+	int			ret;
+	zbx_snmp_value_pair_t	*pair_cached, pair_local;
+
+	pair_local.oid = (char *)oid_needle;
+
+	if (NULL == (pair_cached = (zbx_snmp_value_pair_t *)zbx_hashset_search(&cache->pairs, &pair_local)))
+	{
+		*error = zbx_strdup(NULL, "no data was found");
+		ret = FAIL;
+	}
+	else
+	{
+		*output = pair_cached->value;
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
+void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_snmp_value_pair_t		*pair;
+
+	zbx_hashset_iter_reset(&cache->pairs, &iter);
+
+	while (NULL != (pair = (zbx_snmp_value_pair_t *)zbx_hashset_iter_next(&iter)))
+	{
+		snmp_value_pair_free(pair);
+	}
+
+	zbx_hashset_clear(&cache->pairs);
+	zbx_hashset_destroy(&cache->pairs);
+}
+
+int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, char **error)
+{
+	int	ret = FAIL;
+	char	*data2, *token, *saveptr;
+	size_t	line_number = 1;
+
+	zbx_hashset_create(&cache->pairs, 100, snmp_walk_json_output_obj_hash_func,
+			snmp_walk_json_output_obj_compare_func);
+
+	data2 = zbx_strdup(NULL, data);
+	token = strtok_r(data2, "\n", &saveptr);
+
+	while (NULL != token)
+	{
+		char			*oid, *raw_value;
+		zbx_snmp_value_pair_t	pair;
+
+		zbx_rtrim(token, "\r");
+		zbx_strsplit_first(token, '=', &oid, &raw_value);
+
+		if (NULL == raw_value)
+		{
+			*error = zbx_dsprintf(*error, "failed to parse input data at line " ZBX_FS_UI64,
+					line_number);
+
+			zbx_hashset_destroy(&cache->pairs);
+			return FAIL;
+		}
+
+		pair.oid = oid;
+		pair.value = snmp_walk_convert_value(raw_value, 0);
+		zbx_hashset_insert(&cache->pairs, &pair, sizeof(zbx_snmp_value_pair_t));
+	}
+
+	zbx_free(data2);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1713,6 +1915,63 @@ out:
 	return SUCCEED;
 }
 
+static int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
+		char **errmsg)
+{
+	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output, *value_out = NULL,
+		*err = NULL;
+	int	ret = FAIL;
+
+	if (NULL == params || '\0' == *params)
+	{
+		*errmsg = zbx_strdup(*errmsg, "parameter should be set");
+		return FAIL;
+	}
+
+	if (NULL == cache)
+	{
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			return FAIL;
+
+		ret = snmp_value_from_walk(value->data.str, params, &value_out, &err);
+	}
+	else
+	{
+		zbx_snmp_value_cache_t	*snmp_cache;
+
+		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)zbx_preproc_cache_get(cache,
+				ZBX_PREPROC_SNMP_WALK_TO_VALUE)))
+		{
+			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
+
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+				return FAIL;
+
+			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
+			{
+				zbx_free(snmp_cache);
+				goto out;
+			}
+
+			zbx_preproc_cache_put(cache, ZBX_PREPROC_SNMP_WALK_TO_VALUE, snmp_cache);
+		}
+
+		ret = snmp_value_from_cached_walk(snmp_cache, params, &value_out, &err);
+	}
+out:
+	if (FAIL == ret)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "unable to extract value for given OID: %s", err);
+		zbx_free(err);
+		return FAIL;
+	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: convert Prometheus format metrics to JSON format                  *
@@ -2152,142 +2411,69 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 	return SUCCEED;
 }
 
-static int	preproc_group_flat_json_parse_input_objects(const char *js,
-		zbx_vector_flat_json_input_obj_t *parsed_objects, zbx_preproc_flat_json_t *fj)
+static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
 {
-	struct zbx_json_parse	jp, jp_obj;
-	const char		*ptr;
+	char	*token = NULL, *saveptr, *field_name, *params2;
+	int	idx = 0;
 
-	if (FAIL == zbx_json_brackets_open(js, &jp))
+	if (NULL == params || '\0' == *params)
 		return FAIL;
 
-	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp, ptr));)
+	params2 = zbx_strdup(NULL, params);
+	token = strtok_r(params2, "\n", &saveptr);
+
+	while (NULL != token)
 	{
-		char					*key_field = NULL, *value_field = NULL;
-		size_t					key_field_len = 0, value_field_len = 0;
-		zbx_json_type_t				value_field_type;
-		zbx_preproc_flat_json_input_obj_t	*obj;
-
-		if (FAIL == zbx_json_brackets_open(ptr, &jp_obj))
+		if (0 == idx % 2)
 		{
-			zbx_vector_flat_json_input_obj_clear_ext(parsed_objects, flat_json_input_obj_free);
-			return FAIL;
+			field_name = token;
+		}
+		else
+		{
+			zbx_snmp_walk_to_json_param_t	parsed_param;
+
+			parsed_param.field_name = zbx_strdup(NULL, field_name);
+			parsed_param.oid_prefix = zbx_strdup(NULL, token);
+
+			zbx_vector_snmp_walk_to_json_param_append(parsed_params, parsed_param);
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_obj, fj->key_name, &key_field, &key_field_len, NULL))
-			continue;
-
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_obj, fj->value_name, &value_field, &value_field_len,
-				&value_field_type))
-		{
-			continue;
-		}
-
-		obj = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_input_obj_t));
-		obj->key = key_field;
-		obj->value = value_field;
-		obj->value_type = value_field_type;
-
-		zbx_vector_flat_json_input_obj_append(parsed_objects, obj);
+		token = strtok_r(NULL, "\n", &saveptr);
+		idx++;
 	}
+
+	zbx_free(params2);
+
+	if (0 != idx % 2)
+		return FAIL;
 
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parse preproc parameters from JSON to vector of k-v objects       *
- *                                                                            *
- ******************************************************************************/
-static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_json_t *fj)
+static void	snmp_walk_serialize_json(zbx_hashset_t *grouped_prefixes, char **result)
 {
-	struct zbx_json_parse	jp, jp_list, jp_param;
-	char			index_name[MAX_STRING_LEN], key_name[MAX_STRING_LEN], value_name[MAX_STRING_LEN];
-	const char		*ptr;
-
-	if (FAIL == zbx_json_open(params, &jp))
-		return FAIL;
-
-	if (FAIL == zbx_json_value_by_name(&jp, "index_name", index_name, sizeof(index_name), NULL))
-		return FAIL;
-
-	if (FAIL == zbx_json_value_by_name(&jp, "key_name", key_name, sizeof(key_name), NULL))
-		return FAIL;
-
-	if (FAIL == zbx_json_value_by_name(&jp, "value_name", value_name, sizeof(value_name), NULL))
-		return FAIL;
-
-	if (FAIL == zbx_json_brackets_by_name(&jp, "row", &jp_list))
-		return FAIL;
-
-	fj->index_name = zbx_strdup(NULL, index_name);
-	fj->key_name = zbx_strdup(NULL, key_name);
-	fj->value_name = zbx_strdup(NULL, value_name);
-
-	zbx_vector_flat_json_param_create(&fj->field_list);
-
-	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_list, ptr));)
-	{
-		char				field_name[MAX_STRING_LEN], prefix[MAX_STRING_LEN];
-		zbx_preproc_flat_json_param_t	*parsed_param;
-
-		if ((FAIL == zbx_json_brackets_open(ptr, &jp_param)) ||
-				(FAIL == zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL)) ||
-				(FAIL == zbx_json_value_by_name(&jp_param, "prefix", prefix, sizeof(prefix), NULL)))
-		{
-			zbx_vector_flat_json_param_destroy(&fj->field_list);
-			return FAIL;
-		}
-
-		parsed_param = (zbx_preproc_flat_json_param_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_param_t));
-		parsed_param->field_name = zbx_strdup(NULL, field_name);
-		parsed_param->prefix = zbx_strdup(NULL, prefix);
-
-		zbx_vector_flat_json_param_append(&fj->field_list, parsed_param);
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert grouped prefixes hashset to resulting JSON                *
- *                                                                            *
- ******************************************************************************/
-static void	preproc_group_flat_json_serialize_result(zbx_preproc_flat_json_t *fj, char **result)
-{
-	struct zbx_json				json;
-	zbx_hashset_iter_t			iter;
-	zbx_preproc_flat_json_output_obj_t	*outobj;
-	zbx_preproc_flat_json_input_obj_t	*outval;
-
-	zbx_hashset_iter_reset(&fj->grouped_prefixes, &iter);
+	struct zbx_json			json;
+	zbx_hashset_iter_t		iter;
+	zbx_snmp_walk_json_output_obj_t	*outobj = NULL;
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	while (NULL != (outobj = (zbx_preproc_flat_json_output_obj_t *)zbx_hashset_iter_next(&iter)))
+	zbx_hashset_iter_reset(grouped_prefixes, &iter);
+
+	while (NULL != (outobj = (zbx_snmp_walk_json_output_obj_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_flat_json_input_obj_t	*outvals;
-		int					i;
-
-		outvals = outobj->values;
 		zbx_json_addobject(&json, NULL);
-		zbx_json_addstring(&json, fj->index_name, outobj->key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "{#SNMPINDEX}", outobj->key, ZBX_JSON_TYPE_STRING);
 
-		for (i = 0; i < outvals->values_num; i++)
+		for (int k = 0; k < outobj->values.values_num; k++)
 		{
-			outval = outvals->values[i];
+			zbx_snmp_walk_json_output_value_t	*vv = outobj->values.values[k];
 
-			if (outval->value_type == ZBX_JSON_TYPE_STRING)
-				zbx_json_addstring(&json, outval->key, outval->value, ZBX_JSON_TYPE_STRING);
-			else
-				zbx_json_addraw(&json, outval->key, outval->value);
-
-			zbx_free(outval);
+			zbx_json_addraw(&json, vv->key, vv->value);
 		}
 
+		snmp_walk_json_output_obj_free(outobj);
 		zbx_json_close(&json);
-		zbx_vector_flat_json_input_obj_destroy(outvals);
 	}
 
 	zbx_json_close(&json);
@@ -2296,113 +2482,119 @@ static void	preproc_group_flat_json_serialize_result(zbx_preproc_flat_json_t *fj
 	zbx_json_free(&json);
 }
 
-static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params, char **errmsg)
+static void	zbx_vector_snmp_walk_to_json_param_clear_ext(zbx_vector_snmp_walk_to_json_param_t *v)
 {
-	zbx_preproc_flat_json_t			fj;
-	zbx_vector_flat_json_input_obj_t	input_objects;
-	char					*result = NULL;
+	int	i;
+
+	for (i = 0; i < v->values_num; i++)
+	{
+		zbx_free(v->values[i].field_name);
+		zbx_free(v->values[i].oid_prefix);
+	}
+
+	zbx_vector_snmp_walk_to_json_param_clear(v);
+}
+
+static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char					*result = NULL, *token, *saveptr;
+	size_t					line_number = 1;
+	zbx_hashset_t				grouped_prefixes;
+	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	// params to vector
-	if (FAIL == preproc_group_flat_json_params(params, &fj))
+	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
+
+	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
 	{
+		zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
+		zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
 		*errmsg = zbx_dsprintf(*errmsg, "failed to parse step parameters");
 		return FAIL;
 	}
 
-	// create input objects, each of them will contain
-	// key field name, value field name, json value type
-	zbx_vector_flat_json_input_obj_create(&input_objects);
+	zbx_hashset_create(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
+			snmp_walk_json_output_obj_compare_func);
 
-	if (FAIL == preproc_group_flat_json_parse_input_objects(value->data.str, &input_objects, &fj))
+	token = strtok_r(value->data.str, "\n", &saveptr);
+
+	while (NULL != token)
 	{
-		zbx_vector_flat_json_input_obj_destroy(&input_objects);
-		zbx_vector_flat_json_param_clear_ext(&fj.field_list, flat_json_param_free);
-		zbx_vector_flat_json_param_destroy(&fj.field_list);
-		*errmsg = zbx_dsprintf(*errmsg, "failed to parse input json");
-		return FAIL;
-	}
-
-	// group by fields
-	// in this hashset, key = index in each resulting JSON object
-	zbx_hashset_create(&fj.grouped_prefixes, 100, flat_json_output_obj_hash_func,
-			flat_json_output_obj_compare_func);
-
-	for (int i = 0; i < fj.field_list.values_num; i++)
-	{
-		int				j;
-		zbx_preproc_flat_json_param_t	*fpj_ptr;
+		int				i;
+		char				*oid, *raw_value;
+		zbx_snmp_walk_to_json_param_t	param_field;
 		size_t				prefix_len;
 
-		fpj_ptr = fj.field_list.values[i];
-		prefix_len = strlen(fpj_ptr->prefix);
+		zbx_rtrim(token, "\r");
+		zbx_strsplit_first(token, '=', &oid, &raw_value);
 
-		for (j = 0; j < input_objects.values_num; j++)
+		if (NULL == raw_value)
 		{
-			zbx_preproc_flat_json_input_obj_t	*iobj, *value_elem;
-			zbx_preproc_flat_json_output_obj_t	*oobj_cached, oobj_local;
-			zbx_vector_flat_json_input_obj_t	*ovalues;
+			*errmsg = zbx_dsprintf(*errmsg, "failed to parse input data at line " ZBX_FS_UI64,
+					line_number);
 
-			iobj = input_objects.values[j];
+			return FAIL;
+		}
 
-			if (0 != strncmp(fpj_ptr->prefix, iobj->key, prefix_len))
+		for (i = 0; i < parsed_params.values_num; i++)
+		{
+			zbx_snmp_walk_json_output_obj_t		*oobj_cached, oobj_local;
+			zbx_snmp_walk_json_output_value_t	*output_value;
+
+			param_field = parsed_params.values[i];
+			prefix_len = strlen(param_field.oid_prefix);
+
+			if (0 != strncmp(param_field.oid_prefix, oid, prefix_len))
 				continue;
 
-			// prefix successfully matches
-			// check if there are any object with equal prefix in output hashset
-			oobj_local.key = prefix_len + iobj->key + 1;
-			if (NULL == (oobj_cached = zbx_hashset_search(&fj.grouped_prefixes, &oobj_local)))
+			oobj_local.key = zbx_strdup(NULL, prefix_len + oid + 1);
+			zbx_rtrim(oobj_local.key, " ");
+
+			output_value = (zbx_snmp_walk_json_output_value_t *)zbx_malloc(NULL,
+					sizeof(zbx_snmp_walk_json_output_value_t));
+
+			output_value->key = param_field.field_name;
+			output_value->value = snmp_walk_convert_value(raw_value, 1);
+
+			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
 			{
-
-				ovalues = (zbx_vector_flat_json_input_obj_t *)zbx_malloc(NULL,
-						sizeof(zbx_vector_flat_json_input_obj_t));
-
-				zbx_vector_flat_json_input_obj_create(ovalues);
-
-				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL,
-						sizeof(zbx_preproc_flat_json_input_obj_t));
-				value_elem->key = fpj_ptr->field_name;
-				value_elem->value = iobj->value;
-				value_elem->value_type = iobj->value_type;
-				zbx_vector_flat_json_input_obj_append(ovalues, value_elem);
-
-				oobj_local.values = ovalues;
-
-				zbx_hashset_insert(&fj.grouped_prefixes, &oobj_local, sizeof(oobj_local));
+				zbx_vector_snmp_walk_to_json_output_val_create(&oobj_local.values);
+				zbx_vector_snmp_walk_to_json_output_val_append(&oobj_local.values, output_value);
+				zbx_hashset_insert(&grouped_prefixes, &oobj_local, sizeof(oobj_local));
 			}
 			else
 			{
-				ovalues = oobj_cached->values;
-
-				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL,
-						sizeof(zbx_preproc_flat_json_input_obj_t));
-
-				value_elem->key = fpj_ptr->field_name;
-				value_elem->value = iobj->value;
-				value_elem->value_type = iobj->value_type;
-				zbx_vector_flat_json_input_obj_append(ovalues, value_elem);
+				zbx_free(oobj_local.key);
+				zbx_vector_snmp_walk_to_json_output_val_append(&oobj_cached->values, output_value);
 			}
 		}
+
+		zbx_free(oid);
+		zbx_free(raw_value);
+
+		token = strtok_r(NULL, "\n", &saveptr);
+		line_number++;
 	}
 
-	if (0 == fj.grouped_prefixes.num_data)
+	if (0 < grouped_prefixes.num_data)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "no available objects for grouping were found");
+		snmp_walk_serialize_json(&grouped_prefixes, &result);
+	}
+	else
+	{
+		zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
+		zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
+
+		*errmsg = zbx_dsprintf(*errmsg, "no data was found");
+
 		return FAIL;
 	}
 
-	preproc_group_flat_json_serialize_result(&fj, &result);
-
-	zbx_vector_flat_json_param_clear_ext(&fj.field_list, flat_json_param_free);
-	zbx_vector_flat_json_param_destroy(&fj.field_list);
-	zbx_vector_flat_json_input_obj_clear_ext(&input_objects, flat_json_input_obj_free);
-	zbx_vector_flat_json_input_obj_destroy(&input_objects);
-	zbx_free(fj.index_name);
-	zbx_free(fj.key_name);
-	zbx_free(fj.value_name);
-	zbx_hashset_destroy(&fj.grouped_prefixes);
+	zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
+	zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
+	zbx_hashset_destroy(&grouped_prefixes);
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, result);
@@ -2512,8 +2704,8 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = item_preproc_csv_to_json(value, op->params, error);
 			break;
-		case ZBX_PREPROC_GROUP_FLAT_JSON_DATA:
-			ret = item_preproc_group_flat_json(value, op->params, error);
+		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+			ret = item_preproc_snmp_walk_to_json(value, op->params, error);
 			break;
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = item_preproc_str_replace(value, op->params, error);
@@ -2523,6 +2715,9 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 			break;
 		case ZBX_PREPROC_XML_TO_JSON:
 			ret = item_preproc_xml_to_json(value, error);
+			break;
+		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+			ret = item_preproc_snmp_walk_to_value(cache, value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");

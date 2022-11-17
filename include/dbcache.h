@@ -105,6 +105,7 @@ typedef struct
 	int		disable_until;
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
+	int		snmp_max_repetitions;
 }
 DC_INTERFACE;
 
@@ -221,6 +222,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	char			*history_period, *trends_period;
+	int			snmp_max_repetitions;
 }
 DC_ITEM;
 

@@ -476,6 +476,13 @@ static int DBpatch_6030061(void)
 	return DBmodify_field_type("triggers", &field, NULL);
 }
 
+static int	DBpatch_6030062(void)
+{
+	const ZBX_FIELD	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -544,5 +551,6 @@ DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
+DBPATCH_ADD(6030062, 0, 1)
 
 DBPATCH_END()

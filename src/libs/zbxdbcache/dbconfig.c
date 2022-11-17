@@ -2073,6 +2073,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	ZBX_STR2UCHAR(snmp->authprotocol, row[19]);
 	ZBX_STR2UCHAR(snmp->privprotocol, row[20]);
 	dc_strpool_replace(found, &snmp->contextname, row[21]);
+	ZBX_STR2UCHAR(snmp->max_repetitions, row[22]);
 
 	return snmp;
 }
@@ -8615,6 +8616,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
+				dst_item->snmp_max_repetitions = snmp->max_repetitions;
 			}
 			else
 			{
@@ -8628,6 +8630,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				dst_item->snmp_max_repetitions = 0;
 			}
 
 			dst_item->snmp_community = NULL;

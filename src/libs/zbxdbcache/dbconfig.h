@@ -507,6 +507,7 @@ typedef struct
 	unsigned char	reset_availability;
 	/* item statistics per interface */
 	int		items_num;
+	int		snmp_max_repetitions;
 }
 ZBX_DC_INTERFACE;
 
@@ -525,6 +526,7 @@ typedef struct
 	unsigned char	bulk;
 	unsigned char	max_succeed;
 	unsigned char	min_fail;
+	int		max_repetitions;
 }
 ZBX_DC_SNMPINTERFACE;
 
