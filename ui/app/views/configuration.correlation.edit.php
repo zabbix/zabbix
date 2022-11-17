@@ -82,7 +82,7 @@ $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))->addItem(
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
 		]))
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setId('conditions_#{row_index}')
 );
 
 $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))->addItem(
@@ -111,7 +111,7 @@ $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))-
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
 		]))
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setId('conditions_#{row_index}')
 );
 
 $condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))->addItem(
@@ -144,7 +144,7 @@ $condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
 		]))
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setId('conditions_#{row_index}')
 );
 
 $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-tmpl'))->addItem(
@@ -177,7 +177,7 @@ $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-t
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
 		]))
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setId('conditions_#{row_index}')
 );
 
 // Create condition table.
