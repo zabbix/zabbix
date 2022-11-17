@@ -33,6 +33,8 @@ class CAPIHelper {
 	protected static $debug = [];
 	// Session id.
 	protected static $session = null;
+	// Use authorization header.
+	protected static $use_auth = null;
 
 	/**
 	 * Reset API helper state.
@@ -74,11 +76,14 @@ class CAPIHelper {
 				'content' => $data,
 				'header' => [
 					'Content-type: application/json-rpc',
-					'Content-Length: '.strlen($data),
-					'Authorization: Bearer '.static::$session
+					'Content-Length: '.strlen($data)
 				]
 			]
 		];
+
+		if (static::$use_auth) {
+			$params['http']['header'][] = 'Authorization: Bearer '.static::$session;
+		}
 
 		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
 		if ($handle) {
@@ -222,5 +227,13 @@ class CAPIHelper {
 	 */
 	public static function clearDebugInfo() {
 		static::$debug = [];
+	}
+
+	public static function setAuth(bool $use_auth): void {
+		static::$use_auth = $use_auth;
+	}
+
+	public static function getAuth(): bool {
+		return static::$use_auth;
 	}
 }
