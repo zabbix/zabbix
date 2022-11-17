@@ -162,15 +162,8 @@ class CProxy extends CApiService {
 		}
 
 		if ($result) {
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'name_upper'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
