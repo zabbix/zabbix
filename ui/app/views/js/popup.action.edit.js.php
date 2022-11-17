@@ -29,7 +29,6 @@ window.action_edit_popup = new class {
 		this.condition_types = condition_types;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
-		this.row_count = document.getElementById('conditionTable').rows.length - 2;
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();

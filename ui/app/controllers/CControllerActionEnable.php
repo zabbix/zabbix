@@ -92,7 +92,7 @@ class CControllerActionEnable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot enable action ', 'Cannot enable actions', $actions_count),
+				'title' => _n('Cannot enable action', 'Cannot enable actions', $actions_count),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 
