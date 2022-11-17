@@ -344,26 +344,6 @@ window.action_edit_popup = new class {
 		return result;
 	}
 
-	_getConditionName(input) {
-		switch (parseInt(input.conditiontype)) {
-			case <?= CONDITION_TYPE_SUPPRESSED ?> :
-				if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
-					this.condition_name = <?= json_encode(_('Problem is suppressed')) ?>;
-				}
-				else {
-					this.condition_name = <?= json_encode(_('Problem is not suppressed')) ?>;
-				}
-				break;
-
-			default:
-				this.condition_name = this.condition_types[input.conditiontype] + ' ' +
-					this.condition_operators[input.operator] + ' ' + input.name;
-				break;
-		}
-
-		return this.condition_name;
-	}
-
 	submit() {
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
