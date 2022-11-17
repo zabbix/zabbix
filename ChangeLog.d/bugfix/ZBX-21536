@@ -1,0 +1,1 @@
+..F....... [ZBX-21536] reverted fix for backslash escape in trigger expression constructor (gcalenko)
