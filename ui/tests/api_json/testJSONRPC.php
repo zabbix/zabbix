@@ -391,9 +391,9 @@ class testJSONRPC extends CAPITest {
 						'data' => 'Not authorized.'
 					],
 					'id' => 5
-				]
-			],
-			'auth' => false
+				],
+				'auth' => false
+			]
 		];
 	}
 
