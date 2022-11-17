@@ -167,4 +167,18 @@ class OracleDbBackend extends DbBackend {
 
 		return (is_array($result) && array_key_exists('cnt', $result) && $result['cnt'] == 4);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists(string $table_name, string $field_name): bool {
+		$result = DBFetch(DBselect(
+			'SELECT 1'.
+			' FROM col'.
+			' WHERE lower(tname)='.zbx_dbstr($table_name).
+			' AND lower(cname)='.zbx_dbstr($field_name)
+		));
+
+		return $result ? true : false;
+	}
 }
