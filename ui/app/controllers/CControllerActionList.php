@@ -127,9 +127,13 @@ class CControllerActionList extends CController {
 
 		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
 
-		foreach($data['actions'] as $aIdx => $action) {
-			$data['operation_descriptions'][$aIdx] = getActionOperationData($action['operations']);
+		$operations = [];
+		foreach($data['actions'] as $action) {
+			foreach ($action['operations'] as $operation) {
+				$operations[] = $operation;
+			}
 		}
+		$data['operation_descriptions'] = getActionOperationData($operations);
 
 		// pager
 		$page_num = $this->getInput('page', 1);
