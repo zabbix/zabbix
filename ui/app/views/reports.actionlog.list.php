@@ -129,16 +129,17 @@ foreach ($data['alerts'] as $alert) {
 		? [
 			bold(_('Subject').':'),
 			BR(),
-			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
+			$alert['subject'],
+			BR(),
 			BR(),
 			bold(_('Message').':'),
 			BR(),
-			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
+			zbx_nl2br($alert['message'])
 		]
 		: [
 			bold(_('Command').':'),
 			BR(),
-			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
+			zbx_nl2br($alert['message'])
 		];
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {

@@ -63,7 +63,7 @@ foreach ($data['alerts'] as $alert) {
 		$info_icons = [];
 	}
 
-	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+	$message = $alert['alerttype'] == ALERT_TYPE_MESSAGE
 		? [
 			bold($alert['subject']),
 			BR(),
