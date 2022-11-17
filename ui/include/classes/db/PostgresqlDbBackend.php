@@ -308,14 +308,12 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
 
-		$result = DBFetch(DBselect(
+		return (bool) DBFetch(DBselect(
 			'SELECT 1'.
 			' FROM information_schema.columns'.
 			' WHERE table_name='.zbx_dbstr($table_name).
 				' AND column_name='.zbx_dbstr($field_name).
 				' AND table_schema='.zbx_dbstr($schema)
 		));
-
-		return $result ? true : false;
 	}
 }

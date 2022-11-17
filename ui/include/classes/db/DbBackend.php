@@ -215,7 +215,7 @@ abstract class DbBackend {
 	 *
 	 * @return bool
 	 */
-	abstract function dbFieldExists(string $table_name, string $field_name): bool;
+	abstract public function dbFieldExists(string $table_name, string $field_name): bool;
 
 	/**
 	 * Set warning message.

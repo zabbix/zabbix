@@ -172,13 +172,11 @@ class OracleDbBackend extends DbBackend {
 	 * @inheritdoc
 	 */
 	public function dbFieldExists(string $table_name, string $field_name): bool {
-		$result = DBFetch(DBselect(
+		return (bool) DBFetch(DBselect(
 			'SELECT 1'.
 			' FROM col'.
 			' WHERE lower(tname)='.zbx_dbstr($table_name).
-			' AND lower(cname)='.zbx_dbstr($field_name)
+				' AND lower(cname)='.zbx_dbstr($field_name)
 		));
-
-		return $result ? true : false;
 	}
 }

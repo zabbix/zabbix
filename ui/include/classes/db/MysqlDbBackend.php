@@ -215,12 +215,10 @@ class MysqlDbBackend extends DbBackend {
 	 * @inheritdoc
 	 */
 	public function dbFieldExists(string $table_name, string $field_name): bool {
-		$result = DBFetch(DBselect(
+		return (bool) DBFetch(DBselect(
 			'SHOW COLUMNS'.
 			' FROM '.$table_name.
 			' LIKE '.zbx_dbstr($field_name)
 		));
-
-		return $result ? true : false;
 	}
 }
