@@ -143,7 +143,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call with invalid "auth"
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "host.get", "params": {}, "auth": 12345, "id": 1}',
+				'request' => '{"jsonrpc": "2.0", "method": "host.get", "params": {}, "id": 1}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -158,7 +158,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call with invalid "id"
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "host.get", "params": {}, "auth": null, "id": true}',
+				'request' => '{"jsonrpc": "2.0", "method": "host.get", "params": {}, "id": true}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -352,7 +352,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call with not required auth
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "auth": "token", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "apiinfo.version", "params": {}, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -367,7 +367,7 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call without required auth
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "auth": null, "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
@@ -400,9 +400,9 @@ class testJSONRPC extends CAPITest {
 	/**
 	 * @dataProvider json_rpc_data
 	 */
-	public function testJSONRPC_Calls($request, $expected_result, $use_auth, $token = null) {
-		if ($use_auth) {
-			CAPIHelper::setAuth($use_auth);
+	public function testJSONRPC_Calls($request, $expected_result, $auth, $token = null) {
+		if ($auth) {
+			CAPIHelper::setAuth($auth);
 			CAPIHelper::setSessionId($token);
 		}
 		$this->assertSame($expected_result, $this->callRaw($request));
