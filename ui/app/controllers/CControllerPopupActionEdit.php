@@ -131,19 +131,19 @@ class CControllerPopupActionEdit extends CController {
 
 			foreach ($data['action']['operations'] as &$operation) {
 				$operation['recovery'] = ACTION_OPERATION;
-				$data['descriptions']['operation'] = getActionOperationData([$data['action']], ACTION_OPERATION);
+				$data['descriptions']['operation'] = getActionOperationData($data['action']['operations']);
 			}
 			unset($operation);
 
 			foreach ($data['action']['recovery_operations'] as &$operation) {
 				$operation['recovery'] = ACTION_RECOVERY_OPERATION;
-				$data['descriptions']['recovery'] = getActionOperationData([$data['action']], ACTION_RECOVERY_OPERATION);
+				$data['descriptions']['recovery'] = getActionOperationData($data['action']['recovery_operations']);
 			}
 			unset($operation);
 
 			foreach ($data['action']['update_operations'] as &$operation) {
 				$operation['recovery'] = ACTION_UPDATE_OPERATION;
-				$data['descriptions']['update'] = getActionOperationData([$data['action']], ACTION_UPDATE_OPERATION);
+				$data['descriptions']['update'] = getActionOperationData($data['action']['update_operations']);
 			}
 
 			unset($operation);

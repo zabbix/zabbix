@@ -74,9 +74,8 @@ class CControllerPopupActionOperationGet extends CController {
 	protected function doAction(): void {
 		$data = [];
 		$data['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
-
 		$eventsource = $this->getInput('eventsource');
-		$new_operation = $this->hasInput('new_operation') ? $this->getInput('new_operation')['operation'] : null;
+		$new_operation = $this->getInput('new_operation')['operation'] ?? null;
 
 		if ($new_operation) {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
@@ -98,6 +97,13 @@ class CControllerPopupActionOperationGet extends CController {
 			else {
 				$data['operations'][] = $new_operation;
 			}
+
+			if ($new_operation['recovery'] == ACTION_OPERATION) {
+				sortOperations($eventsource, $data['operations']);
+			}
+			else {
+				CArrayHelper::sort($data['operations'], ['operationtype']);
+			}
 		}
 		else {
 			$data['recovery'] = ACTION_OPERATION;
@@ -107,19 +113,18 @@ class CControllerPopupActionOperationGet extends CController {
 		foreach ($data['operations'] as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				$data['action']['operations'][] = $operation;
-				sortOperations($eventsource, $data['action']['operations']);
+				$data['descriptions'] = getActionOperationData($data['action']['operations']);
 			}
 			elseif ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['action']['recovery_operations'][] = $operation;
-				CArrayHelper::sort($data['action']['recovery_operations'], ['operationtype']);
+				$data['descriptions'] = getActionOperationData($data['action']['recovery_operations']);
 			}
 			elseif ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['action']['update_operations'][] = $operation;
-				CArrayHelper::sort($data['action']['update_operations'], ['operationtype']);
+				$data['descriptions'] = getActionOperationData($data['action']['update_operations']);
 			}
 		}
 
-		$data['descriptions'] = getActionOperationData([$data['action']], $operation['recovery']);
 		$data['allowedOperations'] = getAllowedOperations($eventsource);
 		$data['eventsource'] = $eventsource;
 		$data['action']['esc_period'] = $data['esc_period'];

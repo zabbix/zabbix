@@ -133,7 +133,7 @@ if ($data['actions']) {
 		}
 
 		$operations[] = getActionOperationDescriptions(
-			$data['actions'][$aIdx]['operations'],$data['eventsource'], $data['operation_descriptions']
+			$data['actions'][$aIdx]['operations'],$data['eventsource'], $data['operation_descriptions'][$aIdx]
 		);
 
 		$status = ($action['status'] == ACTION_STATUS_ENABLED)

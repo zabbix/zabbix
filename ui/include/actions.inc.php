@@ -381,119 +381,66 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 /**
  * Gathers operation data and processes it based on operation type.
  *
- * @param array $actions      Array of actions.
- * @param int   $type         Operations recovery type.
+ * @param array $operations   Array of operations.
  *
  * @return array  Returns an array of processed data
  */
-
-function getActionOperationData(array $actions, int $type) {
+function getActionOperationData(array $operations) {
 	$data = [];
 
-	foreach ($actions as $action) {
-		if ($type == ACTION_OPERATION) {
-			foreach ($action['operations'] as $operation) {
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$data['mediatypeid'] = $operation['opmessage']['mediatypeid'];
+	foreach ($operations as $operation) {
+		switch ($operation['operationtype']) {
+			case OPERATION_TYPE_MESSAGE:
+				$data['mediatypeid'] = $operation['opmessage']['mediatypeid'];
 
-						if ($data['mediatypeid'] != 0) {
-							$data['mediatypeids'][$data['mediatypeid']] = $data['mediatypeid'];
-						}
-
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							foreach ($operation['opmessage_usr'] as $users) {
-								$data['userids'][$users['userid']] = $users['userid'];
-							}
-						}
-
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							foreach ($operation['opmessage_grp'] as $user_groups) {
-								$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-							}
-						}
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] != 0) {
-									$data['hostids'][$host['hostid']] = $host['hostid'];
-								}
-							}
-						}
-
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								$data['groupids'][$host_group['groupid']] = true;
-							}
-						}
-
-						$data['scriptids'][$operation['opcommand']['scriptid']] = true;
-						break;
-
-					case OPERATION_TYPE_GROUP_ADD:
-					case OPERATION_TYPE_GROUP_REMOVE:
-						foreach ($operation['opgroup'] as $groupid) {
-							$data['groupids'][$groupid['groupid']] = true;
-						}
-						break;
-
-					case OPERATION_TYPE_TEMPLATE_ADD:
-					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						foreach ($operation['optemplate'] as $templateid) {
-							$data['templateids'][$templateid['templateid']] = true;
-						}
-						break;
+				if ($data['mediatypeid'] != 0) {
+					$data['mediatypeids'][$data['mediatypeid']] = $data['mediatypeid'];
 				}
-			}
-		}
-		else {
-			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
-				? 'recovery_operations'
-				: 'update_operations';
 
-			foreach ($action[$operations_key] as $operation) {
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$mediatypeid = $operation['opmessage']['mediatypeid'];
-
-						if ($mediatypeid != 0) {
-							$data['mediatypeids'][$mediatypeid] = $mediatypeid;
-						}
-
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							foreach ($operation['opmessage_usr'] as $users) {
-								$data['userids'][$users['userid']] = $users['userid'];
-							}
-						}
-
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							foreach ($operation['opmessage_grp'] as $user_groups) {
-								$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-							}
-						}
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] != 0) {
-									$data['hostids'][$host['hostid']] = $host['hostid'];
-								}
-							}
-						}
-
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								$data['groupids'][$host_group['groupid']] = true;
-							}
-						}
-
-						$data['scriptids'][$operation['opcommand']['scriptid']] = true;
-						break;
+				if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+					foreach ($operation['opmessage_usr'] as $users) {
+						$data['userids'][$users['userid']] = $users['userid'];
+					}
 				}
-			}
+
+				if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+					foreach ($operation['opmessage_grp'] as $user_groups) {
+						$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+					}
+				}
+				break;
+
+			case OPERATION_TYPE_COMMAND:
+				if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+					foreach ($operation['opcommand_hst'] as $host) {
+						if ($host['hostid'] != 0) {
+							$data['hostids'][$host['hostid']] = $host['hostid'];
+						}
+					}
+				}
+
+				if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+					foreach ($operation['opcommand_grp'] as $host_group) {
+						$data['groupids'][$host_group['groupid']] = true;
+					}
+				}
+
+				$data['scriptids'][$operation['opcommand']['scriptid']] = true;
+				break;
+
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				foreach ($operation['opgroup'] as $groupid) {
+					$data['groupids'][$groupid['groupid']] = true;
+				}
+				break;
+
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				foreach ($operation['optemplate'] as $templateid) {
+					$data['templateids'][$templateid['templateid']] = true;
+				}
+				break;
 		}
 	}
 
@@ -753,7 +700,6 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 
 	return $result;
 }
-
 
 /**
  * Return an array of action conditions supported by the given event source.

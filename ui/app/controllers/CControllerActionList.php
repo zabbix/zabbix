@@ -117,15 +117,18 @@ class CControllerActionList extends CController {
 			'limit' => $limit
 		]);
 
-		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
-		$data['operation_descriptions'] = getActionOperationData($data['actions'],  ACTION_OPERATION);
-
 		order_result($data['actions'], $sort_field, $sort_order);
 
 		foreach ($data['actions'] as &$action) {
 			order_result($action['filter']['conditions'], 'conditiontype');
 		}
 		unset ($action);
+
+		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
+
+		foreach($data['actions'] as $aIdx => $action) {
+			$data['operation_descriptions'][$aIdx] = getActionOperationData($action['operations']);
+		}
 
 		// pager
 		if (hasRequest('page')) {
