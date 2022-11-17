@@ -116,6 +116,9 @@ class CControllerPopupActionEdit extends CController {
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 
+			order_result($data['action']['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+			$data['action']['filter']['conditions'] = array_values($data['action']['filter']['conditions']);
+
 			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);
 				$data['condition_name'][] = $condition_names[0][$row_index];
@@ -126,9 +129,11 @@ class CControllerPopupActionEdit extends CController {
 			}
 			unset ($condition);
 
-			$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
-				$data['action']['filter']['conditions']
-			);
+			if ($data['action']['filter']['formula'] !== '') {
+				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
+					$data['action']['filter']['conditions']
+				));
+			}
 
 			foreach ($data['action']['operations'] as &$operation) {
 				$operation['recovery'] = ACTION_OPERATION;
@@ -148,7 +153,6 @@ class CControllerPopupActionEdit extends CController {
 			}
 
 			unset($operation);
-
 		}
 		else {
 			$data = [
