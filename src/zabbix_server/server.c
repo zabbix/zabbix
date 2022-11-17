@@ -210,10 +210,12 @@ static const char	*get_fping_location(void)
 }
 
 char	*CONFIG_FPING6_LOCATION		= NULL;
+#ifdef HAVE_IPV6
 static const char	*get_fping6_location(void)
 {
 	return CONFIG_FPING6_LOCATION;
 }
+#endif
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;

@@ -173,10 +173,12 @@ static const char	*get_fping_location(void)
 }
 
 char	*CONFIG_FPING6_LOCATION		= NULL;
+#ifdef HAVE_IPV6
 static const char	*get_fping6_location(void)
 {
 	return CONFIG_FPING6_LOCATION;
 }
+#endif
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
