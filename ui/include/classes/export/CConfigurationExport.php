@@ -57,8 +57,8 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options               IDs of elements that should be exported.
-	 * @param array $templateids_to_unlink Template IDs with parent template ids that should be unlinked.
+	 * @param array $options                IDs of elements that should be exported.
+	 * @param array $templateids_to_unlink  Template IDs with parent template ids that should be unlinked.
 	 */
 	public function __construct(array $options, array $unlink_templates_data = []) {
 		$this->options = array_merge([
