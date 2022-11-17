@@ -61,6 +61,8 @@ extern unsigned char			program_type;
 
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 /*
  * The alert queue is implemented as a nested queue.
  *
