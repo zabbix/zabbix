@@ -102,7 +102,6 @@
 
 		if (input.groupids) {
 			Object.keys(input.groupids).map(key => {
-				console.log(key, input.groupids[key]);
 
 				let element = {...input, name: input.groupids[key], value: key};
 				element.groupid = key;
