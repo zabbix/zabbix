@@ -396,13 +396,13 @@ class testJSONRPC extends CAPITest {
 			],
 			// rpc call auth params
 			[
-				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "auth": "dep", "id": 5}',
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {"output":["hostid"]}, "auth": "token", "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'Not authorized.'
+						'data' => 'Session terminated, re-login, please.'
 					],
 					'id' => 5
 				],
