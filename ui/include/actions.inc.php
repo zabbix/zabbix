@@ -526,6 +526,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 	$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
 	$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
 	$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
+	$users = array_key_exists('users', $operation_values) ? $operation_values['users'] : [];
 
 	foreach ($operations as $i => $operation) {
 		switch ($operation['operationtype']) {
@@ -541,8 +542,8 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					$user_names_list = [];
 
 					foreach ($operation['opmessage_usr'] as $user) {
-						if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
-							$user_names_list[] = $operation_values['users']['fullnames'][$user['userid']];
+						if (array_key_exists($user['userid'], $users['fullnames'])){
+							$user_names_list[] = $users['fullnames'][$user['userid']];
 						}
 					}
 
