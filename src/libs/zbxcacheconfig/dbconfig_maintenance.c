@@ -686,7 +686,7 @@ out:
  ******************************************************************************/
 void	zbx_dc_maintenance_set_update_flags(void)
 {
-	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
+	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
 
 	WRLOCK_CACHE;
 
@@ -763,7 +763,8 @@ int	zbx_dc_maintenance_check_update_flag(int timer)
  ******************************************************************************/
 int	zbx_dc_maintenance_check_update_flags(void)
 {
-	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), ret = SUCCEED;
+	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM();
+	int	ret = SUCCEED;
 
 	RDLOCK_CACHE;
 
