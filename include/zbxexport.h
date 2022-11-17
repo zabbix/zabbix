@@ -29,6 +29,16 @@
 
 typedef struct
 {
+	char	*name;
+	FILE	*file;
+	int	missing;
+}
+zbx_export_file_t;
+
+typedef zbx_export_file_t	*(*zbx_get_export_file_f)(void);
+
+typedef struct
+{
 	char		*dir;
 	char		*type;
 	zbx_uint64_t	file_size;
@@ -40,20 +50,21 @@ void	zbx_deinit_library_export(void);
 int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);
 int	zbx_is_export_enabled(uint32_t flags);
 int	zbx_has_export_dir(void);
+void	zbx_export_deinit(zbx_export_file_t *file);
 
-void	zbx_problems_export_init(const char *process_name, int process_num);
+zbx_export_file_t	*zbx_problems_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num);
 void	zbx_problems_export_write(const char *buf, size_t count);
 void	zbx_problems_export_flush(void);
-void	zbx_problems_export_deinit(void);
 
-void	zbx_history_export_init(const char *process_name, int process_num);
+zbx_export_file_t	*zbx_history_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num);
 void	zbx_history_export_write(const char *buf, size_t count);
 void	zbx_history_export_flush(void);
-void	zbx_history_export_deinit(void);
 
-void	zbx_trends_export_init(const char *process_name, int process_num);
+zbx_export_file_t	*zbx_trends_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num);
 void	zbx_trends_export_write(const char *buf, size_t count);
 void	zbx_trends_export_flush(void);
-void	zbx_trends_export_deinit(void);
 
 #endif

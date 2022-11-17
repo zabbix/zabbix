@@ -185,6 +185,24 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
+static zbx_export_file_t	*problems_export = NULL;
+static zbx_export_file_t	*get_problems_export(void)
+{
+	return problems_export;
+}
+
+static zbx_export_file_t	*history_export = NULL;
+static zbx_export_file_t	*get_history_export(void)
+{
+	return history_export;
+}
+
+static zbx_export_file_t	*trends_export = NULL;
+static zbx_export_file_t	*get_trends_export(void)
+{
+	return trends_export;
+}
+
 unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
 static unsigned char	get_program_type(void)
 {
@@ -1062,13 +1080,13 @@ static void	zbx_on_exit(int ret)
 #endif
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_deinit();
+		zbx_export_deinit(problems_export);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-		zbx_history_export_deinit();
+		zbx_export_deinit(history_export);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-		zbx_trends_export_deinit();
+		zbx_export_deinit(trends_export);
 
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_deinit_library_export();
@@ -1869,13 +1887,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("main-process", 0);
+		problems_export = zbx_problems_export_init(get_problems_export, "main-process", 0);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-		zbx_history_export_init("main-process", 0);
+		history_export = zbx_history_export_init(get_history_export, "main-process", 0);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-		zbx_trends_export_init("main-process", 0);
+		trends_export = zbx_trends_export_init(get_trends_export, "main-process", 0);
 
 	if (SUCCEED != zbx_ha_get_status(CONFIG_HA_NODE_NAME, &ha_status, &ha_failover_delay, &error))
 	{

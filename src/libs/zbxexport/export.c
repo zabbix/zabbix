@@ -28,17 +28,9 @@
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"
 #define ZBX_OPTION_EXPTYPE_TRENDS	"trends"
 
-typedef struct
-{
-	char	*name;
-	FILE	*file;
-	int	missing;
-}
-zbx_export_file_t;
-
-static zbx_export_file_t	*history_file;
-static zbx_export_file_t	*trends_file;
-static zbx_export_file_t	*problems_file;
+static zbx_get_export_file_f	get_history_file;
+static zbx_get_export_file_f	get_trends_file;
+static zbx_get_export_file_f	get_problems_file;
 static zbx_config_export_t	*config_export;
 
 /******************************************************************************
@@ -206,6 +198,9 @@ void	zbx_deinit_library_export(void)
 		zbx_free(config_export->dir);
 		zbx_free(config_export->type);
 	}
+	get_history_file = NULL;
+	get_trends_file = NULL;
+	get_problems_file = NULL;
 }
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
@@ -221,10 +216,10 @@ static int	open_export_file(zbx_export_file_t *file, char **error)
 	return SUCCEED;
 }
 
-static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *process_type, const char
-				*process_name,	int process_num)
+static zbx_export_file_t	*export_init(const char *process_type, const char *process_name, int process_num)
 {
-	char	*export_dir, *error = NULL;
+	char			*export_dir, *error = NULL;
+	zbx_export_file_t	*file = NULL;
 
 	if (NULL == config_export)
 	{
@@ -252,41 +247,35 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 	return file;
 }
 
-void	zbx_history_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_history_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	history_file = export_init(history_file, "history", process_name, process_num);
+	get_history_file = get_export_file_cb;
+
+	return export_init("history", process_name, process_num);
 }
 
-void	zbx_trends_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_trends_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	trends_file = export_init(trends_file, "trends", process_name, process_num);
+	get_trends_file = get_export_file_cb;
+
+	return export_init("trends", process_name, process_num);
 }
 
-void	zbx_problems_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_problems_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	problems_file = export_init(problems_file, "problems", process_name, process_num);
+	get_problems_file = get_export_file_cb;
+
+	return export_init("problems", process_name, process_num);
 }
 
-static void	export_deinit(zbx_export_file_t **file)
+void	zbx_export_deinit(zbx_export_file_t *file)
 {
-	zbx_fclose((*file)->file);
-	zbx_free((*file)->name);
-	zbx_free(*file);
-}
-
-void	zbx_history_export_deinit(void)
-{
-	export_deinit(&history_file);
-}
-
-void	zbx_trends_export_deinit(void)
-{
-	export_deinit(&trends_file);
-}
-
-void	zbx_problems_export_deinit(void)
-{
-	export_deinit(&problems_file);
+	zbx_fclose(file->file);
+	zbx_free(file->name);
+	zbx_free(file);
 }
 
 static void	export_write(const char *buf, size_t count, zbx_export_file_t *file)
@@ -397,17 +386,17 @@ error:
 
 void	zbx_problems_export_write(const char *buf, size_t count)
 {
-	export_write(buf, count, problems_file);
+	export_write(buf, count, get_problems_file());
 }
 
 void	zbx_history_export_write(const char *buf, size_t count)
 {
-	export_write(buf, count, history_file);
+	export_write(buf, count, get_history_file());
 }
 
 void	zbx_trends_export_write(const char *buf, size_t count)
 {
-	export_write(buf, count, trends_file);
+	export_write(buf, count, get_trends_file());
 }
 
 static void	export_flush(zbx_export_file_t *file)
@@ -422,15 +411,15 @@ static void	export_flush(zbx_export_file_t *file)
 
 void	zbx_problems_export_flush(void)
 {
-	export_flush(problems_file);
+	export_flush(get_problems_file());
 }
 
 void	zbx_history_export_flush(void)
 {
-	export_flush(history_file);
+	export_flush(get_history_file());
 }
 
 void	zbx_trends_export_flush(void)
 {
-	export_flush(trends_file);
+	export_flush(get_trends_file());
 }
