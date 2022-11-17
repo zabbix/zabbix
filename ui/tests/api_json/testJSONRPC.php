@@ -147,9 +147,9 @@ class testJSONRPC extends CAPITest {
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
-						'code' => -32600,
-						'message' => 'Invalid request.',
-						'data' => 'Invalid parameter "/auth": a character string is expected.'
+						'code' => -32602,
+						'message' => 'Invalid params.',
+						'data' => 'Session terminated, re-login, please.'
 					],
 					'id' => 1
 				],
@@ -383,6 +383,20 @@ class testJSONRPC extends CAPITest {
 			// rpc call without required auth
 			[
 				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "id": 5}',
+				'result' => [
+					'jsonrpc' => '2.0',
+					'error' => [
+						'code' => -32602,
+						'message' => 'Invalid params.',
+						'data' => 'Not authorized.'
+					],
+					'id' => 5
+				],
+				'auth' => false
+			],
+			// rpc call auth params
+			[
+				'request' => '{"jsonrpc": "2.0", "method": "user.get", "params": {}, "auth": "dep", "id": 5}',
 				'result' => [
 					'jsonrpc' => '2.0',
 					'error' => [
