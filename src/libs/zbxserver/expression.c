@@ -1482,6 +1482,7 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_EVENT_CAUSE_STATUS			MVAR_EVENT_CAUSE "STATUS}"
 #define MVAR_EVENT_CAUSE_TAGS			MVAR_EVENT_CAUSE "TAGS}"
 #define MVAR_EVENT_CAUSE_TAGSJSON		MVAR_EVENT_CAUSE "TAGSJSON}"
+#define MVAR_EVENT_CAUSE_TAGS_PREFIX		MVAR_EVENT_CAUSE "TAGS."
 #define MVAR_EVENT_CAUSE_TIME			MVAR_EVENT_CAUSE "TIME}"
 #define MVAR_EVENT_CAUSE_VALUE			MVAR_EVENT_CAUSE "VALUE}"
 #define MVAR_EVENT_CAUSE_SEVERITY		MVAR_EVENT_CAUSE "SEVERITY}"
@@ -1490,14 +1491,7 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_EVENT_CAUSE_SOURCE			MVAR_EVENT_CAUSE "SOURCE}"
 #define MVAR_EVENT_CAUSE_OPDATA			MVAR_EVENT_CAUSE "OPDATA}"
 #define MVAR_EVENT_CAUSE_UPDATE			MVAR_EVENT_CAUSE "UPDATE."
-#define MVAR_EVENT_CAUSE_UPDATE_ACTION		MVAR_EVENT_CAUSE_UPDATE "ACTION}"
-#define MVAR_EVENT_CAUSE_UPDATE_DATE		MVAR_EVENT_CAUSE_UPDATE "DATE}"
 #define MVAR_EVENT_CAUSE_UPDATE_HISTORY		MVAR_EVENT_CAUSE_UPDATE "HISTORY}"
-#define MVAR_EVENT_CAUSE_UPDATE_MESSAGE		MVAR_EVENT_CAUSE_UPDATE "MESSAGE}"
-#define MVAR_EVENT_CAUSE_UPDATE_TIME		MVAR_EVENT_CAUSE_UPDATE "TIME}"
-#define MVAR_EVENT_CAUSE_UPDATE_STATUS		MVAR_EVENT_CAUSE_UPDATE "STATUS}"
-#define MVAR_EVENT_CAUSE_UPDATE_NSEVERITY	MVAR_EVENT_CAUSE_UPDATE "NSEVERITY}"
-#define MVAR_EVENT_CAUSE_UPDATE_SEVERITY	MVAR_EVENT_CAUSE_UPDATE "SEVERITY}"
 
 #define MVAR_EVENT_SYMPTOMS			"{EVENT.SYMPTOMS}"
 
@@ -2930,8 +2924,7 @@ static const char	*trigger_value_string(unsigned char value)
  *                                                                            *
  ******************************************************************************/
 static void	get_event_cause_value(const char *macro, char **replace_to, const ZBX_DB_EVENT *event,
-		const zbx_uint64_t *recipient_userid, const zbx_service_alarm_t *service_alarm,
-		const DB_ACKNOWLEDGE *ack, const char *tz, int macro_type, char *error, int maxerrlen)
+		const zbx_uint64_t *recipient_userid, const char *tz, char *error, int maxerrlen)
 {
 	const ZBX_DB_EVENT		*cause_event, *r_event, *c_event;
 	zbx_vector_uint64_t		eventids, r_eventids;
@@ -3007,10 +3000,6 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 		*replace_to = zbx_strdup(*replace_to, event_value_string(c_event->source, c_event->object,
 				c_event->value));
 	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->value);
-	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
 	{
 		get_event_tags(cause_event, replace_to);
@@ -3019,9 +3008,17 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	{
 		get_event_tags_json(cause_event, replace_to);
 	}
+	else if (0 == strncmp(macro, MVAR_EVENT_CAUSE_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX)))
+	{
+		get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX), cause_event, replace_to);
+	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TIME))
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_time2str(cause_event->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->value);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
@@ -3043,42 +3040,6 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OPDATA))
 	{
 		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_ACTION))
-	{
-		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
-		{
-			get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
-					ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
-					| ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, replace_to);
-		}
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_DATE))
-	{
-		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str(ack->clock, tz));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_MESSAGE))
-	{
-		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
-			*replace_to = zbx_strdup(*replace_to, ack->message);
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_TIME))
-	{
-		if (NULL != service_alarm)
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str(service_alarm->clock, tz));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_NSEVERITY))
-	{
-		if (NULL != service_alarm)
-			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)service_alarm->value);
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_SEVERITY))
-	{
-		if (NULL != service_alarm && FAIL == get_trigger_severity_name(service_alarm->value, replace_to))
-			*replace_to = zbx_strdup(*replace_to, "unknown");
 	}
 
 clean:
@@ -3224,8 +3185,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 					ZBX_TOKEN_MACRO == token.type &&
 					0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 			{
-				get_event_cause_value(m, &replace_to, event, userid, service_alarm, ack, tz,
-						macro_type, error, maxerrlen);
+				get_event_cause_value(m, &replace_to, event, userid, tz, error, maxerrlen);
 			}
 			else if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object &&
 					ZBX_TOKEN_MACRO == token.type && 0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
