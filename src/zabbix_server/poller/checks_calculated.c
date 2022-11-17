@@ -169,13 +169,14 @@ out:
 static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t max_error_len,
 		zbx_vector_ptr_t *unknown_msgs)
 {
-	function_t	*f = NULL;
-	char		*buf, replace[16], *errstr = NULL;
-	int		i, ret = SUCCEED;
-	zbx_host_key_t	*keys = NULL;
-	DC_ITEM		*items = NULL;
-	int		*errcodes = NULL;
-	zbx_timespec_t	ts;
+	function_t		*f = NULL;
+	char			*buf, replace[16], *errstr = NULL;
+	int			i, ret = SUCCEED;
+	zbx_host_key_t		*keys = NULL;
+	DC_ITEM			*items = NULL;
+	int			*errcodes = NULL;
+	zbx_timespec_t		ts;
+	DC_EVALUATE_ITEM	evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -251,7 +252,6 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 			zbx_vector_ptr_append(unknown_msgs, unknown_msg);
 			ret_unknown = 1;
 		}
-		DC_EVALUATE_ITEM	evaluate_item;
 
 		evaluate_item.itemid = items[i].itemid;
 		evaluate_item.value_type = items[i].value_type;
@@ -260,7 +260,8 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 		evaluate_item.key_orig = items[i].key_orig;
 
 		if (0 == ret_unknown &&
-				SUCCEED != evaluate_function(&(f->value), &evaluate_item, f->func, f->params, &ts, &errstr))
+				SUCCEED != evaluate_function(&(f->value), &evaluate_item, f->func, f->params, &ts,
+						&errstr))
 		{
 			/* compose and store error message for future use */
 			if (NULL != errstr)

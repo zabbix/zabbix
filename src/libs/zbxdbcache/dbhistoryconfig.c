@@ -58,7 +58,6 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	dst_item->state = src_item->state;
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
-	dst_item->lastclock = src_item->lastclock;
 
 	if ('\0' != *src_item->error)
 		dst_item->error = zbx_strdup(NULL, src_item->error);
@@ -118,7 +117,6 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
-	zbx_config_hk_t		config_hk;
 
 	memset(errcodes, 0, sizeof(int) * num);
 

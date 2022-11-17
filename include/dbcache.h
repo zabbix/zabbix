@@ -227,7 +227,6 @@ typedef struct
 	int			history_sec;
 	int			trends_sec;
 	int			flags;
-	int			lastclock;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		state;
