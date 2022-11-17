@@ -31,9 +31,9 @@ $this->includeJsFile('reports.actionlog.list.js.php');
 
 $filter_status_options = [];
 
-foreach ($data['statuses'] as $value => $name) {
+foreach ($data['statuses'] as $value => $label) {
 	$filter_status_options[] = [
-		'name' => $name,
+		'label' => $label,
 		'value' => $value,
 		'checked' => in_array($value, $data['actionlog_statuses'])
 	];
@@ -102,8 +102,7 @@ $filter = (new CFilter())
 			->addRow(_('Status'),
 				(new CCheckBoxList('filter_statuses'))
 					->setId('filter_status')
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_3)
+					->setColumns(3)
 					->setWidth(360)
 					->setOptions($filter_status_options))
 			->addRow(_('Search string'),
