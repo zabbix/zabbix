@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-11T10:35:54Z'
+  date: '2022-11-18T08:49:24Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -130,6 +130,18 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
+                },
+            
+                nextlink: function (data) {
+                    next_data = data;
+                    while ('nextLink' in next_data) {
+                        next_data = Azure.request(next_data.nextLink);
+                        next_data.value.forEach(function (value) {
+                            data.value.push(value);
+                        });
+                    }
+            
+                    return data;
                 }
             };
             
@@ -171,9 +183,19 @@ zabbix_export:
                         for (var i in types) {
                             if (types[i].method === "Microsoft.Sql/servers") {
                                 mssql_servers = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
+                                
+                                if ('nextLink' in mssql_servers) {
+                                    mssql_servers = Azure.nextlink(mssql_servers);
+                                }
+                            
                             if (mssql_servers.value && mssql_servers.value.length > 0) {
                                 for (j in mssql_servers.value) {
                                     mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
+            
+                                    if ('nextLink' in mssql_dbs) {
+                                        mssql_dbs = Azure.nextlink(mssql_dbs);
+                                    }
+                                    
                                     mssql_dbs.value.forEach(function (value) {
                                         raw_data.value.push(value);
                                     });
@@ -182,16 +204,9 @@ zabbix_export:
                         }
                         else {
                             raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
-                        }
-                        
+            
                             if ('nextLink' in raw_data) {
-                                next_data = raw_data;
-                                while ('nextLink' in next_data) {
-                                    next_data = Azure.request(next_data.nextLink);
-                                    next_data.value.forEach(function (value) {
-                                        raw_data.value.push(value);
-                                    });
-                                }
+                                raw_data = Azure.nextlink(raw_data);
                             }
                         
                             raw_data.value.forEach(function (value) {
