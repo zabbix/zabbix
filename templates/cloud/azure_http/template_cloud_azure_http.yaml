@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-18T08:49:24Z'
+  date: '2022-11-18T16:20:19Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -188,27 +188,28 @@ zabbix_export:
                                     mssql_servers = Azure.nextlink(mssql_servers);
                                 }
                             
-                            if (mssql_servers.value && mssql_servers.value.length > 0) {
-                                for (j in mssql_servers.value) {
-                                    mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
+                                if ('value' in mssql_servers && mssql_servers.value.length > 0) {
+                                    for (j in mssql_servers.value) {
+                                        mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
             
-                                    if ('nextLink' in mssql_dbs) {
-                                        mssql_dbs = Azure.nextlink(mssql_dbs);
-                                    }
+                                        if ('nextLink' in mssql_dbs) {
+                                            mssql_dbs = Azure.nextlink(mssql_dbs);
+                                        }
                                     
-                                    mssql_dbs.value.forEach(function (value) {
-                                        raw_data.value.push(value);
-                                    });
+                                        mssql_dbs.value.forEach(function (value) {
+                                            raw_data.value.push(value);
+                                        });
+                                    }
                                 }
                             }
-                        }
-                        else {
-                            raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
+                            else {
+                                raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
             
-                            if ('nextLink' in raw_data) {
-                                raw_data = Azure.nextlink(raw_data);
+                                if ('nextLink' in raw_data) {
+                                    raw_data = Azure.nextlink(raw_data);
+                                }
                             }
-                        
+            
                             raw_data.value.forEach(function (value) {
                                 value.resourceGroup = value.id.split("/")[4];
                                 data.resources.value.push(value);
@@ -1053,6 +1054,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.cpu_limit.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1106,6 +1108,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.cpu_used.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1261,7 +1264,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -1283,8 +1288,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
@@ -1295,8 +1304,12 @@ zabbix_export:
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
                     try {
                         metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + day_metrics + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                        for (l in metrics_data.value) {
-                            data.metrics[metrics_data.value[l].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[l].timeseries[0].data[metrics_data.value[l].timeseries[0].data.length - 1];
+                        if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                            for (l in metrics_data.value) {
+                                if ('name' in metrics_data.value[l] && typeof metrics_data.value[l].name === 'object' && 'value' in metrics_data.value[l].name && typeof metrics_data.value[l].name.value === 'string' && 'timeseries' in metrics_data.value[l] && Array.isArray(metrics_data.value[l].timeseries) && metrics_data.value[l].timeseries.length > 0 && 'data' in metrics_data.value[l].timeseries[0] && Array.isArray(metrics_data.value[l].timeseries[0].data) && metrics_data.value[l].timeseries[0].data.length > 0) {
+                                    data.metrics[metrics_data.value[l].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[l].timeseries[0].data[metrics_data.value[l].timeseries[0].data.length - 1];
+                                }
+                            }
                         }
                     }
                     catch (error) {
@@ -1439,6 +1452,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.sqlserver_process_core_percent.maximum
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1463,6 +1477,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.sqlserver_process_memory_percent.maximum
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1528,6 +1543,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.allocated_data_storage.average
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1669,6 +1685,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.storage.maximum
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1711,6 +1728,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.tempdb_data_size.maximum
+              error_handler: DISCARD_VALUE
             -
               type: MULTIPLIER
               parameters:
@@ -1736,6 +1754,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.tempdb_log_used_percent.maximum
+              error_handler: DISCARD_VALUE
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1757,6 +1776,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.tempdb_log_size.maximum
+              error_handler: DISCARD_VALUE
             -
               type: MULTIPLIER
               parameters:
@@ -2317,7 +2337,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -2339,8 +2361,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
@@ -3234,7 +3260,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -3256,8 +3284,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
@@ -3972,7 +4004,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -3994,8 +4028,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
@@ -4827,7 +4865,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -4849,15 +4889,19 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                if (metrics_data.value[k].name.value === 'disk_queue_depth' ||
-                                    metrics_data.value[k].name.value === 'read_throughput' ||
-                                    metrics_data.value[k].name.value === 'write_throughput' ||
-                                    metrics_data.value[k].name.value === 'read_iops' ||
-                                    metrics_data.value[k].name.value === 'write_iops') {
-                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 6];
-                                } else {
-                                    data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        if (metrics_data.value[k].name.value === 'disk_queue_depth' ||
+                                            metrics_data.value[k].name.value === 'read_throughput' ||
+                                            metrics_data.value[k].name.value === 'write_throughput' ||
+                                            metrics_data.value[k].name.value === 'read_iops' ||
+                                            metrics_data.value[k].name.value === 'write_iops') {
+                                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 6];
+                                        } else {
+                                            data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -5683,7 +5727,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -5705,8 +5751,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
@@ -6849,7 +6899,9 @@ zabbix_export:
                 if (!('auth' in data.errors)) {
                     try {
                         health = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
-                        data.health = health.value[0].properties;
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
                     }
                     catch (error) {
                         data.errors.health = error.toString();
@@ -6871,8 +6923,12 @@ zabbix_export:
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
-                            for (k in metrics_data.value) {
-                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 3];
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 2) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 3];
+                                    }
+                                }
                             }
                         }
                         catch (error) {
