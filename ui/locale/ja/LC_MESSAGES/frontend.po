@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-12 13:26+0000\n"
+"PO-Revision-Date: 2022-11-18 16:34+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -11770,11 +11770,11 @@ msgstr "ホストに\"%1$s\"の名前を持つグラフが1つ以上存在しま
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr "すべての子が障害であったときにもっとも重要"
+msgstr "すべての子が障害であったときに最も重要"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr "子サービスでもっとも重要"
+msgstr "子サービスで最も重要"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
