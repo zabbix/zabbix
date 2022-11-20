@@ -40,6 +40,7 @@ var (
 	getActiveProcessorGroupCount     uintptr
 	getDiskFreeSpaceW                uintptr
 	getVolumePathNameW               uintptr
+	getNativeSystemInfo              uintptr
 )
 
 const (
@@ -51,6 +52,20 @@ const (
 	RelationAll = 0xfff
 )
 
+type SystemInfo struct {
+	WProcessorArchitecture      uint16
+	WReserved                   uint16
+	DWPageSize                  uint32
+	LPMinimumApplicationAddress *uint64
+	LPMaximumApplicationAddress *uint64
+	DWActiveProcessorMask       *uint32
+	DWNumberOfProcessors        uint32
+	DWProcessorType             uint32
+	DWAllocationGranularity     uint32
+	WProcessorLevel             uint16
+	WProcessorRevision          uint16
+}
+
 func init() {
 	hKernel32 = mustLoadLibrary("kernel32.dll")
 
@@ -61,6 +76,7 @@ func init() {
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
 	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
+	getNativeSystemInfo = hKernel32.mustGetProcAddress("GetNativeSystemInfo")
 }
 
 func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
@@ -177,4 +193,15 @@ func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
 	}
 
 	return c, nil
+}
+
+func GetNativeSystemInfo() (sysInfo SystemInfo, err error) {
+	var ret uintptr
+	ret, _, err = syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
+
+	if ret == 0 {
+		err = nil
+	}
+
+	return
 }
