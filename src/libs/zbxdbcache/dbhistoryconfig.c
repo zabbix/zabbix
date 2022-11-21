@@ -70,7 +70,6 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 
 	dst_item->history = src_item->history;
 	dst_item->history_sec = src_item->history_sec;
-	dst_item->flags = src_item->flags;
 
 	strscpy(dst_item->key_orig, src_item->key);
 
