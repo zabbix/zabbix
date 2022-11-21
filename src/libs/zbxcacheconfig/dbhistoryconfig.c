@@ -252,6 +252,28 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functi
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
+void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t *functionids,
+		size_t functionids_num, zbx_vector_ptr_t *item_tags)
+{
+	const ZBX_DC_FUNCTION	*dc_function;
+	size_t			i;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < functionids_num; i++)
+	{
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids[i])))
+		{
+			continue;
+		}
+
+		zbx_get_item_tags(dc_function->itemid, item_tags);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *

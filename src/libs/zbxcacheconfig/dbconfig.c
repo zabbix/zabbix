@@ -14280,7 +14280,7 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 	}
 }
 
-static void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
 	zbx_item_tag_t		*tag;
@@ -14331,28 +14331,6 @@ void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 	RDLOCK_CACHE;
 
 	zbx_get_item_tags(itemid, item_tags);
-
-	UNLOCK_CACHE;
-}
-
-void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num,
-		zbx_vector_ptr_t *item_tags)
-{
-	const ZBX_DC_FUNCTION	*dc_function;
-	size_t			i;
-
-	RDLOCK_CACHE;
-
-	for (i = 0; i < functionids_num; i++)
-	{
-		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
-				&functionids[i])))
-		{
-			continue;
-		}
-
-		zbx_get_item_tags(dc_function->itemid, item_tags);
-	}
 
 	UNLOCK_CACHE;
 }
