@@ -30,7 +30,7 @@
 #include "zbxtime.h"
 #include "zbxexpr.h"
 
-#define ZBX_POLL_INTERVAL	1
+#define ZBX_POLL_INTERVAL		1
 
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY

@@ -30,34 +30,34 @@
 #include "zbxxml.h"
 #include "zbxtime.h"
 
-#define ZBX_AM_LOCATION_NOWHERE		0
-#define ZBX_AM_LOCATION_QUEUE		1
+#define ZBX_AM_LOCATION_NOWHERE			0
+#define ZBX_AM_LOCATION_QUEUE			1
 
-#define ZBX_UPDATE_STR(dst, src)			\
-	if (NULL == src)				\
-		zbx_free(dst);				\
-	else if (NULL == dst || 0 != strcmp(dst, src))	\
-		dst = zbx_strdup(dst, src);
+#define ZBX_UPDATE_STR(dst, src)				\
+	do							\
+	{							\
+		if (NULL == src)				\
+			zbx_free(dst);				\
+		else if (NULL == dst || 0 != strcmp(dst, src))	\
+			dst = zbx_strdup(dst, src);		\
+	}							\
+	while(0)
 
-#define ZBX_AM_DB_POLL_DELAY	1
+#define ALERT_SOURCE_EXTERNAL			0xffff
 
-#define ALERT_SOURCE_EXTERNAL	0xffff
+#define ZBX_ALERTPOOL_SOURCE(id)		(id >> 48)
+#define ZBX_ALERTPOOL_OBJECT(id)		((id >> 32) & 0xffff)
 
-#define ZBX_ALERTPOOL_SOURCE(id) (id >> 48)
-#define ZBX_ALERTPOOL_OBJECT(id) ((id >> 32) & 0xffff)
+#define ZBX_AM_MEDIATYPE_FLAG_NONE		0x00
+#define ZBX_AM_MEDIATYPE_FLAG_REMOVE		0x01
 
-#define ZBX_AM_MEDIATYPE_FLAG_NONE	0x00
-#define ZBX_AM_MEDIATYPE_FLAG_REMOVE	0x01
-
-#define ZBX_DB_PING_FREQUENCY		SEC_PER_MIN
+#define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
 
 #define ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY	SEC_PER_HOUR
 
-#define ZBX_ALERT_RESULT_BATCH_SIZE	1000
+#define ZBX_MEDIA_CONTENT_TYPE_DEFAULT		255
 
-#define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
-
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+static zbx_get_config_forks_f	get_process_forks_cb;
 
 /*
  * The alert queue is implemented as a nested queue.
@@ -1133,7 +1133,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 	int			i, ret;
 	zbx_am_alerter_t	*alerter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, get_process_forks_cb(ZBX_PROCESS_TYPE_ALERTER));
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_ALERTER, error)))
 		goto out;
@@ -1145,7 +1145,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 
 	manager->next_alerter_index = 0;
 
-	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]; i++)
+	for (i = 0; i < get_process_forks_cb(ZBX_PROCESS_TYPE_ALERTER); i++)
 	{
 		alerter = (zbx_am_alerter_t *)zbx_malloc(NULL, sizeof(zbx_am_alerter_t));
 
@@ -2227,8 +2227,6 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 ZBX_THREAD_ENTRY(alert_manager_thread, args)
 {
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
 	zbx_thread_alert_manager_args	*alert_manager_args_in = (zbx_thread_alert_manager_args *)
 							(((zbx_thread_args_t *)args)->args);
 	zbx_am_t			manager;
@@ -2244,7 +2242,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	const char			*scripts_path = alert_manager_args_in->scripts_path;
+	const char			*scripts_path = alert_manager_args_in->get_scripts_path_cb_arg();
+
+	get_process_forks_cb = alert_manager_args_in->get_process_forks_cb_arg;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -2296,6 +2296,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			time_watchdog = 0;
 		}
 
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
 			zbx_setproctitle("%s #%d [sent %d, failed %d alerts, idle " ZBX_FS_DBL " sec during "
@@ -2307,6 +2310,8 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			sent_num = 0;
 			failed_num = 0;
 		}
+
+#undef STAT_INTERVAL
 
 		now = time(NULL);
 

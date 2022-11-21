@@ -239,6 +239,12 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
+static char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
+static const char	*get_alert_scripts_path(void)
+{
+	return CONFIG_ALERT_SCRIPTS_PATH;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
@@ -269,7 +275,6 @@ int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
@@ -1307,7 +1312,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type, CONFIG_CONFSYNCER_FREQUENCY};
-	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type, CONFIG_ALERT_SCRIPTS_PATH};
+	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type, get_config_forks,
+							get_alert_scripts_path};
 	zbx_thread_alert_args		alert_args = {get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))

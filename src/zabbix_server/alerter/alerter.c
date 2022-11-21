@@ -279,9 +279,6 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)
 {
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
-
 	zbx_thread_alert_args	*alert_args_in = (zbx_thread_alert_args *)(((zbx_thread_args_t *)args)->args);
 	char			*error = NULL;
 	int			success_num = 0, fail_num = 0;
@@ -324,6 +321,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	{
 		time_now = zbx_time();
 
+#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds */
+
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
 			zbx_setproctitle("%s #%d [sent %d, failed %d alerts, idle " ZBX_FS_DBL " sec during "
@@ -335,6 +335,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			success_num = 0;
 			fail_num = 0;
 		}
+
+#undef STAT_INTERVAL
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
