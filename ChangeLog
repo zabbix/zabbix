@@ -8,6 +8,12 @@ New features:
 .........T [ZBX-20478] fixed script k8s cluster state (egordymov)
 
 Bug fixes:
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+.........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
+........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
+........S. [ZBX-21830] fixed syntax of message identifier in the In-Reply-To e-mail header field (askolmeisters)
+..F....... [ZBX-21828] fixed undefined index "suppress_until" in Problems by severity widget (kkuzmina)
+..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
 ........S. [ZBX-19813] reworked inteface updates in template linking and lld (wiper)
 ..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
 .......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
@@ -135,6 +141,14 @@ New features:
 .........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
 
 Bug fixes:
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted function parameters (gcalenko)
+..F....... [ZBX-21536] reverted fix for backslash escape in trigger expression constructor (gcalenko)
+.........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
+........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
+........S. [ZBX-21830] fixed syntax of message identifier in the In-Reply-To e-mail header field (askolmeisters)
+..F....... [ZBX-21828] fixed undefined index "suppress_until" in Problems by severity widget (kkuzmina)
+..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
 ........S. [ZBX-19813] reworked inteface updates in template linking and lld (wiper)
 ..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
 .......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
@@ -600,6 +614,12 @@ New features:
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted function parameters (gcalenko)
+..F....... [ZBX-21536] reverted fix for backslash escape in trigger expression constructor (gcalenko)
+........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
+........S. [ZBX-21830] fixed syntax of message identifier in the In-Reply-To e-mail header field (askolmeisters)
+..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
 ........S. [ZBX-19813] reworked inteface updates in template linking and lld (wiper)
 ..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
 .......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
@@ -2811,6 +2831,7 @@ New features:
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
 ..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
 ........S. [ZBX-21825] improved history syncer performance (vso)
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
