@@ -655,6 +655,30 @@ var hintBox = {
 };
 
 /**
+ * Perform Json-RPC Zabbix API call.
+ *
+ * @param method
+ * @param params
+ * @param id
+ *
+ * @returns {Promise<any>}
+ */
+function ApiCall(method, params, id = 1) {
+	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			jsonrpc: '2.0',
+			method,
+			params,
+			id
+		}),
+	}).then((response) => response.json());
+}
+
+/**
  * Add object to the list of favorites.
  */
 function add2favorites(object, objectid) {
