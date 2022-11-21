@@ -158,22 +158,22 @@ class CConfigurationExport {
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover', 'uuid'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url_name', 'url', 'query_fields',
+				'parameters', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps', 'discover', 'uuid'
 			],
-			'trigger_prototype' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'discover', 'event_name', 'uuid'
+			'trigger_prototype' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments',
+				'type', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'manual_close', 'opdata', 'discover', 'event_name', 'uuid'
 			],
 			'httptests' => ['name', 'hostid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
 				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'uuid'
 			],
-			'trigger' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
-				'event_name', 'uuid'
+			'trigger' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type',
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
+				'opdata', 'event_name', 'uuid'
 			]
 		];
 	}
