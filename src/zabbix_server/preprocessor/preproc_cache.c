@@ -98,6 +98,11 @@ void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache)
 			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
 				zbx_snmp_value_cache_clear((zbx_snmp_value_cache_t *)cache->refs.values[i].impl);
 				zbx_free(cache->refs.values[i].impl);
+				break;
+			case ZBX_PREPROC_JSONPATH:
+				zbx_jsonobj_clear((zbx_jsonobj_t *)cache->refs.values[i].impl);
+				zbx_free(cache->refs.values[i].impl);
+				break;
 		}
 	}
 

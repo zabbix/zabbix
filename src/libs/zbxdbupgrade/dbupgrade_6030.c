@@ -478,6 +478,92 @@ static int DBpatch_6030061(void)
 
 static int	DBpatch_6030062(void)
 {
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql;
+	size_t			sql_alloc = 4096, sql_offset = 0;
+	int			ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select moduleid,relative_path from module");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		const char	*rel_path = row[1];
+		char		*updated_path, *updated_path_esc;
+
+		if (NULL == rel_path || '\0' == *rel_path)
+			continue;
+
+		updated_path = zbx_dsprintf(NULL, "modules/%s", rel_path);
+
+		updated_path_esc = DBdyn_escape_string(updated_path);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update module set relative_path='%s' "
+				"where moduleid=%s;\n", updated_path_esc, row[0]);
+
+		zbx_free(updated_path);
+		zbx_free(updated_path_esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6030063(void)
+{
+	zbx_db_insert_t	db_insert;
+	int		i, ret = FAIL;
+
+	const char	*modules[] = {
+			"actionlog", "clock", "dataover", "discovery", "favgraphs", "favmaps", "geomap", "graph",
+			"graphprototype", "hostavail", "item", "map", "navtree", "plaintext", "problemhosts",
+			"problems", "problemsbysv", "slareport", "svggraph", "systeminfo", "tophosts", "trigover",
+			"url", "web"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
+
+	for (i = 0; i < (int)ARRSIZE(modules); i++)
+	{
+		char	*path;
+
+		path = zbx_dsprintf(NULL, "widgets/%s", modules[i]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), modules[i], path, 1, "[]");
+		zbx_free(path);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "moduleid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6030064(void)
+{
 	const ZBX_FIELD	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("interface_snmp", &field);
@@ -552,5 +638,7 @@ DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
+DBPATCH_ADD(6030063, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
 
 DBPATCH_END()
