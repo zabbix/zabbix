@@ -22,11 +22,7 @@ define('ZABBIX_VERSION',		'6.4.0beta4');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-<<<<<<< HEAD
-define('ZABBIX_DB_VERSION',		6030062);
-=======
-define('ZABBIX_DB_VERSION',		6030073);
->>>>>>> master
+define('ZABBIX_DB_VERSION',		6030074);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
