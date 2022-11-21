@@ -150,6 +150,16 @@ class Group extends ScimApiService {
 
 		$scim_group_members = array_column($options['members'], 'value');
 
+		$users = APIRPC::User()->get([
+			'output' => ['userid', 'username'],
+			'userids' => $scim_group_members,
+			'filter' => ['userdirectoryid' => $userdirectoryid]
+		]);
+
+		if (count($users) != count($scim_group_members)) {
+			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+		}
+
 		foreach ($scim_group_members as $memberid) {
 			$user_group = DB::insert('user_scim_group', [[
 				'userid' => $memberid,
@@ -164,12 +174,6 @@ class Group extends ScimApiService {
 
 			$this->updateProvisionedUsersGroup($memberid, $userdirectoryid);
 		}
-
-		$users = APIRPC::User()->get([
-			'output' => ['userid', 'username'],
-			'userids' => $scim_group_members,
-			'filter' => ['userdirectoryid' => $userdirectoryid]
-		]);
 
 		$this->setData($scim_groupid, $options['displayName'], $users);
 
@@ -232,6 +236,10 @@ class Group extends ScimApiService {
 			'output' => ['userid'],
 			'filter' => ['scim_groupid' => $options['id']]
 		]);
+
+		if (count($db_scim_group_members) != count($scim_group_members)) {
+			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+		}
 
 		$users_to_add = array_diff($scim_group_members, array_column($db_scim_group_members, 'userid'));
 		$users_to_remove = array_diff(array_column($db_scim_group_members, 'userid'), $scim_group_members);
