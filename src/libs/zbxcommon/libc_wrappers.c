@@ -17,25 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
-#include "../sysinfo.h"
+#include "zbxcommon.h"
 
-#ifdef HAVE_SYS_UTSNAME_H
-#	include <sys/utsname.h>
-#endif
-
-int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result)
+/******************************************************************************
+ *                                                                            *
+ * Comments: replace strerror to print also the error number                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_strerror(int errnum)
 {
-	struct utsname	name;
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
-	if (-1 == uname(&name))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
-	}
+	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
 
-	SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s %s %s %s %s %s", name.sysname, name.nodename, name.release,
-			name.version, name.machine, name.idnumber));
-
-	return SYSINFO_RET_OK;
+	return utf8_string;
 }
