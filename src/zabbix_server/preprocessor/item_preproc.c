@@ -122,7 +122,7 @@ static int	snmp_cache_pair_compare_func(const void *d1, const void *d2)
 
 static char	*snmp_walk_convert_value(const char *raw_value, int to_json)
 {
-	char	*type, *value;
+	char	*type = NULL, *value = NULL;
 
 	zbx_strsplit_first(raw_value, ':', &type, &value);
 	zbx_ltrim(type, " ");
@@ -161,12 +161,11 @@ static char	*snmp_walk_convert_value(const char *raw_value, int to_json)
 
 			if (0 == to_json)
 			{
-				formatted_value = new_str;
+				formatted_value = zbx_dsprintf(formatted_value, "\\x%s", new_str);
 			}
 			else
 				formatted_value = zbx_dsprintf(formatted_value, "\"\\x%s\"", new_str);
 
-			zbx_free(new_str);
 			zbx_free(value);
 			zbx_free(type);
 
@@ -200,7 +199,9 @@ static int	snmp_value_from_walk(const char *data, const char *oid_needle, char *
 		if (NULL == raw_value)
 		{
 			zbx_free(oid);
-			continue;
+			zbx_free(data2);
+			*error = zbx_strdup(NULL, "no data was found");
+			return FAIL;
 		}
 
 		zbx_rtrim(oid, " ");

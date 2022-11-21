@@ -82,6 +82,10 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_CSV_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_STR_REPLACE"))
 		return ZBX_PREPROC_STR_REPLACE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_JSON"))
+		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_VALUE"))
+		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
