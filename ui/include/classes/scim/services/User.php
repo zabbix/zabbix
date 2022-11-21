@@ -287,7 +287,11 @@ class User extends ScimApiService {
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => self::SCIM_USER_SCHEMA],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
-			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY]
+			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY],
+			'groups' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
+				'value' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'display' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
