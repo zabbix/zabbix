@@ -181,7 +181,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30']
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[

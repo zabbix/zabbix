@@ -254,12 +254,11 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		$form = $this->query('id:iconmap')->waitUntilReady()->one()->asForm();
-
-		// Take a screenshot to test draggable object position.
+		// Take a screenshot to test draggable object position of icon mappings.
 		if (array_key_exists('screenshot', $data)) {
+			$form = $this->query('id:iconmap')->waitUntilVisible()->one()->asForm();
 			$this->page->removeFocus();
-			$this->assertScreenshot($form->query('id:iconmap_list')->waitUntilPresent()->one(), 'Icon_mapping');
+			$this->assertScreenshot($form->query('id:iconmap_list')->waitUntilPresent()->one(), 'Icon mapping');
 		}
 
 		$this->zbxTestClick('add');

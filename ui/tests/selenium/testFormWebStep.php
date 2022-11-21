@@ -797,7 +797,6 @@ class testFormWebStep extends CLegacyWebTest {
 					'name' => 'Take a screenshots',
 					'step_name' => 'Fill all step form',
 					'url' => 'http://www.zabbix.com',
-					'parse' => true,
 					'post' => [
 						['name' => 'post', 'value' => 'test_post'],
 						['name' => 'post2', 'value' => 'test_post2'],
@@ -814,6 +813,7 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => 'header3', 'value' => 'test_header3']
 					],
 					'timeout' => 3600,
+					'screenshot' => true
 				]
 			]
 		];
@@ -931,12 +931,12 @@ class testFormWebStep extends CLegacyWebTest {
 				}
 				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]', $data[$field]);
 			}
+		}
 
-			// Take a screenshot to test draggable object position (It is here because of scrolling).
-			if ($data_type === 'query_fields' && $data['name'] === 'Take a screenshots' && $data['query'][2]['name'] === 'query3'){
-				$this->page->removeFocus();
-				$this->assertScreenshot($this->query('xpath://table[@data-type="query_fields"]')->waitUntilPresent()->one(), 'Step_query_fields');
-			}
+		// Take a screenshot to test draggable object position of query fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('xpath://table[@data-type="query_fields"]')->waitUntilPresent()->one(), 'Step query fields');
 		}
 
 		if (array_key_exists('parse', $data)) {
@@ -988,11 +988,11 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestInputType('status_codes',$data['code']);
 		}
 
-		// Take a screenshot to test draggable object position.
-		if ($data['name'] === 'Take a screenshots') {
+		// Take a screenshot to test draggable object position for post and headers fields.
+		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('xpath://table[@data-type="post_fields"]')->waitUntilPresent()->one(), 'Step_post_fields');
-			$this->assertScreenshot($this->query('xpath://*[@id="http_step"]//table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web_Headers_fields');
+			$this->assertScreenshot($this->query('xpath://table[@data-type="post_fields"]')->waitUntilPresent()->one(), 'Step post fields');
+			$this->assertScreenshot($this->query('xpath://*[@id="http_step"]//table[@data-type="headers"]')->waitUntilPresent()->one(), 'Step headers fields');
 		}
 
 		if ($data['expected'] != TEST_ERROR) {

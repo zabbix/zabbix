@@ -1302,10 +1302,10 @@ class testMassUpdateItems extends CWebTest{
 				case 'Headers':
 					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
 
-					// Take a screenshot to test draggable object position.
+					// Take a screenshot to test draggable object position of headers in mass update.
 					if (array_key_exists('screenshot', $data)) {
 						$this->page->removeFocus();
-						$this->assertScreenshot($form->query('id:headers_pairs')->waitUntilPresent()->one(), 'Item_mass_update_headers'.$prototypes);
+						$this->assertScreenshot($form->query('id:headers_pairs')->waitUntilPresent()->one(), 'Item mass update headers'.$prototypes);
 					}
 
 					break;
@@ -1735,10 +1735,10 @@ class testMassUpdateItems extends CWebTest{
 
 		if ($data['Preprocessing steps'] !== []) {
 			$this->addPreprocessingSteps($data['Preprocessing steps']);
-			// Take a screenshot to test draggable object position.
+			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
 			if (array_key_exists('Screenshot', $data)) {
 				$this->page->removeFocus();
-				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item_mass_update'.$prototypes);
+				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
 			}
 		}
 

@@ -588,29 +588,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 								]
 							]
 						]
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'overrides' => [
-						[
-							'fields' => [
-								'Name' => 'Name for the screenshot 1'
-							]
-						],
-						[
-							'fields' => [
-								'Name' => 'Name for the screenshot 2'
-							]
-						],
-						[
-							'fields' => [
-								'Name' => 'Name for the screenshot 3'
-							]
-						]
-					]
+					],
+					'screenshot' => true
 				]
 			]
 		];
@@ -661,12 +640,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						$override_container->getRow($i)->getColumn('Stop processing')->getText()
 				);
 			}
+		}
 
-			if (CTestArrayHelper::get($override['fields'], 'Name') === 'Name for the screenshot 3') {
-				// Take a screenshot to test draggable object position.
-				$this->assertScreenshot($this->query('class:lld-overrides-table')->one(), 'LLD_override');
-			}
-
+		// Take a screenshot to test draggable object position for overrides.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('class:lld-overrides-table')->one(), 'LLD override');
 		}
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {

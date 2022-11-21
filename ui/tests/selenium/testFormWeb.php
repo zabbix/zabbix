@@ -965,28 +965,13 @@ class testFormWeb extends CLegacyWebTest {
 						['name' => 'test', 'value' => 'test_value']
 					],
 					'add_step' => [
-						['step' => 'Headers - two different']
-					]
-				]
-			],
-			// Headers -screenshot
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Headers -screenshot',
-					'headers' => [
-						['name' => 'header name', 'value' => 'header value'],
-						['name' => 'Content-Type', 'value' => 'application/json'],
-						['name' => 'Any name', 'value' => 'Any value']
+						['step' => 'Headers - two different'],
+						['step' => 'Headers - one more']
 					],
-					'add_step' => [
-						['step' => 'Headers -screenshot'],
-						['step' => 'Headers -screenshot2'],
-						['step' => 'Headers -screenshot3']
-					]
+					'screenshot' => true
 				]
 			],
-			// Headers -empty value
+			// Headers - empty value
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1482,10 +1467,10 @@ class testFormWeb extends CLegacyWebTest {
 				$i++;
 			}
 		}
-		// Take a screenshot to test draggable object position.
-		if (isset($data['name']) && $data['name'] === 'Headers -screenshot') {
+		// Take a screenshot to test draggable object position of web headers.
+		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web_Headers_fields');
+			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web Headers fields');
 		}
 
 		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
@@ -1522,10 +1507,10 @@ class testFormWeb extends CLegacyWebTest {
 			}
 		}
 
-		// Take a screenshot to test draggable object position.
-		if (isset($data['name']) && $data['name'] === 'Headers -screenshot') {
+		// Take a screenshot to test draggable object position of web steps.
+		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('class:httpconf-steps-dynamic-row')->waitUntilPresent()->one(), 'Web_steps');
+			$this->assertScreenshot($this->query('class:httpconf-steps-dynamic-row')->waitUntilPresent()->one(), 'Web steps');
 		}
 
 		$this->zbxTestClickWait('add');

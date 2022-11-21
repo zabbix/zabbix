@@ -762,7 +762,8 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true
+					'dbCheck' => true,
+					'screenshot' => true
 				]
 			],
 			[
@@ -1041,13 +1042,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'
 					]
 				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'graphName' => 'graphProtoScreenshot',
-				]
-			],
+			]
 		];
 	}
 
@@ -1091,9 +1086,10 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			]);
 			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
 
-			if (CTestArrayHelper::get($data, 'graphName') === 'graphProtoScreenshot') {
-				// Take a screenshot to test draggable object position.
-				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'GraphPrototype_Items');
+			// Take a screenshot to test draggable object position of items list.
+			if (array_key_exists('screenshot', $data)) {
+				$this->page->removeFocus();
+				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph prototype - Items');
 			}
 
 			if (isset($data['removeItem'])) {
