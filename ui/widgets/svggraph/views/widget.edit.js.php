@@ -706,6 +706,11 @@ window.widget_svggraph_form = new class {
 			if (!approximation_all_enabled && approximation_select.value == <?= APPROXIMATION_ALL ?>) {
 				approximation_select.value = <?= APPROXIMATION_AVG ?>;
 			}
+
+			const legend_label = dataset.querySelector(`[name="ds[${dataset_index}][legend_label]"]`);
+			const dataset_number = parseInt(dataset_index) + 1;
+
+			legend_label.placeholder = 'Data set #'+dataset_number;
 		}
 
 		// Displaying options tab.

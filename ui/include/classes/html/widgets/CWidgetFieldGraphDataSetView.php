@@ -252,7 +252,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									->setWidth(294)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -263,7 +263,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									->setWidth(294)
 									->setStep(1)
 									->setMin(1)
 									->setMax(10)
@@ -275,7 +275,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 									(int) $value['transparency'])
 								)
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									->setWidth(294)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -286,7 +286,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									->setWidth(294)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
