@@ -347,6 +347,8 @@ class CTabFilterItem extends CBaseComponent {
 	 * Get filter parameters as URLSearchParams object, defining value of unchecked checkboxes equal to
 	 * 'unchecked-value' attribute value.
 	 *
+	 * @param {boolean} preserve_page  Parameter for resetting page.
+	 *
 	 * @return {URLSearchParams}
 	 */
 	getFilterParams(preserve_page = true) {

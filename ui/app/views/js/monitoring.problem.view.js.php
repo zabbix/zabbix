@@ -277,6 +277,7 @@
 			const url = new Curl();
 			const refresh_url = new Curl('zabbix.php', false);
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
+
 			// Modify filter data.
 			data.inventory = data.inventory
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
@@ -313,7 +314,6 @@
 			});
 
 			refresh_url.setArgument('action', 'problem.view.refresh');
-
 			this.refresh_url = refresh_url;
 			this.refreshNow();
 		},
