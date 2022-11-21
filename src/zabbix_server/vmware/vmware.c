@@ -4824,7 +4824,6 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             hv_data      - [IN] the hv data with scsi topology info        *
  *             hvid         - [IN] the vmware hypervisor id                   *
  *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
