@@ -63,7 +63,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		->setArgument('action', 'problem.view')
 		->setArgument('filter_name', '')
 		->setArgument('severities', $data['filter']['severities'])
-		->setArgument('hostids', [$host['hostid']]));
+		->setArgument('hostids', [$host['hostid']])
+		->setArgument('filter_set', '1'));
 
 	$total_problem_count = 0;
 
@@ -120,6 +121,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 						->setArgument('action', 'latest.view')
 						->setArgument('hostids', [$host['hostid']])
 						->setArgument('filter_name', '')
+						->setArgument('filter_set', '1')
 				)
 				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
 				CViewHelper::showNum($host['items_count'])

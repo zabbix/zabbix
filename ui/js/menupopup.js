@@ -133,6 +133,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			if ('severities' in options) {
 				url.setArgument('severities[]', options.severities);
@@ -166,6 +167,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
 
 			items.push({
 				label: t('Latest data'),
@@ -854,6 +856,7 @@ function getMenuPopupItem(options) {
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
 		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 
 		items.push({
 			label: t('Latest data'),
