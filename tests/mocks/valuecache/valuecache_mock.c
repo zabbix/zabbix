@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 #include "valuecache_mock.h"
 
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxnum.h"
 #include "log.h"
 #include "zbxmutexs.h"
@@ -30,7 +30,7 @@
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "history.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #include <setjmp.h>
 #include <cmocka.h>
@@ -84,7 +84,7 @@ static int	history_compare(const void *d1, const void *d2)
  ******************************************************************************/
 
 static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned char value_type,
-		history_value_t *value, zbx_timespec_t *ts)
+		zbx_history_value_t *value, zbx_timespec_t *ts)
 {
 	const char		*data;
 	zbx_mock_error_t	err;

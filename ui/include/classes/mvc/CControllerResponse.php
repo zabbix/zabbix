@@ -39,7 +39,7 @@ abstract class CControllerResponse {
 			CMessageHelper::restoreScheduleMessages();
 		}
 
-		(new CPageHeader(_('Loading...'), CWebUser::getLang()))->display();
+		(new CHtmlPageHeader(_('Loading...'), CWebUser::getLang()))->show();
 
 		echo '<body>';
 

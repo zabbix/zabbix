@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Network maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_EDIT));
 
@@ -436,7 +436,6 @@ else {
 
 $form->addItem($tabs);
 
-// Append form to widget.
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

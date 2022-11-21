@@ -64,6 +64,13 @@ class CPrometheusOutputParserTest extends TestCase {
 					'match' => '{#LLD}'
 				]
 			],
+			[
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
+				]
+			],
 			// partial success
 			[
 				'label1=', 0, [],
@@ -84,6 +91,27 @@ class CPrometheusOutputParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'l1'
+				]
+			],
+			[
+				'{$MACRO} label1  ', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{$MACRO}'
+				]
+			],
+			[
+				'{#LLD_MACRO} label1  ', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{#LLD_MACRO}'
+				]
+			],
+			[
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)} label1  ', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
 				]
 			],
 			// fail
@@ -133,6 +161,20 @@ class CPrometheusOutputParserTest extends TestCase {
 			// LLD macros are not enabled.
 			[
 				'{#LLD}', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''

@@ -1,0 +1,25 @@
+{
+	"manifest_version": 2.0,
+	"id": "hostavail",
+	"type": "widget",
+	"name": "Host availability",
+	"namespace": "HostAvail",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetHostAvail",
+		"size": {
+			"width": 6,
+			"height": 3
+		},
+		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.hostavail.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

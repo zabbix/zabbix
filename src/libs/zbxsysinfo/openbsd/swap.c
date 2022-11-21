@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
@@ -57,7 +58,7 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
+static int	system_swap_total(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -73,7 +74,7 @@ static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
+static int	system_swap_free(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -89,7 +90,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
+static int	system_swap_used(AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -105,7 +106,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
+static int	system_swap_pfree(AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -121,7 +122,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
+static int	system_swap_pused(AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -137,7 +138,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*swapdev, *mode;
 	int	ret;
@@ -159,23 +160,23 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || *mode == '\0' || 0 == strcmp(mode, "free"))
 	{
-		ret = SYSTEM_SWAP_FREE(result);
+		ret = system_swap_free(result);
 	}
 	else if (0 == strcmp(mode, "used"))
 	{
-		ret = SYSTEM_SWAP_USED(result);
+		ret = system_swap_used(result);
 	}
 	else if (0 == strcmp(mode, "total"))
 	{
-		ret = SYSTEM_SWAP_TOTAL(result);
+		ret = system_swap_total(result);
 	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
-		ret = SYSTEM_SWAP_PFREE(result);
+		ret = system_swap_pfree(result);
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		ret = SYSTEM_SWAP_PUSED(result);
+		ret = system_swap_pused(result);
 	}
 	else
 	{
@@ -229,7 +230,7 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*swapdev, *mode, *error;
@@ -274,7 +275,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*swapdev, *mode, *error;

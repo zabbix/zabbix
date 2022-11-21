@@ -117,7 +117,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
+							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
 						]
 					]
 				]
@@ -681,18 +681,19 @@ class testDocumentationLinks extends CWebTest {
 				]
 			],
 			// #68 Template dashboard widget create popup.
-			[
-				[
-					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
-					'actions' => [
-						[
-							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
-						]
-					],
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
-				]
-			],
+			// TODO: Uncomment the below case when ZBX-21929 will be merged.
+//			[
+//				[
+//					'url' => 'zabbix.php?action=template.dashboard.edit&dashboardid=50',
+//					'actions' => [
+//						[
+//							'callback' => 'openFormWithLink',
+//							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+//						]
+//					],
+//					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
+//				]
+//			],
 			// #69 Template dashboard widget edit popup.
 			[
 				[

@@ -19,6 +19,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../../include/defines.inc.php';
@@ -32,6 +33,8 @@ class CAPIHelper {
 	protected static $debug = [];
 	// Session id.
 	protected static $session = null;
+	// Use authorization header.
+	protected static $use_auth = null;
 
 	/**
 	 * Reset API helper state.
@@ -78,12 +81,17 @@ class CAPIHelper {
 			]
 		];
 
-		$handle = fopen($URL, 'rb', false, stream_context_create($params));
+		if (static::$use_auth) {
+			$params['http']['header'][] = 'Authorization: Bearer '.static::$session;
+		}
+
+		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
 		if ($handle) {
 			$response = @stream_get_contents($handle);
 			fclose($handle);
 		}
 		else {
+			$php_errormsg = CTestArrayHelper::get(error_get_last(), 'message');
 			$response = false;
 		}
 
@@ -124,11 +132,6 @@ class CAPIHelper {
 			'params' => $params,
 			'id' => static::$request_id
 		];
-
-		if (static::$session) {
-			$data['auth'] = static::$session;
-		}
-
 		return static::callRaw($data);
 	}
 
@@ -178,6 +181,7 @@ class CAPIHelper {
 
 		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {
+			static::setAuth(true);
 			static::setSessionId($result['result']);
 		}
 	}
@@ -224,5 +228,13 @@ class CAPIHelper {
 	 */
 	public static function clearDebugInfo() {
 		static::$debug = [];
+	}
+
+	public static function setAuth(bool $use_auth): void {
+		static::$use_auth = $use_auth;
+	}
+
+	public static function getAuth(): bool {
+		return static::$use_auth;
 	}
 }

@@ -247,16 +247,6 @@ typedef struct
 }
 zbx_log_value_t;
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-history_value_t;
-
 /* item data types */
 typedef enum
 {
@@ -834,6 +824,7 @@ void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
+typedef const char	*(*zbx_get_progname_f)(void);
 
 typedef enum
 {

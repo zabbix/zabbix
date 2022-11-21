@@ -88,7 +88,7 @@ $filter = (new CFilter())
 			])
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('SLA report'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
@@ -196,7 +196,7 @@ else {
 	$form->addItem($report);
 }
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

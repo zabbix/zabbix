@@ -66,7 +66,7 @@ $filter = (new CFilter())
 			)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('API tokens'))
 	->setTitleSubmenu(getUserSettingsSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_TOKEN_LIST))
@@ -163,7 +163,7 @@ $token_form->addItem([
 	], 'user.token')
 ]);
 
-$widget
+$html_page
 	->addItem($token_form)
 	->show();
 

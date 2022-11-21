@@ -25,7 +25,7 @@
 #include "zbxserver.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxmutexs.h"
 #include "dbconfig.h"
 

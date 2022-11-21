@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ITEM_PREPROC_H
 #define ZABBIX_ITEM_PREPROC_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "preproc.h"
 
 #define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)

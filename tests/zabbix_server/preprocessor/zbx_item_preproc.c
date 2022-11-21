@@ -24,7 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxjson.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxembed.h"
 #include "log.h"
 
