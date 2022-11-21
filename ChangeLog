@@ -473,7 +473,6 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
-
 Changes for 6.0.11rc1
 
 New features:

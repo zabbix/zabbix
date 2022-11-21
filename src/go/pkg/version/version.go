@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	ZABBIX_REVDATE          = "2 November 2022"
+	ZABBIX_REVDATE          = "21 November 2022"
 	ZABBIX_VERSION_MAJOR    = 6
 	ZABBIX_VERSION_MINOR    = 2
 	ZABBIX_VERSION_PATCH    = 5
