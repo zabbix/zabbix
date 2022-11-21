@@ -134,7 +134,6 @@
 
 		reloadPartialAndTabCounters() {
 			this.refresh_url = new Curl('', false);
-			this.refresh_url.setArgument('filter_apply', '1');
 
 			this.unscheduleRefresh();
 			this.refresh();

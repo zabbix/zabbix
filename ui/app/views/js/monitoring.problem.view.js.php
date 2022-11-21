@@ -93,6 +93,8 @@
 				url.setArgument('action', 'problem.view.csv');
 				$('#export_csv').attr('data-url', url.getUrl());
 
+				this.refresh_url.setArgument('page', '1');
+
 				this.refreshResults();
 				this.refreshCounters();
 
@@ -275,7 +277,6 @@
 			const url = new Curl();
 			const refresh_url = new Curl('zabbix.php', false);
 			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
-
 			// Modify filter data.
 			data.inventory = data.inventory
 				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
@@ -312,7 +313,7 @@
 			});
 
 			refresh_url.setArgument('action', 'problem.view.refresh');
-			refresh_url.setArgument('filter_apply', '1');
+
 			this.refresh_url = refresh_url;
 			this.refreshNow();
 		},
