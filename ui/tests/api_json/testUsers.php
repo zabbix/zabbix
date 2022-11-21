@@ -1800,14 +1800,12 @@ class testUsers extends CAPITest {
 						'userid' => '9',
 						'username' => 'check authentication'
 					],
-				'auth' => '12345',
 				'id' => '1'
 			]],
 			[[
 				'jsonrpc' => '2.0',
 				'method' => 'user.logout',
 				'params' => [],
-				'auth' => '12345',
 				'id' => '1'
 			]]
 		];
@@ -1817,6 +1815,8 @@ class testUsers extends CAPITest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId('12345');
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
 	}
 
@@ -1827,7 +1827,6 @@ class testUsers extends CAPITest {
 			'jsonrpc' => '2.0',
 			'method' => 'user.logout',
 			'params' => [],
-			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($logout));
@@ -1840,7 +1839,6 @@ class testUsers extends CAPITest {
 					'userid' => '9',
 					'username' => 'check authentication'
 				],
-			'auth' => CAPIHelper::getSessionId(),
 			'id' => '1'
 		];
 		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
@@ -1958,6 +1956,9 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenIncorrect() {
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId(bin2hex(random_bytes(32)));
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -1965,7 +1966,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => bin2hex(random_bytes(32)),
 			'id' => '1'
 		]);
 
@@ -1984,6 +1984,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -1991,7 +1994,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2012,6 +2014,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2019,7 +2024,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2041,6 +2045,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2048,7 +2055,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2070,6 +2076,9 @@ class testUsers extends CAPITest {
 			'where' => ['usrgrpid' => 7]
 		]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2078,7 +2087,6 @@ class testUsers extends CAPITest {
 				'inheritedTags' => 'incorrect value',
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2101,6 +2109,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2109,7 +2120,6 @@ class testUsers extends CAPITest {
 				'inheritedTags' => 'incorrect value',
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2129,6 +2139,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2136,7 +2149,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 
@@ -2158,6 +2170,9 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
+		CAPIHelper::setAuth(true);
+		CAPIHelper::setSessionId($token);
+
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2165,7 +2180,6 @@ class testUsers extends CAPITest {
 				'output' => [],
 				'limit' => 1
 			],
-			'auth' => $token,
 			'id' => '1'
 		]);
 

@@ -247,16 +247,6 @@ typedef struct
 }
 zbx_log_value_t;
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-history_value_t;
-
 /* item data types */
 typedef enum
 {
@@ -1141,4 +1131,15 @@ void	zbx_free_tag(zbx_tag_t *tag);
 
 /* time and memory size suffixes */
 zbx_uint64_t	suffix2factor(char c);
+
+/******************************************************************************
+ *                                                                            *
+ * CODE BELOW IS LIBC WRAPPERS WHICH COULD BE LATER MOVED TO SEPARATE LIBRARY *
+ *                                                                            *
+ ******************************************************************************/
+
+#define ZBX_MESSAGE_BUF_SIZE	1024
+
+char	*zbx_strerror(int errnum);
+
 #endif

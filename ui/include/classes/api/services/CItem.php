@@ -441,6 +441,7 @@ class CItem extends CItemGeneral {
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
 				$options['output']
 			);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// removing keys (hash -> array)
@@ -1528,7 +1529,7 @@ class CItem extends CItemGeneral {
 					}
 					else {
 						$error = $item['host_status'] == HOST_STATUS_TEMPLATE
-							? _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of template "%3$s", because it is already populated by the item with key "%4$s"')
+							? _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of template "%3$s", because it is already populated by the item with key "%4$s".')
 							: _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of host "%3$s", because it is already populated by the item with key "%4$s".');
 
 						$inventory_fields = getHostInventories();
@@ -1767,6 +1768,12 @@ class CItem extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))
