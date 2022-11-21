@@ -867,14 +867,21 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 
 		if (SUCCEED == err_item)
 		{
-			char		*error = NULL, *parameter = NULL;
-			zbx_variant_t	var;
-			zbx_timespec_t	ts;
+			char			*error = NULL, *parameter = NULL;
+			zbx_variant_t		var;
+			zbx_timespec_t		ts;
+			DC_EVALUATE_ITEM	evaluate_item;
 
 			parameter = zbx_dc_expand_user_macros_in_func_params(function.parameter, item.host.hostid);
 			zbx_timespec(&ts);
 
-			if (SUCCEED == eval_func_cb(&var, &item, function.function, parameter, &ts, &error) &&
+			evaluate_item.itemid = item.itemid;
+			evaluate_item.value_type = item.value_type;
+			evaluate_item.proxy_hostid = item.host.proxy_hostid;
+			evaluate_item.host = item.host.host;
+			evaluate_item.key_orig = item.key_orig;
+
+			if (SUCCEED == eval_func_cb(&var, &evaluate_item, function.function, parameter, &ts, &error) &&
 					ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));

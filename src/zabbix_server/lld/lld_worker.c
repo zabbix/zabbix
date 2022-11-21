@@ -113,7 +113,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, item.error))
+		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
 		{
 			diff.error = error;
 			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
