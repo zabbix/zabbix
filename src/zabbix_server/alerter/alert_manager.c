@@ -57,8 +57,6 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT		255
 
-static zbx_get_config_forks_f	get_process_forks_cb;
-
 /*
  * The alert queue is implemented as a nested queue.
  *
@@ -1128,12 +1126,12 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
  * Parameters: manager - [IN] the manager to initialize                       *
  *                                                                            *
  ******************************************************************************/
-static int	am_init(zbx_am_t *manager, char **error)
+static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char **error)
 {
 	int			i, ret;
 	zbx_am_alerter_t	*alerter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, get_process_forks_cb(ZBX_PROCESS_TYPE_ALERTER));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, get_forks_cb(ZBX_PROCESS_TYPE_ALERTER));
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_ALERTER, error)))
 		goto out;
@@ -1145,7 +1143,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 
 	manager->next_alerter_index = 0;
 
-	for (i = 0; i < get_process_forks_cb(ZBX_PROCESS_TYPE_ALERTER); i++)
+	for (i = 0; i < get_forks_cb(ZBX_PROCESS_TYPE_ALERTER); i++)
 	{
 		alerter = (zbx_am_alerter_t *)zbx_malloc(NULL, sizeof(zbx_am_alerter_t));
 
@@ -2244,8 +2242,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	const char			*scripts_path = alert_manager_args_in->get_scripts_path_cb_arg();
 
-	get_process_forks_cb = alert_manager_args_in->get_process_forks_cb_arg;
-
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
@@ -2254,7 +2250,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	if (FAIL == am_init(&manager, &error))
+	if (FAIL == am_init(&manager, alert_manager_args_in->get_process_forks_cb_arg, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
