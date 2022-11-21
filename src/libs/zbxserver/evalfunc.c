@@ -695,7 +695,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_last_n_value(const DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	get_last_n_value(const DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		zbx_history_record_t *value, char **error)
 {
 	int				arg1 = 1, ret = FAIL, time_shift;
@@ -2843,7 +2843,7 @@ out:
 	return ret;
 }
 
-static int	validate_params_and_get_data(DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
+static int	validate_params_and_get_data(DC_EVALUATE_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		zbx_vector_history_record_t *values, char **error)
 {
 	int			arg1, seconds = 0, nvalues = 0, time_shift;
@@ -3292,7 +3292,15 @@ out:
 int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error)
 {
-	return evaluate_RATE(value, item, parameters, ts, error);
+	DC_EVALUATE_ITEM		evaluate_item;
+
+	evaluate_item.itemid = item->itemid;
+	evaluate_item.value_type = item->value_type;
+	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.host = item->host.host;
+	evaluate_item.key_orig = item->key_orig;
+
+	return evaluate_RATE(value, &evaluate_item, parameters, ts, error);
 }
 
 #define LAST(v, type) v.values[i].value.type

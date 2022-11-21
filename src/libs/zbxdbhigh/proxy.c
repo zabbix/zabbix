@@ -3636,8 +3636,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
+		zbx_substitute_simple_macros_allowed_hosts(item, &allowed_peers);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
 
