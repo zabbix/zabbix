@@ -67,17 +67,10 @@ extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 
-extern int	CONFIG_POLLER_FORKS;
-extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
-extern int	CONFIG_IPMIPOLLER_FORKS;
-extern int	CONFIG_JAVAPOLLER_FORKS;
-extern int	CONFIG_PINGER_FORKS;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 extern int	CONFIG_PROXYDATA_FREQUENCY;
-extern int	CONFIG_HISTORYPOLLER_FORKS;
-extern int	CONFIG_ODBCPOLLER_FORKS;
 
 typedef struct
 {
@@ -781,13 +774,13 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 
 typedef struct zbx_hc_data
 {
-	history_value_t	value;
-	zbx_uint64_t	lastlogsize;
-	zbx_timespec_t	ts;
-	int		mtime;
-	unsigned char	value_type;
-	unsigned char	flags;
-	unsigned char	state;
+	zbx_history_value_t	value;
+	zbx_uint64_t		lastlogsize;
+	zbx_timespec_t		ts;
+	int			mtime;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
 
 	struct zbx_hc_data	*next;
 }

@@ -57,7 +57,7 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
 
-extern int	CONFIG_ALERTER_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
  * The alert queue is implemented as a nested queue.
@@ -1133,7 +1133,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 	int			i, ret;
 	zbx_am_alerter_t	*alerter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, CONFIG_ALERTER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_ALERTER, error)))
 		goto out;
@@ -1145,7 +1145,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 
 	manager->next_alerter_index = 0;
 
-	for (i = 0; i < CONFIG_ALERTER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]; i++)
 	{
 		alerter = (zbx_am_alerter_t *)zbx_malloc(NULL, sizeof(zbx_am_alerter_t));
 

@@ -19,14 +19,12 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
+#include "dbsync.h"
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbsync.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-
-extern int		CONFIG_TIMER_FORKS;
 
 typedef struct
 {
@@ -688,13 +686,13 @@ out:
  ******************************************************************************/
 void	zbx_dc_maintenance_set_update_flags(void)
 {
-	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
+	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), timers_left;
 
 	WRLOCK_CACHE;
 
 	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
 
-	if (0 != (timers_left = (CONFIG_TIMER_FORKS % (sizeof(uint64_t) * 8))))
+	if (0 != (timers_left = ((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] % (sizeof(uint64_t) * 8))))
 		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
 
 	UNLOCK_CACHE;
@@ -765,7 +763,8 @@ int	zbx_dc_maintenance_check_update_flag(int timer)
  ******************************************************************************/
 int	zbx_dc_maintenance_check_update_flags(void)
 {
-	int	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM(), ret = SUCCEED;
+	size_t	slots_num = ZBX_MAINTENANCE_UPDATE_FLAGS_NUM();
+	int	ret = SUCCEED;
 
 	RDLOCK_CACHE;
 

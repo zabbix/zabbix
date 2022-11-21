@@ -30,34 +30,6 @@ extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
 
-/* value_avg_t structure is used for item average value trend calculations. */
-/*                                                                          */
-/* For double values the average value is calculated on the fly with the    */
-/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
-/* into dbl member.                                                         */
-/* For uint64 values the item values are summed into ui64 member and the    */
-/* average value is calculated before flushing trends to database:          */
-/* avg = ui64 / count                                                       */
-typedef union
-{
-	double		dbl;
-	zbx_uint128_t	ui64;
-}
-value_avg_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	history_value_t	value_min;
-	value_avg_t	value_avg;
-	history_value_t	value_max;
-	int		clock;
-	int		num;
-	int		disable_from;
-	unsigned char	value_type;
-}
-ZBX_DC_TREND;
-
 typedef struct
 {
 	zbx_uint64_t	history_counter;	/* the total number of processed values */
