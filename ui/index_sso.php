@@ -293,7 +293,7 @@ try {
 					throw new Exception(_('GUI access disabled.'));
 				}
 			}
-			else if ($saml_data['provisioned_user']['roleid']) {
+			elseif ($saml_data['provisioned_user']['roleid']) {
 				$saml_data['provisioned_user'] += [
 					'userdirectoryid'	=> $userdirectoryid,
 					'username'			=> $saml_data['username_attribute']
