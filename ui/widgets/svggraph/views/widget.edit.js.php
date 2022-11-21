@@ -102,6 +102,13 @@ window.widget_svggraph_form = new class {
 							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
 						);
 					});
+
+				jQuery(`input[name$='[legend_label]']`, this)
+					.each(function () {
+						jQuery(this).attr('placeholder',
+							jQuery(this).attr('placeholder').replace(/\d/, `${i + 1}`)
+						);
+					});
 			});
 		}
 	}
