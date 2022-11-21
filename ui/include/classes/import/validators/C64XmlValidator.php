@@ -51,7 +51,10 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
+		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::GROUP_FLAT_JSON_DATA => CXmlConstantName::GROUP_FLAT_JSON_DATA // FIXME: delete this!
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -66,7 +69,10 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON
+		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
+		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
+		CXmlConstantValue::GROUP_FLAT_JSON_DATA => CXmlConstantName::GROUP_FLAT_JSON_DATA // FIXME: delete this!
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -449,6 +455,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'details' =>				['type' => XML_ARRAY, 'rules' => [
 								'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 								'community' =>				['type' => XML_STRING, 'default' => ''],
+								'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 								'contextname' =>			['type' => XML_STRING, 'default' => ''],
 								'securityname' =>			['type' => XML_STRING, 'default' => ''],
 								'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
@@ -843,6 +850,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 											'details' =>				['type' => XML_ARRAY, 'rules' => [
 												'version' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SNMP_V2, 'in' => [CXmlConstantValue::SNMP_V1 => CXmlConstantName::SNMPV1, CXmlConstantValue::SNMP_V2 => CXmlConstantName::SNMPV2, CXmlConstantValue::SNMP_V3 => CXmlConstantName::SNMPV3]],
 												'community' =>				['type' => XML_STRING, 'default' => ''],
+												'max_repetitions' =>		['type' => XML_STRING, 'default' => '10'],
 												'contextname' =>			['type' => XML_STRING, 'default' => ''],
 												'securityname' =>			['type' => XML_STRING, 'default' => ''],
 												'securitylevel' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],

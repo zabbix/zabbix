@@ -101,6 +101,19 @@
 						->setId('snmp_community_field_#{iface.interfaceid}')
 				])
 				->addItem([
+					(new CLabel([
+						_('Max repetition count'),
+						makeHelpIcon(_('Max repetition count is applicable to discovery and snmp.walk only.'))
+					], 'interfaces[#{iface.interfaceid}][details][repetition_count]'))
+						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
+					(new CFormField(
+						(new CNumericBox('interfaces[#{iface.interfaceid}][details][repetition_count]',
+							'#{iface.details.max_repetitions}', 20, false, false, false
+						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+					))
+						->setId('snmp_repetition_count_field_#{iface.interfaceid}')
+				])
+				->addItem([
 					(new CLabel(_('Context name'), 'interfaces[#{iface.interfaceid}][details][contextname]'))
 						->setId('snmpv3_contextname_label_#{iface.interfaceid}'),
 					(new CFormField(
