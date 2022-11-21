@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config
  */
-class testFormAdministrationAuthentication extends CWebTest {
+class testFormUserAuthentication extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -39,26 +39,38 @@ class testFormAdministrationAuthentication extends CWebTest {
 	/**
 	 * Check saving default authentication page.
 	 */
-	public function testFormAdministrationAuthentication_Layout() {
+	public function testFormUserAuthentication_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->page->assertTitle('Configuration of authentication');
+		$this->page->assertHeader('Authentication');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
-		// Check switcher options and default values
+		// Check switcher options and default values.
 		$auth_radio = $form->getField('Default authentication')->asSegmentedRadio();
 		$this->assertEquals(['Internal', 'LDAP'], $auth_radio->getLabels()->asText());
 		$this->assertEquals('Internal', $auth_radio->getSelected());
+
 		$form->checkValue(['Deprovisioned users group' => '']);
+		$form->query('button:Select')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('User groups', $dialog->getTitle());
+		$this->assertEquals(1, $dialog->getFooter()->query('xpath:.//button')->all()->count());
+		$this->assertTrue($dialog->getFooter()->query('button:Cancel')->one()->isClickable());
+
+		$table = $dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
+		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertEquals('Disabled', $table->getRow(0)->getColumn('Name')->getText());
+		$dialog->close();
 
 		// Summon the Deprovisioned users group hint-box.
 		$form->query('xpath://label[text()="Deprovisioned users group"]//a')->one()->click();
-		$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilPresent();
 
 		// Assert text.
-		$this->assertEquals('Only disabled group can be set for deprovisioned users.', $hint->one()->getText());
+		$this->assertEquals('Only disabled group can be set for deprovisioned users.', $hint->getText());
 
 		// Close the hint-box.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		/*
@@ -71,7 +83,6 @@ class testFormAdministrationAuthentication extends CWebTest {
 			// Save default config without changes.
 			[
 				[
-					'fields' => [],
 					'db_check' => [
 						[
 							'authentication_type' => 0,
@@ -126,7 +137,7 @@ class testFormAdministrationAuthentication extends CWebTest {
 	 *
 	 * @dataProvider getFormData
 	 */
-	public function testFormAdministrationAuthentication_Form($data) {
+	public function testFormUserAuthentication_Form($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		}
@@ -134,7 +145,7 @@ class testFormAdministrationAuthentication extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
-		if ($data['fields'] !== []) {
+		if (array_key_exists('fields', $data)) {
 			$form->fill($data['fields']);
 		}
 
