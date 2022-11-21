@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup widget
@@ -30,6 +30,16 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 
 class testDashboardClockWidget extends CWebTest {
+
+	private static $name = 'UpdateClock';
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -54,20 +64,22 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check edit forms header.
 		$this->assertEquals('Edit widget',
-			$form->query('xpath://h4[contains(@id, "dashbrd-widget-head-title-widgetConfg")]')->one()->getText());
+				$form->query('xpath://h4[contains(@id, "dashbrd-widget-head-title-widgetConfg")]')->one()->getText());
 
 		// Check if widget type is selected as "Clock".
-		$this->assertEquals('Clock', $form->query('xpath:.//button[contains(@class, "focusable")]')->one()->getText());
+		$form->checkValue(['Type' => 'Clock']);
 
 		// Check "Name" field max length.
 		$this->assertEquals('255', $form->query('id:name')->one()->getAttribute('maxlength'));
 
 		// Check fields "Refresh interval" values.
-		$refreshinterval_values = ['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
-			'2 minutes', '10 minutes', '15 minutes'];
+		$this->assertEquals(['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '15 minutes'],
+				$form->query('name', 'rf_rate')->asDropdown()->one()->getOptions()->asText()
+		);
 
-		$ri_dropdown = $form->query('name', 'rf_rate')->asDropdown()->one();
-		$this->assertEquals($refreshinterval_values, $ri_dropdown->getOptions()->asText());
+		$this->assertEquals(['Local time', 'Server time', 'Host time'],
+				$form->query('name', 'time_type')->asDropdown()->one()->getOptions()->asText()
+		);
 
 		// Check fields "Time type" values.
 		$timetype_values = ['Local time', 'Server time', 'Host time'];
@@ -76,7 +88,14 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check that it's possible to select host items, when time type is "Host Time".
 		$form->fill(['Time type' => 'Host time']);
-		$this->assertTrue($this->query('button:Select')->waitUntilVisible()->one()->isClickable());
+		//$this->assertTrue($this->query('button:Select')->waitUntilVisible()->one()->isClickable());
+
+		$fields = ['Type', 'Name', 'Refresh interval', 'Time type'];
+		foreach (['Local time', 'Server time', 'Host time'] as $type) {
+			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+			$fields = ($type === 'Host time') ? array_merge($fields, ['Item']) : $fields;
+			$this->assertEquals($fields, $form->getLabels()->asText());
+		}
 
 		// Check that it's possible to change the status of "Show header" checkbox.
 		$this->assertTrue($form->query('xpath://input[contains(@id, "show_header")]')->one()->isSelected());
@@ -91,9 +110,11 @@ class testDashboardClockWidget extends CWebTest {
 		return [
 			[
 				[
+					'Expected' => TEST_GOOD,
 					'Fields' => [
 						'Type' => 'Clock',
-						'Name' => 'FrontendServerClock',
+						'Show header' => true,
+						'Name' => 'ServerTimeClock',
 						'Refresh interval' => 'No refresh',
 						'Time type' => 'Server time'
 					]
@@ -101,22 +122,86 @@ class testDashboardClockWidget extends CWebTest {
 			],
 			[
 				[
+					'Expected' => TEST_GOOD,
 					'Fields' => [
 						'Type' => 'Clock',
-						'Name' => 'FrontendLocalClock',
-						'Refresh interval' => 'Default (15 minutes)',
+						'Show header' => true,
+						'Name' => 'LocalTimeClock',
+						'Refresh interval' => '10 seconds',
 						'Time type' => 'Local time'
 					]
 				]
 			],
 			[
 				[
+					'Expected' => TEST_GOOD,
 					'Fields' => [
 						'Type' => 'Clock',
-						'Name' => 'FrontendHostClock',
-						'Refresh interval' => 'Default (15 minutes)',
+						'Show header' => true,
+						'Name' => 'HostTimeClock',
+						'Refresh interval' => '30 seconds',
 						'Time type' => 'Host time',
-						'Item' => 'DEV-2236 item'
+						'Item' => 'Item for clock widget'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_BAD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => true,
+						'Name' => 'ClockWithoutItem',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Host time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => 'LocalTimeClock123',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => 'Symb0l$InN@m3Cl0ck',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => '1233212',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => '~@#$%^&*()_+|',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
 					]
 				]
 			]
@@ -134,8 +219,27 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill($data['Fields']);
-		$this->query('button', 'Add')->waitUntilClickable()->one()->click();
-		$dashboard->save();
+
+		if('Expected' === TEST_GOOD) {
+			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, null, 'Dashboard updated');
+			$this->getOverlayMessage()->close();
+
+			// Get fields from saved widgets.
+			$fields = $dashboard->getWidget($data['Fields']['Name'])->edit()->getFields();
+			$original_widget = $fields->asValues();
+		}
+		else{
+			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
+			$form->getOverlayMessage()->close();
+		}
+
+		// Check if added widgets are truly added and fields are filled as expected.
+		$fields = $dashboard->getWidget($data['Fields']['Name'])->edit()->getFields();
+		$created_widget = $fields->asValues();
+		$this->assertEquals($original_widget, $created_widget);
 	}
 
 	/**
@@ -146,10 +250,9 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('FrontendLocalClock')->edit();
+		$dashboard->getWidget('UpdateClock')->edit();
 		$form->submit();
 		$this->page->waitUntilReady();
-		$dashboard->getWidget('FrontendLocalClock');
 		$dashboard->save();
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
@@ -158,9 +261,98 @@ class testDashboardClockWidget extends CWebTest {
 		return [
 			[
 				[
-					'UpdateFields' => [
+					'Expected' => TEST_GOOD,
+					'Fields' => [
 						'Type' => 'Clock',
-						'Name' => 'UpdatedClockWidget'
+						'Show header' => true,
+						'Name' => 'ServerTimeClock',
+						'Refresh interval' => 'No refresh',
+						'Time type' => 'Server time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => true,
+						'Name' => 'LocalTimeClock',
+						'Refresh interval' => '10 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => true,
+						'Name' => 'HostTimeClock',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Host time',
+						'Item' => 'Item for clock widget'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_BAD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => true,
+						'Name' => 'ClockWithoutItem',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Host time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => 'LocalTimeClock123',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => 'Symb0l$InN@m3Cl0ck',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => '1233212',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Expected' => TEST_GOOD,
+					'Fields' => [
+						'Type' => 'Clock',
+						'Show header' => false,
+						'Name' => '~@#$%^&*()_+|',
+						'Refresh interval' => '30 seconds',
+						'Time type' => 'Local time'
 					]
 				]
 			]
@@ -176,21 +368,38 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('FrontendLocalClock')->edit();
-		$form->fill($data['UpdateFields'])->waitUntilReady();
-		$form->submit();
-		$this->page->waitUntilReady();
 
-		// Check that a widget with the corresponding header exists.
-		$header = ($data['UpdateFields']['Name']);
-		$dashboard->getWidget($header);
-		$dashboard->save();
+		// Get widget fields before they are updated.
+		$fields = $dashboard->getWidget(self::$name)->edit()->getFields();
+		$original_widget = $fields->asValues();
 
-		// Check that Dashboard has been saved and that widget has been added.
-		$message = CMessageElement::find()->waitUntilVisible()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
-		$this->assertEquals($dashboard->getWidget($header)->getText(), 'UpdatedClockWidget');
+		$form = $dashboard->getWidget(self::$name)->edit();
+		$form->fill($data['Fields'])->waitUntilReady();
+
+		if('Expected' === TEST_GOOD) {
+			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, null, 'Dashboard updated');
+			$this->assertEquals($dashboard->getWidget(self::$name)->getText(), self::$name);
+			$this->getOverlayMessage()->close();
+
+			// Use updated widget as next widget which will be updated.
+			if(array_key_exists('Name', $data['Fields'])) {
+				self::$name = $data['Fields']['Name'];
+			}
+
+			// Get fields from updated widgets.
+			$fields = $dashboard->getWidget(self::$name)->edit()->getFields();
+			$updated_widget = $fields->asValues();
+		}
+		else{
+			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
+			$form->getOverlayMessage()->close();
+		}
+
+		// Compare if widget fields are not equal with original widget fields.
+		$this->assertNotEquals($original_widget, $updated_widget);
 	}
 
 	/**

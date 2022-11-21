@@ -29,16 +29,16 @@ class ClockWidgets {
 	public static function load() {
 		CDataHelper::call('hostgroup.create', [
 			[
-				'name' => 'DEV-2236 hostgroup',
+				'name' => 'Host group for clock widget',
 			]
 		]);
 		$hostgrpid = CDataHelper::getIds('name');
 
 		CDataHelper::call('host.create', [
-			'host' => 'DEV-2236 host',
+			'host' => 'Host for clock widget',
 			'groups' => [
 				[
-					'groupid' => $hostgrpid['DEV-2236 hostgroup']
+					'groupid' => $hostgrpid['Host group for clock widget']
 				]
 			],
 			'interfaces' => [
@@ -52,12 +52,12 @@ class ClockWidgets {
 		]);
 		$hostid = CDataHelper::getIds('host');
 
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['DEV-2236 host']);
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['Host for clock widget']);
 
 		CDataHelper::call('item.create', [
 			[
-				'hostid' => $hostid['DEV-2236 host'],
-				'name' => 'DEV-2236 item',
+				'hostid' => $hostid['Host for clock widget'],
+				'name' => 'Item for clock widget',
 				'key_' => 'system.localtime[local]',
 				'type' => 0,
 				'value_type' => 1,
@@ -69,11 +69,11 @@ class ClockWidgets {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'DEV-2236 dashboard',
+				'name' => 'Dashboard for creating clock widgets',
 				'widgets' => [
 					[
 						'type' => 'clock',
-						'name' => 'Local',
+						'name' => 'UpdateClock',
 						'x' => 0,
 						'y' => 0,
 						'width' => 5,
@@ -88,7 +88,7 @@ class ClockWidgets {
 					],
 					[
 						'type' => 'clock',
-						'name' => 'Server',
+						'name' => 'DeleteClock',
 						'x' => 5,
 						'y' => 0,
 						'width' => 5,
@@ -103,7 +103,7 @@ class ClockWidgets {
 					],
 					[
 						'type' => 'clock',
-						'name' => 'Host',
+						'name' => 'LayoutClock',
 						'x' => 10,
 						'y' => 0,
 						'width' => 5,
@@ -112,7 +112,7 @@ class ClockWidgets {
 							[
 								'type' => 4,
 								'name' => 'itemid',
-								'value' => $itemid['DEV-2236 item']
+								'value' => $itemid['Item for clock widget']
 							],
 							[
 								'type' => 0,
