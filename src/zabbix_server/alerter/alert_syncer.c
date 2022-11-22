@@ -19,16 +19,20 @@
 
 #include "alert_syncer.h"
 
-#include "../db_lengths.h"
-#include "zbxnix.h"
-#include "zbxself.h"
-#include "log.h"
 #include "alerter_protocol.h"
-#include "zbxservice.h"
-#include "zbxcacheconfig.h"
+#include "log.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxnix.h"
 #include "zbxnum.h"
+#include "zbxself.h"
+#include "zbxservice.h"
+#include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxexpr.h"
+#include "zbxtypes.h"
 
 #define ZBX_POLL_INTERVAL		1
 
@@ -233,6 +237,9 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
  *                                                                            *
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
+ * Parameters: amdb - [IN] the alert manager cache                            *
+ *             ...  - [IN] the mediatype data                                 *
+ *                                                                            *
  * Return value: Updated mediatype or NULL, if the cached media was up to     *
  *               date.                                                        *
  *                                                                            *
@@ -364,7 +371,9 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
  * Purpose: reads alerts/mediatypes from database and queues them in alert    *
  *          manager                                                           *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
+ * Parameters: amdb - [IN] the alert manager cache                            *
+ *                                                                            *
+ * Return value: count of alerts                                              *
  *                                                                            *
  ******************************************************************************/
 static int	am_db_queue_alerts(zbx_am_db_t *amdb)
@@ -662,7 +671,9 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
  * Purpose: retrieves alert updates from alert manager and flushes them into  *
  *          database                                                          *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
+ * Parameters: amdb - [IN] the alert manager cache                            *
+ *                                                                            *
+ * Return value: count of results                                             *
  *                                                                            *
  ******************************************************************************/
 static int	am_db_flush_results(zbx_am_db_t *amdb)
@@ -779,11 +790,12 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	return results_num;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: removes cached media types used more than a day ago               *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
+ * Parameters: amdb - [IN] the alert manager cache                            *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
@@ -829,7 +841,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
+ * Parameters: amdb - [IN] the alert manager cache                            *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_watchdog(zbx_am_db_t *amdb)

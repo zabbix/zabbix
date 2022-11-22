@@ -19,17 +19,19 @@
 
 #include "alerter.h"
 
-#include "log.h"
-#include "zbxnix.h"
-#include "zbxmedia.h"
-#include "zbxself.h"
-#include "zbxexec.h"
-#include "zbxipcservice.h"
-#include "zbxcacheconfig.h"
 #include "alerter_protocol.h"
+#include "log.h"
+#include "zbxcacheconfig.h"
 #include "zbxembed.h"
+#include "zbxexec.h"
 #include "zbxhash.h"
+#include "zbxipcservice.h"
+#include "zbxmedia.h"
+#include "zbxnix.h"
+#include "zbxself.h"
+#include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxtypes.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -38,6 +40,14 @@ static zbx_es_t	es_engine;
 /******************************************************************************
  *                                                                            *
  * Purpose: execute script alert type                                         *
+ *                                                                            *
+ * Parameters: alert         - [IN] the command for execution                 *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
+ *               timeout occurred, SIG_ERROR if interrupted by signal or FAIL *
+ *               otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
 static int	execute_script_alert(const char *command, char *error, size_t max_error_len)
@@ -76,8 +86,9 @@ static void	alerter_register(zbx_ipc_socket_t *socket)
  * Purpose: sends alert sending result to alert manager                       *
  *                                                                            *
  * Parameters: socket  - [IN] the connections socket                          *
- *             errcode - [IN] the error code                                  *
  *             value   - [IN] the value or error message                      *
+ *             errcode - [IN] the error code                                  *
+ *             error   - [IN] the error message                               *
  *             debug   - [IN] debug message                                   *
  *                                                                            *
  ******************************************************************************/
@@ -96,6 +107,12 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 /******************************************************************************
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
+ *                                                                            *
+ * Parameters: mediatypeid - [IN] the media type identifier number            *
+ *             sendto      - [IN] the message Send-To field                   *
+ *             eventid     - [IN] the event identifier number                 *
+ *                                                                            *
+ * Return value: In-Reply_To field value                                      *
  *                                                                            *
  ******************************************************************************/
 static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto, zbx_uint64_t eventid)

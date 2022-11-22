@@ -21,7 +21,9 @@
 
 #include "alert.h"
 #include "log.h"
+#include "zbxipcservice.h"
 #include "zbxserialize.h"
+#include "zbxstr.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
@@ -909,6 +911,12 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
  *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
+ * Parameters: alerts_num - [IN] the alert count                              *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: SUCCEED - the statistics were returned successfully          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
 {
@@ -935,7 +943,7 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  *            error      - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the top n mediatypes were returned successfully    *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error)
@@ -970,7 +978,7 @@ out:
  *            error   - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the top n sources were returned successfully       *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
@@ -1227,8 +1235,6 @@ out:
  * Purpose: finish data dispatch                                              *
  *                                                                            *
  * Parameters: dispatch  - [IN] the dispatcher                                *
- *             sent_num  - [OUT] the number of successfully dispatched        *
- *                              messages                                      *
  *             error     - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was finished successfully             *

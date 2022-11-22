@@ -22,6 +22,8 @@
 
 #include "alert.h"
 
+#include "zbxdbhigh.h"
+
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
 
 /* alerter -> manager */
