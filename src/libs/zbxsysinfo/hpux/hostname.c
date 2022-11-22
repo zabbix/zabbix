@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};

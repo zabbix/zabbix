@@ -40,7 +40,6 @@ extern char	*CONFIG_DB_TLS_CA_FILE;
 extern char	*CONFIG_DB_TLS_CIPHER;
 extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
 #define ZBX_DB_CONNECT_NORMAL	0
@@ -553,6 +552,7 @@ const char	*DBget_inventory_field(unsigned char inventory_link);
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name);
 int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBpk_exists(const char *table_name);
 #endif
@@ -786,10 +786,10 @@ char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
 int	zbx_get_proxy_protocol_version_int(const char *version_str);
 
 /* condition evaluation types */
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR			0
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND			1
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_OR			2
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION		3
+#define ZBX_CONDITION_EVAL_TYPE_AND_OR			0
+#define ZBX_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
