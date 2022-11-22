@@ -154,8 +154,8 @@ static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 }
 
 static void	add_package_to_json(struct zbx_json *json, const char *name, const char *manager, const char *version,
-		const char *arch, zbx_uint64_t size, const char *buildtime_value, zbx_uint64_t buildtime_timestamp,
-		const char *installtime_value, zbx_uint64_t installtime_timestamp)
+		const char *arch, zbx_uint64_t size, const char *buildtime_value, time_t buildtime_timestamp,
+		const char *installtime_value, time_t installtime_timestamp)
 {
 	zbx_json_addobject(json, NULL);
 
@@ -167,12 +167,12 @@ static void	add_package_to_json(struct zbx_json *json, const char *name, const c
 
 	zbx_json_addobject(json, "buildtime");
 	zbx_json_addstring(json, "value"    , buildtime_value, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json, "timestamp", buildtime_timestamp);
+	zbx_json_addint64(json,  "timestamp", buildtime_timestamp);
 	zbx_json_close(json);
 
 	zbx_json_addobject(json, "installtime");
 	zbx_json_addstring(json, "value"    , installtime_value, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json, "timestamp", installtime_timestamp);
+	zbx_json_addint64(json,  "timestamp", installtime_timestamp);
 	zbx_json_close(json);
 
 	zbx_json_close(json);
@@ -227,7 +227,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 
 	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
 			installtime_value[DETAIL_BUF];
-	zbx_uint64_t	size, buildtime_timestamp, installtime_timestamp;
+	zbx_uint64_t	size;
+	time_t		buildtime_timestamp, installtime_timestamp;
 	int		rv;
 
 	if ('\0' == fmt[0])
@@ -236,8 +237,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 				"%%" ZBX_FS_SIZE_T "[^,],"
 				"%%" ZBX_FS_SIZE_T "[^,],"
 				"%%" ZBX_FS_SIZE_T "[^,],"
-				"%" ZBX_FS_UI64 ","
-				"%" ZBX_FS_UI64 ","
+				"%" ZBX_FS_TIME_T ","
+				"%" ZBX_FS_TIME_T ","
 				"%" ZBX_FS_UI64,
 				(zbx_fs_size_t)(sizeof(name) - 1),
 				(zbx_fs_size_t)(sizeof(version) - 1),
@@ -272,7 +273,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 			size_str[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF] = "", installtime_value[DETAIL_BUF],
 			*suffix;
 	const char	*p;
-	zbx_uint64_t	size, buildtime_timestamp, installtime_timestamp;
+	zbx_uint64_t	size;
+	time_t		buildtime_timestamp, installtime_timestamp;
 	struct tm	tm;
 	double		size_double;
 	int		rv;
@@ -360,8 +362,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	if ('\0' != *p)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
-				"), ignoring", line, p);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date format at \"%s\" (expected %s), ignoring",
+				line, p, TIME_FMT);
 		return;
 	}
 
@@ -375,8 +377,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	if ('\0' != *p)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
-				"), ignoring", line, p);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date format at \"%s\" (expected %s), ignoring",
+				line, p, TIME_FMT);
 		return;
 	}
 
