@@ -7663,7 +7663,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->delay = zbx_strdup(NULL, src_item->delay);
 
-	if ('\0' != *src_item->error)		/* allocate after lock */
+	if ('\0' != *src_item->error)
 		dst_item->error = zbx_strdup(NULL, src_item->error);
 	else
 		dst_item->error = NULL;

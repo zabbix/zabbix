@@ -1598,7 +1598,8 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 	if (0 != item_num)
 	{
-		zbx_dc_config_history_sync_get_triggers_by_itemids(trigger_info, trigger_order, itemids, timespecs, item_num);
+		zbx_dc_config_history_sync_get_triggers_by_itemids(trigger_info, trigger_order, itemids, timespecs,
+				item_num);
 		prepare_triggers((DC_TRIGGER **)trigger_order->values, trigger_order->values_num);
 		zbx_determine_items_in_expressions(trigger_order, itemids, item_num);
 	}

@@ -6407,7 +6407,7 @@ static void	substitute_macros_in_xml_elements(const DC_ITEM *item, const struct 
 				if (NULL != item)
 				{
 					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item,
-							NULL, NULL, NULL, NULL, NULL, NULL,&value_tmp,
+							NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
 							MACRO_TYPE_HTTP_XML, NULL, 0);
 				}
 				else
