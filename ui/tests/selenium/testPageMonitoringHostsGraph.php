@@ -220,7 +220,14 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'subfilter' => [
 						'Tags' => ['tag_name_2']
 					],
-					'graphs_amount' => 3
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_2'
+					]
 				]
 			],
 			// #1 Host graphs - filter by Tags.
@@ -232,7 +239,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'subfilter' => [
 						'Tags' => ['tag_name_2']
 					],
-					'graphs_amount' => 2
+					'graphs_amount' => 2,
+					'graph_names' => [
+						'Graph_2',
+						'Graph_3'
+					]
 				]
 			],
 			// #2 Simple graphs - filter by Tags.
@@ -244,7 +255,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'subfilter' => [
 						'Tags' => ['tag_name_2']
 					],
-					'graphs_amount' => 1
+					'graphs_amount' => 1,
+					'item_names' => [
+						'Item_for_graph_2'
+					]
 				]
 			],
 			// #3 All graphs - filter by 2 Tags.
@@ -259,7 +273,16 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1'
 						]
 					],
-					'graphs_amount' => 5
+					'graphs_amount' => 5,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
 				]
 			],
 			// #4 Host graphs - filter by 2 Tags.
@@ -274,7 +297,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1'
 						]
 					],
-					'graphs_amount' => 3
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					]
 				]
 			],
 			// #5 Simple graphs - filter by 2 Tags.
@@ -289,7 +317,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1'
 						]
 					],
-					'graphs_amount' => 2
+					'graphs_amount' => 2,
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
 				]
 			],
 			// #6 All graphs - filter by Tags and Tag value.
@@ -302,7 +334,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Tags' => ['tag_name_2'],
 						'Tag values' => ['tag_value_3']
 					],
-					'graphs_amount' => 1
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
 				]
 			],
 			// #7 Host graphs - filter by Tag and Tag value.
@@ -315,7 +350,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Tags' => ['tag_name_2'],
 						'Tag values' => ['tag_value_3']
 					],
-					'graphs_amount' => 1
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_2'
+					]
 				]
 			],
 			// #8 Simple graphs - filter by Tag and Tag value.
@@ -343,7 +381,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						],
 						'Tag values' => ['tag_value_3']
 					],
-					'graphs_amount' => 1
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
 				]
 			],
 			// #10 Host graphs - filter by 2 Tags and Tag value.
@@ -359,7 +400,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						],
 						'Tag values' => ['tag_value_3']
 					],
-					'graphs_amount' => 1
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
 				]
 			],
 			// #11 Simple graphs - filter by 2 Tags and Tag value.
@@ -393,7 +437,16 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_value_1'
 						]
 					],
-					'graphs_amount' => 5
+					'graphs_amount' => 5,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
 				]
 			],
 			// #13 Host graphs - filter by 2 Tags and 2 Tag value.
@@ -412,7 +465,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_value_1'
 						]
 					],
-					'graphs_amount' => 3
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					]
 				]
 			],
 			// #14 Simple graphs - filter by 2 Tags and 2 Tag value.
@@ -431,7 +489,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_value_1'
 						]
 					],
-					'graphs_amount' => 2
+					'graphs_amount' => 2,
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
 				]
 			]
 		];
@@ -465,6 +527,22 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check result amount.
 		if (array_key_exists('graphs_amount', $data)) {
 			$this->checkGraphs($data['graphs_amount']);
+
+			// Find links with graphs and items ids.
+			$graph_sources = [];
+			foreach ($this->query("xpath://tbody//img")->all() as $source) {
+				$graph_sources[] = $source->getAttribute('src');
+			}
+
+			// Check that displayed graphs has correct ids.
+			if (array_key_exists('graph_name', $data)) {
+				$this->checkGraphsIds($data['graph_names'], $graph_sources);
+			}
+
+			// Check that displayed item graphs has correct ids.
+			if (array_key_exists('item_names', $data)) {
+				$this->checkGraphsIds($data['item_names'], $graph_sources, false);
+			}
 		}
 		else {
 			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
@@ -858,12 +936,13 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 *
 	 * @param array   $names			items or graph names list
 	 * @param array   $graph_sources	displayed graphs src attribute values
-	 * @param boolean $graph			if graphs or items ids checked
+	 * @param boolean $graph			if graphs ids checked
 	 */
 	private function checkGraphsIds($names, $graph_sources, $graph = true) {
 		foreach ($names as $name) {
 			$array_count = count($graph_sources);
 			$id = ($graph) ? self::$graphids[$name] : self::$itemids[$name];
+
 			foreach ($graph_sources as $source) {
 				if (str_contains($source, '='.$id)) {
 					$graph_sources = array_values(array_diff($graph_sources, [$source]));
