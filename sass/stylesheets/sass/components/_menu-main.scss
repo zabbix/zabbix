@@ -1,8 +1,5 @@
 $menu-main-icons-opacity: .75 !default;
 
-$menu-main-arrow-bg-position: -606px -434px !default; // TODO remove! (also dark theme) (acikuns)
-$menu-main-arrow-hover-bg-position: -606px -434px !default;
-
 .menu-main {
 	& > li {
 		line-height: 16px;
@@ -77,8 +74,6 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 			&:hover,
 			&:focus {
 				&::after {
-					background-position: $menu-main-arrow-hover-bg-position;
-
 					@if $menu-main-icons-opacity < 1 {
 						opacity: 1;
 					}
@@ -89,7 +84,6 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 		&.is-expanded {
 			& > a {
 				&::after {
-					background-position: $menu-main-arrow-hover-bg-position;
 					transform: rotate(-180deg);
 				}
 
@@ -249,7 +243,15 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 		}
 	}
 
-	[class^="zi-"], [class*=" zi-"]{
+	.zi-dashboard,
+	.zi-hierarchy,
+	.zi-list,
+	.zi-report,
+	.zi-download,
+	.zi-envelope,
+	.zi-users,
+	.zi-cog,
+	.zi-eye-alt {
 		&::before {
 			top: -1px;
 			padding-right: 11px;

@@ -2564,10 +2564,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
   opacity: 0.75;
   transition: transform 0.3s, opacity 0.3s; }
 .menu-main .has-submenu > a:hover::after, .menu-main .has-submenu > a:focus::after {
-  background-position: -606px -434px;
   opacity: 1; }
 .menu-main .has-submenu.is-expanded > a::after {
-  background-position: -606px -434px;
   transform: rotate(-180deg); }
 .menu-main .has-submenu.is-expanded > a::before, .menu-main .has-submenu.is-expanded > a::after {
   opacity: 1; }
@@ -2647,13 +2645,37 @@ div.dashboard-widget-tophosts z-bar-gauge {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
     left: -9999px !important; }
-.menu-main [class^="zi-"]::before, .menu-main [class*=" zi-"]::before {
+.menu-main .zi-dashboard::before,
+.menu-main .zi-hierarchy::before,
+.menu-main .zi-list::before,
+.menu-main .zi-report::before,
+.menu-main .zi-download::before,
+.menu-main .zi-envelope::before,
+.menu-main .zi-users::before,
+.menu-main .zi-cog::before,
+.menu-main .zi-eye-alt::before {
   top: -1px;
   padding-right: 11px;
   font-size: 23px;
   color: #b7d6ea;
   opacity: 0.75; }
-.menu-main [class^="zi-"]:hover::before, .menu-main [class^="zi-"]:focus::before, .menu-main [class*=" zi-"]:hover::before, .menu-main [class*=" zi-"]:focus::before {
+.menu-main .zi-dashboard:hover::before, .menu-main .zi-dashboard:focus::before,
+.menu-main .zi-hierarchy:hover::before,
+.menu-main .zi-hierarchy:focus::before,
+.menu-main .zi-list:hover::before,
+.menu-main .zi-list:focus::before,
+.menu-main .zi-report:hover::before,
+.menu-main .zi-report:focus::before,
+.menu-main .zi-download:hover::before,
+.menu-main .zi-download:focus::before,
+.menu-main .zi-envelope:hover::before,
+.menu-main .zi-envelope:focus::before,
+.menu-main .zi-users:hover::before,
+.menu-main .zi-users:focus::before,
+.menu-main .zi-cog:hover::before,
+.menu-main .zi-cog:focus::before,
+.menu-main .zi-eye-alt:hover::before,
+.menu-main .zi-eye-alt:focus::before {
   color: #ffffff;
   opacity: 1; }
 
@@ -2774,7 +2796,11 @@ div.dashboard-widget-tophosts z-bar-gauge {
       transform: rotate(-90deg); }
     .menu-user .submenu .has-submenu:not(.is-expanded) .submenu {
       left: -9999px !important; }
-  .menu-user [class^="zi-"]::before, .menu-user [class*=" zi-"]::before {
+  .menu-user .zi-support::before,
+  .menu-user .zi-help::before,
+  .menu-user .zi-user-filled::before,
+  .menu-user .zi-signout::before,
+  .menu-user .zi-z::before {
     top: -2px;
     width: 15px;
     height: 15px;
@@ -2782,7 +2808,15 @@ div.dashboard-widget-tophosts z-bar-gauge {
     font-size: 15px;
     color: #b7d6ea;
     opacity: 0.75; }
-  .menu-user [class^="zi-"]:hover::before, .menu-user [class^="zi-"]:focus::before, .menu-user [class*=" zi-"]:hover::before, .menu-user [class*=" zi-"]:focus::before {
+  .menu-user .zi-support:hover::before, .menu-user .zi-support:focus::before,
+  .menu-user .zi-help:hover::before,
+  .menu-user .zi-help:focus::before,
+  .menu-user .zi-user-filled:hover::before,
+  .menu-user .zi-user-filled:focus::before,
+  .menu-user .zi-signout:hover::before,
+  .menu-user .zi-signout:focus::before,
+  .menu-user .zi-z:hover::before,
+  .menu-user .zi-z:focus::before {
     color: #ffffff;
     opacity: 1; }
 
