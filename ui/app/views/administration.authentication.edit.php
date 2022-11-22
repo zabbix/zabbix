@@ -109,9 +109,9 @@ $auth_tab = (new CFormList('list_auth'))
 $http_tab = (new CFormList('list_http'))
 	->addRow(
 		new CLabel([_('Enable HTTP authentication'),
-			makeHelpIcon([
-				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."),
-			])
+			makeHelpIcon(
+				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+			)
 		], 'http_auth_enabled'),
 		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
 			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
