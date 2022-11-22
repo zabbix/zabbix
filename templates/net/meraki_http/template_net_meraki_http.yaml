@@ -119,7 +119,7 @@ zabbix_export:
               'devices': devices,
               'error': error_msg.toString()
             });
-          description: 'Item for gathering all the organizations and devices from Meraki API"'
+          description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
           parameters:
             -

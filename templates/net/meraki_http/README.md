@@ -19,9 +19,9 @@ This template was tested on:
 
 You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros. 
 
-You have to create Meraki token in Meraki dashboard and use it in {$MERAKI.TOKEN} macro. Read detailed instructions how to create token in Meraki documentation [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization)
+Create the token in the Meraki dashboard (see Meraki [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization) for instructions). Set this token as {$MERAKI.TOKEN} macro value in Zabbix.
 
-Set Meraki dashboard URl for {$MERAKI.API.URL}. e.g. api.meraki.com/api/v1
+Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
 
 
 ## Zabbix configuration
