@@ -79,7 +79,7 @@
 				userids.add(this.data.recipientid);
 			}
 			else {
-				icon.classList.add('<?= ZBX_STYLE_ICON_USER_GROUP ?>'); // todo zi
+				icon.classList.add('<?= ZBX_STYLE_ICON_USER_GROUP ?>');
 				icon.setAttribute('title', <?= json_encode(_('User group')) ?>);
 				usrgrpids.add(this.data.recipientid);
 			}

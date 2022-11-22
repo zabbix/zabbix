@@ -11,15 +11,15 @@ z-select,
 	}
 
 	.zi-chevron-down {
-		background-color: transparent;
-		border: none;
-		border-radius: 0;
-
 		text-align: left;
 		padding: 3px 2px 3px 4px;
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
+
+		& button {
+			@extend %btn-reset;
+		}
 
 		&:active,
 		&:hover,
@@ -29,8 +29,6 @@ z-select,
 			border-color: $form-border-color;
 			box-shadow: none;
 		}
-
-		// todo zi
 
 		&::after {
 			float: right;

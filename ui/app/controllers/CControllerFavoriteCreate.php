@@ -66,7 +66,7 @@ class CControllerFavoriteCreate extends CController {
 					addrm_fav.classList.remove("btn-add-fav");
 				}
 			';
-		}// todo zi
+		}
 		else {
 			$data['main_block'] = '';
 		}

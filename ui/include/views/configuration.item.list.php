@@ -236,7 +236,7 @@ foreach ($data['items'] as $item) {
 	}
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION) // todo zi
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getItem([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],

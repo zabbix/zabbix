@@ -20,7 +20,7 @@
 
 const EXPANDABLE_SUBFILTER_EVENT_EXPAND = 'expand';
 
-const ZBX_STYLE_ICON_WIZARD_ACTION = 'icon-wizard-action'; // TODO zi
+const ZBX_STYLE_ICON_WIZARD_ACTION = 'icon-wizard-action';
 const ZBX_STYLE_EXPANDED = 'expanded';
 const ZBX_STYLE_HIDDEN = 'hidden';
 
@@ -65,7 +65,7 @@ class CExpandableSubfilter extends CBaseComponent {
 
 	makeExpandButton() {
 		this.btn_expand = document.createElement('button');
-		this.btn_expand.classList.add(ZBX_STYLE_ICON_WIZARD_ACTION); // todo zi
+		this.btn_expand.classList.add(ZBX_STYLE_ICON_WIZARD_ACTION);
 		this.btn_expand.addEventListener('click', () => {
 			this._target.classList.add(ZBX_STYLE_EXPANDED);
 			this.btn_expand.remove();

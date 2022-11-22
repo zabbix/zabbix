@@ -9,21 +9,14 @@
 		&.zi-arrows-top-bottom,
 		&.zi-alert {
 			vertical-align: top;
-
 			width: 18px;
 			height: 18px;
 			min-height: 0;
-
 			padding: 0;
 			margin-right: 5px;
 
-			background: transparent;
-			border: none;
-			border-radius: 2px;
-
 			&::after {
 				position: relative;
-
 				width: 18px;
 				height: 18px;
 				display: inline-flex;
@@ -34,6 +27,7 @@
 				font-family: inherit;
 				content: attr(data-count);
 			}
+			@extend %btn-reset;
 		}
 	}
 

@@ -29,16 +29,17 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		width: 48px;
 		justify-content: flex-end;
 
-		[class^="zi-"], [class*=" zi-"]{
+		.zi-chevron-double-left,
+		.zi-collapse,
+		.zi-expand,
+		.zi-chevron-double-right {
 			padding: 0;
 			width: 24px;
 			height: 24px;
 
 			font-size: 0;
 
-			background-color: transparent;
-			border: none;
-			border-radius: 0;
+			@extend %btn-reset;
 
 			&::before {
 				font-size: 15px;

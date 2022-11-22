@@ -115,7 +115,7 @@ foreach ($data['services'] as $serviceid => $service) {
 		$data['tags'][$serviceid],
 		(new CCol([
 			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ADD) // todo zi
+				->addClass(ZBX_STYLE_BTN_ADD)
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Add child service'))

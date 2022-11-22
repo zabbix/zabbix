@@ -1890,6 +1890,56 @@ select {
 	}
 }
 
+.btn-alt {
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
+
+	.plus-icon {
+		background-color: $btn-alt-font-color;
+		margin-right: 8px;
+
+		&::after {
+			background-color: $btn-alt-font-color;
+		}
+	}
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
+	}
+
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+		.plus-icon {
+			background-color: $btn-font-color;
+
+			&::after {
+				background-color: $btn-font-color;
+			}
+		}
+	}
+}
+
 button::-moz-focus-inner {
 	padding: 0;
 	border: 0;
