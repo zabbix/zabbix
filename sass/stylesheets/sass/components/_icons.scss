@@ -74,6 +74,7 @@ $fonts-path: '../fonts/';
 .zi-circle-warning-filled:before { content: "\ea2c"; }
 .zi-circle-warning:before { content: "\ea2d"; }
 .zi-clock:before { content: "\ea2e"; }
+.zi-clock:after { content: "\ea2e"; }
 .zi-cog-filled:before { content: "\ea2f"; }
 .zi-cog:before { content: "\ea30"; }
 .zi-collapse:before { content: "\ea31"; }
@@ -91,6 +92,7 @@ $fonts-path: '../fonts/';
 .zi-eye:before { content: "\ea3d"; }
 .zi-filter-filled:before { content: "\ea3e"; }
 .zi-filter:before { content: "\ea3f"; }
+.zi-filter:after { content: "\ea3f"; }
 .zi-fullscreen:before { content: "\ea40"; }
 .zi-help:before { content: "\ea41"; }
 .zi-hierarchy:before { content: "\ea42"; }

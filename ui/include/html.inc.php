@@ -150,6 +150,7 @@ function get_icon($type, $params = []) {
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV) // todo zi
+					->addClass('zi-star')
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
@@ -981,6 +982,7 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
 
 	return (new CSimpleButton())
 		->addClass(ZBX_STYLE_ACTION_ICON_SUPPRESS)
+		->addClass('zi-eye-off')
 		->addClass($blink ? 'blink' : null)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
@@ -1002,9 +1004,14 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
  * @return CTag  Returns CSpan or CButton depending on boolean $icon_data['button'] parameter
  */
 function makeActionIcon(array $icon_data): CTag {
+	if (!array_key_exists('color', $icon_data)) {
+		$icon_data['color'] = ZBX_STYLE_FONT_COLOR;
+	}
 
 	if (array_key_exists('button', $icon_data) && $icon_data['button']) {
-		$icon = (new CButton(null))->addClass($icon_data['icon']);
+		$icon = (new CButton(null))
+				->addClass($icon_data['icon'])
+				->addStyle('color: '.$icon_data['color'].';');
 	}
 	else {
 		$icon = (new CSpan())->addClass($icon_data['icon']);
@@ -1045,6 +1052,7 @@ function makeActionIcon(array $icon_data): CTag {
 function makeDescriptionIcon($description) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
+		->addClass('zi-alert')
 		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 

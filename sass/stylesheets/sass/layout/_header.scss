@@ -48,8 +48,7 @@ header {
 
 		.zi-cog-filled,
 		.zi-menu,
-		.zi-fullscreen,
-		.zi-chevron-down {
+		.zi-fullscreen {
 			vertical-align: top;
 			line-height: 0;
 			font-size: 0;
@@ -59,6 +58,16 @@ header {
 			}
 
 			@extend %button-icon-size;
+		}
+
+		.zi-star {
+			vertical-align: middle;
+			font-size: 0;
+			padding: 0;
+
+			&::before {
+				padding: 0 2px;
+			}
 		}
 	}
 

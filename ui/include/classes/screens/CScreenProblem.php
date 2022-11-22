@@ -1022,6 +1022,7 @@ class CScreenProblem extends CScreenBase {
 
 						$info_icons[] = (new CSimpleButton())
 							->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+							->addClass('zi-eye')
 							->addClass('blink')
 							->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 					}

@@ -1767,7 +1767,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = ZBX_STYLE_ACTION_ICON_SUPPRESS;
+			$icon = 'zi-eye-off';
 			$title = _('Suppressed');
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
@@ -1781,7 +1781,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 			}
 		}
 		else {
-			$icon = ZBX_STYLE_ACTION_ICON_UNSUPPRESS;
+			$icon = 'zi-eye';
 			$title = _('Unsuppressed');
 			$suppress_until = '';
 		}
@@ -1797,8 +1797,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 	return $total
 		? makeActionIcon([
 			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
-				? ZBX_STYLE_ACTION_ICON_SUPPRESS
-				: ZBX_STYLE_ACTION_ICON_UNSUPPRESS,
+				? 'zi-eye-off'
+				: 'zi-eye',
 			'button' => true,
 			'hint' => [
 				$table,
@@ -1843,10 +1843,10 @@ function makeEventMessagesIcon(array $data, array $users): ?CButton {
 			zbx_nl2br($message['message'])
 		]);
 	}
-
+	// todo zi
 	return $total
 		? makeActionIcon([
-			'icon' => ZBX_STYLE_ACTION_ICON_MSGS,
+			'icon' => 'zi-alert',
 			'button' => true,
 			'hint' => [
 				$table,
@@ -1904,21 +1904,25 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
 
 	// select icon
 	if ($data['original_severity'] > $data['current_severity']) {
-		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_DOWN;
+		$icon_style = 'zi-arrow-down';
+		$color = ZBX_STYLE_ACTION_SEVERETY_DOWN;
 		$aria_label = _x('Severity decreased', 'screen reader');
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
-		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_UP;
+		$icon_style = 'zi-arrow-up';
+		$color = ZBX_STYLE_ACTION_SEVERETY_UP;
 		$aria_label = _x('Severity increased', 'screen reader');
 	}
 	else {
-		$icon_style = ZBX_STYLE_ACTION_ICON_SEV_CHANGED;
+		$icon_style = 'zi-arrows-top-bottom';
+		$color = ZBX_STYLE_ACTION_SEVERETY_CHANGED;
 		$aria_label = _x('Severity changed', 'screen reader');
 	}
 
 	return $total
 		? makeActionIcon([
 			'button' => true,
+			'color' => $color,
 			'icon' => $icon_style,
 			'hint' => [
 				$table,
@@ -2005,21 +2009,21 @@ function makeEventActionsTable(array $actions, array $users, array $mediatypes):
 function makeEventActionsIcon(array $data, $eventid): ?CButton {
 	// Number of meaningful actions.
 	$total = $data['count'];
-
 	// select icon
 	if ($data['has_failed_action']) {
-		$icon_style = ZBX_STYLE_ACTIONS_NUM_RED;
+		$color = ZBX_STYLE_EVENT_ACTION_ICON_RED;
 	}
 	elseif ($data['has_uncomplete_action']) {
-		$icon_style = ZBX_STYLE_ACTIONS_NUM_YELLOW;
+		$color = ZBX_STYLE_EVENT_ACTION_ICON_YELLOW;
 	}
 	else {
-		$icon_style = ZBX_STYLE_ACTIONS_NUM_GRAY;
+		$color = ZBX_STYLE_EVENT_ACTION_ICON_GRAY;
 	}
 
 	return $total
 		? makeActionIcon([
-			'icon' => $icon_style,
+			'icon' => 'zi-bullet-right',
+			'color' => $color,
 			'button' => true,
 			'num' => $total,
 			'aria-label' => _xn('%1$s action', '%1$s actions', $total, 'screen reader', $total)
@@ -2188,27 +2192,27 @@ function makeEventDetailsTableUser(array $action, array $users) {
 function makeActionTableIcon(array $action) {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
-			return makeActionIcon(['icon' => ZBX_STYLE_PROBLEM_GENERATED, 'title' => _('Problem created')]);
+			return makeActionIcon(['icon' => 'zi-calendar-warning', 'title' => _('Problem created')]);
 
 		case ZBX_EVENT_HISTORY_RECOVERY_EVENT:
-			return makeActionIcon(['icon' => ZBX_STYLE_PROBLEM_RECOVERY, 'title' => _('Problem resolved')]);
+			return makeActionIcon(['icon' => 'zi-calendar-check', 'title' => _('Problem resolved')]);
 
 		case ZBX_EVENT_HISTORY_MANUAL_UPDATE:
 			$action_icons = [];
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 				$action_icons[] = makeActionIcon([
-					'icon' => ZBX_STYLE_ACTION_ICON_CLOSE,
+					'icon' => 'zi-checkbox',
 					'title' => _('Manually closed')
 				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK, 'title' => _('Acknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => 'zi-check', 'title' => _('Acknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK, 'title' => _('Unacknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => 'zi-uncheck', 'title' => _('Unacknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
@@ -2223,7 +2227,7 @@ function makeActionTableIcon(array $action) {
 				}
 
 				$action_icons[] = makeActionIcon([
-					'icon' => ZBX_STYLE_ACTION_ICON_SUPPRESS,
+					'icon' => 'zi-eye-off',
 					'button' => true,
 					'hint' => _s('Suppressed till: %1$s', $suppress_until)
 				]);
@@ -2231,13 +2235,13 @@ function makeActionTableIcon(array $action) {
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
 				$action_icons[] = makeActionIcon([
-					'icon' => ZBX_STYLE_ACTION_ICON_UNSUPPRESS,
+					'icon' => 'zi-eye',
 					'title' => _('Unsuppressed')
 				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_MSG, 'title' => _('Message')]);
+				$action_icons[] = makeActionIcon(['icon' => 'zi-alert-more', 'title' => _('Message')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
@@ -2256,8 +2260,8 @@ function makeActionTableIcon(array $action) {
 
 		case ZBX_EVENT_HISTORY_ALERT:
 			$action_icon = ($action['alerttype'] == ALERT_TYPE_COMMAND)
-					? ZBX_STYLE_ACTION_COMMAND
-					: ZBX_STYLE_ACTION_MESSAGE;
+					? 'zi-command'
+					: 'zi-envelope-filled';
 			$title = ($action['alerttype'] == ALERT_TYPE_COMMAND)
 				? _('Remote command')
 				: _('Alert message');

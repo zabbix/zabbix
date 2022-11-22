@@ -1867,6 +1867,13 @@ define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon'); // todo zi
+define('ZBX_STYLE_FONT_COLOR', '#1f2c33;'); // todo zi
+define('ZBX_STYLE_EVENT_ACTION_ICON_RED', '#e33734'); // todo zi
+define('ZBX_STYLE_EVENT_ACTION_ICON_YELLOW', '#af6b00'); // todo zi
+define('ZBX_STYLE_EVENT_ACTION_ICON_GRAY', '#768d99'); // todo zi
+define('ZBX_STYLE_ACTION_SEVERETY_CHANGED', '#768d99'); // todo zi
+define('ZBX_STYLE_ACTION_SEVERETY_DOWN', '#009900'); // todo zi
+define('ZBX_STYLE_ACTION_SEVERETY_UP', '#e33734'); // todo zi
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');

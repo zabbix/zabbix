@@ -244,6 +244,11 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				}
 			}
 		}
+		.zi-filter {
+			&::after {
+				display: none;
+			}
+		}
 	}
 
 	.icon-edit {

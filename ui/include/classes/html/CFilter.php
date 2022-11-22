@@ -223,7 +223,9 @@ class CFilter extends CDiv {
 		}
 
 		return $this->addTab(
-			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_FILTER_TRIGGER),
+			(new CLink($header, '#'.$anchor))
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
+				->addClass('zi-filter'),
 			(new CDiv($body))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
 				->setId($anchor)
@@ -279,7 +281,9 @@ class CFilter extends CDiv {
 			$anchor = 'tab_'.count($this->tabs);
 
 			$this->addTab(
-				(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
+				(new CLink($header, '#'.$anchor))
+					->addClass(ZBX_STYLE_BTN_TIME)
+					->addClass('zi-clock'),
 				(new CDiv([
 					(new CDiv([
 						new CList([

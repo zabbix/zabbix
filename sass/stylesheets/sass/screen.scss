@@ -28,6 +28,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
+@import "components/list-table";
 @import "components/buttons";
 @import "components/checkbox-list";
 @import "components/color-picker";
@@ -338,8 +339,6 @@ form {
 			margin: 0 0 -3px 4px;
 		}
 
-		.icon-depend-up,
-		.icon-depend-down,
 		.icon-ackn {
 			margin: 0 4px -3px 0;
 		}
@@ -413,7 +412,6 @@ form {
 							}
 
 							[class*='icon-depend-'],
-							.icon-description,
 							.icon-wizard-action {
 								background-color: transparent;
 							}
@@ -508,29 +506,12 @@ form {
 				}
 			}
 
-			.icon-depend-up,
-			.icon-depend-down {
-				width: 12px;
-			}
-
-			.icon-depend-up::before {
-				background-position: -49px -731px;
-			}
-
-			.icon-depend-down::before {
-				background-position: -49px -767px;
-			}
-
 			.icon-wizard-action {
 				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
 				margin: 0;
 				position: relative;
-			}
-
-			.icon-description {
-				margin-left: 2px;
 			}
 		}
 	}
@@ -1070,6 +1051,62 @@ form {
 .filter-btn-container {
 	position: relative;
 	text-align: right;
+
+	.zi-filter {
+		&::after {
+			padding-left: 8px;
+
+			vertical-align: middle;
+			font-size: 18px;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+
+	.zi-chevron-left,
+	.zi-chevron-right {
+		padding: 0 4px;
+		vertical-align: top;
+
+		border: none;
+		background-color: transparent;
+		border-radius: 2px;
+
+		color: $icon-header-controls-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			background-color: $btn-bg-color;
+			color: $btn-font-color;
+
+			&::before {
+				opacity: 1;
+			}
+		}
+
+		&::before {
+			top: -1px;
+			opacity: .75;
+		}
+	}
+
+	.zi-clock {
+		padding: 0 10px !important;
+
+		&::before {
+			display: none;
+		}
+		&::after {
+			top: -1px;
+			padding-left: 10px;
+			vertical-align: middle;
+
+			font-size: 18px;
+		}
+	}
 }
 
 .filter-container {
@@ -1968,7 +2005,6 @@ button {
 
 $icon-btn: (
 	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
-	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
 	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
@@ -1979,7 +2015,6 @@ $icon-btn: (
 
 // Dynamically generated classes:
 //  .btn-min
-//  .btn-add-fav
 //  .btn-remove-fav
 //  .btn-info
 //  .btn-dashboard-kioskmode-toggle-slideshow
@@ -2073,11 +2108,6 @@ $icon-widget-btn: (
 		min-height: 24px;
 		vertical-align: bottom;
 
-		&::after {
-			content: '';
-			position: absolute;
-		}
-
 		&:focus,
 		&:hover {
 			@include btn-hover-active($btn-font-color, $btn-bg-color);
@@ -2088,15 +2118,6 @@ $icon-widget-btn: (
 	.btn-info,
 	.btn-time {
 		padding: 0 34px 0 10px;
-
-		&::after {
-			margin: 0 5px;
-			right: 0;
-			top: 0;
-			height: 24px;
-			width: 24px;
-			background: url($sprite-path) no-repeat -87px -583px;
-		}
 	}
 
 	.btn-info {
@@ -2110,15 +2131,6 @@ $icon-widget-btn: (
 
 	.filter-trigger {
 		padding: 0 34px 0 10px;
-
-		&::after {
-			margin: 0 5px;
-			right: 0;
-			top: 0;
-			height: 24px;
-			width: 24px;
-			background: url($sprite-path) no-repeat -87px -547px;
-		}
 	}
 
 	.ui-state-focus {
@@ -2151,6 +2163,10 @@ $icon-widget-btn: (
 			padding: 1px 34px 7px 10px;
 		}
 
+		.filter-trigger {
+			padding: 1px 8px 7px 10px !important;
+		}
+
 		.btn-info {
 			&::after {
 				background-position: -279px -621px;
@@ -2158,17 +2174,8 @@ $icon-widget-btn: (
 			}
 		}
 
-		.btn-time {
-			&::after {
-				background-position: -246px -583px;
-				top: 1px;
-			}
-		}
-
-		.filter-trigger {
-			&::after {
-				background-position: -246px -547px;
-			}
+		.zi-clock {
+			padding: 0 10px 7px 10px !important;
 		}
 	}
 
@@ -2475,15 +2482,11 @@ button[disabled] {
 
 $var-icons: (
 	maintenance: url($sprite-path) no-repeat -47px -803px,
-	depend-up: url($sprite-path) no-repeat -47px -731px,
-	depend-down: url($sprite-path) no-repeat -47px -767px,
 	ackn: url($sprite-path) no-repeat -47px -694px
 );
 
 // Dynamically generated classes:
 //  .icon-maintenance
-//  .icon-depend-up
-//  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
@@ -5062,26 +5065,8 @@ a.icon-count {
 ::placeholder {
 	color: $input-placeholder-color;
 }
-
-.icon-action-command,
-.icon-action-close,
-.icon-action-msg,
-.icon-action-msgs,
-.icon-action-severity-up,
-.icon-action-severity-down,
-.icon-action-severity-changed,
-.icon-action-message,
-.icon-action-ack,
-.icon-action-unack,
-.icon-action-suppress,
-.icon-action-unsuppress,
+// todo ikonki
 .icon-invisible,
-.icon-problem-generated,
-.icon-problem-recovery,
-.icon-actions-number-gray,
-.icon-actions-number-yellow,
-.icon-actions-number-red,
-.icon-description,
 .icon-user,
 .icon-user-group {
 	display: inline-block;
@@ -5106,8 +5091,6 @@ a.icon-count {
 	}
 }
 
-.icon-action-suppress,
-.icon-action-unsuppress,
 .icon-invisible {
 	&:link,
 	&:hover,
@@ -5121,38 +5104,7 @@ a.icon-count {
 	}
 }
 
-button {
-	&.icon-action-command,
-	&.icon-action-close,
-	&.icon-action-msg,
-	&.icon-action-msgs,
-	&.icon-action-severity-up,
-	&.icon-action-severity-down,
-	&.icon-action-severity-changed,
-	&.icon-action-message,
-	&.icon-action-ack,
-	&.icon-action-suppress,
-	&.icon-action-unsuppress,
-	&.icon-problem-generated,
-	&.icon-problem-recovery,
-	&.icon-actions-number-gray,
-	&.icon-actions-number-yellow,
-	&.icon-actions-number-red {
-		background: none;
-		border: none;
-		padding: 0px;
-		margin: 0px;
-		margin-right: 5px;
-		min-height: 0px;
-		&::after {
-			left: 0px;
-			top: 4px;
-		}
-	}
-}
-
-[data-count][class*='icon-']::after,
-.icon-description::after {
+[data-count][class*='icon-']::after {
 	position: absolute;
 	top: -2px;
 	content: attr(data-count);
@@ -5163,125 +5115,8 @@ button {
 	width: 18px;
 }
 
-.icon-action-command::before {
-	background-position: -249px -245px;
-}
-
-.icon-action-close::before {
-	background-position: -224px -245px;
-}
-
-.icon-action-msg::before {
-	background-position: -299px -245px;
-}
-
-.icon-action-severity-up::before {
-	background-position: -349px -245px;
-}
-
-.icon-action-severity-down::before {
-	background-position: -374px -245px;
-}
-
-.icon-action-severity-changed::before {
-	background-position: -399px -245px;
-}
-
-.icon-action-message::before {
-	background-position: -199px -245px;
-}
-
-.icon-action-ack::before {
-	background-position: -323px -245px;
-}
-
-.icon-action-unack::before {
-	background-position: -173px -245px;
-}
-
-.icon-action-suppress::before {
-	background-position: -89px -803px;
-}
-
-.icon-action-unsuppress::before {
-	background-position: -89px -836px;
-}
-
 .icon-invisible::before {
 	background-position: -89px -803px;
-}
-
-.icon-problem-generated::before {
-	background-position: -449px -245px;
-}
-
-.icon-problem-recovery::before {
-	background-position: -424px -245px;
-}
-
-.icon-action-msgs {
-	&[data-count]::after {
-		color: $ui-bg-color;
-	}
-
-	&::before {
-		background-position: -474px -245px;
-	}
-}
-
-.icon-actions-number-gray {
-	&[data-count]::after {
-		color: $font-color;
-	}
-
-	&::before {
-		background-position: -499px -245px;
-	}
-}
-
-.icon-actions-number-yellow {
-	&[data-count]::after {
-		color: $font-color;
-	}
-
-	&::before {
-		background-position: -549px -245px;
-	}
-}
-
-.icon-actions-number-red {
-	&[data-count]::after {
-		color: $font-color;
-	}
-
-	&::before {
-		background-position: -524px -245px;
-	}
-}
-
-.icon-description {
-	margin: 0 0 -5px 5px;
-	vertical-align: baseline;
-	border-radius: 2px;
-
-	&:link,
-	&:hover,
-	&:focus {
-		border-bottom: none;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-border-focus-color;
-	}
-
-	&::after {
-		content: '?';
-		color: $ui-bg-color;
-	}
-
-	&::before {
-		background-position: -474px -245px;
-	}
 }
 
 .icon-user,

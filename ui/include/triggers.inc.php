@@ -2417,7 +2417,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 	foreach (['down', 'up'] as $type) {
 		if (array_key_exists($type, $dependencies)) {
 			$header = ($type === 'down') ? _('Depends on') : _('Dependent');
-			$class = ($type === 'down') ? ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP; // todo zi
+			$class = ($type === 'down') ? 'zi-bullet-alt-down' : 'zi-bullet-alt-up'; // todo zi
 
 			$table = (new CTableInfo())
 				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -2427,7 +2427,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CLink())
+			$result[] = (new CButton())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);
