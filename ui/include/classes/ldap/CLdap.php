@@ -93,7 +93,7 @@ class CLdap {
 
 	/**
 	 * Placeholders with value used for building bind or search filter query.
-	 * Key is placholder name, %{attr} and value is placeholder value to replace to.
+	 * Key is placeholder name, %{attr} and value is placeholder value to replace to.
 	 *
 	 * @var array
 	 */

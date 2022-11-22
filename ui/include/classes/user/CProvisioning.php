@@ -30,7 +30,7 @@ class CProvisioning {
 	 * User directory data array.
 	 *
 	 * @var int    $userdirectory['userdirectoryid']
-	 * @var int    $userdirectory['provisioin_status']
+	 * @var int    $userdirectory['provision_status']
 	 * @var string $userdirectory['user_username']
 	 * @var string $userdirectory['user_lastname']
 	 * @var string $userdirectory['search_attribute']
