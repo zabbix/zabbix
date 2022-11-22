@@ -548,8 +548,8 @@ class CEvent extends CApiService {
 	 *                                       	 - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
 	 *                                       	 - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
 	 *                                       	 - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
-	 *                                           - 0x80  - ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
-	 *                                           - 0x100 - ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+	 *                                           - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                           - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
 	 * @return array
 	 */
@@ -564,7 +564,7 @@ class CEvent extends CApiService {
 		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
 		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 		$has_change_rank_to_symptom_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM);
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
 
 		// Validation of event permissions has already been done in validateAcknowledge().
 		$events = $this->get([
@@ -652,17 +652,17 @@ class CEvent extends CApiService {
 				$unsuppress_eventids[] = $eventid;
 			}
 
-			// Perform ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+			// Perform ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE action flag.
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 					&& $event['cause_eventid'] != 0) {
-				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE;
+				$action |= ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE;
 				$tasks_update_event_rank_cause[$n] = ['eventid' => $eventid];
 			}
 
-			// Perform ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM action flag.
+			// Perform ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM action flag.
 			if ($has_change_rank_to_symptom_action && $update_symptom_eventids
 					&& in_array($eventid, $update_symptom_eventids)) {
-				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
+				$action |= ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 				$tasks_update_event_rank_symptom[$n] = [
 					'eventid' => $eventid,
 					'cause_eventid' => $data['cause_eventid']
@@ -841,7 +841,7 @@ class CEvent extends CApiService {
 				$acknowledgement = $acknowledges[$k];
 
 				if (($acknowledgement['action']
-						& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) {
+						& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
 					$tasks[$k] = [
 						'type' => ZBX_TM_TASK_DATA,
 						'status' => ZBX_TM_STATUS_NEW,
@@ -891,7 +891,7 @@ class CEvent extends CApiService {
 				$acknowledgement = $acknowledges[$k];
 
 				if (($acknowledgement['action']
-						& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+						& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
 					$tasks[$k] = [
 						'type' => ZBX_TM_TASK_DATA,
 						'status' => ZBX_TM_STATUS_NEW,
@@ -952,8 +952,8 @@ class CEvent extends CApiService {
 	 *                                                - 0x10  - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
 	 *                                                - 0x20  - ZBX_PROBLEM_UPDATE_SUPPRESS
 	 *                                                - 0x40  - ZBX_PROBLEM_UPDATE_UNSUPPRESS
-	 *                                                - 0x80  - ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
-	 *                                                - 0x100 - ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+	 *                                                - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+	 *                                                - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
 	 * @throws APIException                          If the input is invalid.
 	 */
@@ -968,8 +968,8 @@ class CEvent extends CApiService {
 
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
 				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
-				| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
-				| ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
+				| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+				| ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$has_ack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
@@ -979,9 +979,9 @@ class CEvent extends CApiService {
 		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
 		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 		$has_rank_change_to_cause_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE);
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE);
 		$has_change_rank_to_symptom_action =
-			(($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM);
+			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
 
 		// "cause_eventid" should only be accessible if a cause event is converted to symptom event.
 		if ($has_change_rank_to_symptom_action) {
@@ -1070,8 +1070,8 @@ class CEvent extends CApiService {
 
 		if ($has_rank_change_to_cause_action && $has_change_rank_to_symptom_action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE,
-					ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
+					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 				]))
 			));
 		}

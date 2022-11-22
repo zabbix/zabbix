@@ -37,7 +37,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
 			'suppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SUPPRESS,
 			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS,
-			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 		];
 
 		$ret = $this->validateInput($fields);

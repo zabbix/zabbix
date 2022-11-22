@@ -280,10 +280,10 @@ function getEventStatusString(bool $in_closing, array $event): string {
 			$in_updating = false;
 
 			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) ==
-						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
-						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
-						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
+						ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
+						ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
 
 					// If currently is symptom and there is an active task.
 					if ($acknowledge['taskid'] != 0) {

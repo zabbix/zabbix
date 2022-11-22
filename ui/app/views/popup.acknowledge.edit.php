@@ -134,7 +134,7 @@ if ($data['allowed_change_problem_ranking']) {
 		(new CLabel([_('Convert to cause'),
 			makeHelpIcon(_('Converts a symptom event back to cause event'))
 		])),
-		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE))
+		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
 	);
 }
 

@@ -101,7 +101,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			'suppress_time_option' =>	'in '.ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE.','.ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE,
 			'suppress_until_problem' => 'range_time',
 			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS,
-			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 		];
 
 		$ret = $this->validateInput($fields);
@@ -122,7 +122,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 		$this->change_rank = $this->getInput('change_rank', ZBX_PROBLEM_UPDATE_NONE);
 
-		if ($ret && $this->change_rank == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+		if ($ret && $this->change_rank == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 				&& !$this->hasInput('cause_eventid')) {
 			error(_s('Field "%1$s" is mandatory.', 'cause_eventid'));
 			$ret = false;
@@ -200,10 +200,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			? ($this->getInput('unsuppress_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_UNSUPPRESS)
 			: false;
 		$this->rank_change_to_cause = $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
-			? ($this->change_rank == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE)
+			? ($this->change_rank == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE)
 			: false;
 		$this->rank_change_to_symptom = $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
-			? ($this->change_rank == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM)
+			? ($this->change_rank == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)
 			: false;
 
 		$eventids = array_flip($this->getInput('eventids'));
@@ -542,7 +542,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				$data['eventids'] = $eventid_groups['readable'];
 			}
 
-			$data['action'] |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE;
 		}
 
 		if ($this->rank_change_to_symptom) {
@@ -550,7 +550,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				$data['eventids'] = $eventid_groups['readable'];
 			}
 
-			$data['action'] |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
+			$data['action'] |= ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 			$data['cause_eventid'] = $this->getInput('cause_eventid');
 		}
 

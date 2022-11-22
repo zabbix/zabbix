@@ -823,8 +823,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 		 * displayed.
 		 */
 		if (typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause) {
-			// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.
-			const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE = 0x80;
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.
+			const ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE = 0x80;
 
 			items[items.length] = {
 				label: t('Mark as cause'),
@@ -836,7 +836,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 						headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
 						body: urlEncodeData({
 							eventids: [options.eventid],
-							change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 						})
 					})
 						.then((response) => response.json())
@@ -869,8 +869,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		// Dashboard does not have checkboxes. So it is not possible to mark problems and change rank to symptom.
 		if (typeof options.show_rank_change_symptom !== 'undefined' && options.show_rank_change_symptom) {
-			// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM.
-			const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM = 0x100;
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM.
+			const ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM = 0x100;
 
 			items[items.length] = {
 				label: t('Mark selected as symptoms'),
@@ -883,7 +883,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 						body: urlEncodeData({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
-							change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 						})
 					})
 						.then((response) => response.json())

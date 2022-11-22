@@ -2204,12 +2204,12 @@ function makeActionTableIcon(array $action) {
 			}
 
 			if (($action['action']
-					& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) {
+					& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_CAUSE, 'title' => _('Cause')]);
 			}
 
 			if (($action['action']
-					& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+					& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')]);
 			}
 
