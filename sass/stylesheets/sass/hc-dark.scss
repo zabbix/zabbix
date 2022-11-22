@@ -386,12 +386,6 @@ $arrow-fill-up-down: #FFFFFF;
 		border: 2px dashed $font-color;
 		box-shadow: none;
 		background: darken($body-bg-color, 6%);
-
-		.dashboard-widget-placeholder-label {
-			&::before {
-				background: url($sprite-path) no-repeat -457px -888px;
-			}
-		}
 	}
 }
 

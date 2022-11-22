@@ -144,6 +144,7 @@ function get_icon($type, $params = []) {
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV) // todo zi
+					->addClass('zi-star-filled') // todo zi
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
@@ -165,6 +166,7 @@ function get_icon($type, $params = []) {
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
+					->addClass('zi-minimize')
 					->addClass(ZBX_STYLE_BTN_MIN); // todo zi
 			}
 			else {

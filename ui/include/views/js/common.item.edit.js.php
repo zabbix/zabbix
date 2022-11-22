@@ -211,7 +211,7 @@
 					'buttons': [
 						{
 							title: <?= json_encode(_('Ok')); ?>,
-							class: 'btn-alt', // todo zi
+							class: 'btn-alt',
 							focused: true,
 							action: function() {}
 						}

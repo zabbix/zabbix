@@ -60,13 +60,20 @@ header {
 			@extend %button-icon-size;
 		}
 
-		.zi-star {
+		.zi-star,
+		.zi-star-filled {
 			vertical-align: middle;
 			font-size: 0;
 			padding: 0;
 
 			&::before {
 				padding: 0 2px;
+			}
+		}
+
+		.zi-star-filled {
+			&::before {
+				color: $icon-remove-fav-color;
 			}
 		}
 	}

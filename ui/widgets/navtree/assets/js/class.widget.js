@@ -580,6 +580,7 @@ class CWidgetNavTree extends CWidget {
 			const drag = document.createElement('div');
 
 			drag.classList.add('drag-icon'); // todo zi
+			drag.classList.add('zi-drag-handle'); // todo zi
 			content.appendChild(drag);
 		}
 

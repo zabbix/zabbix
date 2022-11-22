@@ -1052,6 +1052,15 @@ form {
 	position: relative;
 	text-align: right;
 
+	.zi-circle-info {
+		&::after {
+			padding-left: 10px;
+			font-size: 18px;
+			top: -1px;
+			vertical-align: top;
+		}
+	}
+
 	.zi-filter {
 		&::after {
 			padding-left: 8px;
@@ -2054,9 +2063,6 @@ button {
 }
 
 $icon-btn: (
-	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
-	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
-	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
 	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
@@ -2064,9 +2070,6 @@ $icon-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-min
-//  .btn-remove-fav
-//  .btn-info
 //  .btn-dashboard-kioskmode-toggle-slideshow
 //  .btn-dashboard-kioskmode-previous-page
 //  .btn-dashboard-kioskmode-next-page
@@ -2167,20 +2170,11 @@ $icon-widget-btn: (
 
 	.btn-info,
 	.btn-time {
-		padding: 0 34px 0 10px;
-	}
-
-	.btn-info {
-		width: initial;
-		background-image: none;
-
-		&::after {
-			background: url($sprite-path) no-repeat -431px -621px;
-		}
+		padding: 0 10px;
 	}
 
 	.filter-trigger {
-		padding: 0 34px 0 10px;
+		padding: 0 8px 0 10px;
 	}
 
 	.ui-state-focus {
@@ -2210,7 +2204,7 @@ $icon-widget-btn: (
 			border-bottom: 0;
 			border-radius: 2px 2px 0 0;
 			margin: -1px 0 0 6px;
-			padding: 1px 34px 7px 10px;
+			padding: 1px 10px 7px 10px;
 		}
 
 		.filter-trigger {
@@ -2380,13 +2374,11 @@ $icon-widget-btn: (
 
 .calendar-control {
 	.zi-calendar {
-		background-color: transparent;
-		border: none;
-		border-radius: 2px;
-
 		position: relative;
 		top: -1px;
 		padding: 0 1px;
+
+		@extend %btn-reset;
 
 		opacity: .7;
 
@@ -2427,6 +2419,11 @@ $icon-widget-btn: (
 		li {
 			margin-right: 10px;
 		}
+	}
+
+	.zi-minimize {
+		padding: 0 2px;
+		font-size: 0;
 	}
 }
 
@@ -2528,6 +2525,10 @@ button[disabled] {
 
 	button {
 		margin: 0 10px 10px 0;
+	}
+
+	.zi-chevron-down {
+		top: -1px;
 	}
 }
 
@@ -3254,16 +3255,6 @@ $form-icon-btn: (
 		border-top-left-radius: 0;
 		border-bottom-left-radius: 0;
 
-		&::after {
-			background: url($sprite-path) no-repeat -47px -478px; // todo zi elaborate
-			content: '';
-			position: absolute;
-			left: 3px;
-			top: 4px;
-			height: 14px;
-			width: 15px;
-		}
-
 		&:not([disabled]):not([readonly]) {
 			background-color: $form-bg-color;
 			border-color: $form-border-color;
@@ -3287,6 +3278,13 @@ $form-icon-btn: (
 
 		button::after {
 			opacity: .5;
+		}
+	}
+
+	.zi-pencil {
+		padding: 0 2px;
+		&::before {
+			color: $icon-header-controls-color;
 		}
 	}
 }
@@ -5589,18 +5587,10 @@ a.icon-count {
 		}
 
 		.zi-chevron-down {
-			vertical-align: top;
+			padding: 0 5px;
+			vertical-align: middle;
 			line-height: 0;
 			font-size: 0;
-
-			&::before {
-				font-size: 17px;
-			}
-
-			@extend %button-icon-size;
-		}
-
-		.zi-chevron-down {
 			position: relative;
 			background-color: transparent;
 

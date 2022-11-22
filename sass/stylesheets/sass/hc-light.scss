@@ -359,12 +359,6 @@ $arrow-fill-up-down: #000000;
 	.dashboard-widget-placeholder-resizing {
 		border: 2px dashed $font-color;
 		box-shadow: none;
-
-		.dashboard-widget-placeholder-label {
-			&::before {
-				background: url($sprite-path) no-repeat -401px -888px;
-			}
-		}
 	}
 }
 

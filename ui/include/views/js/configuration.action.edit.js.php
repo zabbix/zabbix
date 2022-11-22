@@ -1084,7 +1084,7 @@
 			action: () => this.onsubmit()
 		}, {
 			title: t('Cancel'),
-			class: 'btn-alt', // todo zi
+			class: 'btn-alt',
 			cancel: true,
 			action: () => this.trigger_element.focus()
 		}];

@@ -294,6 +294,22 @@
 		flex: 1;
 		position: relative;
 		overflow: hidden;
+
+		.zi-widget-add,
+		.zi-widget-resize {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			span {
+				padding: 0 0 20px 0;
+				text-align: center;
+			}
+			&::before {
+				padding: 26px;
+				font-size: 48px;
+			}
+		}
 	}
 
 	.dashboard-widget-placeholder-label {
@@ -301,39 +317,17 @@
 
 		position: absolute;
 		left: 0;
-		top: calc(50% - #{$icon-height / 2});
+		top: 50%;
+		transform: translate(0, -50%);
 		right: 0;
 		bottom: 0;
-		padding: ($icon-height + 10px) 5px 5px;
+
 		text-align: center;
-
-		&::before {
-			background: url($sprite-path) no-repeat -157px -888px;
-			content: ' ';
-			height: $icon-height;
-			width: 36px;
-			position: absolute;
-			top: 0;
-			left: 50%;
-			transform: translateX(-50%);
-		}
-
-		span {
-			&.hidden {
-				display: none;
-			}
-		}
 	}
 
 	.dashboard-widget-placeholder-resizing {
 		background: darken($body-bg-color, 6%);
 		box-shadow: inset 2px 2px 6px $action-shadow-color;
-
-		.dashboard-widget-placeholder-label {
-			&::before {
-				background: url($sprite-path) no-repeat -345px -888px;
-			}
-		}
 	}
 
 	&.disabled {
@@ -341,10 +335,6 @@
 
 		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
-
-			.dashboard-widget-placeholder-label::before {
-				background: url($sprite-path) no-repeat -122px -284px;
-			}
 		}
 	}
 

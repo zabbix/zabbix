@@ -1002,7 +1002,7 @@
 			'content': jQuery('<span>').html(msg),
 			'buttons': [{
 				title: httpconf.msg.ok,
-				class: 'btn-alt', // todo zi
+				class: 'btn-alt',
 				focused: true,
 				action: function() {}
 			}]
@@ -1147,7 +1147,7 @@
 		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 
 		url.setArgument('validate', 1);
-		this.$form.parent().find('.msg-bad, .msg-good').remove(); // todo zi
+		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		var curr_pairs = this.stepPairsData();
 

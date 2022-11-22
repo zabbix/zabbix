@@ -251,12 +251,12 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		}
 	}
 
-	.icon-edit {
+	.zi-cog-filled {
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
-		background: url($sprite-path) no-repeat -42px -621px;
 
+		color: $icon-header-controls-color;
 		cursor: pointer;
 		margin: 0;
 		padding-bottom: 7px !important;

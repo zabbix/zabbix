@@ -54,7 +54,9 @@ $filter = (new CFilter())
 if ($data['service'] !== null && !$data['is_filtered']) {
 	$filter
 		->addTab(
-			(new CLink(_('Info'), '#tab_info'))->addClass(ZBX_STYLE_BTN_INFO), // todo zi
+			(new CLink(_('Info'), '#tab_info'))
+				->addClass(ZBX_STYLE_BTN_INFO)
+				->addClass('zi-circle-info'),
 			(new CDiv())
 				->setId('tab_info')
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)

@@ -366,7 +366,7 @@ $toc-title-bg-color: #4f4f4f;
 	.ui-tabs-active {
 		.btn-info {
 			&::after {
-				background: url($sprite-path) no-repeat -431px -621px;
+				background: url($sprite-path) no-repeat -431px -621px; // todo zi
 			}
 		}
 
