@@ -201,7 +201,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Aggregation interval' => '20y',
 							'Item' => 'Available memory'
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #4 several item columns with different display, time shift, min/max and history data.
@@ -794,31 +795,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
 					]
 				]
-			],
-			// #30 take a screenshot to check draggable element.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'main_fields' =>  [
-						'Name' => 'Screenshot'
-					],
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Name' => 'This is item name',
-							'Item' => 'Available memory'
-						],
-						[
-							'Data' => 'Host name',
-							'Name' => 'This is host name',
-						],
-						[
-							'Data' => 'Text',
-							'Name' => 'This is name for a text',
-							'Text' => 'Here is some text'
-						]
-					]
-				]
 			]
 		];
 	}
@@ -847,9 +823,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->setTags($data['tags']);
 		}
 
-		// Take a screenshot to test draggable object position.
-		if (array_key_exists('Name', $data['main_fields']) && ($data['main_fields']['Name']) === 'Screenshot') {
-			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top_hosts_columns');
+		// Take a screenshot to test draggable object position of columns.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
 		$form->fill($data['main_fields']);

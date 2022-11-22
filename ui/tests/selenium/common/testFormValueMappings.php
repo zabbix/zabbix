@@ -245,8 +245,7 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'default value'
 						]
 					],
-					'screenshot_id' => 'ValuemapScreenshot1',
-					'screenshot_mappings' => true
+					'screenshot_id' => 'ValuemapScreenshot1'
 				]
 			],
 			// Successful creation/update of value mapping with empty value field.
@@ -857,11 +856,6 @@ class testFormValueMappings extends CWebTest {
 				$mapping_table->query('button:Add')->one()->click();
 			}
 			$mapping_table->fill($data['mappings']);
-				// Take a screenshot to test draggable object position.
-				if (CTestArrayHelper::get($data, 'screenshot_mappings') && $action === 'create') {
-				$this->page->removeFocus();
-				$this->assertScreenshot($mapping_table, 'Value_mappings'.$source);
-				}
 		}
 		$dialog->submit();
 
@@ -885,8 +879,15 @@ class testFormValueMappings extends CWebTest {
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
 
-			// Check the screenshot of the whole value mappings tab.
+			// Check the value mapping screenshots after form submit.
 			if (CTestArrayHelper::get($data, 'screenshot_id')) {
+				// Take a screenshot to test draggable object position in overlay dialog.
+				if ($action === 'create') {
+					$this->page->removeFocus();
+					$this->assertScreenshot($mapping_table, 'Value mappings popup'.$data['screenshot_id']);
+				}
+
+				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
 			}
@@ -1095,5 +1096,34 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
+	}
+
+	/**
+	 * Function that checks a screenshot of draggable element in hosts/templates value mapping while mass updating.
+	 *
+	 * @param string $source		Entity (hosts or templates) for which the scenario is executed.
+	 */
+	public function checkMassValuemappingScreenshot($source) {
+
+		if ($source === 'hosts') {
+			$this->page->login()->open('zabbix.php?action=host.list');
+		}
+		else {
+			$this->page->login()->open('templates.php');
+		}
+
+		$form = $this->query('name:'.$source)->asForm()->waitUntilVisible()->one();
+		$form->query('id:all_'.$source)->asCheckbox()->one()->check();
+		$form->query('button:Mass update')->one()->click();
+		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$update_form->selectTab('Value mapping');
+		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
+		$update_form->query('id:valuemap_add')->one()->click();
+		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		// Take a screenshot to test draggable object position of value mapping field.
+		$this->page->removeFocus();
+		// It is necessary because of unexpected viewport shift.
+		$this->page->updateViewport();
+		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilPresent()->one(), 'Value mapping mass update');
 	}
 }
