@@ -41,21 +41,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Warning' => 'Warning',
 		'Average' => 'Average',
 		'High' => 'High',
-		'Disaster' => 'Disaster'
-
-	];
-
-	public $color_default = [
-		'id:lbl_problem_unack_color' => 'CC0000',
-		'id:lbl_problem_ack_color'=> 'CC0000',
-		'id:lbl_ok_unack_color'=> '009900',
-		'id:lbl_ok_ack_color'=> '009900',
-		'id:lbl_severity_color_0' => '97AAB3',
-		'id:lbl_severity_color_1' => '7499FF',
-		'id:lbl_severity_color_2' => 'FFC859' ,
-		'id:lbl_severity_color_3' => 'FFA059',
-		'id:lbl_severity_color_4' => 'E97659',
-		'id:lbl_severity_color_5' => 'E45959'
+		'Disaster' => 'Disaster',
+		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'CC0000',
+		'xpath://button[@id="lbl_problem_ack_color"]/..'=> 'CC0000',
+		'xpath://button[@id="lbl_ok_unack_color"]/..'=> '009900',
+		'xpath://button[@id="lbl_ok_ack_color"]/..'=> '009900',
+		'xpath://button[@id="lbl_severity_color_0"]/..' => '97AAB3',
+		'xpath://button[@id="lbl_severity_color_1"]/..' => '7499FF',
+		'xpath://button[@id="lbl_severity_color_2"]/..' => 'FFC859' ,
+		'xpath://button[@id="lbl_severity_color_3"]/..' => 'FFA059',
+		'xpath://button[@id="lbl_severity_color_4"]/..' => 'E97659',
+		'xpath://button[@id="lbl_severity_color_5"]/..' => 'E45959'
 	];
 
 	public $db_default_values = [
@@ -97,25 +93,22 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Warning' => 'Custom Warning',
 		'Average' => 'Custom Average',
 		'High' => 'Custom High',
-		'High' => 'Custom Disaster'
-	];
-
-	public $color_custom = [
-//		This should be changed to really custom values after DEV-1673 is fixed.
-//		'id:lbl_problem_unack_color' => 'D81B60',
-//		'id:lbl_problem_ack_color' => 'F8BBD0',
-//		'id:lbl_ok_unack_color' => '1A237E',
-//		'id:lbl_ok_ack_color' => 'B3E5FC',
-		'id:lbl_problem_unack_color' => 'CC0000',
-		'id:lbl_problem_ack_color'=> 'CC0000',
-		'id:lbl_ok_unack_color'=> '009900',
-		'id:lbl_ok_ack_color'=> '009900',
-		'id:lbl_severity_color_0' => 'E8EAF6',
-		'id:lbl_severity_color_1' => 'D1C4E9',
-		'id:lbl_severity_color_2' => 'B39DDB' ,
-		'id:lbl_severity_color_3' => '9575CD',
-		'id:lbl_severity_color_4' => '673AB7',
-		'id:lbl_severity_color_5' => '4527A0'
+		'High' => 'Custom Disaster',
+		// TODO: This should be changed to really custom values after DEV-1673 is fixed.
+//		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'D81B60',
+//		'xpath://button[@id="lbl_problem_ack_color"]/..' => 'F8BBD0',
+//		'xpath://button[@id="lbl_ok_unack_color"]/..' => '1A237E',
+//		'xpath://button[@id="lbl_ok_ack_color"]/..' => 'B3E5FC',
+		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'CC0000',
+		'xpath://button[@id="lbl_problem_ack_color"]/..'=> 'CC0000',
+		'xpath://button[@id="lbl_ok_unack_color"]/..'=> '009900',
+		'xpath://button[@id="lbl_ok_ack_color"]/..'=> '009900',
+		'xpath://button[@id="lbl_severity_color_0"]/..' => 'E8EAF6',
+		'xpath://button[@id="lbl_severity_color_1"]/..' => 'D1C4E9',
+		'xpath://button[@id="lbl_severity_color_2"]/..' => 'B39DDB' ,
+		'xpath://button[@id="lbl_severity_color_3"]/..' => '9575CD',
+		'xpath://button[@id="lbl_severity_color_4"]/..' => '673AB7',
+		'xpath://button[@id="lbl_severity_color_5"]/..' => '4527A0'
 	];
 
 	/**
@@ -211,8 +204,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 * Test for checking 'Reset defaults' button.
 	 */
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetButton() {
-		// Variable $check_color set as true because color hex value should be checked.
-		$this->executeResetButtonTest(false, true);
+		$this->executeResetButtonTest(false);
 	}
 
 	/**
@@ -237,19 +229,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => 'Test Warning',
 						'Average' => 'Test Average',
 						'High' => 'Test High',
-						'Disaster' => 'Test Disaster'
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => 'D81B60',
-						'id:lbl_problem_ack_color' => 'F8BBD0',
-						'id:lbl_ok_unack_color' => '1A237E',
-						'id:lbl_ok_ack_color' => 'B3E5FC',
-						'id:lbl_severity_color_0' => 'E8EAF6',
-						'id:lbl_severity_color_1' => 'D1C4E9',
-						'id:lbl_severity_color_2' => 'B39DDB' ,
-						'id:lbl_severity_color_3' => '9575CD',
-						'id:lbl_severity_color_4' => '673AB7',
-						'id:lbl_severity_color_5' => '4527A0'
+						'Disaster' => 'Test Disaster',
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'D81B60',
+						'xpath://button[@id="lbl_problem_ack_color"]/..' => 'F8BBD0',
+						'xpath://button[@id="lbl_ok_unack_color"]/..' => '1A237E',
+						'xpath://button[@id="lbl_ok_ack_color"]/..' => 'B3E5FC',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => 'E8EAF6',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => 'D1C4E9',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => 'B39DDB' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '9575CD',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '673AB7',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => '4527A0'
 					],
 					'db' => [
 						'custom_color' => 1,
@@ -303,19 +293,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => '000000',
-						'id:lbl_problem_ack_color' => '000000',
-						'id:lbl_ok_unack_color' => '000000',
-						'id:lbl_ok_ack_color' => '000000',
-						'id:lbl_severity_color_0' => '000000',
-						'id:lbl_severity_color_1' => '000000',
-						'id:lbl_severity_color_2' => '000000' ,
-						'id:lbl_severity_color_3' => '000000',
-						'id:lbl_severity_color_4' => '000000',
-						'id:lbl_severity_color_5' => '000000'
+						'Use custom event status colors' => true,
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => '000000',
+						'xpath://button[@id="lbl_problem_ack_color"]/..' => '000000',
+						'xpath://button[@id="lbl_ok_unack_color"]/..' => '000000',
+						'xpath://button[@id="lbl_ok_ack_color"]/..' => '000000',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => '000000',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => '000000',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => '000000' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '000000',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '000000',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => '000000'
 					],
 					'db' => [
 						'custom_color' => 1,
@@ -337,19 +325,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => 'AAAAAA',
-						'id:lbl_problem_ack_color' => 'BBBBBB',
-						'id:lbl_ok_unack_color' => 'CCCCCC',
-						'id:lbl_ok_ack_color' => 'ABCDEF',
-						'id:lbl_severity_color_0' => 'AAAAAA',
-						'id:lbl_severity_color_1' => 'BBBBBB',
-						'id:lbl_severity_color_2' => 'CCCCCC' ,
-						'id:lbl_severity_color_3' => 'DDDDDD',
-						'id:lbl_severity_color_4' => 'EEEEEE',
-						'id:lbl_severity_color_5' => 'DEDEDE'
+						'Use custom event status colors' => true,
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'AAAAAA',
+						'xpath://button[@id="lbl_problem_ack_color"]/..' => 'BBBBBB',
+						'xpath://button[@id="lbl_ok_unack_color"]/..' => 'CCCCCC',
+						'xpath://button[@id="lbl_ok_ack_color"]/..' => 'ABCDEF',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => 'AAAAAA',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => 'BBBBBB',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => 'CCCCCC' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => 'DDDDDD',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => 'EEEEEE',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => 'DEDEDE'
 					],
 					'db' => [
 						'custom_color' => 1,
@@ -377,19 +363,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
 						'Average' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 						'High' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => '999999',
-						'id:lbl_problem_ack_color' => '999999',
-						'id:lbl_ok_unack_color' => '999999',
-						'id:lbl_ok_ack_color' => '999999',
-						'id:lbl_severity_color_0' => '999999',
-						'id:lbl_severity_color_1' => '999999',
-						'id:lbl_severity_color_2' => '999999' ,
-						'id:lbl_severity_color_3' => '999999',
-						'id:lbl_severity_color_4' => '999999',
-						'id:lbl_severity_color_5' => '999999'
+						'Disaster' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => '999999',
+						'xpath://button[@id="lbl_problem_ack_color"]/..' => '999999',
+						'xpath://button[@id="lbl_ok_unack_color"]/..' => '999999',
+						'xpath://button[@id="lbl_ok_ack_color"]/..' => '999999',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => '999999',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => '999999',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => '999999' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '999999',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '999999',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => '999999'
 					],
 					'db' => [
 						'custom_color' => 1,
@@ -700,19 +684,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'fields' =>  [
 						'Use custom event status colors' => true,
 						'Display OK triggers for' => '!@#$%^&*()_+',
-						'On status change triggers blink for' => '!@#$%^&*()_+'
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => '!@#$%^&*()_+',
-						'id:lbl_problem_ack_color' => '!@#$%^&*()_+',
-						'id:lbl_ok_unack_color' => '!@#$%^&*()_+',
-						'id:lbl_ok_ack_color' => '!@#$%^&*()_+',
-						'id:lbl_severity_color_0' => '!@#$%^&*()_+',
-						'id:lbl_severity_color_1' => '!@#$%^&*()_+',
-						'id:lbl_severity_color_2' => '!@#$%^&*()_+' ,
-						'id:lbl_severity_color_3' => '!@#$%^&*()_+',
-						'id:lbl_severity_color_4' => '!@#$%^&*()_+',
-						'id:lbl_severity_color_5' => '!@#$%^&*()_+'
+						'On status change triggers blink for' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_problem_ack_color"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_ok_unack_color"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_ok_ack_color"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => '!@#$%^&*()_+' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '!@#$%^&*()_+',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => '!@#$%^&*()_+'
 					],
 					'details' => [
 						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
@@ -743,19 +725,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Warning' => '',
 						'Average' => '',
 						'High' => '',
-						'Disaster' => ''
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => '',
-						'id:lbl_problem_ack_color'=> '',
-						'id:lbl_ok_unack_color'=> '',
-						'id:lbl_ok_ack_color'=> '',
-						'id:lbl_severity_color_0' => '',
-						'id:lbl_severity_color_1' => '',
-						'id:lbl_severity_color_2' => '' ,
-						'id:lbl_severity_color_3' => '',
-						'id:lbl_severity_color_4' => '',
-						'id:lbl_severity_color_5' => ''
+						'Disaster' => '',
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => '',
+						'xpath://button[@id="lbl_problem_ack_color"]/..'=> '',
+						'xpath://button[@id="lbl_ok_unack_color"]/..'=> '',
+						'xpath://button[@id="lbl_ok_ack_color"]/..'=> '',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => '',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => '',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => '' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => ''
 					],
 					'details' => [
 						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
@@ -786,19 +766,17 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					'fields' =>  [
 						'Use custom event status colors' => true,
 						'Display OK triggers for' => '-1',
-						'On status change triggers blink for' => '-1'
-					],
-					'color' => [
-						'id:lbl_problem_unack_color' => '-1    ',
-						'id:lbl_problem_ack_color'=> '-1    ',
-						'id:lbl_ok_unack_color'=> '-1    ',
-						'id:lbl_ok_ack_color'=> '-1    ',
-						'id:lbl_severity_color_0' => '-1    ',
-						'id:lbl_severity_color_1' => '-1    ',
-						'id:lbl_severity_color_2' => '-1    ' ,
-						'id:lbl_severity_color_3' => '-1    ',
-						'id:lbl_severity_color_4' => '-1    ',
-						'id:lbl_severity_color_5' => '-1    '
+						'On status change triggers blink for' => '-1',
+						'xpath://button[@id="lbl_problem_unack_color"]/..' => '-1    ',
+						'xpath://button[@id="lbl_problem_ack_color"]/..'=> '-1    ',
+						'xpath://button[@id="lbl_ok_unack_color"]/..'=> '-1    ',
+						'xpath://button[@id="lbl_ok_ack_color"]/..'=> '-1    ',
+						'xpath://button[@id="lbl_severity_color_0"]/..' => '-1    ',
+						'xpath://button[@id="lbl_severity_color_1"]/..' => '-1    ',
+						'xpath://button[@id="lbl_severity_color_2"]/..' => '-1    ' ,
+						'xpath://button[@id="lbl_severity_color_3"]/..' => '-1    ',
+						'xpath://button[@id="lbl_severity_color_4"]/..' => '-1    ',
+						'xpath://button[@id="lbl_severity_color_5"]/..' => '-1    '
 					],
 					'details' => [
 						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',

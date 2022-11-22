@@ -31,6 +31,11 @@
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern struct zbx_db_version_info_t	db_version_info;
+
+#if defined(HAVE_POSTGRESQL)
+extern int	ZBX_TSDB_VERSION;
+#endif
 
 static int	hk_period;
 
@@ -563,6 +568,22 @@ out:
 #endif
 }
 
+#if defined(HAVE_POSTGRESQL)
+static void	hk_update_dbversion_status(void)
+{
+	struct zbx_json	db_version_json;
+
+	zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_tsdb_update_dbversion_info(&db_version_info);
+
+	zbx_db_version_json_create(&db_version_json, &db_version_info);
+	zbx_db_flush_version_requirements(db_version_json.buffer);
+
+	zbx_json_free(&db_version_json);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: performs housekeeping for history and trends tables               *
@@ -570,22 +591,32 @@ out:
  * Parameters: now    - [IN] the current timestamp                            *
  *                                                                            *
  ******************************************************************************/
+
 static int	housekeeping_history_and_trends(int now)
 {
-	int			deleted = 0, i, rc;
-	zbx_hk_history_rule_t	*rule;
-
+	int				deleted = 0, i, rc;
+	zbx_hk_history_rule_t		*rule;
+#if defined(HAVE_POSTGRESQL)
+	int				ignore_history = 0, ignore_trends = 0;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	/* prepare delete queues for all history housekeeping rules */
 	hk_history_delete_queue_prepare_all(hk_history_rules, now);
+
+#if defined(HAVE_POSTGRESQL)
+	if (ZBX_TSDB_VERSION > 0)
+	{
+		hk_update_dbversion_status();
+	}
+#endif
 
 	/* Loop through the history rules. Each rule is a history table (such as history_log, trends_uint, etc) */
 	/* we need to clear records from */
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
 		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode)
-			continue;
+			goto skip;
 
 		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */
 		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
@@ -594,8 +625,42 @@ static int	housekeeping_history_and_trends(int now)
 		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
 		{
 			hk_drop_partition_for_rule(rule, now);
-			continue;
+			goto skip;
 		}
+
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_TSDB_VERSION > 0)
+		{
+			if (0 == strcmp(rule->history, "history"))
+			{
+				if (1 == ignore_history)
+					goto skip;
+
+				if (1 == db_version_info.history_compressed_chunks)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Unable to perform housekeeping for history "
+							"tables due to having compressed chunks and disabled item history period override.");
+
+					ignore_history = 1;
+					goto skip;
+				}
+			}
+			else if (0 == strcmp(rule->history, "trends"))
+			{
+				if (1 == ignore_trends)
+					goto skip;
+
+				if (1 == db_version_info.trends_compressed_chunks)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Unable to perform housekeeping for trends "
+							"tables due to having compressed chunks and disabled item trends period override.");
+
+					ignore_trends = 1;
+					goto skip;
+				}
+			}
+		}
+#endif
 
 		/* process delete queue for the housekeeping rule */
 
@@ -611,6 +676,7 @@ static int	housekeeping_history_and_trends(int now)
 				deleted += rc;
 		}
 
+skip:
 		/* clear history rule delete queue so it's ready for the next housekeeping cycle */
 		hk_history_delete_queue_clear(rule);
 	}
@@ -1109,6 +1175,25 @@ static int	get_housekeeping_period(double time_slept)
 		return (int)time_slept;
 }
 
+#if defined(HAVE_POSTGRESQL)
+static void	hk_tsdb_check_config()
+{
+	if (cfg.hk.history_global == ZBX_HK_OPTION_DISABLED && cfg.hk.history_mode == ZBX_HK_OPTION_ENABLED &&
+			1 == db_version_info.history_compressed_chunks)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item history period is disabled, but "
+				"historical data is compressed. Housekeeper may skip deleting this data.");
+	}
+
+	if (cfg.hk.trends_global == ZBX_HK_OPTION_DISABLED && cfg.hk.trends_mode == ZBX_HK_OPTION_ENABLED &&
+			1 == db_version_info.trends_compressed_chunks)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item trends period is disabled, but "
+				"trends data is compressed. Housekeeper may skip deleting this data.");
+	}
+}
+#endif
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services,
@@ -1143,6 +1228,15 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	hk_history_compression_init();
 
 	zbx_rtc_subscribe(&rtc, process_type, process_num);
+
+#if defined(HAVE_POSTGRESQL)
+
+	if (ZBX_TSDB_VERSION > 0)
+	{
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		hk_tsdb_check_config();
+	}
+#endif
 
 	while (ZBX_IS_RUNNING())
 	{
