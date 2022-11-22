@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-22T13:36:13Z'
+  date: '2022-10-24T17:02:19Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -11,7 +11,7 @@ zabbix_export:
       template: Solaris
       name: Solaris
       description: |
-        Official Solaris OS template. Requires Zabbix agent 4.0.0 or newer.
+        It is an official Solaris OS template. It requires Zabbix agent 4.0.0 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/+
         
@@ -42,7 +42,7 @@ zabbix_export:
           name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check'
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -72,7 +72,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -95,7 +95,7 @@ zabbix_export:
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
-          description: 'Number of processes in running state.'
+          description: 'The number of processes in a running state.'
           tags:
             -
               tag: component
@@ -118,7 +118,7 @@ zabbix_export:
           name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
-          description: 'Total number of processes in any state.'
+          description: 'The total number of processes in any state.'
           tags:
             -
               tag: component
@@ -168,7 +168,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -189,7 +189,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -200,7 +200,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -239,7 +239,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Amount of time the CPU has been waiting for I/O to complete.'
+          description: 'The amount of time the CPU has been waiting for the I/O to complete.'
           tags:
             -
               tag: component
@@ -250,7 +250,7 @@ zabbix_export:
               expression: 'avg(/Solaris/system.cpu.util[,iowait],5m)>20'
               name: 'Disk I/O is overloaded'
               priority: WARNING
-              description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
+              description: 'The OS spends significant time waiting for the I/O (input/output) operations. It could be an indicator of performance issues with the storage system.'
               tags:
                 -
                   tag: scope
@@ -287,7 +287,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'System host name.'
+          description: 'A host name of the system.'
           inventory_link: NAME
           preprocessing:
             -
@@ -372,7 +372,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by ''uname -a''.'
+          description: 'The information as normally returned by the ''uname -a''.'
           inventory_link: OS
           preprocessing:
             -
@@ -419,7 +419,7 @@ zabbix_export:
           name: 'Number of logged in users'
           key: system.users.num
           history: 7d
-          description: 'Number of users who are currently logged in.'
+          description: 'The number of users who are currently logged in.'
           tags:
             -
               tag: component
@@ -428,10 +428,15 @@ zabbix_export:
           uuid: 5dd55b892d1b4828bfc570d6bf48251d
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 7d
           trends: '0'
           value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             -
               tag: component
@@ -452,7 +457,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'Available memory is defined as free+cached+buffers memory.'
+          description: 'The available memory is defined as free+cached+buffers memory.'
           tags:
             -
               tag: component
@@ -501,7 +506,7 @@ zabbix_export:
               name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
               manual_close: 'YES'
               tags:
                 -
@@ -519,7 +524,7 @@ zabbix_export:
                 macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
                 formulaid: A
-          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          description: 'The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".'
           item_prototypes:
             -
               uuid: 548f317737ee4facbed4a371f3476352
@@ -595,7 +600,7 @@ zabbix_export:
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
           item_prototypes:
             -
               uuid: aa40b3df2229405193c373b00064e420
@@ -725,7 +730,7 @@ zabbix_export:
         -
           macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+          description: 'The timeout after which the agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
       dashboards:
         -
           uuid: 774e5b14c75c49b4a3a4196ce1ccdaf7
@@ -746,8 +751,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
                         name: 'CPU load'
+                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -762,8 +767,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
                         name: 'CPU utilization'
+                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -778,8 +783,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
                         name: 'Memory usage'
+                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -795,8 +800,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: Solaris
                         name: 'Swap usage'
+                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -811,8 +816,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        host: Solaris
                         key: 'proc.num[]'
+                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -828,8 +833,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        host: Solaris
                         key: 'proc.num[,,run]'
+                        host: Solaris
       valuemaps:
         -
           uuid: 2a704279b6e946a99b88bdebd4f99653

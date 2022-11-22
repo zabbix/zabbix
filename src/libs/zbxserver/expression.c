@@ -4653,7 +4653,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			}
 		}
 
-		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
+		if (0 != (macro_type & (MACRO_TYPE_HTTP_JSON | MACRO_TYPE_SCRIPT_PARAMS_FIELD)) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
 		if (0 != (macro_type & MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)
@@ -4856,7 +4856,6 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_vector_uint64_create(&itemids_sorted);
 	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
-	zbx_vector_uint64_sort(&itemids_sorted, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&triggers_func_pos);
 	zbx_vector_ptr_reserve(&triggers_func_pos, trigger_order->values_num);
@@ -5069,7 +5068,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		items = (DC_ITEM *)zbx_malloc(items, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+		items = (DC_ITEM *)zbx_calloc(items, 1, sizeof(DC_ITEM) * (size_t)itemids.values_num);
 		errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
 		DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, itemids.values_num,

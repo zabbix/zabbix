@@ -21,6 +21,10 @@
 
 class CCheckBoxList extends CList {
 
+	private const ZBX_STYLE_CLASS = 'checkbox-list';
+
+	private const ZBX_STYLE_VERTICAL = 'vertical';
+
 	/**
 	 * @var array $values
 	 */
@@ -42,14 +46,25 @@ class CCheckBoxList extends CList {
 	protected $uniqid = '';
 
 	/**
+	 * @var bool $vertical
+	 */
+	protected $vertical = false;
+
+	/**
+	 * @var int $columns
+	 */
+	protected $columns;
+
+	/**
 	 * @param string $name
 	 */
-	public function __construct($name) {
+	public function __construct($name = '') {
 		parent::__construct();
 
-		$this->addClass(ZBX_STYLE_CHECKBOX_LIST);
+		$this->addClass(self::ZBX_STYLE_CLASS);
 		$this->name = $name;
 		$this->values = [];
+		$this->columns = 1;
 	}
 
 	/**
@@ -89,7 +104,7 @@ class CCheckBoxList extends CList {
 
 		foreach ($values as $value) {
 			$this->values[] = $value + [
-				'name' => '',
+				'label' => '',
 				'value' => null,
 				'checked' => false
 			];
@@ -120,20 +135,65 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * Display checkboxes in vertical order.
+	 *
+	 * @param bool $vertical
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setVertical(bool $vertical = true): CCheckBoxList {
+		$this->vertical = $vertical;
+
+		return $this;
+	}
+
+	/**
+	 * Set number of columns.
+	 *
+	 * @param int $columns
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setColumns(int $columns): CCheckBoxList {
+		$this->columns = $columns;
+
+		return $this;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *
 	 * @return string
 	 */
 	public function toString($destroy = true) {
-		$uniqid = ($this->uniqid === '') ? '' : '_'.$this->uniqid;
+		$this->addStyle('--columns: '.$this->columns.';');
+
+		if ($this->vertical) {
+			$values_count = count($this->values);
+			$max_rows = (int) ceil($values_count / $this->columns);
+
+			$this->addClass(self::ZBX_STYLE_VERTICAL);
+			$this->addStyle('--rows: '.$max_rows.';');
+		}
 
 		foreach ($this->values as $value) {
-			$checkbox = (new CCheckBox($this->name.'['.$value['value'].']', $value['value']))
-				->setLabel($value['name'])
+			$name = array_key_exists('name', $value) ? $value['name'] : $this->name.'['.$value['value'].']';
+			$checkbox = (new CCheckBox($name, $value['value']))
+				->setLabel($value['label'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
-			$checkbox->setId($checkbox->getId().$uniqid);
+
+			if (array_key_exists('id', $value) || $this->uniqid !== '') {
+				$checkbox->setId(array_key_exists('id', $value)
+					? $value['id']
+					: $checkbox->getId().'_'.$this->uniqid
+				);
+			}
+
+			if (array_key_exists('unchecked_value', $value)) {
+				$checkbox->setUncheckedValue($value['unchecked_value']);
+			}
 
 			parent::addItem($checkbox);
 		}
