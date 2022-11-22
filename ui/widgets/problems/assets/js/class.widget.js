@@ -21,16 +21,18 @@
 class CWidgetProblems extends CWidget {
 
 	// Must be synced with PHP ZBX_STYLE_BTN_WIDGET_EXPAND;
-	static ZBX_STYLE_BTN_WIDGET_EXPAND = 'btn-widget-expand';
+	static ZBX_STYLE_BTN_WIDGET_EXPAND;
 
 	// Must be synced with PHP ZBX_STYLE_BTN_WIDGET_COLLAPSE;
-	static ZBX_STYLE_BTN_WIDGET_COLLAPSE = 'btn-widget-collapse';
+	static ZBX_STYLE_BTN_WIDGET_COLLAPSE;
 
 	_init() {
 		super._init();
 
 		this._has_contents = false;
 		this._opened_eventids = [];
+		this.ZBX_STYLE_BTN_WIDGET_EXPAND = 'btn-widget-expand';
+		this.ZBX_STYLE_BTN_WIDGET_COLLAPSE = 'btn-widget-collapse';
 	}
 
 	_registerEvents() {
@@ -91,12 +93,14 @@ class CWidgetProblems extends CWidget {
 				if (state) {
 					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
 					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+					button.title = t('Collapse');
 
 					this._opened_eventids.push(button.dataset.eventid);
 				}
 				else {
 					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
 					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
+					button.title = t('Expand');
 
 					this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
 				}
@@ -165,6 +169,7 @@ class CWidgetProblems extends CWidget {
 
 					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
 					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+					button.title = t('Collapse');
 				}
 			}
 		}

@@ -191,6 +191,7 @@
 
 					btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 					btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+					btn.title = '<?= _('Collapse') ?>';
 				}
 
 				// Fix last row border depeding if it is opened or closed.
@@ -231,12 +232,14 @@
 			if (state) {
 				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+				btn.title = '<?= _('Collapse') ?>';
 
 				this.opened_eventids.push(btn.dataset.eventid);
 			}
 			else {
 				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.title = '<?= _('Expand') ?>';
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
 			}

@@ -3375,9 +3375,12 @@ form.is-loading {
     width: 18px;
     height: 18px;
     background-position-x: -9px;
-    background-position-y: -693px;
     margin: 7px 0 0 0;
     opacity: 1; }
+  .list-table td .btn-widget-expand, .list-table td .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table td .list-accordion-item-toggle {
+    background-position-y: -693px; }
+  .list-table td .btn-widget-collapse, .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
+    background-position-y: -657px; }
   .list-table .second-col {
     padding-left: 0;
     padding-right: 0; }
