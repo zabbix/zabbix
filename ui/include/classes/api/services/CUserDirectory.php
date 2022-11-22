@@ -637,15 +637,27 @@ class CUserDirectory extends CApiService {
 		}
 
 		foreach ($userdirectories as &$userdirectory) {
-			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
-				$empty_provision_fields = array_fill_keys(['group_basedn', 'group_member', 'group_membership',
-					'group_name', 'user_username', 'user_lastname', 'user_ref_attr'], ''
-				);
-				$empty_provision_fields['provision_groups'] = [];
-				$empty_provision_fields['provision_media'] = [];
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 
-				$userdirectory = $empty_provision_fields + $userdirectory;
+			if (!array_key_exists('provision_status', $userdirectory)
+					|| $userdirectory['provision_status'] == $db_userdirectory['provision_status']
+					|| $userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+				continue;
 			}
+
+			$idp_fields = $db_userdirectory['idp_type'] == IDP_TYPE_LDAP
+				? $this->ldap_output_fields
+				: $this->saml_output_fields;
+			$empty_provision_fields = array_fill_keys(
+				array_intersect(['group_basedn', 'group_member', 'group_membership', 'group_name', 'user_username',
+					'user_lastname', 'user_ref_attr'
+				], $idp_fields),
+				''
+			);
+			$empty_provision_fields['provision_groups'] = [];
+			$empty_provision_fields['provision_media'] = [];
+
+			$userdirectory = $empty_provision_fields + $userdirectory;
 		}
 		unset($userdirectory);
 
