@@ -591,8 +591,14 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 			_('Tags')
 		]));
 
+	$data = [
+		'last_clock' => 0,
+		'sortorder' => ZBX_SORT_DOWN,
+		'show_three_columns' => false,
+		'show_two_columns' => false
+	];
+
 	$today = strtotime('today');
-	$last_clock = 0;
 
 	// Unset triggers, which missing in problems array.
 	if ($problems) {
@@ -632,10 +638,10 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		}
 
 		if ($show_timeline) {
-			if ($last_clock != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			if ($data['last_clock'] != 0) {
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, true);
 			}
-			$last_clock = $problem['clock'];
+			$data['last_clock'] = $problem['clock'];
 
 			$row = [
 				$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),

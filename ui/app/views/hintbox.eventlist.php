@@ -77,8 +77,14 @@ if (array_key_exists('problems', $data)) {
 			($data['show_tags'] != SHOW_TAGS_NONE) ? _('Tags') : null
 		]));
 
+	$data += [
+		'last_clock' => 0,
+		'sortorder' => ZBX_SORT_DOWN,
+		'show_three_columns' => false,
+		'show_two_columns' => false
+	];
+
 	$today = strtotime('today');
-	$last_clock = 0;
 
 	if ($data['problems'] && $data['show_tags'] != SHOW_TAGS_NONE) {
 		$tags = makeTags($data['problems'], true, 'eventid', $data['show_tags'], $data['filter_tags'], null,
@@ -147,10 +153,10 @@ if (array_key_exists('problems', $data)) {
 		addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
 		if ($data['show_timeline']) {
-			if ($last_clock != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $last_clock, $problem['clock'], ZBX_SORT_DOWN);
+			if ($data['last_clock'] != 0) {
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, true);
 			}
-			$last_clock = $problem['clock'];
+			$data['last_clock'] = $problem['clock'];
 
 			$row = [
 				$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
