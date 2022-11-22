@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxjson.h"
@@ -565,7 +564,7 @@ static void	prometheus_condition_free(zbx_prometheus_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates and initializes conditionect                            *
+ * Purpose: allocates and initializes condition                               *
  *                                                                            *
  * Parameters: key     - [IN] the key to match                                *
  *             pattern - [IN] the matching pattern                            *
@@ -1892,7 +1891,7 @@ static int	prometheus_validate_request(const char *request, const char *output, 
  *                                                                            *
  * Purpose: extract value from prometheus cache by the specified filter       *
  *                                                                            *
- * Parameters: data        - [IN] the prometheus cache                        *
+ * Parameters: prom        - [IN] the prometheus cache                        *
  *             filter_data - [IN] the filter in text format                   *
  *             request     - [IN] the data request - value, label, function   *
  *             output      - [IN] the output template/function name           *
