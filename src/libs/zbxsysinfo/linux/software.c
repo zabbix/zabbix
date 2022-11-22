@@ -203,8 +203,8 @@ static void	dpkg_details(const char *manager, const char *line, const char *rege
 #define NUM_FIELDS	5
 	if (NUM_FIELDS != (rv = sscanf(line, fmt, status, name, version, arch, &size)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
-				rv, NUM_FIELDS, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
 		return;
 	}
 #undef NUM_FIELDS
@@ -248,8 +248,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, &size, &buildtime_timestamp,
 			&installtime_timestamp)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
-				rv, NUM_FIELDS, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
 		return;
 	}
 #undef NUM_FIELDS
@@ -298,8 +298,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 #define NUM_FIELDS	6
 	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, size_str, buildtime_value, installtime_value)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
-				rv, NUM_FIELDS, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
 		return;
 	}
 #undef NUM_FIELDS
@@ -309,16 +309,16 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	if (NULL == (suffix = strchr(size_str, ' ')))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Installed Size \"%s\" (expected whitespace) at line \"%s\""
-				", ignoring", size_str, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected whitespace), ignoring",
+				line, size_str);
 	}
 
 	*suffix++ = '\0';
 
 	if (SUCCEED != zbx_is_double(size_str, &size_double))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Installed Size \"%s\" (expected type double) at line \"%s\""
-				", ignoring", size_str, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected type double), ignoring",
+				line, size_str);
 	}
 
 	/* pacman supports the following labels:                       */
@@ -345,26 +345,23 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unrecognized Installed Size suffix \"%s %s\" at line \"%s\", ignoring",
-				size_str, suffix, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unrecognized Installed Size suffix \"%s %s\", ignoring",
+				line, size_str, suffix);
 	}
-
-	zabbix_log(LOG_LEVEL_CRIT, "size_str=%s %s", size_str, suffix);
 
 	/* tell mktime() to determine whether daylight saving time is in effect */
 	tm.tm_isdst = -1;
 
 	if (NULL == (p = strptime(buildtime_value, TIME_FMT, &tm)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Build Date \"%s\" in \"%s\", ignoring", buildtime_value,
-				line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date \"%s\", ignoring", line, buildtime_value);
 		return;
 	}
 
 	if ('\0' != *p)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Build Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
-				" in \"%s\", ignoring", p, line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
+				"), ignoring", line, p);
 		return;
 	}
 
@@ -372,8 +369,14 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	if (NULL == strptime(installtime_value, TIME_FMT, &tm))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected Install Date \"%s\" in \"%s\", ignoring", installtime_value,
-				line);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date \"%s\", ignoring", line, installtime_value);
+		return;
+	}
+
+	if ('\0' != *p)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date format at \"%s\" (expected " ZBX_STR(TIME_FMT)
+				"), ignoring", line, p);
 		return;
 	}
 
@@ -381,6 +384,97 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
 			installtime_value, installtime_timestamp);
+}
+
+static void	pkgtools_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			size_str[DETAIL_BUF] = "", *out = NULL, *suffix;
+	zbx_uint64_t	size, multiplier;
+	double		size_double;
+	int		rv;
+
+	/* Since <name> can contain dashes we cannot use sscanf() here so regex is the only way. */
+	/* /var/log/packages/util-linux-2.27.1-x86_64-1:UNCOMPRESSED PACKAGE SIZE:     1.9M      */
+	/* "version" and "build" must be combined: <name>-<version>-<arch>-<build>...:<size>     */
+	if (SUCCEED != zbx_regexp_sub(
+			line,
+			"^/var/log/packages/(.*)-([^-]+)-([^-]+)-([^:]+):UNCOMPRESSED PACKAGE SIZE:\\s+(.*)$",
+			"\\1,\\2-\\4,\\3,\\5",
+			&out))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "internal error: could not compile regex");
+		goto out;
+	}
+
+	if (NULL == out)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected line \"%s\", ignoring", line);
+		goto out;
+	}
+
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],",
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1),
+				(zbx_fs_size_t)(sizeof(size_str) - 1));
+	}
+
+#define NUM_FIELDS	4
+	rv = sscanf(out, fmt, name, version, arch, size_str);
+
+	if (NUM_FIELDS != rv)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
+		goto out;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		goto out;
+
+	/* according to pkgtools source code the size suffix is    */
+	/* either 'K' or 'M' and it may be specified in 3 formats: */
+	/*   <n>K                                                  */
+	/*   <n>.<n>M                                              */
+	/*   <n>M                                                  */
+	if (NULL != (suffix = strchr(size_str, 'K')))
+	{
+		multiplier = ZBX_KIBIBYTE;
+	}
+	else if (NULL != (suffix = strchr(size_str, 'M')))
+	{
+		multiplier = ZBX_MEBIBYTE;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected size suffix in \"%s\": expected 'K' or 'M', ignoring",
+				line, size_str);
+		goto out;
+	}
+
+	*suffix = '\0';
+
+	if (SUCCEED != zbx_is_double(size_str, &size_double))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected size in \"%s\"", line, size_str);
+		goto out;
+	}
+
+	size = (zbx_uint64_t)(size_double * multiplier);
+
+	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+out:
+	zbx_free(out);
 }
 
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
@@ -427,7 +521,14 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		dpkg_list,
 		dpkg_details
 	},
-	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL, NULL, NULL},
+	{
+		"pkgtools",
+		"[ -d /var/log/packages ] && echo true",
+		"ls /var/log/packages",
+		"grep -r '^UNCOMPRESSED PACKAGE SIZE' /var/log/packages",
+		NULL,
+		pkgtools_details
+	},
 	{
 		"rpm",
 		"rpm --version 2> /dev/null",
