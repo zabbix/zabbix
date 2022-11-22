@@ -181,7 +181,6 @@ class CAPIHelper {
 
 		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {
-			static::setAuth(true);
 			static::setSessionId($result['result']);
 		}
 	}

@@ -105,7 +105,6 @@ class CAPITest extends CTest {
 	 * Disable authorization/session for the following API calls.
 	 */
 	public static function disableAuthorization() {
-		CAPIHelper::setAuth(false);
 		CAPIHelper::setSessionId(false);
 	}
 
