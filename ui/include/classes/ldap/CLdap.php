@@ -41,6 +41,7 @@ class CLdap {
 
 	const DEFAULT_FILTER_USER = '(%{attr}=%{user})';
 	const DEFAULT_FILTER_GROUP = '(%{groupattr}=%{user})';
+	const DEFAULT_MEMBERSHIP_ATTRIBUTE = 'memberOf';
 
 	/**
 	 * Type of binding made to LDAP server. One of static::BIND_ constant value.
@@ -120,6 +121,10 @@ class CLdap {
 
 		if ($this->cnf['group_filter'] === '') {
 			$this->cnf['group_filter'] = static::DEFAULT_FILTER_GROUP;
+		}
+
+		if ($this->cnf['group_membership'] === '') {
+			$this->cnf['group_membership'] = static::DEFAULT_MEMBERSHIP_ATTRIBUTE;
 		}
 
 		$this->initBindAttributes();
