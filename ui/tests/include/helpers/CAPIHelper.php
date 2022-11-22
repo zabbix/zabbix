@@ -33,8 +33,6 @@ class CAPIHelper {
 	protected static $debug = [];
 	// Session id.
 	protected static $session = null;
-	// Use authorization header.
-	protected static $use_auth = null;
 
 	/**
 	 * Reset API helper state.
@@ -50,12 +48,13 @@ class CAPIHelper {
 	 * Make API call.
 	 *
 	 * @param mixed $data     string containing request data as json.
+	 * @param bool  $auth     use authorization header
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public static function callRaw($data) {
+	public static function callRaw($data, $auth = true) {
 		global $URL;
 		if (!is_string($URL)) {
 			$URL = PHPUNIT_URL.'api_jsonrpc.php';
@@ -81,7 +80,7 @@ class CAPIHelper {
 			]
 		];
 
-		if (static::$use_auth) {
+		if ($auth) {
 			$params['http']['header'][] = 'Authorization: Bearer '.static::$session;
 		}
 
@@ -132,7 +131,8 @@ class CAPIHelper {
 			'params' => $params,
 			'id' => static::$request_id
 		];
-		return static::callRaw($data);
+
+		return static::callRaw($data, static::$session ? true : false);
 	}
 
 	/**
@@ -228,13 +228,5 @@ class CAPIHelper {
 	 */
 	public static function clearDebugInfo() {
 		static::$debug = [];
-	}
-
-	public static function setAuth(bool $use_auth): void {
-		static::$use_auth = $use_auth;
-	}
-
-	public static function getAuth(): bool {
-		return static::$use_auth;
 	}
 }

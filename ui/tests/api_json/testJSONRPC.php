@@ -388,10 +388,9 @@ class testJSONRPC extends CAPITest {
 	 */
 	public function testJSONRPC_Calls($request, $expected_result, $auth, $token = null) {
 		if ($auth) {
-			CAPIHelper::setAuth($auth);
 			CAPIHelper::setSessionId($token);
 		}
 
-		$this->assertSame($expected_result, $this->callRaw($request));
+		$this->assertSame($expected_result, $this->callRaw($request, $auth));
 	}
 }
