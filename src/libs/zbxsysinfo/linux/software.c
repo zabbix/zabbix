@@ -167,12 +167,12 @@ static void	add_package_to_json(struct zbx_json *json, const char *name, const c
 
 	zbx_json_addobject(json, "buildtime");
 	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(json,  "timestamp", buildtime_timestamp);
+	zbx_json_addint64(json, "timestamp", buildtime_timestamp);
 	zbx_json_close(json);
 
 	zbx_json_addobject(json, "installtime");
 	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(json,  "timestamp", installtime_timestamp);
+	zbx_json_addint64(json, "timestamp", installtime_timestamp);
 	zbx_json_close(json);
 
 	zbx_json_close(json);
