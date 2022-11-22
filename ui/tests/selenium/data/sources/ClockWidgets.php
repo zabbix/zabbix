@@ -29,16 +29,16 @@ class ClockWidgets {
 	public static function load() {
 		CDataHelper::call('hostgroup.create', [
 			[
-				'name' => 'DEV-2236 hostgroup',
+				'name' => 'Host group for clock widget',
 			]
 		]);
 		$hostgrpid = CDataHelper::getIds('name');
 
 		CDataHelper::call('host.create', [
-			'host' => 'DEV-2236 host',
+			'host' => 'Host for clock widget',
 			'groups' => [
 				[
-					'groupid' => $hostgrpid['DEV-2236 hostgroup']
+					'groupid' => $hostgrpid['Host group for clock widget']
 				]
 			],
 			'interfaces' => [
@@ -52,12 +52,12 @@ class ClockWidgets {
 		]);
 		$hostid = CDataHelper::getIds('host');
 
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['DEV-2236 host']);
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['Host for clock widget']);
 
 		CDataHelper::call('item.create', [
 			[
-				'hostid' => $hostid['DEV-2236 host'],
-				'name' => 'DEV-2236 item',
+				'hostid' => $hostid['Host for clock widget'],
+				'name' => 'Item for clock widget',
 				'key_' => 'system.localtime[local]',
 				'type' => 0,
 				'value_type' => 1,
@@ -69,87 +69,91 @@ class ClockWidgets {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'DEV-2236 dashboard',
-				'display_period' => 30,
-				'auto_start' => 1,
+				'name' => 'Dashboard for creating clock widgets',
 				'pages' => [
 					[
 						'widgets' => [
 							[
 								'type' => 'clock',
-								'name' => 'Host',
-								'x' => 10,
+								'name' => 'UpdateClock',
+								'x' => 0,
 								'y' => 0,
 								'width' => 5,
 								'height' => 5,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => 0,
 										'name' => 'rf_rate',
-										'value' => '60'
+										'value' => -1
+									]
+								]
+							],
+							[
+								'type' => 'clock',
+								'name' => 'CopyClock',
+								'x' => 15,
+								'y' => 0,
+								'width' => 5,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'rf_rate',
+										'value' => -1
+									]
+								]
+							],
+							[
+								'type' => 'clock',
+								'name' => 'DeleteClock',
+								'x' => 5,
+								'y' => 0,
+								'width' => 5,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'rf_rate',
+										'value' => -1
+									]
+								]
+							],
+							[
+								'type' => 'clock',
+								'name' => 'CancelClock',
+								'x' => 20,
+								'y' => 0,
+								'width' => 4,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'rf_rate',
+										'value' => -1
+									]
+								]
+							],
+							[
+								'type' => 'clock',
+								'name' => 'LayoutClock',
+								'x' => 10,
+								'y' => 0,
+								'width' => 5,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => $itemid['Item for clock widget']
 									],
 									[
 										'type' => 0,
 										'name' => 'time_type',
 										'value' => 2
-									],
-									[
-										'type' => 4,
-										'name' => 'itemid',
-										'value' => $itemid['DEV-2236 item']
 									]
 								]
-							],
-							[
-								'type' => 'clock',
-								'name' => 'Server',
-								'x' => 5,
-								'y' => 0,
-								'width' => 5,
-								'height' => 5,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 0,
-										'name' => 'rf_rate',
-										'value' => '-1'
-									],
-									[
-										'type' => 0,
-										'name' => 'time_type',
-										'value' => 1
-									]
-								]
-							],
-							[
-								'type' => 'clock',
-								'name' => 'Local',
-								'x' => 0,
-								'y' => 0,
-								'width' => 5,
-								'height' => 5,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 0,
-										'name' => 'rf_rate',
-										'value' => '-1'
-									],
-									[
-										'type' => 0,
-										'name' => 'time_type',
-										'value' => 0
-									]
-								]
-							],
+							]
 						]
-					]
-				],
-				'users' => [
-					[
-						'userid' => '4',
-						'permission' => 3
 					]
 				]
 			]
