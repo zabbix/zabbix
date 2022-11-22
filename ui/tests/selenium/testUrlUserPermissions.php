@@ -218,7 +218,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'auditacts.php',
+				'url' => 'zabbix.php?action=actionlog.list',
 				'title' =>	'Action log',
 				'users' => [
 					'guest' => false,

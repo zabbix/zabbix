@@ -25,7 +25,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 
 	public function testPageReportsActionLog_CheckLayout() {
 		// dates can be in relative format, example: now-1y/y, now-1w, now
-		$this->zbxTestLogin('auditacts.php?from=now-2y&to=now');
+		$this->zbxTestLogin('zabbix.php?action=actionlog.list&from=now-2y&to=now');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
@@ -34,7 +34,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('filter_userids__ms');
 		$this->zbxTestAssertElementPresentXpath("//button[@name='filter_set']");
 		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
-		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient', 'Message', 'Status', 'Info']);
+		$this->zbxTestTextPresent(['Time', 'Action','Media type', 'Status', 'Recipient', 'Message', 'Status', 'Info']);
 
 	}
 
@@ -49,7 +49,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$time = $auditactions['clock'];
 		$today = date("Y-m-d H:i:s", $time);
 
-		$this->zbxTestLogin('auditacts.php?'.http_build_query([
+		$this->zbxTestLogin('zabbix.php?action=actionlog.list&'.http_build_query([
 			'from' => date('Y-m-d H:i:s', $time - 3600),
 			'to' => date('Y-m-d H:i:s', $time + 3600)
 		]));
