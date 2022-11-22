@@ -1044,6 +1044,8 @@ zbx_dc_um_handle_t	*zbx_dc_open_user_macros(void);
 zbx_dc_um_handle_t	*zbx_dc_open_user_macros_secure(void);
 zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void);
 
+char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env);
+
 void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
