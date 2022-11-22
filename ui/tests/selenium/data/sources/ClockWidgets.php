@@ -118,6 +118,21 @@ class ClockWidgets {
 					],
 					[
 						'type' => 'clock',
+						'name' => 'CancelClock',
+						'x' => 20,
+						'y' => 0,
+						'width' => 4,
+						'height' => 5,
+						'fields' => [
+							[
+								'type' => 0,
+								'name' => 'rf_rate',
+								'value' => -1
+							]
+						]
+					],
+					[
+						'type' => 'clock',
 						'name' => 'LayoutClock',
 						'x' => 10,
 						'y' => 0,

@@ -89,8 +89,6 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check that it's possible to select host items, when time type is "Host Time".
 		$form->fill(['Time type' => 'Host time']);
-		//$this->assertTrue($this->query('button:Select')->waitUntilVisible()->one()->isClickable());
-
 		$fields = ['Type', 'Name', 'Refresh interval', 'Time type'];
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
 			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
@@ -101,7 +99,24 @@ class testDashboardClockWidget extends CWebTest {
 		// Check that it's possible to change the status of "Show header" checkbox.
 		$this->assertTrue($form->query('xpath://input[contains(@id, "show_header")]')->one()->isSelected());
 
+		// Check that clock widget with "Time Type" - "Host time", displays host name, when clock widget name is empty.
+		$form = $dashboard->getWidget('LayoutClock')->edit();
+		$form->fill(['Name' => '']);
+		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$dashboard->save();
+		$hostname = $dashboard->getWidget('Host for clock widget')->getText();
+		$this->assertEquals("Host for clock widget", $hostname);
+
+		// Update widget back to it's original name.
+		$form = $dashboard->getWidget('Host for clock widget')->edit();
+		$form->fill(['Name' => 'LayoutClock']);
+		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$dashboard->save();
+
 		// Check if Apply and Cancel button are clickable.
+		$dashboard->getWidget('LayoutClock')->edit();
 		foreach(['Apply', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
@@ -407,55 +422,15 @@ class testDashboardClockWidget extends CWebTest {
 	}
 
 	/**
-	 * Check clock widgets successful copy.
-	 */
-	public function testDashboardClockWidget_Copy() {
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-
-		// Get size of widget which will be copied;
-		$sql = "Select width, height from widget where name =".zbx_dbstr('Server')." and dashboardid =".$dashboardid." ORDER BY widgetid DESC";
-		$original_size = CDBHelper::getRow($sql);
-
-		$dashboard->copyWidget('CopyClock');
-		$dashboard->edit();
-		$dashboard->pasteWidget();
-		sleep(5);
-		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$dashboard->save();
-		$this->page->waitUntilReady();
-
-		// Get size of widget which has been copied;
-		$copied_size = CDBHelper::getRow($sql);
-		$this->assertEquals($original_size, $copied_size);
-	}
-
-	public static function getDeleteData() {
-		return [
-			[
-				[
-					'Fields' => [
-						'Type' => 'Clock',
-						'Name' => 'DeleteClock'
-					]
-				]
-			]
-		];
-	}
-
-	/**
 	 * Check clock widgets deletion.
-	 *
-	 * @dataProvider getDeleteData
 	 */
-	public function testDashboardClockWidget_Delete($data) {
+	public function testDashboardClockWidget_Delete() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->edit()->getWidget($data['Fields']['Name']);
+		$widget = $dashboard->edit()->getWidget('DeleteClock');
 		$this->assertTrue($widget->isEditable());
-		$dashboard->deleteWidget($data['Fields']['Name']);
+		$dashboard->deleteWidget('DeleteClock');
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$message = CMessageElement::find()->waitUntilPresent()->one();
@@ -463,9 +438,9 @@ class testDashboardClockWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertFalse($dashboard->getWidget($data['Fields']['Name'], false)->isValid());
+		$this->assertFalse($dashboard->getWidget('DeleteClock', false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr($data['Fields']['Name']);
+			' WHERE w.name='.zbx_dbstr('DeleteClock');
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
@@ -499,21 +474,22 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 
 		// Start creating a widget.
-			$overlay = $dashboard->edit()->addWidget();
-			$form = $overlay->asForm();
-			$form->getField('Type')->fill('Clock');
-			$form->getField('Name')->fill('Widget to be cancelled');
-			$widget = $dashboard->getWidgets()->last();
+		$overlay = $dashboard->edit()->addWidget();
+		$form = $overlay->asForm();
+		$form->fill(['Type' => 'Clock', 'Name' => 'Widget to be cancelled']);
+		$widget = $dashboard->getWidgets()->last();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
 			$this->page->waitUntilReady();
+
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget('Widget to be cancelled')->isVisible());
 		}
 		else {
 			$this->query('button:Cancel')->one()->click();
+
 			// Check that widget changes didn't take place after pressing "Cancel".
 			if (CTestArrayHelper::get($data, 'existing_widget', false)) {
 				$this->assertNotEquals('Widget to be cancelled', $widget->waitUntilReady()->getHeaderText());
@@ -527,6 +503,10 @@ class testDashboardClockWidget extends CWebTest {
 				}
 			}
 		}
+
+		// Cancel update process of already existing widget.
+		$dashboard->edit()->getWidget('CancelClock')->edit();
+		$this->query('button', 'Cancel')->waitUntilClickable()->one()->click();
 
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
