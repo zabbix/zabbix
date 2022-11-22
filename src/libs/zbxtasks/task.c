@@ -20,7 +20,6 @@
 #include "zbxtasks.h"
 
 #include "log.h"
-#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 
@@ -85,7 +84,7 @@ static void	tm_data_clear(zbx_tm_data_t *data)
  * Parameters: task - [IN] the task to free                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_task_clear(zbx_tm_task_t *task)
+static void	zbx_tm_task_clear(zbx_tm_task_t *task)
 {
 	if (NULL != task->data)
 	{

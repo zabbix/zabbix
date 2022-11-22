@@ -20,8 +20,9 @@
 #ifndef ZABBIX_PROXY_TASKMANAGER_H
 #define ZABBIX_PROXY_TASKMANAGER_H
 
-#include "zbxcomms.h"
 #include "zbxtasks.h"
+
+#include "zbxcomms.h"
 #include "zbxthreads.h"
 #include "zbxversion.h"
 
