@@ -31,8 +31,14 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 	use TableTrait;
 
+	/**
+	 * Item id.
+	 */
 	private static $itemids;
 
+	/**
+	 * Graph id.
+	 */
 	private static $graphids;
 
 	public static function prepareGraphsData() {
