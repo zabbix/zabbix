@@ -670,8 +670,7 @@ function ApiCall(method, params, sessionid = null) {
 	if (['user.login', 'user.checkauthentication', 'apiinfo.version', 'settings.getglobal'].includes(method)) {
 		credentials = 'omit';
 	}
-
-	if (sessionid) {
+	else if (sessionid) {
 		headers.Authorization = 'Bearer ' + sessionid;
 	}
 
