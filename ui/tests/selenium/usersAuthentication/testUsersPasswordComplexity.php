@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  *
  * @backup config, users
  */
-class testPasswordComplexity extends CWebTest {
+class testUsersPasswordComplexity extends CWebTest {
 
 	const ACTION_UPDATE = true;
 	const OWN_PASSWORD  = true;
@@ -84,67 +84,6 @@ class testPasswordComplexity extends CWebTest {
 
 		$this->assertArrayHasKey('userids', $response);
 		self::$userid = $response['userids'][0];
-	}
-
-	/**
-	 * Check authentication form fields layout.
-	 */
-	public function testPasswordComplexity_Layout() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$this->page->assertTitle('Configuration of authentication');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-
-		// Check that 'Password policy' header presents.
-		$this->assertTrue($form->query('xpath://h4[text()="Password policy"]')->exists());
-
-		$this->assertEquals(2, $form->getField('Minimum password length')->getAttribute('maxlength'));
-
-		// Check default texts in hint-boxes.
-		$hintboxes = [
-			[
-				'field' => 'Password must contain',
-				'text' => "Password requirements:".
-						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)".
-						"\nmust contain at least one digit (0-9)".
-						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
-			],
-			[
-				'field' => 'Avoid easy-to-guess passwords',
-				'text' => "Password requirements:".
-						"\nmust not contain user's name, surname or username".
-						"\nmust not be one of common or context-specific passwords"
-			]
-		];
-
-		foreach ($hintboxes as $hintbox) {
-			// Summon the hint-box.
-			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//a')->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-
-			// Assert text.
-			$this->assertEquals($hintbox['text'], $hint->one()->getText());
-
-			// Close the hint-box.
-			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
-			$hint->waitUntilNotPresent();
-		}
-
-		// Assert default values in form.
-		$default_values = [
-			'Minimum password length' => '8',
-			'id:passwd_check_rules_case' => false,
-			'id:passwd_check_rules_digits' => false,
-			'id:passwd_check_rules_special' => false,
-			'id:passwd_check_rules_simple' => true
-		];
-		foreach ($default_values as $field => $value) {
-			$this->assertEquals($value, $form->getField($field)->getValue());
-		}
-
-		// Check default values in DB.
-		$this->assertEquals([['passwd_min_length' => 8, 'passwd_check_rules' => 8]],
-				CDBHelper::getAll('SELECT passwd_min_length, passwd_check_rules FROM config')
-		);
 	}
 
 	public function getFormValidationData() {
@@ -212,7 +151,7 @@ class testPasswordComplexity extends CWebTest {
 	 *
 	 * @dataProvider getFormValidationData
 	 */
-	public function testPasswordComplexity_FormValidation($data) {
+	public function testUsersPasswordComplexity_FormValidation($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		}
@@ -974,7 +913,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
 	 */
-	public function testPasswordComplexity_CreateUserPassword($data) {
+	public function testUsersPasswordComplexity_CreateUserPassword($data) {
 		$this->checkPasswordComplexity($data, self::$admin_password);
 	}
 
@@ -984,7 +923,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
 	 */
-	public function testPasswordComplexity_ChangeOwnUserPassword($data) {
+	public function testUsersPasswordComplexity_ChangeOwnUserPassword($data) {
 		$this->checkPasswordComplexity($data, self::$admin_password, self::$userid, self::ACTION_UPDATE,
 				self::OWN_PASSWORD, self::$user_password
 		);
@@ -996,7 +935,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
 	 */
-	public function testPasswordComplexity_ChangeOwnAdminPassword($data) {
+	public function testUsersPasswordComplexity_ChangeOwnAdminPassword($data) {
 		$this->checkPasswordComplexity($data, self::$admin_password, self::ADMIN_USERID, self::ACTION_UPDATE, self::OWN_PASSWORD);
 	}
 
@@ -1006,7 +945,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
 	 */
-	public function testPasswordComplexity_UpdateUserPassword($data) {
+	public function testUsersPasswordComplexity_UpdateUserPassword($data) {
 		$this->checkPasswordComplexity($data, self::$admin_password, self::$userid, self::ACTION_UPDATE);
 	}
 
@@ -1016,7 +955,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
 	 */
-	public function testPasswordComplexity_UpdateAdminPassword($data) {
+	public function testUsersPasswordComplexity_UpdateAdminPassword($data) {
 		$this->checkPasswordComplexity($data, self::$admin_password, self::ADMIN_USERID, self::ACTION_UPDATE);
 	}
 

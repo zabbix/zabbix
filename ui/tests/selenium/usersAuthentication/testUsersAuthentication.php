@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config
  */
-class testFormUserAuthentication extends CWebTest {
+class testUsersAuthentication extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -39,7 +39,7 @@ class testFormUserAuthentication extends CWebTest {
 	/**
 	 * Check saving default authentication page.
 	 */
-	public function testFormUserAuthentication_Layout() {
+	public function testUsersAuthentication_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->page->assertTitle('Configuration of authentication');
 		$this->page->assertHeader('Authentication');
@@ -48,7 +48,6 @@ class testFormUserAuthentication extends CWebTest {
 		// Check switcher options and default values.
 		$auth_radio = $form->getField('Default authentication')->asSegmentedRadio();
 		$this->assertEquals(['Internal', 'LDAP'], $auth_radio->getLabels()->asText());
-		$this->assertEquals('Internal', $auth_radio->getSelected());
 
 		$form->checkValue(['Deprovisioned users group' => '']);
 		$form->query('button:Select')->waitUntilClickable()->one()->click();
@@ -62,20 +61,73 @@ class testFormUserAuthentication extends CWebTest {
 		$this->assertEquals('Disabled', $table->getRow(0)->getColumn('Name')->getText());
 		$dialog->close();
 
-		// Summon the Deprovisioned users group hint-box.
-		$form->query('xpath://label[text()="Deprovisioned users group"]//a')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilPresent();
+		// Check that 'Password policy' header presents.
+		$this->assertTrue($form->query('xpath://h4[text()="Password policy"]')->exists());
 
-		// Assert text.
-		$this->assertEquals('Only disabled group can be set for deprovisioned users.', $hint->getText());
+		$this->assertEquals(2, $form->getField('Minimum password length')->getAttribute('maxlength'));
 
-		// Close the hint-box.
-		$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
-		$hint->waitUntilNotPresent();
+		// Check default texts in hint-boxes.
+		$hintboxes = [
+			[
+				'field' => 'Deprovisioned users group',
+				'text' => 'Only disabled group can be set for deprovisioned users.'
+			],
+			[
+				'field' => 'Password must contain',
+				'text' => "Password requirements:".
+						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)".
+						"\nmust contain at least one digit (0-9)".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
+			],
+			[
+				'field' => 'Avoid easy-to-guess passwords',
+				'text' => "Password requirements:".
+						"\nmust not contain user's name, surname or username".
+						"\nmust not be one of common or context-specific passwords"
+			]
+		];
 
-		/*
-		 * !!! All password related checks are performed in testPasswordComplexity test !!!
-		 */
+		foreach ($hintboxes as $hintbox) {
+			// Summon the hint-box.
+			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//a')->one()->click();
+			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+
+			// Assert text.
+			$this->assertEquals($hintbox['text'], $hint->one()->getText());
+
+			// Close the hint-box.
+			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+			$hint->waitUntilNotPresent();
+		}
+
+		// Assert default values in form.
+		$default_values = [
+			'Default authentication' => 'Internal',
+			'Deprovisioned users group' => '',
+			'Minimum password length' => 8,
+			'id:passwd_check_rules_case' => false,
+			'id:passwd_check_rules_digits' => false,
+			'id:passwd_check_rules_special' => false,
+			'id:passwd_check_rules_simple' => true
+		];
+
+		foreach ($default_values as $field => $value) {
+			$this->assertEquals($value, $form->getField($field)->getValue());
+		}
+
+		// Check default values in DB.
+		$db_values = [
+			[
+				'authentication_type' => 0,
+				'disabled_usrgrpid' => 0,
+				'passwd_min_length' => 8,
+				'passwd_check_rules' => 8
+			]
+		];
+
+		$this->assertEquals($db_values, CDBHelper::getAll('SELECT authentication_type, disabled_usrgrpid,'.
+				' passwd_min_length, passwd_check_rules FROM config')
+		);
 	}
 
 	public function getFormData() {
@@ -137,7 +189,7 @@ class testFormUserAuthentication extends CWebTest {
 	 *
 	 * @dataProvider getFormData
 	 */
-	public function testFormUserAuthentication_Form($data) {
+	public function testUsersAuthentication_Form($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		}
@@ -175,7 +227,7 @@ class testFormUserAuthentication extends CWebTest {
 		}
 
 		/*
-		 * !!! All password related checks are performed in testPasswordComplexity test !!!
+		 * !!! All password related checks are performed in testUsersPasswordComplexity test !!!
 		 */
 
 	}

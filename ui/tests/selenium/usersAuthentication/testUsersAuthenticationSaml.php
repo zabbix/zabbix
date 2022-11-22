@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config
  */
-class testFormAdministrationAuthenticationSaml extends CWebTest {
+class testUsersAuthenticationSaml extends CWebTest {
 
 	protected function onBeforeTestSuite() {
 		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
@@ -172,7 +172,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * @backup config
 	 * @dataProvider getSamlData
 	 */
-	public function testFormAdministrationAuthenticationSaml_Configure($data) {
+	public function testUsersAuthenticationSaml_Configure($data) {
 		$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
@@ -206,7 +206,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		}
 	}
 
-	public function testFormAdministrationAuthenticationSaml_CheckStatusChange() {
+	public function testUsersAuthenticationSaml_CheckStatusChange() {
 		$settings = [
 			'IdP entity ID' => 'IdP',
 			'SSO service URL' => 'SSO',
@@ -323,7 +323,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * @backup config
 	 * @dataProvider getAuthenticationDetails
 	 */
-	public function testFormAdministrationAuthenticationSaml_Authenticate($data) {
+	public function testUsersAuthenticationSaml_Authenticate($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$settings = [
 			'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,

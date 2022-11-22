@@ -32,11 +32,6 @@ require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
 
-// Authentication.
-require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationHttp.php';
-require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationLdap.php';
-require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationSaml.php';
-
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
@@ -179,12 +174,17 @@ require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
-require_once dirname(__FILE__).'/users/testFormUserAuthentication.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
-require_once dirname(__FILE__).'/users/testPasswordComplexity.php';
+
+// Users authentication.
+require_once dirname(__FILE__).'/usersAuthentication/testUsersAuthentication.php';
+require_once dirname(__FILE__).'/usersAuthentication/testUsersAuthenticationHttp.php';
+require_once dirname(__FILE__).'/usersAuthentication/testUsersAuthenticationLdap.php';
+require_once dirname(__FILE__).'/usersAuthentication/testUsersAuthenticationSaml.php';
+require_once dirname(__FILE__).'/usersAuthentication/testUsersPasswordComplexity.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
@@ -285,11 +285,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
-
-		// Authentication.
-		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
-		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
-		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
@@ -433,12 +428,17 @@ class SeleniumTests {
 
 		// Users.
 		$suite->addTestSuite('testFormUser');
-		$suite->addTestSuite('testFormUserAuthentication');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUsers');
-		$suite->addTestSuite('testPasswordComplexity');
+
+		// Users authentication.
+		$suite->addTestSuite('testUsersAuthentication');
+		$suite->addTestSuite('testUsersAuthenticationHttp');
+		$suite->addTestSuite('testUsersAuthenticationLdap');
+		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');

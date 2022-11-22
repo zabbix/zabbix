@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @dataSource LoginUsers
  */
-class testFormAdministrationAuthenticationLdap extends CWebTest {
+class testUsersAuthenticationLdap extends CWebTest {
 
 	use TableTrait;
 
@@ -245,7 +245,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Test LDAP settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Test($data) {
+	public function testUsersAuthenticationLdap_Test($data) {
 		$form = $this->openLdapForm();
 		$form->fill(['Enable LDAP authentication' => true]);
 		$form->query('button:Add')->waitUntilCLickable()->one()->click();
@@ -270,7 +270,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Check that remove button works.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Remove() {
+	public function testUsersAuthenticationLdap_Remove() {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
@@ -302,7 +302,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Check default LDAP server change.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Default() {
+	public function testUsersAuthenticationLdap_Default() {
 		$form = $this->openLdapForm();
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
@@ -470,7 +470,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Update LDAP server settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Update($data) {
+	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
 			$ldap_settings = [
 				'ldap_settings' => [
@@ -755,7 +755,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Check authentication with LDAP settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Create($data) {
+	public function testUsersAuthenticationLdap_Create($data) {
 		$this->checkLdap($data, 'button:Add');
 
 		// Check error messages.
@@ -781,7 +781,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Check that User Group value in table changes after adding LDAP server to any user group.
 	 */
-	public function testFormAdministrationAuthenticationLdap_UserGroups() {
+	public function testUsersAuthenticationLdap_UserGroups() {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 

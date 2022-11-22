@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  * @onAfter addGuestToDisabledGroup
  * @dataSource LoginUsers
  */
-class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
+class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 	const LOGIN_GUEST	= 1;
 	const LOGIN_USER	= 2;
@@ -505,7 +505,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	 *
 	 * Internal authentication with HTTP settings.
 	 */
-	public function testFormAdministrationAuthenticationHttp_CheckSettings($data) {
+	public function testUsersAuthenticationHttp_CheckSettings($data) {
 		$this->setHttpConfiguration($data);
 
 		// Check authentication on pages.
