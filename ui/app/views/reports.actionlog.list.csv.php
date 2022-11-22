@@ -39,7 +39,7 @@ $csv[] = array_filter([
 	_("Recipient's Zabbix username"),
 	_("Recipient's name"),
 	_("Recipient's surname"),
-	_('Email or username'),
+	_('Recipient'),
 	_('Subject'),
 	_('Message'),
 	_('Command'),
