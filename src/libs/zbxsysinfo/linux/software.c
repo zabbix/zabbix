@@ -594,7 +594,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
-				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
+				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
@@ -686,12 +686,13 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
-				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
+				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
 			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
-				continue;
+				SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+				goto out;
 			}
 
 			ret = SYSINFO_RET_OK;
@@ -704,16 +705,15 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				line = strtok(NULL, "\n");
 			}
+
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+			goto out;
 		}
 	}
 
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+out:
 	zbx_free(buf);
-
-	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
-	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
-
 	zbx_json_free(&json);
 
 	return ret;
