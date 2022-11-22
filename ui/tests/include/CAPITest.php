@@ -65,13 +65,13 @@ class CAPITest extends CTest {
 	 * Make API call.
 	 *
 	 * @param mixed  $data       String containing request data as json.
-	 * @param string $sessionid  Authorization token
+	 * @param string $sessionid  Authorization token.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public function callRaw($data, $sessionid = null) {
+	public function callRaw($data, string $sessionid = null) {
 		return CAPIHelper::callRaw($data, $sessionid);
 	}
 

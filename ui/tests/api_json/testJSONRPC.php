@@ -145,7 +145,7 @@ class testJSONRPC extends CAPITest {
 					],
 					'id' => 1
 				],
-				'token' => 12345
+				'token' => '12345'
 			],
 			// rpc call with invalid "id"
 			[
