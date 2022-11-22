@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-18T14:03:14Z'
+  date: '2022-11-22T19:30:41Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -123,7 +123,7 @@ zabbix_export:
               'devices': devices,
               'error': error_msg.toString()
             });
-          description: 'Item for gathering all the organizations and devices from Meraki API"'
+          description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
           parameters:
             -
