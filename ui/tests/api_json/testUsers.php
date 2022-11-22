@@ -1865,10 +1865,15 @@ class testUsers extends CAPITest {
 		$this->checkResult($this->call('user.logout', []));
 
 		$data = [
-			'userid' => '9',
-			'username' => 'check authentication'
+			'jsonrpc' => '2.0',
+			'method' => 'user.update',
+			'params' => [
+				'userid' => '9',
+				'username' => 'check authentication'
+			],
+			'id' => '1'
 		];
-		$this->checkResult($this->call('user.update', $data), 'Session terminated, re-login, please.');
+		$this->checkResult($this->callRaw($data, CAPIHelper::getSessionId()), 'Session terminated, re-login, please.');
 	}
 
 	public static function login_data() {
