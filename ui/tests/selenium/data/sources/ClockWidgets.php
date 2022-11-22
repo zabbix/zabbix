@@ -88,6 +88,21 @@ class ClockWidgets {
 					],
 					[
 						'type' => 'clock',
+						'name' => 'CopyClock',
+						'x' => 15,
+						'y' => 0,
+						'width' => 5,
+						'height' => 5,
+						'fields' => [
+							[
+								'type' => 0,
+								'name' => 'rf_rate',
+								'value' => -1
+							]
+						]
+					],
+					[
+						'type' => 'clock',
 						'name' => 'DeleteClock',
 						'x' => 5,
 						'y' => 0,
