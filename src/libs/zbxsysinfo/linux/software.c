@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* strptime() */
-#define _XOPEN_SOURCE
+/* strptime() on newer and older GNU/Linux systems */
+#define _GNU_SOURCE
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
