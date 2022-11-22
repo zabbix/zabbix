@@ -34,7 +34,7 @@
 #include "zbxexpr.h"
 #include "zbxdbwrap.h"
 
-extern int	CONFIG_ESCALATOR_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -3312,41 +3312,41 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(triggerid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_ITEM:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is null and"
 					" itemid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(itemid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_SERVICE:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(serviceid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(escalationid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 	}

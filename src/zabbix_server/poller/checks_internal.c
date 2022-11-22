@@ -31,6 +31,7 @@
 #include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -476,7 +477,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		process_forks = get_process_type_forks(process_type);
+		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? CONFIG_FORKS[process_type] : 0;
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";

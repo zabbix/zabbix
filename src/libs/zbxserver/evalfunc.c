@@ -1542,7 +1542,7 @@ static int	evaluate_SUM(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, cons
 	int				arg1, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_history_record_t	values;
-	history_value_t			result;
+	zbx_history_value_t		result;
 	zbx_timespec_t			ts_end = *ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3216,10 +3216,10 @@ static int	evaluate_RATE(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, con
 
 	if (1 < values.values_num)
 	{
-		history_value_t	last = {0};
-		int		i;
-		double		delta, gap_start, gap_end, sampled_interval, average_duration_between_samples,
-				threshold, interval, range, range_start, range_end;
+		zbx_history_value_t	last = {0};
+		int			i;
+		double			delta, gap_start, gap_end, sampled_interval, average_duration_between_samples,
+					threshold, interval, range, range_start, range_end;
 
 		/* Reset detection */
 

@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxserver.h"
+#include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -97,7 +98,6 @@ zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
 zbx_shmem_info_t	*config_mem;
 
 extern unsigned char	program_type;
-extern int		CONFIG_TIMER_FORKS;
 
 ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
 
@@ -248,7 +248,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY))
 			{
-				if (0 == CONFIG_PINGER_FORKS)
+				if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER])
 					break;
 
 				return ZBX_POLLER_TYPE_PINGER;
@@ -262,27 +262,27 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_INTERNAL:
-			if (0 == CONFIG_POLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_POLLER])
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_DB_MONITOR:
-			if (0 == CONFIG_ODBCPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER])
 				break;
 
 			return ZBX_POLLER_TYPE_ODBC;
 		case ITEM_TYPE_CALCULATED:
-			if (0 == CONFIG_HISTORYPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER])
 				break;
 
 			return ZBX_POLLER_TYPE_HISTORY;
 		case ITEM_TYPE_IPMI:
-			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 				break;
 
 			return ZBX_POLLER_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
-			if (0 == CONFIG_JAVAPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
@@ -7733,7 +7733,7 @@ int	init_configuration_cache(char **error)
 	}
 
 	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
-			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
+			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] * sizeof(zbx_vector_ptr_t));
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
 														\
@@ -7905,7 +7905,7 @@ int	init_configuration_cache(char **error)
 	config->um_cache = um_cache_create();
 
 	/* maintenance data are used only when timers are defined (server) */
-	if (0 != CONFIG_TIMER_FORKS)
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER])
 	{
 		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
 		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL,

@@ -97,10 +97,13 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
  ******************************************************************************/
 static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
 {
+	char	*tmp;
+
 	if (NULL != item->trends_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->trends_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		zbx_free(item->trends_period);
+		item->trends_period = tmp;
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -113,8 +116,9 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 	if (NULL != item->history_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->history_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		zbx_free(item->history_period);
+		item->history_period = tmp;
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;

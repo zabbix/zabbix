@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "stats.h"
-#include "log.h"
 #include "zbxnum.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
