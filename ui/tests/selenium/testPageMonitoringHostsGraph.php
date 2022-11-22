@@ -798,7 +798,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
-			foreach ($this->query('xpath://tbody//img')->all() as $source) {
+			foreach ($this->query("xpath://tbody//img")->all() as $source) {
 				$graph_sources[] = $source->getAttribute('src');
 			}
 
