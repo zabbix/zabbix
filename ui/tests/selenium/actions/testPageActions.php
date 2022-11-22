@@ -183,14 +183,12 @@ class testPageActions extends CLegacyWebTest {
 	*/
 	public function testPageActions_SimpleUpdate($action) {
 		$this->calculateHash($action['actionid']);
-
 		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
 		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent($action['name']);
-
 		$this->verifyHash();
 	}
 
@@ -206,13 +204,13 @@ class testPageActions extends CLegacyWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestClickXpath('//a[contains(@actionid,"'.$action['actionid'].'") and (text()="Enabled")]');
+				$this->zbxTestClickXpath('//a[contains(@data-actionid,"'.$action['actionid'].'") and (text()="Enabled")]');
 				$this->page->acceptAlert();
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$this->zbxTestClickXpath('//a[contains(@actionid,"'.$action['actionid'].'") and (text()="Disabled")]');
+				$this->zbxTestClickXpath('//a[contains(@data-actionid,"'.$action['actionid'].'") and (text()="Disabled")]');
 				$this->page->acceptAlert();
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;

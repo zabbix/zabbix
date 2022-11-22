@@ -486,8 +486,8 @@ class testFormAction extends CLegacyWebTest {
 		]);
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
-			$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Trigger name contains TEST1');
-			$this->zbxTestAssertElementText('//tr[@data-row_index="1"]//td[@class="wordwrap"]', 'Trigger name contains TEST2');
+			$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Tag name equals TEST1');
+			$this->zbxTestAssertElementText('//tr[@data-row_index="1"]//td[@class="wordwrap"]', 'Tag name equals TEST2');
 			$this->zbxTestAssertElementPresentXpath('//tr[@data-row_index="0"]//button[@type="button" and text()="Remove"]');
 			$this->zbxTestAssertElementPresentXpath('//tr[@data-row_index="1"]//button[@type="button" and text()="Remove"]');
 		}
@@ -1241,9 +1241,9 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Trigger name contains trigger',
+						'A' => 'Tag name does not contain Does not contain Tag',
 						'B' => 'Trigger severity equals Warning',
-						'C' => 'Tag name does not contain Does not contain Tag'
+						'C' => 'Trigger name contains trigger'
 					],
 					'operations' => [
 						[
@@ -1284,8 +1284,8 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Service type equals FTP',
-						'B' => 'Received value does not contain Received value'
+						'A' => 'Received value does not contain Received value',
+						'B' => 'Service type equals FTP'
 					],
 					'operations' => [
 						[
@@ -1325,8 +1325,8 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Host name contains Zabbix',
-						'B' => 'Host metadata does not contain Zabbix'
+						'A' => 'Host metadata does not contain Zabbix',
+						'B' => 'Host name contains Zabbix'
 					],
 					'operations' => [
 						[

@@ -81,7 +81,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (524, 12, 2, 1, '13485');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (525, 12, 2, 0, '99252');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (526, 12, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (527, 12, 1, 0, '99134');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (528, 12, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (529, 12, 0, 0, '2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (530, 13, 26, 3, 'PostgreSQL', 'Database');
@@ -102,7 +102,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (548, 13, 2, 1, '13485');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (549, 13, 2, 0, '99252');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (550, 13, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (551, 13, 1, 0, '99134');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (552, 13, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (553, 13, 0, 0, '2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (554, 14, 26, 3, 'PostgreSQL', 'Database');
@@ -123,7 +123,7 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (572, 14, 2, 1, '13485');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (573, 14, 2, 0, '99252');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (574, 14, 1, 1, '10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (575, 14, 1, 0, '10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (575, 14, 1, 0, '99134');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (576, 14, 0, 1, '4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (577, 14, 0, 0, '2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (578, 15, 22, 3, 'DB2');
