@@ -55,7 +55,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API"</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API.</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Data item errors |<p>Item for gathering all the data item errors.</p> |DEPENDENT |meraki.get.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
@@ -89,7 +89,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
-|{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in metric config and in URL query.</p> |`1200` |
+|{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in the metric config and in the URL query.</p> |`1200` |
 |{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
