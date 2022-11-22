@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "proc.h"
-#include "log.h"
 
 static int	vm_memory_total(AGENT_RESULT *result)
 {
