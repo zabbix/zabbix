@@ -1084,31 +1084,20 @@ footer {
       color: #000000;
       background-color: transparent;
       font-size: 100%; }
+      .dashboard-edit ul li .zi-plus:hover, .dashboard-edit ul li .zi-plus:focus, .dashboard-edit ul li .zi-plus:active {
+        color: #ffffff;
+        background-color: #484848;
+        border-color: #484848; }
       .dashboard-edit ul li .zi-plus::before {
         padding-right: 5px;
         vertical-align: unset;
         font-size: 8px; }
-      .dashboard-edit ul li .zi-plus:hover {
-        color: #ffffff;
-        background-color: #484848;
-        border-color: #484848; }
-      .dashboard-edit ul li .zi-plus:focus {
-        color: #ffffff;
-        background-color: #484848;
-        border-color: #484848; }
-      .dashboard-edit ul li .zi-plus:active {
-        color: #ffffff;
-        background-color: #484848;
-        border-color: #484848; }
   .dashboard-edit .zi-cog-filled {
     padding: 0;
     width: 24px;
     height: 24px;
     color: #768d99;
     opacity: .5;
-    background-color: transparent;
-    border: none;
-    border-radius: 2px;
     transition: opacity .2s ease-out; }
     .dashboard-edit .zi-cog-filled:hover, .dashboard-edit .zi-cog-filled:focus {
       box-shadow: 0 0 0 2px #000000;
@@ -1172,9 +1161,6 @@ footer {
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #ffffff; }
   .dashboard-navigation-tabs .zi-more {
-    background-color: transparent;
-    border: none;
-    border-radius: 0;
     padding: 0; }
     .dashboard-navigation-tabs .zi-more::before {
       top: -1px;
@@ -1320,9 +1306,6 @@ footer {
     top: 2px;
     color: #768d99;
     opacity: .5;
-    background-color: transparent;
-    border: none;
-    border-radius: 2px;
     transition: opacity .2s ease-out; }
     .dashboard-grid-widget-actions .zi-more:hover, .dashboard-grid-widget-actions .zi-more:focus,
     .dashboard-grid-widget-actions .zi-cog-filled:hover,
@@ -5022,6 +5005,12 @@ button {
 
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
+
+.dashboard-edit .zi-cog-filled, .dashboard-navigation-tabs .zi-more, .dashboard-grid-widget-actions .zi-more,
+.dashboard-grid-widget-actions .zi-cog-filled {
+  background-color: transparent;
+  border: none;
+  border-radius: 2px; }
 
 .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-expand, .btn-widget-edit {
   width: 24px;

@@ -47,29 +47,23 @@
 			.zi-plus {
 				width: unset;
 				height: unset;
-
 				padding: 0 11px 0 8px;
+
 				color: $btn-alt-font-color;
 				background-color: $btn-alt-bg-color;
 				font-size: 100%;
+
+				&:hover,
+				&:focus,
+				&:active {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+				}
 
 				&::before {
 					padding-right: 5px;
 					vertical-align: unset;
 
 					font-size: 8px;
-				}
-
-				&:hover {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
-				}
-
-				&:focus {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
-				}
-
-				&:active {
-					@include btn-hover-active($btn-font-color, $btn-bg-color);
 				}
 			}
 		}
@@ -82,18 +76,13 @@
 
 		color: $icon-header-controls-color;
 		opacity: .5;
-
-		background-color: transparent;
-		border: none;
-		border-radius: 2px;
-
 		transition: opacity .2s ease-out;
-
 		&:hover,
 		&:focus {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
 		}
+		@extend %btn-reset;
 	}
 }
 
@@ -203,16 +192,13 @@
 	}
 
 	.zi-more {
-		background-color: transparent;
-		border: none;
-		border-radius: 0;
-
 		padding: 0;
-
 		&::before {
 			top: -1px;
 			padding: 0 3px;
 		}
+
+		@extend %btn-reset;
 	}
 }
 
@@ -428,28 +414,22 @@
 	padding-right: 2px;
 
 	.zi-more,
-	.zi-cog-filled	{
+	.zi-cog-filled {
 		padding: 0;
 		width: 24px;
 		height: 24px;
-
 		position: relative;
 		top: 2px;
 
 		color: $icon-header-controls-color;
 		opacity: .5;
-
-		background-color: transparent;
-		border: none;
-		border-radius: 2px;
-
 		transition: opacity .2s ease-out;
-
 		&:hover,
 		&:focus {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
 		}
+		@extend %btn-reset;
 	}
 }
 
