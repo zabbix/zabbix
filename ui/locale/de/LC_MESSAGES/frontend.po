@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-07-08 20:03+0000\n"
-"Last-Translator: Stephan Burger <stephan.burger@mail.de>\n"
+"PO-Revision-Date: 2022-11-03 14:45+0000\n"
+"Last-Translator: Peter Störmer <peter.stoermer@mettenmeier.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr "%1$s (Jahr %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - ausgelöst von einem Modul mit der Adresse %2$s."
 
 #: app/partials/monitoring.latest.view.html.php:133
 #, c-format
@@ -131,12 +131,12 @@ msgstr[1] "%1$s Aktionen"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s Zeichen"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s verbleibende Zeichen"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -150,8 +150,8 @@ msgstr[1] "%1$s Ereignisse"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Host in Wartung"
+msgstr[1] "%1$s Hosts in Wartung"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:32
@@ -232,8 +232,8 @@ msgstr[1] "%1$s Sekunden"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s unbestätigtes Problem"
+msgstr[1] "%1$s unbestätigte Probleme"
 
 #: app/views/monitoring.widget.problems.view.php:272
 #, c-format
@@ -356,7 +356,7 @@ msgstr "<manuell>"
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<Metrikname>{<Labelname>=\"<Labelwert>\", ...} == <Wert>"
 
 #: app/views/administration.script.edit.php:44
 msgid "<sub-menu/sub-menu/...>script"
@@ -364,7 +364,7 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:784
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "ÜBERSCHREIBEN HINZUFÜGEN"
 
 #: app/views/popup.discovery.check.php:113
 #: include/views/js/configuration.host.edit.js.php:134
@@ -414,7 +414,7 @@ msgstr "Bestätigte PROBLEM-Ereignisse"
 
 #: app/views/administration.trigdisplay.edit.php:73
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Bestätigte GELÖST-Ereignisse"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -509,7 +509,7 @@ msgstr "Aktion hinzugefügt"
 #: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Aktionsklasse %1$s muss die Klasse %2$s erweitern."
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -750,7 +750,7 @@ msgstr "Host hinzufügen"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr ""
+msgstr "Fehlendes hinzufügen"
 
 #: jsLoader.php:326
 msgid "Add multiple maps"
@@ -762,7 +762,7 @@ msgstr "Neuen Datensatz hinzufügen"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr ""
+msgstr "Neues Interface hinzufügen"
 
 #: include/classes/widgets/CWidgetHelper.php:738
 msgid "Add new override"
@@ -825,7 +825,7 @@ msgstr "Jünger als"
 #: include/views/monitoring.overview.triggers.php:71
 #, c-format
 msgid "Age less than %1$s"
-msgstr ""
+msgstr "Jünger als %1$s"
 
 #: app/views/administration.script.list.php:87 app/views/popup.generic.php:618
 #: include/hosts.inc.php:1407 include/items.inc.php:345
@@ -859,15 +859,15 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
-msgstr ""
+msgstr "Zusammenfassung"
 
 #: include/classes/widgets/CWidgetHelper.php:1122
 msgid "Aggregation function"
-msgstr ""
+msgstr "Zusammenfassende Funktion"
 
 #: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Zusammenfassungsintervall"
 
 #: include/actions.inc.php:2132
 msgid "Alert message"
@@ -1106,7 +1106,7 @@ msgstr "Verwenden"
 
 #: include/views/configuration.hostgroups.edit.php:46
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Berechtigungen und Tag-Filter auf alle Untergruppen anwenden"
 
 #: include/views/configuration.maintenance.list.php:64
 #: include/views/configuration.maintenance.list.php:98
@@ -1273,7 +1273,7 @@ msgstr "August"
 
 #: app/views/administration.authentication.edit.php:212
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN-Anfragen"
 
 #: app/views/administration.authentication.edit.php:254
 #: app/views/administration.authentication.edit.php:263
@@ -1473,14 +1473,14 @@ msgstr "Blau"
 #: include/views/configuration.item.edit.php:298
 #: include/views/configuration.item.prototype.edit.php:279
 msgid "Body"
-msgstr ""
+msgstr "Hauptteil"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:261
 #: include/views/configuration.item.edit.php:300
 #: include/views/configuration.item.prototype.edit.php:281
 msgid "Body and headers"
-msgstr ""
+msgstr "Hauptteil und Kopfzeilen"
 
 # Vielleicht reichts sogar "fett"
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:765
@@ -1745,7 +1745,7 @@ msgstr "Kann Wartung nicht hinzufügen"
 #: include/classes/api/services/CMap.php:1509
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Karten-Element der Karte \"%1$s\" kann aufgrund einer zirkulären Referenz nicht hinzugefügt werden."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -1756,8 +1756,8 @@ msgstr "Kann Medientyp nicht hinzufügen"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Modul kann nicht hinzugefügt werden: %1$s."
+msgstr[1] "Module können nicht hinzugefügt werden: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2064,7 +2064,7 @@ msgstr "Kann Bild nicht löschen"
 #: include/classes/api/services/CHostInterface.php:626
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Interface für erkannten Host \"%1$s\" kann nicht gelöscht werden."
 
 #: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
@@ -2100,8 +2100,8 @@ msgstr[1] "Kann Medien-Typ nicht löschen"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Modul kann nicht gelöscht werden: %1$s."
+msgstr[1] "Module können nicht gelöscht werden: %1$s."
 
 #: sysmaps.php:259
 msgid "Cannot delete network map"
@@ -2217,7 +2217,7 @@ msgstr "Kann Auslöser nicht löschen"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Kann Benutzer nicht löschen"
-msgstr[1] ""
+msgstr[1] "Benutzer können nicht gelöscht werden"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2276,8 +2276,8 @@ msgstr[1] "Kann Medientypen nicht deaktivieren"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Modul kann nicht deaktiviert werden: %1$s."
+msgstr[1] "Module können nicht deaktiviert werden: %1$s."
 
 #: triggers.php:555
 msgid "Cannot disable trigger"
@@ -2340,8 +2340,8 @@ msgstr[1] "Kann Medientypen nicht aktivieren"
 #, c-format
 msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Modul kann nicht aktiviert werden: %1$s."
+msgstr[1] "Module können nicht aktiviert werden: %1$s."
 
 #: triggers.php:554
 msgid "Cannot enable trigger"
