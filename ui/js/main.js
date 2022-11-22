@@ -655,25 +655,35 @@ var hintBox = {
 };
 
 /**
- * Perform Json-RPC Zabbix API call.
+ * Perform JSON-RPC Zabbix API call.
  *
- * @param method
- * @param params
- * @param id
+ * @param {string} method
+ * @param {object} params
+ * @param {string} sessionid
  *
  * @returns {Promise<any>}
  */
-function ApiCall(method, params, id = 1) {
+function ApiCall(method, params, sessionid = null) {
+	let headers = { 'Content-Type': 'application/json' };
+	let credentials = 'same-origin';
+
+	if (['user.login', 'user.checkauthentication', 'apiinfo.version', 'settings.getglobal'].includes(method)) {
+		credentials = 'omit';
+	}
+
+	if (sessionid) {
+		headers.Authorization = 'Bearer ' + sessionid;
+	}
+
 	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
+		headers,
+		credentials,
 		body: JSON.stringify({
 			jsonrpc: '2.0',
 			method,
 			params,
-			id
+			id: 1
 		}),
 	}).then((response) => response.json());
 }
