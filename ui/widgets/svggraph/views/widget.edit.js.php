@@ -726,15 +726,15 @@ window.widget_svggraph_form = new class {
 			const dataset_number = parseInt(dataset_index) + 1;
 
 			legend_label.placeholder = 'Data set #'+dataset_number;
-
-			const datasets = this._dataset_wrapper.querySelectorAll('[data-set]');
-
-			datasets.forEach(function (element, i) {
-				element.firstChild.textContent = element.querySelector(`[name="ds[${i}][legend_label]"]`).value
-					? element.querySelector(`[name="ds[${i}][legend_label]"]`).value
-					: element.querySelector(`[name="ds[${i}][legend_label]"]`).placeholder;
-			});
 		}
+
+		const datasets = this._dataset_wrapper.querySelectorAll('[data-set]');
+
+		datasets.forEach(function (element, i) {
+			element.firstChild.textContent = element.querySelector(`[name="ds[${i}][legend_label]"]`).value
+				? element.querySelector(`[name="ds[${i}][legend_label]"]`).value
+				: element.querySelector(`[name="ds[${i}][legend_label]"]`).placeholder;
+		});
 
 		// Displaying options tab.
 		const percentile_left_checkbox = document.getElementById('percentile_left');
