@@ -277,7 +277,7 @@ class CConfigurationImportcompare {
 				$entity['uniqueness'][] = $unique_values;
 			}
 			// To make unique entity string, get result values, get rid of value duplicates and sort them.
-			$entity['uniqueness'] = array_unique(CArrayHelper::flatten($entity['uniqueness']));
+			$entity['uniqueness'] = array_unique($this->flatten($entity['uniqueness']));
 			sort($entity['uniqueness']);
 
 			$entity['uniqueness'] = implode('/', $entity['uniqueness']);
@@ -324,6 +324,28 @@ class CConfigurationImportcompare {
 			}
 			else {
 				$result = array_column($entity, $field_key_path);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Return multidimensional array as one dimensional array.
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	private function flatten(array $array): array {
+		$result = [];
+
+		foreach ($array as $value) {
+			if (is_array($value)) {
+				$result = array_merge($result, self::flatten($value));
+			}
+			else {
+				$result[] = $value;
 			}
 		}
 
