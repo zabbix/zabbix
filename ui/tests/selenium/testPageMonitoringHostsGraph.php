@@ -224,7 +224,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2']
+						'Tags' => [
+							'tag_name_2'
+						]
 					],
 					'graphs_amount' => 3,
 					'graph_names' => [
@@ -243,7 +245,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2']
+						'Tags' => [
+							'tag_name_2'
+						]
 					],
 					'graphs_amount' => 2,
 					'graph_names' => [
@@ -259,7 +263,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2']
+						'Tags' => [
+							'tag_name_2'
+						]
 					],
 					'graphs_amount' => 1,
 					'item_names' => [
@@ -337,8 +343,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2'],
-						'Tag values' => ['tag_value_3']
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
 					],
 					'graphs_amount' => 1,
 					'graph_names' => [
@@ -353,8 +363,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2'],
-						'Tag values' => ['tag_value_3']
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
 					],
 					'graphs_amount' => 1,
 					'graph_names' => [
@@ -369,8 +383,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
-						'Tags' => ['tag_name_2'],
-						'Tag values' => ['tag_value_3']
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
 					]
 				]
 			],
@@ -385,7 +403,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1',
 							'tag_name_2'
 						],
-						'Tag values' => ['tag_value_3']
+						'Tag values' => [
+							'tag_value_3'
+						]
 					],
 					'graphs_amount' => 1,
 					'graph_names' => [
@@ -404,7 +424,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1',
 							'tag_name_2'
 						],
-						'Tag values' => ['tag_value_3']
+						'Tag values' => [
+							'tag_value_3'
+						]
 					],
 					'graphs_amount' => 1,
 					'graph_names' => [
@@ -423,7 +445,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 							'tag_name_1',
 							'tag_name_2'
 						],
-						'Tag values' => ['tag_value_3']
+						'Tag values' => [
+							'tag_value_3'
+						]
 					]
 				]
 			],
@@ -637,7 +661,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graph_names' => [
 						'Graph_2',
 						'Graph_3'
-					],
+					]
 				]
 			],
 			// #5 Show simple graphs for host with graph name.
