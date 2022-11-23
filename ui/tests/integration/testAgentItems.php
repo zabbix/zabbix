@@ -490,6 +490,20 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 2
+		],
+		[
+			'key' => 'net.tcp.port[123.123.123.123,111]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENTD,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
+		],
+		[
+			'key' => 'net.tcp.port[123.123.123.123,111]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
 		]
 	];
 
