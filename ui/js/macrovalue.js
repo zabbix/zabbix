@@ -75,9 +75,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('icon-text icon-secret') // todo zi
-			.addClass('btn-alt btn-dropdown-toggle icon-invisible'); // todo zi
-
+			.removeClass('icon-text zi-text icon-secret')
+			.addClass('btn-alt btn-dropdown-toggle icon-invisible zi-chevron-down');
 		$this.hide();
 	}
 
@@ -98,6 +97,8 @@
 			value_type = $this.val(),
 			$container = $this.closest('.macro-input-group'),
 			curr_value_type = getCurrentValueType($container);
+
+		$('.btn-dropdown-container button', $container).addClass('zi-chevron-down'); // todo: needs a better implementation (acikuns)
 
 		if (value_type == curr_value_type) {
 			return false;

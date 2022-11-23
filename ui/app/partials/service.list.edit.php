@@ -116,12 +116,14 @@ foreach ($data['services'] as $serviceid => $service) {
 		(new CCol([
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_ADD)
+				->addClass('zi-plus')
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Add child service'))
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButton(null))
 				->addClass(ZBX_STYLE_BTN_EDIT)
+				->addClass('zi-pencil')
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
 				->setTitle(_('Edit'))

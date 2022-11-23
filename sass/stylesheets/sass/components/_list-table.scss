@@ -1,4 +1,37 @@
 .list-table {
+	.list-table-actions {
+		.zi-plus,
+		.zi-pencil {
+			width: 18px;
+			height: 18px;
+			min-height: 18px;
+			margin-left: 5px;
+			padding: 0 2px;
+			vertical-align: middle;
+
+			color: $icon-header-controls-color;
+
+			@extend %btn-reset;
+
+			&:hover,
+			&:focus,
+			&:active {
+				&::before {
+					opacity: 1;
+				}
+			}
+
+			&::before {
+				top: -1px;
+				right: 2px;
+				vertical-align: middle;
+
+				font-size: 18px;
+				opacity: 0.5;
+			}
+		}
+	}
+
 	button,
 	a {
 		&.zi-bullet-right,
@@ -116,5 +149,13 @@
 	.zi-calendar-check,
 	.zi-envelope-filled {
 		color: $icon-action-list-table-color;
+	}
+
+	.zi-wrench-alt {
+		&::before {
+			padding-left: 6px;
+			font-size: 12px;
+			color: #f3a914;
+		}
 	}
 }

@@ -144,6 +144,7 @@ class CHtmlPage {
 				(new CButton(null, _('Show sidebar')))
 					->setId('sidebar-button-toggle') // todo zi
 					->addClass('button-toggle') // todo zi
+					->addClass('zi-menu') // todo zi
 					->setAttribute('title', _('Show sidebar'))
 			))
 				->addClass('sidebar-nav-toggle') // todo zi

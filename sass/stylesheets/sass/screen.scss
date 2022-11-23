@@ -320,9 +320,9 @@ form {
 			@extend %overflow-ellipsis;
 		}
 
-		[class*='icon-'] {
-			flex-shrink: 0;
-		}
+		//[class*='icon-'] {
+		//	flex-shrink: 0;
+		//}
 
 		.rel-container {
 			display: flex;
@@ -331,16 +331,6 @@ form {
 		.separator {
 			flex-shrink: 0;
 			margin-right: 4px;
-		}
-	}
-
-	td {
-		.icon-maintenance {
-			margin: 0 0 -3px 4px;
-		}
-
-		.icon-ackn {
-			margin: 0 4px -3px 0;
 		}
 	}
 
@@ -402,22 +392,6 @@ form {
 						}
 					}
 				}
-
-				@if $theme-name == 'blue' or $theme-name == 'dark' {
-					&:not(.row-selected):not(:hover) {
-						td {
-							[class*='icon-'] {
-								background-color: $ui-bg-color;
-								border-radius: 2px;
-							}
-
-							[class*='icon-depend-'],
-							.icon-wizard-action {
-								background-color: transparent;
-							}
-						}
-					}
-				}
 			}
 		}
 
@@ -456,18 +430,6 @@ form {
 			vertical-align: middle;
 			white-space: nowrap;
 
-			[class*='icon-'] {
-				&::after {
-					margin: 0;
-					line-height: 14px;
-					top: 0;
-				}
-
-				&:last-of-type {
-					margin-right: 0;
-				}
-			}
-
 			.rel-container {
 				span {
 					margin: 0;
@@ -494,20 +456,8 @@ form {
 				}
 			}
 
-			.icon-maintenance {
-				height: 12px;
-				width: 12px;
-				margin: 3px 1px 2px 4px;
-
-				&::before {
-					height: 12px;
-					width: 12px;
-					background-position: -49px -805px;
-				}
-			}
-
 			.icon-wizard-action {
-				background: url($sprite-path) no-repeat -6px -624px;
+				background: url($sprite-path) no-repeat -6px -624px; // todo last
 				height: 12px;
 				min-height: 12px;
 				margin: 0;
@@ -1519,6 +1469,13 @@ form {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
+
+	.zi-check,
+	.zi-alert-more {
+		&::before {
+			color: $icon-header-controls-color;
+		}
+	}
 }
 
 .border-left {
@@ -2061,7 +2018,7 @@ button {
 		}
 	}
 }
-
+// todo last
 $icon-btn: (
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
@@ -2079,7 +2036,7 @@ $icon-btn: (
 		@extend %button-icon-size;
 	}
 }
-
+// todo last
 $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
@@ -2537,43 +2494,6 @@ button[disabled] {
 	margin: 0 14px 0 0;
 }
 
-$var-icons: (
-	maintenance: url($sprite-path) no-repeat -47px -803px,
-	ackn: url($sprite-path) no-repeat -47px -694px
-);
-
-// Dynamically generated classes:
-//  .icon-maintenance
-//  .icon-ackn
-@each $var-icons, $bgimage in $var-icons {
-	.icon-#{$var-icons} {
-		position: relative;
-		display: inline-block;
-		width: 16px;
-		height: 16px;
-		border-radius: 2px;
-
-		&::before {
-			@extend %var-icons;
-			background: $bgimage;
-			width: 14px;
-			height: 14px;
-			left: 1px;
-			top: 1px;
-		}
-
-		&:link,
-		&:hover,
-		&:focus {
-			border-bottom: none;
-		}
-
-		&:focus {
-			box-shadow: 0 0 0 2px $btn-border-focus-color;
-		}
-	}
-}
-
 $trigger-expression-tree-icons: (
 	top-bottom: -84px -300px,
 	top-bottom-right: -84px -334px,
@@ -2585,7 +2505,7 @@ $trigger-expression-tree-icons: (
 	margin: 0 12px 0 0;
 
 	&::before {
-		background: url($sprite-path) no-repeat;
+		background: url($sprite-path) no-repeat; // todo last
 		display: inline-block;
 		width: 12px;
 		height: 12px;
@@ -2610,7 +2530,7 @@ $trigger-expression-tree-icons: (
 }
 
 $form-icon-btn: (
-	wizard-action: url($sprite-path) no-repeat -6px -617px
+	wizard-action: url($sprite-path) no-repeat -6px -617px // todo last
 );
 
 // Dynamically generated classes:
@@ -2650,7 +2570,7 @@ $form-icon-btn: (
 .drag-icon {
 	margin-left: -9px;
 	height: 24px;
-	background: url($sprite-path) no-repeat -6px -762px;
+	background: url($sprite-path) no-repeat -6px -762px; // todo last
 	@extend %button-icon-size;
 }
 
@@ -2691,7 +2611,7 @@ $form-icon-btn: (
 		left: 0;
 		width: 14px;
 		height: 14px;
-		background: url($sprite-path) no-repeat -47px -659px;
+		background: url($sprite-path) no-repeat -47px -659px; // todo last
 	}
 
 	&.status-red {
@@ -2953,7 +2873,7 @@ $form-icon-btn: (
 				position: absolute;
 				left: 0;
 				content: '';
-				background: url($sprite-path) no-repeat -5px -835px;
+				background: url($sprite-path) no-repeat -5px -835px; // todo last
 			}
 		}
 
@@ -2966,18 +2886,6 @@ $form-icon-btn: (
 			padding: 0;
 			margin: 0;
 			border-left-color: $font-alt-color;
-		}
-
-		&[class*='icon-'] {
-			&::before {
-				position: absolute;
-				top: 0;
-				left: 0;
-				display: block;
-				width: 22px;
-				height: 22px;
-				content: "";
-			}
 		}
 
 		&.disabled {
@@ -3004,6 +2912,26 @@ $form-icon-btn: (
 		border-top: 1px solid $overlay-border-color;
 		border-left: 1px solid $overlay-border-color;
 		transform: rotate(45deg);
+	}
+}
+
+.menu-popup-item.zi-text,
+.menu-popup-item.zi-eye-off,
+.menu-popup-item.zi-lock {
+	padding: 0 0 0 5px;
+	&::before {
+		top: -2px;
+		padding-right: 5px;
+		vertical-align: middle;
+
+		font-size: 16px;
+		color: $icon-header-controls-color;
+	}
+}
+
+.menu-popup-item.zi-eye-off {
+	&::before {
+		font-size: 18px;
 	}
 }
 
@@ -3435,7 +3363,7 @@ $form-icon-btn: (
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
-			background: url($sprite-path) no-repeat -85px -691px;
+			background: url($sprite-path) no-repeat -85px -691px; // todo last
 		}
 	}
 }
@@ -3637,7 +3565,7 @@ $form-icon-btn: (
 		height: 14px;
 		float: left;
 		margin-top: 20px;
-		background: url($sprite-path) no-repeat -11px -587px;
+		background: url($sprite-path) no-repeat -11px -587px; // todo last
 	}
 }
 
@@ -4940,8 +4868,6 @@ svg {
 					display: flex;
 					width: 85px;
 
-					.btn-add,
-					.btn-edit,
 					.btn-import,
 					.btn-remove {
 						&:focus {
@@ -5119,83 +5045,17 @@ a.icon-count {
 ::placeholder {
 	color: $input-placeholder-color;
 }
-// todo ikonki
-.icon-invisible,
-.icon-user,
-.icon-user-group {
-	display: inline-block;
-	position: relative;
-	height: 18px;
-	width: 18px;
-	margin: 0 5px 0 0;
-	top: 0;
-	bottom: 0;
-	vertical-align: bottom;
 
-	&::before {
-		content: '';
-		display: inline-block;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 18px;
-		height: 18px;
-		background-image: url($sprite-path);
-		background-repeat: no-repeat;
-	}
-}
-
-.icon-invisible {
-	&:link,
-	&:hover,
-	&:focus {
-		border-bottom: none;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-border-focus-color;
-		border-radius: 2px;
-	}
-}
-
-[data-count][class*='icon-']::after {
-	position: absolute;
-	top: -2px;
-	content: attr(data-count);
-	text-align: center;
-	font-size: 9px;
-	letter-spacing: -.25px;
-	line-height: 18px;
-	width: 18px;
-}
-
-.icon-invisible::before {
-	background-position: -89px -803px;
-}
-
-.icon-user,
-.icon-user-group {
-	height: 16px;
-	width: 16px;
-	vertical-align: top;
-
-	&::before {
-		height: inherit;
-		width: inherit;
-	}
-}
-
-.icon-user {
-	&::before {
-		background-position: -339px -46px;
-	}
-}
-
-.icon-user-group {
-	&::before {
-		background-position: -339px -8px;
-	}
-}
+//[data-count][class*='icon-']::after {
+//	position: absolute;
+//	top: -2px;
+//	content: attr(data-count);
+//	text-align: center;
+//	font-size: 9px;
+//	letter-spacing: -.25px;
+//	line-height: 18px;
+//	width: 18px;
+//}
 
 .zi-circle-question-filled {
 	&::before {
@@ -5438,7 +5298,7 @@ a.icon-count {
 				width: 22px;
 				height: 22px;
 				content: '';
-				background: url($sprite-path) no-repeat -119px -474px;
+				background: url($sprite-path) no-repeat -119px -474px; // todo last
 			}
 
 			&.is-focused {
@@ -5456,16 +5316,6 @@ a.icon-count {
 				&::before {
 					background-position: -431px -474px;
 				}
-			}
-		}
-
-		&.btn-dropdown-toggle {
-			border-color: $form-border-focus-color;
-			border-top-left-radius: 0;
-			border-bottom-left-radius: 0;
-
-			&:disabled {
-				@extend %form-disabled;
 			}
 		}
 	}
@@ -5502,63 +5352,61 @@ a.icon-count {
 
 .btn-dropdown-container {
 	display: flex;
-}
-
-.icon-text {
-	&::before {
-		background: url($sprite-path) no-repeat -87px -474px;
-	}
-
-	&:not(.highlighted):enabled {
+	.zi-text,
+	.zi-eye-off,
+	.zi-lock {
+		padding: 0 5px;
+		&::before {
+			font-size: 15px;
+			color: $icon-header-controls-color;
+		}
 		&:hover,
-		&:focus,
 		&:active,
-		&[aria-expanded="true"] {
+		&:focus {
 			&::before {
-				background-position: -399px -474px;
+				color: $white;
 			}
 		}
 	}
-}
 
-.icon-secret {
-	&::before {
-		background: url($sprite-path) no-repeat -87px -510px;
-	}
+	.zi-chevron-down {
+		border-radius: 0 2px 2px 0;
+		&::after {
+			display: inline-block;
+			padding-left: 3px;
+			float: right;
+			top: 3px;
 
-	&:not(.highlighted):enabled {
+			font-size: 7px;
+
+			transform: rotate(0deg) translateX(0) translateY(0);
+			@if $menu-main-icons-opacity < 1 {
+				opacity: $menu-main-icons-opacity;
+			}
+		}
+
 		&:hover,
-		&:focus,
-		&:active,
+		&:focus {
+			&::after {
+				@if $menu-main-icons-opacity < 1 {
+					opacity: 1;
+				}
+			}
+		}
+
 		&[aria-expanded="true"] {
-			&::before {
-				background-position: -399px -510px;
+			&::after {
+				transform: rotate(-180deg) translateX(-3px) translateY(1px);
+			}
+
+			@if $menu-main-icons-opacity < 1 {
+				&::before,
+				&::after {
+					opacity: 1;
+				}
 			}
 		}
 	}
-}
-
-.icon-invisible.menu-popup-item, // elaborate todo zi
-.icon-invisible.btn-dropdown-toggle {
-	width: 100%;
-
-	&::before {
-		background: url($sprite-path) no-repeat -87px -800px;
-	}
-
-	&:not(.highlighted):enabled {
-		&:hover,
-		&:focus,
-		&:active,
-		&[aria-expanded="true"] {
-			&::before {
-				background-position: -399px -800px;
-			}
-		}
-	}
-}
-.icon-invisible.btn-dropdown-toggle {
-	margin: 0;
 }
 
 .btn-split {
@@ -5640,70 +5488,6 @@ a.icon-count {
 	}
 }
 
-.btn-dropdown-toggle {
-	white-space: nowrap;
-	overflow: hidden;
-
-	&[class*='icon-'] {
-		padding-left: 22px;
-
-		&::before {
-			position: absolute;
-			top: 0;
-			left: 0;
-			display: block;
-			width: 22px;
-			height: 22px;
-			content: '';
-		}
-
-		&::after {
-			top: 6px;
-			right: 2px;
-		}
-	}
-
-	&:not(:empty) {
-		padding-right: 22px;
-	}
-
-	&::after {
-		position: absolute;
-		top: 7px;
-		right: 6px;
-		width: 10px;
-		height: 10px;
-		content: '';
-		background: url($sprite-path) no-repeat -547px -431px;
-	}
-
-	&:enabled {
-		&:hover,
-		&:focus,
-		&:active {
-			&::after {
-				background-position: -604px -431px;
-			}
-		}
-	}
-
-	&[aria-expanded="true"] {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		&::after {
-			background: url($sprite-path) no-repeat -604px -503px;
-		}
-
-		&:hover,
-		&:focus,
-		&:active {
-			&::after {
-				background: url($sprite-path) no-repeat -604px -503px;
-			}
-		}
-	}
-}
-
 // Macros mass update tab.
 
 .checkbox-block {
@@ -5779,7 +5563,7 @@ a.icon-count {
 				display: inline-block;
 				width: 24px;
 				height: 24px;
-				background: url($sprite-path) no-repeat -6px -690px;
+				background: url($sprite-path) no-repeat -6px -690px; // todo last
 			}
 
 			.list-accordion-item-body {
@@ -5789,7 +5573,7 @@ a.icon-count {
 
 			&.list-accordion-item-opened {
 				.interface-btn-toggle {
-					background: url($sprite-path) no-repeat -6px -655px;
+					background: url($sprite-path) no-repeat -6px -655px; // todo last
 				}
 
 				.list-accordion-item-body {
@@ -6007,9 +5791,18 @@ z-select,
 }
 
 .subscriptions-table {
-
 	th {
 		color: $font-alt-color;
+	}
+
+	.zi-user-filled {
+		padding: 0 7px 0 2px;
+
+		&::before {
+			top: -1px;
+			font-size: 12px;
+			color: $icon-header-controls-color;
+		}
 	}
 }
 

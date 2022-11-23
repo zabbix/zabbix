@@ -315,14 +315,14 @@ class CLegacyWebTest extends CWebTest {
 		if ($string === 'Filter') {
 			$element = $this->query('xpath', "//div[contains(@class,'table filter-forms')]")->one()->isDisplayed();
 			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]"); // todo zi
+				$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
 			}
 		}
 		else {
 			$element = $this->query('xpath', "//div[@class='time-input']")->one()->isDisplayed();
 			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'btn-time')]"); // todo
+				$this->zbxTestClickXpathWait("//a[contains(@class,'btn-time')]");
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='time-input']"));
 			}
 		}

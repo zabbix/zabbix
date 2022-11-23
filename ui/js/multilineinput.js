@@ -142,7 +142,7 @@
 				},
 				{
 					title: t('S_CANCEL'),
-					class: 'btn-alt', // todo zi
+					class: 'btn-alt',
 					action: function() {}
 				}
 			]

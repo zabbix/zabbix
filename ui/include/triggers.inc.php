@@ -755,7 +755,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
  * @return CCol
  */
 function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
-	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN) : null; // todo zi
+	$ack = $trigger['problem']['acknowledged'] == 1 ? (new CSpan())
+		->addClass(ZBX_STYLE_ICON_ACKN)
+		->addClass('zi-check') : null; // todo zi
 	$desc = array_key_exists($trigger['triggerid'], $dependencies)
 		? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
 		: [];

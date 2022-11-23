@@ -44,11 +44,9 @@
 	}
 }
 
-.btn-add,
-.btn-edit,
 .btn-import {
 	@extend %btn-icon;
-	background-image: url($sprite-path);
+	background-image: url($sprite-path); // todo last
 	background-repeat: no-repeat;
 
 	&::-moz-focus-inner {
@@ -58,14 +56,6 @@
 	&:not(:first-child) {
 		margin-left: 5px;
 	}
-}
-
-.btn-add {
-	background-position: -45px -550px;
-}
-
-.btn-edit {
-	background-position: -45px -477px;
 }
 
 .btn-import {
@@ -81,8 +71,6 @@
 	}
 }
 
-.btn-add,
-.btn-edit,
 .btn-remove {
 	&[disabled],
 	&[disabled]:hover {

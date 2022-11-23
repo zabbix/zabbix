@@ -545,7 +545,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
-			button_add_child.classList.add('btn-add', 'js-button-add-child'); // todo zi
+			button_add_child.classList.add('btn-add', 'js-button-add-child', 'zi-plus'); // todo zi
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
@@ -562,7 +562,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
-				button_edit.classList.add('btn-edit', 'js-button-edit'); // todo zi
+				button_edit.classList.add('btn-edit', 'js-button-edit', 'zi-pencil'); // todo zi
 				button_edit.setAttribute('data-id', item.id);
 				tools.appendChild(button_edit);
 

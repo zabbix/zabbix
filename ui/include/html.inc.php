@@ -939,6 +939,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_MAINTENANCE) // todo zi
+		->addClass('zi-wrench-alt') // todo zi (acikuns) check maintenance yellow wrench
 		->setHint($hint);
 }
 

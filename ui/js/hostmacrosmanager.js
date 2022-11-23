@@ -26,9 +26,9 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
-	static ZBX_STYLE_ICON_TEXT = 'icon-text'; // todo zi
-	static ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible'; // todo zi
-	static ZBX_STYLE_ICON_SECRET_TEXT = 'icon-secret'; // todo zi
+	static ZBX_STYLE_ICON_TEXT = ['icon-text', 'zi-text'];
+	static ZBX_STYLE_ICON_INVISIBLE = ['icon-invisible', 'zi-eye-off'];
+	static ZBX_STYLE_ICON_SECRET_TEXT = ['icon-secret', 'zi-lock'];
 	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
@@ -123,9 +123,9 @@ class HostMacrosManager {
 	initMacroTable(show_inherited_macros) {
 		const $parent = this.getMacroTable();
 		const dropdown_btn_classes = {
-			[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: HostMacrosManager.ZBX_STYLE_ICON_TEXT, // todo zi
-			[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: HostMacrosManager.ZBX_STYLE_ICON_INVISIBLE, // todo zi
-			[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: HostMacrosManager.ZBX_STYLE_ICON_SECRET_TEXT // todo zi
+			[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: HostMacrosManager.ZBX_STYLE_ICON_TEXT,
+			[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: HostMacrosManager.ZBX_STYLE_ICON_INVISIBLE,
+			[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: HostMacrosManager.ZBX_STYLE_ICON_SECRET_TEXT
 		};
 
 		$parent

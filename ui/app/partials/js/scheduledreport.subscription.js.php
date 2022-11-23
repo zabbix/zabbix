@@ -75,11 +75,13 @@
 
 			if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
 				icon.classList.add('<?= ZBX_STYLE_ICON_USER ?>');
+				icon.classList.add('zi-user-filled');
 				icon.setAttribute('title', <?= json_encode(_('User')) ?>);
 				userids.add(this.data.recipientid);
 			}
 			else {
 				icon.classList.add('<?= ZBX_STYLE_ICON_USER_GROUP ?>');
+				icon.classList.add('zi-users-filled');
 				icon.setAttribute('title', <?= json_encode(_('User group')) ?>);
 				usrgrpids.add(this.data.recipientid);
 			}

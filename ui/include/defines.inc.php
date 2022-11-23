@@ -2152,8 +2152,8 @@ define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // Icons.
-define('ZBX_STYLE_ICON_TEXT', 'icon-text'); // todo zi
-define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret'); // todo zi
+define('ZBX_STYLE_ICON_TEXT', 'icon-text');
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
 define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 

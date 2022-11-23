@@ -259,17 +259,24 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	flex-shrink: 0;
 	margin-right: 10px;
 
-	.button-toggle {
+	.zi-menu {
+		padding: 0 2px;
 		width: 24px;
 		height: 24px;
-		background: url($sprite-path) no-repeat $sidebar-toggle-bg-position;
-		border: none;
-		border-radius: 0;
-		text-indent: -9999px;
+
+		@extend %btn-reset;
+
+		font-size: 0;
 		opacity: .75;
 
 		&:hover {
 			opacity: 1;
+		}
+
+		&::before {
+			font-size: 18px;
+			color: $icon-menu-toggle-color;
+			text-indent: unset;
 		}
 
 		@if $ui-transitions {
