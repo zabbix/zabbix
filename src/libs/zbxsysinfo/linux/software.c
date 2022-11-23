@@ -27,10 +27,17 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxstr.h"
+#include "zbxjson.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>
 #endif
+
+#define SW_OS_FULL			"/proc/version"
+#define SW_OS_SHORT 			"/proc/version_signature"
+#define SW_OS_NAME			"/etc/issue.net"
+#define SW_OS_NAME_RELEASE		"/etc/os-release"
+#define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
 
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -49,11 +56,101 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int get_line_from_file(char **line, size_t size, FILE *f)
+{
+	if (NULL == fgets(*line, size, f))
+	{
+		*line = zbx_strdup(*line, "Cannot read from file.");
+		return FAIL;
+	}
+
+	zbx_rtrim(*line, ZBX_WHITESPACE);
+	return SUCCEED;
+}
+
+static int get_os_name(char **line)
+{
+	char	tmp_line[MAX_STRING_LEN];
+	FILE	*f = NULL;
+
+	*line = zbx_malloc(NULL, sizeof(char) * MAX_STRING_LEN);
+
+	/* firstly need to check option PRETTY_NAME in /etc/os-release */
+	/* if cannot find it, get value from /etc/issue.net            */
+	if (NULL != (f = fopen(SW_OS_NAME_RELEASE, "r")))
+	{
+		char	line2[MAX_STRING_LEN];
+		int	line_read = FAIL;
+
+		while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
+		{
+
+			if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME,
+					ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
+				continue;
+
+			if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", *line) ||
+					1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^ \t\n] %s", *line, line2))
+			{
+				line_read = SUCCEED;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		if (SUCCEED == line_read)
+		{
+			zbx_rtrim(*line, ZBX_WHITESPACE);
+			goto out;
+		}
+	}
+
+	if (NULL == (f = fopen(SW_OS_NAME, "r")))
+	{
+		*line = zbx_dsprintf(*line, "Cannot open " SW_OS_NAME ": %s", zbx_strerror(errno));
+		goto error;
+	}
+	else
+	{
+		if (FAIL == get_line_from_file(line, MAX_STRING_LEN, f))
+			goto error;
+		zbx_fclose(f);
+	}
+
+out:
+	return SUCCEED;
+
+error:
+	if (NULL != f)
+		zbx_fclose(f);
+
+	return FAIL;
+}
+
+static int get_os_info_file(char **line, const char *filename)
+{
+	FILE	*f = NULL;
+	int	ret = FAIL;
+
+	*line = zbx_malloc(NULL, sizeof(char) * MAX_STRING_LEN);
+
+	if (NULL == (f = fopen(filename, "r")))
+	{
+		*line = zbx_dsprintf(*line, "Cannot open %s: %s", filename, zbx_strerror(errno));
+
+		return FAIL;
+	}
+
+	ret = get_line_from_file(line, MAX_STRING_LEN, f);
+	zbx_fclose(f);
+
+	return ret;
+}
+
 int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
-	FILE	*f = NULL;
+	char	*type, *str;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 	{
@@ -65,53 +162,15 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full"))
 	{
-		if (NULL == (f = fopen(SW_OS_FULL, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_FULL ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_info_file(&str, SW_OS_FULL);
 	}
 	else if (0 == strcmp(type, "short"))
 	{
-		if (NULL == (f = fopen(SW_OS_SHORT, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_SHORT ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_info_file(&str, SW_OS_SHORT);
 	}
 	else if (0 == strcmp(type, "name"))
 	{
-		/* firstly need to check option PRETTY_NAME in /etc/os-release */
-		/* if cannot find it, get value from /etc/issue.net            */
-		if (NULL != (f = fopen(SW_OS_NAME_RELEASE, "r")))
-		{
-			while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
-			{
-				char	line2[MAX_STRING_LEN];
-
-				if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME,
-						ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
-					continue;
-
-				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line) ||
-						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^ \t\n] %s",
-								line, line2))
-				{
-					line_read = SUCCEED;
-					break;
-				}
-			}
-			zbx_fclose(f);
-		}
-
-		if (FAIL == line_read && NULL == (f = fopen(SW_OS_NAME, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_NAME ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_name(&str);
 	}
 	else
 	{
@@ -119,16 +178,17 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (SUCCEED == line_read || NULL != fgets(line, sizeof(line), f))
+	if (SUCCEED == ret)
 	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, str));
 		ret = SYSINFO_RET_OK;
-		zbx_rtrim(line, ZBX_WHITESPACE);
-		SET_STR_RESULT(result, zbx_strdup(NULL, line));
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
-
-	zbx_fclose(f);
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, str));
+		ret = SYSINFO_RET_FAIL;
+	}
+	zbx_free(str);
 
 	return ret;
 }
@@ -286,4 +346,69 @@ next:
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
 
 	return ret;
+}
+
+int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct zbx_json	j;
+	struct utsname	info;
+	int		read;
+	char		*str, pretty_version[MAX_STRING_LEN];
+	char		major[sizeof(info.release)], minor[sizeof(info.release)], patch[sizeof(info.release)];
+
+	ZBX_UNUSED(request);
+	memset(pretty_version, 0, sizeof(pretty_version));
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(&j, "os_type", "linux", ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED == get_os_name(&str))
+	{
+		zbx_json_addstring(&j, "product_name", str, ZBX_JSON_TYPE_STRING);
+		strcat(pretty_version, str);
+	}
+	zbx_free(str);
+
+	if (0 != uname(&info))
+		goto out;
+
+	if (0 != strlen(info.machine))
+	{
+		zbx_json_addstring(&j, "architecture", info.machine, ZBX_JSON_TYPE_STRING);
+
+		strcat(pretty_version, " ");
+		strcat(pretty_version, info.machine);
+	}
+
+	if (0 != strlen(info.release))
+	{
+		read = sscanf(info.release, "%[0-9].%[0-9].%[0-9]", major, minor, patch);
+
+		if (0 < read)
+			zbx_json_addstring(&j, "major", major, ZBX_JSON_TYPE_STRING);
+		if (1 < read)
+			zbx_json_addstring(&j, "minor", minor, ZBX_JSON_TYPE_STRING);
+		if (2 < read)
+			zbx_json_addstring(&j, "patch", patch, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(&j, "kernel", info.release, ZBX_JSON_TYPE_STRING);
+
+		strcat(pretty_version, " ");
+		strcat(pretty_version, info.release);
+	}
+out:
+	if (0 != strlen(pretty_version))
+		zbx_json_addstring(&j, "version_pretty", pretty_version, ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED == get_os_info_file(&str, SW_OS_FULL))
+		zbx_json_addstring(&j, "version_full", str, ZBX_JSON_TYPE_STRING);
+	else
+		zbx_json_addstring(&j, "version_full", "", ZBX_JSON_TYPE_STRING);
+	zbx_free(str);
+
+	zbx_json_close(&j);
+	SET_STR_RESULT(result, strdup(j.buffer));
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
 }

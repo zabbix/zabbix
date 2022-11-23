@@ -56,6 +56,14 @@ type system_info struct {
 	VersionFull    string `json:"version_full"`
 }
 
+const (
+	swOSFull             = "/proc/version"
+	swOSShort            = "/proc/version_signature"
+	swOSName             = "/etc/issue.net"
+	swOSNameRelease      = "/etc/os-release"
+	swOSOptionPrettyName = "PRETTY_NAME"
+)
+
 func charArray2String(chArr []int8) (result string) {
 	var bin []byte
 
@@ -71,58 +79,51 @@ func charArray2String(chArr []int8) (result string) {
 	return
 }
 
-func getVersionFull() (version string, err error) {
+func readOsInfoFile(path string) (contents string, err error) {
 	var bin []byte
 
-	bin, err = os.ReadFile(swOSFull)
+	bin, err = os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("Cannot open " + swOSFull + ": %s", err)
+		return "", fmt.Errorf("Cannot open " + path + ": %s", err)
 	}
 
-	version = string(bin)
+	return string(bin), nil
+}
+
+func getVersionFull() (version string, err error) {
+	version, err = readOsInfoFile(swOSFull)
+
+	if err == nil {
+		version = strings.TrimSpace(version)
+	}
 
 	return
 }
 
-func getName() (name string, err error) {
-	var bin []byte
+func findFirstMatch(src string, pattern string) (res string) {
+	regex := regexp.MustCompile("PRETTY_NAME=\"([^\"]+)\"")
+	match := regex.FindStringSubmatch(src)
+	if len(match) > 1 {
+		return match[1]
+	}
 
-	bin, err = os.ReadFile(swOSNameRelease)
-	suceeded := false
-	var line string
+	return ""
+}
+
+func getName() (name string, err error) {
+	name, err = readOsInfoFile(swOSNameRelease)
 
 	if err == nil {
-
-		regex := regexp.MustCompile("PRETTY_NAME=\"([^\"]+)\"")
-		res := regex.FindStringSubmatch(string(bin))
-		if len(res) > 1 {
-			line = res[1]
-			suceeded = true
+		if name = findFirstMatch(name, "PRETTY_NAME=\"([^\"]+)\""); len(name) > 0 {
+			return name, nil
 		}
 
-		if suceeded == false {
-			regex := regexp.MustCompile("PRETTY_NAME=\\s*(\\S+)")
-			res := regex.FindStringSubmatch(string(bin))
-			if len(res) > 1 {
-				line = res[1]
-				suceeded = true
-			}
+		if name = findFirstMatch(name, "PRETTY_NAME=(\\S+)\\s*\\n"); len(name) > 0 {
+			return name, nil
 		}
 	}
 
-	if suceeded == false {
-		bin, err = os.ReadFile(swOSName)
-		if err != nil {
-			return "", fmt.Errorf("Cannot open " + swOSName + ": %s", err)
-		}
-
-		line = string(bin)
-		suceeded = true
-	}
-
-	if (suceeded == true) {
-		name = line
-	}
+	name, err = readOsInfoFile(swOSName)
 
 	return
 }
@@ -249,7 +250,6 @@ func (p *Plugin) getPackages(params []string) (result interface{}, err error) {
 
 func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	var info string
-	var bin []byte
 
 	if len(params) > 0 && params[0] != "" {
 		info = params[0]
@@ -259,23 +259,16 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 
 	switch info {
 	case "full":
-		info, err = getVersionFull()
-		if err == nil {
-			result = info
+		if result, err = getVersionFull(); err == nil {
+			return result, nil
 		}
 
 	case "short":
-		bin, err = os.ReadFile(swOSShort)
-		if err != nil {
-			return nil, fmt.Errorf("Cannot open " + swOSShort + ": %s", err)
-		}
-
-		result = string(bin)
+		return readOsInfoFile (swOSShort)
 
 	case "name":
-		info, err = getName()
-		if err == nil {
-			result = info
+		if result, err = getName(); err == nil {
+			return result, nil
 		}
 
 	default:
@@ -290,10 +283,8 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	var jsonArray []byte
 
 	info.OSType = "linux"
-	name, err := getName()
-	if err == nil {
-		info.ProductName = name
-	}
+
+	info.ProductName, _ = getName()
 
 	u := syscall.Utsname{}
 	syscall.Uname(&u)
@@ -324,7 +315,7 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 		}
 	}
 
-	info.VersionFull, err = getVersionFull()
+	info.VersionFull, _ = getVersionFull()
 
 	jsonArray, err = json.Marshal(info)
 	result = string(jsonArray)

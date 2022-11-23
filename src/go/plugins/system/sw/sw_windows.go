@@ -26,6 +26,7 @@ import (
 	"errors"
 	"encoding/json"
 	"strconv"
+	"strings"
 
 	"golang.org/x/sys/windows/registry"
 	"git.zabbix.com/ap/plugin-support/plugin"
@@ -71,13 +72,7 @@ type system_info struct {
 	VersionFull    string `json:"version_full"`
 }
 
-func getRegistryValue(value string, valueType uint32) (result string, err error) {
-	handle, err := registry.OpenKey(registry.LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", registry.QUERY_VALUE)
-	if err != nil {
-		return "", err
-	}
-	defer handle.Close()
-
+func getRegistryValue(handle registry.Key, value string, valueType uint32) (result string, err error) {
 	if valueType == registry.SZ {
 		result, _, err = handle.GetStringValue(value)
 		if err != nil {
@@ -95,100 +90,78 @@ func getRegistryValue(value string, valueType uint32) (result string, err error)
 	return
 }
 
-func getBuildString() (result string, err error) {
-	var tmp string
+func openRegistrySysInfoKey() (handle registry.Key, err error) {
+	return registry.OpenKey(registry.LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", registry.QUERY_VALUE)
+}
 
-	tmp, err = getRegistryValue(regMajor, registry.SZ)
+func getBuildString(handle registry.Key) (result string, err error) {
+	var tmp string
+	var minor_err error
+
+	tmp, err = getRegistryValue(handle, regMajor, registry.SZ)
 	if err == nil {
 		result += "Build " + tmp
 
-		tmp, err = getRegistryValue(regMinor, registry.DWORD)
-		if err == nil {
+		tmp, minor_err = getRegistryValue(handle, regMinor, registry.DWORD)
+		if minor_err == nil {
 			result += "." + tmp
 		}
 	}
 
+	return
+}
+
+func joinNonEmptyStrings(strs []string) (res string) {
+	var nonEmpty []string
+	for _, s := range strs {
+		if len(s) > 0 {
+			nonEmpty = append(nonEmpty, s)
+		}
+	}
+
+	return strings.Join(nonEmpty, " ")
+}
+
+func getFullOSInfoString(handle registry.Key) (result string, err error) {
+	var name, lab, build string
+	var internal_err error
+	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
+
+	lab, internal_err = getRegistryValue(handle, regLabEX, registry.SZ)
+
+	if len(lab) == 0 {
+		lab, internal_err = getRegistryValue(handle, regLab, registry.SZ)
+	}
+
+	build, internal_err = getBuildString(handle)
+
+	result = joinNonEmptyStrings([]string{name, lab, build})
 	if len(result) > 0 {
-		err = nil
-	}
-
-	return
-}
-
-func getFullOSInfoString() (result string, err error) {
-	var tmp string
-	gotSomething := false
-
-	tmp, err = getRegistryValue(regProductName, registry.SZ)
-	if err == nil {
-		result += tmp
-		gotSomething = true
-	}
-
-	tmp, err = getRegistryValue(regLabEX, registry.SZ)
-	if err == nil {
-		if gotSomething {
-			result += " "
-		}
-		result += tmp
-		gotSomething = true
+		result = strings.TrimSpace(result)
 	} else {
-		tmp, err = getRegistryValue(regLab, registry.SZ)
-		if err == nil {
-			if gotSomething {
-				result += " "
-			}
-			result += tmp
-			gotSomething = true
-		}
+		err = internal_err
 	}
 
-	tmp, err = getBuildString()
-	if err == nil {
-		if gotSomething {
-			result += " "
-		}
-		result += tmp
-		gotSomething = true
-	}
-
-	if gotSomething {
-		err = nil
-	}
 	return
 }
 
-func getPrettyOSInfoString() (result string, err error) {
-	var tmp string
-	gotSomething := false
+func getPrettyOSInfoString(handle registry.Key) (result string, err error) {
+	var name, build, spVer string
+	var internal_err error
 
-	tmp, err = getRegistryValue(regProductName, registry.SZ)
-	if err == nil {
-		result += tmp
-		gotSomething = true
+	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
+
+	build, internal_err = getBuildString(handle)
+
+	spVer, internal_err = getRegistryValue(handle, regSPVersion, registry.SZ)
+
+	result = joinNonEmptyStrings([]string{name, build, spVer})
+	if len(result) > 0 {
+		result = strings.TrimSpace(result)
+	} else {
+		err = internal_err
 	}
 
-	tmp, err = getBuildString()
-	if err == nil {
-		if gotSomething {
-			result += " "
-		}
-		result += tmp
-		gotSomething = true
-	}
-
-	tmp, err = getRegistryValue(regSPVersion, registry.SZ)
-	if err == nil {
-		if gotSomething {
-			result += " "
-		}
-		result += tmp
-		gotSomething = true
-	}
-
-	if gotSomething {
-		err = nil
-	}
 	return
 }
 
@@ -198,6 +171,7 @@ func (p *Plugin) getPackages(params []string) (result interface{}, err error) {
 
 func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	var info string
+	var handle registry.Key
 
 	if len(params) > 0 && params[0] != "" {
 		info = params[0]
@@ -205,15 +179,21 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 		info = "full"
 	}
 
+	handle, err = openRegistrySysInfoKey()
+	if err != nil {
+		return nil, err
+	}
+	defer handle.Close()
+
 	switch info {
 	case "full":
-		return getFullOSInfoString()
+		return getFullOSInfoString(handle)
 
 	case "short":
-		return getPrettyOSInfoString()
+		return getPrettyOSInfoString(handle)
 
 	case "name":
-		return getRegistryValue(regProductName, registry.SZ)
+		return getRegistryValue(handle, regProductName, registry.SZ)
 
 	default:
 		return nil, errors.New("Invalid first parameter.")
@@ -226,21 +206,28 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	var info system_info
 	var sysInfo win32.SystemInfo
 	var jsonArray []byte
+	var handle registry.Key
 
 	info.OSType = "windows"
 
-	info.VersionFull, _ = getFullOSInfoString()
-	info.VersionPretty, _ = getPrettyOSInfoString()
+	handle, err = openRegistrySysInfoKey()
+	if err != nil {
+		return nil, err
+	}
+	defer handle.Close()
 
-	info.ProductName, _ = getRegistryValue(regProductName, registry.SZ)
-	info.Major, _ = getRegistryValue(regMajor, registry.SZ)
-	info.Minor, _ = getRegistryValue(regMinor, registry.DWORD)
-	info.Edition, _ = getRegistryValue(regEdition, registry.SZ)
-	info.Composition, _ = getRegistryValue(regComposition, registry.SZ)
-	info.DisplayVersion, _ = getRegistryValue(regDisplayVersion, registry.SZ)
-	info.SPVersion, _ = getRegistryValue(regSPVersion, registry.SZ)
-	info.SPBuild, _ = getRegistryValue(regSPBuild, registry.SZ)
-	info.Version, _ = getRegistryValue(regVersion, registry.SZ)
+	info.VersionFull, _ = getFullOSInfoString(handle)
+	info.VersionPretty, _ = getPrettyOSInfoString(handle)
+
+	info.ProductName, _ = getRegistryValue(handle, regProductName, registry.SZ)
+	info.Major, _ = getRegistryValue(handle, regMajor, registry.SZ)
+	info.Minor, _ = getRegistryValue(handle, regMinor, registry.DWORD)
+	info.Edition, _ = getRegistryValue(handle, regEdition, registry.SZ)
+	info.Composition, _ = getRegistryValue(handle, regComposition, registry.SZ)
+	info.DisplayVersion, _ = getRegistryValue(handle, regDisplayVersion, registry.SZ)
+	info.SPVersion, _ = getRegistryValue(handle, regSPVersion, registry.SZ)
+	info.SPBuild, _ = getRegistryValue(handle, regSPBuild, registry.SZ)
+	info.Version, _ = getRegistryValue(handle, regVersion, registry.SZ)
 
 	sysInfo, err = win32.GetNativeSystemInfo()
 	if err == nil {
@@ -255,7 +242,7 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 			info.Architecture = "arm64"
 
 		case processorArchitectureIa64:
-			info.Architecture = "Itanium64"
+			info.Architecture = "Intel Itanium"
 
 		case processorArchitectureIntel:
 			info.Architecture = "x86"
@@ -266,7 +253,9 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	}
 
 	jsonArray, err = json.Marshal(info)
-	result = string(jsonArray)
+	if err == nil {
+		result = string(jsonArray)
+	}
 
 	return
 }

@@ -26,17 +26,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
-const (
-	swPackages           = "system.sw.packages"
-	swOS                 = "system.sw.os"
-	swOSGet              = "system.sw.os.get"
-	swOSFull             = "/proc/version"
-	swOSShort            = "/proc/version_signature"
-	swOSName             = "/etc/issue.net"
-	swOSNameRelease      = "/etc/os-release"
-	swOSOptionPrettyName = "PRETTY_NAME"
-)
-
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -62,21 +51,21 @@ func (p *Plugin) Validate(options interface{}) error { return nil }
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
-	case swPackages:
+	case "system.sw.packages":
 		if len(params) > 3 {
 			return nil, zbxerr.ErrorTooManyParameters
 		}
 
 		result, err = p.getPackages(params)
 
-	case swOS:
+	case "system.sw.os":
 		if len(params) > 1 {
 			return nil, zbxerr.ErrorTooManyParameters
 		}
 
 		result, err = p.getOSVersion(params)
 
-	case swOSGet:
+	case "system.sw.os.get":
 		result, err = p.getOSVersionJSON()
 
 	default:
