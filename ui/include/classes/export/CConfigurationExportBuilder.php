@@ -255,17 +255,15 @@ class CConfigurationExportBuilder {
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
-	 * @param array $unlink_itemids
 	 *
 	 * @return array
 	 */
-	public function extractSimpleTriggers(array &$triggers, array $unlink_itemids) {
+	public function extractSimpleTriggers(array &$triggers) {
 		$simple_triggers = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
 			if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
-					&& ($trigger['items'][0]['templateid'] == 0
-						|| in_array($trigger['items'][0]['templateid'], $unlink_itemids))) {
+					&& ($trigger['items'][0]['templateid'] == 0 )) {
 				$simple_triggers[] = $trigger;
 				unset($triggers[$triggerid]);
 			}
