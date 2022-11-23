@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-11T15:45:13Z'
+  date: '2022-11-23T07:32:29Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 80fc469750f84061924662a98c33580c
-      template: 'Cisco Nexus 9000 Series SNMP'
-      name: 'Cisco Nexus 9000 Series SNMP'
+      template: 'Cisco Nexus 9000 Series by SNMP'
+      name: 'Cisco Nexus 9000 Series by SNMP'
       description: |
         Template Cisco Nexus 9000 Series
           
@@ -50,7 +50,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2b9b678cb9fc407cb485136ddcf5953c
-              expression: 'max(/Cisco Nexus 9000 Series SNMP/icmpping,#3)=0'
+              expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'The last three attempts returned a timeout. Check the connectivity of a device.'
@@ -76,14 +76,14 @@ zabbix_export:
           triggers:
             -
               uuid: d32cffe7dcef4873ac8bb4d86119ddaa
-              expression: 'min(/Cisco Nexus 9000 Series SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Cisco Nexus 9000 Series SNMP/icmpping,#3)=0'
+                  expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -109,17 +109,17 @@ zabbix_export:
           triggers:
             -
               uuid: a51dc1f61eec4709b8f52b3df65eae86
-              expression: 'avg(/Cisco Nexus 9000 Series SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Cisco Nexus 9000 Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Cisco Nexus 9000 Series SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Cisco Nexus 9000 Series SNMP/icmpping,#3)=0'
+                  expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -231,7 +231,7 @@ zabbix_export:
           triggers:
             -
               uuid: b813bf6448fe4974911106e36b2d8888
-              expression: 'change(/Cisco Nexus 9000 Series SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series SNMP/system.hw.serialnumber))>0'
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -291,7 +291,7 @@ zabbix_export:
           triggers:
             -
               uuid: cf98bf1ffe854a758f0006aaeb5096ab
-              expression: 'change(/Cisco Nexus 9000 Series SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series SNMP/system.name))>0'
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -352,7 +352,7 @@ zabbix_export:
           triggers:
             -
               uuid: 749b4c4b8f4e49caa6b239b15953ffb9
-              expression: 'change(/Cisco Nexus 9000 Series SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series SNMP/system.sw.os))>0'
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.sw.os))>0'
               recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
@@ -361,7 +361,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'change(/Cisco Nexus 9000 Series SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series SNMP/system.name))>0'
+                  expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -387,7 +387,7 @@ zabbix_export:
           triggers:
             -
               uuid: fc80a45e361842f09dfe9b047e1c6b5f
-              expression: 'last(/Cisco Nexus 9000 Series SNMP/system.uptime)<10m'
+              expression: 'last(/Cisco Nexus 9000 Series by SNMP/system.uptime)<10m'
               name: 'Device has been restarted or reinitialized'
               event_name: '{HOST.NAME} has been restarted or reinitialized (uptime < 10m)'
               priority: WARNING
@@ -412,7 +412,7 @@ zabbix_export:
           triggers:
             -
               uuid: b60bca40b3b14f2384332103af74bd23
-              expression: 'max(/Cisco Nexus 9000 Series SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Cisco Nexus 9000 Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -456,7 +456,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1ac7652bda474762aa0b0c354728307e
-                  expression: 'min(/Cisco Nexus 9000 Series SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE}'
@@ -480,8 +480,13 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'system.cpu.util[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: b0c97bd2037f405ba2b183456d01973e
           name: 'Entity serial numbers discovery'
@@ -494,11 +499,12 @@ zabbix_export:
             conditions:
               -
                 macro: '{#ENT_SN}'
-                value: .+
+                value: '{$ENT_SN.MATCHES}'
                 formulaid: B
               -
                 macro: '{#ENT_CLASS}'
-                value: '[^3]'
+                value: '{$ENT_CLASS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
                 formulaid: A
           description: 'The discovery of serial numbers of the entities from ENTITY-MIB.'
           item_prototypes:
@@ -531,7 +537,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 18e244c17d6c436f9e3b1d71d7bfd024
-                  expression: 'change(/Cisco Nexus 9000 Series SNMP/system.hw.serialnumber[{#SNMPINDEX}])=1 and length(last(/Cisco Nexus 9000 Series SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}])=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -541,6 +547,11 @@ zabbix_export:
                     -
                       tag: scope
                       value: notice
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: a323e6f090e043058e2e932ed2456cba
           name: 'Fan status discovery'
@@ -581,7 +592,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c06b2cf2183d40348b3f688a7fbcb479
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
                   name: '{#SNMPVALUE}: Fan is down'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
@@ -595,7 +606,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: ec5a4c0aa2b947309d012fcaf1736c7e
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.fan.status[{#SNMPINDEX}])=1'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=1'
                   name: '{#SNMPVALUE}: Fan is in unknown state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: INFO
@@ -603,7 +614,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Fan is down'
-                      expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
                   tags:
                     -
                       tag: scope
@@ -613,7 +624,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 83494b0d4ec84709a18f8674c1fa50fd
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
                   name: '{#SNMPVALUE}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
@@ -621,7 +632,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Fan is down'
-                      expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
                   tags:
                     -
                       tag: scope
@@ -629,6 +640,11 @@ zabbix_export:
                     -
                       tag: scope
                       value: performance
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: 2714f855584347329b2f175a85198f80
           name: 'Memory discovery'
@@ -698,7 +714,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d7f6de21b2434a81b2b116a98a59b1ed
-                  expression: 'min(/Cisco Nexus 9000 Series SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
                   event_name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -721,8 +737,13 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'vm.memory.util[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: cd6bc93993e44b61aca57f0486e61756
           name: 'Network interfaces discovery'
@@ -846,9 +867,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9d60de695fa243b4b933766b668de946
-                  expression: 'min(/Cisco Nexus 9000 Series SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Nexus 9000 Series SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE}'
@@ -860,8 +881,8 @@ zabbix_export:
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                       expression: |
                         {$IFCONTROL:"{#IFNAME}"}=1 
-                        and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                        and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                        and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                        and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
                   tags:
                     -
                       tag: scope
@@ -954,9 +975,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d1cc4527260346e59b86577e0ae9cc0c
-                  expression: 'min(/Cisco Nexus 9000 Series SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Nexus 9000 Series SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
@@ -968,8 +989,8 @@ zabbix_export:
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                       expression: |
                         {$IFCONTROL:"{#IFNAME}"}=1 
-                        and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                        and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                        and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                        and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
                   tags:
                     -
                       tag: scope
@@ -1075,8 +1096,8 @@ zabbix_export:
                   uuid: d16b8b35258a4c4b8e4338c2577f198b
                   expression: |
                     {$IFCONTROL:"{#IFNAME}"}=1 
-                    and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                    and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1125,14 +1146,14 @@ zabbix_export:
             -
               uuid: 06a31bd057814786aac4f42ccdf57fdf
               expression: |
-                change(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])<0 
-                and last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])>0 
-                and find(/Cisco Nexus 9000 Series SNMP/net.if.type[{#SNMPINDEX}],#1,"regexp","^[6|7|11|62|69|117]$") 
-                and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])<>2
+                change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])<0 
+                and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 
+                and find(/Cisco Nexus 9000 Series by SNMP/net.if.type[{#SNMPINDEX}],#1,"regexp","^(6|7|11|62|69|117)$") 
+                and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])<>2
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}],#2)>0)
-                or last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2
+                (change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0)
+                or last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1143,8 +1164,8 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: |
                     {$IFCONTROL:"{#IFNAME}"}=1 
-                    and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                    and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
               tags:
                 -
                   tag: scope
@@ -1152,10 +1173,10 @@ zabbix_export:
             -
               uuid: 9dc308a5f30a45689eb2b9b3c2d9d453
               expression: |
-                (avg(/Cisco Nexus 9000 Series SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Cisco Nexus 9000 Series SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1167,8 +1188,8 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: |
                     {$IFCONTROL:"{#IFNAME}"}=1 
-                    and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                    and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
               tags:
                 -
                   tag: scope
@@ -1176,10 +1197,10 @@ zabbix_export:
             -
               uuid: 0036e4b0761740aea6f0b5c305861a4d
               expression: |
-                (avg(/Cisco Nexus 9000 Series SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Cisco Nexus 9000 Series SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1191,8 +1212,8 @@ zabbix_export:
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: |
                     {$IFCONTROL:"{#IFNAME}"}=1 
-                    and last(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])=2 
-                    and change(/Cisco Nexus 9000 Series SNMP/net.if.status[{#SNMPINDEX}])
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
               tags:
                 -
                   tag: scope
@@ -1206,43 +1227,48 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.in[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.out[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.out.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.in.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.out.discards[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: 73133517383046b58c8039363a907fe4
           name: 'EtherLike discovery'
@@ -1297,7 +1323,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c1f6a9e7c53c43a6ae19fa249236157d
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/net.if.duplex[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/net.if.duplex[{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Check the autonegotiation settings and cabling.'
@@ -1320,10 +1346,14 @@ zabbix_export:
                   var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
                   data.forEach(function (element) {
                       fields.forEach(function (field) {
-                          element[field] = element[field] || '';
+                          element[field] = typeof(element[field]) === 'undefined' ? '' : element[field];
                       });
                   });
                   return JSON.stringify(data);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: 8a6f70d8eaa94e1dbd45f199c231d770
           name: 'PSU discovery'
@@ -1371,30 +1401,8 @@ zabbix_export:
                   value: power
               trigger_prototypes:
                 -
-                  uuid: f2ed73c3d4ca407b86b3a53299e76373
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=9'
-                  name: '{#SNMPVALUE}: PSU fan failed'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is on, but the fan has failed.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 0d6f024f52244460ac0101aec4da3b4f
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=12'
-                  name: '{#SNMPVALUE}: PSU inline power component failed'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is on, but no inline power is being delivered as the data/inline power component of the FRU has failed.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
                   uuid: 4bc31f8605ab4899979d2f3385cd7b7a
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
                   name: '{#SNMPVALUE}: PSU is in failed state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -1405,92 +1413,52 @@ zabbix_export:
                       value: availability
                 -
                   uuid: a930e2d032804dc880ebe51c4fd0dd07
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=3'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=3'
                   name: '{#SNMPVALUE}: PSU is off: Administratively'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: WARNING
+                  priority: INFO
                   description: 'The FRU is administratively off.'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: PSU is in failed state'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
-                  uuid: 4d058bc166b04927a521b33766de5be4
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=11'
-                  name: '{#SNMPVALUE}: PSU is off: Connector rating exceeded'
+                  uuid: 6e2517ce92c949589539edece3cb5eb5
+                  expression: 'find(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}],#1,"regexp",{$PSU.PROBLEM.STATES})'
+                  name: '{#SNMPVALUE}: PSU is off or out of optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'The FRU is powered off because of the system''s connector rating exceeded.'
+                  description: |
+                    The PSU requires attention. Compare current state from operaional data with table below:
+                    -  offEnvOther (1): FRU is powered off because of a problem not listed below;
+                    -  on (2): FRU is powered on;
+                    -  offAdmin (3): administratively off;
+                    -  offDenied (4): FRU is powered off because available system power is insufficient;
+                    -  offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;
+                    -  offEnvTemp (6): FRU is powered off because of temperature problem;
+                    -  offEnvFan (7): FRU is powered off because of fan problems;
+                    -  failed (8): FRU is in failed state;
+                    -  onButFanFail (9): FRU is on but fan has failed;
+                    -  offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;
+                    -  offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;
+                    -  onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: PSU is in failed state'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
                   tags:
                     -
                       tag: scope
                       value: availability
-                -
-                  uuid: 866d1a2703204edc8858c99ed6e3f3aa
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=7'
-                  name: '{#SNMPVALUE}: PSU is off: Fan problem'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because of fan problems.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 1ce3deb1475f4221b7660a9332b310f4
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=10'
-                  name: '{#SNMPVALUE}: PSU is off: Insufficient cooling capacity'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because of the system''s insufficient cooling capacity.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 2499071ffe1a42568ad37464cca25d53
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
-                  name: '{#SNMPVALUE}: PSU is off: Insufficient power available'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because available system power is insufficient.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 8810394107e647c39cb2d9cd35308fc5
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=5'
-                  name: '{#SNMPVALUE}: PSU is off: Power problem'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because of a power problem in the FRU. For example, the FRU''s power translation (DC-DC converter) or distribution failed.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 7fbb4f6a367e47a597c33dbe99c1b5a0
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=6'
-                  name: '{#SNMPVALUE}: PSU is off: Temperature problem'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because of a temperature problem.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 15d39b0c4609463091a786a8f748bf20
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.psu.status[{#SNMPINDEX}])=1'
-                  name: '{#SNMPVALUE}: PSU is off: Unknown'
-                  opdata: 'Current state: {ITEM.LASTVALUE}'
-                  priority: AVERAGE
-                  description: 'The FRU is powered off because of an unknown problem.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
         -
           uuid: bb7d48018f8044ec9bb4fd20d6c52106
           name: 'Temperature sensors discovery'
@@ -1527,7 +1495,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 938eb8e3d3f4486b89316a7b00aa5600
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
                   name: '{#SNMPVALUE}: Temperature sensor is not available'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: WARNING
@@ -1541,7 +1509,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: ec63ba043da64c8abd4c4a9e2dbc297f
-                  expression: 'last(/Cisco Nexus 9000 Series SNMP/sensor.temp.status[{#SNMPINDEX}])=3'
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=3'
                   name: '{#SNMPVALUE}: Temperature sensor is not operational'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -1581,9 +1549,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ca54affa31654e358ad2be30b8e6dc72
-                  expression: 'avg(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}°C'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
@@ -1598,9 +1566,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 29f9c6e22d714a18997683ad8979239a
-                  expression: 'avg(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}°C"}'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
@@ -1609,8 +1577,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1620,9 +1588,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 0ce9b389385f482c9bea0c52822be85d
-                  expression: 'avg(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Cisco Nexus 9000 Series SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'min(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is too low'
                   event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}°C"}'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
@@ -1645,7 +1613,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Nexus 9000 Series SNMP'
+                    host: 'Cisco Nexus 9000 Series by SNMP'
                     key: 'sensor.temp.value[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1653,23 +1621,25 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                  var sensors = JSON.parse(value);
+                      var sensors = JSON.parse(value);
                   } catch (e) {
-                  throw "Failed to parse JSON of temperature discovery.";
+                      throw "Failed to parse JSON of temperature discovery.";
                   }
                   
                   var scales = {'9': 1, '8': 0.001, '7': 0.000001};
                   var result = sensors.filter(function (sensor) {      
-                  if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof(scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
-                    return false;
-                  }
-                  
-                  sensor['{#SENSOR_SCALE}'] = scales[sensor['{#SENSOR_SCALE}']];
-                  
-                  return true;
+                      if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof(scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
+                          return false;
+                      }
+                      sensor['{#SENSOR_SCALE}'] = scales[sensor['{#SENSOR_SCALE}']];
+                      return true;
                   });
                   
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
       tags:
         -
           tag: class
@@ -1695,6 +1665,14 @@ zabbix_export:
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
+        -
+          macro: '{$ENT_CLASS.NOT_MATCHES}'
+          value: '3'
+          description: 'Filter excludes chassis(3) class from Serial discovery. Chassis(3) polled with regular item.'
+        -
+          macro: '{$ENT_SN.MATCHES}'
+          value: .+
+          description: 'Filter retrieves only existing serial number strings.'
         -
           macro: '{$ICMP_LOSS_WARN}'
           value: '20'
@@ -1752,6 +1730,10 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+        -
+          macro: '{$PSU.PROBLEM.STATES}'
+          value: ^(1|4|5|6|7|9|10|11|12)$
+          description: 'The PSU states list for average trigger priority'
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
@@ -1822,7 +1804,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Cisco Nexus 9000 Series SNMP'
+                        host: 'Cisco Nexus 9000 Series by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
