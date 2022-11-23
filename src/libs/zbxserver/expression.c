@@ -4882,7 +4882,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 			}
 		}
 
-		if (0 != (macro_type & MACRO_TYPE_HTTP_JSON) && NULL != replace_to)
+		if (0 != (macro_type & (MACRO_TYPE_HTTP_JSON | MACRO_TYPE_SCRIPT_PARAMS_FIELD)) && NULL != replace_to)
 			zbx_json_escape(&replace_to);
 
 		if (0 != (macro_type & MACRO_TYPE_QUERY_FILTER) && NULL != replace_to)

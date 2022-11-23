@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 #ifdef HAVE_LIBPERFSTAT
 
 static perfstat_memory_total_t	m;
