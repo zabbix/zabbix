@@ -2919,7 +2919,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 	items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
-	zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
+	zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, (size_t)itemids.values_num,
 			ZBX_ITEM_GET_SYNC);
 
 	for (i = 0; i < history_num; i++)
@@ -2953,7 +2953,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 		history[i].flags |= ZBX_DC_FLAG_NOVALUE;
 	}
 
-	zbx_dc_config_clean_history_sync_items(items, errcodes, history_num);
+	zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
 	zbx_free(items);
 	zbx_free(errcodes);
 	zbx_vector_uint64_destroy(&itemids);

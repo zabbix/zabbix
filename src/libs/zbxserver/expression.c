@@ -4800,7 +4800,7 @@ static int	expand_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT *event,
 
 		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, NULL, &token->value.data.str, MACRO_TYPE_TRIGGER_EXPRESSION, error,
-				maxerrlen))
+				(int)maxerrlen))
 		{
 			return FAIL;
 		}
@@ -5096,8 +5096,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 				(size_t)itemids.values_num);
 		errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * (size_t)itemids.values_num);
 
-		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num,
-				ZBX_ITEM_GET_SYNC);
+		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes,
+				(size_t)itemids.values_num, ZBX_ITEM_GET_SYNC);
 	}
 
 	zbx_hashset_iter_reset(funcs, &iter);
@@ -5194,7 +5194,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 
 	zbx_vc_flush_stats();
 
-	zbx_dc_config_clean_history_sync_items(items, errcodes, itemids.values_num);
+	zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)itemids.values_num);
 	zbx_vector_uint64_destroy(&itemids);
 
 	zbx_free(errcodes);
