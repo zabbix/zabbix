@@ -20,7 +20,6 @@
 #ifndef ZABBIX_SERVER_TASKMANAGER_H
 #define ZABBIX_SERVER_TASKMANAGER_H
 
-#include "zbxalgo.h"
 #include "zbxtasks.h"
 #include "zbxthreads.h"
 #include "zbxversion.h"
