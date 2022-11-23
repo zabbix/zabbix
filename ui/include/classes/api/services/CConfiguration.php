@@ -357,16 +357,17 @@ class CConfiguration extends CApiService {
 
 		$imported_entities = [];
 
-		foreach (['host_groups', 'template_groups'] as $first_level) {
-			if (array_key_exists($first_level, $import)) {
-				$imported_entities[$first_level]['uuid'] = array_column($import[$first_level], 'uuid');
-				$imported_entities[$first_level]['name'] = array_column($import[$first_level], 'name');
-			}
-		}
+		$entities = [
+			'host_groups' => 'name',
+			'template_groups' => 'name',
+			'templates' => 'template',
+		];
 
-		if (array_key_exists('templates', $import)) {
-			$imported_entities['templates']['uuid'] = array_column($import['templates'], 'uuid');
-			$imported_entities['templates']['template'] = array_column($import['templates'], 'template');
+		foreach ($entities as $entity => $name_field) {
+			if (array_key_exists($entity, $import)) {
+				$imported_entities[$entity]['uuid'] = array_column($import[$entity], 'uuid');
+				$imported_entities[$entity][$name_field] = array_column($import[$entity], $name_field);
+			}
 		}
 
 		$imported_ids = [];
