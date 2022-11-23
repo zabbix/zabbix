@@ -335,7 +335,7 @@ func parseParamas(params []string) (o options, err error) {
 	case firstParam:
 		err = o.setIP(params[firstParam-1])
 		if err != nil {
-			return o, zbxerr.New(fmt.Sprintf("invalid fist parameter, %s", err.Error()))
+			return o, zbxerr.New(fmt.Sprintf("invalid first parameter, %s", err.Error()))
 		}
 
 		fallthrough

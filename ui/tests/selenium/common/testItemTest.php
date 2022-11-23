@@ -407,7 +407,7 @@ class testItemTest extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => 'Zabbix agent',
-						'Key' => 'test.item.preproc.no.fist.param'
+						'Key' => 'test.item.preproc.no.first.param'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']

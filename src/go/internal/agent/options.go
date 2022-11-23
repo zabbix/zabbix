@@ -43,7 +43,7 @@ const (
 )
 
 // CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the
-// beginning of the string s, which is cut after the fist n runes.
+// beginning of the string s, which is cut after the first n runs.
 func CutAfterN(s string, n int) string {
 	var i int
 	for pos := range s {
