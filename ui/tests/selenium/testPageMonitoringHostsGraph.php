@@ -123,9 +123,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'itemid' => $itemids['Item for graph 3'],
 						'color' => '00AA00'
 					]
-
 				]
-			],
+			]
 		]);
 		$this->assertArrayHasKey('graphids', $graphs);
 		self::$graphids = CDataHelper::getIds('name');
@@ -239,8 +238,14 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graph_2',
 						'Graph_3'
 					],
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
-					'view_result' => ["1\n2\n3"]
+					'items_names' => [
+						'Item for graph 1',
+						'Item for graph 2',
+						'Item for graph 3'
+					],
+					'view_result' => [
+						"1\n2\n3"
+					]
 				]
 			],
 			// #1
@@ -256,8 +261,14 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graph_2',
 						'Graph_3'
 					],
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
-					'view_result' => ["1\n2\n3"]
+					'items_names' => [
+						'Item for graph 1',
+						'Item for graph 2',
+						'Item for graph 3'
+					],
+					'view_result' => [
+						"1\n2\n3"
+					]
 				]
 			],
 			// #2
@@ -269,9 +280,15 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_2'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => ['Graph_2'],
-					'items_names' => ['Item for graph 2'],
-					'view_result' => ["2"]
+					'graph_names' => [
+						'Graph_2'
+					],
+					'items_names' => [
+						'Item for graph 2'
+					],
+					'view_result' => [
+						"2"
+					]
 				]
 			],
 			// #3
@@ -283,9 +300,15 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_2'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => ['Graph_2'],
-					'items_names' => ['Item for graph 2'],
-					'view_result' => ["2"]
+					'graph_names' => [
+						'Graph_2'
+					],
+					'items_names' => [
+						'Item for graph 2'
+					],
+					'view_result' => [
+						"2"
+					]
 				]
 			],
 			// #4
@@ -296,9 +319,15 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_1'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => ['Graph_1'],
-					'items_names' => ['Item for graph 1'],
-					'view_result' => ["1"]
+					'graph_names' => [
+						'Graph_1'
+					],
+					'items_names' => [
+						'Item for graph 1'
+					],
+					'view_result' => [
+						"1"
+					]
 				]
 			],
 			// #5
@@ -315,12 +344,24 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				[
 					'filter' => [
 						'Search type' => 'Strict',
-						'Graphs' => ['Graph_1', 'Graph_3']
+						'Graphs' => [
+							'Graph_1',
+							'Graph_3'
+						]
 					],
 					'graphs_amount' => 2,
-					'graph_names' => ['Graph_1', 'Graph_3'],
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
-					'view_result' => ["1\n2\n3"]
+					'graph_names' => [
+						'Graph_1',
+						'Graph_3'
+					],
+					'items_names' => [
+						'Item for graph 1',
+						'Item for graph 2',
+						'Item for graph 3'
+					],
+					'view_result' => [
+						"1\n2\n3"
+					]
 				]
 			],
 			// #7
@@ -328,7 +369,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				[
 					'filter' => [
 						'Search type' => 'Pattern',
-						'Graphs' => ['Graph_1', 'Graph_3']
+						'Graphs' => [
+							'Graph_1',
+							'Graph_3'
+						]
 					]
 				]
 			],
@@ -337,7 +381,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				[
 					'filter' => [
 						'Search type' => 'Pattern',
-						'Graphs' => ['non_existing_graph', 'Graph_1']
+						'Graphs' => [
+							'non_existing_graph',
+							'Graph_1'
+						]
 					]
 				]
 			],
@@ -357,12 +404,21 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'filter' => [
 						'Host' => 'Host for monitoring graphs',
 						'Search type' => 'Pattern',
-						'Graphs' => ['non_existing_graph', 'Graph_1']
+						'Graphs' => [
+							'non_existing_graph',
+							'Graph_1'
+						]
 					],
 					'graphs_amount' => 1,
-					'graph_names' => ['Graph_1'],
-					'items_names' => ['Item for graph 1'],
-					'view_result' => ["1"]
+					'graph_names' => [
+						'Graph_1'
+					],
+					'items_names' => [
+						'Item for graph 1'
+					],
+					'view_result' => [
+						"1"
+					]
 				]
 			]
 		];
