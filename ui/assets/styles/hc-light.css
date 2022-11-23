@@ -1777,7 +1777,7 @@ form.dashboard-widget-svggraph .dataset-actions {
     right: 0;
     vertical-align: baseline; }
 form.dashboard-widget-svggraph .items-list {
-  grid-column: 2 / span 3; }
+  grid-column: 3 / span 3; }
 form.dashboard-widget-svggraph .list-vertical-accordion {
   position: relative;
   margin-left: 15px;
