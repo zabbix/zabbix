@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-23T07:32:29Z'
+  date: '2022-11-23T16:29:11Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1433,7 +1433,7 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
                   description: |
-                    The PSU requires attention. Compare current state from operaional data with table below:
+                    The PSU requires attention. Compare current state from operational data with table below:
                     -  offEnvOther (1): FRU is powered off because of a problem not listed below;
                     -  on (2): FRU is powered on;
                     -  offAdmin (3): administratively off;
