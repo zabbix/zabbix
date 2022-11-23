@@ -199,6 +199,12 @@ window.widget_svggraph_form = new class {
 		});
 
 		document
+			.querySelector('[id*="legend_label"]')
+			.addEventListener('change', (e) => {
+				this._updateForm();
+			});
+
+		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
 				this._addDataset(<?= CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
@@ -716,8 +722,10 @@ window.widget_svggraph_form = new class {
 
 			const legend_label = dataset.querySelector(`[name="ds[${dataset_index}][legend_label]"]`);
 			const dataset_number = parseInt(dataset_index) + 1;
+			const dataset_label = dataset.firstChild;
 
 			legend_label.placeholder = 'Data set #'+dataset_number;
+			dataset_label.textContent = legend_label.value ? legend_label.value : legend_label.placeholder;
 		}
 
 		// Displaying options tab.

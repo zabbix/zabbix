@@ -1771,7 +1771,7 @@ form.dashboard-widget-svggraph .dataset-head .multiselect {
 form.dashboard-widget-svggraph .dataset-body .form-grid {
   padding-top: 0; }
   form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
-    grid-column-start: 3; }
+    grid-column-start: 4; }
 form.dashboard-widget-svggraph .drag-icon {
   position: absolute;
   top: 5px;
@@ -1799,16 +1799,21 @@ form.dashboard-widget-svggraph .list-vertical-accordion {
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;
-  grid-template-columns: 24px 24px 1fr 1fr 24px;
+  grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
   grid-gap: 10px;
   align-items: start;
   padding: 5px 0; }
+  form.dashboard-widget-svggraph .list-accordion-item > label {
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
     position: absolute;
-    top: 24px;
+    top: 29px;
     bottom: 0;
-    left: 11px;
+    left: 121px;
     width: 2px;
     background: #303030; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {

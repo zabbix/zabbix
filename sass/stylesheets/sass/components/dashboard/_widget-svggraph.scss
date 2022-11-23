@@ -62,7 +62,7 @@ form.dashboard-widget-svggraph {
 			padding-top: 0;
 
 			&:first-child {
-				grid-column-start: 3;
+				grid-column-start: 4;
 			}
 		}
 	}
@@ -110,18 +110,25 @@ form.dashboard-widget-svggraph {
 	.list-accordion-item {
 		position: relative;
 		display: grid;
-		grid-template-columns: 24px 24px 1fr 1fr 24px;
+		grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
 		grid-gap: 10px;
 		align-items: start;
 		padding: 5px 0;
+
+		> label {
+			height: 24px;
+			line-height: 24px;
+			overflow: hidden;
+			text-overflow: ellipsis
+		}
 
 		&.list-accordion-item-opened {
 			&::before {
 				content: ' ';
 				position: absolute;
-				top: 24px;
+				top: 29px;
 				bottom: 0;
-				left: 11px;
+				left: 121px;
 				width: 2px;
 				background: $ui-border-color;
 			}

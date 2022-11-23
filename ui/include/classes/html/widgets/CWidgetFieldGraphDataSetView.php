@@ -212,6 +212,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
+			(new CLabel($value['legend_label'] ?: _('Data set').' #'.$dataset_num))
+				->setId($field_name.'_'.$row_num.'_dataset_label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
@@ -404,6 +406,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CTextBox($field_name.'['.$row_num.'][legend_label]',
 									$value['legend_label']
 								))
+									->setId($field_name.'_'.$row_num.'_legend_label')
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setAttribute('placeholder', _('Data set').' #'.$dataset_num)
 							)
