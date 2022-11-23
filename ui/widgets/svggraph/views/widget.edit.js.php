@@ -111,6 +111,7 @@ window.widget_svggraph_form = new class {
 					});
 			});
 		}
+		this._updateForm();
 	}
 
 	_datasetTabInit() {
@@ -722,10 +723,16 @@ window.widget_svggraph_form = new class {
 
 			const legend_label = dataset.querySelector(`[name="ds[${dataset_index}][legend_label]"]`);
 			const dataset_number = parseInt(dataset_index) + 1;
-			const dataset_label = dataset.firstChild;
 
 			legend_label.placeholder = 'Data set #'+dataset_number;
-			dataset_label.textContent = legend_label.value ? legend_label.value : legend_label.placeholder;
+
+			const datasets = this._dataset_wrapper.querySelectorAll('[data-set]');
+
+			datasets.forEach(function (element, i) {
+				element.firstChild.textContent = element.querySelector(`[name="ds[${i}][legend_label]"]`).value
+					? element.querySelector(`[name="ds[${i}][legend_label]"]`).value
+					: element.querySelector(`[name="ds[${i}][legend_label]"]`).placeholder;
+			});
 		}
 
 		// Displaying options tab.

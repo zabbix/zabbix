@@ -1796,6 +1796,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
   form.dashboard-widget-svggraph .list-accordion-item > label {
     height: 24px;
     line-height: 24px;
+    cursor: grab;
     overflow: hidden;
     text-overflow: ellipsis; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
