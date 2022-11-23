@@ -351,8 +351,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 				line, size_str, suffix);
 	}
 
-	/* tell mktime() to determine whether daylight saving time is in effect */
-	tm.tm_isdst = -1;
+	memset(&tm, 0, sizeof(tm));
+	tm.tm_isdst = -1;	/* tell mktime() to determine whether daylight saving time is in effect */
 
 	if (NULL == (p = strptime(buildtime_value, TIME_FMT, &tm)))
 	{
@@ -368,6 +368,9 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 	}
 
 	buildtime_timestamp = mktime(&tm);
+
+	memset(&tm, 0, sizeof(tm));
+	tm.tm_isdst = -1;	/* tell mktime() to determine whether daylight saving time is in effect */
 
 	if (NULL == strptime(installtime_value, TIME_FMT, &tm))
 	{
