@@ -773,6 +773,14 @@ static int	DBpatch_6030083(void)
 	return DBadd_foreign_key("widget_field", 11, &field);
 }
 
+static int	DBpatch_6030084(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -863,4 +871,5 @@ DBPATCH_ADD(6030080, 0, 1)
 DBPATCH_ADD(6030081, 0, 1)
 DBPATCH_ADD(6030082, 0, 1)
 DBPATCH_ADD(6030083, 0, 1)
+DBPATCH_ADD(6030084, 0, 1)
 DBPATCH_END()
