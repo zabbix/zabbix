@@ -455,7 +455,7 @@ class testDocumentationLinks extends CWebTest {
 			// #43 Action log view.
 			[
 				[
-					'url' => 'auditacts.php',
+					'url' => 'zabbix.php?action=actionlog.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/action_log'
 				]
 			],
