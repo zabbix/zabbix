@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 #define CHECKED_SYSCONF_SYSCALL(sysconf_name)									\
 	errno = 0;												\
 	if (-1 == (res##sysconf_name = sysconf(sysconf_name)))							\

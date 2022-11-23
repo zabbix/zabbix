@@ -69,7 +69,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
-	$(top_builddir)/src/libs/zbxself/libzbxself_proxy.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
