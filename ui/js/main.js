@@ -671,7 +671,7 @@ function ApiCall(method, params, sessionid = null) {
 		credentials = 'omit';
 	}
 	else if (sessionid) {
-		headers.Authorization = 'Bearer ' + sessionid;
+		headers.Authorization = `Bearer ${sessionid}`;
 	}
 
 	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
