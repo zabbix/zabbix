@@ -263,7 +263,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($triggers as $triggerid => $trigger) {
 			if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
-					&& ($trigger['items'][0]['templateid'] == 0 )) {
+					&& $trigger['items'][0]['templateid'] == 0) {
 				$simple_triggers[] = $trigger;
 				unset($triggers[$triggerid]);
 			}
