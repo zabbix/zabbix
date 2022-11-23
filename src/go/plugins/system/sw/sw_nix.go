@@ -44,7 +44,7 @@ type manager struct {
 	parser  func(in []string, regex string) ([]string, error)
 }
 
-type system_info struct {
+type systemInfo struct {
 	OSType        string `json:"os_type"`
 	ProductName   string `json:"product_name,omitempty"`
 	Architecture  string `json:"architecture,omitempty"`
@@ -278,16 +278,33 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	return
 }
 
+// nolint:gomnd
+func parseKernelVersion(info *systemInfo) {
+	var major, minor, patch int
+	read, _ := fmt.Sscanf((*info).Kernel, "%d.%d.%d", &major, &minor, &patch)
+
+	if read > 0 {
+		(*info).Major = strconv.Itoa(major)
+	}
+	if read > 1 {
+		(*info).Minor = strconv.Itoa(minor)
+	}
+	if read > 2 {
+		(*info).Patch = strconv.Itoa(patch)
+	}
+}
+
 func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
-	var info system_info
+	var info systemInfo
 	var jsonArray []byte
 
 	info.OSType = "linux"
 
 	info.ProductName, _ = getName()
+	info.VersionFull, _ = getVersionFull()
 
 	u := syscall.Utsname{}
-	if nil == syscall.Uname(&u) {
+	if syscall.Uname(&u) == nil {
 		info.Kernel = charArray2String(u.Release[:])
 		info.Architecture = charArray2String(u.Machine[:])
 
@@ -300,22 +317,9 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 		if len(info.Kernel) > 0 {
 			info.VersionPretty += " " + info.Kernel
 
-			var major, minor, patch int
-			read, _ := fmt.Sscanf(info.Kernel, "%d.%d.%d", &major, &minor, &patch)
-
-			if read > 0 {
-				info.Major = strconv.Itoa(major)
-			}
-			if read > 1 {
-				info.Minor = strconv.Itoa(minor)
-			}
-			if read > 2 {
-				info.Patch = strconv.Itoa(patch)
-			}
+			parseKernelVersion(&info)
 		}
 	}
-
-	info.VersionFull, _ = getVersionFull()
 
 	jsonArray, err = json.Marshal(info)
 	result = string(jsonArray)

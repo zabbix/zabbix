@@ -50,16 +50,21 @@ func (p *Plugin) Validate(options interface{}) error { return nil }
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	const (
+		maxSwPackagesParams = 3
+		maxSwOSParams       = 1
+	)
+
 	switch key {
 	case "system.sw.packages":
-		if len(params) > 3 {
+		if len(params) > maxSwPackagesParams {
 			return nil, zbxerr.ErrorTooManyParameters
 		}
 
 		result, err = p.getPackages(params)
 
 	case "system.sw.os":
-		if len(params) > 1 {
+		if len(params) > maxSwOSParams {
 			return nil, zbxerr.ErrorTooManyParameters
 		}
 
