@@ -1968,8 +1968,8 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 			for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 			{
-				if (var->name_length < root_oid_len || (memcmp(root_oid, var->name,
-						root_oid_len * sizeof(oid)) != 0))
+				if (var->name_length < root_oid_len ||
+						0 != memcmp(root_oid, var->name, root_oid_len * sizeof(oid)))
 				{
 					running = 0;
 					break;
@@ -1980,9 +1980,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 				{
 					char	buffer[MAX_STRING_LEN];
 
-					if (snmp_oid_compare(name, name_length,
-								var->name,
-								var->name_length) >= 0)
+					if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
 					{
 						running = 0;
 						break;
@@ -1995,12 +1993,14 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 					zbx_strcpy_alloc(&results, &results_alloc, &results_offset, buffer);
 
-					if (var->next_variable == NULL)
+					if (NULL == var->next_variable)
 					{
 						memmove(name, var->name, var->name_length * sizeof(oid));
 						name_length = var->name_length;
 					}
-				} else {
+				}
+				else
+				{
 					running = 0;
 					break;
 				}
