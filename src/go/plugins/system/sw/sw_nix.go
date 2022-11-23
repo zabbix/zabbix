@@ -23,16 +23,16 @@
 package sw
 
 import (
+	"encoding/json"
 	"errors"
-	"regexp"
-	"sort"
-	"strings"
-	"time"
 	"fmt"
 	"os"
-	"encoding/json"
-	"syscall"
+	"regexp"
+	"sort"
 	"strconv"
+	"strings"
+	"syscall"
+	"time"
 
 	"zabbix.com/pkg/zbxcmd"
 )
@@ -45,15 +45,15 @@ type manager struct {
 }
 
 type system_info struct {
-	OSType         string `json:"os_type"`
-	ProductName    string `json:"product_name,omitempty"`
-	Architecture   string `json:"architecture,omitempty"`
-	Major          string `json:"major,omitempty"`
-	Minor          string `json:"minor,omitempty"`
-	Patch          string `json:"patch,omitempty"`
-	Kernel         string `json:"kernel,omitempty"`
-	VersionPretty  string `json:"version_pretty,omitempty"`
-	VersionFull    string `json:"version_full"`
+	OSType        string `json:"os_type"`
+	ProductName   string `json:"product_name,omitempty"`
+	Architecture  string `json:"architecture,omitempty"`
+	Major         string `json:"major,omitempty"`
+	Minor         string `json:"minor,omitempty"`
+	Patch         string `json:"patch,omitempty"`
+	Kernel        string `json:"kernel,omitempty"`
+	VersionPretty string `json:"version_pretty,omitempty"`
+	VersionFull   string `json:"version_full"`
 }
 
 const (
@@ -84,7 +84,7 @@ func readOsInfoFile(path string) (contents string, err error) {
 
 	bin, err = os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("Cannot open " + path + ": %s", err)
+		return "", fmt.Errorf("Cannot open "+path+": %s", err)
 	}
 
 	return string(bin), nil
@@ -101,7 +101,7 @@ func getVersionFull() (version string, err error) {
 }
 
 func findFirstMatch(src string, pattern string) (res string) {
-	regex := regexp.MustCompile("PRETTY_NAME=\"([^\"]+)\"")
+	regex := regexp.MustCompile(pattern)
 	match := regex.FindStringSubmatch(src)
 	if len(match) > 1 {
 		return match[1]
@@ -114,11 +114,11 @@ func getName() (name string, err error) {
 	name, err = readOsInfoFile(swOSNameRelease)
 
 	if err == nil {
-		if name = findFirstMatch(name, "PRETTY_NAME=\"([^\"]+)\""); len(name) > 0 {
+		if name = findFirstMatch(name, swOSOptionPrettyName+"=\"([^\"]+)\""); len(name) > 0 {
 			return name, nil
 		}
 
-		if name = findFirstMatch(name, "PRETTY_NAME=(\\S+)\\s*\\n"); len(name) > 0 {
+		if name = findFirstMatch(name, swOSOptionPrettyName+"=(\\S+)\\s*\\n"); len(name) > 0 {
 			return name, nil
 		}
 	}
@@ -264,7 +264,7 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 		}
 
 	case "short":
-		return readOsInfoFile (swOSShort)
+		return readOsInfoFile(swOSShort)
 
 	case "name":
 		if result, err = getName(); err == nil {
@@ -287,31 +287,31 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	info.ProductName, _ = getName()
 
 	u := syscall.Utsname{}
-	syscall.Uname(&u)
+	if nil == syscall.Uname(&u) {
+		info.Kernel = charArray2String(u.Release[:])
+		info.Architecture = charArray2String(u.Machine[:])
 
-	info.Kernel = charArray2String(u.Release[:])
-	info.Architecture = charArray2String(u.Machine[:])
-
-	if len(info.ProductName) > 0 {
-		info.VersionPretty += info.ProductName
-	}
-	if len(info.Architecture) > 0 {
-		info.VersionPretty += " " + info.Architecture
-	}
-	if len(info.Kernel) > 0 {
-		info.VersionPretty += " " + info.Kernel
-
-		var major, minor, patch int
-		read, _ := fmt.Sscanf(info.Kernel, "%d.%d.%d", &major, &minor, &patch)
-
-		if read > 0 {
-			info.Major = strconv.Itoa(major)
+		if len(info.ProductName) > 0 {
+			info.VersionPretty += info.ProductName
 		}
-		if read > 1 {
-			info.Minor = strconv.Itoa(minor)
+		if len(info.Architecture) > 0 {
+			info.VersionPretty += " " + info.Architecture
 		}
-		if read > 2 {
-			info.Patch = strconv.Itoa(patch)
+		if len(info.Kernel) > 0 {
+			info.VersionPretty += " " + info.Kernel
+
+			var major, minor, patch int
+			read, _ := fmt.Sscanf(info.Kernel, "%d.%d.%d", &major, &minor, &patch)
+
+			if read > 0 {
+				info.Major = strconv.Itoa(major)
+			}
+			if read > 1 {
+				info.Minor = strconv.Itoa(minor)
+			}
+			if read > 2 {
+				info.Patch = strconv.Itoa(patch)
+			}
 		}
 	}
 
