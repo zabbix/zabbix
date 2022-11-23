@@ -401,12 +401,8 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 
 static void	export_flush(zbx_export_file_t *file)
 {
-	if(NULL != file && NULL != file->file)
-	{
-		if (0 != fflush(file->file))
-			zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file->name,
-					zbx_strerror(errno));
-	}
+	if (NULL != file && NULL != file->file && 0 != fflush(file->file))
+		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file->name, zbx_strerror(errno));
 }
 
 void	zbx_problems_export_flush(void)

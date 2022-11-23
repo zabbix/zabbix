@@ -955,7 +955,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ExportType",			&(zbx_config_export.type),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ExportFileSize",		&(zbx_config_export.file_size),	TYPE_UINT64,
+		{"ExportFileSize",		&(zbx_config_export.file_size),		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_LLDWORKER_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			100},

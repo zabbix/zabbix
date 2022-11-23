@@ -20,7 +20,6 @@
 #ifndef ZABBIX_EXPORT_H
 #define ZABBIX_EXPORT_H
 
-#include "zbxsysinc.h"
 #include "zbxtypes.h"
 
 #define ZBX_FLAG_EXPTYPE_EVENTS		1
