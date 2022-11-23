@@ -23,6 +23,11 @@ class CJsonRpc {
 
 	const VERSION = '2.0';
 
+	public const AUTH_TYPE_FRONTEND = 0;
+	public const AUTH_TYPE_PARAM = 1;
+	public const AUTH_TYPE_HEADER = 2;
+	public const AUTH_TYPE_COOKIE = 3;
+
 	/**
 	 * API client to use for making requests.
 	 *
@@ -71,19 +76,30 @@ class CJsonRpc {
 				continue;
 			}
 
+			$auth = [
+				'type' => self::AUTH_TYPE_PARAM,
+				'auth' => $call['auth']
+			];
+
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
 			$header = $this->getAuthorizationHeader();
 			if ($header !== null && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
-				$call['auth'] = substr($header, strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX));
+				$auth = [
+					'type' => self::AUTH_TYPE_HEADER,
+					'auth' => substr($header, strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX))
+				];
 			}
 			elseif ($call['auth'] === null) {
 				$session = new CEncryptedCookieSession();
 
-				$call['auth'] = $session->extractSessionId();
+				$auth = [
+					'type' => self::AUTH_TYPE_COOKIE,
+					'auth' => $session->extractSessionId()
+				];
 			}
 
-			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);
 
 			$this->processResult($call, $result);
 		}

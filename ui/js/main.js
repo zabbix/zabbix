@@ -659,30 +659,22 @@ var hintBox = {
  *
  * @param {string} method
  * @param {object} params
- * @param {string} sessionid
+ * @param {int}    id
  *
  * @returns {Promise<any>}
  */
-function ApiCall(method, params, sessionid = null) {
-	let headers = { 'Content-Type': 'application/json' };
-	let credentials = 'same-origin';
-
-	if (['user.login', 'user.checkauthentication', 'apiinfo.version', 'settings.getglobal'].includes(method)) {
-		credentials = 'omit';
-	}
-	else if (sessionid) {
-		headers.Authorization = `Bearer ${sessionid}`;
-	}
-
+function ApiCall(method, params, id = 1) {
 	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
 		method: 'POST',
-		headers,
-		credentials,
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		credentials: 'same-origin',
 		body: JSON.stringify({
 			jsonrpc: '2.0',
 			method,
 			params,
-			id: 1
+			id
 		}),
 	}).then((response) => response.json());
 }

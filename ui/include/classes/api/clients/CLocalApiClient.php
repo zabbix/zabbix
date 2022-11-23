@@ -57,7 +57,7 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @return CApiClientResponse
 	 */
-	public function callMethod($requestApi, $requestMethod, array $params, $auth) {
+	public function callMethod(string $requestApi, string $requestMethod, array $params, array $auth) {
 		global $DB;
 
 		$api = strtolower($requestApi);
@@ -84,11 +84,26 @@ class CLocalApiClient extends CApiClient {
 		$requiresAuthentication = $this->requiresAuthentication($api, $method);
 
 		// check that no authentication token is passed to methods that don't require it
-		if (!$requiresAuthentication && $auth !== null) {
+		if (!$requiresAuthentication && ($auth['type'] != CJsonRpc::AUTH_TYPE_COOKIE && $auth['auth'] !== null)) {
 			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
-				$requestApi, $requestMethod
-			);
+
+			switch ($auth['type']) {
+				case CJsonRpc::AUTH_TYPE_HEADER:
+					$response->errorMessage = _s('The "%1$s.%2$s" method must be called without authorization header.',
+						$requestApi, $requestMethod
+					);
+					break;
+				case CJsonRpc::AUTH_TYPE_COOKIE:
+					$response->errorMessage = _s('The "%1$s.%2$s" method must be called without "%3$s" cookie.',
+						$requestApi, $requestMethod, ZBX_SESSION_NAME
+					);
+					break;
+				default:
+					$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
+						$requestApi, $requestMethod
+					);
+					break;
+			}
 
 			return $response;
 		}
@@ -97,7 +112,7 @@ class CLocalApiClient extends CApiClient {
 		try {
 			// authenticate
 			if ($requiresAuthentication) {
-				$this->authenticate($auth);
+				$this->authenticate($auth['auth']);
 
 				// check permissions
 				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
