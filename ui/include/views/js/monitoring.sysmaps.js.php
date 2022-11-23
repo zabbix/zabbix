@@ -932,6 +932,7 @@ function createFontSelect(string $name): CSelect {
 			(new CCol([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addClass('zi-drag-handle')
 					->addStyle('top: 0px;'),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),

@@ -289,7 +289,9 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			->setAriaRequired($this->isRequired());
 
 		return (new CListItem([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			(new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass('zi-drag-handle'),
 			$host_pattern_field,
 			(new CPatternSelect([
 				'name' => $this->field->getName().'['.$row_num.'][items][]',

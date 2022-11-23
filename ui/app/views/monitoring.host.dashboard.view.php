@@ -85,11 +85,13 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE) // todo zi
+						->addClass('zi-chevron-left') // todo zi
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
 					(new CSimpleButton(null))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW) // todo zi
+						->addClass('zi-pause') // todo zi
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
 							: _s('Start slideshow')
@@ -102,7 +104,8 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE) // todo zi
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
+						->addClass('zi-chevron-right')// todo zi
 						->setTitle(_('Next page'))
 				)
 			: null

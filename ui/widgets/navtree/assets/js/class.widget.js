@@ -541,7 +541,7 @@ class CWidgetNavTree extends CWidget {
 		content.appendChild(margin_lvl);
 
 		if (this._is_edit_mode) {
-			const button_add_child = document.createElement('input');
+			const button_add_child = document.createElement('button');
 
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
@@ -549,16 +549,16 @@ class CWidgetNavTree extends CWidget {
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
-			const button_add_maps = document.createElement('input');
+			const button_add_maps = document.createElement('button');
 
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
-			button_add_maps.classList.add('btn-import', 'js-button-add-maps'); // todo zi
+			button_add_maps.classList.add('btn-import', 'js-button-add-maps', 'zi-copy'); // todo zi
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
 			if (editable) {
-				const button_edit = document.createElement('input');
+				const button_edit = document.createElement('button');
 
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');

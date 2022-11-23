@@ -356,10 +356,6 @@ form {
 								background-color: rgba($font-color, .5);
 							}
 
-							.icon-wizard-action {
-								background-position: -165px -624px;
-							}
-
 							button:focus {
 								box-shadow: 0 0 0 2px rgba($font-color, .5);
 							}
@@ -380,10 +376,6 @@ form {
 							.ok-ack-fg {
 								color: #000000;
 								border-bottom-color: rgba(0, 0, 0, .5);
-							}
-
-							.icon-wizard-action {
-								background-position: -165px -624px;
 							}
 
 							button:focus {
@@ -454,14 +446,6 @@ form {
 				@media screen and (min-width: 1600px) {
 					max-width: 133px;
 				}
-			}
-
-			.icon-wizard-action {
-				background: url($sprite-path) no-repeat -6px -624px; // todo last
-				height: 12px;
-				min-height: 12px;
-				margin: 0;
-				position: relative;
 			}
 		}
 	}
@@ -2018,24 +2002,7 @@ button {
 		}
 	}
 }
-// todo last
-$icon-btn: (
-	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
-	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
-	dashboard-kioskmode-previous-page: $btn-bg-color url($sprite-path) no-repeat -398px -657px,
-	dashboard-kioskmode-next-page: $btn-bg-color url($sprite-path) no-repeat -396px -624px
-);
 
-// Dynamically generated classes:
-//  .btn-dashboard-kioskmode-toggle-slideshow
-//  .btn-dashboard-kioskmode-previous-page
-//  .btn-dashboard-kioskmode-next-page
-@each $icon-btn, $bgimage in $icon-btn {
-	.btn-#{$icon-btn} {
-		background: $bgimage;
-		@extend %button-icon-size;
-	}
-}
 // todo last
 $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
@@ -2526,36 +2493,6 @@ $trigger-expression-tree-icons: (
 		&::before {
 			background-position: $bg-position;
 		}
-	}
-}
-
-$form-icon-btn: (
-	wizard-action: url($sprite-path) no-repeat -6px -617px // todo last
-);
-
-// Dynamically generated classes:
-//  .icon-wizard-action
-@each $form-icon-btn, $bgimage in $form-icon-btn {
-	.icon-#{$form-icon-btn} {
-		background: $transparent $bgimage;
-		@extend %form-icon-btn;
-	}
-}
-
-%form-icon-btn {
-	border: 0;
-	margin: -4px 0;
-	vertical-align: middle;
-	cursor: pointer;
-	opacity: .75;
-	transition: opacity .2s ease-out;
-	@extend %button-icon-size;
-
-	&:hover,
-	&:focus,
-	&:active {
-		opacity: 1;
-		background-color: $transparent;
 	}
 }
 
@@ -4868,11 +4805,40 @@ svg {
 					display: flex;
 					width: 85px;
 
-					.btn-import,
 					.btn-remove {
 						&:focus {
 							box-shadow: none;
 						}
+					}
+
+					.zi-plus,
+					.zi-copy {
+						display: inline-block;
+						width: 18px;
+						height: 18px;
+						min-height: unset;
+						min-width: unset;
+						padding: 0;
+						margin-right: 5px;
+
+						opacity: 0.5;
+						transition: transform $ui-transition-duration;
+						&::before {
+							vertical-align: middle;
+							color: $icon-header-controls-color;
+							font-size: 18px;
+						}
+
+						&:hover,
+						&:active,
+						&:focus {
+							opacity: 1;
+						}
+						&:focus {
+							box-shadow: 0 0 0 2px $btn-border-focus-color;
+						}
+
+						@extend %btn-reset;
 					}
 				}
 

@@ -124,7 +124,10 @@ $item_form_list
 			(new CTag('script', true))
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->addItem(new CRow([
-					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CCol((new CDiv)
+						->addClass(ZBX_STYLE_DRAG_ICON)
+						->addClass('zi-drag-handle')
+					))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))

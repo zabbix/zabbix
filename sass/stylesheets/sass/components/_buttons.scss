@@ -44,24 +44,6 @@
 	}
 }
 
-.btn-import {
-	@extend %btn-icon;
-	background-image: url($sprite-path); // todo last
-	background-repeat: no-repeat;
-
-	&::-moz-focus-inner {
-		padding: 0;
-	}
-
-	&:not(:first-child) {
-		margin-left: 5px;
-	}
-}
-
-.btn-import {
-	background-position: -45px -514px;
-}
-
 .btn-remove {
 	@extend %btn-icon;
 	@extend %btn-remove-icon;

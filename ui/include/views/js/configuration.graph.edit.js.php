@@ -31,7 +31,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<div class="<?= ZBX_STYLE_DRAG_ICON.' zi-drag-handle' ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
@@ -111,7 +111,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<div class="<?= ZBX_STYLE_DRAG_ICON.' zi-drag-handle' ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
@@ -182,7 +182,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<div class="<?= ZBX_STYLE_DRAG_ICON.' zi-drag-handle' ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
@@ -254,7 +254,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+				<div class="<?= ZBX_STYLE_DRAG_ICON.' zi-drag-handle' ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">

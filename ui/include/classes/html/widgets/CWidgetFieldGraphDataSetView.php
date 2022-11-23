@@ -211,6 +211,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass('zi-drag-handle')
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
 			(new CDiv())
@@ -406,7 +407,9 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			$name = '#{name}', $color = '#{color}'): CRow {
 		return (new CRow([
 			(new CCol(
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addClass('zi-drag-handle')
 			))
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),

@@ -8,6 +8,14 @@
 		li {
 			margin-right: 6px;
 		}
+		.zi-chevron-left,
+		.zi-chevron-right,
+		.zi-pause {
+			padding: 0 2px;
+			&::before {
+				top: -1px;
+			}
+		}
 	}
 }
 

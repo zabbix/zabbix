@@ -18,13 +18,27 @@ section {
 		}
 	}
 
-	.section-toggle {
-		@extend %btn-widget-defaults;
-
+	.zi-chevron-up {
 		width: 24px;
 		height: 24px;
 		margin: 2px 2px 0 auto;
-		background: url($sprite-path) no-repeat -6px -654px; // todo last
+		padding: 0 1px;
+		top: -1px;
+
+
+		color: $icon-header-controls-color;
+		opacity: 0.5;
+
+		&:hover,
+		&:active,
+		&:focus {
+			color: $icon-header-controls-color;
+			opacity: 1;
+		}
+
+		transition: opacity .2s ease-out;
+
+		@extend %btn-reset;
 	}
 
 	.section-foot {
@@ -38,10 +52,6 @@ section {
 		.section-body,
 		.section-foot {
 			display: none;
-		}
-
-		.section-toggle {
-			background-position: -6px -689px;
 		}
 	}
 

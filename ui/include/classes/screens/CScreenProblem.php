@@ -1044,6 +1044,7 @@ class CScreenProblem extends CScreenBase {
 						&& count($info_icons) > 1) {
 					$cell_info = (new CButton(null))
 						->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
+						->addClass('zi-more')
 						->addStyle('margin-left: -3px;')
 						->setHint(makeInformationList($info_icons));
 				}

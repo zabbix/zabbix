@@ -42,7 +42,10 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass('zi-drag-handle')
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
@@ -63,7 +66,9 @@
 <script type="text/x-jquery-tmpl" id="scenario-pair-row">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+				(new CDiv())
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addClass('zi-drag-handle')
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
