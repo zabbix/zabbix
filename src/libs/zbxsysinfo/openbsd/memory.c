@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 static int		mib[] = {CTL_VM, VM_UVMEXP};
 static size_t		len;
 static struct uvmexp	uvm;

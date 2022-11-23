@@ -739,7 +739,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -754,7 +754,7 @@ zabbix_export:
                         host: Solaris
                         name: 'CPU load'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -770,7 +770,7 @@ zabbix_export:
                         host: Solaris
                         name: 'CPU utilization'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -786,7 +786,7 @@ zabbix_export:
                         host: Solaris
                         name: 'Memory usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -803,7 +803,7 @@ zabbix_export:
                         host: Solaris
                         name: 'Swap usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -819,7 +819,7 @@ zabbix_export:
                         host: Solaris
                         key: 'proc.num[]'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-07-01T06:44:50Z'
   template_groups:
     -
@@ -824,7 +824,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -839,7 +839,7 @@ zabbix_export:
                         name: 'Cloudflare: Bandwidth'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -855,7 +855,7 @@ zabbix_export:
                         name: 'Cloudflare: Web requests'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -871,7 +871,7 @@ zabbix_export:
                         name: 'Cloudflare: DNS requests'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -888,7 +888,7 @@ zabbix_export:
                         name: 'Cloudflare: Caching'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -904,7 +904,7 @@ zabbix_export:
                         name: 'Cloudflare: HTTP responses ratio over time'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -921,7 +921,7 @@ zabbix_export:
                         name: 'Cloudflare: IPs and threats'
                         host: 'Cloudflare by HTTP'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '12'
                   height: '5'

@@ -955,6 +955,7 @@ ZBX_DC_CONFIG;
 extern int	sync_in_progress;
 extern ZBX_DC_CONFIG	*config;
 extern zbx_rwlock_t	config_lock;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
@@ -994,7 +995,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 
 /* number of slots to store maintenance update flags */
 #define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+		((((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER]) + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);

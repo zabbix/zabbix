@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 static long	hertz = 0;
 
 int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
