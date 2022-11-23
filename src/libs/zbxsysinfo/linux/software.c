@@ -313,6 +313,7 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected whitespace), ignoring",
 				line, size_str);
+		return;
 	}
 
 	*suffix++ = '\0';
@@ -321,6 +322,7 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected type double), ignoring",
 				line, size_str);
+		return;
 	}
 
 	/* pacman supports the following labels:                       */
@@ -349,6 +351,7 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: unrecognized Installed Size suffix \"%s %s\", ignoring",
 				line, size_str, suffix);
+		return;
 	}
 
 	memset(&tm, 0, sizeof(tm));
