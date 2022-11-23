@@ -150,11 +150,11 @@ else {
 	if ($data['diff']) {
 		$buttons[] = [
 			'title' => _('Import'),
-			'class' => '',
+			'class' => 'js-import',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'focused' => true,
-			'action' => 'submitImportComparePopup(overlay);'
+			'action' => 'popup_import_compare.submitImportComparePopup();'
 		];
 	}
 
@@ -174,9 +174,10 @@ else {
 				->toString()
 			: (new CForm())
 				->addClass('import-compare')
-				->addVar('import_overlayid', $data['import_overlayid'])
 				->addItem(drawToc($data['diff_toc']))
 				->addItem(drawDiff($data['diff']))
+				->addItem(
+					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady())
 				->toString(),
 		'buttons' => $buttons,
 		'no_changes' => !$data['diff']

@@ -24,169 +24,101 @@
  */
 ?>
 
-function submitPopup(overlay) {
-	if (document.getElementById('rules_preset').value === "template") {
-		return openImportComparePopup(overlay);
+window.popup_import = new class {
+
+	constructor() {
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+		this.activate_advanced_configuration = false;
 	}
-	else {
-		if (isDeleteMissingChecked(overlay)) {
-			return confirmSubmit(overlay);
+
+	init(activate_advanced_configuration) {
+		this.overlay = overlays_stack.getById('popup_import');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.activate_advanced_configuration = activate_advanced_configuration;
+
+		this.warningListeners();
+
+		if (activate_advanced_configuration) {
+			this.AdvancedConfigurationListeners();
 		}
-
-		return submitImportPopup(overlay);
 	}
-}
 
-function isDeleteMissingChecked(import_overlay) {
-	return import_overlay.$dialogue.get(0).querySelectorAll('.deleteMissing:checked').length > 0;
-}
+	warningListeners() {
+		document
+			.getElementById('rules_valueMaps_updateExisting')
+			.addEventListener('change', (e) => {
+				this.updateWarning(e.target, <?= json_encode(_('Images for all maps will be updated!')) ?>)
+			})
+	}
 
-function confirmSubmit(import_overlay, compare_overlay) {
-	overlayDialogue({
-		class: 'position-middle',
-		content: jQuery('<span>')
-					.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
-		buttons: [
-			{
-				title: <?= json_encode(_('OK')) ?>,
-				focused: true,
-				action: function() {
-					if (compare_overlay !== undefined) {
-						overlayDialogueDestroy(compare_overlay.dialogueid);
-					}
-					return submitImportPopup(import_overlay);
-				}
-			},
-			{
-				title: <?= json_encode(_('Cancel')) ?>,
-				cancel: true,
-				class: '<?= ZBX_STYLE_BTN_ALT ?>',
-				action: function() {
-					(compare_overlay || import_overlay).unsetLoading();
-					return true;
-				}
+	AdvancedConfigurationListeners() {
+		document
+			.getElementById('advanced_options')
+			.addEventListener('change', () => {
+				this.form.querySelectorAll('.js-advanced-configuration').forEach(function (e) {
+					return e.classList.toggle("display-none");
+				});
+			});
+
+		document
+			.getElementById('update_all')
+			.addEventListener('change', () => { this.toggleAllCheckboxes('update')})
+
+		document
+			.getElementById('create_all')
+			.addEventListener('change', () => { this.toggleAllCheckboxes('create')})
+
+		document
+			.getElementById('delete_all')
+			.addEventListener('change', () => { this.toggleAllCheckboxes('delete')})
+
+		this.form.addEventListener('change',  (e) => {
+			if (e.target.classList.contains('js-delete')) {
+				this.updateMainCheckbox('delete');
 			}
-		]
-	}, (compare_overlay || import_overlay).$btn_submit);
-}
-
-function openImportComparePopup(overlay) {
-	const form = document.getElementById('import-form');
-
-	const url = new Curl('zabbix.php', false);
-	url.setArgument('action', 'popup.import.compare');
-	url.setArgument('import_overlayid', overlay.dialogueid);
-
-	overlay.setLoading();
-
-	fetch(url.getUrl(), {
-		method: 'post',
-		body: new FormData(form)
-	})
-		.then((response) => response.json())
-		.then((response) => {
-			if ('error' in response) {
-				throw {error: response.error};
+			else if (e.target.classList.contains('js-create')) {
+				this.updateMainCheckbox('create');
 			}
-
-			overlayDialogue({
-				title: response.header,
-				class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
-				content: response.body,
-				buttons: response.buttons,
-				script_inline: response.script_inline,
-				debug: response.debug
-			}, overlay.$btn_submit);
+			else if (e.target.classList.contains('js-update')) {
+				this.updateMainCheckbox('update');
+			}
 		})
-		.catch((exception) => {
-			document.getElementById('import_file').value = '';
+	}
 
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
-			let title, messages;
-
-			if (typeof exception === 'object' && 'error' in exception) {
-				title = exception.error.title;
-				messages = exception.error.messages;
-			}
-			else {
-				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+	submitPopup() {
+		if (document.getElementById('rules_preset').value === "template") {
+			return this.openImportComparePopup();
+		}
+		else {
+			if (this.isDeleteMissingChecked()) {
+				return this.confirmSubmit();
 			}
 
-			const message_box = makeMessageBox('bad', messages, title);
+			return this.submitImportPopup();
+		}
+	}
 
-			message_box.insertBefore(form);
-		})
-		.finally(() => {
-			overlay.unsetLoading();
-		});
-}
+	isDeleteMissingChecked() {
+		return this.form.querySelectorAll('.js-delete:checked').length > 0;
+	}
 
-function submitImportPopup(overlay) {
-	const form = document.getElementById('import-form');
-
-	const url = new Curl('zabbix.php', false);
-	url.setArgument('action', 'popup.import');
-
-	overlay.setLoading();
-
-	fetch(url.getUrl(), {
-		method: 'post',
-		body: new FormData(form)
-	})
-		.then((response) => response.json())
-		.then((response) => {
-			if ('error' in response) {
-				throw {error: response.error};
-			}
-
-			postMessageOk(response.success.title);
-
-			if ('messages' in response.success) {
-				postMessageDetails('success', response.success.messages);
-			}
-
-			overlayDialogueDestroy(overlay.dialogueid);
-
-			location.href = location.href.split('#')[0];
-		})
-		.catch((exception) => {
-			document.getElementById('import_file').value = '';
-
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
-			let title, messages;
-
-			if (typeof exception === 'object' && 'error' in exception) {
-				title = exception.error.title;
-				messages = exception.error.messages;
-			}
-			else {
-				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-			}
-
-			const message_box = makeMessageBox('bad', messages, title);
-
-			message_box.insertBefore(form);
-		})
-		.finally(() => {
-			overlay.unsetLoading();
-		});
-}
-
-function updateWarning(obj, content) {
-	if (jQuery(obj).is(':checked')) {
+	confirmSubmit(compare_overlay) {
 		overlayDialogue({
 			class: 'position-middle',
-			content: jQuery('<span>').text(content),
+			content: document.createElement('span')
+				.innerText = (<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
 			buttons: [
 				{
 					title: <?= json_encode(_('OK')) ?>,
 					focused: true,
 					action: function() {
-						if (obj.id === 'delete_all') {
-							toggleAll('delete');
+						if (compare_overlay !== undefined) {
+							overlayDialogueDestroy(compare_overlay.dialogueid);
 						}
+						popup_import.submitImportPopup();
 					}
 				},
 				{
@@ -194,28 +126,166 @@ function updateWarning(obj, content) {
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
 					action: function() {
-						jQuery(obj).prop('checked', false);
-						if (obj.id === 'delete_all') {
-							toggleAll('delete');
-						}
+						(compare_overlay || popup_import.overlay).unsetLoading();
+						return true;
 					}
 				}
 			]
-		}, obj);
+		}, (compare_overlay || this.overlay).$btn_submit);
 	}
+
+	openImportComparePopup() {
+		const url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'popup.import.compare');
+
+		fetch(url.getUrl(), {
+			method: 'post',
+			body: new FormData(this.form)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				overlayDialogue({
+					title: response.header,
+					class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
+					dialogueid: 'popup_import_compare',
+					content: response.body,
+					buttons: response.buttons,
+					script_inline: response.script_inline,
+					debug: response.debug
+				}, this.overlay.$btn_submit);
+			})
+			.catch((exception) => {
+				document.getElementById('import_file').value = '';
+
+				const msg_bad = this.dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
+				if (msg_bad) {
+					msg_bad.remove();
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				message_box.insertBefore(this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	submitImportPopup() {
+		const url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'popup.import');
+
+		this.overlay.setLoading();
+
+		fetch(url.getUrl(), {
+			method: 'post',
+			body: new FormData(this.form)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				postMessageOk(response.success.title);
+
+				if ('messages' in response.success) {
+					postMessageDetails('success', response.success.messages);
+				}
+
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				location.href = location.href.split('#')[0];
+			})
+			.catch((exception) => {
+				document.getElementById('import_file').value = '';
+
+				const msg_bad = this.dialogue.querySelector('.<?= ZBX_STYLE_MSG_BAD ?>');
+				if (msg_bad) {
+					msg_bad.remove();
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				message_box.insertBefore(this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	updateWarning(obj, content) {
+		if (obj.checked) {
+			overlayDialogue({
+				class: 'position-middle',
+				content: document.createElement('span').innerText = content,
+				buttons: [
+					{
+						title: <?= json_encode(_('OK')) ?>,
+						focused: true,
+						action: function() {}
+					},
+					{
+						title: <?= json_encode(_('Cancel')) ?>,
+						cancel: true,
+						class: '<?= ZBX_STYLE_BTN_ALT ?>',
+						action: function() {
+							obj.checked = false;
+							popup_import.updateMainCheckbox('update');
+
+						}
+					}
+				]
+			}, obj);
+		}
+	}
+
+	updateMainCheckbox(action) {
+		const all_checkbox = document.getElementById(action + '_all');
+		all_checkbox.checked = true;
+
+		this.form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
+			if (!checkbox.checked) {
+				all_checkbox.checked = false;
+			}
+		})
+	}
+
+	toggleAllCheckboxes(action) {
+		const check = document.getElementById(action + '_all').checked;
+
+		this.form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
+			if (checkbox.checked !== check) {
+				checkbox.checked = check;
+
+				checkbox.dispatchEvent(new CustomEvent('change'));
+			}
+		})
+	}
+
 }
 
-function updateAllCheckbox(action, input) {
-	const all_checkbox = document.getElementById(action + '_all')
-	if (!input.checked) {
-		all_checkbox.checked = false;
-	}
-}
-
-function toggleAll(action) {
-	const action_all = document.getElementById(action + '_all');
-	const table = document.getElementById('rules_table');
-	const checkboxes = Array.from(table.getElementsByTagName('input'));
-	const action_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes(action));
-	action_checkboxes.forEach((checkbox) => checkbox.checked = action_all.checked);
-}
