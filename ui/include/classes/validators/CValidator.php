@@ -100,14 +100,12 @@ abstract class CValidator {
 	 *
 	 * @return string
 	 */
-	protected function error($message) {
-		$arguments = array_slice(func_get_args(), 1);
-
+	protected function error($message, ...$param) {
 		if ($this->objectName !== null) {
-			array_unshift($arguments, $this->objectName);
+			array_unshift($param, $this->objectName);
 		}
 
-		$this->setError(vsprintf($message, $arguments));
+		$this->setError(vsprintf($message, $param));
 	}
 
 
