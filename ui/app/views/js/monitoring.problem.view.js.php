@@ -185,12 +185,9 @@
 				if (this.opened_eventids.includes(btn.dataset.eventid)) {
 					const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
 
-					rows.forEach((row) => {
-						row.style.display = null;
-					});
+					[...rows].forEach(row => row.classList.remove('hidden'));
 
-					btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
-					btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 					btn.title = '<?= _('Collapse') ?>';
 				}
 
@@ -214,34 +211,23 @@
 
 			const table = this.getCurrentResultsTable();
 			const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
-			let state = false;
 
 			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
-			rows.forEach((row) => {
-				if (row.getAttribute('style').indexOf('display:') != -1) {
-					row.style.display = null;
-					state = true;
-				}
-				else {
-					row.style.display = 'none';
-					state = false;
-				}
-			});
-
-			// Store or remove opened cause event IDs localy.
-			if (state) {
-				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
-				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+			if (rows[0].classList.contains('hidden')) {
+				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 				btn.title = '<?= _('Collapse') ?>';
 
 				this.opened_eventids.push(btn.dataset.eventid);
+
+				[...rows].forEach(row => row.classList.remove('hidden'));
 			}
 			else {
-				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
-				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>', '<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 				btn.title = '<?= _('Expand') ?>';
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
+
+				[...rows].forEach(row => row.classList.add('hidden'));
 			}
 
 			// Fix last row border depeding if it is opened or closed.

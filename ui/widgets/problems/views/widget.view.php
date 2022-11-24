@@ -343,7 +343,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			makeActionIcon([
 				'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
 				'title' => _('Symptom'),
-				'style' => 'margin: 0'
+				'style' => 'margin-right: 0'
 			])
 		))->addClass(ZBX_STYLE_RIGHT);
 
@@ -403,8 +403,8 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 				// First and second column empty for symptom event.
 				$row = (new CRow($empty_col))
 					->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
-					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-					->addStyle('display: none');
+					->addClass('hidden')
+					->setAttribute('data-cause-eventid', $problem['cause_eventid']);
 
 				if (getUserTheme(CWebUser::$data) === 'dark-theme'
 						|| getUserTheme(CWebUser::$data) === 'blue-theme') {

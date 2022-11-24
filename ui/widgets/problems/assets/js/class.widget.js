@@ -75,34 +75,22 @@ class CWidgetProblems extends CWidget {
 				button.disabled = true;
 
 				const rows = this._target.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
-				let state = false;
 
-				// Show symptom rows for current cause. Sliding animations are not supported on table rows.
-				rows.forEach((row) => {
-					if (row.getAttribute('style').indexOf('display:') != -1) {
-						row.style.display = null;
-						state = true;
-					}
-					else {
-						row.style.display = 'none';
-						state = false;
-					}
-				});
-
-				// Store or remove opened cause event IDs localy.
-				if (state) {
-					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
-					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+				if (rows[0].classList.contains('hidden')) {
+					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_EXPAND, this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
 					button.title = t('Collapse');
 
 					this._opened_eventids.push(button.dataset.eventid);
+
+					[...rows].forEach(row => row.classList.remove('hidden'));
 				}
 				else {
-					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
-					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
+					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE, this.ZBX_STYLE_BTN_WIDGET_EXPAND);
 					button.title = t('Expand');
 
 					this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
+
+					[...rows].forEach(row => row.classList.add('hidden'));
 				}
 
 				// When complete enable button again.
@@ -163,12 +151,9 @@ class CWidgetProblems extends CWidget {
 					const rows = this._target
 						.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
 
-					rows.forEach((row) => {
-						row.style.display = null;
-					});
+					[...rows].forEach(row => row.classList.remove('hidden'));
 
-					button.classList.remove(this.ZBX_STYLE_BTN_WIDGET_EXPAND);
-					button.classList.add(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_EXPAND, this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
 					button.title = t('Collapse');
 				}
 			}

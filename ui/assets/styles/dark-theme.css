@@ -3617,6 +3617,8 @@ form.is-loading {
     background-color: #1e1e1e; }
     .list-table tbody tr.hover-nobg-problem-nested .timeline-axis, .list-table tbody tr.hover-nobg-problem-nested .timeline-td {
       border-bottom-color: #1e1e1e !important; }
+  .list-table tbody tr.hidden {
+    display: none; }
   .list-table tbody th,
   .list-table td {
     padding: 6px 5px;

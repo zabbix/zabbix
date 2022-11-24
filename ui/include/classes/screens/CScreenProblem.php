@@ -782,8 +782,8 @@ class CScreenProblem extends CScreenBase {
 			// Hide row and show when expanded for nested symptom problems.
 			if ($nested && $problem['cause_eventid'] != 0) {
 				$row
-					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-					->addStyle('display: none');
+					->addClass('hidden')
+					->setAttribute('data-cause-eventid', $problem['cause_eventid']);
 			}
 
 			$table->addRow($row);
@@ -1552,8 +1552,8 @@ class CScreenProblem extends CScreenBase {
 						$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
 					]))
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
-						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-						->addStyle('display: none');
+						->addClass('hidden')
+						->setAttribute('data-cause-eventid', $problem['cause_eventid']);
 
 					if (getUserTheme(CWebUser::$data) === 'dark-theme'
 							|| getUserTheme(CWebUser::$data) === 'blue-theme') {
@@ -1667,9 +1667,9 @@ class CScreenProblem extends CScreenBase {
 			$widget = false): void {
 		if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 			$row = (new CRow())
-				->setAttribute('data-cause-eventid', $problem['eventid'])
-				->addStyle('display: none;')
-				->addClass(ZBX_STYLE_NO_HOVER_PROBLEM_NESTED);
+				->addClass(ZBX_STYLE_NO_HOVER_PROBLEM_NESTED)
+				->addClass('hidden')
+				->setAttribute('data-cause-eventid', $problem['eventid']);
 
 			$symptom_limit_col = (new CCol(
 				(new CDiv(
