@@ -79,10 +79,8 @@ function eventObject($object = null) {
 
 /**
  * Returns all supported event source-object pairs.
- *
- * @return array
  */
-function eventSourceObjects() {
+function eventSourceObjects(): array {
 	return [
 		['source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST],
@@ -460,6 +458,10 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
 	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 	foreach ($acknowledges as $ack) {
+		if (!array_key_exists('suppress_until', $ack)) {
+			continue;
+		}
+
 		if (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
 			return false;
 		}

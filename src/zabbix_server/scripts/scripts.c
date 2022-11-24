@@ -33,7 +33,7 @@
 #include "zbxsysinfo.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
-extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
 		char *error, size_t max_error_len)
@@ -478,7 +478,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				zbx_strlcpy(error, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.", max_error_len);

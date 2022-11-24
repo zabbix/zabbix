@@ -157,7 +157,10 @@ class CDashboardHelper {
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
 			ZBX_WIDGET_FIELD_TYPE_MAP => [],
 			ZBX_WIDGET_FIELD_TYPE_SERVICE => [],
-			ZBX_WIDGET_FIELD_TYPE_SLA => []
+			ZBX_WIDGET_FIELD_TYPE_SLA => [],
+			ZBX_WIDGET_FIELD_TYPE_USER => [],
+			ZBX_WIDGET_FIELD_TYPE_ACTION => [],
+			ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => []
 		];
 
 		foreach ($pages as $p_index => $page) {
@@ -294,6 +297,48 @@ class CDashboardHelper {
 
 			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_SLA] as $slaid => $indexes) {
 				if (!array_key_exists($slaid, $db_slas)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_USER]) {
+			$db_users = API::User()->get([
+				'output' => [],
+				'userids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_USER]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_USER] as $userid => $indexes) {
+				if (!array_key_exists($userid, $db_users)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]) {
+			$db_actions = API::Action()->get([
+				'output' => [],
+				'actionids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_ACTION] as $actionid => $indexes) {
+				if (!array_key_exists($actionid, $db_actions)) {
+					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]) {
+			$db_media_types = API::MediaType()->get([
+				'output' => [],
+				'mediatypeids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE]),
+				'preservekeys' => true
+			]);
+
+			foreach ($ids[ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE] as $mediatypeid => $indexes) {
+				if (!array_key_exists($mediatypeid, $db_media_types)) {
 					$inaccessible_indexes = array_merge($inaccessible_indexes, $indexes);
 				}
 			}

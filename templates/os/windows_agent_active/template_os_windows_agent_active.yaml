@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-09-13T14:21:39Z'
+  date: '2022-10-28T11:54:12Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -655,7 +655,7 @@ zabbix_export:
               tag: component
               value: cpu
         -
-          uuid: 3c1068939adf4d998a942dcb6be23656
+          uuid: 1ac6ebdb5c98415b94cb44da5feeac7f
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -677,7 +677,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: ce4a95a80cc54353ab0e0d2ae6312930
+              uuid: bad86dfaf5274927bce35ad314a2d21a
               expression: 'min(/Windows by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -1779,7 +1779,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -1808,7 +1808,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1823,7 +1823,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: 'CPU usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1839,7 +1839,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         key: 'perf_counter_en["\System\Processor Queue Length"]'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1855,7 +1855,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: 'Memory utilization'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1872,7 +1872,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: 'Swap usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -1896,7 +1896,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -1920,7 +1920,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: '{#DEVNAME}: Disk read/write rates'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -1944,7 +1944,7 @@ zabbix_export:
                         host: 'Windows by Zabbix agent active'
                         name: '{#DEVNAME}: Disk utilization and queue'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '25'
                   width: '24'
                   height: '5'
@@ -2089,7 +2089,7 @@ zabbix_export:
               value: '255'
               newvalue: 'No such service'
         -
-          uuid: 6e7949c77d3442849778ff80271211df
+          uuid: 131de6a1016e43019d7cac2ce76901d4
           name: zabbix.host.active_agent.available
           mappings:
             -

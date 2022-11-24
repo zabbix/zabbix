@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-08 22:54+0000\n"
+"PO-Revision-Date: 2022-11-13 12:59+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -8592,8 +8592,8 @@ msgstr "Posição horizontal"
 #: jsLoader.php:373 report2.php:509
 msgid "Host"
 msgid_plural "Hosts"
-msgstr[0] "Host"
-msgstr[1] "Host"
+msgstr[0] "Servidor"
+msgstr[1] "Servidores"
 
 #: app/views/monitoring.widget.problems.view.php:66
 #: app/views/monitoring.widget.problems.view.php:67
@@ -8648,7 +8648,7 @@ msgstr "O host não pode ter mais do que uma interface padrão do mesmo tipo."
 #: app/views/administration.proxy.list.php:82 hostinventoriesoverview.php:89
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
-msgstr "Contagem de hosts"
+msgstr "Contagem de servidores"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
