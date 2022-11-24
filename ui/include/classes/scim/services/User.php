@@ -66,8 +66,7 @@ class User extends ScimApiService {
 
 		if (array_key_exists('userName', $options)) {
 			$users = APIRPC::User()->get([
-				'output' => ['userid', 'username', 'userdirectoryid', 'name', 'surname'],
-				'selectMedias' => ['mediatypeid', 'sendto'],
+				'output' => ['userid', 'username', 'userdirectoryid'],
 				'selectUsrgrps' => ['usrgrpid'],
 				'filter' => ['username' => $options['userName']]
 			]);
@@ -92,8 +91,7 @@ class User extends ScimApiService {
 		}
 		elseif (array_key_exists('id', $options)) {
 			$users = APIRPC::User()->get([
-				'output' => ['userid', 'username', 'userdirectoryid', 'name', 'surname'],
-				'selectMedias' => ['mediatypeid', 'sendto'],
+				'output' => ['userid', 'username', 'userdirectoryid'],
 				'userids' => $options['id']
 			]);
 
@@ -129,8 +127,7 @@ class User extends ScimApiService {
 
 				$users = $userids
 					? APIRPC::User()->get([
-						'output' => ['userid', 'username', 'userdirectoryid', 'name', 'surname'],
-						'selectMedias' => ['mediatypeid', 'sendto'],
+						'output' => ['userid', 'username', 'userdirectoryid'],
 						'userids' => $userids
 					])
 					: [];
@@ -395,8 +392,7 @@ class User extends ScimApiService {
 	 */
 	private function setData(string $userid, string $userdirectoryid, array $options = []): void {
 		$user = APIRPC::User()->get([
-			'output' => ['userid', 'username', 'userdirectoryid', 'name', 'surname'],
-			'selectMedias' => ['mediatypeid', 'sendto'],
+			'output' => ['userid', 'username', 'userdirectoryid'],
 			'userids' => $userid,
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
@@ -410,9 +406,6 @@ class User extends ScimApiService {
 	 * @param array  $user
 	 * @param string $user['userid']
 	 * @param string $user['username']
-	 * @param string $user['userdirectoryid']
-	 * @param string $user['name']
-	 * @param string $user['surname']
 	 * @param array  $options                                     Optional. User information sent in request from IdP.
 	 *
 	 * @return array                                              Returns array with data formatted according to SCIM.
@@ -431,33 +424,13 @@ class User extends ScimApiService {
 		];
 
 		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
-		$saml_settings = $provisioning->getIdpConfig();
-		$data += [
-			$saml_settings['user_username'] => $user['name'],
-			$saml_settings['user_lastname'] => $user['surname']
-		];
+		$user_attributes = $provisioning->getUserAttributes($options);
+		$data += $user_attributes;
 
-		if ($options == []) {
-			$provision_medias = APIRPC::UserDirectory()->get([
-				'output' => ['userdirectoryid'],
-				'selectProvisionMedia' => ['mediatypeid', 'attribute'],
-				'userdirectoryids' => $user['userdirectoryid'],
-			]);
-
-			foreach ($user['medias'] as $user_media) {
-				foreach ($provision_medias[0]['provision_media'] as $provision_media) {
-					if ($provision_media['mediatypeid'] == $user_media['mediatypeid']) {
-						$data += [$provision_media['attribute'] => $user_media['sendto']];
-					}
-				}
-			}
-		}
-		else {
-			$media_attributes = $provisioning->getUserIdpMediaAttributes();
-			foreach ($media_attributes as $media_attribute) {
-				if (array_key_exists($media_attribute, $options)) {
-					$data[$media_attribute] = $options[$media_attribute];
-				}
+		$media_attributes = $provisioning->getUserIdpMediaAttributes();
+		foreach ($media_attributes as $media_attribute) {
+			if (array_key_exists($media_attribute, $options)) {
+				$data[$media_attribute] = $options[$media_attribute];
 			}
 		}
 
