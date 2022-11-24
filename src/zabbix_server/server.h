@@ -17,29 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_SERVER_H
+#define ZABBIX_SERVER_H
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
 
-#ifndef PROMETHEUS_TEST_H
-#define PROMETHEUS_TEST_H
+/* media statuses */
+#define MEDIA_STATUS_ACTIVE	0
+#define MEDIA_STATUS_DISABLED	1
 
-#include "zbxalgo.h"
-#include "zbxexpr.h"
+/* normal and recovery operations */
+#define ZBX_OPERATION_MODE_NORMAL	0
+#define ZBX_OPERATION_MODE_RECOVERY	1
+#define ZBX_OPERATION_MODE_UPDATE	2
 
-typedef struct
-{
-	char	*key;
-	char	*pattern;
-	char	*op;
-}
-zbx_prometheus_condition_test_t;
+/* algorithms for service status calculation */
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
 
-ZBX_PTR_VECTOR_DECL(prometheus_condition_test, zbx_prometheus_condition_test_t *)
-
-int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
-		zbx_vector_prometheus_condition_test_t *labels, zbx_prometheus_condition_test_t **value, char **error);
-
-int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
-		zbx_strloc_t *loc, char **error);
-
-void	zbx_prometheus_condition_test_free(zbx_prometheus_condition_test_t *condition);
-
-#endif
+#endif /*ZABBIX_SERVER_H*/

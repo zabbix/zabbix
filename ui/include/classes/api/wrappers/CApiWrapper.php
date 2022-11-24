@@ -32,9 +32,9 @@ class CApiWrapper {
 	public $api;
 
 	/**
-	 * Authentication token.
+	 * Authentication token and authentication type.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $auth;
 

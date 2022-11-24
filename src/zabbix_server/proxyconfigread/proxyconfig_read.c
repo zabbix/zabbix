@@ -27,6 +27,7 @@
 #include "zbxcommshigh.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
+#include "zbx_item_constants.h"
 
 extern char	*CONFIG_VAULTDBPATH;
 extern int	CONFIG_TRAPPER_TIMEOUT;

@@ -17,29 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBX_ITEM_CONSTANTS_H
+#define ZABBIX_ZBX_ITEM_CONSTANTS_H
 
-#ifndef PROMETHEUS_TEST_H
-#define PROMETHEUS_TEST_H
+/* item statuses */
+#define ITEM_STATUS_ACTIVE		0
+#define ITEM_STATUS_DISABLED		1
 
-#include "zbxalgo.h"
-#include "zbxexpr.h"
+/* item states */
+#define ITEM_STATE_NORMAL		0
+#define ITEM_STATE_NOTSUPPORTED		1
 
-typedef struct
-{
-	char	*key;
-	char	*pattern;
-	char	*op;
-}
-zbx_prometheus_condition_test_t;
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
 
-ZBX_PTR_VECTOR_DECL(prometheus_condition_test, zbx_prometheus_condition_test_t *)
+/* discovery rule */
+#define DRULE_STATUS_MONITORED		0
+#define DRULE_STATUS_NOT_MONITORED	1
 
-int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
-		zbx_vector_prometheus_condition_test_t *labels, zbx_prometheus_condition_test_t **value, char **error);
+#define ITEM_LOGTYPE_INFORMATION	1
+#define ITEM_LOGTYPE_WARNING		2
+#define ITEM_LOGTYPE_ERROR		4
+#define ITEM_LOGTYPE_FAILURE_AUDIT	7
+#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+#define ITEM_LOGTYPE_CRITICAL		9
+#define ITEM_LOGTYPE_VERBOSE		10
 
-int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
-		zbx_strloc_t *loc, char **error);
+#define HTTPTEST_STATUS_MONITORED       0
+#define HTTPTEST_STATUS_NOT_MONITORED	1
 
-void	zbx_prometheus_condition_test_free(zbx_prometheus_condition_test_t *condition);
-
-#endif
+#endif /*ZABBIX_ZBX_ITEM_CONSTANTS_H*/

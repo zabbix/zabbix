@@ -29,6 +29,7 @@
 #include "zbxcommshigh.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
 
 extern unsigned char	program_type;

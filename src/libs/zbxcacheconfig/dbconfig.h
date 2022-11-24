@@ -26,6 +26,8 @@
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
