@@ -381,12 +381,18 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				'value_type' => $item['valueType'],
 				'delay' => '1s'
 			];
-
 			foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-				$items[] = array_merge($data, [
-					'hostid' => self::$hostids[$component],
-					'interfaceid' => $interfaceids[$component]
-				]);
+				$host_if_props = [
+					'hostid' => self::$hostids[$component]
+				];
+
+				if ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+					$host_if_props['interfaceid'] = 0;
+				} else {
+					$host_if_props['interfaceid'] = $interfaceids[$component];
+				}
+
+				$items[] = array_merge($data, $host_if_props);
 			}
 		}
 

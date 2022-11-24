@@ -57,6 +57,16 @@ class CApiInputValidator {
 		return self::validateDataUniqueness($rule, $data, $path, $error);
 	}
 
+	private static function validateData($rule, &$data, $path, &$error) {
+		$result = self::_validateData($rule, $data, $path, $error);
+		if (!$result) {
+			file_put_contents('/tmp/zabbix.log',
+				"\n\nPath:\t".$path."\nError:\t".$error."\nData: ".print_r($data, true), FILE_APPEND
+			);
+		}
+		return $result;
+	}
+
 	/**
 	 * Base data validation function.
 	 *
@@ -67,7 +77,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateData($rule, &$data, $path, &$error) {
+	private static function _validateData($rule, &$data, $path, &$error) {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 				return self::validateCalcFormula($rule, $data, $path, $error);
