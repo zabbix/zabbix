@@ -1851,7 +1851,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
@@ -1884,12 +1884,12 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			$good = true;
 		}
 		else {
-			$class = ZBX_STYLE_MSG_GOOD;
+			$class = ZBX_STYLE_MSG_GOOD.' zi-circle-check';
 			$good = true;
 		}
 	}
 	else {
-		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
+		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
 	}
 
 	$title = $good ? $okmsg : $errmsg;

@@ -263,8 +263,8 @@
 
 							$('.wrapper > .msg-bad').remove(); // todo zi
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							html.filter('.msg-bad').insertBefore('.wrapper main'); // todo zi
-
+							html.filter('.msg-bad zi-triangle-warning').insertBefore('.wrapper main'); // todo zi
+// todo check (acikuns)
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {

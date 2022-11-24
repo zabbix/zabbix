@@ -205,7 +205,12 @@
 			top: -1px;
 			padding: 0 3px;
 		}
-
+		opacity: .5;
+		transition: opacity .2s ease-out;
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
 		@extend %btn-reset;
 	}
 }
@@ -423,7 +428,8 @@
 		opacity: .5;
 		transition: opacity .2s ease-out;
 		&:hover,
-		&:focus {
+		&:focus,
+		&:active {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
 		}

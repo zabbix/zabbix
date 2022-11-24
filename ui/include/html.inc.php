@@ -914,7 +914,8 @@ function makeInformationList($info_icons) {
  */
 function makeInformationIcon($message) { // TODO ZI: a new icon should be added to the font
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
+		->addClass(ZBX_STYLE_ICON_INFO)
+		->addClass('zi-i')
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
 }
@@ -1069,6 +1070,7 @@ function makeDescriptionIcon($description) {
 function makeErrorIcon($error) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
+		->addClass('zi-i')
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }
@@ -1097,6 +1099,7 @@ function makeHelpIcon($help_text): CLink {
 function makeWarningIcon($error) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
+		->addClass('zi-i')
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);
 }
