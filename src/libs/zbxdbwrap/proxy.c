@@ -2787,9 +2787,9 @@ int	proxy_get_history_count(void)
  ******************************************************************************/
 static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 {
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 
 	zbx_tm_json_deserialize_tasks(jp_tasks, &tasks);
 
@@ -2797,8 +2797,8 @@ static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 	zbx_tm_save_tasks(&tasks);
 	DBcommit();
 
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 }
 
 /******************************************************************************
