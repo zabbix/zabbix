@@ -7,11 +7,11 @@ and querying docker API. It can be used in conjunction with the official
 You can extend it or create your own template to cater specific needs.
 
 ## Requirements
-* Zabbix agent 2;
-* Go >= 1.18 (required only to build from source);
+* Zabbix agent 2
+* Go >= 1.18 (required only to build from source)
 
 ## Tested versions
-* Docker, version 19.03.5.
+* Docker, version 19.03.5
 
 ## Installation
 The plugin is supplied as an out-of-box part of Zabbix agent 2 and 
