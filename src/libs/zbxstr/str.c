@@ -1880,7 +1880,7 @@ fail:
  *                                                                            *
  * Parameters: src   - [IN] the source string                                 *
  *             left  - [IN] the left substring position (start)               *
- *             right - [IN] the right substirng position (end)                *
+ *             right - [IN] the right substring position (end)                *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
@@ -1902,7 +1902,7 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
  *                                                                            *
  * Parameters: src   - [IN] the source string                                 *
  *             left  - [IN] the left substring position (start)               *
- *             right - [IN] the right substirng position (end)                *
+ *             right - [IN] the right substring position (end)                *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
