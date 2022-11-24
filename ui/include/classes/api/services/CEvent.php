@@ -963,8 +963,17 @@ class CEvent extends CApiService {
 			'action' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
 			'message' =>		['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'message'), 'length' => DB::getFieldLength('acknowledges', 'message')],
 			'severity' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'new_severity')],
-			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null]
+			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'cause_eventid' => ['type' => API_MULTIPLE, 'rules' => [
+				// "cause_eventid" should only be accessible if a cause event is converted to symptom event.
+				['if' => static function ($data) { return ($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) != 0; }, 'type' => API_ID, 'flags' => API_REQUIRED],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		];
+
+		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $fields], $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
 				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
@@ -982,15 +991,6 @@ class CEvent extends CApiService {
 			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE);
 		$has_change_rank_to_symptom_action =
 			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
-
-		// "cause_eventid" should only be accessible if a cause event is converted to symptom event.
-		if ($has_change_rank_to_symptom_action) {
-			$fields += ['cause_eventid' => ['type' => API_ID, 'flags' => API_REQUIRED]];
-		}
-
-		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $fields], $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 
 		// Check that at least one valid flag is set.
 		if (($data['action'] & $action_mask) != $data['action']) {
