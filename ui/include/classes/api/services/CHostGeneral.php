@@ -153,97 +153,6 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Check templates links for given data of mass API methods.
-	 *
-	 * @param string $method
-	 * @param array  $templateids
-	 * @param array  $db_hosts
-	 */
-	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts,
-			array $templateids_clear = []): void {
-		$ins_templates = [];
-		$del_links = [];
-		$check_double_linkage = false;
-		$del_templates = [];
-		$del_links_clear  = [];
-
-		foreach ($db_hosts as $hostid => $db_host) {
-			$db_templateids = array_column($db_host['templates'], 'templateid');
-
-			if ($method === 'massadd') {
-				$_templateids = array_diff($templateids, $db_templateids);
-			}
-			elseif ($method === 'massremove') {
-				$_templateids = array_diff($db_templateids, $templateids);
-			}
-			else {
-				$_templateids = $templateids;
-			}
-
-			$permitted_templateids = $_templateids;
-			$templates_count = count($permitted_templateids);
-			$upd_templateids = [];
-
-			if (array_key_exists('nopermissions_templates', $db_host)) {
-				foreach ($db_host['nopermissions_templates'] as $db_template) {
-					$_templateids[] = $db_template['templateid'];
-					$templates_count++;
-					$upd_templateids[] = $db_template['templateid'];
-				}
-			}
-
-			foreach ($permitted_templateids as $templateid) {
-				$index = array_search($templateid, $db_templateids);
-
-				if ($index !== false) {
-					$upd_templateids[] = $templateid;
-					unset($db_templateids[$index]);
-				}
-				else {
-					$ins_templates[$templateid][$hostid] = $_templateids;
-
-					if ($this instanceof CTemplate || $templates_count > 1) {
-						$check_double_linkage = true;
-					}
-				}
-			}
-
-			foreach ($db_templateids as $db_templateid) {
-				$del_links[$db_templateid][$hostid] = true;
-
-				if ($upd_templateids) {
-					$del_templates[$db_templateid][$hostid] = $upd_templateids;
-				}
-
-				if (array_key_exists($db_templateid, $templateids_clear)) {
-					$del_links_clear[$db_templateid][$hostid] = true;
-				}
-			}
-		}
-
-		if ($del_templates) {
-			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
-		}
-
-		if ($del_links_clear) {
-			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
-		}
-
-		if ($ins_templates) {
-			if ($this instanceof CTemplate) {
-				self::checkCircularLinkageNew($ins_templates, $del_links);
-			}
-
-			if ($check_double_linkage) {
-				$this->checkDoubleLinkageNew($ins_templates, $del_links);
-			}
-
-			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
-			$this->checkTriggerExpressionsOfInsTemplates($ins_templates);
-		}
-	}
-
-	/**
 	 * Update table "hosts_groups" and populate hosts.groups by "hostgroupid" property.
 	 *
 	 * @param array      $hosts
@@ -306,14 +215,12 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts or templates.
+	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
 	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		parent::updateTemplates($hosts, $db_hosts);
 
 		$ins_links = [];
@@ -326,7 +233,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
 				: [];
 
 			if (array_key_exists('templates', $host)) {
@@ -335,7 +242,7 @@ abstract class CHostGeneral extends CHostBase {
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_links[$template['templateid']][] = $host[$id_field_name];
+						$ins_links[$template['templateid']][] = $host['hostid'];
 					}
 				}
 
@@ -345,16 +252,16 @@ abstract class CHostGeneral extends CHostBase {
 
 				foreach ($db_templates as $del_template) {
 					if (array_key_exists($del_template['templateid'], $templates_clear)) {
-						$del_links_clear[$del_template['templateid']][] = $host[$id_field_name];
+						$del_links_clear[$del_template['templateid']][] = $host['hostid'];
 					}
 					else {
-						$del_links[$del_template['templateid']][] = $host[$id_field_name];
+						$del_links[$del_template['templateid']][] = $host['hostid'];
 					}
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
 				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][] = $host[$id_field_name];
+					$del_links_clear[$template['templateid']][] = $host['hostid'];
 				}
 			}
 		}

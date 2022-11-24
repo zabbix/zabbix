@@ -40,8 +40,6 @@ abstract class CHostBase extends CApiService {
 	 * @throws APIException
 	 */
 	protected function checkTemplates(array $hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		$edit_templates = [];
 
 		foreach ($hosts as $i1 => $host) {
@@ -70,7 +68,7 @@ abstract class CHostBase extends CApiService {
 					$edit_templates += $templates;
 				}
 				else {
-					$db_templates = array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid');
+					$db_templates = array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid');
 
 					$ins_templates = array_diff_key($templates, $db_templates);
 					$del_templates = array_diff_key($db_templates, $templates);
@@ -102,7 +100,7 @@ abstract class CHostBase extends CApiService {
 				continue;
 			}
 
-			$db_templates = array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid');
+			$db_templates = array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid');
 			$path = '/'.($i1 + 1).'/templates_clear';
 
 			foreach ($host['templates_clear'] as $i2 => $template) {
@@ -122,26 +120,23 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 */
 	protected function checkTemplatesLinks(array $hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		$ins_templates = [];
 		$del_links = [];
-		$check_double_linkage = false;
 		$del_templates = [];
 		$del_links_clear = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {
 				$db_templates = ($db_hosts !== null)
-					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+					? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
 					: [];
 				$templateids = array_column($host['templates'], 'templateid');
 				$templates_count = count($host['templates']);
 				$upd_templateids = [];
 
 				if ($db_hosts !== null
-						&& array_key_exists('nopermissions_templates', $db_hosts[$host[$id_field_name]])) {
-					foreach ($db_hosts[$host[$id_field_name]]['nopermissions_templates'] as $db_template) {
+						&& array_key_exists('nopermissions_templates', $db_hosts[$host['hostid']])) {
+					foreach ($db_hosts[$host['hostid']]['nopermissions_templates'] as $db_template) {
 						$templateids[] = $db_template['templateid'];
 						$templates_count++;
 						$upd_templateids[] = $db_template['templateid'];
@@ -154,19 +149,15 @@ abstract class CHostBase extends CApiService {
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_templates[$template['templateid']][$host[$id_field_name]] = $templateids;
-
-						if (($this instanceof CTemplate && $db_hosts !== null) || $templates_count > 1) {
-							$check_double_linkage = true;
-						}
+						$ins_templates[$template['templateid']][$host['hostid']] = $templateids;
 					}
 				}
 
 				foreach ($db_templates as $db_template) {
-					$del_links[$db_template['templateid']][$host[$id_field_name]] = true;
+					$del_links[$db_template['templateid']][$host['hostid']] = true;
 
-					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templateids) {
-						$del_templates[$db_template['templateid']][$host[$id_field_name]] = $upd_templateids;
+					if ($this instanceof CHost && $upd_templateids) {
+						$del_templates[$db_template['templateid']][$host['hostid']] = $upd_templateids;
 					}
 				}
 			}
@@ -174,24 +165,24 @@ abstract class CHostBase extends CApiService {
 				$templateids = array_column($host['templates_clear'], 'templateid');
 				$upd_templateids = [];
 
-				foreach ($db_hosts[$host[$id_field_name]]['templates'] as $db_template) {
+				foreach ($db_hosts[$host['hostid']]['templates'] as $db_template) {
 					if (!in_array($db_template['templateid'], $templateids)) {
 						$upd_templateids[] = $db_template['templateid'];
 					}
 				}
 
 				foreach ($host['templates_clear'] as $template) {
-					$del_links[$template['templateid']][$host[$id_field_name]] = true;
+					$del_links[$template['templateid']][$host['hostid']] = true;
 
-					if (($this instanceof CHost || $this instanceof CTemplate) && $upd_templateids) {
-						$del_templates[$template['templateid']][$host[$id_field_name]] = $upd_templateids;
+					if ($this instanceof CHost && $upd_templateids) {
+						$del_templates[$template['templateid']][$host['hostid']] = $upd_templateids;
 					}
 				}
 			}
 
-			if (($this instanceof CHost || $this instanceof CTemplate) && array_key_exists('templates_clear', $host)) {
+			if ($this instanceof CHost && array_key_exists('templates_clear', $host)) {
 				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][$host[$id_field_name]] = true;
+					$del_links_clear[$template['templateid']][$host['hostid']] = true;
 				}
 			}
 		}
@@ -205,14 +196,6 @@ abstract class CHostBase extends CApiService {
 		}
 
 		if ($ins_templates) {
-			if ($this instanceof CTemplate && $db_hosts !== null) {
-				self::checkCircularLinkageNew($ins_templates, $del_links);
-			}
-
-			if ($check_double_linkage) {
-				$this->checkDoubleLinkageNew($ins_templates, $del_links);
-			}
-
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
 			$this->checkTriggerExpressionsOfInsTemplates($ins_templates);
 		}
@@ -422,338 +405,6 @@ abstract class CHostBase extends CApiService {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Check whether circular linkage occurs as a result of the given changes in templates links.
-	 *
-	 * @param array $ins_links[<templateid>][<hostid>]
-	 * @param array $del_links[<templateid>][<hostid>]
-	 *
-	 * @throws APIException
-	 */
-	protected static function checkCircularLinkageNew(array $ins_links, array $del_links): void {
-		$links = [];
-		$_hostids = $ins_links;
-
-		do {
-			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('ht.hostid', array_keys($_hostids))
-			);
-
-			$_hostids = [];
-
-			while ($row = DBfetch($result)) {
-				if (array_key_exists($row['templateid'], $del_links)
-						&& array_key_exists($row['hostid'], $del_links[$row['templateid']])) {
-					continue;
-				}
-
-				if (!array_key_exists($row['templateid'], $links)) {
-					$_hostids[$row['templateid']] = true;
-				}
-
-				$links[$row['templateid']][$row['hostid']] = true;
-			}
-		}
-		while ($_hostids);
-
-		foreach ($ins_links as $templateid => $hostids) {
-			if (array_key_exists($templateid, $links)) {
-				$links[$templateid] += $hostids;
-			}
-			else {
-				$links[$templateid] = $ins_links[$templateid];
-			}
-		}
-
-		foreach ($ins_links as $templateid => $hostids) {
-			foreach ($hostids as $hostid => $foo) {
-				if (array_key_exists($hostid, $links)){
-					$links_path = [$hostid => true];
-
-					if (self::circularLinkageExists($links, $templateid, $links[$hostid], $links_path)) {
-						$template_name = '';
-
-						$templates = DB::select('hosts', [
-							'output' => ['hostid', 'host'],
-							'hostids' => array_keys($links_path + [$templateid => true]),
-							'preservekeys' => true
-						]);
-
-						foreach ($templates as $template) {
-							$description = '"'.$template['host'].'"';
-
-							if (bccomp($template['hostid'], $templateid) == 0) {
-								$template_name = $description;
-							}
-							else {
-								$links_path[$template['hostid']] = $description;
-							}
-						}
-
-						$circular_linkage = (bccomp($templateid, $hostid) == 0)
-							? $template_name.' -> '.$template_name
-							: $template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name;
-
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot link template "%1$s" to template "%2$s", because a circular linkage (%3$s) would occur.',
-							$templates[$templateid]['host'], $templates[$hostid]['host'], $circular_linkage
-						));
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Recursively check whether given template to link forms a circular linkage.
-	 *
-	 * @param array  $links[<templateid>][<hostid>]
-	 * @param string $templateid
-	 * @param array  $hostids[<hostid>]
-	 * @param array  $links_path                     Circular linkage path, collected performing the check.
-	 *
-	 * @return bool
-	 */
-	private static function circularLinkageExists(array $links, string $templateid, array $hostids,
-			array &$links_path): bool {
-		if (array_key_exists($templateid, $hostids)) {
-			return true;
-		}
-
-		$_links_path = $links_path;
-
-		foreach ($hostids as $hostid => $foo) {
-			if (array_key_exists($hostid, $links)) {
-				$links_path = $_links_path;
-				$hostid_links = array_diff_key($links[$hostid], $links_path);
-
-				if ($hostid_links) {
-					$links_path[$hostid] = true;
-
-					if (self::circularLinkageExists($links, $templateid, $hostid_links, $links_path)) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check whether double linkage occurs as a result of the given changes in templates links.
-	 *
-	 * @param array $ins_links[<templateid>][<hostid>]
-	 * @param array $del_links[<templateid>][<hostid>]
-	 *
-	 * @throws APIException
-	 */
-	protected function checkDoubleLinkageNew(array $ins_links, array $del_links): void {
-		$hostids = [];
-
-		foreach ($ins_links as $ins_hostids) {
-			$hostids += $ins_hostids;
-		}
-
-		if ($this instanceof CTemplate) {
-			$_templateids = $hostids;
-
-			do {
-				$result = DBselect(
-					'SELECT ht.templateid,ht.hostid'.
-					' FROM hosts_templates ht'.
-					' WHERE '.dbConditionId('ht.templateid', array_keys($_templateids))
-				);
-
-				$_templateids = [];
-
-				while ($row = DBfetch($result)) {
-					if (array_key_exists($row['templateid'], $del_links)
-							&& array_key_exists($row['hostid'], $del_links[$row['templateid']])) {
-						continue;
-					}
-
-					if (!array_key_exists($row['hostid'], $hostids)) {
-						$hostids[$row['hostid']] = true;
-						$_templateids[$row['hostid']] = true;
-					}
-				}
-			}
-			while ($_templateids);
-		}
-
-		$_hostids = $ins_links + $hostids;
-		$links = [];
-		$templateids = [];
-
-		do {
-			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('hostid', array_keys($_hostids))
-			);
-
-			$_hostids = [];
-
-			while ($row = DBfetch($result)) {
-				if (array_key_exists($row['templateid'], $del_links)
-						&& array_key_exists($row['hostid'], $del_links[$row['templateid']])) {
-					continue;
-				}
-
-				if (!array_key_exists($row['templateid'], $templateids)) {
-					$templateids[$row['templateid']] = true;
-					$_hostids[$row['templateid']] = true;
-				}
-
-				$links[$row['hostid']][$row['templateid']] = true;
-			}
-		}
-		while ($_hostids);
-
-		$_ins_links = [];
-
-		foreach ($ins_links as $templateid => $ins_hostids) {
-			foreach ($ins_hostids as $hostid => $foo) {
-				$links[$hostid][$templateid] = true;
-				$_ins_links[$hostid][$templateid] = true;
-			}
-		}
-
-		foreach ($hostids as $hostid => $foo) {
-			if (self::doubleLinkageExists($links, $hostid, $parent_templateid)) {
-				$hostid = self::getDoubleLinkageHost($links, $_ins_links, $hostid, $parent_templateid, $ins_templateid);
-
-				$objects = DB::select('hosts', [
-					'output' => ['host', 'status', 'flags'],
-					'hostids' => [$hostid, $ins_templateid, $parent_templateid],
-					'preservekeys' => true
-				]);
-
-				if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-					$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked twice.');
-				}
-				elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$error = _('Cannot link template "%1$s" to host prototype "%2$s", because its parent template "%3$s" would be linked twice.');
-				}
-				else {
-					$error = _('Cannot link template "%1$s" to host "%2$s", because its parent template "%3$s" would be linked twice.');
-				}
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$ins_templateid]['host'],
-					$objects[$hostid]['host'], $objects[$parent_templateid]['host']
-				));
-			}
-		}
-	}
-
-	/**
-	 * Recursively check whether given host have a double linkage.
-	 *
-	 * @param array       $links[<hostid>][<templateid>]
-	 * @param string      $hostid
-	 * @param string|null $parent_templateid              ID of double linked template, retrieved performing the check.
-	 * @param array       $templateids
-	 *
-	 * @return bool
-	 */
-	private static function doubleLinkageExists(array $links, string $hostid, string &$parent_templateid = null,
-			array &$templateids = []): bool {
-		$templateids = $links[$hostid];
-
-		foreach ($links[$hostid] as $templateid => $foo) {
-			if (array_key_exists($templateid, $links)) {
-				$_templateids = [];
-
-				if (self::doubleLinkageExists($links, $templateid, $parent_templateid, $_templateids)) {
-					return true;
-				}
-
-				$double_linked_templateids = array_intersect_key($templateids, $_templateids);
-
-				if ($double_linked_templateids) {
-					$parent_templateid = key($double_linked_templateids);
-
-					return true;
-				}
-
-				$templateids += $_templateids;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get ID of the object to which is requested to link a template, that results a double linkage.
-	 *
-	 * @param array       $links[<hostid>][<templateid]
-	 * @param array       $ins_links[<hostid>][<templateid>]
-	 * @param string      $hostid
-	 * @param string      $parent_templateid
-	 * @param string|null $ins_templateid                     ID of template, requested to be linked to the found host,
-	 *                                                        retrieved performing the check.
-	 *
-	 * @return string
-	 */
-	private static function getDoubleLinkageHost(array $links, array $ins_links, string $hostid,
-			string $parent_templateid, string &$ins_templateid = null): string {
-		if (!array_key_exists($hostid, $ins_links)) {
-			foreach ($links[$hostid] as $templateid => $foo) {
-				if (array_key_exists($templateid, $links)) {
-					$_hostid = self::getDoubleLinkageHost($links, $ins_links, $templateid, $parent_templateid,
-						$ins_templateid
-					);
-
-					if ($ins_templateid !== null) {
-						return $_hostid;
-					}
-				}
-			}
-		}
-		else {
-			foreach ($links[$hostid] as $templateid => $foo) {
-				if (!array_key_exists($templateid, $ins_links[$hostid])) {
-					continue;
-				}
-
-				if (bccomp($templateid, $parent_templateid) == 0
-						|| (array_key_exists($templateid, $links)
-							&& self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid))) {
-					$ins_templateid = $templateid;
-					break;
-				}
-			}
-		}
-
-		return $hostid;
-	}
-
-	/**
-	 * Check whether the given template is requested to be linked and results a double linkage.
-	 *
-	 * @param array  $links
-	 * @param string $templateid
-	 * @param string $parent_templateid
-	 *
-	 * @return bool
-	 */
-	private static function isDoubleLinkageTemplate(array $links, string $templateid, string $parent_templateid): bool {
-		if (array_key_exists($parent_templateid, $links[$templateid])) {
-			return true;
-		}
-
-		foreach ($links[$templateid] as $templateid => $foo) {
-			if (array_key_exists($templateid, $links)) {
-				return self::isDoubleLinkageTemplate($links, $templateid, $parent_templateid);
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -971,8 +622,6 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 */
 	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		$ins_hosts_templates = [];
 		$del_hosttemplateids = [];
 
@@ -982,7 +631,7 @@ abstract class CHostBase extends CApiService {
 			}
 
 			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
 				: [];
 
 			if (array_key_exists('templates', $host)) {
@@ -993,7 +642,7 @@ abstract class CHostBase extends CApiService {
 					}
 					else {
 						$ins_hosts_templates[] = [
-							'hostid' => $host[$id_field_name],
+							'hostid' => $host['hostid'],
 							'templateid' => $template['templateid']
 						];
 					}
@@ -1290,9 +939,6 @@ abstract class CHostBase extends CApiService {
 		}
 
 		if ($hostsLinkageInserts) {
-			self::checkCircularLinkage($hostsLinkageInserts);
-			self::checkDoubleLinkage($hostsLinkageInserts);
-
 			$hosttemplateids = DB::insertBatch('hosts_templates', $hostsLinkageInserts);
 
 			foreach ($hostsLinkageInserts as &$host_linkage) {
@@ -1355,171 +1001,6 @@ abstract class CHostBase extends CApiService {
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}
-	}
-
-	/**
-	 * Searches for circular linkages.
-	 *
-	 * @param array  $host_templates
-	 * @param string $host_templates[]['templateid']
-	 * @param string $host_templates[]['hostid']
-	 */
-	private static function checkCircularLinkage(array $host_templates) {
-		$links = [];
-
-		foreach ($host_templates as $host_template) {
-			$links[$host_template['templateid']][$host_template['hostid']] = true;
-		}
-
-		$templateids = array_keys($links);
-		$_templateids = $templateids;
-
-		do {
-			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('ht.hostid', $_templateids)
-			);
-
-			$_templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['templateid'], $links)) {
-					$_templateids[$row['templateid']] = true;
-				}
-
-				$links[$row['templateid']][$row['hostid']] = true;
-			}
-
-			$_templateids = array_keys($_templateids);
-		}
-		while ($_templateids);
-
-		foreach ($templateids as $templateid) {
-			self::checkTemplateCircularLinkage($links, $templateid, $links[$templateid]);
-		}
-	}
-
-	/**
-	 * Searches for circular linkages for specific template.
-	 *
-	 * @param array  $links[<templateid>][<hostid>]  The list of linkages.
-	 * @param string $templateid                     ID of the template to check circular linkages.
-	 * @param array  $hostids[<hostid>]
-	 *
-	 * @throws APIException if circular linkage is found.
-	 */
-	private static function checkTemplateCircularLinkage(array $links, $templateid, array $hostids): void {
-		if (array_key_exists($templateid, $hostids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-		}
-
-		foreach ($hostids as $hostid => $foo) {
-			if (array_key_exists($hostid, $links)) {
-				self::checkTemplateCircularLinkage($links, $templateid, $links[$hostid]);
-			}
-		}
-	}
-
-	/**
-	 * Searches for double linkages.
-	 *
-	 * @param array  $host_templates
-	 * @param string $host_templates[]['templateid']
-	 * @param string $host_templates[]['hostid']
-	 */
-	private static function checkDoubleLinkage(array $host_templates) {
-		$links = [];
-		$templateids = [];
-		$hostids = [];
-
-		foreach ($host_templates as $host_template) {
-			$links[$host_template['hostid']][$host_template['templateid']] = true;
-			$templateids[$host_template['templateid']] = true;
-			$hostids[$host_template['hostid']] = true;
-		}
-
-		$_hostids = array_keys($hostids);
-
-		do {
-			$result = DBselect(
-				'SELECT ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('ht.templateid', $_hostids)
-			);
-
-			$_hostids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['hostid'], $hostids)) {
-					$_hostids[$row['hostid']] = true;
-				}
-
-				$hostids[$row['hostid']] = true;
-			}
-
-			$_hostids = array_keys($_hostids);
-		}
-		while ($_hostids);
-
-		$_templateids = array_keys($templateids + $hostids);
-		$templateids = [];
-
-		do {
-			$result = DBselect(
-				'SELECT ht.templateid,ht.hostid'.
-				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionId('hostid', $_templateids)
-			);
-
-			$_templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['templateid'], $templateids)) {
-					$_templateids[$row['templateid']] = true;
-				}
-
-				$templateids[$row['templateid']] = true;
-				$links[$row['hostid']][$row['templateid']] = true;
-			}
-
-			$_templateids = array_keys($_templateids);
-		}
-		while ($_templateids);
-
-		foreach ($hostids as $hostid => $foo) {
-			self::checkTemplateDoubleLinkage($links, $hostid);
-		}
-	}
-
-	/**
-	 * Searches for double linkages.
-	 *
-	 * @param array  $links[<hostid>][<templateid>]  The list of linked template IDs by host ID.
-	 * @param string $hostid
-	 *
-	 * @throws APIException if double linkage is found.
-	 *
-	 * @return array  An array of the linked templates for the selected host.
-	 */
-	private static function checkTemplateDoubleLinkage(array $links, $hostid): array {
-		$templateids = $links[$hostid];
-
-		foreach ($links[$hostid] as $templateid => $foo) {
-			if (array_key_exists($templateid, $links)) {
-				$_templateids = self::checkTemplateDoubleLinkage($links, $templateid);
-
-				if (array_intersect_key($templateids, $_templateids)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Template cannot be linked to another template more than once even through other templates.')
-					);
-				}
-
-				$templateids += $_templateids;
-			}
-		}
-
-		return $templateids;
 	}
 
 	/**
@@ -1768,14 +1249,16 @@ abstract class CHostBase extends CApiService {
 	 * @param array $db_hosts
 	 */
 	private function addAffectedTemplates(array $hosts, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+		if ($this instanceof CTemplate) {
+			return;
+		}
 
 		$hostids = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host) || array_key_exists('templates_clear', $host)) {
-				$hostids[] = $host[$id_field_name];
-				$db_hosts[$host[$id_field_name]]['templates'] = [];
+				$hostids[] = $host['hostid'];
+				$db_hosts[$host['hostid']]['templates'] = [];
 			}
 		}
 

@@ -2169,17 +2169,13 @@ abstract class CTriggerGeneral extends CApiService {
 		$templates = API::Template()->get([
 			'output' => [],
 			'selectHosts' => ['hostid'],
-			'selectTemplates' => ['templateid'],
 			'templateids' => array_keys($templateids),
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
 
 		foreach ($templates as &$template) {
-			$template = array_merge(
-				zbx_objectValues($template['hosts'], 'hostid'),
-				zbx_objectValues($template['templates'], 'templateid')
-			);
+			$template = array_column($template['hosts'], 'hostid');
 		}
 		unset($template);
 

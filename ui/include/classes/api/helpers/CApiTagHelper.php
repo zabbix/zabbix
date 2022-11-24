@@ -257,19 +257,6 @@ class CApiTagHelper {
 
 		$negated_where_conditions = [];
 		foreach ($negated_conditions as $tag => $tag_where) {
-
-			$templateids_in = [];
-			while ($tag_where['templateids']) {
-				$templateids_in += $tag_where['templateids'];
-
-				$tag_where['templateids'] = API::Template()->get([
-					'output' => [],
-					'parentTemplateids' => array_keys($tag_where['templateids']),
-					'preservekeys' => true,
-					'nopermissions' => true
-				]);
-			}
-
 			$negated_where_conditions[] = '(NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
@@ -277,8 +264,8 @@ class CApiTagHelper {
 					' AND host_tag.tag='.zbx_dbstr($tag).
 						($tag_where['values'] ? ' AND ('.implode(' OR ', $tag_where['values']).')' : '').
 					')'.
-					($templateids_in
-						? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)).''
+					($tag_where['templateids']
+						? ' OR '.dbConditionInt('ht2.templateid', array_keys($tag_where['templateids'])).''
 						: ''
 					).
 				')'.
@@ -321,18 +308,6 @@ class CApiTagHelper {
 				}
 			}
 
-			$templateids_in = [];
-			while ($templateids) {
-				$templateids_in += $templateids;
-
-				$templateids = API::Template()->get([
-					'output' => [],
-					'parentTemplateids' => array_keys($templateids),
-					'preservekeys' => true,
-					'nopermissions' => true
-				]);
-			}
-
 			$where_conditions[] = '(EXISTS ('.
 				'SELECT NULL'.
 				' FROM host_tag'.
@@ -340,7 +315,7 @@ class CApiTagHelper {
 					' AND host_tag.tag='.zbx_dbstr($tag_name).
 					($values ? ' AND ('.implode(' OR ', $values).')' : '').
 				')'.
-				($templateids_in ? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids_in)) : '').
+				($templateids ? ' OR '.dbConditionInt('ht2.templateid', array_keys($templateids)) : '').
 			')';
 		}
 
