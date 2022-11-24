@@ -317,7 +317,10 @@ try {
 		}
 
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+		API::getWrapper()->auth = [
+			'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+			'auth' => CWebUser::$data['sessionid']
+		];
 
 		$redirect = array_filter([$request, CWebUser::$data['url'], $relay_state, CMenuHelper::getFirstUrl()]);
 		redirect(reset($redirect));

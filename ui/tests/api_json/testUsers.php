@@ -1815,33 +1815,24 @@ class testUsers extends CAPITest {
 	* @dataProvider auth_data
 	*/
 	public function testUsers_Session($data) {
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId('12345');
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+		$this->checkResult($this->callRaw($data, '12345'), 'Session terminated, re-login, please.');
 	}
 
 	public function testUsers_Logout() {
 		$this->authorize('Admin', 'zabbix');
 
-		$logout = [
-			'jsonrpc' => '2.0',
-			'method' => 'user.logout',
-			'params' => [],
-			'id' => '1'
-		];
-		$this->checkResult($this->callRaw($logout));
+		$this->checkResult($this->call('user.logout', []));
 
 		$data = [
 			'jsonrpc' => '2.0',
 			'method' => 'user.update',
-			'params' =>
-				[
-					'userid' => '9',
-					'username' => 'check authentication'
-				],
+			'params' => [
+				'userid' => '9',
+				'username' => 'check authentication'
+			],
 			'id' => '1'
 		];
-		$this->checkResult($this->callRaw($data), 'Session terminated, re-login, please.');
+		$this->checkResult($this->callRaw($data, CAPIHelper::getSessionId()), 'Session terminated, re-login, please.');
 	}
 
 	public static function login_data() {
@@ -1956,9 +1947,6 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenIncorrect() {
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId(bin2hex(random_bytes(32)));
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -1967,7 +1955,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], bin2hex(random_bytes(32)));
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -1977,15 +1965,13 @@ class testUsers extends CAPITest {
 
 	public function testUsers_AuthTokenDisabled() {
 		$token = bin2hex(random_bytes(32));
+
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_DISABLED,
 			'userid' => 1,
 			'name' => 'disabled',
 			'token' => hash('sha512', $token)
 		]]);
-
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
 
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
@@ -1995,7 +1981,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2006,6 +1992,7 @@ class testUsers extends CAPITest {
 	public function testUsers_AuthTokenExpired() {
 		$now = time();
 		$token = bin2hex(random_bytes(32));
+
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
@@ -2013,9 +2000,6 @@ class testUsers extends CAPITest {
 			'expires_at' => $now - 1,
 			'token' => hash('sha512', $token)
 		]]);
-
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
 
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
@@ -2025,7 +2009,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2045,9 +2029,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2056,7 +2037,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('result', $res));
 	}
@@ -2076,9 +2057,6 @@ class testUsers extends CAPITest {
 			'where' => ['usrgrpid' => 7]
 		]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2088,7 +2066,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		DB::update('usrgrp', [
 			'values' => ['debug_mode' => GROUP_DEBUG_MODE_DISABLED],
@@ -2109,9 +2087,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2121,7 +2096,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
 		$this->assertTrue(!array_key_exists('debug', $res['error']), 'Not expected debug trace in error.');
@@ -2139,9 +2114,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2150,7 +2122,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		[['lastaccess' => $lastaccess]] = DB::select('token', [
 			'output' => ['lastaccess'],
@@ -2170,9 +2142,6 @@ class testUsers extends CAPITest {
 			'token' => hash('sha512', $token)
 		]]);
 
-		CAPIHelper::setAuth(true);
-		CAPIHelper::setSessionId($token);
-
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'host.get',
@@ -2181,7 +2150,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		]);
+		], $token);
 
 		$this->assertTrue(array_key_exists('error', $res), 'Expected error to occur.');
 		$this->assertEquals($res['error']['data'], 'Not authorized.');
