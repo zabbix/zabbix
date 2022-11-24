@@ -412,6 +412,7 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
+		this._updateForm();
 		this._updatePreview();
 	}
 
