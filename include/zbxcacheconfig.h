@@ -94,7 +94,6 @@ typedef struct
 	int		disable_until;
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
-	int		snmp_max_repetitions;
 }
 DC_INTERFACE;
 
