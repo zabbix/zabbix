@@ -616,7 +616,7 @@ void	zbx_update_env(double time_now)
 #endif
 	}
 
-	zbx_printf_prof_throttled();
+	zbx_prof_update();
 }
 
 /******************************************************************************

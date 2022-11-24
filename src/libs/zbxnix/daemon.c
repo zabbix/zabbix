@@ -74,10 +74,10 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		case ZBX_RTC_PROF_ENABLE:
-			zbx_enable_prof();
+			zbx_prof_enable();
 			break;
 		case ZBX_RTC_PROF_DISABLE:
-			zbx_disable_prof();
+			zbx_prof_disable();
 			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != zabbix_decrease_log_level())

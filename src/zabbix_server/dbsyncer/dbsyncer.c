@@ -127,11 +127,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	for (;;)
 	{
-		void	*prof_func;
-
 		sec = zbx_time();
 
-		zbx_printf_prof_throttled();
+		zbx_prof_update();
 
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
@@ -142,9 +140,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
-		prof_func = zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
+		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
-		zbx_prof_end(prof_func);
+		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();

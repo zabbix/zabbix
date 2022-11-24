@@ -3,6 +3,8 @@
 #include "zbxtime.h"
 #include "zbxprof.h"
 
+#define PROF_LEVEL_MAX	10
+
 typedef struct
 {
 	const char		*func_name;
@@ -18,7 +20,8 @@ static volatile int	zbx_prof_enable_requested;
 
 static zbx_vector_ptr_t	zbx_func_profiles;
 static int		zbx_prof_enabled;
-void			*zbx_func_profile;
+static ZBX_FUNC_PROFILE	*zbx_func_profile[PROF_LEVEL_MAX];
+static int		zbx_level;
 
 static int	zbx_default_ptr_ptr_compare_func(const void *d1, const void *d2)
 {
@@ -28,7 +31,7 @@ static int	zbx_default_ptr_ptr_compare_func(const void *d1, const void *d2)
 	return zbx_default_ptr_compare_func(p1, p2);
 }
 
-void	*zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
+void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 {
 	if (1 == zbx_prof_enabled)
 	{
@@ -57,22 +60,33 @@ void	*zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 		func_profile->locked++;
 		func_profile->start = zbx_time();
 
-		return func_profile;
+		zbx_func_profile[zbx_level] = func_profile;
+		zbx_level++;
 	}
-
-	return NULL;
 }
 
-void	zbx_prof_end(void *func_profile)
+void	zbx_prof_end(void)
 {
-	if (NULL != func_profile && 1 == zbx_prof_enabled)
-		((ZBX_FUNC_PROFILE *)func_profile)->sec += zbx_time() - ((ZBX_FUNC_PROFILE *)func_profile)->start;
+	if (1 == zbx_prof_enabled)
+	{
+		ZBX_FUNC_PROFILE	*func_profile;
+
+		func_profile = zbx_func_profile[zbx_level - 1];
+		func_profile->sec += zbx_time() - func_profile->start;
+		zbx_level--;
+	}
 }
 
-void	zbx_prof_end_wait(void *func_profile)	/* nested locks not supported but currently don't need */
+void	zbx_prof_end_wait(void)
 {
-	if (NULL != func_profile && 1 == zbx_prof_enabled)
-		((ZBX_FUNC_PROFILE *)func_profile)->sec_wait += zbx_time() - ((ZBX_FUNC_PROFILE *)func_profile)->start;
+	if (1 == zbx_prof_enabled)
+	{
+		ZBX_FUNC_PROFILE	*func_profile;
+
+		func_profile = zbx_func_profile[zbx_level - 1];
+
+		func_profile->sec_wait += zbx_time() - func_profile->start;
+	}
 }
 
 static const char	*get_scope_string(zbx_prof_scope_t scope)
@@ -140,7 +154,7 @@ static void	zbx_print_prof(void)
 		zbx_reset_prof();
 }
 
-void	zbx_printf_prof_throttled(void)
+void	zbx_prof_update(void)
 {
 	static double	last_update, time_now;
 
@@ -152,16 +166,20 @@ void	zbx_printf_prof_throttled(void)
 	if (30 < (time_now = zbx_time()) - last_update)
 	{
 		last_update = time_now;
-		zbx_print_prof();
+
+		if (1 == zbx_prof_enabled)
+			zbx_print_prof();
+		else
+			zbx_reset_prof();
 	}
 }
 
-void	zbx_enable_prof(void)
+void	zbx_prof_enable(void)
 {
 	zbx_prof_enable_requested = 1;
 }
 
-void	zbx_disable_prof(void)
+void	zbx_prof_disable(void)
 {
 	zbx_prof_enable_requested = 0;
 }
