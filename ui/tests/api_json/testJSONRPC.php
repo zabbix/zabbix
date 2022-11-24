@@ -338,7 +338,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32602,
 						'message' => 'Invalid params.',
-						'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+						'data' => 'The "apiinfo.version" method must be called without authorization header.'
 					],
 					'id' => 5
 				],
