@@ -25,6 +25,14 @@
 #include "audit/zbxaudit_graph.h"
 #include "zbxnum.h"
 
+typedef enum
+{
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+}
+zbx_graph_yaxis_types_t;
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
