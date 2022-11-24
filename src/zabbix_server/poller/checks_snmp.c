@@ -1929,7 +1929,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 			goto out;
 		}
 
-		memmove(name, root_oid, root_oid_len * sizeof(oid));
+		memcpy(name, root_oid, root_oid_len * sizeof(oid));
 		name_length = root_oid_len;
 
 		while (running)
@@ -1995,7 +1995,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 					if (NULL == var->next_variable)
 					{
-						memmove(name, var->name, var->name_length * sizeof(oid));
+						memcpy(name, var->name, var->name_length * sizeof(oid));
 						name_length = var->name_length;
 					}
 				}
