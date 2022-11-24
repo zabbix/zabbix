@@ -3,7 +3,7 @@ This plugin provides a native solution to monitor Docker
 containers and images by Zabbix. 
 The plugin can monitor docker instances with Zabbix agent 2 using docker socket
 and querying docker API. It can be used in conjunction with the official 
-[Docker template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/docker) 
+[Docker template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/docker). 
 You can extend it or create your own template to cater specific needs.
 
 ## Requirements
@@ -23,10 +23,10 @@ Now, you need to make sure that a Docker instance is available.
 Open Zabbix agent 2 docker configuration file `zabbix_agent2.d/plugins.d/docker.conf` and 
 set the required parameters.
 
-**Plugins.Docker.Endpoint** — Docker API endpoint.
+**Plugins.Docker.Endpoint** — the Docker API endpoint.
 *Default value:* `unix:///var/run/docker.sock`    
  
-**Plugins.Docker.Timeout** — The maximum time (in seconds) for 
+**Plugins.Docker.Timeout** — the maximum time (in seconds) for 
 waiting when a request has to be done.
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
@@ -38,11 +38,11 @@ default hard-coded values will be used instead.
 ## Supported keys
 **docker.container_info[\<Container\>]** — returns low-level information about a container.
 *Parameters:*  
-Container (required) — container name.
+Container (required) — a container name.
 
 **docker.container_stats[\<Container\>]** — returns near real-time statistics for a given container.
 *Parameters:*
-Container (required) — container name.
+Container (required) — a container name.
 
 **docker.containers[]** — returns a list of containers.
 
