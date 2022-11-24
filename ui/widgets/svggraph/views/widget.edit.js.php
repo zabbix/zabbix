@@ -111,7 +111,6 @@ window.widget_svggraph_form = new class {
 					});
 			});
 		}
-		this._updateForm();
 	}
 
 	_datasetTabInit() {
@@ -198,12 +197,6 @@ window.widget_svggraph_form = new class {
 				this._removeDataSet(e.target);
 			}
 		});
-
-		document
-			.querySelector('[id*="legend_label"]')
-			.addEventListener('change', (e) => {
-				this._updateForm();
-			});
 
 		document
 			.getElementById('dataset-add')
@@ -465,6 +458,8 @@ window.widget_svggraph_form = new class {
 			widget_svggraph_form.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
 				'ds'
 			);
+
+			widget_svggraph_form._updateForm();
 			widget_svggraph_form._updatePreview();
 		});
 	}
