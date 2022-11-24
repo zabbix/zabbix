@@ -49,11 +49,6 @@ zbx_session_type_t;
 #define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
 #define MAX_PINGER_ITEMS	128
 
-#define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
-
-#define ZBX_TRIGGER_DEPENDENCY_FAIL		1
-#define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
-
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
 #define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
@@ -224,10 +219,6 @@ typedef struct
 	zbx_tag_t	tag;
 }
 zbx_item_tag_t;
-
-#define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
-							/* initiated by a time-based function or a new value of */
-							/* an item in problem expression */
 
 typedef struct _DC_TRIGGER
 {
@@ -583,11 +574,6 @@ zbx_synced_new_config_t;
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
-#define ZBX_TRIGGER_GET_ITEMIDS		0x0001
-
-#define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
-#define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
-
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
@@ -762,8 +748,6 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
-#define ZBX_HC_ITEM_STATUS_NORMAL	0
-#define ZBX_HC_ITEM_STATUS_BUSY		1
 
 #define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
 #define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
@@ -868,7 +852,6 @@ void		zbx_dc_cleanup_sessions(void);
 void		zbx_dc_cleanup_autoreg_host(void);
 
 /* maintenance support */
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -1034,4 +1017,44 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_vector_uint64_t *del_macro_hostids);
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *templateids);
+
+/* maintenance */
+
+typedef enum
+{
+	MAINTENANCE_TYPE_NORMAL = 0,
+	MAINTENANCE_TYPE_NODATA
+}
+zbx_maintenance_type_t;
+
+/* action statuses */
+#define ACTION_STATUS_ACTIVE	0
+#define ACTION_STATUS_DISABLED	1
+
+/* operation types */
+#define OPERATION_TYPE_MESSAGE		0
+#define OPERATION_TYPE_COMMAND		1
+#define OPERATION_TYPE_HOST_ADD		2
+#define OPERATION_TYPE_HOST_REMOVE	3
+#define OPERATION_TYPE_GROUP_ADD	4
+#define OPERATION_TYPE_GROUP_REMOVE	5
+#define OPERATION_TYPE_TEMPLATE_ADD	6
+#define OPERATION_TYPE_TEMPLATE_REMOVE	7
+#define OPERATION_TYPE_HOST_ENABLE	8
+#define OPERATION_TYPE_HOST_DISABLE	9
+#define OPERATION_TYPE_HOST_INVENTORY	10
+#define OPERATION_TYPE_RECOVERY_MESSAGE	11
+#define OPERATION_TYPE_UPDATE_MESSAGE	12 /* OPERATION_TYPE_ACK_MESSAGE */
+
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
+#define PROXY_HISTORY_MASK_NOVALUE	(PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE)
+
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG		0
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG		1
+#define ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP		2
+#define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
 #endif
