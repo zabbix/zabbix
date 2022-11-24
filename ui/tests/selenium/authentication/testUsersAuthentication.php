@@ -53,50 +53,42 @@ class testUsersAuthentication extends CWebTest {
 		$form->query('button:Select')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('User groups', $dialog->getTitle());
-		$this->assertEquals(1, $dialog->getFooter()->query('xpath:.//button')->all()->count());
-		$this->assertTrue($dialog->getFooter()->query('button:Cancel')->one()->isClickable());
+		$footer = $dialog->getFooter();
+		$this->assertEquals(1, $footer->query('xpath:.//button')->all()->count());
+		$this->assertTrue($footer->query('button:Cancel')->one()->isClickable());
 
-		$table = $dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
-		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertEquals('Disabled', $table->getRow(0)->getColumn('Name')->getText());
+		$this->assertEquals(['Disabled'], $dialog->query('class:list-table')->asTable()->waitUntilVisible()->one()
+				->getRows()->asText()
+		);
 		$dialog->close();
 
 		// Check that 'Password policy' header presents.
-		$this->assertTrue($form->query('xpath://h4[text()="Password policy"]')->exists());
+		$this->assertTrue($form->query('xpath:.//h4[text()="Password policy"]')->exists());
 
 		$this->assertEquals(2, $form->getField('Minimum password length')->getAttribute('maxlength'));
 
 		// Check default texts in hint-boxes.
 		$hintboxes = [
-			[
-				'field' => 'Deprovisioned users group',
-				'text' => 'Only disabled group can be set for deprovisioned users.'
-			],
-			[
-				'field' => 'Password must contain',
-				'text' => "Password requirements:".
+				'Deprovisioned users group' => 'Only disabled group can be set for deprovisioned users.',
+				'Password must contain' => "Password requirements:".
 						"\nmust contain at least one lowercase and one uppercase Latin letter (A-Z, a-z)".
 						"\nmust contain at least one digit (0-9)".
-						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)"
-			],
-			[
-				'field' => 'Avoid easy-to-guess passwords',
-				'text' => "Password requirements:".
+						"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)",
+				'Avoid easy-to-guess passwords' => "Password requirements:".
 						"\nmust not contain user's name, surname or username".
 						"\nmust not be one of common or context-specific passwords"
-			]
 		];
 
-		foreach ($hintboxes as $hintbox) {
+		foreach ($hintboxes as $field => $text) {
 			// Summon the hint-box.
-			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//a')->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$form->query('xpath:.//label[text()='.zbx_dbstr($field).']//a')->waitUntilClickable()->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 
 			// Assert text.
-			$this->assertEquals($hintbox['text'], $hint->one()->getText());
+			$this->assertEquals($text, $hint->getText());
 
 			// Close the hint-box.
-			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 			$hint->waitUntilNotPresent();
 		}
 
