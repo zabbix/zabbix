@@ -30,28 +30,28 @@ window.popup_import = new class {
 		this.overlay = null;
 		this.dialogue = null;
 		this.form = null;
-		this.activate_advanced_configuration = false;
 	}
 
 	init(activate_advanced_configuration) {
 		this.overlay = overlays_stack.getById('popup_import');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.activate_advanced_configuration = activate_advanced_configuration;
 
 		this.warningListeners();
 
-		if (activate_advanced_configuration) {
+		if (activate_advanced_configuration === true) {
 			this.AdvancedConfigurationListeners();
 		}
 	}
 
 	warningListeners() {
-		document
-			.getElementById('rules_valueMaps_updateExisting')
-			.addEventListener('change', (e) => {
+		const rules_images = document.getElementById('rules_images_updateExisting')
+
+		if (rules_images) {
+			rules_images.addEventListener('change', (e) => {
 				this.updateWarning(e.target, <?= json_encode(_('Images for all maps will be updated!')) ?>)
 			})
+		}
 	}
 
 	AdvancedConfigurationListeners() {
@@ -65,15 +65,15 @@ window.popup_import = new class {
 
 		document
 			.getElementById('update_all')
-			.addEventListener('change', () => { this.toggleAllCheckboxes('update')})
+			.addEventListener('change', () => { this.toggleCheckboxColumn('update')})
 
 		document
 			.getElementById('create_all')
-			.addEventListener('change', () => { this.toggleAllCheckboxes('create')})
+			.addEventListener('change', () => { this.toggleCheckboxColumn('create')})
 
 		document
 			.getElementById('delete_all')
-			.addEventListener('change', () => { this.toggleAllCheckboxes('delete')})
+			.addEventListener('change', () => { this.toggleCheckboxColumn('delete')})
 
 		this.form.addEventListener('change',  (e) => {
 			if (e.target.classList.contains('js-delete')) {
@@ -255,8 +255,6 @@ window.popup_import = new class {
 						class: '<?= ZBX_STYLE_BTN_ALT ?>',
 						action: function() {
 							obj.checked = false;
-							popup_import.updateMainCheckbox('update');
-
 						}
 					}
 				]
@@ -275,14 +273,12 @@ window.popup_import = new class {
 		})
 	}
 
-	toggleAllCheckboxes(action) {
+	toggleCheckboxColumn(action) {
 		const check = document.getElementById(action + '_all').checked;
 
 		this.form.querySelectorAll('.js-' + action).forEach(function (checkbox) {
 			if (checkbox.checked !== check) {
 				checkbox.checked = check;
-
-				checkbox.dispatchEvent(new CustomEvent('change'));
 			}
 		})
 	}

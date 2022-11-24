@@ -74,7 +74,7 @@ foreach ($titles as $key => $title) {
 	}
 }
 
-if (array_key_exists('advanced_config', $data)) {
+if ($data['advanced_config']) {
 	$rules_table->addRow([
 		(new CCol('All'))->addStyle('width: 124px;'),
 		$col_update
@@ -150,7 +150,7 @@ foreach ($titles as $key => $title) {
 		$col_delete ? (new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER) : null
 	]));
 
-	if (array_key_exists('advanced_config', $data)) {
+	if ($data['advanced_config']) {
 		$checkbox_row
 			->addClass(ZBX_STYLE_DISPLAY_NONE)
 			->addClass('js-advanced-configuration');
@@ -166,7 +166,7 @@ $rules_table->setHeader([
 	$col_delete ? (new CColHeader(_('Delete missing')))->addClass(ZBX_STYLE_CENTER) : null
 ]);
 
-$advanced_config_checkbox = array_key_exists('advanced_config', $data)
+$advanced_config_checkbox = $data['advanced_config']
 	? [new CLabel(_('Advanced options'), 'advanced_options'), new CFormField(
 			(new CCheckBox('advanced_options'))
 				->setChecked(false)
@@ -190,7 +190,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($form_grid)
 	->addItem((new CScriptTag('popup_import.init('
-		.json_encode(['advanced_configuration' => $advanced_config_checkbox !== null])
+		.json_encode(['advanced_configuration' => $data['advanced_config']])
 	.');'))->setOnDocumentReady());
 
 $output = [
