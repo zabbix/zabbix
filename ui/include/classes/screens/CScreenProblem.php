@@ -856,8 +856,8 @@ class CScreenProblem extends CScreenBase {
 
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
+						'countOutput' => true,
 						'filter' => ['cause_eventid' => $problem['eventid']],
-						'countOutput' => true
 					];
 
 					$problem['symptom_count'] = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
@@ -905,7 +905,7 @@ class CScreenProblem extends CScreenBase {
 				$data['correlations'] += $symptom_data['correlations'];
 
 				foreach ($symptom_data['actions'] as $key => $actions) {
-					$data['actions'][$key] += $symptom_data['actions'][$key];
+					$data['actions'][$key] += $actions;
 				}
 
 				if ($symptom_data['triggers']) {
