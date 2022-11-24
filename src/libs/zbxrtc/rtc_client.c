@@ -103,6 +103,21 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char
 		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), data, error);
 	}
 
+	if (0 == strncmp(opt, ZBX_PROF_ENABLE, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE)))
+	{
+		*code = ZBX_RTC_PROF_ENABLE;
+
+		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE), data, error);
+	}
+
+	if (0 == strncmp(opt, ZBX_PROF_DISABLE, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE)))
+	{
+		*code = ZBX_RTC_PROF_DISABLE;
+
+		return rtc_parse_log_level_parameter(opt, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE), data, error);
+	}
+
+
 	if (0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		*code = ZBX_RTC_CONFIG_CACHE_RELOAD;

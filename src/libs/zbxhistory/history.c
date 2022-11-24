@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxprof.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 
@@ -93,7 +94,7 @@ void	zbx_history_destroy(void)
 int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 {
 	int	i, flags = 0;
-
+	void	*prof_func = zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 	*ret_flush = FLUSH_SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -118,6 +119,8 @@ int	zbx_history_add_values(const zbx_vector_ptr_t *history, int *ret_flush)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	zbx_prof_end(prof_func);
 
 	return (FLUSH_SUCCEED == *ret_flush ? SUCCEED : FAIL);
 }

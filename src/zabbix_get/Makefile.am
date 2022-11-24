@@ -20,6 +20,7 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_builddir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \

@@ -53,7 +53,7 @@ static void	rtc_change_service_loglevel(int code)
 					zabbix_get_log_level_string());
 		}
 	}
-	else
+	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
 	{
 		if (SUCCEED != zabbix_decrease_log_level())
 		{
@@ -237,6 +237,8 @@ static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *d
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
+		case ZBX_RTC_PROF_ENABLE:
+		case ZBX_RTC_PROF_DISABLE:
 			rtc_process_loglevel(code, (const char *)data, result);
 			return;
 #endif

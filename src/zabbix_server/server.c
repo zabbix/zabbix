@@ -1398,6 +1398,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
+	zbx_reset_prof();
 
 	zbx_set_exit_on_terminate();
 

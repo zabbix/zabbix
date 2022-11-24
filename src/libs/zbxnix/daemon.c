@@ -73,6 +73,12 @@ static void	common_sigusr_handler(int flags)
 						zabbix_get_log_level_string());
 			}
 			break;
+		case ZBX_RTC_PROF_ENABLE:
+			zbx_enable_prof();
+			break;
+		case ZBX_RTC_PROF_DISABLE:
+			zbx_disable_prof();
+			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != zabbix_decrease_log_level())
 			{

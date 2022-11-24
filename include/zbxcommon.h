@@ -312,6 +312,8 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
 #define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
+#define ZBX_PROF_ENABLE			"prof_enable"
+#define ZBX_PROF_DISABLE		"prof_disable"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"

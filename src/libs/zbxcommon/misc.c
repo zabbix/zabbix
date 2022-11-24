@@ -21,6 +21,7 @@
 #include "log.h"
 #include "setproctitle.h"
 #include "zbxthreads.h"
+#include "zbxprof.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {
@@ -603,7 +604,7 @@ static void	update_resolver_conf(void)
  ******************************************************************************/
 void	zbx_update_env(double time_now)
 {
-	static double	time_update = 0;
+	static double	time_update = 0, last_update;
 
 	/* handle /etc/resolv.conf update and log rotate less often than once a second */
 	if (1.0 < time_now - time_update)
@@ -613,6 +614,12 @@ void	zbx_update_env(double time_now)
 #if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 		update_resolver_conf();
 #endif
+	}
+
+	if (30 < time_now - last_update)
+	{
+		last_update = time_now;
+		zbx_print_prof();
 	}
 }
 
