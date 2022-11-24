@@ -980,6 +980,13 @@ class CEvent extends CApiService {
 				| ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 				| ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM;
 
+		// Check that at least one valid flag is set.
+		if (($data['action'] & $action_mask) != $data['action']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('unexpected value "%1$s"', $data['action'])
+			));
+		}
+
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$has_ack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE);
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
@@ -991,13 +998,6 @@ class CEvent extends CApiService {
 			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE);
 		$has_change_rank_to_symptom_action =
 			(($data['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM);
-
-		// Check that at least one valid flag is set.
-		if (($data['action'] & $action_mask) != $data['action']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-				_s('unexpected value "%1$s"', $data['action'])
-			));
-		}
 
 		// Check access rules.
 		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
