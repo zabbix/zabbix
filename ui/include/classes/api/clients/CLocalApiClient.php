@@ -92,18 +92,12 @@ class CLocalApiClient extends CApiClient {
 			}
 
 			if ($auth['auth'] !== null) {
-				$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+				$error = $auth['type'] == CJsonRpc::AUTH_TYPE_HEADER
+					? _('The "%1$s.%2$s" method must be called without authorization header.')
+					: _('The "%1$s.%2$s" method must be called without the "auth" parameter.');
 
-				if ($auth['type'] == CJsonRpc::AUTH_TYPE_HEADER) {
-					$response->errorMessage = _s('The "%1$s.%2$s" method must be called without authorization header.',
-						$requestApi, $requestMethod
-					);
-				}
-				else {
-					$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
-						$requestApi, $requestMethod
-					);
-				}
+				$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+				$response->errorMessage = _params($error, [$requestApi, $requestMethod]);
 
 				return $response;
 			}
