@@ -278,18 +278,23 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	return
 }
 
-// nolint:gomnd
 func parseKernelVersion(info *systemInfo) {
+	const (
+		gotMajor = 1
+		gotMinor = 2
+		gotPatch = 3
+	)
+
 	var major, minor, patch int
 	read, _ := fmt.Sscanf((*info).Kernel, "%d.%d.%d", &major, &minor, &patch)
 
-	if read > 0 {
+	if read >= gotMajor {
 		(*info).Major = strconv.Itoa(major)
 	}
-	if read > 1 {
+	if read >= gotMinor {
 		(*info).Minor = strconv.Itoa(minor)
 	}
-	if read > 2 {
+	if read >= gotPatch {
 		(*info).Patch = strconv.Itoa(patch)
 	}
 }
