@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('script');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_LIST))
 	->setControls((new CTag('nav', true,
@@ -223,6 +223,6 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$widget
+$html_page
 	->addItem($scriptsForm)
 	->show();

@@ -66,7 +66,7 @@ static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 	return NULL != zbx_regexp_match(procargs, proccomm, NULL) ? SUCCEED : FAIL;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_VSIZE	0
 #define ZBX_RSS		1
@@ -286,7 +286,7 @@ out:
 #undef ZBX_TRSS
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*param, *procname, *proccomm;
 	struct passwd		*usrinfo;

@@ -100,7 +100,7 @@ $filter = (new CFilter())
 			)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('API tokens'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_TOKEN_LIST))
 	->setControls(
@@ -210,7 +210,7 @@ $token_form->addItem([
 	], 'token')
 ]);
 
-$widget
+$html_page
 	->addItem($token_form)
 	->show();
 

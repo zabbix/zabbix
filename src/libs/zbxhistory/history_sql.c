@@ -22,8 +22,8 @@
 
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
-#include "dbcache.h"
 #include "zbxnum.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
@@ -34,7 +34,7 @@ zbx_sql_writer_t;
 
 static zbx_sql_writer_t	writer;
 
-typedef void (*vc_str2value_func_t)(history_value_t *value, DB_ROW row);
+typedef void (*vc_str2value_func_t)(zbx_history_value_t *value, DB_ROW row);
 
 /* history table data */
 typedef struct
@@ -52,23 +52,23 @@ typedef struct
 zbx_vc_history_table_t;
 
 /* row to value converters for all value types */
-static void	row2value_str(history_value_t *value, DB_ROW row)
+static void	row2value_str(zbx_history_value_t *value, DB_ROW row)
 {
 	value->str = zbx_strdup(NULL, row[0]);
 }
 
-static void	row2value_dbl(history_value_t *value, DB_ROW row)
+static void	row2value_dbl(zbx_history_value_t *value, DB_ROW row)
 {
 	value->dbl = atof(row[0]);
 }
 
-static void	row2value_ui64(history_value_t *value, DB_ROW row)
+static void	row2value_ui64(zbx_history_value_t *value, DB_ROW row)
 {
 	ZBX_STR2UINT64(value->ui64, row[0]);
 }
 
 /* timestamp, logeventid, severity, source, value */
-static void	row2value_log(history_value_t *value, DB_ROW row)
+static void	row2value_log(zbx_history_value_t *value, DB_ROW row)
 {
 	value->log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
 

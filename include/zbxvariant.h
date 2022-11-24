@@ -87,4 +87,14 @@ int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, i
 
 ZBX_VECTOR_DECL(var, zbx_variant_t)
 
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+zbx_history_value_t;
+
 #endif

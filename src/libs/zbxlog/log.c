@@ -36,6 +36,17 @@ static int		log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 int			zbx_log_level = LOG_LEVEL_WARNING;
 
+static int		config_log_file_size = -1;	/* max log file size in MB */
+
+static int	get_config_log_file_size(void)
+{
+	if (-1 != config_log_file_size)
+		return config_log_file_size;
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
 #ifdef _WINDOWS
 #	define LOCK_LOG		zbx_mutex_lock(log_access)
 #	define UNLOCK_LOG	zbx_mutex_unlock(log_access)
@@ -43,8 +54,6 @@ int			zbx_log_level = LOG_LEVEL_WARNING;
 #	define LOCK_LOG		lock_log()
 #	define UNLOCK_LOG	unlock_log()
 #endif
-
-#define ZBX_MESSAGE_BUF_SIZE	1024
 
 #ifdef _WINDOWS
 #	define STDIN_FILENO	_fileno(stdin)
@@ -159,7 +168,7 @@ static void	rotate_log(const char *filename)
 
 	new_size = buf.st_size;
 
-	if (0 != CONFIG_LOG_FILE_SIZE && (zbx_uint64_t)CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
+	if (0 != get_config_log_file_size() && (zbx_uint64_t)get_config_log_file_size() * ZBX_MEBIBYTE < new_size)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
@@ -291,10 +300,14 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zabbix_open_log(int type, int level, const char *filename, char **error)
+int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
 {
+	const char	*filename = log_file_cfg->log_file_name;
+	int		type = log_file_cfg->log_type;
+
 	log_type = type;
 	zbx_log_level = level;
+	config_log_file_size = log_file_cfg->log_file_size;
 
 	if (LOG_TYPE_SYSTEM == type)
 	{
@@ -323,7 +336,8 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 
 		if (NULL == (log_file = fopen(filename, "a+")))
 		{
-			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename, zbx_strerror(errno));
+			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename,
+					zbx_strerror(errno));
 			return FAIL;
 		}
 
@@ -387,7 +401,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		LOCK_LOG;
 
-		if (0 != CONFIG_LOG_FILE_SIZE)
+		if (0 != get_config_log_file_size())
 			rotate_log(log_filename);
 
 		if (NULL != (log_file = fopen(log_filename, "a+")))
@@ -577,15 +591,16 @@ int	zbx_get_log_type(const char *logtype)
 	return LOG_TYPE_UNDEFINED;
 }
 
-int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
+int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_file_cfg)
 {
-	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
+	if (LOG_TYPE_UNDEFINED == log_file_cfg->log_type)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'",
+				log_file_cfg->log_type_str);
 		return FAIL;
 	}
 
-	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
+	if (LOG_TYPE_CONSOLE == log_file_cfg->log_type && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
 			ZBX_TASK_START == task->task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
@@ -593,28 +608,14 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 		return FAIL;
 	}
 
-	if (LOG_TYPE_FILE == CONFIG_LOG_TYPE && (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE))
+	if (LOG_TYPE_FILE == log_file_cfg->log_type && (NULL == log_file_cfg->log_file_name || '\0' ==
+			*log_file_cfg->log_file_name))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter to be set");
 		return FAIL;
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: replace strerror to print also the error number                  *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_strerror(int errnum)
-{
-	/* !!! Attention: static !!! Not thread-safe for Win32 */
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
-
-	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
-
-	return utf8_string;
 }
 
 char	*strerror_from_system(unsigned long error)

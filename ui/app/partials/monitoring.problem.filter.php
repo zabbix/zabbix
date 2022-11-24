@@ -101,9 +101,12 @@ $left_column = (new CFormList())
 			->setId('name_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
@@ -268,7 +271,7 @@ $right_column = (new CFormList())
 		(new CDiv([
 			(new CLabel(_('Show timeline'), 'show_timeline_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('show_timeline'))
-				->setChecked($data['show_timeline'] == 1)
+				->setChecked($data['show_timeline'] == ZBX_TIMELINE_ON)
 				->setEnabled($data['compact_view'] == 0)
 				->setUncheckedValue(0)
 				->setId('show_timeline_#{uniqid}')
@@ -323,12 +326,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-problem'))
+(new CTemplateTag('filter-monitoring-problem'))
 	->setAttribute('data-template', 'monitoring.problem.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-inventory-row'))
+(new CTemplateTag('filter-inventory-row'))
 	->addItem(
 		(new CRow([
 			(new CSelect('inventory[#{rowNum}][field]'))
@@ -346,7 +349,7 @@ if (array_key_exists('render_html', $data)) {
 	)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))

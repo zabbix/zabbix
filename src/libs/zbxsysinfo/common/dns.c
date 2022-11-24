@@ -24,7 +24,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -963,7 +962,7 @@ static int	dns_query_is_tcp(AGENT_REQUEST *request)
 	return FAIL;
 }
 
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_dns(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == dns_query_is_tcp(request))
@@ -972,7 +971,7 @@ int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return dns_query_short(request, result);
 }
 
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_dns_record(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == dns_query_is_tcp(request))

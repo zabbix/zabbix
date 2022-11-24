@@ -21,7 +21,7 @@
 #define ZABBIX_PREPROC_H
 
 #include "module.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 /* preprocessing step execution result */
 typedef struct

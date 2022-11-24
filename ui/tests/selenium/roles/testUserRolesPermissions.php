@@ -117,6 +117,10 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	public function prepareServiceData() {
+		// Remove all unnecessary services before proceeding with execution.
+		DBExecute('DELETE FROM services');
+
+		// Create services for Service permission checks.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Parent 1',
@@ -672,7 +676,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Audit log',
 						'Notifications'
 					],
-					'link' => ['auditacts.php']
+					'link' => ['zabbix.php?action=actionlog.list']
 				]
 			],
 			[

@@ -859,7 +859,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -874,7 +874,7 @@ zabbix_export:
                         host: 'Apache by Zabbix agent'
                         name: 'Apache: Requests per second'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -890,7 +890,7 @@ zabbix_export:
                         host: 'Apache by Zabbix agent'
                         name: 'Apache: Workers total'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -914,7 +914,7 @@ zabbix_export:
                         host: 'Apache by Zabbix agent'
                         name: 'Apache: Current async connections{#SINGLETON}'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -939,7 +939,7 @@ zabbix_export:
                         host: 'Apache by Zabbix agent'
                         name: 'Apache: Current async processes{#SINGLETON}'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'

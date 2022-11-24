@@ -18,14 +18,13 @@
 **/
 
 #include "zbxsysinfo.h"
-
-#include "log.h"
+#include "../sysinfo.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
 #endif
 
-int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 

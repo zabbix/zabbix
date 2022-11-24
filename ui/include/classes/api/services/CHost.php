@@ -503,7 +503,7 @@ class CHost extends CHostGeneral {
 		/*
 		 * Cleaning the output from write-only properties.
 		 */
-		$write_only_keys = ['tls_psk_identity', 'tls_psk'];
+		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
@@ -556,6 +556,7 @@ class CHost extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -594,6 +595,17 @@ class CHost extends CHostGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
+			$sqlParts['select']['inventory_mode'] =
+				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
@@ -1479,24 +1491,29 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => [],
-			'templateids' => $hostids,
-			'nopermissions' => true,
+		$db_items = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $hostids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'type' => CItem::SUPPORTED_ITEM_TYPES
+			],
 			'preservekeys' => true
 		]);
-		if ($del_items) {
-			CItemManager::delete(array_keys($del_items));
+
+		if ($db_items) {
+			CItem::deleteForce($db_items);
 		}
 
-		// delete web tests
-		$delHttptests = [];
-		$dbHttptests = get_httptests_by_hostid($hostids);
-		while ($dbHttptest = DBfetch($dbHttptests)) {
-			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
-		}
-		if (!empty($delHttptests)) {
-			API::HttpTest()->delete($delHttptests, true);
+		// delete web scenarios
+		$db_httptests = DB::select('httptest', [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['hostid' => $hostids],
+			'preservekeys' => true
+		]);
+
+		if ($db_httptests) {
+			CHttpTest::deleteForce($db_httptests);
 		}
 
 		// delete host from maps

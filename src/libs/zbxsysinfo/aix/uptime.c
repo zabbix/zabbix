@@ -18,12 +18,11 @@
 **/
 
 #include "zbxsysinfo.h"
-
-#include "log.h"
+#include "../sysinfo.h"
 
 static long	hertz = 0;
 
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;

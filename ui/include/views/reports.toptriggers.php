@@ -74,7 +74,11 @@ $filter_column = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Severity')),
-		(new CSeverityCheckBoxList('severities'))->setChecked($data['filter']['severities'])
+		(new CCheckBoxList('severities'))
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['filter']['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filterForm
@@ -115,7 +119,7 @@ $obj_data = [
 zbx_add_post_js('timeControl.addObject("toptriggers", '.zbx_jsvalue($data['filter']).', '.zbx_jsvalue($obj_data).');');
 zbx_add_post_js('timeControl.processObjects();');
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('100 busiest triggers'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_TOPTRIGGERS))
 	->addItem($filterForm)

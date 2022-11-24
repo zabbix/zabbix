@@ -32,8 +32,9 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "zbxdbwrap.h"
 
-extern int	CONFIG_ESCALATOR_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -1798,7 +1799,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 	DB_ROW		row;
 	zbx_condition_t	condition;
 
-	int		ret = SUCCEED; /* SUCCEED required for ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR */
+	int		ret = SUCCEED; /* SUCCEED required for ZBX_CONDITION_EVAL_TYPE_AND_OR */
 	int		cond, exit = 0;
 	unsigned char	old_type = 0xff;
 
@@ -1824,7 +1825,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		switch (evaltype)
 		{
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
 					if (SUCCEED == check_action_condition(event, &condition))
@@ -1840,7 +1841,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				}
 				old_type = condition.conditiontype;
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
+			case ZBX_CONDITION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
 				if (cond == FAIL)
@@ -1851,7 +1852,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				else
 					ret = SUCCEED;
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+			case ZBX_CONDITION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
 				if (cond == SUCCEED)
@@ -3311,41 +3312,41 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(triggerid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_ITEM:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is null and"
 					" itemid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(itemid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_SERVICE:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(serviceid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(escalationid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 	}

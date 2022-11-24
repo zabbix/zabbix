@@ -254,6 +254,13 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
+		$upcased_index = array_search($this->tableAlias().'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
+
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
@@ -281,6 +288,7 @@ class CTemplate extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// removing keys (hash -> array)
@@ -532,19 +540,24 @@ class CTemplate extends CHostGeneral {
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
+
 		if ($del_rules) {
 			CDiscoveryRuleManager::delete(array_keys($del_rules));
 		}
 
 		// delete the items
-		$del_items = API::Item()->get([
-			'output' => [],
-			'templateids' => $templateids,
-			'nopermissions' => true,
+		$db_items = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+				'type' => CItem::SUPPORTED_ITEM_TYPES
+			],
 			'preservekeys' => true
 		]);
-		if ($del_items) {
-			CItemManager::delete(array_keys($del_items));
+
+		if ($db_items) {
+			CItem::deleteForce($db_items);
 		}
 
 		// delete host from maps
@@ -616,15 +629,15 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids
 		]);
 
-		// http tests
-		$delHttpTests = API::HttpTest()->get([
-			'templateids' => $templateids,
-			'output' => ['httptestid'],
-			'nopermissions' => 1,
+		// delete web scenarios
+		$db_httptests = DB::select('httptest', [
+			'output' => ['httptestid', 'name'],
+			'filter' => ['hostid' => $templateids],
 			'preservekeys' => true
 		]);
-		if (!empty($delHttpTests)) {
-			API::HttpTest()->delete(array_keys($delHttpTests), true);
+
+		if ($db_httptests) {
+			CHttpTest::deleteForce($db_httptests);
 		}
 
 		// Get host prototype operations from LLD overrides where this template is linked.
