@@ -459,7 +459,6 @@ window.widget_svggraph_form = new class {
 			widget_svggraph_form.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
 				'ds'
 			);
-
 			widget_svggraph_form._updateForm();
 			widget_svggraph_form._updatePreview();
 		});
@@ -720,7 +719,6 @@ window.widget_svggraph_form = new class {
 
 			const legend_label = dataset.querySelector(`[name="ds[${dataset_index}][legend_label]"]`);
 			const dataset_number = parseInt(dataset_index) + 1;
-
 			legend_label.placeholder = 'Data set #'+dataset_number;
 		}
 
@@ -728,7 +726,6 @@ window.widget_svggraph_form = new class {
 
 		datasets.forEach(function (dataset, i) {
 			var legend_label = dataset.querySelector(`[name="ds[${i}][legend_label]"]`);
-
 			dataset.firstChild.textContent = legend_label.value
 				? legend_label.value
 				: legend_label.placeholder;
