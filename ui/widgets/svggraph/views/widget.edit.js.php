@@ -728,12 +728,14 @@ window.widget_svggraph_form = new class {
 			legend_label.placeholder = 'Data set #'+dataset_number;
 		}
 
-		const datasets = this._dataset_wrapper.querySelectorAll('[data-set]');
+		const datasets = this._dataset_wrapper.querySelectorAll('li[data-set]');
 
-		datasets.forEach(function (element, i) {
-			element.firstChild.textContent = element.querySelector(`[name="ds[${i}][legend_label]"]`).value
-				? element.querySelector(`[name="ds[${i}][legend_label]"]`).value
-				: element.querySelector(`[name="ds[${i}][legend_label]"]`).placeholder;
+		datasets.forEach(function (dataset, i) {
+			var legend_label = dataset.querySelector(`[name="ds[${i}][legend_label]"]`);
+
+			dataset.firstChild.textContent = legend_label.value
+				? legend_label.value
+				: legend_label.placeholder;
 		});
 
 		// Displaying options tab.
