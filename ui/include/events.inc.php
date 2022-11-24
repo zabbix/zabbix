@@ -817,7 +817,7 @@ function validateEventRankChangeToSymptom(array $eventids, string $cause_eventid
 
 	$dst_event = $events[$cause_eventid];
 
-	foreach ($eventids as $eventid => $foo) {
+	foreach (array_keys($eventids) as $eventid) {
 		$event = $events[$eventid];
 
 		// Given cause is being moved.

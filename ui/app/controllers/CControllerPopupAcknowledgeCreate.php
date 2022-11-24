@@ -62,7 +62,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	private $unsuppress;
 
 	/**
-	 * @var bool
+	 * @var int
 	 */
 	private $suppress_until;
 
@@ -367,9 +367,9 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 * @param string  $events[]['eventid']                             Event ID.
 	 * @param string  $events[]['objectid']                            Trigger ID that has generated particular event.
 	 * @param string  $events[]['r_eventid']                           Recovery event ID.
-	 * @param string  $events[]['acknowledged']                        Array containing previously performed actions.
+	 * @param string  $events[]['acknowledged']                        Indicates if event is acknowledged.
 	 * @param array   $editable_triggers[<triggerid>]                  Arrays containing editable trigger IDs as keys.
-	 * @param string  $editable_triggers[<triggerid>]['manual_close']  Trigger's manual_close configuration.
+	 * @param int     $editable_triggers[<triggerid>]['manual_close']  Trigger's manual_close configuration.
 	 *
 	 * @param array
 	 */
@@ -423,7 +423,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 * @param array  $event['acknowledges']                           List of problem updates.
 	 * @param string $event['acknowledges'][]['action']               Action performed in update.
 	 * @param array  $editable_triggers[<triggerid>]                  List of editable triggers.
-	 * @param string $editable_triggers[<triggerid>]['manual_close']  Trigger's manual_close configuration.
+	 * @param int    $editable_triggers[<triggerid>]['manual_close']  Trigger's manual_close configuration.
 	 *
 	 * @return bool
 	 */

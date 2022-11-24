@@ -107,9 +107,9 @@ class WidgetProblems extends CTableInfo {
 			($this->data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
 				? _x('Operational data', 'compact table header')
 				: null,
-				_x('Duration', 'compact table header'),
-				_x('Ack', 'compact table header'),
-				_x('Actions', 'compact table header'),
+			_x('Duration', 'compact table header'),
+			_x('Ack', 'compact table header'),
+			_x('Actions', 'compact table header'),
 			$this->data['fields']['show_tags'] ? _x('Tags', 'compact table header') : null
 		]));
 

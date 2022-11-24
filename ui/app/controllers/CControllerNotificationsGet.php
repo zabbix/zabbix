@@ -92,7 +92,7 @@ class CControllerNotificationsGet extends CController {
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => 'eventid',
 			'limit' => 15,
-			'preservekeys' => true,
+			'preservekeys' => true
 		];
 
 		$options += $this->settings['show_recovered']

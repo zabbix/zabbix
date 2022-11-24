@@ -833,7 +833,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 					fetch(curl.getUrl(), {
 						method: 'POST',
-						headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
+						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 						body: urlEncodeData({
 							eventids: [options.eventid],
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
@@ -849,7 +849,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 									true
 								));
 							}
-							else if('success' in response) {
+							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
 								$.publish('event.rank_change');
@@ -879,7 +879,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 					fetch(curl.getUrl(), {
 						method: 'POST',
-						headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
+						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 						body: urlEncodeData({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
@@ -896,7 +896,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 									true
 								));
 							}
-							else if('success' in response) {
+							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
 								const uncheckids = Object.keys(chkbxRange.getSelectedIds());

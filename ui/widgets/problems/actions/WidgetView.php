@@ -94,8 +94,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
-						'filter' => ['cause_eventid' => $problem['eventid']],
-						'countOutput' => true
+						'countOutput' => true,
+						'filter' => ['cause_eventid' => $problem['eventid']]
 					];
 
 					$problem['symptom_count'] = ($this->fields_values['show'] == TRIGGERS_OPTION_ALL)
@@ -139,7 +139,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$data['correlations'] += $symptom_data['correlations'];
 
 				foreach ($symptom_data['actions'] as $key => $actions) {
-					$data['actions'][$key] += $symptom_data['actions'][$key];
+					$data['actions'][$key] += $actions;
 				}
 
 				if ($symptom_data['triggers']) {
