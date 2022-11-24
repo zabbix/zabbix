@@ -1989,7 +1989,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 					snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
 
 					if (NULL != results)
-						zbx_strcpy_alloc(&results, &results_alloc, &results_offset, "\n");
+						zbx_chrcpy_alloc(&results, &results_alloc, &results_offset, '\n');
 
 					zbx_strcpy_alloc(&results, &results_alloc, &results_offset, buffer);
 
