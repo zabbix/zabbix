@@ -545,7 +545,10 @@ class ZBase {
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 
 		// Set the authentication token for the API.
-		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+		API::getWrapper()->auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => CWebUser::$data['sessionid']
+		];
 
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
