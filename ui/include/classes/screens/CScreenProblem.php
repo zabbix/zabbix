@@ -715,9 +715,8 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $problem['clock']            Timestamp of the current record.
 	 * @param int    $problem['symptom_count']    Problem symptom count.
 	 * @param bool   $nested                      True if this is a nested block.
-	 * @param bool   $widget                      When false add one more column.
 	 */
-	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested, $widget = false): void {
+	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested): void {
 		if ($data['sortorder'] === ZBX_SORT_UP) {
 			[$problem['clock'], $data['last_clock']] = [$data['last_clock'], $problem['clock']];
 		}
@@ -760,7 +759,7 @@ class CScreenProblem extends CScreenBase {
 				$colspan = 2;
 			}
 
-			if (!$widget) {
+			if (!($table instanceof widgets\problems\includes\WidgetProblems)) {
 				$colspan++;
 			}
 
@@ -1661,10 +1660,8 @@ class CScreenProblem extends CScreenBase {
 	 * @param bool       $data['show_timeline']                 "Show timeline" filter option.
 	 * @param bool       $data['show_three_columns']            True if 3 columns should be displayed.
 	 * @param bool       $data['show_two_columns']              True if 2 columns should be displayed.
-	 * @param bool       $widget                                When false, add one more column.
 	 */
-	public static function addSymptomLimitToTable(CTableInfo $table, array $problem, array $data,
-			$widget = false): void {
+	public static function addSymptomLimitToTable(CTableInfo $table, array $problem, array $data): void {
 		if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 			$row = (new CRow())
 				->addClass(ZBX_STYLE_NO_HOVER_PROBLEM_NESTED)
@@ -1690,7 +1687,7 @@ class CScreenProblem extends CScreenBase {
 					$colspan = 3;
 				}
 
-				if (!$widget) {
+				if (!($table instanceof widgets\problems\includes\WidgetProblems)) {
 					$colspan++;
 				}
 

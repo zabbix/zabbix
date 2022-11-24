@@ -55,7 +55,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'show_opdata' => $this->fields_values['show_opdata']
 		], $search_limit);
 
-
 		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $search_limit, $sortfield, $sortorder);
 

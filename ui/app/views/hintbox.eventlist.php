@@ -154,7 +154,7 @@ if (array_key_exists('problems', $data)) {
 
 		if ($data['show_timeline']) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, true);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 
