@@ -919,7 +919,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+		$data['template'] = makeItemTemplateHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}

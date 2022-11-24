@@ -787,37 +787,43 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 		];
 	}
 
-	// hostid => array('name' => name, 'macros' => array(macro => value), 'templateids' => array(templateid))
+	// hostid => array('name' => name, 'macros' => array(macro => value))
 	$hosts = [];
 
-	$templateids = $hostids;
+	$db_templates = API::Template()->get([
+		'output' => ['name'],
+		'selectMacros' => ['macro', 'value', 'description', 'type'],
+		'templateids' => $hostids,
+		'preservekeys' => true
+	]);
 
-	do {
-		$db_templates = API::Template()->get([
-			'output' => ['name'],
-			'selectParentTemplates' => ['templateid'],
-			'selectMacros' => ['macro', 'value', 'description', 'type'],
-			'templateids' => $templateids,
-			'preservekeys' => true
-		]);
+	foreach ($db_templates as $hostid => $db_template) {
+		$hosts[$hostid] = [
+			'templateid' => $hostid,
+			'name' => $db_template['name'],
+			'macros' => []
+		];
 
-		$templateids = [];
+		/*
+		* Global macros are overwritten by template macros and template macros are overwritten by host macros.
+		* Macros with contexts require additional checking for contexts, since {$MACRO:} is the same as
+		* {$MACRO:""}.
+		*/
+		foreach ($db_template['macros'] as $dbMacro) {
+			if (array_key_exists($dbMacro['macro'], $all_macros)) {
+				$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+					'value' => getMacroConfigValue($dbMacro),
+					'description' => $dbMacro['description'],
+					'type' => $dbMacro['type']
+				];
+				$all_macros[$dbMacro['macro']] = true;
+			}
+			else {
+				$user_macro_parser->parse($dbMacro['macro']);
+				$tpl_macro = $user_macro_parser->getMacro();
+				$tpl_context = $user_macro_parser->getContext();
 
-		foreach ($db_templates as $hostid => $db_template) {
-			$hosts[$hostid] = [
-				'templateid' => $hostid,
-				'name' => $db_template['name'],
-				'templateids' => zbx_objectValues($db_template['parentTemplates'], 'templateid'),
-				'macros' => []
-			];
-
-			/*
-			 * Global macros are overwritten by template macros and template macros are overwritten by host macros.
-			 * Macros with contexts require additional checking for contexts, since {$MACRO:} is the same as
-			 * {$MACRO:""}.
-			 */
-			foreach ($db_template['macros'] as $dbMacro) {
-				if (array_key_exists($dbMacro['macro'], $all_macros)) {
+				if ($tpl_context === null) {
 					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 						'value' => getMacroConfigValue($dbMacro),
 						'description' => $dbMacro['description'],
@@ -826,11 +832,33 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 					$all_macros[$dbMacro['macro']] = true;
 				}
 				else {
-					$user_macro_parser->parse($dbMacro['macro']);
-					$tpl_macro = $user_macro_parser->getMacro();
-					$tpl_context = $user_macro_parser->getContext();
+					$match_found = false;
 
-					if ($tpl_context === null) {
+					foreach ($global_macros as $global_macro => $global_value) {
+						$user_macro_parser->parse($global_macro);
+						$gbl_macro = $user_macro_parser->getMacro();
+						$gbl_context = $user_macro_parser->getContext();
+
+						if ($tpl_macro === $gbl_macro && $tpl_context === $gbl_context) {
+							$match_found = true;
+
+							unset($global_macros[$global_macro], $hosts[$hostid][$global_macro],
+								$all_macros[$global_macro]
+							);
+
+							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+								'value' => getMacroConfigValue($dbMacro),
+								'description' => $dbMacro['description'],
+								'type' => $dbMacro['type']
+							];
+							$all_macros[$dbMacro['macro']] = true;
+							$global_macros[$dbMacro['macro']] = $global_value;
+
+							break;
+						}
+					}
+
+					if (!$match_found) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
 							'value' => getMacroConfigValue($dbMacro),
 							'description' => $dbMacro['description'],
@@ -838,55 +866,10 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 						];
 						$all_macros[$dbMacro['macro']] = true;
 					}
-					else {
-						$match_found = false;
-
-						foreach ($global_macros as $global_macro => $global_value) {
-							$user_macro_parser->parse($global_macro);
-							$gbl_macro = $user_macro_parser->getMacro();
-							$gbl_context = $user_macro_parser->getContext();
-
-							if ($tpl_macro === $gbl_macro && $tpl_context === $gbl_context) {
-								$match_found = true;
-
-								unset($global_macros[$global_macro], $hosts[$hostid][$global_macro],
-									$all_macros[$global_macro]
-								);
-
-								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-									'value' => getMacroConfigValue($dbMacro),
-									'description' => $dbMacro['description'],
-									'type' => $dbMacro['type']
-								];
-								$all_macros[$dbMacro['macro']] = true;
-								$global_macros[$dbMacro['macro']] = $global_value;
-
-								break;
-							}
-						}
-
-						if (!$match_found) {
-							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
-								'value' => getMacroConfigValue($dbMacro),
-								'description' => $dbMacro['description'],
-								'type' => $dbMacro['type']
-							];
-							$all_macros[$dbMacro['macro']] = true;
-						}
-					}
 				}
 			}
 		}
-
-		foreach ($db_templates as $db_template) {
-			// only unprocessed templates will be populated
-			foreach ($db_template['parentTemplates'] as $template) {
-				if (!array_key_exists($template['templateid'], $hosts)) {
-					$templateids[$template['templateid']] = $template['templateid'];
-				}
-			}
-		}
-	} while ($templateids);
+	}
 
 	$all_templates = [];
 	$inherited_macros = [];
@@ -924,42 +907,27 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 		}
 
 		$templateids = $hostids;
+		natsort($templateids);
 
-		do {
-			natsort($templateids);
+		foreach ($templateids as $templateid) {
+			if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
+				$inherited_macro['template'] = [
+					'value' => $hosts[$templateid]['macros'][$macro]['value'],
+					'description' => $hosts[$templateid]['macros'][$macro]['description'],
+					'templateid' => $hosts[$templateid]['templateid'],
+					'name' => $hosts[$templateid]['name'],
+					'rights' => PERM_READ,
+					'type' => $hosts[$templateid]['macros'][$macro]['type']
+				];
 
-			foreach ($templateids as $templateid) {
-				if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
-					$inherited_macro['template'] = [
-						'value' => $hosts[$templateid]['macros'][$macro]['value'],
-						'description' => $hosts[$templateid]['macros'][$macro]['description'],
-						'templateid' => $hosts[$templateid]['templateid'],
-						'name' => $hosts[$templateid]['name'],
-						'rights' => PERM_READ,
-						'type' => $hosts[$templateid]['macros'][$macro]['type']
-					];
-
-					if (!array_key_exists($hosts[$templateid]['templateid'], $all_templates)) {
-						$all_templates[$hosts[$templateid]['templateid']] = [];
-					}
-					$all_templates[$hosts[$templateid]['templateid']][] = &$inherited_macro['template'];
-
-					break 2;
+				if (!array_key_exists($hosts[$templateid]['templateid'], $all_templates)) {
+					$all_templates[$hosts[$templateid]['templateid']] = [];
 				}
+				$all_templates[$hosts[$templateid]['templateid']][] = &$inherited_macro['template'];
+
+				break;
 			}
-
-			$parent_templateids = [];
-
-			foreach ($templateids as $templateid) {
-				if (array_key_exists($templateid, $hosts)) {
-					foreach ($hosts[$templateid]['templateids'] as $templateid) {
-						$parent_templateids[$templateid] = $templateid;
-					}
-				}
-			}
-
-			$templateids = $parent_templateids;
-		} while ($templateids);
+		}
 
 		$inherited_macros[$macro] = $inherited_macro;
 	}
@@ -1265,4 +1233,27 @@ function getHostDashboards(string $hostid, array $dashboard_fields = []): array 
  */
 function getMacroConfigValue(array $macro): string {
 	return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
+}
+
+/**
+ * Add host parent template IDs to input host ID array.
+ *
+ * @param array $hostids An array of host IDs.
+ *
+ * @return array
+ */
+function addHostParentTemplateIds(array $hostids): array {
+	$hosts = API::Host()->get([
+		'output' => [],
+		'selectParentTemplates' => ['templateid'],
+		'hostids' => $hostids
+	]);
+
+	$hostids = array_flip($hostids);
+
+	foreach ($hosts as $host) {
+		$hostids += array_column($host['parentTemplates'], 'templateid', 'templateid');
+	}
+
+	return array_keys($hostids);
 }

@@ -86,19 +86,17 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	);
 
 	// template list
-	if (empty($hostPrototype['templates'])) {
-		$hostTemplates = '';
+	if (!$hostPrototype['templates']) {
+		$host_templates = '';
 	}
 	else {
-		$hostTemplates = [];
+		$host_templates = [];
 		order_result($hostPrototype['templates'], 'name');
 
 		foreach ($hostPrototype['templates'] as $template) {
-			$caption = [];
-
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
-				$caption[] = (new CLink($template['name'],
+				$host_templates[] = (new CLink($template['name'],
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
@@ -107,41 +105,14 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 					->addClass(ZBX_STYLE_GREY);
 			}
 			else {
-				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+				$host_templates[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 			}
 
-			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
-			if ($linkedTemplates) {
-				order_result($linkedTemplates, 'name');
-
-				$caption[] = ' (';
-				foreach ($linkedTemplates as $tpl) {
-					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
-						$caption[] = (new CLink($tpl['name'],
-							(new CUrl('templates.php'))
-								->setArgument('form', 'update')
-								->setArgument('templateid', $tpl['templateid'])
-						))
-							->addClass(ZBX_STYLE_LINK_ALT)
-							->addClass(ZBX_STYLE_GREY);
-					}
-					else {
-						$caption[] = (new CSpan($tpl['name']))->addClass(ZBX_STYLE_GREY);
-					}
-
-					$caption[] = ', ';
-				}
-				array_pop($caption);
-
-				$caption[] = ')';
-			}
-
-			$hostTemplates[] = $caption;
-			$hostTemplates[] = ', ';
+			$host_templates[] = ', ';
 		}
 
-		if ($hostTemplates) {
-			array_pop($hostTemplates);
+		if ($host_templates) {
+			array_pop($host_templates);
 		}
 	}
 
@@ -179,7 +150,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
 		$name,
-		$hostTemplates,
+		$host_templates,
 		$status,
 		$discover,
 		$data['tags'][$hostPrototype['hostid']]

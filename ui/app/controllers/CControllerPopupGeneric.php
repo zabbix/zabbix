@@ -1604,8 +1604,8 @@ class CControllerPopupGeneric extends CController {
 					break;
 				}
 
-				if ($this->hasInput('with_inherited')) {
-					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
+				if ($context === 'host' && $this->hasInput('with_inherited')) {
+					$hostids = addHostParentTemplateIds($hostids);
 				}
 
 				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([

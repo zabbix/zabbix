@@ -331,35 +331,6 @@ foreach ($data['hosts'] as $host) {
 			];
 		}
 
-		$parent_templates = $data['templates'][$template['templateid']]['parentTemplates'];
-
-		if ($parent_templates) {
-			order_result($parent_templates, 'name');
-
-			$caption[] = ' (';
-
-			foreach ($parent_templates as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
-						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink(CHtml::encode($parent_template['name']),
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $parent_template['templateid'])
-					))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREY);
-				}
-				else {
-					$caption[] = (new CSpan(CHtml::encode($parent_template['name'])))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$caption[] = ', ';
-			}
-
-			array_pop($caption);
-			$caption[] = ')';
-		}
-
 		if ($hostTemplates) {
 			$hostTemplates[] = ', ';
 		}

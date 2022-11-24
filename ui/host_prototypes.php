@@ -625,30 +625,16 @@ else {
 
 	// Fetch templates linked to the prototypes.
 	$templateids = [];
+
 	foreach ($data['hostPrototypes'] as $hostPrototype) {
-		$templateids = array_merge($templateids, zbx_objectValues($hostPrototype['templates'], 'templateid'));
-	}
-	$templateids = array_keys(array_flip($templateids));
-
-	$linkedTemplates = API::Template()->get([
-		'output' => ['templateid', 'name'],
-		'selectParentTemplates' => ['templateid', 'name'],
-		'templateids' => $templateids
-	]);
-	$data['linkedTemplates'] = zbx_toHash($linkedTemplates, 'templateid');
-
-	foreach ($data['linkedTemplates'] as $linked_template) {
-		foreach ($linked_template['parentTemplates'] as $parent_template) {
-			$templateids[] = $parent_template['templateid'];
-		}
+		$templateids += array_column($hostPrototype['templates'], 'templateid', 'templateid');
 	}
 
-	// Select writable template IDs.
 	$data['writable_templates'] = [];
 
 	if ($templateids) {
 		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
+			'output' => [],
 			'templateids' => $templateids,
 			'editable' => true,
 			'preservekeys' => true

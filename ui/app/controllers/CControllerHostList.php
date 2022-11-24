@@ -267,18 +267,14 @@ class CControllerHostList extends CController {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
-		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
 
 		foreach ($hosts as $host) {
-			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
+			$templateids += array_column($host['parentTemplates'], 'templateid', 'templateid');
 		}
-
-		$templateids = array_keys(array_flip($templateids));
 
 		$templates = API::Template()->get([
 			'output' => ['templateid', 'name'],
-			'selectParentTemplates' => ['templateid', 'name'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -286,13 +282,9 @@ class CControllerHostList extends CController {
 		$writable_templates = [];
 
 		if ($templateids) {
-			foreach ($templates as $template) {
-				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
-			}
-
 			$writable_templates = API::Template()->get([
-				'output' => ['templateid'],
-				'templateids' => array_keys(array_flip($templateids)),
+				'output' => [],
+				'templateids' => $templateids,
 				'editable' => true,
 				'preservekeys' => true
 			]);

@@ -52,10 +52,10 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (!empty($data['templates'])) {
+if (!empty($data['template'])) {
 	$item_tab->addItem([
-		new CLabel(_('Parent items')),
-		new CFormField($data['templates'])
+		new CLabel(_('Parent item')),
+		new CFormField($data['template'])
 	]);
 }
 

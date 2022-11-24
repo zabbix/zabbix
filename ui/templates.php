@@ -33,10 +33,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
@@ -66,7 +62,6 @@ $fields = [
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
-	'filter_templates' =>  [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
 	'filter_groups'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,		null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
 								IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
@@ -124,22 +119,7 @@ $macros = array_filter($macros, function($macro) {
 /*
  * Actions
  */
-if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
-	$unlinkTemplates = [];
-
-	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
-		$unlinkTemplates = array_keys(getRequest('unlink'));
-	}
-	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
-		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
-		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
-	}
-
-	foreach ($unlinkTemplates as $id) {
-		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
-	}
-}
-elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
+if (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
 	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
 
 	$groups = getRequest('groups', []);
@@ -235,13 +215,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$groups = array_merge($groups, $new_groupid['groupids']);
 		}
 
-		// Linked templates.
-		$templates = [];
-
-		foreach (array_merge(getRequest('templates', []), getRequest('add_templates', [])) as $templateid) {
-			$templates[] = ['templateid' => $templateid];
-		}
-
 		$template_name = getRequest('template_name', '');
 
 		// create / update template
@@ -250,7 +223,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => (getRequest('visiblename', '') === '') ? $template_name : getRequest('visiblename'),
 			'description' => getRequest('description', ''),
 			'groups' => zbx_toObject($groups, 'groupid'),
-			'templates' => $templates,
 			'tags' => $tags,
 			'macros' => $macros
 		];
@@ -266,13 +238,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 		else {
-			$templates_clear = array_diff(
-				getRequest('clear_templates', []),
-				getRequest('add_templates', [])
-			);
-
 			$template['templateid'] = $input_templateid;
-			$template['templates_clear'] = zbx_toObject($templates_clear, 'templateid');
 
 			$result = API::Template()->update($template);
 
@@ -424,23 +390,6 @@ elseif (hasRequest('templateid') && hasRequest('delete')) {
 			}
 		}
 
-		$templates = API::Template()->get([
-			'output' => [],
-			'parentTemplateids' => getRequest('templateid'),
-			'preservekeys' => true
-		]);
-
-		if ($templates) {
-			$result = API::Template()->massRemove([
-				'templateids' => array_keys($templates),
-				'templateids_link' => getRequest('templateid')
-			]);
-
-			if (!$result) {
-				throw new Exception();
-			}
-		}
-
 		$result = API::Template()->delete([getRequest('templateid')]);
 
 		$result = DBend($result);
@@ -494,23 +443,6 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 					throw new Exception();
 				}
 			}
-
-			$templates = API::Template()->get([
-				'output' => [],
-				'parentTemplateids' => $templateids,
-				'preservekeys' => true
-			]);
-
-			if ($templates) {
-				$result = API::Template()->massRemove([
-					'templateids' => array_keys($templates),
-					'templateids_link' => $templateids
-				]);
-
-				if (!$result) {
-					throw new Exception();
-				}
-			}
 		}
 
 		$result = API::Template()->delete($templateids);
@@ -545,9 +477,6 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
-		'linked_templates' => [],
-		'add_templates' => [],
-		'original_templates' => [],
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,
@@ -559,17 +488,12 @@ if (hasRequest('form')) {
 		$dbTemplates = API::Template()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectTemplateGroups' => ['groupid'],
-			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 			'templateids' => $data['templateid']
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
-
-		foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
-			$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
-		}
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
@@ -592,39 +516,9 @@ if (hasRequest('form')) {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 
-	// Add already linked and new templates.
-	$templates = [];
-	$request_linked_templates = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
-	$request_add_templates = getRequest('add_templates', []);
-
-	if ($request_linked_templates || $request_add_templates) {
-		$templates = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => array_merge($request_linked_templates, $request_add_templates),
-			'preservekeys' => true
-		]);
-
-		$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
-		CArrayHelper::sort($data['linked_templates'], ['name']);
-
-		$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
-
-		foreach ($data['add_templates'] as &$template) {
-			$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
-		}
-		unset($template);
-	}
-
-	$data['writable_templates'] = API::Template()->get([
-		'output' => ['templateid'],
-		'templateids' => array_keys($data['linked_templates']),
-		'editable' => true,
-		'preservekeys' => true
-	]);
-
-	// Add inherited macros to template macros.
+	// Add global macros to template macros.
 	if ($data['show_inherited_macros']) {
-		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
+		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros([]));
 	}
 
 	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
@@ -708,17 +602,8 @@ if (hasRequest('form')) {
 	}
 	CArrayHelper::sort($data['groups_ms'], ['name']);
 
-	// This data is used in common.template.edit.js.php.
-	$data['macros_tab'] = [
-		'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
-		'add_templates' => array_map('strval', array_keys($data['add_templates']))
-	];
-
 	$data['template_name'] = getRequest('template_name', '');
 	$data['visible_name'] = getRequest('visiblename', '');
-
-	$templateids = getRequest('templates', []);
-	$clear_templates = getRequest('clear_templates', []);
 
 	if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
 		$data['template_name'] = $data['dbTemplate']['host'];
@@ -728,14 +613,7 @@ if (hasRequest('form')) {
 		if ($data['visible_name'] === $data['template_name']) {
 			$data['visible_name'] = '';
 		}
-
-		$templateids = $data['original_templates'];
 	}
-
-	$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
-	$clear_templates = array_diff($clear_templates, array_keys($templateids));
-
-	$data['clear_templates'] = $clear_templates;
 
 	$view = new CView('configuration.template.edit', $data);
 }
@@ -749,7 +627,6 @@ else {
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-		CProfile::updateArray('web.templates.filter_templates', getRequest('filter_templates', []), PROFILE_TYPE_ID);
 		CProfile::updateArray('web.templates.filter_groups', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::update('web.templates.filter.evaltype', getRequest('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
 			PROFILE_TYPE_INT
@@ -771,7 +648,6 @@ else {
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.templates.filter_name');
-		CProfile::deleteIdx('web.templates.filter_templates');
 		CProfile::deleteIdx('web.templates.filter_groups');
 		CProfile::delete('web.templates.filter.evaltype');
 		CProfile::deleteIdx('web.templates.filter.tags.tag');
@@ -781,7 +657,6 @@ else {
 
 	$filter = [
 		'name' => CProfile::get('web.templates.filter_name', ''),
-		'templates' => CProfile::getArray('web.templates.filter_templates', null),
 		'groups' => CProfile::getArray('web.templates.filter_groups', null),
 		'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 		'tags' => []
@@ -794,14 +669,6 @@ else {
 			'operator' => CProfile::get('web.templates.filter.tags.operator', null, $i)
 		];
 	}
-
-	$filter['templates'] = $filter['templates']
-		? CArrayHelper::renameObjectsKeys(API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $filter['templates'],
-			'preservekeys' => true
-		]), ['templateid' => 'id'])
-		: [];
 
 	// Get template groups.
 	$filter['groups'] = $filter['groups']
@@ -827,7 +694,6 @@ else {
 		'search' => [
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
-		'parentTemplateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 		'groupids' => $filter_groupids,
 		'editable' => true,
 		'sortfield' => $sortField,
@@ -854,8 +720,6 @@ else {
 	$templates = API::Template()->get([
 		'output' => ['templateid', 'name'],
 		'selectHosts' => ['hostid'],
-		'selectTemplates' => ['templateid', 'name'],
-		'selectParentTemplates' => ['templateid', 'name'],
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
@@ -863,38 +727,22 @@ else {
 		'selectDashboards' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectTags' => ['tag', 'value'],
-		'templateids' => zbx_objectValues($templates, 'templateid'),
+		'templateids' => array_column($templates, 'templateid'),
 		'editable' => true,
 		'preservekeys' => true
 	]);
 
 	order_result($templates, $sortField, $sortOrder);
 
-	// Select editable templates:
-	$linked_templateids = [];
-	$editable_templates = [];
 	$linked_hostids = [];
 	$editable_hosts = [];
+
 	foreach ($templates as &$template) {
-		order_result($template['templates'], 'name');
-		order_result($template['parentTemplates'], 'name');
-
-		$linked_templateids += array_flip(array_column($template['parentTemplates'], 'templateid'));
-		$linked_templateids += array_flip(array_column($template['templates'], 'templateid'));
-
 		$template['hosts'] = array_flip(array_column($template['hosts'], 'hostid'));
 		$linked_hostids += $template['hosts'];
 	}
 	unset($template);
 
-	if ($linked_templateids) {
-		$editable_templates = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($linked_templateids),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-	}
 	if ($linked_hostids) {
 		$editable_hosts = API::Host()->get([
 			'output' => ['hostid'],
@@ -911,7 +759,6 @@ else {
 		'filter' => $filter,
 		'sortField' => $sortField,
 		'sortOrder' => $sortOrder,
-		'editable_templates' => $editable_templates,
 		'editable_hosts' => $editable_hosts,
 		'profileIdx' => 'web.templates.filter',
 		'active_tab' => CProfile::get('web.templates.filter.active', 1),

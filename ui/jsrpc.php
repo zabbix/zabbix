@@ -527,8 +527,8 @@ switch ($data['method']) {
 
 				$hostids = $data['hostids'];
 
-				if (array_key_exists('with_inherited', $data)) {
-					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $data['context']);
+				if ($data['context'] === 'host' && array_key_exists('with_inherited', $data)) {
+					$hostids = addHostParentTemplateIds($hostids);
 				}
 
 				$result = API::ValueMap()->get([
