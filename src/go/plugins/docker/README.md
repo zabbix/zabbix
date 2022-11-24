@@ -3,15 +3,15 @@ This plugin provides a native solution to monitor Docker
 containers and images by Zabbix. 
 The plugin can monitor docker instances with Zabbix agent 2 using docker socket
 and querying docker API. It can be used in conjunction with the official 
-[Docker template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/docker) 
+[Docker template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/docker). 
 You can extend it or create your own template to cater specific needs.
 
 ## Requirements
-* Zabbix agent 2;
-* Go >= 1.18 (required only to build from source);
+* Zabbix agent 2
+* Go >= 1.18 (required only to build from source)
 
 ## Tested versions
-* Docker, version 19.03.5.
+* Docker, version 19.03.5
 
 ## Installation
 The plugin is supplied as an out-of-box part of Zabbix agent 2 and 
@@ -23,10 +23,10 @@ Now, you need to make sure that a Docker instance is available.
 Open Zabbix agent 2 docker configuration file `zabbix_agent2.conf` and 
 set the required parameters.
 
-**Plugins.Docker.Endpoint** — Docker API endpoint.
+**Plugins.Docker.Endpoint** — the Docker API endpoint.
 *Default value:* `unix:///var/run/docker.sock`    
  
-**Plugins.Docker.Timeout** — The maximum time (in seconds) for 
+**Plugins.Docker.Timeout** — the maximum time (in seconds) for 
 waiting when a request has to be done.
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
@@ -38,11 +38,11 @@ default hard-coded values will be used instead.
 ## Supported keys
 **docker.container_info[\<Container\>]** — returns low-level information about a container.
 *Parameters:*  
-Container (required) — container name.
+Container (required) — a container name.
 
 **docker.container_stats[\<Container\>]** — returns near real-time statistics for a given container.
 *Parameters:*
-Container (required) — container name.
+Container (required) — a container name.
 
 **docker.containers[]** — returns a list of containers.
 
@@ -53,7 +53,7 @@ All (not required; default: false) — returns all containers (true) or only run
 
 **docker.images[]** — returns a list of images.
 
-**docker.images.discovery[]** — returns a list of images, used in low-level discovery rules.
+**docker.images.discovery[]** — returns a list of images used in low-level discovery rules.
 
 **docker.info[]** — returns the information about the docker server.
 
@@ -61,7 +61,7 @@ All (not required; default: false) — returns all containers (true) or only run
 
 **docker.ping[]** — pings the server and returns 0 or 1.
 *Returns:*
-- "1" if the connection is alive.
+- "1" if the connection is alive;
 - "0" if the connection is broken (is returned if there is any error during the test, or the response is not "OK").
 
 ## Troubleshooting
