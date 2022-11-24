@@ -1,3 +1,5 @@
+<?php
+declare(strict_types=0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,9 +19,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SELFMON_H
-#define ZABBIX_SELFMON_H
 
-int	get_component_process_type_forks(unsigned char proc_type);
+namespace Zabbix\Widgets\Fields;
 
-#endif
+class CWidgetFieldMultiSelectUser extends CWidgetFieldMultiSelect
+{
+
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_USER);
+	}
+}

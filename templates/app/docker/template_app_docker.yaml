@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:33:17Z'
   template_groups:
     -
@@ -2241,7 +2241,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2256,7 +2256,7 @@ zabbix_export:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Containers'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2272,7 +2272,7 @@ zabbix_export:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Size'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2288,7 +2288,7 @@ zabbix_export:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Memory total'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2305,7 +2305,7 @@ zabbix_export:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Goroutines'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'

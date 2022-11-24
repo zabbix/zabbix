@@ -1631,6 +1631,9 @@ FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
 FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
 FIELD		|value_serviceid|t_id		|	|NULL		|0			|7|services	|serviceid
 FIELD		|value_slaid	|t_id		|	|NULL		|0			|8|sla		|slaid
+FIELD		|value_userid	|t_id		|	|NULL		|0			|9|users	|userid
+FIELD		|value_actionid	|t_id		|	|NULL		|0			|10|actions	|actionid
+FIELD		|value_mediatypeid|t_id		|	|NULL		|0			|11|media_type	|mediatypeid
 INDEX		|1		|widgetid
 INDEX		|2		|value_groupid
 INDEX		|3		|value_hostid
@@ -1639,6 +1642,9 @@ INDEX		|5		|value_graphid
 INDEX		|6		|value_sysmapid
 INDEX		|7		|value_serviceid
 INDEX		|8		|value_slaid
+INDEX		|9		|value_userid
+INDEX		|10		|value_actionid
+INDEX		|11		|value_mediatypeid
 
 TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
@@ -2058,4 +2064,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030138	|6030138
+ROW		|1		|6030148	|6030148

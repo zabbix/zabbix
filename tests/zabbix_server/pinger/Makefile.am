@@ -62,7 +62,6 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself_server.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -81,7 +80,7 @@ zbx_pinger_test_SOURCES = \
 	../../zbxmockdir.c
 
 zbx_pinger_test_LDADD = $(PINGER_LIBS)
-zbx_pinger_test_LDADD += @SERVER_LIBS@ 
+zbx_pinger_test_LDADD += @SERVER_LIBS@
 zbx_pinger_test_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_pinger_test_CFLAGS = \

@@ -7518,6 +7518,27 @@ return [
 				'length' => 20,
 				'ref_table' => 'sla',
 				'ref_field' => 'slaid'
+			],
+			'value_userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'value_actionid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'actions',
+				'ref_field' => 'actionid'
+			],
+			'value_mediatypeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'media_type',
+				'ref_field' => 'mediatypeid'
 			]
 		]
 	],

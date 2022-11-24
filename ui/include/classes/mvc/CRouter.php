@@ -47,6 +47,8 @@ class CRouter {
 		// action									controller												layout					view
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
+		'actionlog.csv'								=> ['CControllerActionLogList',							'layout.csv',			'reports.actionlog.list.csv'],
+		'actionlog.list'							=> ['CControllerActionLogList',							'layout.htmlpage',		'reports.actionlog.list'],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> ['CControllerAuditSettingsUpdate',					null,					null],
 		'auditlog.list'								=> ['CControllerAuditLogList',							'layout.htmlpage',		'reports.auditlog.list'],
@@ -311,7 +313,6 @@ class CRouter {
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
-		'auditacts.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
 		'chart2.php'					=> ['CLegacyAction', null, null],
