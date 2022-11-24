@@ -268,7 +268,6 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache)
 
 int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, char **error)
 {
-	int	ret = FAIL;
 	char	*data2, *token, *saveptr;
 	size_t	line_number = 1;
 
@@ -292,17 +291,21 @@ int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, c
 					line_number);
 
 			zbx_hashset_destroy(&cache->pairs);
+			zbx_free(oid);
 			return FAIL;
 		}
 
 		pair.oid = oid;
 		pair.value = snmp_walk_convert_value(raw_value, 0);
 		zbx_hashset_insert(&cache->pairs, &pair, sizeof(zbx_snmp_value_pair_t));
+
+		zbx_free(raw_value);
+		token = strtok_r(NULL, "\n", &saveptr);
 	}
 
 	zbx_free(data2);
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
