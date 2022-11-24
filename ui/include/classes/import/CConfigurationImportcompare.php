@@ -70,7 +70,7 @@ class CConfigurationImportcompare {
 		$this->unique_fields_keys_by_type = [
 			'template_groups' => ['name'],
 			'host_groups' => ['name'],
-			'templates' => ['name'],
+			'templates' => ['template'],
 			'items' => ['name', 'key'],
 			'triggers' => ['name', 'expression', 'recovery_expression'],
 			'dashboards' => ['name'],
