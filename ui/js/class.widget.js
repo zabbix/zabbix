@@ -346,6 +346,10 @@ class CWidget extends CBaseComponent {
 		this._fields = fields;
 	}
 
+	getWidgetId() {
+		return this._widgetid;
+	}
+
 	_hasPadding() {
 		return this._view_mode != ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 	}

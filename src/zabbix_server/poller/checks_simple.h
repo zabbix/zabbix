@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_SIMPLE_H
 #define ZABBIX_CHECKS_SIMPLE_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "module.h"
 #include "zbxalgo.h"
 

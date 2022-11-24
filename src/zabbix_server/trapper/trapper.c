@@ -52,8 +52,6 @@ static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
 
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
-extern int	CONFIG_CONFSYNCER_FORKS;
-
 typedef struct
 {
 	zbx_counter_value_t	online;
@@ -74,6 +72,13 @@ typedef struct
 	zbx_uint64_t	value;
 }
 zbx_entry_attribute_t;
+
+typedef enum
+{
+	ZBX_COUNTER_TYPE_UI64,
+	ZBX_COUNTER_TYPE_DBL
+}
+zbx_counter_type_t;
 
 typedef struct
 {

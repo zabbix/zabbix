@@ -178,7 +178,7 @@ $event_tab = (new CDiv([
 			->setId(SECTION_HAT_EVENTLIST)
 			->setHeader(new CTag('h4', true, _('Event list [previous 20]')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state')
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true)),
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true))
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)

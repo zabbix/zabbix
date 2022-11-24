@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-26 08:28+0000\n"
-"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
+"PO-Revision-Date: 2022-11-04 08:52+0000\n"
+"Last-Translator: Krejcik Tomas <tkrejcik@sysma.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -286,6 +286,11 @@ msgstr "%1$s, vybrané"
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
 msgstr "%1$s. %2$s: %3$s. %4$s."
+
+#: include/classes/core/CModuleManager.php:153
+#, c-format
+msgid "%1$s.php class must extend %2$s for module located at %3$s."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -920,6 +925,10 @@ msgstr "Přidat nový widget"
 msgid "Add child element"
 msgstr "Přidat podřízený prvek"
 
+#: widgets/navtree/Widget.php:39
+msgid "Add child elements"
+msgstr ""
+
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
 msgstr "Přidat podřízenou službu"
@@ -1246,6 +1255,36 @@ msgstr "Množství fyzické paměti hosta, která je odložena do odkládacího 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Množství fyzické paměti hostitele spotřebované pro zálohování stránek fyzické paměti hosta, <url> – URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware"
+
+#: include/classes/api/services/CItemGeneral.php:1544
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1543
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1538
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1537
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1532
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1531
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -2152,9 +2191,28 @@ msgstr "Nelze přidat uživatelskou skupinu"
 msgid "Cannot add web scenario"
 msgstr "Není možné přidat webový scénář"
 
+#: jsLoader.php:129
+msgid "Cannot add widget: no widgets available."
+msgstr ""
+
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr "Widget nelze přidat: na řídicím panelu není dostatek volného místa."
+
+#: include/classes/api/services/CItem.php:1532
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2228,6 +2286,16 @@ msgid_plural "Cannot copy items"
 msgstr[0] "Není možné kopírovat položku"
 msgstr[1] "Není možné kopírovat položky"
 msgstr[2] "Není možné kopírovat položky"
+
+#: include/classes/api/services/CDiscoveryRule.php:2475
+#, c-format
+msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:590
+#, c-format
+msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2880,6 +2948,16 @@ msgstr "Nelze najít skupinu \"%1$s\" pro prototyp hosta \"%2$s\" zjišťovacíh
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Nelze najít hostitelské rozhraní na \"%1$s\" pro klíč položky \"%2$s\"."
 
+#: include/classes/api/services/CDiscoveryRule.php:2517
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:640
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2997,6 +3075,205 @@ msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not 
 msgstr[0] "Není možné importovat šablonu \"%1$s\", připojená šablona \"%2$s\" neexistuje."
 msgstr[1] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2$s\" neexistují."
 msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2$s\" neexistují."
+
+#: include/classes/api/services/CItemGeneral.php:588
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:589
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:704
+#: include/classes/api/services/CItemGeneral.php:716
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1030
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:710
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:769
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:711
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:770
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1230
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1231
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#: include/classes/api/services/CItemGeneral.php:737
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1034
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:731
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:775
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#: include/classes/api/services/CItemGeneral.php:738
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:732
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:776
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:582
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:583
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1455
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1454
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:695
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1026
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:683
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:689
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:763
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1509
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:696
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:690
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:764
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1508
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:576
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:577
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3135,6 +3412,10 @@ msgstr "Není možné hromadně aktualizovat zobrazované jméno hosta."
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr "Není možné vykonat vícenásobné linkovaní šablon s ID: %1$s."
 
+#: jsLoader.php:130
+msgid "Cannot paste inaccessible widget."
+msgstr ""
+
 #: include/classes/db/DB.php:958
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
@@ -3220,6 +3501,46 @@ msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nelze nastavit \"%1$s\" pro položku \"%2$s\"."
+
+#: include/classes/api/services/CItemGeneral.php:2237
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2236
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2231
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2230
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2226
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2225
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2220
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2219
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -4075,7 +4396,7 @@ msgstr "Komprimace"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "Komprese není podporována."
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4141,7 +4462,7 @@ msgstr "Nastavení akcí"
 
 #: app/controllers/CControllerAuditSettingsEdit.php:60
 msgid "Configuration of audit log"
-msgstr ""
+msgstr "Konfigurace auditního logu"
 
 #: app/controllers/CControllerAuthenticationEdit.php:196
 msgid "Configuration of authentication"
@@ -4241,7 +4562,7 @@ msgstr "Nastavení skriptů"
 
 #: app/controllers/CControllerTemplateGroupEdit.php:88
 msgid "Configuration of template group"
-msgstr ""
+msgstr "Konfigurace šablony"
 
 #: app/controllers/CControllerTemplateGroupList.php:123
 msgid "Configuration of template groups"
@@ -5261,7 +5582,7 @@ msgstr "Den"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr ""
+msgstr "Den"
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5336,7 +5657,7 @@ msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:134
 msgid "Default LDAP server must be specified."
-msgstr ""
+msgstr "Výchozí LDAP server musí být definován."
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
@@ -5557,7 +5878,7 @@ msgstr "Smazat vybranou smlouvu SLA?"
 
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
-msgstr ""
+msgstr "Smazat vybraná SLAs?"
 
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
@@ -5700,7 +6021,7 @@ msgstr "Smazat vybrané tvary?"
 #: app/views/js/configuration.templategroup.list.js.php:70
 #: app/views/popup.templategroup.edit.php:50
 msgid "Delete selected template group?"
-msgstr ""
+msgstr "Smazat vybranou šablonu?"
 
 #: app/views/js/configuration.templategroup.list.js.php:69
 msgid "Delete selected template groups?"
@@ -6599,7 +6920,7 @@ msgstr "E-mail"
 
 #: app/views/js/administration.mediatype.edit.js.php:397
 msgid "Email and password"
-msgstr ""
+msgstr "Email a heslo"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Email provider"
@@ -9218,6 +9539,25 @@ msgstr "Nepřístupný uživatel"
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
 msgstr "Nepřístupná uživatelská skupina"
+
+#: jsLoader.php:147 jsLoader.php:175
+msgid "Inaccessible widget"
+msgstr ""
+
+#: app/controllers/CControllerDashboardWidgetCheck.php:52
+#: app/controllers/CControllerDashboardWidgetEdit.php:65
+#: include/classes/helpers/CDashboardHelper.php:453
+#: include/classes/helpers/CDashboardHelper.php:461
+msgid "Inaccessible widget type."
+msgstr ""
+
+#: jsLoader.php:138
+msgid "Inaccessible widgets were not copied."
+msgstr ""
+
+#: jsLoader.php:139
+msgid "Inaccessible widgets were not pasted."
+msgstr ""
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -13840,7 +14180,7 @@ msgstr "Ok"
 #: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13940,11 +14280,11 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
-msgstr ""
+msgstr "Otevřít v novém okně"
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Otevřít log"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -14441,6 +14781,10 @@ msgstr "Stránka %1$d"
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
 msgstr "Doba zobrazení stránky"
+
+#: include/classes/core/ZBase.php:565
+msgid "Page not found"
+msgstr ""
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -16917,7 +17261,7 @@ msgstr ""
 #: include/classes/api/services/CService.php:1519
 #, c-format
 msgid "Service \"%1$s\" cannot have problem tags and children at the same time."
-msgstr ""
+msgstr "Služba \"%1$s\" nemůže mít problémy v tagech a zároveň v podřízených službách."
 
 #: include/classes/helpers/CMenuHelper.php:83
 #: include/classes/helpers/CRoleHelper.php:352
@@ -21213,6 +21557,11 @@ msgstr "Pracovní doba"
 msgid "Write"
 msgstr "Zápis"
 
+#: include/classes/core/CModuleManager.php:136
+#, c-format
+msgid "Wrong %1$s.php class name for module located at %2$s."
+msgstr ""
+
 #: include/classes/core/CModuleManager.php:203
 #, c-format
 msgid "Wrong Module.php class name for module located at %1$s."
@@ -21757,6 +22106,14 @@ msgstr "vše"
 msgid "all media"
 msgstr "všechny média"
 
+#: include/classes/api/services/CItemGeneral.php:1877
+msgid "allowed count of dependency levels would be exceeded"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1888
+msgid "allowed count of dependent items would be exceeded"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr ""
@@ -21824,6 +22181,18 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:677
 msgid "an integer is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1806
+#: include/classes/api/services/CItemGeneral.php:1827
+#: include/classes/api/services/CItemGeneral.php:1930
+msgid "an item ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1805
+#: include/classes/api/services/CItemGeneral.php:1826
+#: include/classes/api/services/CItemGeneral.php:1929
+msgid "an item/item prototype ID is expected"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:716
@@ -21979,6 +22348,22 @@ msgstr "vypočítáno"
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:2383
+msgid "cannot be a value map ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1942
+msgid "cannot be an item ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1956
+msgid "cannot be an item prototype ID from another LLD rule"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1941
+msgid "cannot be an item/item prototype ID from another host or template"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
 msgstr "nemůže být změněno"
@@ -22079,6 +22464,10 @@ msgstr "nemůže být změněno"
 msgid "cannot be empty"
 msgstr "nemůže být prázdný"
 
+#: include/classes/validators/CApiInputValidator.php:3560
+msgid "cannot be equal to zero without custom intervals"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -22090,6 +22479,10 @@ msgstr ""
 msgid "cannot be specified the value of parameter \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:1658
+msgid "cannot be the host interface ID from another host"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
 msgstr ""
@@ -22097,6 +22490,14 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
 msgstr "nelze převést na JSON, výsledná hodnota je příliš dlouhá"
+
+#: include/classes/api/services/CItem.php:899
+msgid "cannot delete inherited item"
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:810
+msgid "cannot delete inherited item prototype"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -22525,6 +22926,10 @@ msgctxt "event source"
 msgid "internal"
 msgstr "interní"
 
+#: include/classes/validators/CApiInputValidator.php:4155
+msgid "invalid Prometheus label"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
 msgid "invalid Prometheus output"
@@ -22910,6 +23315,14 @@ msgstr ""
 msgid "must contain at least one special character"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:3818
+msgid "must have a polling interval not blocked by non-active interval periods"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:3653
+msgid "must have at least one interval greater than 0"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150
 #: include/classes/validators/CPasswordComplexityValidator.php:108
@@ -22999,6 +23412,10 @@ msgstr ""
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:3681
+msgid "non-active intervals cannot fill the entire time"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
 #: include/classes/widgets/CWidgetHelper.php:1285 include/graphs.inc.php:74
@@ -23073,6 +23490,11 @@ msgstr "pryč"
 #: include/classes/setup/CFrontendSetup.php:626
 msgid "on"
 msgstr "na"
+
+#: include/classes/validators/CApiInputValidator.php:2388
+#, c-format
+msgid "only one object can exist within the combinations of %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -23387,6 +23809,18 @@ msgstr ""
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "šablona ID \"%1$s\" je použitá %2$s krát"
 
+#: include/classes/api/services/CItemGeneral.php:1577
+#: include/classes/api/services/CItemGeneral.php:1594
+#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1652
+msgid "the host interface ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1668
+#, c-format
+msgid "the host interface ID of type \"%1$s\" is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr ""
@@ -23630,6 +24064,11 @@ msgstr "nepodporovaná časová přípona"
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
 msgstr "nepodporované číslo verze"
+
+#: include/classes/validators/CApiInputValidator.php:3626
+#, c-format
+msgid "update interval \"%1$s\" is longer than period \"%2$s\""
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"

@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 struct pst_static	pst;
 struct pst_dynamic	pdy;
 

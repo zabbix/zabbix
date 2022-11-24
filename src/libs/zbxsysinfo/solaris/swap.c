@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get swap usage statistics                                         *

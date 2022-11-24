@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_INTERNAL_H
 #define ZABBIX_CHECKS_INTERNAL_H
 
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxcomms.h"
 
 extern int	CONFIG_SERVER_STARTUP_TIME;

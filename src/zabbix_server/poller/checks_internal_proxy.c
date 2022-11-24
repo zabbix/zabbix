@@ -18,7 +18,7 @@
 **/
 
 #include "zbxcommon.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "checks_internal.h"
 
 /******************************************************************************

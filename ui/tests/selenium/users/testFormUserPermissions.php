@@ -473,10 +473,7 @@ class testFormUserPermissions extends CWebTest {
 		// Check that the default modules are present in form.
 		$modules_selector = 'xpath://h4[text()="Access to modules"]/../../following::li[1]//span';
 		$modules = $this->query($modules_selector)->all()->asText();
-
-		foreach (array_values($modules) as $module_name) {
-			$this->assertTrue(in_array($module_name, $widget_modules));
-		}
+		$this->assertEquals($widget_modules, array_values($modules));
 
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();

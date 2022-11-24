@@ -14,7 +14,9 @@ COMMON_SRC_FILES = \
 COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \

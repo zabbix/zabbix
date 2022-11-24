@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

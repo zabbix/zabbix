@@ -26,7 +26,7 @@ use Zabbix\Widgets\CWidgetForm;
 /**
  * Class containing methods for operations with widgets.
  */
-abstract class CControllerDashboardWidgetView extends CController {
+class CControllerDashboardWidgetView extends CController {
 
 	protected ?CWidget $widget;
 	protected CWidgetForm $form;
@@ -103,5 +103,14 @@ abstract class CControllerDashboardWidgetView extends CController {
 
 	protected function getForm(): CWidgetForm {
 		return $this->form;
+	}
+
+	protected function doAction(): void {
+		$this->setResponse(new CControllerResponseData([
+			'name' => $this->getInput('name', $this->widget->getName()),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

@@ -22,11 +22,11 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char			program_type;

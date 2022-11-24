@@ -343,6 +343,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
 				'default' => ''
+			],
+			'name_upper' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
 			]
 		]
 	],
@@ -1205,6 +1211,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
+				'default' => ''
+			],
+			'name_upper' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => ''
 			]
 		]
@@ -7543,6 +7555,27 @@ return [
 				'length' => 20,
 				'ref_table' => 'sla',
 				'ref_field' => 'slaid'
+			],
+			'value_userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'value_actionid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'actions',
+				'ref_field' => 'actionid'
+			],
+			'value_mediatypeid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'media_type',
+				'ref_field' => 'mediatypeid'
 			]
 		]
 	],
