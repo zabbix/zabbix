@@ -1884,21 +1884,21 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 {
 	struct snmp_pdu		*pdu = NULL, *response = NULL;
 	int			i, ret = SUCCEED, status, num_vars, pdu_type;
-	zbx_snmp_ddata_t	data;
+	AGENT_REQUEST		request;
 	struct variable_list	*var;
 	char			*results = NULL;
 	size_t			results_alloc = 0, results_offset = 0;
 
-	zbx_init_agent_request(&data.request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &data.request))
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
 	{
 		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse parameter.", max_error_len);
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
-	if (0 == data.request.nparam || (1 == data.request.nparam && '\0' == *(data.request.params[0])))
+	if (0 == request.nparam || (1 == request.nparam && '\0' == *(request.params[0])))
 	{
 		zbx_strlcpy(error, "Invalid parameters: at least one OID is expected.", max_error_len);
 		ret = CONFIG_ERROR;
@@ -1911,7 +1911,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
 
-	for (i = 0; i < data.request.nparam; i++)
+	for (i = 0; i < request.nparam; i++)
 	{
 		char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
 		int		running = 1;
@@ -1920,7 +1920,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 		oid             name[MAX_OID_LEN];
 		size_t          name_length = MAX_OID_LEN;
 
-		zbx_snmp_translate(oid_translated, data.request.params[i], sizeof(oid_translated));
+		zbx_snmp_translate(oid_translated, request.params[i], sizeof(oid_translated));
 
 		if (NULL == snmp_parse_oid(oid_translated, root_oid, &root_oid_len))
 		{
@@ -2012,6 +2012,8 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 out:
 	if (NULL != response)
 		snmp_free_pdu(response);
+
+	zbx_free_agent_request(&request);
 
 	if (SUCCEED != (*errcode = ret))
 	{

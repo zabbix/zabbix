@@ -199,9 +199,8 @@ static int	snmp_value_from_walk(const char *data, const char *oid_needle, char *
 		if (NULL == raw_value)
 		{
 			zbx_free(oid);
-			zbx_free(data2);
-			*error = zbx_strdup(NULL, "no data was found");
-			return FAIL;
+			ret = FAIL;
+			goto out;
 		}
 
 		zbx_rtrim(oid, " ");
@@ -2546,6 +2545,7 @@ static void	zbx_vector_snmp_walk_to_json_param_clear_ext(zbx_vector_snmp_walk_to
 
 static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg)
 {
+	int					ret = SUCCEED;
 	char					*result = NULL, *token, *saveptr;
 	size_t					line_number = 1;
 	zbx_hashset_t				grouped_prefixes;
@@ -2556,16 +2556,15 @@ static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *para
 
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
 
-	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
-	{
-		zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
-		zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
-		*errmsg = zbx_dsprintf(*errmsg, "failed to parse step parameters");
-		return FAIL;
-	}
-
 	zbx_hashset_create(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
 			snmp_walk_json_output_obj_compare_func);
+
+	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "failed to parse step parameters");
+		ret = FAIL;
+		goto out;
+	}
 
 	token = strtok_r(value->data.str, "\n", &saveptr);
 
@@ -2584,7 +2583,9 @@ static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *para
 			*errmsg = zbx_dsprintf(*errmsg, "failed to parse input data at line " ZBX_FS_UI64,
 					line_number);
 
-			return FAIL;
+			zbx_free(oid);
+			ret = FAIL;
+			goto out;
 		}
 
 		for (i = 0; i < parsed_params.values_num; i++)
@@ -2633,22 +2634,21 @@ static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *para
 	}
 	else
 	{
-		zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
-		zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
-
 		*errmsg = zbx_dsprintf(*errmsg, "no data was found");
-
-		return FAIL;
+		ret = FAIL;
 	}
-
+out:
 	zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
 	zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
 	zbx_hashset_destroy(&grouped_prefixes);
 
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, result);
+	if (SUCCEED == ret)
+	{
+		zbx_variant_clear(value);
+		zbx_variant_set_str(value, result);
+	}
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
