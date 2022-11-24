@@ -6,7 +6,7 @@
 For Zabbix version: 6.2 and higher.
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
-Currently the template supports discovery of virtual machines (VMs), MySQL and PosgtreSQL servers.
+Currently the template supports discovery of virtual machines (VMs), MySQL and PostgreSQL servers.
 
 ## Setup
 
@@ -538,9 +538,9 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.pgsql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.pgsql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Percentage CPU |<p>The CPU percent of a host.</p> |DEPENDENT |azure.db.pgsql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
-|Azure |Azure PsotgreSQL: Memory utilization |<p>The memory percent of a host.</p> |DEPENDENT |azure.db.pgsql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
+|Azure |Azure PostgreSQL: Memory utilization |<p>The memory percent of a host.</p> |DEPENDENT |azure.db.pgsql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
 |Azure |Azure PostgreSQL: Network out |<p>Network outbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
-|Azure |Azure PosgtreSQL: Network in |<p>Network inbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
+|Azure |Azure PostgreSQL: Network in |<p>Network inbound traffic across the active connections.</p> |DEPENDENT |azure.db.pgsql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
 |Azure |Azure PostgreSQL: Connections active |<p>The count of active connections.</p> |DEPENDENT |azure.db.pgsql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
 |Azure |Azure PostgreSQL: Connections failed |<p>The count of failed connections.</p> |DEPENDENT |azure.db.pgsql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: IO consumption percent |<p>The IO Percent.</p> |DEPENDENT |azure.db.pgsql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
@@ -563,7 +563,7 @@ There are no template links in this template.
 |Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
 |Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
 |Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
-|Azure PsotgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 

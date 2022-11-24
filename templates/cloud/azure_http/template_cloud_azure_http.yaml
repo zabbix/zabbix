@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-18T16:20:19Z'
+  date: '2022-11-24T06:43:19Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -20,7 +20,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports discovery of virtual machines (VMs), MySQL and PosgtreSQL servers.
+        Currently the template supports discovery of virtual machines (VMs), MySQL and PostgreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -291,12 +291,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#SIZE}'
                 value: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
@@ -429,12 +429,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           description: 'The list of the MySQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -562,12 +562,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -695,12 +695,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
@@ -5826,7 +5826,7 @@ zabbix_export:
               value: operations
         -
           uuid: e2ee4882b08f45788e6abb698265810e
-          name: 'Azure PsotgreSQL: Memory utilization'
+          name: 'Azure PostgreSQL: Memory utilization'
           type: DEPENDENT
           key: azure.db.pgsql.memory.percentage
           delay: '0'
@@ -5849,7 +5849,7 @@ zabbix_export:
             -
               uuid: 3119f21167a546369c05d31cda2e0147
               expression: 'min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure PsotgreSQL: High memory utilization'
+              name: 'Azure PostgreSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -5885,7 +5885,7 @@ zabbix_export:
               value: network
         -
           uuid: 51f7e35042d04ddb88c7703d1b015d3b
-          name: 'Azure PosgtreSQL: Network in'
+          name: 'Azure PostgreSQL: Network in'
           type: DEPENDENT
           key: azure.db.pgsql.network.ingress
           delay: '0'
@@ -7947,21 +7947,6 @@ zabbix_export:
             host: 'Azure Microsoft SQL serverless database by HTTP'
             key: azure.db.mssql.storage.allocated
     -
-      uuid: 360a24b56be74cf48df3135008437824
-      name: 'Azure MySQL: Connections'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.connections.active
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.connections.failed
-    -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
       name: 'Azure MySQL: Connections'
       graph_items:
@@ -7983,20 +7968,20 @@ zabbix_export:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.aborted
     -
-      uuid: dc6840162405481ebc1c3c98fdfcaef1
-      name: 'Azure MySQL: Network traffic'
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure MySQL: Connections'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.network.egress
+            key: azure.db.mysql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.network.ingress
+            key: azure.db.mysql.connections.failed
     -
       uuid: f929f47602734f82a79f22a5f4446f61
       name: 'Azure MySQL: Network traffic'
@@ -8011,6 +7996,21 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: dc6840162405481ebc1c3c98fdfcaef1
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.network.ingress
     -
       uuid: 3fcf43fd338e4902874d940fc0bec8b9
@@ -8028,21 +8028,6 @@ zabbix_export:
             host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
-      uuid: bdc178e6faaa4850badc0c60c7c80d40
-      name: 'Azure MySQL: Storage utilization'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.storage.used
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.mysql.storage.limit
-    -
       uuid: 4210e6b4ed8744589dce88217e961a56
       name: 'Azure MySQL: Storage utilization'
       graph_items:
@@ -8058,20 +8043,20 @@ zabbix_export:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.limit
     -
-      uuid: c76cf8ec6a584af6be815ec4a9257a8c
-      name: 'Azure PostgreSQL: Connections'
+      uuid: bdc178e6faaa4850badc0c60c7c80d40
+      name: 'Azure MySQL: Storage utilization'
       graph_items:
         -
           color: 1A7C11
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.connections.active
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.connections.failed
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.limit
     -
       uuid: 2b60e8b1fd7c43f4ac61812e43c0e1ca
       name: 'Azure PostgreSQL: Connections'
@@ -8094,20 +8079,20 @@ zabbix_export:
             host: 'Azure PostgreSQL flexible server by HTTP'
             key: azure.db.pgsql.connections.failed
     -
-      uuid: 8bc17d843775414ea971e640e1fe5ec0
-      name: 'Azure PostgreSQL: Network traffic'
+      uuid: c76cf8ec6a584af6be815ec4a9257a8c
+      name: 'Azure PostgreSQL: Connections'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.network.egress
+            key: azure.db.pgsql.connections.active
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.network.ingress
+            key: azure.db.pgsql.connections.failed
     -
       uuid: a4679d243b574bea84397c980723c68b
       name: 'Azure PostgreSQL: Network traffic'
@@ -8122,6 +8107,21 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure PostgreSQL flexible server by HTTP'
+            key: azure.db.pgsql.network.ingress
+    -
+      uuid: 8bc17d843775414ea971e640e1fe5ec0
+      name: 'Azure PostgreSQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure PostgreSQL single server by HTTP'
+            key: azure.db.pgsql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure PostgreSQL single server by HTTP'
             key: azure.db.pgsql.network.ingress
     -
       uuid: 9e750a5a462b4429ac5a36a72bd60c66
@@ -8139,21 +8139,6 @@ zabbix_export:
             host: 'Azure PostgreSQL single server by HTTP'
             key: azure.db.pgsql.storage.server.log.limit
     -
-      uuid: 9ecd071a77364c4486fa5f63125cd985
-      name: 'Azure PostgreSQL: Storage utilization'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.storage.used
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure PostgreSQL single server by HTTP'
-            key: azure.db.pgsql.storage.limit
-    -
       uuid: 5fa13cfbdd784475818fae06ff94f879
       name: 'Azure PostgreSQL: Storage utilization'
       graph_items:
@@ -8168,3 +8153,18 @@ zabbix_export:
           item:
             host: 'Azure PostgreSQL flexible server by HTTP'
             key: azure.db.pgsql.storage.free
+    -
+      uuid: 9ecd071a77364c4486fa5f63125cd985
+      name: 'Azure PostgreSQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure PostgreSQL single server by HTTP'
+            key: azure.db.pgsql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure PostgreSQL single server by HTTP'
+            key: azure.db.pgsql.storage.limit
