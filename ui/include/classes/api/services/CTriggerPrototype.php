@@ -440,12 +440,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * Update existing trigger prototypes.
 	 *
 	 * @param array $trigger_prototypes
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $trigger_prototypes, bool $allowed_uuid_update = false): array {
-		$this->validateUpdate($trigger_prototypes, $db_triggers, $allowed_uuid_update);
+	public function update(array $trigger_prototypes): array {
+		$this->validateUpdate($trigger_prototypes, $db_triggers);
 
 		$this->updateReal($trigger_prototypes, $db_triggers);
 		$this->inherit($trigger_prototypes);

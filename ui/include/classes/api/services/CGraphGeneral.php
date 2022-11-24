@@ -41,11 +41,10 @@ abstract class CGraphGeneral extends CApiService {
 	 * Update graphs.
 	 *
 	 * @param array $graphs
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $graphs, bool $allowed_uuid_update = false) {
+	public function update(array $graphs) {
 		$graphs = zbx_toArray($graphs);
 		$graphids = array_column($graphs, 'graphid');
 
@@ -103,7 +102,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $db_graphs, $allowed_uuid_update);
+		$this->validateUpdate($graphs, $db_graphs);
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
@@ -762,9 +761,8 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 * @param bool  $allowed_uuid_update
 	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update) {
+	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
@@ -784,10 +782,7 @@ abstract class CGraphGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
 
-		if ($allowed_uuid_update) {
-			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-		}
-
+		$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $key => $graph) {

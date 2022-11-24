@@ -136,7 +136,8 @@ abstract class CItemGeneralOld extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
+			'uuid' => ['type' => API_UUID]
 		]];
 		if ($update) {
 			unset($api_input_rules['fields']['type']['flags']);
@@ -611,16 +612,6 @@ abstract class CItemGeneralOld extends CApiService {
 	 */
 	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
 		if ($is_update) {
-			foreach ($items_to_create as $index => &$item) {
-				if (array_key_exists('uuid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
-							_s('unexpected parameter "%1$s"', 'uuid')
-						)
-					);
-				}
-			}
-
 			return;
 		}
 

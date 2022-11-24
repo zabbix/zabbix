@@ -628,7 +628,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['template_groups']['updateExisting'] && $groups_to_update) {
-			API::TemplateGroup()->update($groups_to_update, true);
+			API::TemplateGroup()->update($groups_to_update);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbTemplateGroup($group['groupid'], $group);
@@ -671,7 +671,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['host_groups']['updateExisting'] && $groups_to_update) {
-			API::HostGroup()->update($groups_to_update, true);
+			API::HostGroup()->update($groups_to_update);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbHostGroup($group['groupid'], $group);
@@ -950,7 +950,7 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$updated_items = $api_service->update($items_to_update, true);
+			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
 				$item['hostid'] = array_shift($hostids);
@@ -1123,7 +1123,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['discoveryRules']['updateExisting'] && $discovery_rules_to_update) {
-			API::DiscoveryRule()->update($discovery_rules_to_update, true);
+			API::DiscoveryRule()->update($discovery_rules_to_update);
 
 			foreach ($discovery_rules_to_update as $discovery_rule) {
 				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
@@ -1381,7 +1381,7 @@ class CConfigurationImport {
 		}
 
 		if ($host_prototypes_to_update) {
-			API::HostPrototype()->update($host_prototypes_to_update, true);
+			API::HostPrototype()->update($host_prototypes_to_update);
 		}
 
 		if ($host_prototypes_to_create) {
@@ -1417,7 +1417,7 @@ class CConfigurationImport {
 						$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
 					}
 
-					if ($host_prototypeid === null) {
+					if ($triggerid === null) {
 						$triggerid = $this->referencer->findTriggeridByName($trigger['description'],
 							$trigger['expression'], $trigger['recovery_expression']
 						);
@@ -1504,7 +1504,7 @@ class CConfigurationImport {
 						$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
 					}
 
-					if ($host_prototypeid === null) {
+					if ($graphid === null) {
 						$graphid = $this->referencer->findGraphidByName($hostid, $graph['name']);
 					}
 
@@ -1520,7 +1520,7 @@ class CConfigurationImport {
 		}
 
 		if ($triggers_to_update) {
-			$updated_triggers = API::TriggerPrototype()->update($triggers_to_update, true);
+			$updated_triggers = API::TriggerPrototype()->update($triggers_to_update);
 
 			foreach ($updated_triggers['triggerids'] as $index => $triggerid) {
 				$trigger = $triggers_to_update[$index];
@@ -1538,7 +1538,7 @@ class CConfigurationImport {
 		}
 
 		if ($graphs_to_update) {
-			API::GraphPrototype()->update($graphs_to_update, true);
+			API::GraphPrototype()->update($graphs_to_update);
 			$this->referencer->refreshGraphs();
 		}
 
@@ -1650,7 +1650,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['httptests']['updateExisting'] && $httptests_to_update) {
-			API::HttpTest()->update($httptests_to_update, true);
+			API::HttpTest()->update($httptests_to_update);
 		}
 
 		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
@@ -1751,7 +1751,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['graphs']['updateExisting'] && $graphs_to_update) {
-			API::Graph()->update($graphs_to_update, true);
+			API::Graph()->update($graphs_to_update);
 		}
 
 		if ($this->options['graphs']['createMissing'] && $graphs_to_create) {
@@ -1837,7 +1837,7 @@ class CConfigurationImport {
 		}
 
 		if ($triggers_to_update) {
-			API::Trigger()->update($triggers_to_update, true);
+			API::Trigger()->update($triggers_to_update);
 		}
 
 		if ($triggers_to_create) {

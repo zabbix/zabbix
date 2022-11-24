@@ -614,12 +614,11 @@ class CItem extends CItemGeneral {
 
 	/**
 	 * @param array $items
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $items, bool $allowed_uuid_update = false): array {
-		$this->validateUpdate($items, $db_items, $allowed_uuid_update);
+	public function update(array $items): array {
+		$this->validateUpdate($items, $db_items);
 
 		$itemids = array_column($items, 'itemid');
 
@@ -632,20 +631,15 @@ class CItem extends CItemGeneral {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
-	 * @param bool       $allowed_uuid_update
-	 * @param
 	 *
 	 * @throws APIException
 	 */
 
-	protected function validateUpdate(array &$items, ?array &$db_items, bool $allowed_uuid_update): void {
+	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
+			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
-
-		if ($allowed_uuid_update) {
-			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -683,10 +677,6 @@ class CItem extends CItemGeneral {
 					'value_type' => ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 				]];
 
-				if ($allowed_uuid_update) {
-					$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-				}
-
 				if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
@@ -702,10 +692,6 @@ class CItem extends CItemGeneral {
 				$item += array_intersect_key($db_item, array_flip(['value_type']));
 
 				$api_input_rules = self::getValidationRules();
-			}
-
-			if ($allowed_uuid_update) {
-				$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 			}
 
 			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
@@ -736,6 +722,7 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'uuid' => 			['type' => API_UUID],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
@@ -774,6 +761,7 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'uuid' => 			['type' => API_UUID],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],

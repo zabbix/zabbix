@@ -415,11 +415,10 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 * Update DiscoveryRule.
 	 *
 	 * @param array $items
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $items, bool $allowed_uuid_update = false) {
+	public function update(array $items) {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
@@ -429,7 +428,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 			'preservekeys' => true
 		]);
 
-		$this->checkInput($items, true, $allowed_uuid_update, $db_items);
+		$this->checkInput($items, true, $db_items);
 		$this->validateUpdateLLDMacroPaths($items);
 
 		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['flags', 'type', 'authtype',
@@ -1606,12 +1605,10 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
-	 * @param bool  $allowed_uuid_update
 	 * @param array $dbItems
 	 *
 	 */
-	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false,
-			array $dbItems = []) {
+	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
@@ -1623,7 +1620,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 		}
 		unset($item);
 
-		parent::checkInput($items, $update, $allowed_uuid_update);
+		parent::checkInput($items, $update);
 
 		$validateItems = $items;
 		if ($update) {
