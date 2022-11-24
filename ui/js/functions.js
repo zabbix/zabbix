@@ -224,7 +224,7 @@ function objectSize(obj) {
  *
  * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning. // todo zi
  */
-function addMessage($msg_box) {
+function addMessage($msg_box) { // todo check (acikuns)
 	var $wrapper = $('.wrapper'),
 		$main = $wrapper.find('> main'),
 		$footer = $wrapper.find('> footer');

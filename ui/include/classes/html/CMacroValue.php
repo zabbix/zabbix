@@ -93,7 +93,8 @@ class CMacroValue extends CInput {
 		$this->revert_button = (new CButton(null))
 			->setAttribute('title', _('Revert changes'))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass(self::ZBX_STYLE_BTN_UNDO);
+			->addClass(self::ZBX_STYLE_BTN_UNDO)
+			->addClass('zi-arrow-back');
 
 		return $this;
 	}

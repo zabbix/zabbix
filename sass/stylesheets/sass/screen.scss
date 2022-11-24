@@ -178,7 +178,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 	border-right: 6px solid $font-color;
 }
 
-.arrow-right {
+.arrow-right { // todo last change to zi-play
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
@@ -1356,12 +1356,15 @@ form {
 		&.td-drag-icon {
 			padding: 0 11px 0 0;
 			vertical-align: middle;
-		}
 
-		.drag-icon {
-			position: absolute;
-			top: 5px;
-			margin-right: 5px;
+			.zi-drag-handle {
+				position: relative;
+				top: 0;
+				left: 0;
+				&::before {
+					left: -8px;
+				}
+			}
 		}
 	}
 
@@ -2461,6 +2464,7 @@ button[disabled] {
 	margin: 0 14px 0 0;
 }
 
+// todo no icon present
 $trigger-expression-tree-icons: (
 	top-bottom: -84px -300px,
 	top-bottom-right: -84px -334px,
@@ -2502,13 +2506,6 @@ $trigger-expression-tree-icons: (
 	height: 18px;
 	position: absolute;
 	content: '';
-}
-
-.drag-icon {
-	margin-left: -9px;
-	height: 24px;
-	background: url($sprite-path) no-repeat -6px -762px; // todo last
-	@extend %button-icon-size;
 }
 
 .drag-icon,
@@ -4596,12 +4593,6 @@ svg {
 		position: relative;
 	}
 
-	.drag-icon {
-		position: absolute;
-		left: 0;
-		top: 5px;
-	}
-
 	.list-numbered-item::before {
 		content: counter(line) ':';
 		flex: 0 0 15px;
@@ -4633,6 +4624,13 @@ svg {
 		display: flex;
 		align-items: center;
 		box-sizing: border-box;
+	}
+
+	.preprocessing-step {
+		.zi-drag-handle {
+			left: -8px;
+			top: 4px;
+		}
 	}
 
 	.step-name,
@@ -4746,10 +4744,23 @@ svg {
 				padding-left: 5px;
 			}
 
-			@for $i from 0 through $max_depth {
+			&[data-depth="0"] > .tree-item {
+				> .tree-row > .content > .margin-lvl {
+					flex: 0 0 10px;
+				}
+				&.ui-sortable-helper {
+					margin-left: 10px;
+
+					> .tree-row > .content > .margin-lvl {
+						display: none;
+					}
+				}
+			}
+
+			@for $i from 1 through $max_depth {
 				&[data-depth="#{$i}"] > .tree-item {
 					> .tree-row > .content > .margin-lvl {
-						flex: 0 0 ($i * 15px + 10px);
+						flex: 0 0 ($i * 15px + 2px);
 					}
 					&.ui-sortable-helper {
 						margin-left: ($i * 15px + 10px);
@@ -4812,7 +4823,8 @@ svg {
 					}
 
 					.zi-plus,
-					.zi-copy {
+					.zi-copy,
+					.zi-pencil {
 						display: inline-block;
 						width: 18px;
 						height: 18px;
@@ -4856,10 +4868,6 @@ svg {
 						}
 					}
 
-					> .drag-icon {
-						min-width: 24px;
-					}
-
 					> .item-name {
 						flex: 0 1 auto;
 						white-space: nowrap;
@@ -4869,6 +4877,13 @@ svg {
 						line-height: 1.5;
 					}
 				}
+			}
+
+			.zi-drag-handle {
+				position: relative;
+				top: 3px;
+				left: 0;
+				opacity: .35;
 			}
 
 			&.is-parent {
@@ -5245,31 +5260,27 @@ a.icon-count {
 			}
 		}
 
-		&.btn-undo {
+		&.zi-arrow-back {
 			display: none;
 			width: 24px;
+			padding: 0 2px;
 			border-left: 0;
 			border-right: 0;
 			border-top: 1px solid $form-border-color;
 			border-bottom: 1px solid $form-border-color;
 			border-radius: 0;
 			background-color: $form-bg-color;
+			color: $icon-header-controls-color;
 			transition: border-color .2s ease-out, box-shadow .2s ease-out;
-
-			&::before {
-				position: absolute;
-				top: 0;
-				left: 0;
-				display: block;
-				width: 22px;
-				height: 22px;
-				content: '';
-				background: url($sprite-path) no-repeat -119px -474px; // todo last
-			}
 
 			&.is-focused {
 				border-top: 1px solid $form-border-focus-color;
 				border-bottom: 1px solid $form-border-focus-color;
+			}
+
+			&::before {
+				top: -1px;
+				font-size: 14px;
 			}
 
 			&:hover,
@@ -5278,10 +5289,6 @@ a.icon-count {
 				border-top: 1px solid $form-border-focus-color;
 				border-bottom: 1px solid $form-border-focus-color;
 				@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-				&::before {
-					background-position: -431px -474px;
-				}
 			}
 		}
 	}
@@ -5323,7 +5330,7 @@ a.icon-count {
 	.zi-lock {
 		padding: 0 5px;
 		&::before {
-			font-size: 15px;
+			font-size: 15px; // todo vopros vertical align configuration of macros
 			color: $icon-header-controls-color;
 		}
 		&:hover,
@@ -5402,7 +5409,7 @@ a.icon-count {
 
 		.zi-chevron-down {
 			padding: 0 5px;
-			vertical-align: middle;
+			vertical-align: top;
 			line-height: 0;
 			font-size: 0;
 			position: relative;
@@ -5523,13 +5530,35 @@ a.icon-count {
 		display: contents;
 
 		&[data-type="2"] {
-			.interface-btn-toggle {
-				@extend %btn-widget-defaults;
+			.interface-btn-toggle.zi-chevron-down {
+				@extend %btn-reset;
 
 				display: inline-block;
 				width: 24px;
 				height: 24px;
-				background: url($sprite-path) no-repeat -6px -690px; // todo last
+				padding: 0 2px;
+
+				opacity: 0.5;
+
+				transition: opacity .3s ease-out;
+				&:hover,
+				&:active,
+				&:focus {
+					opacity: 1;
+				}
+
+				&::before {
+					top: -1px;
+					font-size: 16px;
+					color: $icon-header-controls-color;
+				}
+				&::after {
+					display: none;
+				}
+
+				&[aria-expanded="true"] {
+					transform: rotate(180deg);
+				}
 			}
 
 			.list-accordion-item-body {
@@ -5538,10 +5567,6 @@ a.icon-count {
 			}
 
 			&.list-accordion-item-opened {
-				.interface-btn-toggle {
-					background: url($sprite-path) no-repeat -6px -655px; // todo last
-				}
-
 				.list-accordion-item-body {
 					display: block;
 				}
@@ -5558,7 +5583,7 @@ a.icon-count {
 		}
 	}
 
-	.interface-btn-toggle {
+	.interface-btn-toggle.zi-chevron-down {
 		display: none;
 		vertical-align: top;
 	}
@@ -5922,4 +5947,15 @@ z-select,
 .leaflet-container {
 	height: 100%;
 	z-index: 1;
+}
+
+.zi-drag-handle {
+	position: absolute;
+	left: -22px;
+	top: 2px;
+	opacity: .5;
+
+	&::before {
+		font-size: 22px;
+	}
 }

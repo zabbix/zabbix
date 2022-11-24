@@ -504,7 +504,7 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
-			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, null, false, true);
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, null, false, true);
 		}
 		else {
 			$message_box = null;
@@ -686,7 +686,7 @@ class CSetupWizard extends CForm {
 			);
 
 		if ($this->step_failed) {
-			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, CMessageHelper::getMessages(),
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD.' zi-triangle-warning', CMessageHelper::getMessages(),
 				_('Cannot connect to the database.'), false, true
 			);
 		}
@@ -1030,7 +1030,7 @@ class CSetupWizard extends CForm {
 
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
 
-			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD, $messages, _('Cannot create the configuration file.'),
+			$message_box = makeMessageBox(ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, _('Cannot create the configuration file.'),
 				false, true
 			);
 			$message = [

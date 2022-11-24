@@ -1851,7 +1851,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD, $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
@@ -1876,7 +1876,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 
 		if ($has_errors) {
-			$class = ZBX_STYLE_MSG_BAD;
+			$class = ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
 			$good = false;
 		}
 		elseif ($has_warnings) {
@@ -1889,7 +1889,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 	}
 	else {
-		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+		$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
 	}
 
 	$title = $good ? $okmsg : $errmsg;

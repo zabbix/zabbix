@@ -67,9 +67,6 @@ form.dashboard-widget-svggraph {
 		}
 	}
 
-	.td-drag-icon {
-	}
-
 	.dataset-actions {
 		text-align: right;
 
@@ -198,6 +195,20 @@ form.dashboard-widget-svggraph {
 			right: 0;
 			top: 0;
 			vertical-align: baseline;
+		}
+
+		.zi-drag-handle {
+			opacity: .7;
+
+			&::before {
+				top: 2px;
+				font-size: 22px;
+				color: $icon-header-controls-color;
+			}
+
+			&.disabled {
+				opacity: .35;
+			}
 		}
 	}
 

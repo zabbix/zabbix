@@ -123,7 +123,8 @@ $fonts-path: '../fonts/';
 .zi-time-period:before { content: "\ea5b"; }
 .zi-trash:before { content: "\ea5c"; }
 .zi-triangle-flipped-warning:before { content: "\ea5d"; }
-.zi-triangle-warning:before { content: "\ea5e"; }
+//.zi-triangle-warning:before { content: "\ea5e"; }
+.zi-triangle-warning:after { content: "\ea5e"; }
 .zi-uncheck:before { content: "\ea5f"; }
 .zi-user-filled:before { content: "\ea60"; }
 .zi-user:before { content: "\ea61"; }
