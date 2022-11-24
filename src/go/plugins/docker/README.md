@@ -61,7 +61,7 @@ All (not required; default: false) — returns all containers (true) or only run
 
 **docker.ping[]** — pings the server and returns 0 or 1.
 *Returns:*
-- "1" if the connection is alive.
+- "1" if the connection is alive;
 - "0" if the connection is broken (is returned if there is any error during the test, or the response is not "OK").
 
 ## Troubleshooting
