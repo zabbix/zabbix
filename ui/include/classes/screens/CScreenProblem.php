@@ -882,55 +882,56 @@ class CScreenProblem extends CScreenBase {
 			// Get all symptoms for given cause event IDs.
 			$symptom_data = self::getData([
 				'show_symptoms' => true,
+				'show_suppressed' => true,
 				'cause_eventid' => $cause_eventids_with_symptoms,
 				'show' => $this->data['filter']['show'],
 				'details' => $this->data['filter']['details'],
 				'show_opdata' => $this->data['filter']['show_opdata']
 			], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
-			$symptom_data = self::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $this->data['sort'],
-				$this->data['sortorder']
-			);
-
-			// Filter does not matter.
-			$symptom_data = self::makeData($symptom_data, [
-				'show' => $this->data['filter']['show'],
-				'details' => $this->data['filter']['details'],
-				'show_opdata' => $this->data['filter']['show_opdata']
-			], true);
-
-			$data['users'] += $symptom_data['users'];
-			$data['correlations'] += $symptom_data['correlations'];
-
-			foreach ($symptom_data['actions'] as $key => $actions) {
-				$data['actions'][$key] += $symptom_data['actions'][$key];
-			}
-
-			if ($symptom_data['triggers']) {
-				$triggerids = array_keys($symptom_data['triggers']);
-
-				$db_triggers = API::Trigger()->get([
-					'output' => [],
-					'selectDependencies' => ['triggerid'],
-					'triggerids' => $triggerids,
-					'preservekeys' => true
-				]);
-
-				foreach ($symptom_data['triggers'] as $triggerid => &$trigger) {
-					$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
-						? $db_triggers[$triggerid]['dependencies']
-						: [];
-				}
-				unset($trigger);
-
-				// Add hosts from symptoms to the list.
-				$triggers_hosts += getTriggersHostsList($symptom_data['triggers']);
-
-				// Store all known triggers in one place.
-				$data['triggers'] += $symptom_data['triggers'];
-			}
-
 			if ($symptom_data['problems']) {
+				$symptom_data = self::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $this->data['sort'],
+					$this->data['sortorder']
+				);
+
+				// Filter does not matter.
+				$symptom_data = self::makeData($symptom_data, [
+					'show' => $this->data['filter']['show'],
+					'details' => $this->data['filter']['details'],
+					'show_opdata' => $this->data['filter']['show_opdata']
+				], true);
+
+				$data['users'] += $symptom_data['users'];
+				$data['correlations'] += $symptom_data['correlations'];
+
+				foreach ($symptom_data['actions'] as $key => $actions) {
+					$data['actions'][$key] += $symptom_data['actions'][$key];
+				}
+
+				if ($symptom_data['triggers']) {
+					$triggerids = array_keys($symptom_data['triggers']);
+
+					$db_triggers = API::Trigger()->get([
+						'output' => [],
+						'selectDependencies' => ['triggerid'],
+						'triggerids' => $triggerids,
+						'preservekeys' => true
+					]);
+
+					foreach ($symptom_data['triggers'] as $triggerid => &$trigger) {
+						$trigger['dependencies'] = array_key_exists($triggerid, $db_triggers)
+							? $db_triggers[$triggerid]['dependencies']
+							: [];
+					}
+					unset($trigger);
+
+					// Add hosts from symptoms to the list.
+					$triggers_hosts += getTriggersHostsList($symptom_data['triggers']);
+
+					// Store all known triggers in one place.
+					$data['triggers'] += $symptom_data['triggers'];
+				}
+
 				foreach ($data['problems'] as &$problem) {
 					foreach ($symptom_data['problems'] as $symptom) {
 						if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {

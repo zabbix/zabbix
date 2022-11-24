@@ -119,38 +119,39 @@ class WidgetView extends CControllerDashboardWidgetView {
 				// Get all symptoms for given cause event IDs.
 				$symptom_data = CScreenProblem::getData([
 					'show_symptoms' => true,
+					'show_suppressed' => true,
 					'cause_eventid' => $cause_eventids_with_symptoms,
 					'show' => $this->fields_values['show'],
 					'show_opdata' => $this->fields_values['show_opdata']
 				], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
-				$symptom_data = CScreenProblem::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sortfield,
-					$sortorder
-				);
-
-				// Filter does not matter.
-				$symptom_data = CScreenProblem::makeData($symptom_data, [
-					'show' => $this->fields_values['show'],
-					'show_opdata' => $this->fields_values['show_opdata'],
-					'details' => 0
-				], true);
-
-				$data['users'] += $symptom_data['users'];
-				$data['correlations'] += $symptom_data['correlations'];
-
-				foreach ($symptom_data['actions'] as $key => $actions) {
-					$data['actions'][$key] += $actions;
-				}
-
-				if ($symptom_data['triggers']) {
-					// Add hosts from symptoms to the list.
-					$data['triggers_hosts'] += getTriggersHostsList($symptom_data['triggers']);
-
-					// Store all known triggers in one place.
-					$data['triggers'] += $symptom_data['triggers'];
-				}
-
 				if ($symptom_data['problems']) {
+					$symptom_data = CScreenProblem::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sortfield,
+						$sortorder
+					);
+
+					// Filter does not matter.
+					$symptom_data = CScreenProblem::makeData($symptom_data, [
+						'show' => $this->fields_values['show'],
+						'show_opdata' => $this->fields_values['show_opdata'],
+						'details' => 0
+					], true);
+
+					$data['users'] += $symptom_data['users'];
+					$data['correlations'] += $symptom_data['correlations'];
+
+					foreach ($symptom_data['actions'] as $key => $actions) {
+						$data['actions'][$key] += $actions;
+					}
+
+					if ($symptom_data['triggers']) {
+						// Add hosts from symptoms to the list.
+						$data['triggers_hosts'] += getTriggersHostsList($symptom_data['triggers']);
+
+						// Store all known triggers in one place.
+						$data['triggers'] += $symptom_data['triggers'];
+					}
+
 					foreach ($data['problems'] as &$problem) {
 						foreach ($symptom_data['problems'] as $symptom) {
 							if (bccomp($symptom['cause_eventid'], $problem['eventid']) == 0) {
