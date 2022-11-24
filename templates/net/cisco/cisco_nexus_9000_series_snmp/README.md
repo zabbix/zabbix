@@ -5,7 +5,7 @@
 
 For Zabbix version: 6.0 and higher.  
 This template is designed to monitor `Cisco Nexus 9000 Series Switches`. 
-> See [Cisco support documentatio](https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html) for details.
+> See [Cisco support documentation](https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html) for details.
 
 This template was tested on:
 
