@@ -14,8 +14,10 @@ typedef struct
 }
 ZBX_FUNC_PROFILE;
 
+static volatile int	zbx_prof_enable_requested;
+
 static zbx_vector_ptr_t	zbx_func_profiles;
-static volatile int	zbx_prof_enabled;
+static int		zbx_prof_enabled;
 void			*zbx_func_profile;
 
 static int	zbx_default_ptr_ptr_compare_func(const void *d1, const void *d2)
@@ -73,17 +75,6 @@ void	zbx_prof_end_wait(void *func_profile)	/* nested locks not supported but cur
 		((ZBX_FUNC_PROFILE *)func_profile)->sec_wait += zbx_time() - ((ZBX_FUNC_PROFILE *)func_profile)->start;
 }
 
-void	zbx_printf_prof_throttled(void)
-{
-	static double	last_update, time_now;
-
-	if (30 < (time_now = zbx_time()) - last_update)
-	{
-		last_update = time_now;
-		zbx_print_prof();
-	}
-}
-
 static const char	*get_scope_string(zbx_prof_scope_t scope)
 {
 	switch (scope)
@@ -96,7 +87,17 @@ static const char	*get_scope_string(zbx_prof_scope_t scope)
 			return "processing";
 	}
 }
-void	zbx_print_prof(void)
+
+static void	zbx_reset_prof(void)
+{
+	if (0 != zbx_func_profiles.values_alloc)
+	{
+		zbx_vector_ptr_clear_ext(&zbx_func_profiles, zbx_ptr_free);
+		zbx_vector_ptr_destroy(&zbx_func_profiles);
+	}
+}
+
+static void	zbx_print_prof(void)
 {
 	if (1 == zbx_prof_enabled)
 	{
@@ -139,21 +140,28 @@ void	zbx_print_prof(void)
 		zbx_reset_prof();
 }
 
-void	zbx_reset_prof(void)
+void	zbx_printf_prof_throttled(void)
 {
-	if (0 != zbx_func_profiles.values_alloc)
+	static double	last_update, time_now;
+
+	if (1 == zbx_prof_enable_requested)
+		zbx_prof_enabled = 1;
+	else
+		zbx_prof_enabled = 0;
+
+	if (30 < (time_now = zbx_time()) - last_update)
 	{
-		zbx_vector_ptr_clear_ext(&zbx_func_profiles, zbx_ptr_free);
-		zbx_vector_ptr_destroy(&zbx_func_profiles);
+		last_update = time_now;
+		zbx_print_prof();
 	}
 }
 
 void	zbx_enable_prof(void)
 {
-	zbx_prof_enabled = 1;
+	zbx_prof_enable_requested = 1;
 }
 
 void	zbx_disable_prof(void)
 {
-	zbx_prof_enabled = 0;
+	zbx_prof_enable_requested = 0;
 }

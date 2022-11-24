@@ -28,14 +28,12 @@ typedef enum
 }
 zbx_prof_scope_t;
 
-void	zbx_print_prof(void);
 void	zbx_printf_prof_throttled(void);
 void	zbx_enable_prof(void);
 void	zbx_disable_prof(void);
 void	*zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);
 void	zbx_prof_end_wait(void *func_profile);
 void	zbx_prof_end(void *func_profile);
-void	zbx_reset_prof(void);
 
 extern void	*zbx_func_profile;
 

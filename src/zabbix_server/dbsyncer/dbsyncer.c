@@ -136,7 +136,6 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
-
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())
 			zbx_log_sync_history_cache_progress();

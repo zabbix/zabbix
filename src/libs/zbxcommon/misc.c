@@ -604,7 +604,7 @@ static void	update_resolver_conf(void)
  ******************************************************************************/
 void	zbx_update_env(double time_now)
 {
-	static double	time_update = 0, last_update;
+	static double	time_update = 0;
 
 	/* handle /etc/resolv.conf update and log rotate less often than once a second */
 	if (1.0 < time_now - time_update)
@@ -616,11 +616,7 @@ void	zbx_update_env(double time_now)
 #endif
 	}
 
-	if (30 < time_now - last_update)
-	{
-		last_update = time_now;
-		zbx_print_prof();
-	}
+	zbx_printf_prof_throttled();
 }
 
 /******************************************************************************
