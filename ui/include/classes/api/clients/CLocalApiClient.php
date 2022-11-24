@@ -50,10 +50,12 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Call the given API service method and return the response.
 	 *
-	 * @param string 	$requestApi			API name
-	 * @param string 	$requestMethod		API method
-	 * @param array 	$params				API parameters
-	 * @param string	$auth				Authentication token
+	 * @param string $requestApi     API name.
+	 * @param string $requestMethod  API method.
+	 * @param array  $params         API parameters.
+	 * @param array  $auth
+	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_PARAM, CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param string $auth['auth']   Authentication token.
 	 *
 	 * @return CApiClientResponse
 	 */

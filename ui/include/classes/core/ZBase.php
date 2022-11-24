@@ -550,7 +550,6 @@ class ZBase {
 			'auth' => CWebUser::$data['sessionid']
 		];
 
-
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();
 	}
