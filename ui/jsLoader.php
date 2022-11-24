@@ -167,9 +167,7 @@ $translate_strings = [
 		'Edit' => _s('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _s('Paste'),
-		'Refresh interval' => _s('Refresh interval'),
-		'Collapse' => _('Collapse'),
-		'Expand' => _('Expand')
+		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.inaccessible.js' => [
 		'Actions' => _s('Actions'),
