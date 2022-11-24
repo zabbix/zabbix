@@ -68,17 +68,17 @@ static void	test_match(const char *prefix, zbx_mock_handle_t hmatch, zbx_prometh
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char			*filter;
-	zbx_prometheus_condition_test_t	*metric = NULL, *value = NULL;
-	zbx_vector_ptr_t		labels;
-	int				ret, expected_ret, index;
-	char				*error = NULL;
-	zbx_mock_handle_t		hmetric, hvalue, hlabels, hlabel;
-	zbx_mock_error_t		mock_ret;
+	const char				*filter;
+	zbx_prometheus_condition_test_t		*metric = NULL, *value = NULL;
+	zbx_vector_prometheus_condition_test_t	labels;
+	int					ret, expected_ret, index;
+	char					*error = NULL;
+	zbx_mock_handle_t			hmetric, hvalue, hlabels, hlabel;
+	zbx_mock_error_t			mock_ret;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_ptr_create(&labels);
+	zbx_vector_prometheus_condition_test_create(&labels);
 
 	filter = zbx_mock_get_parameter_string("in.filter");
 
@@ -130,8 +130,8 @@ void	zbx_mock_test_entry(void **state)
 	if (NULL != value)
 		zbx_prometheus_condition_test_free(value);
 
-	zbx_vector_ptr_clear_ext(&labels, (zbx_clean_func_t)zbx_prometheus_condition_test_free);
-	zbx_vector_ptr_destroy(&labels);
+	zbx_vector_prometheus_condition_test_clear_ext(&labels, zbx_prometheus_condition_test_free);
+	zbx_vector_prometheus_condition_test_destroy(&labels);
 
 	zbx_free(error);
 }
