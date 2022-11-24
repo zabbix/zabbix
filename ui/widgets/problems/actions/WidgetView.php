@@ -95,7 +95,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
 						'filter' => ['cause_eventid' => $problem['eventid']],
-						'limit' => $search_limit,
 						'countOutput' => true
 					];
 

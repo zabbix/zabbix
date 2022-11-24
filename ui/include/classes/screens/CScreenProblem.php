@@ -857,7 +857,6 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
 						'filter' => ['cause_eventid' => $problem['eventid']],
-						'limit' => $this->data['limit'],
 						'countOutput' => true
 					];
 
