@@ -39,7 +39,7 @@ window.popup_import = new class {
 
 		this.warningListeners();
 
-		if (activate_advanced_configuration === true) {
+		if (activate_advanced_configuration) {
 			this.AdvancedConfigurationListeners();
 		}
 	}
@@ -282,6 +282,5 @@ window.popup_import = new class {
 			}
 		})
 	}
-
 }
 
