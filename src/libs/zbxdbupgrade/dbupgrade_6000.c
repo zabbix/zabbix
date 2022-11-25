@@ -315,7 +315,6 @@ static int	DBpatch_6000013(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-
 	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
