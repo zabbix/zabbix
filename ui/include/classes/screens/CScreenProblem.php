@@ -980,11 +980,11 @@ class CScreenProblem extends CScreenBase {
 				$col_header_2 = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header_1->addStyle('width: 20px;');
+					$header[] = $col_header_1->addStyle('width: 28px;');
 					$header[] = $col_header_2->addStyle('width: 20px;');
 				}
 				else {
-					$header[] = $col_header_1->addClass(ZBX_STYLE_CELL_WIDTH);
+					$header[] = $col_header_1->addStyle('width: 20px;');
 					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
@@ -1488,12 +1488,15 @@ class CScreenProblem extends CScreenBase {
 
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
-					$symptom_count_col = (new CCol(
-						(new CSpan($problem['symptom_count']))
-							->addClass(ZBX_STYLE_TAG)
-							->addStyle('max-width: 24px;')
-							->setHint($problem['symptom_count'])
-					))->addClass(ZBX_STYLE_SECOND_COL);
+					$symptom_count_span = (new CSpan($problem['symptom_count']))
+						->addClass(ZBX_STYLE_TAG)
+						->addStyle('max-width: 22px;');
+
+					if ($problem['symptom_count'] >= 1000) {
+						$symptom_count_span->setHint($problem['symptom_count']);
+					}
+
+					$symptom_count_col = (new CCol($symptom_count_span))->addClass(ZBX_STYLE_SECOND_COL);
 
 					$collapse_expand_col = (new CCol(
 						(new CButton(null))

@@ -387,9 +387,7 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_col = (new CCol(
-						(new CSpan($problem['symptom_count']))
-							->addClass(ZBX_STYLE_TAG)
-							->setHint($problem['symptom_count'])
+						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_TAG)
 					))->addClass(ZBX_STYLE_RIGHT);
 
 					$collapse_expand_col = (new CCol(
