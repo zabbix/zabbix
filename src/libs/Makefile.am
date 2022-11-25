@@ -10,7 +10,6 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -29,7 +28,6 @@ DIST_SUBDIRS = \
 	zbxgetopt \
 	zbxha \
 	zbxhash \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \

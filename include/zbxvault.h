@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXVAULT_H
 #define ZABBIX_ZBXVAULT_H
 
-#include "../zbxkvs/kvs.h"
+#include "zbxkvs.h"
 
 int	zbx_vault_init(char **error);
 int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);

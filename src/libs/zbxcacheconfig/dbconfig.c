@@ -26,7 +26,7 @@
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
-#include "../zbxvault/vault.h"
+#include "zbxvault.h"
 #include "base64.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"

@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vault.h"
-#include "../zbxhashicorp/hashicorp.h"
-#include "../zbxcyberark/cyberark.h"
-#include "../zbxkvs/kvs.h"
+#include "zbxvault.h"
+#include "hashicorp.h"
+#include "cyberark.h"
 
+#include "zbxkvs.h"
 #include "zbxstr.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN

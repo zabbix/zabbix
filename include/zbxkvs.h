@@ -17,15 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CYBERARK_H
-#define ZABBIX_CYBERARK_H
+#ifndef ZABBIX_KVS_H
+#define ZABBIX_KVS_H
 
-#include "../zbxkvs/kvs.h"
+#include "zbxalgo.h"
+#include "zbxjson.h"
 
-#define ZBX_CYBERARK_NAME		"CyberArk"
-#define ZBX_CYBERARK_DBUSER_KEY		"UserName"
-#define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
+typedef struct
+{
+	char	*key;
+	char	*value;
+}
+zbx_kv_t;
 
-int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
+typedef zbx_hashset_t zbx_kvs_t;
+
+void		zbx_kvs_create(zbx_kvs_t *kvs, size_t init_size);
+void		zbx_kvs_clear(zbx_kvs_t *kvs);
+void		zbx_kvs_destroy(zbx_kvs_t *kvs);
+zbx_kv_t	*zbx_kvs_search(zbx_kvs_t *kvs, const zbx_kv_t *data);
+
+int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_kvs_t *kvs,
+		char **error);
+
+void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_kvs_t *kvs);
+
 #endif
