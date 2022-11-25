@@ -142,9 +142,9 @@ static void	zbx_print_prof(void)
 			}
 			else
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s %s() locked:%u busy:" ZBX_FS_DBL
-						" wait:"ZBX_FS_DBL "\n", get_scope_string(func_profile->scope),
-						func_profile->func_name, func_profile->locked,
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() %s locked:%u busy:" ZBX_FS_DBL
+						" wait:"ZBX_FS_DBL "\n", func_profile->func_name,
+						get_scope_string(func_profile->scope), func_profile->locked,
 						func_profile->sec - func_profile->sec_wait, func_profile->sec_wait);
 
 				total_wait_lock += func_profile->sec_wait;
