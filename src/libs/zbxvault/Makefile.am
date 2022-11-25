@@ -7,5 +7,4 @@ libzbxvault_a_SOURCES = \
 	cyberark.h \
 	hashicorp.c \
 	hashicorp.h \
-	vault.c \
-	vault.h
+	vault.c
