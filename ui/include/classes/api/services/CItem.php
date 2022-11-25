@@ -590,14 +590,13 @@ class CItem extends CItemGeneral {
 	 * Update item.
 	 *
 	 * @param array $items
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update($items, bool $allowed_uuid_update = false) {
+	public function update($items) {
 		$items = zbx_toArray($items);
 
-		parent::checkInput($items, true, $allowed_uuid_update);
+		parent::checkInput($items, true);
 		self::validateInventoryLinks($items, true);
 
 		$db_items = $this->get([
