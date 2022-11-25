@@ -456,7 +456,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'encrypt_nameid' => 0,
 			'encrypt_assertions' => 0,
 			'provision_status' => JIT_PROVISIONING_DISABLED,
-			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
+			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED
 		];
 		$this->getInputs($saml_data, array_keys($saml_data));
 
@@ -467,7 +467,7 @@ class CControllerAuthenticationUpdate extends CController {
 				'saml_user_username' => '',
 				'saml_user_lastname' => '',
 				'saml_provision_groups' => [],
-				'saml_provision_media' => [],
+				'saml_provision_media' => []
 			];
 			$this->getInputs($provisioning_fields, array_keys($provisioning_fields));
 			$provisioning_fields = CArrayHelper::renameKeys($provisioning_fields, [

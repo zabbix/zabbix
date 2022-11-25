@@ -263,7 +263,7 @@ class User extends ScimApiService {
 		}
 		else {
 			DB::delete('user_scim_group', [
-				'userid' => $user_data['userid'],
+				'userid' => $user_data['userid']
 			]);
 
 			$user_data['usrgrps'] = [];
@@ -340,7 +340,7 @@ class User extends ScimApiService {
 		$user_data['usrgrps'] = [];
 
 		DB::delete('user_scim_group', [
-			'userid' => $user_data['userid'],
+			'userid' => $user_data['userid']
 		]);
 
 		APIRPC::User()->updateProvisionedUser($user_data);

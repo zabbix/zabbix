@@ -33,7 +33,7 @@ class testAuthentication extends CAPITest {
 						'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'saml_auth_enabled',
 						'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval',
 						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
-					],
+					]
 				],
 				'get_result' => [
 					// General fields.
