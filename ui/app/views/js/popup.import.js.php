@@ -32,16 +32,13 @@ window.popup_import = new class {
 		this.form = null;
 	}
 
-	init(activate_advanced_configuration) {
+	init() {
 		this.overlay = overlays_stack.getById('popup_import');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.warningListeners();
-
-		if (activate_advanced_configuration) {
-			this.AdvancedConfigurationListeners();
-		}
+		this.advancedConfigurationListeners();
 	}
 
 	warningListeners() {
@@ -54,14 +51,18 @@ window.popup_import = new class {
 		}
 	}
 
-	AdvancedConfigurationListeners() {
-		document
-			.getElementById('advanced_options')
-			.addEventListener('change', () => {
-				this.form.querySelectorAll('.js-advanced-configuration').forEach(function (e) {
-					return e.classList.toggle("display-none");
-				});
+	advancedConfigurationListeners() {
+		const advanced_configuration = document.getElementById('advanced_options');
+
+		if (!advanced_configuration) {
+			return;
+		}
+
+		advanced_configuration.addEventListener('change', () => {
+			this.form.querySelectorAll('.js-advanced-configuration').forEach(function (e) {
+				return e.classList.toggle("display-none");
 			});
+		});
 
 		document
 			.getElementById('update_all')

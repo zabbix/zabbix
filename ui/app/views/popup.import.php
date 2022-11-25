@@ -189,9 +189,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($form_grid)
-	->addItem((new CScriptTag('popup_import.init('
-		.json_encode(['advanced_configuration' => $data['advanced_config']])
-	.');'))->setOnDocumentReady());
+	->addItem((new CScriptTag('popup_import.init();'))->setOnDocumentReady());
 
 $output = [
 	'header' => $data['title'],
