@@ -314,7 +314,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
+			'result_exec' => 'netstat -au --numeric-hosts | grep "^udp " | wc -l'
 		],
 		[
 			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
@@ -494,7 +494,7 @@ class testAgentItems extends CIntegrationTest {
 		[
 			'key' => 'net.tcp.port[123.123.123.123,111]',
 			'type' => ITEM_TYPE_ZABBIX,
-			'component' => self::COMPONENT_AGENTD,
+			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 0
 		],
