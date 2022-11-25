@@ -17,19 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EVALFUNC_H
-#define ZABBIX_EVALFUNC_H
+#ifndef ZABBIX_SERVER_H
+#define ZABBIX_SERVER_H
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
 
-#include "zbxtypes.h"
-#include "zbxcacheconfig.h"
+/* media statuses */
+#define MEDIA_STATUS_ACTIVE	0
+#define MEDIA_STATUS_DISABLED	1
 
-int	zbx_evaluatable_for_notsupported(const char *fn);
-int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error);
+/* normal and recovery operations */
+#define ZBX_OPERATION_MODE_NORMAL	0
+#define ZBX_OPERATION_MODE_RECOVERY	1
+#define ZBX_OPERATION_MODE_UPDATE	2
 
-int	evaluate_function(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
+/* algorithms for service status calculation */
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
 
-int	zbx_is_trigger_function(const char *name, size_t len);
-
-#endif
+#endif /*ZABBIX_SERVER_H*/

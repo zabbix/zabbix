@@ -17,19 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EVALFUNC_H
-#define ZABBIX_EVALFUNC_H
+#ifndef ZABBIX_ZBX_ITEM_CONSTANTS_H
+#define ZABBIX_ZBX_ITEM_CONSTANTS_H
 
-#include "zbxtypes.h"
-#include "zbxcacheconfig.h"
+/* item statuses */
+#define ITEM_STATUS_ACTIVE		0
+#define ITEM_STATUS_DISABLED		1
 
-int	zbx_evaluatable_for_notsupported(const char *fn);
-int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
-		char **error);
+/* item states */
+#define ITEM_STATE_NORMAL		0
+#define ITEM_STATE_NOTSUPPORTED		1
 
-int	evaluate_function(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
 
-int	zbx_is_trigger_function(const char *name, size_t len);
+/* discovery rule */
+#define DRULE_STATUS_MONITORED		0
+#define DRULE_STATUS_NOT_MONITORED	1
 
-#endif
+#define ITEM_LOGTYPE_INFORMATION	1
+#define ITEM_LOGTYPE_WARNING		2
+#define ITEM_LOGTYPE_ERROR		4
+#define ITEM_LOGTYPE_FAILURE_AUDIT	7
+#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+#define ITEM_LOGTYPE_CRITICAL		9
+#define ITEM_LOGTYPE_VERBOSE		10
+
+#define HTTPTEST_STATUS_MONITORED       0
+#define HTTPTEST_STATUS_NOT_MONITORED	1
+
+#endif /*ZABBIX_ZBX_ITEM_CONSTANTS_H*/

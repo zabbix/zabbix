@@ -60,6 +60,7 @@
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
 
 #ifdef HAVE_OPENIPMI
