@@ -185,3 +185,9 @@ EXTRA_DIST = \
 	zbxsymbols \
 	zbxwin32 \
 	zbxwinservice
+
+## hashicorp and cyberark used to be a separate libraries, remove them at some point in the future
+clean:
+	rm -rf hashicorp && \
+	rm -rf cyberark
+.PHONY: clean
