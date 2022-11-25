@@ -21,6 +21,7 @@
 #include "dbconfig.h"
 #include "zbxserver.h"
 #include "actions.h"
+#include "zbx_item_constants.h"
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
