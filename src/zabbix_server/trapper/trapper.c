@@ -40,6 +40,9 @@
 #include "zbxtime.h"
 #include "zbxstats.h"
 #include "zbx_rtc_constants.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -51,8 +54,6 @@
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
 
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
-
-extern int	CONFIG_CONFSYNCER_FORKS;
 
 typedef struct
 {
@@ -488,9 +489,10 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 
 	while (NULL != (row = DBfetch(result)))
 	{
+#define ZBX_USER_ONLINE_TIME	600
 		if (atoi(row[0]) + ZBX_USER_ONLINE_TIME < now)
 			continue;
-
+#undef ZBX_USER_ONLINE_TIME
 		users_online++;
 
 		if (0 == users_offline)	/* new user can be created and log in between two selects */

@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "actions.h"
 #include "zbxserver.h"
+#include "server.h"
+#include "actions.h"
 
 #include "log.h"
 #include "operations.h"
@@ -27,6 +28,8 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *

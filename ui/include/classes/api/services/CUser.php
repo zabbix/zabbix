@@ -1628,6 +1628,7 @@ class CUser extends CApiService {
 			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
