@@ -129,7 +129,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	{
 		sec = zbx_time();
 
-		zbx_prof_update();
+		zbx_prof_update(sec);
 
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);

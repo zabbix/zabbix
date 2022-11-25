@@ -1110,7 +1110,16 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_RETRIEVE_MODE_HEADERS	1
 #define ZBX_RETRIEVE_MODE_BOTH		2
 
-void	zbx_update_env(double time_now);
+void	__zbx_update_env(double time_now);
+
+#define zbx_update_env(time_now)	\
+					\
+do					\
+{					\
+	__zbx_update_env(time_now);	\
+	zbx_prof_update(time_now);	\
+}					\
+while (0)
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1

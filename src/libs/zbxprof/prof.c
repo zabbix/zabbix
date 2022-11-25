@@ -178,9 +178,9 @@ static void	zbx_reset_prof(void)
 		zbx_vector_func_profiles_clear_ext(&zbx_func_profiles, func_profile_free);
 }
 
-void	zbx_prof_update(void)
+void	zbx_prof_update(double time_now)
 {
-	static double	last_update, time_now;
+	static double	last_update;
 
 	if (1 == zbx_prof_enable_requested)
 	{
@@ -190,7 +190,7 @@ void	zbx_prof_update(void)
 	else
 		zbx_prof_enabled = 0;
 
-	if (30 < (time_now = zbx_time()) - last_update)
+	if (30 < time_now - last_update)
 	{
 		last_update = time_now;
 

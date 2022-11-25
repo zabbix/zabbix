@@ -602,7 +602,7 @@ static void	update_resolver_conf(void)
  * Parameters: time_now - [IN] the time for compare in seconds                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_env(double time_now)
+void	__zbx_update_env(double time_now)
 {
 	static double	time_update = 0;
 
@@ -615,8 +615,6 @@ void	zbx_update_env(double time_now)
 		update_resolver_conf();
 #endif
 	}
-
-	zbx_prof_update();
 }
 
 /******************************************************************************

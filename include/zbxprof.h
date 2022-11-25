@@ -33,6 +33,6 @@ void	zbx_prof_disable(void);
 void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);
 void	zbx_prof_end_wait(void);
 void	zbx_prof_end(void);
-void	zbx_prof_update(void);
+void	zbx_prof_update(double time_now);
 
 #endif
