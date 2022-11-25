@@ -21,8 +21,8 @@
 
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
-#include "libs/zbxkvs/kvs.h"
-#include "libs/zbxvault/vault.h"
+#include "zbxkvs.h"
+#include "zbxvault.h"
 #include "log.h"
 #include "zbxcommshigh.h"
 #include "zbxcompress.h"

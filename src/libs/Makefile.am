@@ -66,7 +66,6 @@ SERVER_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
 	zbxcompress \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -81,7 +80,6 @@ SERVER_SUBDIRS = \
 	zbxexport \
 	zbxexpr \
 	zbxha \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
@@ -111,7 +109,6 @@ PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
 	zbxcompress \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -124,7 +121,6 @@ PROXY_SUBDIRS = \
 	zbxembed \
 	zbxeval \
 	zbxexport \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
