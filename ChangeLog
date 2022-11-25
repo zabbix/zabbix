@@ -1,6 +1,8 @@
 Changes for 6.4.0beta4
 
 New features:
+A......... [ZBXNEXT-8051] added new authentications methods for API calls (rlataria)
+..F.I..... [ZBXNEXT-4714] implemented filters for Action log page and widget and export to CSV file for Action log page (ashubin, dpetra, vso)
 .........T [ZBX-21588] optimized template k8s nodes by http (egordymov)
 .........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBXNEXT-7903] added templates for Azure PostgreSQL servers (vkhaliev)
@@ -8,6 +10,7 @@ New features:
 .........T [ZBX-20478] fixed script k8s cluster state (egordymov)
 
 Bug fixes:
+.........T [ZBX-21929] fixed field 'type' of widgets (abakaldin)
 A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
 .........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
 ........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
