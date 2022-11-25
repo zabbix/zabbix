@@ -238,7 +238,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 		}
 		else
 		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
+			switch (zbx_regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
 				case ZBX_REGEXP_MATCH:
 					*result = (ZBX_CONDITION_OPERATOR_REGEXP == condition->op ? 1 : 0);

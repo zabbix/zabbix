@@ -65,8 +65,8 @@ func DestroyGlobalRegexp(grxp unsafe.Pointer) {
 func AddGlobalRegexp(grxp unsafe.Pointer, name, body string, expr_type int, delim byte, mode int) {
 	cname := C.CString(name)
 	cbody := C.CString(body)
-	log.Tracef("Calling C function \"add_regexp_ex()\"")
-	C.add_regexp_ex(C.zbx_vector_ptr_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim), C.int(mode))
+	log.Tracef("Calling C function \"zbx_add_regexp_ex()\"")
+	C.zbx_add_regexp_ex(C.zbx_vector_ptr_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim), C.int(mode))
 	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cname))
 	log.Tracef("Calling C function \"free()\"")
@@ -88,8 +88,8 @@ func MatchGlobalRegexp(
 		defer C.free(unsafe.Pointer(ctemplate))
 	}
 
-	log.Tracef("Calling C function \"regexp_sub_ex()\"")
-	ret := C.regexp_sub_ex(C.zbx_vector_ptr_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate, &coutput)
+	log.Tracef("Calling C function \"zbx_regexp_sub_ex()\"")
+	ret := C.zbx_regexp_sub_ex(C.zbx_vector_ptr_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate, &coutput)
 	switch ret {
 	case C.ZBX_REGEXP_MATCH:
 		match = true

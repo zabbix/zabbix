@@ -517,7 +517,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 			case_sensitive = atoi(tmp);
 
-			add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
+			zbx_add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
 success:

@@ -409,7 +409,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 			pattern = valuemap->value;
 
-			match = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+			match = zbx_regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
 
 			zbx_regexp_clean_expressions(&regexps);
 			zbx_vector_ptr_destroy(&regexps);
@@ -806,7 +806,7 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, const DC_EVALUATE_ITEM *ite
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
 
-		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, pattern, ZBX_CASE_SENSITIVE)))
+		if (FAIL == (regexp_ret = zbx_regexp_match_ex(&regexps, logeventid, pattern, ZBX_CASE_SENSITIVE)))
 		{
 			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		}
@@ -899,7 +899,7 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const DC_EVALUATE_ITEM *item
 
 	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
+		switch (zbx_regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				zbx_variant_set_dbl(value, 1);
@@ -1159,13 +1159,15 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 				(*count)++;
 			break;
 		case OP_REGEXP:
-			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+			if (ZBX_REGEXP_MATCH ==
+					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;
 			break;
 		case OP_IREGEXP:
-			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+			if (ZBX_REGEXP_MATCH ==
+					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;

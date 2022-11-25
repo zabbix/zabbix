@@ -784,7 +784,7 @@ int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_
 /******************************************************************************
  *                                                                            *
  * Purpose: frees expression data retrieved by DCget_expressions function or  *
- *          prepared with add_regexp_ex() function calls                      *
+ *          prepared with zbx_add_regexp_ex() function calls                  *
  *                                                                            *
  * Parameters: expressions  - [IN] a vector of expression data pointers       *
  *                                                                            *
@@ -805,7 +805,7 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 	zbx_vector_ptr_clear(expressions);
 }
 
-void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
+void	zbx_add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
 		char exp_delimiter, int case_sensitive)
 {
 	zbx_expression_t	*regexp;
@@ -990,7 +990,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *           the whole string is stored into 'output' variable.                   *
  *                                                                                *
  **********************************************************************************/
-int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+int	zbx_regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
 /* regular expressions */
@@ -1100,9 +1100,10 @@ out:
 #undef EXPRESSION_TYPE_FALSE
 }
 
-int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
+int	zbx_regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+		int case_sensitive)
 {
-	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
+	return zbx_regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
 
 int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps)

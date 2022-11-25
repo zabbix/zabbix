@@ -2010,7 +2010,7 @@ static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value,
 {
 	int	ret;
 
-	if (FAIL == (ret = regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
+	if (FAIL == (ret = zbx_regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
 		*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
 
 	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or FAIL */
