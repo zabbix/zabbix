@@ -354,7 +354,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 			}
 		}
 
-		$this->configureSamlAuthentication($settings, false);
+		$this->configureSamlAuthentication($settings);
 
 		// Logout and check that SAML authentication was enabled.
 		$this->page->logout();
