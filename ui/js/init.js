@@ -285,8 +285,10 @@ jQuery(function($) {
 		}, data.options || {});
 
 		if (isServerRequestRequired(data.type)) {
-			// Add additional IDs from checkboxes and pass them to popup menu.
-			data.data.ids = Object.keys(chkbxRange.getSelectedIds());
+			if (data.type === 'trigger') {
+				// Add additional IDs from checkboxes and pass them to popup menu.
+				data.data.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
 
 			var url = new Curl('zabbix.php');
 
