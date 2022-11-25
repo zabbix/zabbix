@@ -687,6 +687,7 @@ int	DBtxn_ongoing(void);
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name);
 int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBpk_exists(const char *table_name);
 #endif
