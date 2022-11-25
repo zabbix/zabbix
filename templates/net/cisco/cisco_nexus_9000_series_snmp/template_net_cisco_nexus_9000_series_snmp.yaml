@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-23T16:29:11Z'
+  date: '2022-11-25T12:59:18Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -235,7 +235,7 @@ zabbix_export:
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'The serial number of a device has changed. Acknowledge (Ack) to close manually.'
+              description: 'The serial number of a device has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -295,7 +295,7 @@ zabbix_export:
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'The system name has changed. Acknowledge (Ack) to close manually.'
+              description: 'The system name has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -312,8 +312,8 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
-            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprise's subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed.
-            For example, if the vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprise's subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining "what kind of box" is being managed.
+            For example, if the vendor "Flintstones, Inc." was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its "Fred Router".
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -356,7 +356,7 @@ zabbix_export:
               recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
-              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge (Ack) to close manually.'
+              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -377,9 +377,9 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMP-FRAMEWORK-MIB::snmpEngineTime.
-            The number of seconds since the value of the snmpEngineBoots object has had a last change.
-            When incrementing this object's value would cause it to exceed its maximum, the snmpEngineBoots is incremented as if a re-initialization had occurred, and this
-            object's value consequently reverts to zero.
+            The number of seconds since the value of the `snmpEngineBoots` object has had a last change.
+            When incrementing this object's value would cause it to exceed its maximum, the `snmpEngineBoots` is incremented as if a re-initialization had occurred,
+            and this object's value consequently reverts to zero.
           tags:
             -
               tag: component
@@ -430,9 +430,9 @@ zabbix_export:
           key: cpu.discovery
           delay: 1h
           description: |
-            You must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable, indexed with cpmCPUTotalPhysicalIndex.
-            The table cpmCPUTotalTable allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router, like different CPU chips, group of CPUs, or CPUs in different modules/cards.
-            In case of a single CPU, cpmCPUTotalTable has only one entry.
+            You must use CISCO-PROCESS-MIB and its object `cpmCPUTotal5minRev` from the table called `cpmCPUTotalTable`, and indexed with `cpmCPUTotalPhysicalIndex`.
+            The table `cpmCPUTotalTable` allows CISCO-PROCESS-MIB to keep the CPU statistics for different physical entities in the router, such as different CPU chips, a group of CPUs, or CPUs in different modules/cards.
+            In the case of a single CPU, the `cpmCPUTotalTable` has only one entry.
           item_prototypes:
             -
               uuid: 0196f6b4431b4823860b89c712b2e5a8
@@ -446,9 +446,9 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CISCO-PROCESS-MIB
-                The object name: cpmCPUTotal5minRev
+                The object name: `cpmCPUTotal5minRev`
                 
-                The MIB object cpmCPUTotal5minRev provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev. These MIB objects are not accurate because they look at the CPU with an interval of one minute and five seconds, respectively. These MIBs enable to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for the cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500 series can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
+                The MIB object `cpmCPUTotal5minRev` provides a more accurate view of the performance of the router over time than the MIB objects `cpmCPUTotal1minRev` and `cpmCPUTotal5secRev`. These MIB objects are not accurate because they look at the CPU with an interval of one minute and five seconds, respectively. These MIBs enable to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for the `cpmCPUTotal5minRev` is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500 series can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
               tags:
                 -
                   tag: component
@@ -520,7 +520,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: ENTITY-MIB.
-                The object name: entPhysicalSerialNum.
+                The object name: `entPhysicalSerialNum`.
                 The vendor-specific serial number string for the physical entity. The preferred value is the serial number string actually printed on the component itself (if present).
               preprocessing:
                 -
@@ -541,7 +541,7 @@ zabbix_export:
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
-                  description: 'Device serial number has changed. Ack to close.'
+                  description: 'The device serial number has changed. Acknowledge to close manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -576,7 +576,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: CISCO-ENTITY-FRU-CONTROL-MIB.
-                The object name: cefcFanTrayOperStatus.
+                The object name: `cefcFanTrayOperStatus`.
                 The operational state of the fan or a fan tray.
                 Possible values:
                 -  unknown (1) - unknown;
@@ -653,7 +653,8 @@ zabbix_export:
           key: memory.discovery
           delay: 1h
           description: |
-            The discovery of ciscoMemoryPoolTable - the table that contains monitoring entries of the memory pool.
+            The discovery of `ciscoMemoryPoolTable` - the table that contains monitoring entries of the memory pool.
+            For more details see "How to Get Free and Largest Block of Contiguous Memory Using SNMP":
             http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
           item_prototypes:
             -
@@ -666,7 +667,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CISCO-ENHANCED-MEMPOOL-MIB.
-                The object name: cempMemPoolFree.
+                The object name: `cempMemPoolFree`.
                 It indicates the number of bytes from the memory pool that are currently unused on the physical entity.
               tags:
                 -
@@ -685,7 +686,7 @@ zabbix_export:
               units: B
               description: |
                 MIB: CISCO-ENHANCED-MEMPOOL-MIB.
-                The object name: cempMemPoolUsed.
+                The object name: `cempMemPoolUsed`.
                 It indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity.
               tags:
                 -
@@ -1433,7 +1434,7 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
                   description: |
-                    The PSU requires attention. Compare current state from operational data with table below:
+                    The PSU requires attention. Compare the current state from operational data with the table below:
                     -  offEnvOther (1): FRU is powered off because of a problem not listed below;
                     -  on (2): FRU is powered on;
                     -  offAdmin (3): administratively off;
@@ -1466,7 +1467,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.4.1.9.9.91.1.1.1.1.1,{#SENSOR_SCALE},1.3.6.1.4.1.9.9.91.1.1.1.1.2,{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.7]'
           key: temperature.discovery
           delay: 1h
-          description: 'The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) entSensorType are discovered. The scale of gathered values is taken from the entSensorScale and applied in item preprocessing.'
+          description: 'The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) `entSensorType` are discovered. The scale of gathered values is taken from the `entSensorScale` and applied in item preprocessing.'
           item_prototypes:
             -
               uuid: d4e13b5e26164a2ca240bfb93fdd9b77
@@ -1668,11 +1669,11 @@ zabbix_export:
         -
           macro: '{$ENT_CLASS.NOT_MATCHES}'
           value: '3'
-          description: 'Filter excludes chassis(3) class from Serial discovery. Chassis(3) polled with regular item.'
+          description: 'The filter excludes chassis (3) class from Serial discovery. The chassis (3) are polled with a regular item.'
         -
           macro: '{$ENT_SN.MATCHES}'
           value: .+
-          description: 'Filter retrieves only existing serial number strings.'
+          description: 'The filter retrieves only existing serial number strings.'
         -
           macro: '{$ICMP_LOSS_WARN}'
           value: '20'
@@ -1716,14 +1717,14 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'It filters out loopbacks, nulls, docker veth links and docker0 bridge by default.'
+          description: 'It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         -
           macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'If the operational status is notPresent (6), then an interface is excluded.'
+          description: 'If the operational status is `notPresent (6)`, then an interface is excluded.'
         -
           macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
@@ -1733,7 +1734,7 @@ zabbix_export:
         -
           macro: '{$PSU.PROBLEM.STATES}'
           value: ^(1|4|5|6|7|9|10|11|12)$
-          description: 'The PSU states list for average trigger priority'
+          description: 'The PSU states list for average trigger priority.'
         -
           macro: '{$SNMP.TIMEOUT}'
           value: 5m
