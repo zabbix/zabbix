@@ -205,12 +205,6 @@ class CConfigurationImport {
 					$template_macros_refs[$template['uuid']][] = $macro['macro'];
 				}
 			}
-
-			if ($template['templates']) {
-				foreach ($template['templates'] as $linked_template) {
-					$templates_refs += [$linked_template['name'] => []];
-				}
-			}
 		}
 
 		foreach ($this->getFormattedHostGroups() as $group) {

@@ -316,7 +316,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Unlink or clear objects of given templates from given hosts or templates.
+	 * Unlink or clear objects of given templates from given hosts.
 	 *
 	 * @param array      $templateids
 	 * @param array|null $hostids
@@ -1423,8 +1423,6 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array      $db_hosts
 	 */
 	protected function massAddAffectedObjects(string $objects, array $objectids, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
 		foreach ($db_hosts as &$db_host) {
 			$db_host[$objects] = [];
 		}
@@ -1547,96 +1545,5 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Get templates or hosts input array based on requested data and database data.
-	 *
-	 * @param array $data
-	 * @param array $db_objects
-	 *
-	 * @return array
-	 */
-	protected function getObjectsByData(array $data, array $db_objects): array {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		$objects = [];
-
-		foreach ($db_objects as $db_object) {
-			$object = [$id_field_name => $db_object[$id_field_name]];
-
-			if (array_key_exists('groups', $db_object)) {
-				$object['groups'] = [];
-
-				if (array_key_exists('groups', $data)) {
-					foreach ($data['groups'] as $group) {
-						$object['groups'][] = ['groupid' => $group['groupid']];
-					}
-				}
-			}
-
-			if (array_key_exists('macros', $db_object)) {
-				$object['macros'] = [];
-
-				if (array_key_exists('macros', $data) && is_array(reset($data['macros']))) {
-					$db_macros = [];
-
-					foreach ($db_object['macros'] as $db_macro) {
-						$db_macros[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro;
-					}
-
-					foreach ($data['macros'] as $macro) {
-						$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-						if (array_key_exists($trimmed_macro, $db_macros)) {
-							$object['macros'][] = ['hostmacroid' => $db_macros[$trimmed_macro]['hostmacroid']] + $macro
-								+ ['description' => DB::getDefault('hostmacro', 'description')];
-						}
-						else {
-							$object['macros'][] = $macro;
-						}
-					}
-				}
-			}
-
-			if (array_key_exists('templates', $db_object)) {
-				$templates = $this instanceof CTemplate ? 'templates_link' : 'templates';
-				$templateids = $this instanceof CTemplate ? 'templateids_link' : 'templateids';
-
-				if (array_key_exists($templates, $data) || array_key_exists($templateids, $data)) {
-					$object['templates'] = [];
-
-					if (array_key_exists($templates, $data)) {
-						foreach ($data[$templates] as $template) {
-							$object['templates'][] = ['templateid' => $template['templateid']];
-						}
-					}
-				}
-
-				if (array_key_exists('templates_clear', $data) || array_key_exists('templateids_clear', $data)) {
-					$object['templates_clear'] = [];
-					$db_templateids = array_column($db_object['templates'], 'templateid');
-
-					if (array_key_exists('templates_clear', $data)) {
-						foreach ($data['templates_clear'] as $template) {
-							if (in_array($template['templateid'], $db_templateids)) {
-								$object['templates_clear'][] = ['templateid' => $template['templateid']];
-							}
-						}
-					}
-					else {
-						foreach ($data['templateids_clear'] as $templateid) {
-							if (in_array($templateid, $db_templateids)) {
-								$object['templates_clear'][] = ['templateid' => $templateid];
-							}
-						}
-					}
-				}
-			}
-
-			$objects[] = $object;
-		}
-
-		return $objects;
 	}
 }

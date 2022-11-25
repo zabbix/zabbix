@@ -233,12 +233,10 @@ abstract class CHostBase extends CApiService {
 						'triggerids' => $row['triggerid']
 					]);
 
-					$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-						? _('Cannot unlink template "%1$s" without template "%2$s" from template "%3$s" due to expression of trigger "%4$s".')
-						: _('Cannot unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".');
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['del_templateid']]['host'],
-						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(
+						_('Cannot unlink template "%1$s" without template "%2$s" from host "%3$s" due to expression of trigger "%4$s".'),
+						$objects[$row['del_templateid']]['host'], $objects[$row['hostid']]['host'],
+						$objects[$hostid]['host'], $triggers[0]['description']
 					));
 				}
 			}
@@ -319,97 +317,11 @@ abstract class CHostBase extends CApiService {
 				}
 			}
 		}
-
-		if ($this instanceof CTemplate) {
-			$trigger_hosts = [];
-
-			foreach ($trigger_links as $triggerid => $hostids) {
-				$trigger_hosts[$triggerid] = array_keys($hostids);
-			}
-
-			$trigger_map = [];
-
-			while (true) {
-				$result = DBselect(
-					'SELECT DISTINCT t.templateid,t.triggerid,i.hostid'.
-					' FROM triggers t,functions f,items i'.
-					' WHERE t.triggerid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND '.dbConditionInt('t.templateid', array_keys($trigger_hosts))
-				);
-
-				$_trigger_hosts = [];
-				$hostids = [];
-
-				while ($row = DBfetch($result)) {
-					foreach ($trigger_hosts[$row['templateid']] as $hostid) {
-						if (array_key_exists($row['hostid'], $del_host_templates)
-								&& in_array($hostid, $del_host_templates[$row['hostid']])) {
-							continue;
-						}
-
-						$trigger_map[$row['triggerid']] = $row['templateid'];
-						$_trigger_hosts[$row['triggerid']][] = $row['hostid'];
-						$hostids[$row['hostid']] = true;
-					}
-				}
-
-				if (!$_trigger_hosts) {
-					break;
-				}
-
-				$trigger_hosts = $_trigger_hosts;
-
-				$result = DBselect(
-					'SELECT DISTINCT td.triggerid_up,td.triggerid_down,i.hostid'.
-					' FROM trigger_depends td,functions f,items i'.
-					' WHERE td.triggerid_down=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND '.dbConditionId('td.triggerid_up', array_keys($trigger_hosts)).
-						' AND '.dbConditionId('td.triggerid_down', array_keys($trigger_hosts), true).
-						' AND '.dbConditionId('i.hostid', array_keys($hostids))
-				);
-
-				while ($row = DBfetch($result)) {
-					foreach ($trigger_hosts[$row['triggerid_up']] as $hostid) {
-						if (bccomp($row['hostid'], $hostid) == 0) {
-							$triggerid = $row['triggerid_up'];
-
-							do {
-								$triggerid = $trigger_map[$triggerid];
-							} while (array_key_exists($triggerid, $trigger_map));
-
-							$from_hostid = key($trigger_links[$triggerid]);
-							$templateid = $trigger_links[$triggerid][$from_hostid];
-
-							$objects = DB::select('hosts', [
-								'output' => ['host', 'status'],
-								'hostids' => [$templateid, $from_hostid, $hostid],
-								'preservekeys' => true
-							]);
-
-							$triggers = DB::select('triggers', [
-								'output' => ['description'],
-								'triggerids' => $row['triggerid_down']
-							]);
-
-							$error = ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-								? _('Cannot unlink template "%1$s" from template "%2$s" due to dependency of trigger "%3$s" on template "%4$s".')
-								: _('Cannot unlink template "%1$s" from template "%2$s" due to dependency of trigger "%3$s" on host "%4$s".');
-
-							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$templateid]['host'],
-								$objects[$from_hostid]['host'], $triggers[0]['description'], $objects[$hostid]['host']
-							));
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**
-	 * Check whether all templates of triggers, from which depends the triggers of linking templates, are linked to
-	 * target hosts or templates.
+	 * Check whether all templates of triggers, on which the linked template triggers depend, are linked to target
+	 * hosts.
 	 *
 	 * @param array  $ins_templates
 	 * @param string $ins_templates[<templateid>][<hostid>]  Array of IDs of templates to replace on target object.
@@ -431,33 +343,6 @@ abstract class CHostBase extends CApiService {
 
 		while ($row = DBfetch($result)) {
 			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
-				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
-					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
-						'hostids' => [$row['ins_templateid'], $hostid],
-						'preservekeys' => true
-					]);
-
-					$triggers = DB::select('triggers', [
-						'output' => ['description'],
-						'triggerids' => $row['triggerid_down']
-					]);
-
-					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
-					}
-					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$hostid]['host'], $triggers[0]['description']
-					));
-				}
-
 				if (!in_array($row['hostid'], $templateids)) {
 					$objects = DB::select('hosts', [
 						'output' => ['host', 'status', 'flags'],
@@ -470,10 +355,7 @@ abstract class CHostBase extends CApiService {
 						'triggerids' => $row['triggerid_down']
 					]);
 
-					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" without template "%2$s" to template "%3$s" due to dependency of trigger "%4$s".');
-					}
-					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					if ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$error = _('Cannot link template "%1$s" without template "%2$s" to host prototype "%3$s" due to dependency of trigger "%4$s".');
 					}
 					else {
@@ -482,56 +364,6 @@ abstract class CHostBase extends CApiService {
 
 					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
 						$objects[$row['hostid']]['host'], $objects[$hostid]['host'], $triggers[0]['description']
-					));
-				}
-			}
-		}
-
-		if ($this instanceof CTemplate) {
-			$hostids = [];
-
-			foreach ($ins_templates as $hostids_templateids) {
-				foreach ($hostids_templateids as $hostid => $templateids) {
-					$hostids[$hostid] = true;
-				}
-			}
-
-			$result = DBselect(
-				'SELECT DISTINCT i.hostid AS ins_templateid,td.triggerid_down,ii.hostid'.
-				' FROM items i,functions f,trigger_depends td,functions ff,items ii'.
-				' WHERE i.itemid=f.itemid'.
-					' AND f.triggerid=td.triggerid_up'.
-					' AND td.triggerid_down=ff.triggerid'.
-					' AND ff.itemid=ii.itemid'.
-					' AND '.dbConditionInt('i.hostid', array_keys($ins_templates)).
-					' AND '.dbConditionInt('ii.hostid', array_keys($hostids))
-			);
-
-			while ($row = DBfetch($result)) {
-				if (array_key_exists($row['hostid'], $ins_templates[$row['ins_templateid']])) {
-					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
-						'hostids' => [$row['ins_templateid'], $row['hostid']],
-						'preservekeys' => true
-					]);
-
-					$triggers = DB::select('triggers', [
-						'output' => ['description'],
-						'triggerids' => $row['triggerid_down']
-					]);
-
-					if ($objects[$row['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to dependency of trigger "%3$s".');
-					}
-					elseif ($objects[$row['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to dependency of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to dependency of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$row['hostid']]['host'], $triggers[0]['description']
 					));
 				}
 			}
@@ -558,33 +390,6 @@ abstract class CHostBase extends CApiService {
 
 		while ($row = DBfetch($result)) {
 			foreach ($ins_templates[$row['ins_templateid']] as $hostid => $templateids) {
-				if (bccomp($row['hostid'], $hostid) == 0 && $this instanceof CTemplate) {
-					$objects = DB::select('hosts', [
-						'output' => ['host', 'status', 'flags'],
-						'hostids' => [$row['ins_templateid'], $hostid],
-						'preservekeys' => true
-					]);
-
-					$triggers = DB::select('triggers', [
-						'output' => ['description'],
-						'triggerids' => $row['triggerid']
-					]);
-
-					if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-						$error = _('Cannot link template "%1$s" to template "%2$s" due to expression of trigger "%3$s".');
-					}
-					elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$error = _('Cannot link template "%1$s" to host prototype "%2$s" due to expression of trigger "%3$s".');
-					}
-					else {
-						$error = _('Cannot link template "%1$s" to host "%2$s" due to expression of trigger "%3$s".');
-					}
-
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$row['ins_templateid']]['host'],
-						$objects[$hostid]['host'], $triggers[0]['description']
-					));
-				}
-
 				if (!in_array($row['hostid'], $templateids)) {
 					$objects = DB::select('hosts', [
 						'output' => ['host', 'status', 'flags'],
@@ -1239,7 +1044,10 @@ abstract class CHostBase extends CApiService {
 	 * @param array $db_hosts
 	 */
 	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedTemplates($hosts, $db_hosts);
+		if (!($this instanceof CTemplate)) {
+			$this->addAffectedTemplates($hosts, $db_hosts);
+		}
+
 		$this->addAffectedTags($hosts, $db_hosts);
 		$this->addAffectedMacros($hosts, $db_hosts);
 	}
@@ -1249,10 +1057,6 @@ abstract class CHostBase extends CApiService {
 	 * @param array $db_hosts
 	 */
 	private function addAffectedTemplates(array $hosts, array &$db_hosts): void {
-		if ($this instanceof CTemplate) {
-			return;
-		}
-
 		$hostids = [];
 
 		foreach ($hosts as $host) {
