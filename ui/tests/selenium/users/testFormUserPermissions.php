@@ -243,7 +243,7 @@ class testFormUserPermissions extends CWebTest {
 	 * @dataProvider getUpdateUserRoletypeData
 	 */
 	public function testFormUserPermissions_UpdateUserRoletype($data) {
-		$this->page->login()->open('zabbix.php?action=user.edit&userid=4');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=40');
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->fill($data);
