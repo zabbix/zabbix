@@ -86,6 +86,17 @@ class testDashboardURLWidget extends CWebTest {
 			]
 		]);
 		self::$dashboardid = $response['dashboardids'][0];
+		$host_id = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host in('Not available host')");
+		$interface_id = CDBHelper::getValue("SELECT interfaceid FROM interface WHERE hostid=$host_id AND type=1");
+		CDataHelper::call('item.create', [
+			'hostid' => $host_id,
+			'name' => 'Test DNS',
+			'key_' => 'dns_macro',
+			'type' => ITEM_TYPE_ZABBIX,
+			'delay' => "30",
+			'interfaceid' => $interface_id,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
 	}
 
 	public function testDashboardURLWidget_Layout() {

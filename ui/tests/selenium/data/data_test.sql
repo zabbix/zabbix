@@ -1737,7 +1737,6 @@ INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, av
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55041, 2, 1, '{$SNMP_COMMUNITY}');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55042, 99130, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR IPMI');
 INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55043, 99130, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR JMX');
-INSERT INTO items (itemid, type, hostid, name, key_, description) VALUES (400700, 0, 99130, 'Test DNS macro', 'dns_macro', 'The item is needed for dynamic host check. Hosts without items do not appear in the search');
 
 INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from) VALUES (99131, 'Not available host in maintenance', 'Not available host in maintenance', 0, 'Not available host in maintenance for Host availability widget', 5, 1, 0, 1534971600);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99051, 99131, 50016);
