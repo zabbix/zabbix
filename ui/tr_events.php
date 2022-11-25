@@ -60,7 +60,9 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $events = API::Event()->get([
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity',
+		'cause_eventid'
+	],
 	'selectTags' => ['tag', 'value'],
 	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
 		'suppress_until'

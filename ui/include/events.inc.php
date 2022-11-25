@@ -254,6 +254,34 @@ function make_event_details(array $event, array $allowed) {
 		->addRow([_('Tags'), $tags[$event['eventid']]])
 		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
+	if ($event['cause_eventid'] == 0) {
+		$table->addRow([_('Rank'), _('Cause')]);
+	}
+	else {
+		$cause_event = API::Event()->get([
+			'output' => ['name', 'objectid'],
+			'eventids' => $event['cause_eventid']
+		]);
+
+		if ($cause_event) {
+			$cause_event = reset($cause_event);
+
+			$table->addRow([_('Rank'),
+				[
+					_('Symptom'),
+					' (',
+					new CLink(
+						$cause_event['name'],
+						(new CUrl('tr_events.php'))
+							->setArgument('triggerid', $cause_event['objectid'])
+							->setArgument('eventid', $event['cause_eventid'])
+					),
+					')'
+				]
+			]);
+		}
+	}
+
 	return $table;
 }
 
