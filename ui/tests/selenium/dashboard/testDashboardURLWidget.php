@@ -42,7 +42,6 @@ class testDashboardURLWidget extends CWebTest {
 	}
 
 	private static $dashboardid;
-	private static $form;
 	private static $default_widget = 'Default URL Widget';
 
 	/**
