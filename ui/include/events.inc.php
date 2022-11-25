@@ -258,13 +258,43 @@ function make_event_details(array $event, array $allowed) {
 }
 
 /**
- * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges task ID.
+ * Check if event status is UPDATING depending on acknowledges task ID.
  *
  * @param bool   $in_closing                         True if problem is in CLOSING state.
  * @param array  $event                              Event data.
  * @param array  $event['acknowledges']              List of event acknowledges.
  * @param int    $event['acknowledges'][]['action']  Event action type.
  * @param string $event['acknowledges'][]['taskid']  Task ID.
+ *
+ * @return bool
+ */
+function isEventUpdating(bool $in_closing, array $event): bool {
+	$in_updating = false;
+
+	if (!$in_closing) {
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
+					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
+					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+
+				// If currently is symptom and there is an active task.
+				if ($acknowledge['taskid'] != 0) {
+					$in_updating = true;
+					break;
+				}
+			}
+		}
+	}
+
+	return $in_updating;
+}
+
+/**
+ * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges task ID.
+ *
+ * @param bool   $in_closing                         True if problem is in CLOSING state.
+ * @param array  $event                              Event data.
  *
  * @return string
  */
@@ -277,23 +307,7 @@ function getEventStatusString(bool $in_closing, array $event): string {
 			$value_str = _('CLOSING');
 		}
 		else {
-			$in_updating = false;
-
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
-						ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
-						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
-						ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
-
-					// If currently is symptom and there is an active task.
-					if ($acknowledge['taskid'] != 0) {
-						$in_updating = true;
-						break;
-					}
-				}
-			}
-
-			$value_str = $in_updating ? _('UPDATING') : _('PROBLEM');
+			$value_str = isEventUpdating($in_closing, $event) ? _('UPDATING') : _('PROBLEM');
 		}
 	}
 
@@ -415,6 +429,10 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		$value_str = getEventStatusString($in_closing, $event);
 		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
+
+		if (isEventUpdating($in_closing, $event)) {
+			$cell_status->addClass('blink');
+		}
 
 		/*
 		 * Add colors to span depending on configuration and trigger parameters. No blinking added to status,

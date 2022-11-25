@@ -1351,6 +1351,10 @@ class CScreenProblem extends CScreenBase {
 			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 			$cell_status = new CSpan($value_str);
 
+			if (isEventUpdating($in_closing, $problem)) {
+				$cell_status->addClass('blink');
+			}
+
 			// Add colors and blinking to span depending on configuration and trigger parameters.
 			addTriggerValueStyle($cell_status, $value, $value_clock, $is_acknowledged);
 
