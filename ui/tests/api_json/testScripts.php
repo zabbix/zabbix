@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/triggers.inc.php';
+require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 
 /**
  * @onBefore prepareScriptsData
@@ -8437,12 +8438,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8475,12 +8476,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_d_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8513,12 +8514,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8551,12 +8552,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8589,12 +8590,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8627,12 +8628,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8665,12 +8666,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8703,12 +8704,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8741,12 +8742,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_d_cause' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8779,12 +8780,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_symptom' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9021,12 +9022,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9059,12 +9060,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9097,12 +9098,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9135,12 +9136,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9173,12 +9174,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9211,12 +9212,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9249,12 +9250,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9287,12 +9288,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						// Cause event is restricted, so macros resolve to empty string.
 						'macros_rw_symptom' => [
@@ -9327,11 +9328,11 @@ class testScripts extends CAPITest {
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
 							'{EVENT.CAUSE.ID}' => 'macros_d_cause',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
@@ -9529,12 +9530,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9567,12 +9568,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9605,12 +9606,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9643,12 +9644,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9681,12 +9682,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9719,12 +9720,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9757,12 +9758,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9795,12 +9796,12 @@ class testScripts extends CAPITest {
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
-							'{EVENT.CAUSE.ID}' => '',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						// Cause event is restricted, so macros resolve to empty string.
 						'macros_rw_symptom' => [
@@ -9835,11 +9836,11 @@ class testScripts extends CAPITest {
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
 							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
 							'{EVENT.CAUSE.ID}' => 'macros_d_cause',
-							'{EVENT.CAUSE.NAME}' => '',
-							'{EVENT.CAUSE.NSEVERITY}' => '',
-							'{EVENT.CAUSE.SEVERITY}' => '',
-							'{EVENT.CAUSE.STATUS}' => '',
-							'{EVENT.CAUSE.VALUE}' => ''
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],

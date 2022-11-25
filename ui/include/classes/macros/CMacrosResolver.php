@@ -2946,40 +2946,42 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					/*
 					 * If event is already cause event, $event['cause'] does not exist or is empty, macros resolve to
-					 * empty string.
+					 * *UNKNOWN*.
 					 */
 					case '{EVENT.CAUSE.ID}':
-						$macro_values[$eventid][$macro] = $event['cause_eventid'] == 0 ? '' : $event['cause_eventid'];
+						$macro_values[$eventid][$macro] = $event['cause_eventid'] == 0
+							? UNRESOLVED_MACRO_STRING
+							: $event['cause_eventid'];
 						break;
 
 					case '{EVENT.CAUSE.NAME}':
 						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['name']
-							: '';
+							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.NSEVERITY}':
 						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['severity']
-							: '';
+							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.SEVERITY}':
 						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? CSeverityHelper::getName($event['cause']['severity'])
-							: '';
+							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.STATUS}':
 						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? trigger_value2str($event['cause']['value'])
-							: '';
+							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.VALUE}':
 						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['value']
-							: '';
+							: UNRESOLVED_MACRO_STRING;
 						break;
 				}
 			}
