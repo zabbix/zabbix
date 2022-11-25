@@ -1,3 +1,9 @@
+Changes for 6.0.11rc2
+
+Bug fixes:
+........S. [ZBX-17419] prepared an upgrade patch for backporting the feature to 5.0 (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.11rc1
 
 New features:
