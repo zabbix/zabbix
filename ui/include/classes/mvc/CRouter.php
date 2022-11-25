@@ -248,7 +248,7 @@ class CRouter {
 		'proxy.delete'								=> ['CControllerProxyDelete',							'layout.json',			null],
 		'proxy.host.disable'						=> ['CControllerProxyHostDisable',						'layout.json',			null],
 		'proxy.host.enable'							=> ['CControllerProxyHostEnable',						'layout.json',			null],
-		'proxy.list'								=> ['CControllerProxyList',								'layout.htmlpage',		'proxy.list'],
+		'proxy.list'								=> ['CControllerProxyList',								'layout.htmlpage',		'administration.proxy.list'],
 		'proxy.update'								=> ['CControllerProxyUpdate',							'layout.json',			null],
 		'queue.details'								=> ['CControllerQueueDetails',							'layout.htmlpage',		'administration.queue.details'],
 		'queue.overview'							=> ['CControllerQueueOverview',							'layout.htmlpage',		'administration.queue.overview'],
