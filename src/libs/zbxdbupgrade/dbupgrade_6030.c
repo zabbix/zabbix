@@ -699,9 +699,8 @@ static int	DBpatch_6030074(void)
 	const ZBX_TABLE table =
 		{"event_symptom", "eventid", 0,
 			{
-				{"eventid", NULL, "events", "evendid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-						ZBX_FK_CASCADE_DELETE},
-				{"cause_eventid", NULL, "events", "evendid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
