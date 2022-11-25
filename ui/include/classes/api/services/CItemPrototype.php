@@ -341,10 +341,9 @@ class CItemPrototype extends CItemGeneral {
 	 *
 	 * @param array $items
 	 * @param bool  $update
-	 * @param bool  $allowed_uuid_update
 	 */
-	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false) {
-		parent::checkInput($items, $update, $allowed_uuid_update);
+	protected function checkInput(array &$items, $update = false) {
+		parent::checkInput($items, $update);
 
 		// set proper flags to divide normal and discovered items in future processing
 		foreach ($items as &$item) {
@@ -465,14 +464,13 @@ class CItemPrototype extends CItemGeneral {
 	 * Update ItemPrototype.
 	 *
 	 * @param array $items
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update($items, bool $allowed_uuid_update = false) {
+	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$this->checkInput($items, true, $allowed_uuid_update);
+		$this->checkInput($items, true);
 
 		// Validate item prototype status and discover status fields.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [

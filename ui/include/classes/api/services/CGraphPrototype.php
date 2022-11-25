@@ -454,9 +454,8 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 * @param bool  $allowed_uuid_update
 	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update) {
+	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		// check for "itemid" when updating graph prototype with only "gitemid" passed
 		foreach ($graphs as &$graph) {
 			if (isset($graph['gitems'])) {
@@ -493,7 +492,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$this->checkDiscoveryRuleCount($graphs, $allowedItems);
 
-		parent::validateUpdate($graphs, $dbGraphs, $allowed_uuid_update);
+		parent::validateUpdate($graphs, $dbGraphs);
 
 		$allowedValueTypes = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 

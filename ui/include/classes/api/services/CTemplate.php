@@ -416,12 +416,11 @@ class CTemplate extends CHostGeneral {
 
 	/**
 	 * @param array $templates
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $templates, bool $allowed_uuid_update = false): array {
-		$this->validateUpdate($templates, $db_templates, $allowed_uuid_update);
+	public function update(array $templates): array {
+		$this->validateUpdate($templates, $db_templates);
 
 		$upd_templates =[];
 
@@ -453,12 +452,12 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * @param array      $templates
 	 * @param array|null $db_templates
-	 * @param bool       $allowed_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$templates, array &$db_templates = null, bool $allowed_uuid_update) {
+	protected function validateUpdate(array &$templates, array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -484,10 +483,6 @@ class CTemplate extends CHostGeneral {
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 			]]
 		]];
-
-		if ($allowed_uuid_update) {
-			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

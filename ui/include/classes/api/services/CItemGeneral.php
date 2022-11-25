@@ -133,16 +133,12 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
-	 * @param bool  $allowed_uuid_update
 	 */
-	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false) {
+	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
+			'uuid' => ['type' => API_UUID]
 		]];
-
-		if ($allowed_uuid_update) {
-			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-		}
 
 		if ($update) {
 			unset($api_input_rules['fields']['type']['flags']);
@@ -601,7 +597,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->validateValueMaps($items);
 
-		$this->checkAndAddUuid($items, $dbHosts, $update, $allowed_uuid_update);
+		$this->checkAndAddUuid($items, $dbHosts, $update);
 		$this->checkExistingItems($items);
 	}
 
@@ -612,27 +608,11 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $items_to_create
 	 * @param array $db_hosts
 	 * @param bool  $is_update
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update,
-			bool $allowed_uuid_update): void {
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
 		if ($is_update) {
-			if ($allowed_uuid_update) {
-				return;
-			}
-
-			foreach ($items_to_create as $index => &$item) {
-				if (array_key_exists('uuid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
-							_s('unexpected parameter "%1$s"', 'uuid')
-						)
-					);
-				}
-			}
-
 			return;
 		}
 

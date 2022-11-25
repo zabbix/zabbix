@@ -156,12 +156,11 @@ class CValueMap extends CApiService {
 
 	/**
 	 * @param array $valuemap
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $valuemaps, bool $allowed_uuid_update = false) {
-		$this->validateUpdate($valuemaps, $db_valuemaps, $allowed_uuid_update);
+	public function update(array $valuemaps) {
+		$this->validateUpdate($valuemaps, $db_valuemaps);
 
 		$upd_valuemaps = [];
 		$valuemaps_mappings = [];
@@ -458,12 +457,12 @@ class CValueMap extends CApiService {
 	/**
 	 * @param array $valuemaps
 	 * @param array $db_valuemaps
-	 * @param bool  $allowed_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null, bool $allowed_uuid_update) {
+	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+			'uuid' => 		['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -499,10 +498,6 @@ class CValueMap extends CApiService {
 				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
-
-		if ($allowed_uuid_update) {
-			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
-		}
 
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
