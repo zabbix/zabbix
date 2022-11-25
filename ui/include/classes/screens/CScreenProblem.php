@@ -1550,14 +1550,10 @@ class CScreenProblem extends CScreenBase {
 						$checkbox_col,
 						$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
 					]))
+						->addClass(ZBX_STYLE_PROBLEM_NESTED)
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
 						->addClass('hidden')
 						->setAttribute('data-cause-eventid', $problem['cause_eventid']);
-
-					if (getUserTheme(CWebUser::$data) === 'dark-theme'
-							|| getUserTheme(CWebUser::$data) === 'blue-theme') {
-						$row->addClass(ZBX_STYLE_PROBLEM_NESTED);
-					}
 				}
 				else {
 					// This is a stand-alone symptom event. First column is checkbox, followed by a Symptom icon.

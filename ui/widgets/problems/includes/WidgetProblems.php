@@ -428,18 +428,13 @@ class WidgetProblems extends CTableInfo {
 				if ($nested) {
 					// First and second column empty for symptom event.
 					$row = (new CRow($empty_col))
+						->addClass(ZBX_STYLE_PROBLEM_NESTED)
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
 						->addClass('hidden')
-						->setAttribute('data-cause-eventid', $problem['cause_eventid']);
-
-					if (getUserTheme(CWebUser::$data) === 'dark-theme'
-							|| getUserTheme(CWebUser::$data) === 'blue-theme') {
-						$row->addClass(ZBX_STYLE_PROBLEM_NESTED);
-					}
-
-					$row->addItem(
-						$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
-					);
+						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
+						->addItem(
+							$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
+						);
 				}
 				else {
 					// First column empty stand-alone symptom event.
