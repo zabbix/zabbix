@@ -22,8 +22,10 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup dashboard
+ * The ignore browser errors annotation is required due to the errors coming from the URL opened in the URL widget.
+ * @ignoreBrowserErrors
  *
+ * @backup dashboard
  * @onBefore prepareDashboardData
  */
 class testDashboardURLWidget extends CWebTest {
@@ -78,6 +80,17 @@ class testDashboardURLWidget extends CWebTest {
 			]
 		]);
 		self::$dashboardid = $response['dashboardids'][0];
+		$host_id = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host in('Not available host')");
+		$interface_id = CDBHelper::getValue("SELECT interfaceid FROM interface WHERE hostid=$host_id AND type=1");
+		CDataHelper::call('item.create', [
+			'hostid' => $host_id,
+			'name' => 'Test DNS',
+			'key_' => 'dns_macro',
+			'type' => ITEM_TYPE_ZABBIX,
+			'delay' => "30",
+			'interfaceid' => $interface_id,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
 	}
 
 	public function testDashboardURLWidget_Layout() {
@@ -201,7 +214,43 @@ class testDashboardURLWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Refresh interval' => '1 minute',
-						'URL' => 'http://localhost/DEV-2341-6.3/zabbix.php?action=dashboard.view'
+						'URL' => 'ftp://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => '1 minute',
+						'URL' => 'file://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => '1 minute',
+						'URL' => 'mailto://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => '1 minute',
+						'URL' => 'tel://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => '1 minute',
+						'URL' => 'ssh://zabbix.com'
 					]
 				]
 			]
@@ -270,10 +319,12 @@ class testDashboardURLWidget extends CWebTest {
 
 			COverlayDialogElement::ensureNotPresent();
 			$header = CTestArrayHelper::get($data['fields'], 'Name');
-			$dashboard->getWidget($header)->waitUntilReady();
+			$dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->waitUntilReady()->save();
+			$this->page->scrollToTop();
+			$dashboard->save();
+			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widget count.
@@ -289,6 +340,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			$saved_form->submit();
 			COverlayDialogElement::ensureNotPresent();
+			$this->page->scrollToTop();
 			$dashboard->save();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -448,33 +500,110 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
 	}
 
-	public function testDashboardURLWidget_CheckMacro() {
-		$data = [
-			'Name' => 'ЗАББИКС Сервер',
-			'Dynamic item' => true,
-			'URL' => 'http://{HOST.*}'
+	public static function getWidgetMacroData(){
+		return [
+			[
+				[
+					'fields' => [
+						'Name' => 'ЗАББИКС Сервер',
+						'Dynamic item' => true,
+						'URL' => 'hosts.php?form=update&hostid={HOST.ID}'
+					],
+					'case' => 'Host ID'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Dynamic widgets H1',
+						'Dynamic item' => true,
+						'URL' => 'zabbix.php?action=host.view&filter_name={HOST.NAME}&filter_ip=&'.
+							'filter_dns=&filter_port=&filter_status=-1&filter_evaltype=0&filter_maintenance_status=1&'.
+							'filter_show_suppressed=0&filter_set=1'
+					],
+					'case' => 'Host Name'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Simple form test host',
+						'Dynamic item' => true,
+						'URL' => 'hosts.php?filter_host=&filter_dns=&filter_ip={HOST.IP}&'.
+							'filter_port=&filter_monitored_by=0&filter_evaltype=0&filter_set=1'
+					],
+					'case' => 'Host IP',
+					'Port' => ': 10051',
+					'IP' => '127.0.5.1'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Not available host',
+						'Dynamic item' => true,
+						'URL' => 'hosts.php?filter_host=&filter_dns={HOST.DNS}&filter_ip=&'.
+							'filter_port=&filter_monitored_by=0&filter_evaltype=0&filter_set=1'
+					],
+					'case' => 'Host DNS'
+				]
+			]
 		];
+	}
 
+	/**
+	 * @dataProvider getWidgetMacroData
+	 */
+	public function testDashboardURLWidget_CheckMacro($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
+		$form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		if ($form->getField('Type') !== 'URL') {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
-		$form->fill($data)->submit()->waitUntilReady();;
+		$form->fill($data['fields'])->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard->save();
+		self::$default_widget = $data['fields']['Name'];
 
 		// Check widget empty content, because the host doesn't match dynamic option criteria.
-		$content = $dashboard->getWidget($data['Name'])->query('class:nothing-to-show')->one()->getText();
+		$content = $dashboard->getWidget($data['fields']['Name'])->query('class:nothing-to-show')->one()->getText();
 		$this->assertEquals('No host selected.', $content);
 
 		// Select host.
-		$host = $this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['Name'])->waitUntilVisible();
+		$host = $this->query('class:multiselect-control')->asMultiselect()->one()->fill($data['fields']['Name']);
 
 		// Check widget content when the host match dynamic option criteria.
-		$this->assertFalse($dashboard->getWidget($data['Name'])->query('class:nothing-to-show')->one(false)->isValid());
+		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
+		$this->page->waitUntilReady();
+		$this->page->switchTo($widget->query('id:iframe')->one());
+
+		if (array_key_exists('case', $data)) {
+			switch ($data['case']) {
+				case 'Host ID':
+					$visible_name = $this->query('id:visiblename')->one()->getValue();
+					$this->assertEquals($data['fields']['Name'], $visible_name);
+					break;
+
+				case 'Host Name':
+					$visible_name = $this->query('class:link-action')->one()->getText();
+					$this->assertEquals($data['fields']['Name'], $visible_name);
+					break;
+
+				case 'Host IP':
+					$visible_ip = $this->query('xpath://td[contains(text(), "'.$data['Port'].'")]')->one()->getText();
+					$this->assertEquals($data['IP'].$data['Port'], $visible_ip);
+					break;
+
+				case 'Host DNS':
+					$displayed_hosts = $this->query('class:table-stats')->one()->getText();
+					$this->assertEquals('Displaying 5 of 5 found', $displayed_hosts);
+					break;
+			}
+		}
+		$this->page->switchTo();
 		$host->clear();
 	}
 }
