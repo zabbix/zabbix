@@ -863,16 +863,18 @@ ROW   |185                |14         |4          |2       |Changed "{SERVICE.NA
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|userdirectoryid|
 ROW   |7       |Zabbix administrators    |0         |0           |0         |NULL           |
-ROW   |8       |Guests                   |1         |0           |0         |NULL           |
+ROW   |8       |Guests                   |0         |0           |0         |NULL           |
 ROW   |9       |Disabled                 |0         |1           |0         |NULL           |
 ROW   |11      |Enabled debug mode       |0         |0           |1         |NULL           |
 ROW   |12      |No access to the frontend|3         |0           |0         |NULL           |
+ROW   |13      |Internal                 |1         |0           |0         |NULL           |
 
 TABLE |users_groups
 FIELDS|id  |usrgrpid|userid|
 ROW   |2   |8       |2     |
 ROW   |3   |9       |2     |
 ROW   |4   |7       |1     |
+ROW   |5   |13      |1     |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|timeout|scope|port|authtype|username|password|publickey|privatekey|menu_path|url |new_window|
