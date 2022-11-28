@@ -24,6 +24,8 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
 
 struct _zbx_template_item_preproc_t
 {

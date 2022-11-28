@@ -26,6 +26,7 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
+#include "zbx_trigger_constants.h"
 
 typedef struct
 {

@@ -693,6 +693,86 @@ static int	DBpatch_6030073(void)
 
 	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
 }
+
+static int	DBpatch_6030074(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.auditacts.filter.from", "web.actionlog.filter.from",
+			"web.auditacts.filter.to", "web.actionlog.filter.to",
+			"web.auditacts.filter.active", "web.actionlog.filter.active",
+			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030075(void)
+{
+	const ZBX_FIELD	field = {"value_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030076(void)
+{
+	return DBcreate_index("widget_field", "widget_field_9", "value_userid", 0);
+}
+
+static int	DBpatch_6030077(void)
+{
+	const ZBX_FIELD	field = {"value_userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 9, &field);
+}
+
+static int	DBpatch_6030078(void)
+{
+	const ZBX_FIELD	field = {"value_actionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030079(void)
+{
+	return DBcreate_index("widget_field", "widget_field_10", "value_actionid", 0);
+}
+
+static int	DBpatch_6030080(void)
+{
+	const ZBX_FIELD	field = {"value_actionid", NULL, "actions", "actionid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 10, &field);
+}
+
+static int	DBpatch_6030081(void)
+{
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030082(void)
+{
+	return DBcreate_index("widget_field", "widget_field_11", "value_mediatypeid", 0);
+}
+
+static int	DBpatch_6030083(void)
+{
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 11, &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -773,4 +853,14 @@ DBPATCH_ADD(6030070, 0, 1)
 DBPATCH_ADD(6030071, 0, 1)
 DBPATCH_ADD(6030072, 0, 1)
 DBPATCH_ADD(6030073, 0, 1)
+DBPATCH_ADD(6030074, 0, 1)
+DBPATCH_ADD(6030075, 0, 1)
+DBPATCH_ADD(6030076, 0, 1)
+DBPATCH_ADD(6030077, 0, 1)
+DBPATCH_ADD(6030078, 0, 1)
+DBPATCH_ADD(6030079, 0, 1)
+DBPATCH_ADD(6030080, 0, 1)
+DBPATCH_ADD(6030081, 0, 1)
+DBPATCH_ADD(6030082, 0, 1)
+DBPATCH_ADD(6030083, 0, 1)
 DBPATCH_END()

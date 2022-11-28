@@ -54,6 +54,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
+	..\..\..\src\libs\zbxcommon\libc_wrappers.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \

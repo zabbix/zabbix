@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
