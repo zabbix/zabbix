@@ -82,6 +82,7 @@
 #define ZBX_PROTO_TAG_ALERTID			"alertid"
 #define ZBX_PROTO_TAG_JMX_ENDPOINT		"jmx_endpoint"
 #define ZBX_PROTO_TAG_EVENTID			"eventid"
+#define ZBX_PROTO_TAG_CAUSE_EVENTID		"cause_eventid"
 #define ZBX_PROTO_TAG_NAME			"name"
 #define ZBX_PROTO_TAG_SEVERITY			"severity"
 #define ZBX_PROTO_TAG_HOSTS			"hosts"
@@ -201,6 +202,7 @@
 #define ZBX_PROTO_TAG_MACRO_SECRETS		"macro.secrets"
 #define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
 #define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
+#define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

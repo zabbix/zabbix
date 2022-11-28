@@ -2972,7 +2972,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_AGE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - (time_t)cause_event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DATE))
 	{
@@ -2981,7 +2981,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION))
 	{
 		if (NULL == r_event)
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - (time_t)cause_event->clock));
 		else
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - cause_event->clock));
 	}
@@ -2995,8 +2995,8 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_STATUS))
 	{
-		*replace_to = zbx_strdup(*replace_to, event_value_string(c_event->source, c_event->object,
-				c_event->value));
+		*replace_to = zbx_strdup(*replace_to, event_value_string((unsigned char)c_event->source,
+				(unsigned char)c_event->object, (unsigned char)c_event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
 	{
@@ -3020,7 +3020,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
-		if (FAIL == get_trigger_severity_name(cause_event->severity, replace_to))
+		if (FAIL == get_trigger_severity_name((unsigned char)cause_event->severity, replace_to))
 			*replace_to = zbx_strdup(*replace_to, "unknown");
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NSEVERITY))
