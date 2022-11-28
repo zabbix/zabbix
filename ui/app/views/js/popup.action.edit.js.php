@@ -44,7 +44,7 @@ window.action_edit_popup = new class {
 		// Reload operation table when esc_period is changed.
 		const esc_period = document.querySelector('#esc_period');
 		if (esc_period) {
-			esc_period.addEventListener('change', () => {
+			esc_period.addEventListener('input', () => {
 				this.recovery = <?= ACTION_OPERATION ?>;
 				this._loadOperationTable();
 			});
