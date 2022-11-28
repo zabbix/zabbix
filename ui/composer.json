@@ -2,5 +2,10 @@
 	"require": {
 		"symfony/yaml": "v5.1.3",
 		"onelogin/php-saml": "^4.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"SCIM\\": "include/classes/scim/"
+		}
 	}
 }

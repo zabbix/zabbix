@@ -19,7 +19,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxcommon.h"
+#include "zbxnum.h"
 #include "zbxtypes.h"
 
 /* unresolved symbols needed for linking */
@@ -96,9 +96,6 @@ int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-char	*CONFIG_TMPDIR			= NULL;
-char	*CONFIG_FPING_LOCATION		= NULL;
-char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;

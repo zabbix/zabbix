@@ -124,6 +124,11 @@ a:active {
 a img {
   border: 0;
   vertical-align: top; }
+a.disabled:active, a.disabled:focus, a.disabled:hover {
+  cursor: default !important;
+  border-bottom: 0;
+  outline: 0;
+  opacity: .35; }
 
 svg a {
   fill: #4796c4;
@@ -4864,11 +4869,21 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
+  .btn-link.red {
+    color: #e45959;
+    border-color: #e45959; }
+  .btn-link.green {
+    color: #59db8f;
+    border-color: #59db8f; }
   .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(71, 150, 196, 0.5);
     box-shadow: 0 0 0 0 !important; }
+    .btn-link:focus.red {
+      border-color: #e45959; }
+    .btn-link:focus.green {
+      border-color: #59db8f; }
   .btn-link[disabled] {
     background-color: transparent; }
     .btn-link[disabled]:hover {
@@ -5161,7 +5176,7 @@ header .header-controls .zi-fullscreen {
 button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #525252 !important;
   background-color: transparent;
-  border-color: #3d3d3d;
+  border-color: #3d3d3d !important;
   cursor: default; }
   button.zi-calendar[disabled] {
     opacity: .3;

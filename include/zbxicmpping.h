@@ -17,7 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBXICMPPING_H
+#define ZABBIX_ZBXICMPPING_H
+
 #include "zbxcommon.h"
+
+typedef struct
+{
+	zbx_get_config_str_f	get_source_ip;
+	zbx_get_config_str_f	get_fping_location;
+#ifdef HAVE_IPV6
+	zbx_get_config_str_f	get_fping6_location;
+#endif
+	zbx_get_config_str_f	get_tmpdir;
+}
+zbx_config_icmpping_t;
 
 typedef struct
 {
@@ -60,5 +74,9 @@ typedef struct
 }
 icmpitem_t;
 
+void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config);
+
 int	zbx_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int period, int size, int timeout,
 		char *error, size_t max_error_len);
+
+#endif

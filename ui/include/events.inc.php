@@ -79,10 +79,8 @@ function eventObject($object = null) {
 
 /**
  * Returns all supported event source-object pairs.
- *
- * @return array
  */
-function eventSourceObjects() {
+function eventSourceObjects(): array {
 	return [
 		['source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST],

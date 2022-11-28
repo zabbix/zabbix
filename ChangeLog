@@ -1,6 +1,9 @@
 Changes for 6.4.0beta4
 
 New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
+A......... [ZBXNEXT-8051] added new authentications methods for API calls (rlataria)
+..F.I..... [ZBXNEXT-4714] implemented filters for Action log page and widget and export to CSV file for Action log page (ashubin, dpetra, vso)
 .........T [ZBX-21588] optimized template k8s nodes by http (egordymov)
 .........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBXNEXT-7903] added templates for Azure PostgreSQL servers (vkhaliev)
@@ -8,6 +11,7 @@ New features:
 .........T [ZBX-20478] fixed script k8s cluster state (egordymov)
 
 Bug fixes:
+.........T [ZBX-21929] fixed field 'type' of widgets (abakaldin)
 A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
 .........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
 ........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
@@ -25,6 +29,7 @@ A.......S. [ZBX-17419] optimized API queries when searching through names in hos
 ........S. [ZBX-21616] fixed error due to non-existent macros in custom expressions (dgoloscapov, wiper)
 .......PS. [ZBX-21786] fixed 'invalid timeout' error occurring after script item parameters removal (asestakovs)
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta3
@@ -128,6 +133,11 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.5
+
+6.2.5rc1 was released as 6.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.5rc1
 
 New features:
@@ -165,6 +175,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
 ...G...... [ZBX-21689] modified proc.num item to prevent agent crash on Windows when 'user' parameter is set (asestakovs)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.4
@@ -603,6 +614,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.11
+
+6.0.11rc2 was released as 6.0.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.11rc2
+
+Bug fixes:
+........S. [ZBX-17419] prepared an upgrade patch for backporting the feature to 5.0 (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.11rc1
 
 New features:
@@ -633,6 +655,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ........S. [ZBX-21655] updated VMware datastore discovery to prevent returning the same datastore multiple times (asestakovs)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10
@@ -2825,6 +2848,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.30
+
+5.0.30rc1 was released as 5.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.30rc1
 
 New features:
@@ -2837,6 +2865,7 @@ A.F....... [ZBX-16432] removed the ability to import a graph with an empty name 
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
@@ -5489,6 +5518,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44

@@ -28,6 +28,7 @@
 #include "preproc_manager.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
+#include "zbx_item_constants.h"
 
 extern unsigned char			program_type;
 extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];

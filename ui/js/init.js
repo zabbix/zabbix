@@ -105,9 +105,9 @@ jQuery(function($) {
 		var $this = $(this);
 
 		uncheckedHandler($this);
-		$this.on('change enable disable', function() {
-			uncheckedHandler($(this));
-		});
+		$this.on('change enable disable', function () {
+			uncheckedHandler($(this))
+		})
 	});
 
 	function showMenuPopup($obj, data, event, options) {

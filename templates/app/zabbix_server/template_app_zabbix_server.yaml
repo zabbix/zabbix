@@ -1922,7 +1922,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1937,7 +1937,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix server performance'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1953,7 +1953,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix data gathering process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1969,7 +1969,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix internal process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1986,7 +1986,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix cache usage, % free'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -2002,7 +2002,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Value cache effectiveness'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -2025,7 +2025,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2040,7 +2040,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Data handling processes'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2056,7 +2056,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Reporting processes'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2072,7 +2072,7 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Internal processes'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'

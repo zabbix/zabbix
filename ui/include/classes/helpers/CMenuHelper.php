@@ -147,7 +147,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Audit log')))->setAction('auditlog.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
-				? (new CMenuItem(_('Action log')))->setUrl(new CUrl('auditacts.php'), 'auditacts.php')
+				? (new CMenuItem(_('Action log')))->setAction('actionlog.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_NOTIFICATIONS)
 				? (new CMenuItem(_('Notifications')))->setUrl(new CUrl('report4.php'), 'report4.php')

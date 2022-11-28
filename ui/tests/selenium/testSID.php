@@ -515,7 +515,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
 					'authentication_type=0&passwd_min_length=8&passwd_check_rules%5B%5D=1&passwd_check_rules%5B%5D=2&'.
 					'passwd_check_rules%5B%5D=4&passwd_check_rules%5B%5D=8&http_auth_enabled=1&http_login_form=0&'.
-					'http_strip_domains=&http_case_sensitive=1&ldap_configured=0&change_bind_password=1&'.
+					'http_strip_domains=&http_case_sensitive=1&ldap_auth_enabled=0&change_bind_password=1&'.
 					'saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
