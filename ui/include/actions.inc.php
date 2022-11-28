@@ -454,13 +454,14 @@ function getActionOperationData(array $operations) {
 	}
 
 	if (array_key_exists('userids', $data)) {
-		$result['users'] = API::User()->get([
+		$users = API::User()->get([
 			'output' => ['userid', 'username', 'name', 'surname'],
 			'userids' => array_keys($data['userids'])
 		]);
 
-		foreach ($result['users'] as $user) {
-			$result['users']['fullnames'][$user['userid']] = getUserFullname($user);
+		foreach ($users as $user) {
+			$result['users'][$user['userid']]['name'] = getUserFullname($user);
+			$result['users'][$user['userid']]['userid'] = $user['userid'];
 		}
 	}
 
@@ -470,6 +471,7 @@ function getActionOperationData(array $operations) {
 			'usrgrpids' => array_keys($data['usr_grpids']),
 			'preservekeys' => true
 		]);
+
 	}
 
 	if (array_key_exists('hostids', $data)) {
@@ -542,8 +544,8 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					$user_names_list = [];
 
 					foreach ($operation['opmessage_usr'] as $user) {
-						if (array_key_exists($user['userid'], $users['fullnames'])){
-							$user_names_list[] = $users['fullnames'][$user['userid']];
+						if (array_key_exists($user['userid'], $users)){
+							$user_names_list[] = $users[$user['userid']]['name'];
 						}
 					}
 
