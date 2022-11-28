@@ -1606,7 +1606,6 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 * @param array $items passed by reference
 	 * @param bool  $update
 	 * @param array $dbItems
-	 *
 	 */
 	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing

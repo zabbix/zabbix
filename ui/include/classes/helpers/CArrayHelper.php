@@ -350,4 +350,3 @@ class CArrayHelper {
 		return false;
 	}
 }
-
