@@ -59,12 +59,14 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_link = new CLink('', (new CUrl('zabbix.php'))
-		->setArgument('action', 'problem.view')
-		->setArgument('filter_name', '')
-		->setArgument('severities', $data['filter']['severities'])
-		->setArgument('hostids', [$host['hostid']])
-		->setArgument('filter_set', '1'));
+	$problems_link = new CLink('',
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'problem.view')
+			->setArgument('filter_name', '')
+			->setArgument('severities', $data['filter']['severities'])
+			->setArgument('hostids', [$host['hostid']])
+			->setArgument('filter_set', '1')
+	);
 
 	$total_problem_count = 0;
 
