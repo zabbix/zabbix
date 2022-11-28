@@ -43,7 +43,6 @@
 #define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
 #endif
 #define ZBX_REGEXP_CASELESS PCRE2_CASELESS
-#define ZBX_REGEXP_ERR_MSG_SIZE 256
 #endif
 
 struct zbx_regexp
@@ -151,6 +150,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef HAVE_PCRE2_H
+#define ZBX_REGEXP_ERR_MSG_SIZE 256
+
 	*err_msg = NULL;
 
 	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
@@ -182,6 +183,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	}
 	else
 		pcre2_code_free(pcre2_regexp);
+
+#undef ZBX_REGEXP_ERR_MSG_SIZE
 #endif
 	return SUCCEED;
 }
