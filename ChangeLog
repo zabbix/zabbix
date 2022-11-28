@@ -15,7 +15,7 @@ A.F....... [ZBX-16432] removed the ability to import a graph with an empty name 
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
-..F....... [DEV-2301] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
@@ -2668,7 +2668,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
-..F....... [DEV-2301] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44
