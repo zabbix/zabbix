@@ -419,7 +419,8 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $groups	 *
+	 * @param array $groups
+	 *
 	 * @return array
 	 */
 	public function update(array $groups): array {

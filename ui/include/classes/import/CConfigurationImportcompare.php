@@ -80,7 +80,6 @@ class CConfigurationImportcompare {
 			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
 			'host_prototypes' => ['host'],
 			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
-
 		];
 
 		$this->options = $options;
