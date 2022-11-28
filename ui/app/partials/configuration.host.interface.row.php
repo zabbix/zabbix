@@ -104,10 +104,10 @@
 					(new CLabel([
 						_('Max repetition count'),
 						makeHelpIcon(_('Max repetition count is applicable to discovery and snmp.walk only.'))
-					], 'interfaces[#{iface.interfaceid}][details][repetition_count]'))
+					], 'interfaces[#{iface.interfaceid}][details][max_repetitions]'))
 						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 					(new CFormField(
-						(new CNumericBox('interfaces[#{iface.interfaceid}][details][repetition_count]',
+						(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
 							'#{iface.details.max_repetitions}', 20, false, false, false
 						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					))
@@ -204,7 +204,7 @@
 				->addItem(
 					new CFormField(
 						(new CCheckBox('interfaces[#{iface.interfaceid}][details][bulk]', SNMP_BULK_ENABLED))
-							->setLabel(_('Use bulk requests'))
+							->setLabel(_('Use combined requests'))
 					)
 				)
 		))

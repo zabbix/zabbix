@@ -1014,18 +1014,32 @@ abstract class CControllerPopupItemTest extends CController {
 			 * Values received from user input form may be transformed so we must remove redundant "\r" before
 			 * sending data to Zabbix server.
 			 */
-			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			if ($step['type'] != ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+				$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			}
 
 			// Resolve macros in parameter fields before send data to Zabbix server.
 			foreach (['params', 'error_handler_params'] as $field) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
+				$text = $step[$field];
+
+				if ($field === 'params' && $step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$text = json_encode($step[$field]);
+				}
+
+				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($text, $macros_types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$macro_value = array_key_exists($macro, $macros_posted)
 						? $macros_posted[$macro]
 						: '';
 
-					$step[$field] = substr_replace($step[$field], $macro_value, $pos, strlen($macro));
+					$replaced_text = substr_replace($text, $macro_value, $pos, strlen($macro));
+
+					if ($field === 'params' && $step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+						$replaced_text = json_decode($replaced_text, true);
+					}
+
+					$step[$field] = $replaced_text;
 				}
 			}
 		}

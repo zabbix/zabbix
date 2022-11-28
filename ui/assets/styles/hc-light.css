@@ -6283,6 +6283,8 @@ svg {
   .preprocessing-list .on-fail-options > label,
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
+  .preprocessing-list .preprocessing-step {
+    align-items: flex-start; }
   .preprocessing-list .step-name {
     flex: 0 0 295px;
     max-width: 295px; }

@@ -2472,9 +2472,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$texts = [];
 		foreach ($data['steps'] as $step) {
-			if ($step['params'] !== '') {
+			if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+				if (count($step['params'])) {
+					$texts = array_merge($texts, array_column($step['params'], 'name'));
+				}
+			}
+			else if ($step['params'] !== '') {
 				$texts[] = $step['params'];
 			}
+
 			if ($step['error_handler_params'] !== '') {
 				$texts[] = $step['error_handler_params'];
 			}

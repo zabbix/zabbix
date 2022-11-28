@@ -1313,7 +1313,17 @@ abstract class CItemGeneralOld extends CApiService {
 					);
 				}
 
-				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
+				if ($preprocessing['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$preprocessing['params'] = array_map(static function(array $value): array {
+						$value['name'] = str_replace("\r\n", "\n", $value['name']);
+						$value['oid'] = str_replace("\r\n", "\n", $value['oid']);
+
+						return $value;
+					}, $preprocessing['params']);
+				}
+				else {
+					$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
+				}
 
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:
@@ -1356,6 +1366,7 @@ abstract class CItemGeneralOld extends CApiService {
 					case ZBX_PREPROC_ERROR_FIELD_JSON:
 					case ZBX_PREPROC_ERROR_FIELD_XML:
 					case ZBX_PREPROC_SCRIPT:
+					case ZBX_PREPROC_SNMP_WALK_VALUE:
 						// Check 'params' if not empty.
 						if (is_array($preprocessing['params'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -1689,6 +1700,19 @@ abstract class CItemGeneralOld extends CApiService {
 							);
 						}
 						break;
+
+					case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+						$params = $preprocessing['params'];
+
+						$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+							'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+							'oid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
+						]];
+
+						if (!CApiInputValidator::validate($api_input_rules, $params, '/params', $error)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
+						break;
 				}
 
 				switch ($preprocessing['type']) {
@@ -1833,6 +1857,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
@@ -1869,6 +1894,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
@@ -1947,7 +1973,7 @@ abstract class CItemGeneralOld extends CApiService {
 		}
 
 		if ($ins_item_preprocs) {
-			DB::insertBatch('item_preproc', $ins_item_preprocs);
+			DB::insert('item_preproc', $ins_item_preprocs);
 		}
 	}
 
@@ -2953,6 +2979,11 @@ abstract class CItemGeneralOld extends CApiService {
 	 */
 	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		foreach ($preprocessing as &$step) {
+			if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+				$step['params'] = json_encode($step['params']);
+				continue;
+			}
+
 			$step['params'] = str_replace("\r\n", "\n", $step['params']);
 			$params = explode("\n", $step['params']);
 

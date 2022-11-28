@@ -2387,6 +2387,22 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
+	protected static function normalizePreprocessingSteps(array $items): array {
+		foreach ($items as &$item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as &$item_preproc) {
+				if ($item_preproc['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$item_preproc['params'] = json_encode($item_preproc['params']);
+				}
+			}
+		}
+
+		return $items;
+	}
+
 	/**
 	 * Add the internally used fields to the given $db_items.
 	 *

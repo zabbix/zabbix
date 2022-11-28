@@ -4848,6 +4848,10 @@ svg {
 		padding: 5px 5px 5px 0;
 	}
 
+	.preprocessing-step {
+		align-items: flex-start;
+	}
+
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;

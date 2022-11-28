@@ -40,7 +40,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON
+		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -2234,6 +2235,15 @@ class CDiscoveryRule extends CItemGeneralOld {
 			unset($dstDiscovery['overrides']);
 		}
 
+		if (array_key_exists('preprocessing', $dstDiscovery)) {
+			foreach ($dstDiscovery['preprocessing'] as &$step) {
+				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$step['params'] = json_decode($step['params'], true);
+				}
+			}
+			unset($step);
+		}
+
 		// if this is a plain host, map discovery interfaces
 		if ($src_host['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
@@ -2525,6 +2535,15 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 				if ($src_item['type'] == ITEM_TYPE_DEPENDENT) {
 					$dst_item['master_itemid'] = $master_item_links[$src_item['master_itemid']][$dst_host['hostid']];
+				}
+
+				if (array_key_exists('preprocessing', $src_item)) {
+					foreach ($dst_item['preprocessing'] as &$step) {
+						if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+							$step['params'] = json_decode($step['params'], true);
+						}
+					}
+					unset($step);
 				}
 
 				$dst_items[] = ['hostid' => $dst_host['hostid'], 'ruleid' => $dst_ruleid] + $dst_item;

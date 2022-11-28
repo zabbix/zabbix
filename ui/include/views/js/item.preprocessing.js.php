@@ -110,7 +110,7 @@
 	?>
 </script>
 
-<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern">
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern-tmpl">
 	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
 			->setAttribute('placeholder', '#{placeholder_0}').
 		(new CSelect('preprocessing[#{rowNum}][params][1]'))
@@ -130,17 +130,88 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-tmpl">
+	<?php
+		echo (new CDiv(
+				(new CTable())
+					->addClass('group-json-mapping')
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Output field name')),
+							new CColHeader(_('Key value prefix')),
+							(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CRow([
+							new CCol(
+								(new CTextBox('preprocessing[#{rowNum}][params][#{index}][name]', ''))
+									->setAttribute('placeholder', _('Output field name')),
+							),
+							new CCol(
+								(new CTextBox('preprocessing[#{rowNum}][params][#{index}][oid]', ''))
+									->setAttribute('placeholder', _('Key value prefix')),
+							),
+							(new CCol(
+								(new CSimpleButton(_('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-group-json-action-delete')
+									->setEnabled(false)
+							))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass('group-json-row')
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-group-json-action-add')
+								))->setColSpan(3)
+							)
+					)
+					->setAttribute('data-index', '#{rowNum}')
+					->setAttribute('data-last-row-index', '#{index}')
+			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl">
+	<?php
+		echo (new CRow([
+			new CCol(
+				(new CTextBox('preprocessing[#{rowNum}][params][#{index}][name]', ''))
+					->setAttribute('placeholder', _('Output field name')),
+			),
+			new CCol(
+				(new CTextBox('preprocessing[#{rowNum}][params][#{index}][oid]', ''))
+				->setAttribute('placeholder', _('Key value prefix')),
+			),
+			(new CCol(
+				(new CSimpleButton(_('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-group-json-action-delete')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->addClass('group-json-row');
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
-			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
-				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
-				preproc_param_custom_width_chkbox_tmpl =
-					new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html()),
-				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html()),
-				preproc_param_prometheus_pattern_tmpl = new Template(
-					$('#preprocessing-steps-parameters-custom-prometheus-pattern').html()
-				);
+			const preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html());
+			const preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html());
+			const preproc_param_custom_width_chkbox_tmpl =
+				new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html());
+			const preproc_param_multiline_tmpl = new Template(
+				$('#preprocessing-steps-parameters-multiline-tmpl').html()
+			);
+			const preproc_param_prometheus_pattern_tmpl = new Template(
+				$('#preprocessing-steps-parameters-custom-prometheus-pattern-tmpl').html()
+			);
+			const preproc_param_snmp_walk_to_json_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-walk-to-json-tmpl').html()
+			);
 
 			switch (type) {
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
@@ -245,6 +316,18 @@
 						rowNum: index,
 						placeholder_0: <?= json_encode(_('search string')) ?>,
 						placeholder_1: <?= json_encode(_('replacement')) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
+					return $(preproc_param_single_tmpl.evaluate({
+						rowNum: index,
+						placeholder: <?= json_encode(_('OID')) ?>
+					})).css('width', <?= ZBX_TEXTAREA_SMALL_WIDTH ?>);
+
+				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
+					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({
+						rowNum: index,
+						index: 1
 					}));
 
 				default:
@@ -469,6 +552,42 @@
 			})
 			.on('change', '.js-preproc-param-prometheus-pattern-function', function() {
 				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
+			})
+			.on('click', '.js-group-json-action-delete', function() {
+				const table = this.closest('.group-json-mapping');
+				const row = this.closest('.group-json-row');
+				const count = table.querySelectorAll('.group-json-row').length;
+
+				if (count == 1) {
+					return;
+				}
+
+				row.remove();
+
+				if (count == 2) {
+					table.querySelector('.js-group-json-action-delete').disabled = true;
+				}
+			})
+			.on('click', '.js-group-json-action-add', function() {
+				const template = new Template(
+					document
+						.getElementById('preprocessing-steps-parameters-snmp-walk-to-json-row-tmpl')
+						.innerHTML
+				);
+				const container = this.closest('.group-json-mapping');
+
+				const row_numb = container.dataset.index;
+				const last_index = parseInt(container.dataset.lastRowIndex, 10);
+
+				[...container.querySelectorAll('.js-group-json-action-delete')].map((btn) => {
+					btn.disabled = false;
+				});
+
+				container.dataset.lastRowIndex = last_index + 1;
+
+				container
+					.querySelector('tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb, index: last_index + 1}));
 			});
 	});
 </script>
