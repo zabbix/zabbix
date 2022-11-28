@@ -168,25 +168,15 @@ array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediat
 $disabled = [];
 $media = [];
 
+$mediatypes = [];
 foreach($data['mediatype_options'] as $mediatype) {
-	$media[$mediatype['mediatypeid']] = $mediatype['name'];
-	if ($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) {
-		$disabled[] = $mediatype['mediatypeid'];
-	}
-}
-
-$mediatype_options = CSelect::createOptionsFromArray($media);
-
-foreach ($mediatype_options as $option_data) {
-	$option = $option_data->toArray();
-	if (in_array($option['value'], $disabled)) {
-		$option_data->addClass(ZBX_STYLE_RED);
-	}
+	$mediatypes[] = (new CSelectOption($mediatype['mediatypeid'], $mediatype['name']))
+		->addClass($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null);
 }
 
 // Operation message media type row.
 $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions($mediatype_options)
+	->addOptions($mediatypes)
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
@@ -199,7 +189,7 @@ $form_grid->addItem([
 
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions($mediatype_options)
+	->addOptions($mediatypes)
 	->setFocusableElementId('operation-mediatypeid')
 	->setName('operation[opmessage][mediatypeid]')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
