@@ -325,6 +325,7 @@ $saml_tab = (new CFormList('list_saml'))
 			->setEnabled($data['saml_enabled'])
 	);
 
+$selected_tab = $data['form_refresh'] ? CCookieHelper::get('tab') : 0;
 (new CWidget())
 	->setTitle(_('Authentication'))
 	->addItem((new CForm())
@@ -336,7 +337,7 @@ $saml_tab = (new CFormList('list_saml'))
 		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->disablePasswordAutofill()
 		->addItem((new CTabView())
-			->setSelected($data['form_refresh'] ? null : 0)
+			->setSelected($selected_tab)
 			->addTab('auth', _('Authentication'), $auth_tab)
 			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
@@ -344,7 +345,7 @@ $saml_tab = (new CFormList('list_saml'))
 			->setFooter(makeFormFooter(
 				(new CSubmit('update', _('Update'))),
 				[(new CSubmitButton(_('Test'), 'ldap_test', 1))
-					->addStyle(($data['form_refresh'] && CCookieHelper::get('tab') == 2) ? '' : 'display: none')
+					->addStyle($selected_tab == 2 ? '' : 'display: none')
 					->setEnabled($data['ldap_enabled'])
 				]
 			))
