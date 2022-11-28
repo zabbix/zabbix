@@ -110,6 +110,8 @@ class CControllerPopupActionOperationsList extends CController {
 			$data['operations'] = $this->getInput('operations', []);
 		}
 
+		$data['action']['operations'] = [];
+
 		foreach ($data['operations'] as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				$data['action']['operations'][] = $operation;
