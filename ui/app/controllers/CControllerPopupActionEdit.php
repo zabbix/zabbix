@@ -67,16 +67,25 @@ class CControllerPopupActionEdit extends CController {
 			return false;
 		}
 
+		$operation_output = [
+			'operationtype', 'opcommand', 'opcommand_grp', 'opcommand_hst', 'opmessage', 'opmessage_usr',
+			'opmessage_grp'
+		];
+
 		if ($this->hasInput('actionid')) {
 			$this->action = API::Action()->get([
 				'output' => [
 					'actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'
 				],
 				'actionids' => $this->getInput('actionid'),
-				'selectOperations' => 'extend',
-				'selectRecoveryOperations' => 'extend',
-				'selectUpdateOperations' => 'extend',
-				'selectFilter' => 'extend'
+				'selectOperations' => [
+					'operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype', 'opcommand',
+					'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
+					'opconditions', 'opmessage_usr', 'opmessage_grp'
+				],
+				'selectRecoveryOperations' => $operation_output,
+				'selectUpdateOperations' => $operation_output,
+				'selectFilter' => ['conditions', 'formula', 'evaltype']
 			]);
 
 			if (!$this->action) {
