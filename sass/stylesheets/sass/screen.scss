@@ -178,7 +178,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 	border-right: 6px solid $font-color;
 }
 
-.arrow-right { // todo last change to zi-play
+.arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
@@ -1019,14 +1019,16 @@ form {
 
 		color: $icon-header-controls-color;
 
-		&:hover,
-		&:focus,
-		&:active {
-			background-color: $btn-bg-color;
-			color: $btn-font-color;
+		&:not(:disabled) {
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: $btn-bg-color;
+				color: $btn-font-color;
 
-			&::before {
-				opacity: 1;
+				&::before {
+					opacity: 1;
+				}
 			}
 		}
 
@@ -2006,7 +2008,7 @@ button {
 	}
 }
 
-// todo last
+// todo last (probably need to create module to check it)
 $icon-widget-btn: (
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
@@ -2473,7 +2475,7 @@ $trigger-expression-tree-icons: (
 
 %trigger-expression-tree-icons-common {
 	margin: 0 12px 0 0;
-
+	// todo no icon present
 	&::before {
 		background: url($sprite-path) no-repeat;
 		display: inline-block;
@@ -2483,7 +2485,7 @@ $trigger-expression-tree-icons: (
 		content: '';
 	}
 }
-
+// todo no icon present
 // Dynamically generated classes:
 //  .icon-tree-top-bottom
 //  .icon-tree-top-bottom-right
@@ -5379,6 +5381,7 @@ a.icon-count {
 }
 
 .btn-split {
+	// todo last chevron-down not aligned (alerts->media types footer)
 	display: inline-block;
 	position: relative;
 	margin-right: 10px;
@@ -5878,18 +5881,6 @@ z-select,
 	}
 }
 
-// Geomap widget.
-.geomap-filter-button,
-.navigate-home-button {
-	background-image: url($sprite-path);
-	background-repeat: no-repeat;
-}
-.geomap-filter-button {
-	background-position: -243px -543px !important;
-}
-.navigate-home-button {
-	background-position: -117px -506px !important;
-}
 .geomap-filter {
 	border: 1px solid $overlay-border-color;
 	background-color: $ui-bg-color;
@@ -5931,12 +5922,21 @@ z-select,
 }
 .leaflet-control {
 	&.disabled {
-		background-color: #ffffff;
+		background-color: $white;
 		opacity: 1;
-
-		.geomap-filter-button {
-			cursor: default;
-			opacity: .4;
+	}
+	.zi-filter,
+	.zi-home {
+		cursor: pointer;
+		&::after {
+			display: none;
+		}
+	}
+	.zi-home {
+		&::before {
+			top: -1px;
+			font-size: 19px;
+			color: $icon-header-controls-color;
 		}
 	}
 }
