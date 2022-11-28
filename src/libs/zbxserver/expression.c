@@ -3179,18 +3179,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 
 			c_event = ((NULL != r_event) ? r_event : event);
 
-			if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object &&
-					ZBX_TOKEN_MACRO == token.type &&
-					0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
-			{
-				get_event_cause_value(m, &replace_to, event, userid, tz, error, maxerrlen);
-			}
-			else if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object &&
-					ZBX_TOKEN_MACRO == token.type && 0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
-			{
-				get_event_symptoms(event, &replace_to);
-			}
-			else if (EVENT_SOURCE_TRIGGERS == c_event->source)
+			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
@@ -3243,6 +3232,14 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				{
 					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to, tz);
+				}
+				else if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
+				{
+					get_event_cause_value(m, &replace_to, event, userid, tz, error, maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
+				{
+					get_event_symptoms(event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
