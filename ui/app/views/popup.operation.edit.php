@@ -113,16 +113,6 @@ $form_grid->addItem(
 	))->setId('operation-message-notice')
 );
 
-$multiselect_values_usergroups = [];
-
-if ($operation['opmessage_grp']) {
-	foreach($operation['opmessage_grp'] as $user_group) {
-		$group['id'] = $user_group['usrgrpid'];
-		$group['name'] = $user_group['name'];
-		$multiselect_values_usergroups[] = $group;
-	}
-}
-
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups'), 'operation_opmessage_grp__usrgrpid_ms'))
 		->setId('user-groups-label'),
@@ -130,7 +120,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[opmessage_grp][][usrgrpid]',
 			'object_name' => 'usersGroups',
-			'data' => $multiselect_values_usergroups,
+			'data' => $operation['opmessage_grp'],
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',
@@ -148,16 +138,6 @@ $form_grid->addItem([
 		->setId('operation-message-user-groups')
 ]);
 
-$multiselect_values_users = [];
-
-if ($operation['opmessage_usr']) {
-	foreach($operation['opmessage_usr'] as $user) {
-		$users['id'] = $user['userid'];
-		$users['name'] = $user['name'];
-		$multiselect_values_users[] = $users;
-	}
-}
-
 $form_grid->addItem([
 	(new CLabel(_('Send to users'),'operation_opmessage_usr__userid_ms'))
 		->setId('users-label'),
@@ -165,7 +145,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[opmessage_usr][][userid]',
 			'object_name' => 'users',
-			'data' => $multiselect_values_users,
+			'data' => $operation['opmessage_usr'],
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',
@@ -261,32 +241,18 @@ $form_grid->addItem([
 ]);
 
 $opcommand_hst_value = null;
+$host_ms = [];
 
-if (array_key_exists('0', $operation['opcommand_hst'])) {
-	if (array_key_exists('hostid', $operation['opcommand_hst'][0])) {
-		$opcommand_hst_value = $operation['opcommand_hst'][0]['hostid'];
-	}
-}
-
-$multiselect_values_host = [];
-$multiselect_values_host_grp = [];
-$hosts = [];
-
-if ($operation['opcommand_hst']) {
-	foreach($operation['opcommand_hst'] as $host) {
-		if (array_key_exists('name', $host)) {
-			$hosts['id'] = $host['hostid'];
-			$hosts['name'] = $host['name'];
-			$multiselect_values_host[] = $hosts;
+if (array_key_exists('opcommand_hst', $operation)) {
+	foreach ($operation['opcommand_hst'] as $host) {
+		if ($host !== null) {
+			if ($host['id'] == 0) {
+				$opcommand_hst_value = 0;
+			}
+			else {
+				$host_ms[] = $host;
+			}
 		}
-	}
-}
-
-if ($operation['opcommand_grp']) {
-	foreach ($operation['opcommand_grp'] as $group) {
-		$host_group['id'] = $group['groupid'];
-		$host_group['name'] = $group['name'];
-		$multiselect_values_host_grp[] = $host_group;
 	}
 }
 
@@ -310,7 +276,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_hst][][hostid]',
 						'object_name' => 'hosts',
-						'data' => $multiselect_values_host,
+						'data' => $host_ms,
 						'popup' => [
 							'parameters' => [
 								'multiselect' => '1',
@@ -328,7 +294,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_grp][][groupid]',
 						'object_name' => 'hostGroup',
-						'data' => $multiselect_values_host_grp,
+						'data' => $operation['opcommand_grp'],
 						'popup' => [
 							'parameters' => [
 								'multiselect' => '1',
@@ -348,15 +314,6 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 	]);
 }
 
-$multiselect_values_ophost_grp = [];
-$multiselect_values_optemplate = [];
-
-foreach ($operation['opgroup'] as $group) {
-	$host_group['id'] = $group['groupid'];
-	$host_group['name'] = $group['name'];
-	$multiselect_values_ophost_grp[] = $host_group;
-}
-
 // Add / remove host group attribute row.
 $form_grid->addItem([
 	(new CLabel(_('Host groups'), 'operation_opgroup__groupid_ms'))
@@ -366,7 +323,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[opgroup][][groupid]',
 			'object_name' => 'hostGroup',
-			'data' => $multiselect_values_ophost_grp,
+			'data' => $operation['opgroup'],
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',
@@ -384,12 +341,6 @@ $form_grid->addItem([
 	)->setId('operation-attr-hostgroups')
 ]);
 
-foreach ($operation['optemplate'] as $template) {
-	$templates['id'] = $template['templateid'];
-	$templates['name'] = $template['name'];
-	$multiselect_values_optemplate[] = $templates;
-}
-
 // Link / unlink templates attribute row.
 $form_grid->addItem([
 	(new CLabel(_('Templates'), 'operation_optemplate__templateid_ms'))
@@ -399,7 +350,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[optemplate][][templateid]',
 			'object_name' => 'templates',
-			'data' => $multiselect_values_optemplate,
+			'data' => $operation['optemplate'],
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',

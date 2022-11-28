@@ -105,15 +105,19 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if (array_key_exists('opcommand_hst', $operation)) {
-			foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+			$current_host = null;
+
+			foreach ($operation['opcommand_hst'] as $opcommand_hst) {
 				if ($opcommand_hst['hostid'] == 0) {
-					$opcommand_hst = ['hostid' => 0];
-				}
-				else {
-					$opcommand_hst = $operation_data['opcommand_hst'][0];
+					$current_host = ['id' => 0];
 				}
 			}
-			unset($opcommand_hst);
+
+			if (array_key_exists('opcommand_hst', $operation_data)) {
+				$operation['opcommand_hst'] = $operation_data['opcommand_hst'];
+			}
+
+			$operation['opcommand_hst'][] = $current_host;
 		}
 
 		if (array_key_exists('opcommand_grp', $operation_data)) {
@@ -151,20 +155,21 @@ class CControllerPopupActionOperationEdit extends CController {
 		$result = [];
 
 		if ($operation['opmessage_grp']) {
-			$user_groups = API::UserGroup()->get([
+			$user_groups = CArrayHelper::renameObjectsKeys(API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name'],
 				'usrgrpids' => array_column($operation['opmessage_grp'], 'usrgrpid'),
-			]);
+			]), ['usrgrpid' => 'id']);
+
 			CArrayHelper::sort($user_groups, ['name']);
 
 			$result['user_group'] = array_values($user_groups);
 		}
 
 		if ($operation['opmessage_usr']) {
-			$users = API::User()->get([
+			$users = CArrayHelper::renameObjectsKeys(API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
 				'userids' => array_column($operation['opmessage_usr'], 'userid'),
-			]);
+			]), ['userid' => 'id']);
 
 			$fullnames = [];
 
@@ -177,40 +182,44 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if ($operation['opcommand_hst']) {
-			$host = API::Host()->get([
+			$host = CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'hostids' => array_column($operation['opcommand_hst'], 'hostid')
-			]);
+			]), ['hostid' => 'id']);
+
 			CArrayHelper::sort($host, ['name']);
 
 			$result['opcommand_hst'] = array_values($host);
 		}
 
 		if ($operation['opcommand_grp']) {
-			$group = API::HostGroup()->get([
+			$group = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => array_column($operation['opcommand_grp'], 'groupid')
-			]);
+			]), ['groupid' => 'id']);
+
 			CArrayHelper::sort($group, ['name']);
 
 			$result['opcommand_grp'] = array_values($group);
 		}
 
 		if ($operation['opgroup']) {
-			$group = API::HostGroup()->get([
+			$group = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => array_column($operation['opgroup'], 'groupid')
-			]);
+			]), ['groupid' => 'id']);
+
 			CArrayHelper::sort($group, ['name']);
 
 			$result['opgroup'] = array_values($group);
 		}
 
 		if ($operation['optemplate']) {
-			$template = API::Template()->get([
+			$template = CArrayHelper::renameObjectsKeys(API::Template()->get([
 				'output' => ['templateid', 'name'],
 				'templateids' => array_column($operation['optemplate'], 'templateid')
-			]);
+			]), ['templateid' => 'id']);
+
 			CArrayHelper::sort($template, ['name']);
 
 			$result['optemplate'] = array_values($template);
