@@ -109,24 +109,6 @@ class testUsers extends CAPITest {
 			// Check user group.
 			[
 				'user' => [
-					'username' => 'User without group parameter',
-					'roleid' => 1,
-					'passwd' => 'zabbix'
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "usrgrps" is missing.'
-			],
-			[
-				'user' => [
-					'username' => 'User without group',
-					'roleid' => 1,
-					'passwd' => 'zabbix',
-					'usrgrps' => [
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
-			],
-			[
-				'user' => [
 					'username' => 'Group unexpected parameter',
 					'roleid' => 1,
 					'passwd' => 'zabbix',
@@ -191,19 +173,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
-			],
-			// Roleid is missing.
-			[
-				'user' => [
-					[
-						'username' => 'API user create 1',
-						'passwd' => 'zabbix',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1": the parameter "roleid" is missing.'
 			],
 			// Roleid is as a string.
 			[
@@ -277,6 +246,16 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'user' => [
+					[
+						'username' => 'API user with non-existing userdirectory',
+						'passwd' => 'Z@bb1x1234',
+						'userdirectoryid' => 1234
+					]
+				],
+				'expected_error' => 'User directory with ID "1234" is not available.'
 			]
 		];
 	}
@@ -455,15 +434,6 @@ class testUsers extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
 			],
 			// Check user group.
-			[
-				'user' => [[
-					'userid' => '9',
-					'username' => 'User without group',
-					'usrgrps' => [
-					]
-				]],
-				'expected_error' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
-			],
 			[
 				'user' => [[
 					'userid' => '9',
@@ -878,17 +848,6 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
-			],
-			[
-				'user' => [
-					'username' => 'User with invalid roleid',
-					'roleid' => 0,
-					'passwd' => 'Z@bb1x1234',
-					'usrgrps' => [
-						['usrgrpid' => '7']
-					]
-				],
-				'expected_error' => 'User role with ID "0" is not available.'
 			],
 			[
 				'user' => [
