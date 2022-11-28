@@ -351,14 +351,16 @@ class CConfiguration extends CApiService {
 		$import = $adapter->getData();
 		$imported_entities = [];
 
-		if (array_key_exists('groups', $import)) {
-			$imported_entities['groups']['uuid'] = array_column($import['groups'], 'uuid');
-			$imported_entities['groups']['name'] = array_column($import['groups'], 'name');
-		}
+		$entities = [
+			'groups' => 'name',
+			'templates' => 'template'
+		];
 
-		if (array_key_exists('templates', $import)) {
-			$imported_entities['templates']['uuid'] = array_column($import['templates'], 'uuid');
-			$imported_entities['templates']['template'] = array_column($import['templates'], 'template');
+		foreach ($entities as $entity => $name_field) {
+			if (array_key_exists($entity, $import)) {
+				$imported_entities[$entity]['uuid'] = array_column($import[$entity], 'uuid');
+				$imported_entities[$entity][$name_field] = array_column($import[$entity], $name_field);
+			}
 		}
 
 		$imported_ids = [];
