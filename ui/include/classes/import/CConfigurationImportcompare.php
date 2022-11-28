@@ -70,7 +70,7 @@ class CConfigurationImportcompare {
 		$this->unique_fields_keys_by_type = [
 			'template_groups' => ['name'],
 			'host_groups' => ['name'],
-			'templates' => ['name'],
+			'templates' => ['template'],
 			'items' => ['name', 'key'],
 			'triggers' => ['name', 'expression', 'recovery_expression'],
 			'dashboards' => ['name'],
@@ -81,8 +81,7 @@ class CConfigurationImportcompare {
 			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
 			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
 			'host_prototypes' => ['host'],
-			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
-
+			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
 		];
 
 		$this->options = $options;
