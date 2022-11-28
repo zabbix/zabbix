@@ -873,7 +873,7 @@ out:
  ******************************************************************************/
 static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
 		EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
-		zbx_uint64_t LastID, zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
+		zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent,
 		const zbx_config_tls_t *zbx_config_tls, char **error)
@@ -1399,7 +1399,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *                                                                            *
  ******************************************************************************/
 static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
+		zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
 		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls,
 		char **error)
