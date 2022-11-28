@@ -109,15 +109,31 @@ class CControllerActionList extends CController {
 				'eventsource' => $data['eventsource'],
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
+			'editable' => true,
+			'sortfield' => $sort_field,
+			'limit' => $limit
+		]);
+
+		// pager
+		$page_num = $this->getInput('page', 1);
+		CPagerHelper::savePage('action.list', $page_num);
+
+		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
+			->setArgument('action', 'action.list')
+			->setArgument('eventsource', $eventsource)
+		);
+
+		$data['actions'] = API::Action()->get([
+			'actionids' => array_column($data['actions'], 'actionid'),
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => [
 				'operationid', 'actionid', 'operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 				'opconditions', 'opmessage_usr', 'opmessage_grp'
 			],
-			'editable' => true,
 			'sortfield' => $sort_field,
-			'limit' => $limit
+			'sortorder' => $sort_order,
+			'preservekeys' => true
 		]);
 
 		order_result($data['actions'], $sort_field, $sort_order);
@@ -136,15 +152,6 @@ class CControllerActionList extends CController {
 			}
 		}
 		$data['operation_descriptions'] = getActionOperationData($operations);
-
-		// pager
-		$page_num = $this->getInput('page', 1);
-		CPagerHelper::savePage('action.list', $page_num);
-
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
-			->setArgument('action', 'action.list')
-			->setArgument('eventsource', $eventsource)
-		);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of actions'));
