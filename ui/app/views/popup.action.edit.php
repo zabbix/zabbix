@@ -47,7 +47,7 @@ $condition_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
-$formula = (new CTextBox('formula', $data['formula'], DB::getFieldLength('actions', 'formula')))
+$formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
@@ -134,10 +134,7 @@ $action_tab->addItem([
 		(new CSpan(''))
 			->addStyle('white-space: normal;')
 			->setId('expression'),
-		(new CTextBox('formula', $data['formula'], DB::getFieldLength('actions', 'formula')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setId('formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;'),
+		$formula,
 		$condition_suppressed_template,
 		$condition_template_default,
 		$condition_tag_value_template
