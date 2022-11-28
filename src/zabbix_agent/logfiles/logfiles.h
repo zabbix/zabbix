@@ -23,6 +23,7 @@
 #include "../metrics.h"
 #include "persistent_state.h"
 #include "zbxcomms.h"
+#include "zbxregexp.h"
 
 #define ZBX_MD5_PRINT_BUF_LEN	((ZBX_MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
 
@@ -64,7 +65,7 @@ typedef int 	(*zbx_process_value_func_t)(zbx_vector_ptr_t *addrs, zbx_vector_ptr
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *zbx_config_tls);

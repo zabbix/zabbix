@@ -37,7 +37,7 @@ typedef struct
 	zbx_uint64_t		id;
 	char			*macro;
 	char			*regexp;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	unsigned char		op;
 }
 lld_condition_t;
@@ -72,7 +72,7 @@ lld_override_t;
 static void	lld_condition_free(lld_condition_t *condition)
 {
 	zbx_regexp_clean_expressions(&condition->regexps);
-	zbx_vector_ptr_destroy(&condition->regexps);
+	zbx_vector_expression_destroy(&condition->regexps);
 
 	zbx_free(condition->macro);
 	zbx_free(condition->regexp);
@@ -146,7 +146,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
 	condition->regexp = zbx_strdup(NULL, regexp);
 	condition->op = (unsigned char)atoi(op);
 
-	zbx_vector_ptr_create(&condition->regexps);
+	zbx_vector_expression_create(&condition->regexps);
 
 	zbx_vector_ptr_append(conditions, condition);
 

@@ -39,6 +39,8 @@ typedef struct
 }
 zbx_expression_t;
 
+ZBX_PTR_VECTOR_DECL(expression, zbx_expression_t *)
+
 /* regular expressions */
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg);
 int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg);
@@ -51,15 +53,15 @@ int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
 		size_t limit, char **out);
 
-void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions);
+void	zbx_regexp_clean_expressions(zbx_vector_expression_t *expressions);
 
-void	zbx_add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
-		char exp_delimiter, int case_sensitive);
-int	zbx_regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const char *expression,
+		int expression_type, char exp_delimiter, int case_sensitive);
+int	zbx_regexp_match_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
 		int case_sensitive);
-int	zbx_regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
-		const char *output_template, char **output);
-int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
+int	zbx_regexp_sub_ex(const zbx_vector_expression_t *regexps, const char *string, const char *pattern,
+		int case_sensitive, const char *output_template, char **output);
+int	zbx_global_regexp_exists(const char *name, const zbx_vector_expression_t *regexps);
 void	zbx_regexp_escape(char **string);
 
 /* wildcards */

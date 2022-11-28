@@ -27,6 +27,7 @@ package zbxlib
 #include "zbxregexp.h"
 
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
+typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
 static void *new_global_regexp()
 {
@@ -36,10 +37,10 @@ static void *new_global_regexp()
 	return (void *)regexps;
 }
 
-static void	free_global_regexp(zbx_vector_ptr_t *regexps)
+static void	free_global_regexp(zbx_vector_expression_t *regexps)
 {
 	zbx_regexp_clean_expressions(regexps);
-	zbx_vector_ptr_destroy(regexps);
+	zbx_vector_expression_destroy(regexps);
 	free(regexps);
 }
 
@@ -59,14 +60,15 @@ func NewGlobalRegexp() (grxp unsafe.Pointer) {
 
 func DestroyGlobalRegexp(grxp unsafe.Pointer) {
 	log.Tracef("Calling C function \"free_global_regexp()\"")
-	C.free_global_regexp(C.zbx_vector_ptr_lp_t(grxp))
+	C.free_global_regexp(C.zbx_vector_expression_lp_t(grxp))
 }
 
 func AddGlobalRegexp(grxp unsafe.Pointer, name, body string, expr_type int, delim byte, mode int) {
 	cname := C.CString(name)
 	cbody := C.CString(body)
 	log.Tracef("Calling C function \"zbx_add_regexp_ex()\"")
-	C.zbx_add_regexp_ex(C.zbx_vector_ptr_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim), C.int(mode))
+	C.zbx_add_regexp_ex(C.zbx_vector_expression_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim),
+			C.int(mode))
 	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cname))
 	log.Tracef("Calling C function \"free()\"")
@@ -89,7 +91,8 @@ func MatchGlobalRegexp(
 	}
 
 	log.Tracef("Calling C function \"zbx_regexp_sub_ex()\"")
-	ret := C.zbx_regexp_sub_ex(C.zbx_vector_ptr_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate, &coutput)
+	ret := C.zbx_regexp_sub_ex(C.zbx_vector_expression_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate,
+			&coutput)
 	switch ret {
 	case C.ZBX_REGEXP_MATCH:
 		match = true

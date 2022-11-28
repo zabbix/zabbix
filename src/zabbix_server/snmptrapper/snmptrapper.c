@@ -87,10 +87,10 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	zbx_uint64_t		*itemids = NULL;
 	AGENT_RESULT		*results = NULL;
 	AGENT_REQUEST		request;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	zbx_dc_um_handle_t	*um_handle;
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 
 	um_handle = zbx_dc_open_user_macros();
 
@@ -223,7 +223,7 @@ next:
 	zbx_dc_close_user_macros(um_handle);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zbx_preprocessor_flush();
 

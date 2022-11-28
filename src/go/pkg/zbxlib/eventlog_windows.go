@@ -36,6 +36,7 @@ extern int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
+typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
 void metric_set_refresh(ZBX_ACTIVE_METRIC *metric, int refresh);
@@ -210,8 +211,8 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
-	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
-		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+	ret := C.process_eventlog_check(nil, C.zbx_vector_expression_lp_t(unsafe.Pointer(result)),
+		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p, &cerrmsg)
 
 	// add cached results
