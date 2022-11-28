@@ -124,7 +124,7 @@ if ($operation['opmessage_grp']) {
 }
 
 $form_grid->addItem([
-	(new CLabel(_('Send to user groups'),'operation-message-user-groups'))
+	(new CLabel(_('Send to user groups'), 'operation_opmessage_grp__usrgrpid_ms'))
 		->setId('user-groups-label'),
 	(new CFormField(
 		(new CMultiSelect([
@@ -137,14 +137,15 @@ $form_grid->addItem([
 					'srctbl' => 'usrgrp',
 					'srcfld1' => 'usrgrpid',
 					'dstfrm' => $form->getName(),
-					'dstfld1'=> 'operation_opmessage_grp__usrgrpid',
+					'dstfld1' => 'operation_opmessage_grp__usrgrpid',
 					'editable' => '1',
 				]
 			]
 		]))
 			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-	)->setId('operation-message-user-groups')
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+	))
+		->setId('operation-message-user-groups')
 ]);
 
 $multiselect_values_users = [];
@@ -158,7 +159,7 @@ if ($operation['opmessage_usr']) {
 }
 
 $form_grid->addItem([
-	(new CLabel(_('Send to users'),'operation-message-users'))
+	(new CLabel(_('Send to users'),'operation_opmessage_usr__userid_ms'))
 		->setId('users-label'),
 	(new CFormField(
 		(new CMultiSelect([
@@ -217,7 +218,7 @@ $form_grid->addItem([
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions($mediatype_options)
-	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->setFocusableElementId('operation-mediatypeid')
 	->setName('operation[opmessage][mediatypeid]')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
@@ -241,7 +242,7 @@ $form_grid->addItem([
 
 // Operation custom message subject row.
 $form_grid->addItem([
-	(new CLabel(_('Subject')))->setId('operation-message-subject-label'),
+	(new CLabel(_('Subject'), 'operation-message-subject'))->setId('operation-message-subject-label'),
 	(new CTextBox('operation[opmessage][subject]'))
 		->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -250,7 +251,7 @@ $form_grid->addItem([
 
 // Operation custom message body row.
 $form_grid->addItem([
-	(new CLabel(_('Message')))->setId('operation-message-label'),
+	(new CLabel(_('Message'), 'operation-message-body'))->setId('operation-message-label'),
 	(new CTextArea('operation[opmessage][message]'))
 		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -297,13 +298,13 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 			(new CFormGrid())
 				->cleanItems()
 				->addItem([
-					new CLabel(_('Current host')),
+					new CLabel(_('Current host'), 'operation_opcommand_hst__hostid_current_host'),
 					(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
 						->setChecked($opcommand_hst_value === 0)
 					))->setId('operation-command-checkbox')
 				])
 				->addItem([
-					(new CLabel(_('Hosts'))),
+					(new CLabel(_('Hosts'), 'operation_opcommand_hst__hostid_ms')),
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_hst][][hostid]',
 						'object_name' => 'hosts',
@@ -321,7 +322,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				])
 				->addItem([
-					new CLabel(_('Host groups')),
+					new CLabel(_('Host groups'), 'operation_opcommand_grp__groupid_ms'),
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_grp][][groupid]',
 						'object_name' => 'hostGroup',
@@ -356,7 +357,7 @@ foreach ($operation['opgroup'] as $group) {
 
 // Add / remove host group attribute row.
 $form_grid->addItem([
-	(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
+	(new CLabel(_('Host groups'), 'operation_opgroup__groupid_ms'))
 		->setId('operation-attr-hostgroups-label')
 		->setAsteriskMark(),
 	(new CFormField(
@@ -389,7 +390,7 @@ foreach ($operation['optemplate'] as $template) {
 
 // Link / unlink templates attribute row.
 $form_grid->addItem([
-	(new CLabel(_('Templates')))
+	(new CLabel(_('Templates'), 'operation_optemplate__templateid_ms'))
 		->setId('operation-attr-templates-label')
 		->setAsteriskMark(),
 	(new CFormField(

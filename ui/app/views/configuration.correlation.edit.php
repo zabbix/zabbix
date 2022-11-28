@@ -248,11 +248,11 @@ $condition_table->addItem(
 );
 
 $form_list
-	->addRow((new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'), [
+	->addRow((new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'), [
 		(new CSelect('evaltype'))
 			->setId('evaltype')
 			->setValue($data['evaltype'])
-			->setFocusableElementId('label-evaltype')
+			->setFocusableElementId('evaltype_select')
 			->addOptions(CSelect::createOptionsFromArray([
 				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
 				CONDITION_EVAL_TYPE_AND => _('And'),

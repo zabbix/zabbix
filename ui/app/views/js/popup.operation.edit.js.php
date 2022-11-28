@@ -220,13 +220,13 @@ window.operation_popup = new class {
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
 				this.fields = [
-					'operation-message-user-groups', 'operation-condition-table',
+					'operation-message-user-groups', 'operation-condition-table', 'operation-evaltype-label',
 					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range',
-					'operation-step-duration', 'operation-message-notice', 'operation-message-notice',
+					'operation-step-duration', 'operation-message-notice', 'operation-message-notice', 'operation-type',
 					'operation-message-users', 'operation-evaltype', 'operation-message-mediatype-only',
 					'operation-message-custom', 'operation_esc_period', 'operation-message-custom-label',
-					'operation_opmessage_default_msg', 'operation-type', 'operation-condition-row',
-					'operation-condition-evaltype-formula', 'operation-evaltype-label'
+					'operation_opmessage_default_msg', 'operation-condition-row', 'operation_opmessage_usr__userid_ms',
+					'operation-condition-evaltype-formula', 'user-groups-label', 'operation_opmessage_grp__usrgrpid_ms'
 				];
 
 				this._customMessageFields();
@@ -239,7 +239,7 @@ window.operation_popup = new class {
 					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-message-body'
+					'operation_opmessage_grp__usrgrpid_ms', 'operation_opmessage_usr__userid_ms'
 				];
 
 				this._customMessageFields();
@@ -250,8 +250,8 @@ window.operation_popup = new class {
 				this.fields = [
 					'operation-message-notice', 'operation-message-user-groups', 'operation-message-users',
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
-					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-message-notice'
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-message-notice',
+					'operation-type', 'operation_opmessage_grp__usrgrpid_ms', 'operation_opmessage_usr__userid_ms'
 				];
 
 				this._customMessageFields();
