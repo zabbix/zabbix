@@ -303,7 +303,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					))->setId('operation-command-checkbox')
 				])
 				->addItem([
-					(new CLabel(_('Host'))),
+					(new CLabel(_('Hosts'))),
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_hst][][hostid]',
 						'object_name' => 'hosts',
@@ -321,7 +321,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				])
 				->addItem([
-					new CLabel(_('Host group')),
+					new CLabel(_('Host groups')),
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_grp][][groupid]',
 						'object_name' => 'hostGroup',
