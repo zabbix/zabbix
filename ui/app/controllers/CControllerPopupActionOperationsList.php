@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupActionOperationGet extends CController {
+class CControllerPopupActionOperationsList extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);

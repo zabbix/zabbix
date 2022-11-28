@@ -25,9 +25,9 @@
  */
 
 $partials = [
-	ACTION_OPERATION => 'popup.operations',
-	ACTION_RECOVERY_OPERATION => 'popup.recovery.operations',
-	ACTION_UPDATE_OPERATION => 'popup.update.operations'
+	ACTION_OPERATION => 'action.operations',
+	ACTION_RECOVERY_OPERATION => 'action.recovery.operations',
+	ACTION_UPDATE_OPERATION => 'action.update.operations'
 ];
 
 $output = [

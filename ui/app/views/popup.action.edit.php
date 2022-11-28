@@ -190,7 +190,7 @@ $data['esc_period'] = $data['action']['esc_period'];
 
 $operations_tab->addItem([
 	new CLabel('Operations'),
-	(new CFormField(new CPartial('popup.operations', $data)))
+	(new CFormField(new CPartial('action.operations', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('operations-container')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -200,7 +200,7 @@ $operations_tab->addItem([
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_tab->addItem([
 		new CLabel('Recovery operations'),
-		(new CFormField(new CPartial('popup.recovery.operations', $data)))
+		(new CFormField(new CPartial('action.recovery.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('recovery-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -211,7 +211,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$operations_tab->addItem([
 		new CLabel('Update operations'),
-		(new CFormField(new CPartial('popup.update.operations', $data)))
+		(new CFormField(new CPartial('action.update.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('update-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

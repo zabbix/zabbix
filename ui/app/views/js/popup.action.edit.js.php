@@ -65,7 +65,7 @@ window.action_edit_popup = new class {
 		const fields = getFormFields(this.form);
 
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', 'popup.action.operation.get');
+		curl.setArgument('action', 'popup.action.operations.list');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
 		if (document.querySelector('#esc_period')) {

@@ -163,7 +163,7 @@ class CRouter {
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
 		'popup.action.edit'							=> ['CControllerPopupActionEdit',						'layout.json',			'popup.action.edit'],
 		'popup.action.operation.edit'				=> ['CControllerPopupActionOperationEdit',				'layout.json',			'popup.operation.edit'],
-		'popup.action.operation.get'				=> ['CControllerPopupActionOperationGet',				'layout.json',			'popup.operation'],
+		'popup.action.operations.list'				=> ['CControllerPopupActionOperationsList',				'layout.json',			'popup.action.operations.list'],
 		'popup.condition.check'						=> ['CControllerActionConditionCheck',					'layout.json',			null],
 		'popup.condition.edit'						=> ['CControllerPopupActionConditionEdit',				'layout.json',			'popup.condition.edit'],
 		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.edit'],
