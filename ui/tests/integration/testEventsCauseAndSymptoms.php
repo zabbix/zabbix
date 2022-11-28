@@ -74,7 +74,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		foreach ($rank_requests as $rank_request) {
 			$response = $this->call('event.acknowledge', [
 				'eventids' => $rank_request['eventids'],
-				'action' => ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM,
+				'action' => ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
 				'cause_eventid' => $rank_request['cause_eventid'],
 			]);
 
@@ -549,7 +549,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		// request event/problem ranking
 		$response = $this->call('event.acknowledge', [
 			'eventids' => [1, 2, 4, 5],
-			'action' => ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 		]);
 
 		$this->assertArrayHasKey('result', $response);
