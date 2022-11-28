@@ -222,9 +222,9 @@ function objectSize(obj) {
 /**
  * Add standard message to the top of the site.
  *
- * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning. // todo zi
+ * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning.
  */
-function addMessage($msg_box) { // todo check (acikuns)
+function addMessage($msg_box) {
 	var $wrapper = $('.wrapper'),
 		$main = $wrapper.find('> main'),
 		$footer = $wrapper.find('> footer');
@@ -244,7 +244,7 @@ function addMessage($msg_box) { // todo check (acikuns)
  * Clear standard messages.
  */
 function clearMessages() {
-	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove(); // todo zi
+	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
 }
 
 /**
@@ -580,7 +580,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			'buttons': [
 				{
 					'title': t('Cancel'),
-					'class': 'btn-alt', // todo zi
+					'class': 'btn-alt',
 					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
@@ -717,7 +717,7 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good zi-circle-check', bad: 'msg-bad zi-triangle-warning', warning: 'msg-warning'}, // todo zi
+	var classes = {good: 'msg-good zi-circle-check', bad: 'msg-bad zi-triangle-warning', warning: 'msg-warning zi-triangle-warning'},
 		msg_class = classes[type];
 
 	if (show_details === null) {

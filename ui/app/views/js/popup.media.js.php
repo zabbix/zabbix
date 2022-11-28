@@ -67,7 +67,7 @@ function validateMedia(overlay) {
 		url: $form.attr('action'),
 		data: $form.serialize(),
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove(); // todo zi
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if ('error' in ret) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);

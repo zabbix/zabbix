@@ -130,7 +130,7 @@ if ($data['tokenid'] != 0) {
 		[
 			'title' => _('Regenerate'),
 			'confirmation' => _('Regenerate selected API token? Previously generated token will become invalid.'),
-			'class' => 'btn-alt', // todo zi
+			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'token_edit_popup.regenerate();'
@@ -138,7 +138,7 @@ if ($data['tokenid'] != 0) {
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected API token?'),
-			'class' => 'btn-alt', // todo zi
+			'class' => 'btn-alt',
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'token_edit_popup.delete('.json_encode($data['tokenid']).');'

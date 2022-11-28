@@ -142,12 +142,12 @@ class CHtmlPage {
 		$divs = [
 			(new CTag('nav', true,
 				(new CButton(null, _('Show sidebar')))
-					->setId('sidebar-button-toggle') // todo zi
-					->addClass('button-toggle') // todo zi
-					->addClass('zi-menu') // todo zi
+					->setId('sidebar-button-toggle')
+					->addClass('button-toggle')
+					->addClass('zi-menu')
 					->setAttribute('title', _('Show sidebar'))
 			))
-				->addClass('sidebar-nav-toggle') // todo zi
+				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
 				->setAttribute('aria-label', _('Sidebar control'))
 		];

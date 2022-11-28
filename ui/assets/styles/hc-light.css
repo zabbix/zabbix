@@ -489,6 +489,7 @@ header {
       position: relative;
       padding: 0 0 0 10px; }
       header ul li .btn-split {
+        top: 1px;
         margin-right: 0; }
         header ul li .btn-split li {
           padding-left: 0; }
@@ -2846,8 +2847,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     color: #ffffff; }
 
 .zi-triangle-warning,
-.zi-circle-check,
-.msg-warning {
+.zi-circle-check {
   position: relative;
   padding: 6px 10px 6px 75px;
   margin: 10px;
@@ -2859,29 +2859,23 @@ div.dashboard-widget-tophosts z-bar-gauge {
   border: 2px solid;
   border-radius: 2px; }
   .zi-triangle-warning .overlay-close-btn,
-  .zi-circle-check .overlay-close-btn,
-  .msg-warning .overlay-close-btn {
+  .zi-circle-check .overlay-close-btn {
     color: #333333; }
   .zi-triangle-warning .link-action,
-  .zi-circle-check .link-action,
-  .msg-warning .link-action {
+  .zi-circle-check .link-action {
     margin-right: 10px;
     font-size: 0.85em; }
     .zi-triangle-warning .link-action .arrow-up,
-    .zi-circle-check .link-action .arrow-up,
-    .msg-warning .link-action .arrow-up {
+    .zi-circle-check .link-action .arrow-up {
       border-bottom-color: #033003; }
     .zi-triangle-warning .link-action .arrow-down,
-    .zi-circle-check .link-action .arrow-down,
-    .msg-warning .link-action .arrow-down {
+    .zi-circle-check .link-action .arrow-down {
       border-top-color: #033003; }
   .zi-triangle-warning button,
-  .zi-circle-check button,
-  .msg-warning button {
+  .zi-circle-check button {
     background-color: #ffffff; }
   .zi-triangle-warning::before,
-  .zi-circle-check::before,
-  .msg-warning::before {
+  .zi-circle-check::before {
     content: '';
     position: absolute;
     top: 0;
@@ -2889,10 +2883,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
     left: 0;
     width: 61px; }
   .zi-triangle-warning::after,
-  .zi-circle-check::after,
-  .msg-warning::after {
+  .zi-circle-check::after {
     position: absolute;
-    top: 7px;
+    top: 4px;
     left: 0;
     width: 27px;
     height: 25px;
@@ -3178,6 +3171,8 @@ section {
   section.section-collapsed .section-body,
   section.section-collapsed .section-foot {
     display: none; }
+  section.section-collapsed .zi-chevron-up {
+    transform: rotate(180deg); }
   section:not(:last-child) {
     margin-bottom: 10px; }
   section .list-table {
@@ -4252,16 +4247,16 @@ form.is-loading {
     background-color: transparent;
     border-radius: 2px;
     color: #768d99; }
-    .filter-btn-container .zi-chevron-left:hover, .filter-btn-container .zi-chevron-left:focus, .filter-btn-container .zi-chevron-left:active,
-    .filter-btn-container .zi-chevron-right:hover,
-    .filter-btn-container .zi-chevron-right:focus,
-    .filter-btn-container .zi-chevron-right:active {
+    .filter-btn-container .zi-chevron-left:not(:disabled):hover, .filter-btn-container .zi-chevron-left:not(:disabled):focus, .filter-btn-container .zi-chevron-left:not(:disabled):active,
+    .filter-btn-container .zi-chevron-right:not(:disabled):hover,
+    .filter-btn-container .zi-chevron-right:not(:disabled):focus,
+    .filter-btn-container .zi-chevron-right:not(:disabled):active {
       background-color: #555555;
       color: #ffffff; }
-      .filter-btn-container .zi-chevron-left:hover::before, .filter-btn-container .zi-chevron-left:focus::before, .filter-btn-container .zi-chevron-left:active::before,
-      .filter-btn-container .zi-chevron-right:hover::before,
-      .filter-btn-container .zi-chevron-right:focus::before,
-      .filter-btn-container .zi-chevron-right:active::before {
+      .filter-btn-container .zi-chevron-left:not(:disabled):hover::before, .filter-btn-container .zi-chevron-left:not(:disabled):focus::before, .filter-btn-container .zi-chevron-left:not(:disabled):active::before,
+      .filter-btn-container .zi-chevron-right:not(:disabled):hover::before,
+      .filter-btn-container .zi-chevron-right:not(:disabled):focus::before,
+      .filter-btn-container .zi-chevron-right:not(:disabled):active::before {
         opacity: 1; }
     .filter-btn-container .zi-chevron-left::before,
     .filter-btn-container .zi-chevron-right::before {
@@ -4849,23 +4844,41 @@ button {
     .btn-link[disabled]:hover {
       background-color: transparent; }
 
-.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
-
-.btn-alarm-on {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -546px; }
-
-.btn-alarm-off {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -582px; }
-
-.btn-sound-on {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -474px; }
-
-.btn-sound-off {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -510px; }
-
-.btn-info-clock {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -87px -762px; }
+.zi-bell,
+.zi-bell-off,
+.zi-speaker,
+.zi-speaker-off,
+.zi-time-period {
+  margin-right: 2px;
+  width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  opacity: .5;
+  transition: opacity .3s ease-out; }
+  .zi-bell::before,
+  .zi-bell-off::before,
+  .zi-speaker::before,
+  .zi-speaker-off::before,
+  .zi-time-period::before {
+    left: -1px;
+    color: #768d99; }
+  .zi-bell:hover, .zi-bell:active, .zi-bell:focus,
+  .zi-bell-off:hover,
+  .zi-bell-off:active,
+  .zi-bell-off:focus,
+  .zi-speaker:hover,
+  .zi-speaker:active,
+  .zi-speaker:focus,
+  .zi-speaker-off:hover,
+  .zi-speaker-off:active,
+  .zi-speaker-off:focus,
+  .zi-time-period:hover,
+  .zi-time-period:active,
+  .zi-time-period:focus {
+    color: unset;
+    background-color: unset;
+    border-color: unset;
+    opacity: 1; }
 
 .ui-tabs-nav {
   height: 30px;
@@ -5087,25 +5100,24 @@ button {
 .list-table a.zi-arrows-top-bottom,
 .list-table a.zi-alert, .list-table .zi-more, .dashboard-edit .zi-cog-filled, .dashboard-navigation-tabs .zi-more, .dashboard-grid-widget-actions .zi-more,
 .dashboard-grid-widget-actions .zi-cog-filled, section .zi-chevron-up, .service-info .service-actions .zi-pencil, z-select .zi-chevron-down button,
-.z-select .zi-chevron-down button, .calendar-control .zi-calendar, .navtree .tree .tree-item > .tree-row > .tools .zi-plus,
+.z-select .zi-chevron-down button, .zi-bell,
+.zi-bell-off,
+.zi-speaker,
+.zi-speaker-off,
+.zi-time-period, .calendar-control .zi-calendar, .list-vertical-accordion .zi-chevron-up, .navtree .tree .tree-item > .tree-row > .tools .zi-plus,
 .navtree .tree .tree-item > .tree-row > .tools .zi-copy,
 .navtree .tree .tree-item > .tree-row > .tools .zi-pencil, .interfaces .interface-row[data-type="2"] .interface-btn-toggle.zi-chevron-down {
   background-color: transparent;
   border: none;
   border-radius: 2px; }
 
-.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
-  width: 24px;
-  height: 24px;
-  margin: 2px 2px 0 0; }
-
-.filter-container.tabfilter-container .zi-cog-filled, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
+.filter-container.tabfilter-container .zi-cog-filled {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .filter-container.tabfilter-container [disabled].zi-cog-filled, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .filter-container.tabfilter-container [disabled].zi-cog-filled:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .filter-container.tabfilter-container [disabled].zi-cog-filled:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .filter-container.tabfilter-container [disabled].zi-cog-filled:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active {
+  .filter-container.tabfilter-container [disabled].zi-cog-filled, .filter-container.tabfilter-container [disabled].zi-cog-filled:hover, .filter-container.tabfilter-container [disabled].zi-cog-filled:focus, .filter-container.tabfilter-container [disabled].zi-cog-filled:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -5135,7 +5147,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-.filter-container.tabfilter-container .zi-cog-filled:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .filter-container.tabfilter-container .zi-cog-filled:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .filter-container.tabfilter-container .zi-cog-filled:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active {
+.filter-container.tabfilter-container .zi-cog-filled:hover, .filter-container.tabfilter-container .zi-cog-filled:focus, .filter-container.tabfilter-container .zi-cog-filled:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -5353,14 +5365,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     transition: background-color .2s ease-out; }
     .menu-popup .menu-popup-item:hover, .menu-popup .menu-popup-item:focus, .menu-popup .menu-popup-item:active, .menu-popup .menu-popup-item.highlighted {
       background-color: #f4f4f4; }
-    .menu-popup .menu-popup-item.selected::before {
-      display: block;
-      width: 24px;
-      height: 24px;
-      position: absolute;
-      left: 0;
-      content: '';
-      background: url("../img/icon-sprite.svg?20220722") no-repeat -5px -835px; }
+    .menu-popup .menu-popup-item.zi-check {
+      padding: 0; }
+      .menu-popup .menu-popup-item.zi-check::before {
+        padding: 0 4px;
+        top: -2px;
+        font-size: 16px;
+        color: #768d99; }
     .menu-popup .menu-popup-item .arrow-right {
       position: absolute;
       right: 10px;
@@ -5662,8 +5673,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       flex: 1 0 auto;
       width: 28px;
       height: 24px;
-      vertical-align: middle;
-      background: url("../img/icon-sprite.svg?20220722") no-repeat -85px -691px; }
+      vertical-align: middle; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px;
@@ -5790,8 +5800,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     width: 14px;
     height: 14px;
     float: left;
-    margin-top: 20px;
-    background: url("../img/icon-sprite.svg?20220722") no-repeat -11px -587px; }
+    margin-top: 20px; }
+  .notif-indic .zi-bell-off::before {
+    left: -6px;
+    color: #768d99; }
 
 .dashed-border td {
   border: 1px dashed #888888; }
@@ -6539,6 +6551,19 @@ svg {
 .list-vertical-accordion {
   padding-left: 15px;
   width: calc(100% - 15px); }
+  .list-vertical-accordion .zi-chevron-up {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    opacity: .5;
+    transition: opacity .3s ease-out; }
+    .list-vertical-accordion .zi-chevron-up:hover, .list-vertical-accordion .zi-chevron-up:active, .list-vertical-accordion .zi-chevron-up:focus {
+      opacity: 1; }
+    .list-vertical-accordion .zi-chevron-up::before {
+      top: -1px;
+      left: 2px;
+      font-size: 16px;
+      color: #768d99; }
   .list-vertical-accordion .list-accordion-item .btn-remove {
     position: relative;
     right: -10px;
@@ -6548,14 +6573,12 @@ svg {
     padding-bottom: 2px; }
   .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-body {
     display: block; }
-  .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle {
-    margin: 0; }
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
     margin: 0; }
-  .list-vertical-accordion .list-accordion-item-toggle {
-    text-indent: -9999px; }
+  .list-vertical-accordion .list-accordion-item-closed .zi-chevron-up {
+    transform: rotate(180deg); }
 
 .display-none, .table-forms > li.display-none {
   display: none; }
@@ -7111,7 +7134,7 @@ a.icon-count {
       border-radius: 2px; }
     .btn-split li .zi-chevron-down {
       padding: 0 5px;
-      vertical-align: top;
+      vertical-align: middle;
       line-height: 0;
       font-size: 0;
       position: relative;
@@ -7396,17 +7419,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
-.geomap-filter-button,
-.navigate-home-button {
-  background-image: url("../img/icon-sprite.svg?20220722");
-  background-repeat: no-repeat; }
-
-.geomap-filter-button {
-  background-position: -243px -543px !important; }
-
-.navigate-home-button {
-  background-position: -117px -506px !important; }
-
 .geomap-filter {
   border: 1px solid #383838;
   background-color: #ffffff;
@@ -7448,9 +7460,16 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .leaflet-control.disabled {
   background-color: #ffffff;
   opacity: 1; }
-  .leaflet-control.disabled .geomap-filter-button {
-    cursor: default;
-    opacity: .4; }
+.leaflet-control .zi-filter,
+.leaflet-control .zi-home {
+  cursor: pointer; }
+  .leaflet-control .zi-filter::after,
+  .leaflet-control .zi-home::after {
+    display: none; }
+.leaflet-control .zi-home::before {
+  top: -1px;
+  font-size: 19px;
+  color: #768d99; }
 
 .leaflet-container {
   height: 100%;
@@ -8124,11 +8143,6 @@ td.inactive-bg {
   content: " /"; }
 .breadcrumbs > :last-child::after {
   content: ""; }
-
-.interfaces .interface-row[data-type="2"] .interface-btn-toggle {
-  background-position: -165px -690px; }
-.interfaces .interface-row[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
-  background-position: -165px -655px; }
 
 section .section-toggle {
   background-position: -165px -654px; }

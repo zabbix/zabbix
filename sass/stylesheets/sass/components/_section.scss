@@ -53,6 +53,9 @@ section {
 		.section-foot {
 			display: none;
 		}
+		.zi-chevron-up {
+			transform: rotate(180deg);
+		}
 	}
 
 	&:not(:last-child) {

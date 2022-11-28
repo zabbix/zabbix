@@ -40,7 +40,7 @@ class CSidebar extends CBaseComponent {
 	}
 
 	init() {
-		this._sidebar_toggle = document.getElementById('sidebar-button-toggle'); // todo zi
+		this._sidebar_toggle = document.getElementById('sidebar-button-toggle');
 		this._sidebar_scrollable = this._target.querySelector('.scrollable');
 
 		this._is_focused = false;
@@ -309,15 +309,14 @@ class CSidebar extends CBaseComponent {
 				ZABBIX.MenuMain.collapseExpanded(1);
 			},
 
-			// TODO (acikuns) icons
 			viewmodeChange: (e) => {
-				if (e.target.classList.contains('button-compact')) { // todo zi
+				if (e.target.classList.contains('button-compact')) {
 					ZABBIX.MenuMain.collapseExpanded();
 					ZABBIX.UserMain.collapseExpanded();
 					clearTimeout(this._expand_timer);
 					this.setViewMode(SIDEBAR_VIEW_MODE_COMPACT);
 				}
-				else if (e.target.classList.contains('button-hide')) { // todo zi
+				else if (e.target.classList.contains('button-hide')) {
 					ZABBIX.MenuMain.collapseExpanded(1);
 					ZABBIX.UserMain.collapseExpanded(1);
 					this.setViewMode(SIDEBAR_VIEW_MODE_HIDDEN);

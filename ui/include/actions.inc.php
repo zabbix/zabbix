@@ -1843,7 +1843,6 @@ function makeEventMessagesIcon(array $data, array $users): ?CButton {
 			zbx_nl2br($message['message'])
 		]);
 	}
-	// todo zi
 	return $total
 		? makeActionIcon([
 			'icon' => 'zi-alert',

@@ -250,12 +250,12 @@ class CFilter extends CDiv {
 		if ($visible) {
 			$this->addTab(new CDiv([
 				(new CSimpleButton())
-					->addClass(ZBX_STYLE_BTN_TIME_LEFT) // todo zi
-					->addClass('zi-chevron-left'), // todo zi
-				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT), // todo zi
+					->addClass(ZBX_STYLE_BTN_TIME_LEFT)
+					->addClass('zi-chevron-left'),
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
 				(new CSimpleButton())
 					->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
-					->addClass('zi-chevron-right')// todo zi
+					->addClass('zi-chevron-right')
 			]), null);
 
 			$predefined_ranges = [];

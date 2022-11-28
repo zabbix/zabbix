@@ -28,7 +28,7 @@ const TABFILTERITEM_EVENT_DELETE = 'delete.item.tabfilter';
 const TABFILTERITEM_EVENT_ACTION = 'action.item.tabfilter';
 
 const TABFILTERITEM_STYLE_UNSAVED = 'unsaved';
-const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit'; // todo zi
+const TABFILTERITEM_STYLE_EDIT_BTN = 'icon-edit';
 const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';

@@ -2008,26 +2008,32 @@ button {
 	}
 }
 
-// todo last (probably need to create module to check it)
-$icon-widget-btn: (
-	widget-collapse: url($sprite-path) no-repeat -6px -654px,
-	alarm-on: url($sprite-path) no-repeat -6px -546px,
-	alarm-off: url($sprite-path) no-repeat -6px -582px,
-	sound-on: url($sprite-path) no-repeat -6px -474px,
-	sound-off: url($sprite-path) no-repeat -6px -510px,
-	info-clock: url($sprite-path) no-repeat -87px -762px
-);
+.zi-bell,
+.zi-bell-off,
+.zi-speaker,
+.zi-speaker-off,
+.zi-time-period {
+	margin-right: 2px;
+	width: 24px;
+	height: 24px;
+	padding: 0 4px;
 
-// Dynamically generated classes:
-//  .btn-alarm-on // todo notification
-//  .btn-alarm-off // todo notification
-//  .btn-sound-on // todo notification
-//  .btn-sound-off // todo notification
-//  .btn-info-clock
-@each $icon-widget-btn, $bgimage in $icon-widget-btn {
-	.btn-#{$icon-widget-btn} {
-		background: $bgimage;
-		@extend %btn-widget;
+	opacity: .5;
+	@extend %btn-reset;
+	&::before {
+		left: -1px;
+		color: $icon-header-controls-color;
+	}
+
+	transition: opacity .3s ease-out;
+
+	&:hover,
+	&:active,
+	&:focus {
+		color: unset;
+		background-color: unset;
+		border-color: unset;
+		opacity: 1;
 	}
 }
 
@@ -2798,15 +2804,13 @@ $trigger-expression-tree-icons: (
 			background-color: $action-hover-color;
 		}
 
-		&.selected {
+		&.zi-check {
+			padding: 0;
 			&::before {
-				display: block;
-				width: 24px;
-				height: 24px;
-				position: absolute;
-				left: 0;
-				content: '';
-				background: url($sprite-path) no-repeat -5px -835px; // todo last
+				padding: 0 4px;
+				top: -2px;
+				font-size: 16px;
+				color: $icon-header-controls-color;
 			}
 		}
 
@@ -3296,7 +3300,6 @@ $trigger-expression-tree-icons: (
 			width: 28px;
 			height: 24px;
 			vertical-align: middle;
-			background: url($sprite-path) no-repeat -85px -691px; // todo last
 		}
 	}
 }
@@ -3498,7 +3501,12 @@ $trigger-expression-tree-icons: (
 		height: 14px;
 		float: left;
 		margin-top: 20px;
-		background: url($sprite-path) no-repeat -11px -587px; // todo last
+	}
+	.zi-bell-off {
+		&::before {
+			left: -6px;
+			color: $icon-header-controls-color;
+		}
 	}
 }
 
@@ -4529,6 +4537,29 @@ svg {
 	padding-left: 15px;
 	width: calc(100% - 15px);
 
+	.zi-chevron-up {
+		width: 24px;
+		height: 24px;
+		padding: 0;
+
+		@extend %btn-reset;
+
+		opacity: .5;
+		transition: opacity .3s ease-out;
+		&:hover,
+		&:active,
+		&:focus {
+			opacity: 1;
+		}
+
+		&::before {
+			top: -1px;
+			left: 2px;
+			font-size: 16px;
+			color: $icon-header-controls-color;
+		}
+	}
+
 	.list-accordion-item {
 		.btn-remove {
 			position: relative;
@@ -4546,11 +4577,6 @@ svg {
 		.list-accordion-item-body {
 			display: block;
 		}
-
-		.list-accordion-item-toggle {
-			@extend .btn-widget-collapse;
-			margin: 0;
-		}
 	}
 
 	.list-accordion-item-closed {
@@ -4561,10 +4587,10 @@ svg {
 		.list-accordion-item-toggle {
 			margin: 0;
 		}
-	}
 
-	.list-accordion-item-toggle {
-		text-indent: -9999px;
+		.zi-chevron-up {
+			transform: rotate(180deg);
+		}
 	}
 }
 
@@ -5381,7 +5407,7 @@ a.icon-count {
 }
 
 .btn-split {
-	// todo last chevron-down not aligned (alerts->media types footer)
+	// todo last chevron-down not aligned (data collection->template)
 	display: inline-block;
 	position: relative;
 	margin-right: 10px;
@@ -5408,7 +5434,7 @@ a.icon-count {
 
 		.zi-chevron-down {
 			padding: 0 5px;
-			vertical-align: top;
+			vertical-align: middle;
 			line-height: 0;
 			font-size: 0;
 			position: relative;

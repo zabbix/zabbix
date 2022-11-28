@@ -1202,7 +1202,7 @@ class testFormServicesServices extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 
-		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]') // todo zi
+		$this->query('id:tab_info')->one()->waitUntilVisible()->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
@@ -1241,7 +1241,7 @@ class testFormServicesServices extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 		$table->findRow('Name', $parent, true)->query('link', $parent)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]') // todo zi
+		$table->findRow('Name', $child, true)->query('xpath:.//button[contains(@class, "btn-edit")]')
 				->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();

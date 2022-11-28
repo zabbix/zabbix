@@ -431,7 +431,6 @@ class testDocumentationLinks extends CWebTest {
 					]
 				]
 			],
-			// todo zi
 			// #40 Availability report view.
 			[
 				[
@@ -1890,7 +1889,7 @@ class testDocumentationLinks extends CWebTest {
 		$location = ($dialog->isValid()) ? $dialog->waitUntilReady() : $this;
 
 		// Get the documentation link and compare it with expected result.
-		$link = $location->query('class:icon-doc-link')->one(); // todo zi
+		$link = $location->query('class:icon-doc-link')->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
@@ -1984,7 +1983,7 @@ class testDocumentationLinks extends CWebTest {
 		$dialog = $this->query('id:map-window')->one()->waitUntilVisible();
 
 		// Maps contain headers for all map elements, so only the visible one should be checked.
-		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first(); // todo zi
+		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
 
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 	}

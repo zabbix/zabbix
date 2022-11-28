@@ -132,7 +132,7 @@ window.tophosts_column_edit_form = new class {
 				const form = this._$widget_form[0];
 
 				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) { // todo zi
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
 				}

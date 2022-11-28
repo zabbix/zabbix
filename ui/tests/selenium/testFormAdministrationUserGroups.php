@@ -136,7 +136,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add user group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group added'); // todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group added');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 
@@ -317,7 +317,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot delete user group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group deleted'); // todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group deleted');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;

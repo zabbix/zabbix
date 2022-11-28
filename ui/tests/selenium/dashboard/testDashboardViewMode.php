@@ -82,18 +82,18 @@ class testDashboardViewMode extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 
-		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]"); // todo zi
+		$this->zbxTestClickXpathWait("//button[contains(@class, 'btn-kiosk')]");
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Normal view"]'));
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view'); // todo zi
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
-		$this->query('class:btn-min')->one()->forceClick(); // todo zi
+		$this->query('class:btn-min')->one()->forceClick();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-kiosk')]")); // todo zi
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode'); // todo zi
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-kiosk')]"));
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertElementPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
@@ -107,13 +107,13 @@ class testDashboardViewMode extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentXpath("//header");
 		$this->zbxTestAssertElementNotPresentXpath("//header[@class='header-title']");
 		$this->zbxTestAssertElementNotPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view'); // todo zi
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-min')]", 'title', 'Normal view');
 
 		// Set layout mode to default layout.
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view&kiosk=0');
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode'); // todo zi
+		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 	}
 
 	/**

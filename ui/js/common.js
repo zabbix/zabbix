@@ -366,7 +366,7 @@ function PopUp(action, parameters, {
 					buttons: [
 						{
 							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel', // todo zi
+							'class': 'btn-alt js-cancel',
 							'cancel': true,
 							'action': function() {}
 						}
@@ -390,7 +390,7 @@ function PopUp(action, parameters, {
 					default:
 						buttons.push({
 							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel', // todo zi
+							'class': 'btn-alt js-cancel',
 							'cancel': true,
 							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 						});
@@ -421,7 +421,7 @@ function PopUp(action, parameters, {
 				buttons: [
 					{
 						'title': t('Cancel'),
-						'class': 'btn-alt js-cancel', // todo zi
+						'class': 'btn-alt js-cancel',
 						'cancel': true,
 						'action': function() {}
 					}
@@ -727,7 +727,7 @@ function validate_trigger_expression(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove(); // todo zi
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
 			if ('error' in ret) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);

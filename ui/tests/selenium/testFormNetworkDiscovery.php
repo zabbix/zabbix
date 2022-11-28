@@ -175,7 +175,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClick('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -335,7 +335,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created');
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM drules WHERE name='.zbx_dbstr($data['name'])));
@@ -422,7 +422,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClick('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));

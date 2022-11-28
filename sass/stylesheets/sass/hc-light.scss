@@ -1313,25 +1313,6 @@ td.inactive-bg {
 		content: "";
 	}
 }
-
-// Host interfaces.
-
-.interfaces {
-	.interface-row {
-		&[data-type="2"] {
-			.interface-btn-toggle {
-				background-position: -165px -690px;
-			}
-
-			&.list-accordion-item-opened {
-				.interface-btn-toggle {
-					background-position: -165px -655px;
-				}
-			}
-		}
-	}
-}
-
 // Section (components/_section.scss).
 
 section {

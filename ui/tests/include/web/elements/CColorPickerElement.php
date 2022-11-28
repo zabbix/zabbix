@@ -44,7 +44,7 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function overwrite($color) {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click(); // todo zi
+		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
 		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
 
 		if ($color === null) {

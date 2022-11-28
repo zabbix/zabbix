@@ -1334,7 +1334,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 			$ack = [' ', (new CSpan())
 				->addClass(ZBX_STYLE_ICON_ACKN)
 				->addClass('zi-check')
-			]; // todo zi
+			];
 		}
 	}
 

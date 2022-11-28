@@ -261,10 +261,9 @@
 							screen.timestamp = request_start;
 							screen.isRefreshing = false;
 
-							$('.wrapper > .msg-bad').remove(); // todo zi
+							$('.wrapper > .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							html.filter('.msg-bad zi-triangle-warning').insertBefore('.wrapper main'); // todo zi
-// todo check (acikuns)
+							html.filter('.msg-bad zi-triangle-warning').insertBefore('.wrapper main');
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {

@@ -85,7 +85,7 @@ function validateConditionPopup(overlay) {
 			overlay.unsetLoading();
 		})
 		.done(function(response) {
-			overlay.$dialogue.find('.msg-bad').remove(); // todo zi
+			overlay.$dialogue.find('.msg-bad').remove();
 
 			if ('error' in response) {
 				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);

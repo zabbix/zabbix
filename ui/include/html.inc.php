@@ -143,14 +143,14 @@ function get_icon($type, $params = []) {
 		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
-					->addClass(ZBX_STYLE_BTN_REMOVE_FAV) // todo zi
-					->addClass('zi-star-filled') // todo zi
+					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
+					->addClass('zi-star-filled')
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
-					->addClass(ZBX_STYLE_BTN_ADD_FAV) // todo zi
+					->addClass(ZBX_STYLE_BTN_ADD_FAV)
 					->addClass('zi-star')
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
@@ -167,14 +167,14 @@ function get_icon($type, $params = []) {
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
 					->addClass('zi-minimize')
-					->addClass(ZBX_STYLE_BTN_MIN); // todo zi
+					->addClass(ZBX_STYLE_BTN_MIN);
 			}
 			else {
 				$icon = (new CButton(null, '&nbsp;'))
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_KIOSK) // TODO ZI:
+					->addClass(ZBX_STYLE_BTN_KIOSK)
 					->addClass('zi-fullscreen');
 			}
 
@@ -912,7 +912,7 @@ function makeInformationList($info_icons) {
  *
  * @return CLink
  */
-function makeInformationIcon($message) { // TODO ZI: a new icon should be added to the font
+function makeInformationIcon($message) {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass('zi-i')
@@ -939,8 +939,8 @@ function makeMaintenanceIcon($type, $name, $description) {
 	}
 
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_MAINTENANCE) // todo zi
-		->addClass('zi-wrench-alt') // todo zi (acikuns) check maintenance yellow wrench
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE)
+		->addClass('zi-wrench-alt')
 		->setHint($hint);
 }
 
@@ -1069,7 +1069,7 @@ function makeDescriptionIcon($description) {
  */
 function makeErrorIcon($error) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
+		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass('zi-i')
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
@@ -1098,7 +1098,7 @@ function makeHelpIcon($help_text): CLink {
  */
 function makeWarningIcon($error) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
+		->addClass(ZBX_STYLE_ICON_INFO)
 		->addClass('zi-i')
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP);

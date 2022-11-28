@@ -165,7 +165,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
@@ -191,7 +191,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('all_graphs');
 		$this->zbxTestClickButton('graph.massdelete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete graph prototypes');
 		$this->zbxTestTextPresentInMessageDetails('Cannot delete templated graph prototype.');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));

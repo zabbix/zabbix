@@ -32,7 +32,7 @@ class CMacroValue extends CInput {
 	/**
 	 * Button class for undo.
 	 */
-	public const ZBX_STYLE_BTN_UNDO = 'btn-undo'; // todo zi
+	public const ZBX_STYLE_BTN_UNDO = 'btn-undo';
 
 	/**
 	 * Add element initialization javascript.
@@ -135,7 +135,7 @@ class CMacroValue extends CInput {
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
-			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT.' zi-lock'; // todo zi
+			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT.' zi-lock';
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
@@ -144,7 +144,7 @@ class CMacroValue extends CInput {
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
-			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE.' zi-eye-off'; // todo zi
+			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE.' zi-eye-off';
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)

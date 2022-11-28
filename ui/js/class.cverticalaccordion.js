@@ -102,7 +102,6 @@ jQuery(function($) {
 			accordion.trigger('expand', {section: section});
 
 			handler.attr('title', t('S_COLLAPSE'));
-			console.log('hello')
 			handler.attr('aria-expanded', true);
 		}
 	};

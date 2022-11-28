@@ -1010,7 +1010,7 @@ class testFormWebStep extends CLegacyWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestClickWait('add');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added'); // todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				break;
 			case TEST_BAD:
 				if (array_key_exists('error_msg', $data)) {

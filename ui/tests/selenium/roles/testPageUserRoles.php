@@ -119,7 +119,7 @@ class testPageUserRoles extends CWebTest {
 		$this->assertTableStats($roles_count);
 
 		// Check filter collapse/expand.
-		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one(); // todo zi
+		$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 		foreach ([true, false] as $status) {
 			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "filter-container")]')->one()->isDisplayed());
 			$filter_tab->click();

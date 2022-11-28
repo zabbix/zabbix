@@ -46,8 +46,8 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CTag('nav', true, new CList([
 					(new CButton('dashboard-config'))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF) // todo zi
-						->addClass('zi-cog-filled'), // todo zi
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF)
+						->addClass('zi-cog-filled'),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget', _('Add')))
@@ -56,7 +56,7 @@ $html_page = (new CHtmlPage())
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass('zi-chevron-down') // todo zi
+								->addClass('zi-chevron-down')
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -86,13 +86,13 @@ $dashboard->addItem(
 				->addItem([
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-						->addClass('btn-iterator-page-previous') // todo zi
-						->addClass('zi-chevron-left') // todo zi
+						->addClass('btn-iterator-page-previous')
+						->addClass('zi-chevron-left')
 						->setEnabled(false),
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
 						->addClass('btn-iterator-page-next')
-						->addClass('zi-chevron-right')// todo zi
+						->addClass('zi-chevron-right')
 						->setEnabled(false)
 				])
 		)

@@ -74,7 +74,9 @@ class CControllerFavoriteDelete extends CController {
 					addrm_fav.title = "'._('Add to favorites').'";
 					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("btn-add-fav");
+					addrm_fav.classList.add("zi-star");
 					addrm_fav.classList.remove("btn-remove-fav");
+					addrm_fav.classList.remove("zi-star-filled");
 				}
 				else {
 					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {

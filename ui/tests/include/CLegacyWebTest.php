@@ -204,7 +204,7 @@ class CLegacyWebTest extends CWebTest {
 	public function zbxTestDoubleClickBeforeMessage($click_id, $id) {
 		$this->zbxTestClickWait($click_id);
 
-		if (!$this->zbxTestElementPresentId($id) && $this->query('class:msg-bad')->count() === 0){ // todo zi
+		if (!$this->zbxTestElementPresentId($id) && $this->query('class:msg-bad')->count() === 0){
 			$this->zbxTestClickWait($click_id);
 		}
 	}

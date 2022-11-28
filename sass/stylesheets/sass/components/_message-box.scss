@@ -1,6 +1,5 @@
 .zi-triangle-warning,
-.zi-circle-check,
-.msg-warning {
+.zi-circle-check {
 	position: relative;
 	padding: 6px 10px 6px 75px;
 	margin: 10px;
@@ -44,7 +43,7 @@
 
 	&::after {
 		position: absolute;
-		top: 7px;
+		top: 4px;
 		left: 0;
 		width: 27px;
 		height: 25px;

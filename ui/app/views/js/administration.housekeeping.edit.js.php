@@ -95,7 +95,7 @@
 						'focused': true,
 						'action': function() {
 							$('main')
-								.prev('.msg-bad') // todo zi
+								.prev('.msg-bad')
 								.remove();
 
 							// events and alerts

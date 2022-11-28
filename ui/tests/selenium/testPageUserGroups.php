@@ -68,7 +68,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));

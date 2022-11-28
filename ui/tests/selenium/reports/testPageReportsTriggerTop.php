@@ -182,11 +182,11 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		}
 
 		// Check closed filter
-		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]'); // todo zi
+		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
 		$this->zbxTestAssertNotVisibleId('groupids_');
 
 		// Check opened filter
-		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]'); // todo zi
+		$this->zbxTestClickXpathWait('//a[contains(@class,\'filter-trigger\')]');
 		$this->zbxTestAssertVisibleId('groupids_');
 	}
 

@@ -256,7 +256,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 
@@ -329,7 +329,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->zbxTestClickLinkText($iconmap['name']);
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated'); // todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		}
 
 		$this->assertEquals($old_icon_map, CDBHelper::getHash($sql_icon_map));
@@ -540,7 +540,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClick('update');
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map updated');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 
@@ -791,7 +791,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map created');
 		$this->zbxTestCheckTitle('Configuration of icon mapping');
 		$this->zbxTestCheckHeader('Icon mapping');
 
@@ -844,7 +844,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClickAndAcceptAlert('delete');
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map deleted'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Icon map deleted');
 
 		// Check the results in DB.
 		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);

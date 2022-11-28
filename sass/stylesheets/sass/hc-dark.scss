@@ -450,7 +450,6 @@ $arrow-fill-up-down: #FFFFFF;
 }
 
 $icon-widget-btn: (
-	alarm-on: url($sprite-path) no-repeat -318px -546px,
 	alarm-off: url($sprite-path) no-repeat -318px -582px,
 	sound-on: url($sprite-path) no-repeat -318px -474px,
 	sound-off: url($sprite-path) no-repeat -318px -510px,
@@ -458,7 +457,6 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
 //  .btn-sound-off

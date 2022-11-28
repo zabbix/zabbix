@@ -122,7 +122,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent('Cannot add web scenario');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added'); // todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
 				break;
 
 			case TEST_BAD:

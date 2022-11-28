@@ -154,7 +154,7 @@ class HostMacrosManager {
 						.trigger('input');
 					$('#macros_' + macro_num + '_type_button')
 						.removeClass()
-						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' ')) // todo zi
+						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '))
 						.prop('disabled', true)
 						.attr({'aria-haspopup': false});
 					$('input[type=hidden]', $('#macros_' + macro_num + '_type_button').parent())
@@ -166,7 +166,7 @@ class HostMacrosManager {
 						.trigger('input');
 					$('#macros_' + macro_num + '_value')
 						.closest('.macro-input-group')
-						.find('.btn-undo') // todo zi
+						.find('.btn-undo')
 						.hide();
 					$('#macros_' + macro_num + '_value_btn').prop('disabled', true);
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Change'));
@@ -205,7 +205,7 @@ class HostMacrosManager {
 					$('#macros_' + num + '_value_btn', $row).prop('disabled', true);
 					$('#macros_' + num + '_type_button', $row)
 						.removeClass()
-						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[original_type]].join(' ')) // todo zi
+						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[original_type]].join(' '))
 						.prop('disabled', true)
 						.attr({'aria-haspopup': false});
 					$('input[type=hidden]', $('#macros_' + num + '_type_button', $row).parent())
@@ -217,7 +217,7 @@ class HostMacrosManager {
 						.trigger('input');
 					$('#macros_' + num + '_value', $row)
 						.closest('.macro-input-group')
-						.find('.btn-undo') // todo zi
+						.find('.btn-undo')
 						.hide();
 					$('#macros_' + num + '_description')
 						.val(original_descr)

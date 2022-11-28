@@ -60,7 +60,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Zabbix agent');
 		$form->submit();
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		$sql = 'select hosttemplateid from hosts_templates where templateid='.$hostid.' AND hostid=15001';
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -125,7 +125,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		switch ($result) {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add item']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added'); // todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				break;
@@ -134,7 +134,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				foreach ($errorMsgs as $msg) {
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item'); // todo zi
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
 					$this->zbxTestTextPresent($msg);
 				}
 				$this->zbxTestTextPresent('Host');
@@ -183,7 +183,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 				->getColumn('Action')->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($table->findRow('Name', $template)->isValid());
 		$form->submit();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
 		$sql = 'select hosttemplateid from hosts_templates where templateid='.$hostid.'';
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -210,7 +210,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
 
 		// check that the inherited trigger matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -309,7 +309,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule created');// todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule created');
 
 		// check that the inherited rule matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -361,7 +361,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickWait('interval_add');
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
 		$this->zbxTestTextPresent('Test LLD item');
 
 		// check that the inherited item prototype matches the original
@@ -415,7 +415,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger prototype added'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger prototype added');
 		$this->zbxTestTextPresent('Test LLD trigger');
 
 		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NULL";

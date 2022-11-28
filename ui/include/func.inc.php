@@ -1777,8 +1777,8 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	}
 
 	$aria_labels = [
-		ZBX_STYLE_MSG_GOOD => _('Success message'),
-		ZBX_STYLE_MSG_BAD => _('Error message'),
+		ZBX_STYLE_MSG_GOOD.' zi-circle-check' => _('Success message'),
+		ZBX_STYLE_MSG_BAD.' zi-triangle-warning' => _('Error message'),
 		ZBX_STYLE_MSG_WARNING => _('Warning message')
 	];
 

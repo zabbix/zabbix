@@ -183,7 +183,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.
@@ -272,7 +272,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		$this->assertEquals($old_host, CDBHelper::getHash($sql));
 	}
 
@@ -352,7 +352,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestClick('update');
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated'); // todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 
@@ -469,11 +469,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 
 		if (array_key_exists('error', $data)) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']); // todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
 			$this->zbxTestTextPresent($data['error_detail']);
 		}
 		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added'); // todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
 
 			$this->zbxTestTextPresent($data['host_prototype']);
 			if (array_key_exists('cloned_visible_name', $data)) {
@@ -612,12 +612,12 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		if (array_key_exists('error', $data)) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete host prototypes');// todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete host prototypes');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NOT NULL AND host='.zbx_dbstr($data['host_prototype']);
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
 		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototypes deleted'); // todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototypes deleted');
 			$sql = 'SELECT hostid FROM hosts WHERE templateid IS NULL AND host='.zbx_dbstr($data['host_prototype']);
 			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}

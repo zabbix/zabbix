@@ -70,7 +70,7 @@ class testPageAdministrationProxies extends CWebTest {
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
 			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "ui-tabs-panel")]')->one()->isVisible());
-			$this->query('xpath://a[contains(@class, "filter-trigger")]')->one()->click(); // todo zi
+			$this->query('xpath://a[contains(@class, "filter-trigger")]')->one()->click();
 		}
 
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
@@ -102,7 +102,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check info-icon color.
 				$this->assertTrue($column->query("xpath:.//a[@class=".
-						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists() // todo zi
+						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists()
 				);
 
 				// Check version hint.

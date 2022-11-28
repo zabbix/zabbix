@@ -149,7 +149,9 @@ class WidgetMap extends CDiv
 							(new CSpan())
 								->addClass(ZBX_STYLE_BTN_BACK_MAP)
 								->addItem(
-									(new CDiv())->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON) // todo zi
+									(new CDiv())
+										->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON)
+										->addClass('zi-chevron-left')
 								)
 								->addItem(
 									(new CDiv())

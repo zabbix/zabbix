@@ -49,7 +49,7 @@ class CButtonExport extends CList {
 				),
 			(new CButton('export', '&#8203;'))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('zi-chevron-down') // todo zi
+				->addClass('zi-chevron-down')
 				->setMenuPopup([
 					'type' => 'dropdown',
 					'data' => [

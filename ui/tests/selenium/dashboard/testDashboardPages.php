@@ -37,14 +37,14 @@ class testDashboardPages extends CWebTest {
 	 *
 	 * @var string
 	 */
-	const NEXT_BUTTON = 'xpath://button[@class="dashboard-next-page btn-iterator-page-next"]'; // todo zi
+	const NEXT_BUTTON = 'xpath://button[@class="dashboard-next-page btn-iterator-page-next"]';
 
 	/**
 	 * Previous page button in dashboard.
 	 *
 	 * @var string
 	 */
-	const PREVIOUS_BUTTON = 'xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]'; // todo zi
+	const PREVIOUS_BUTTON = 'xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]';
 
 	/**
 	 * Attach MessageBehavior to the test.

@@ -1426,7 +1426,7 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wizard-action')->one()->click(); // todo zi
+									->query('class:icon-wizard-action')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
