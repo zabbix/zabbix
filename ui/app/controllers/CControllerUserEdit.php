@@ -35,7 +35,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'username' =>			'db users.username',
 			'name' =>				'db users.name',
 			'surname' =>			'db users.surname',
-			'user_groups' =>		'array_id|not_empty',
+			'user_groups' =>		'array_id',
 			'change_password' =>	'in 1',
 			'password1' =>			'string',
 			'password2' =>			'string',
@@ -51,7 +51,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
-			'roleid' =>				'db users.roleid',
+			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
 
@@ -72,7 +72,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone'
+					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -118,7 +118,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
-			'db_user' => ['username' => '']
+			'db_user' => ['username' => ''],
+			'userdirectoryid' => 0
 		];
 		$user_groups = [];
 
@@ -127,7 +128,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['username'] = $this->user['username'];
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
-			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
+			$user_groups = array_column($this->user['usrgrps'], 'usrgrpid');
 			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 			$data['password1'] = '';
 			$data['password2'] = '';
@@ -141,6 +142,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
+			$data['userdirectoryid'] = $this->user['userdirectoryid'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -251,6 +253,11 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$db_modules = API::Module()->get([
 			'output' => ['moduleid', 'relative_path', 'status']
 		]);
+
+		$data['readonly'] = false;
+		if ($data['userdirectoryid'] != 0) {
+			$data['readonly'] = true;
+		}
 
 		if ($db_modules) {
 			$module_manager = new CModuleManager(APP::getRootDir());

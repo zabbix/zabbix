@@ -21,7 +21,6 @@
 #include "pid.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 
 static FILE	*fpid = NULL;
 static int	fdpid = -1;

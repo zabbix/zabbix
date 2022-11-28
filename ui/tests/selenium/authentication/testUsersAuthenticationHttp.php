@@ -19,18 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
  * @dataSource LoginUsers
  */
-class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
+class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 	const LOGIN_GUEST	= 1;
-	const LOGIN_USER		= 2;
-	const LOGIN_HTTP		= 3;
+	const LOGIN_USER	= 2;
+	const LOGIN_HTTP	= 3;
 
 	public function getHttpData() {
 		return [
@@ -505,7 +505,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	 *
 	 * Internal authentication with HTTP settings.
 	 */
-	public function testFormAdministrationAuthenticationHttp_CheckSettings($data) {
+	public function testUsersAuthenticationHttp_CheckSettings($data) {
 		$this->setHttpConfiguration($data);
 
 		// Check authentication on pages.
@@ -618,11 +618,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		// Check DB configuration.
 		$default_values = [
 			'authentication_type' => '0',
-			'ldap_configured' => '0',
+			'ldap_auth_enabled' => '0',
 			'ldap_case_sensitive' => '1',
 			'ldap_userdirectoryid' => '0'
 		];
-		$sql = 'SELECT authentication_type,ldap_configured,ldap_case_sensitive,ldap_userdirectoryid,http_auth_enabled,http_login_form,'.
+		$sql = 'SELECT authentication_type,ldap_auth_enabled,ldap_case_sensitive,ldap_userdirectoryid,http_auth_enabled,http_login_form,'.
 				'http_strip_domains,http_case_sensitive FROM config';
 
 		$result = CDBHelper::getRow($sql);

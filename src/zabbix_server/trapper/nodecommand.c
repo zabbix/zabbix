@@ -28,6 +28,7 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -519,7 +520,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;
 	}
-
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
@@ -527,7 +529,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. No role access.");
 		goto finish;
 	}
-
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS
 	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||

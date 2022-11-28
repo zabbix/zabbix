@@ -177,6 +177,15 @@ class CRoleHelper {
 			return;
 		}
 
+		if (!$roleid) {
+			self::$roles[0] = [
+				'type'	=> USER_TYPE_ZABBIX_USER,
+				'rules' => ['api' => []]
+			];
+
+			return;
+		}
+
 		$roles = API::Role()->get([
 			'output' => ['roleid', 'name', 'type'],
 			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api.access', 'api.mode',

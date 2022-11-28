@@ -1645,7 +1645,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   width: '8'
                   height: '5'
                   fields:
@@ -1656,7 +1656,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'system.net.uptime[sysUpTime.0]'
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   x: '8'
                   width: '8'
                   height: '5'
@@ -1668,7 +1668,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'input.fail[upsAdvInputLineFailCause]'
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   x: '16'
                   width: '8'
                   height: '5'
@@ -1680,7 +1680,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'output.status[upsBasicOutputStatus]'
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   'y': '5'
                   width: '8'
                   height: '5'
@@ -1692,7 +1692,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'battery.status[upsBasicBatteryStatus]'
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   x: '8'
                   'y': '5'
                   width: '8'
@@ -1705,7 +1705,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
                 -
-                  type: PLAIN_TEXT
+                  type: plaintext
                   x: '16'
                   'y': '5'
                   width: '8'
@@ -1718,7 +1718,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '8'
                   height: '5'
@@ -1734,7 +1734,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         name: 'Capacity of the UPS batteries'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '8'
                   'y': '10'
                   width: '8'
@@ -1751,7 +1751,7 @@ zabbix_export:
                         host: 'APC UPS Symmetra LX by SNMP'
                         name: Voltage
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '16'
                   'y': '10'
                   width: '8'

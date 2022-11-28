@@ -28,9 +28,10 @@
 #include "preproc_manager.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
+#include "zbx_item_constants.h"
 
 extern unsigned char			program_type;
-extern int				CONFIG_PREPROCESSOR_FORKS;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_PREPROCESSING_MANAGER_DELAY	1
 
@@ -1858,12 +1859,12 @@ static int	preproc_item_link_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static void	preprocessor_init_manager(zbx_preprocessing_manager_t *manager)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_PREPROCESSOR_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]);
 
 	memset(manager, 0, sizeof(zbx_preprocessing_manager_t));
 
-	manager->workers = (zbx_preprocessing_worker_t *)zbx_calloc(NULL, (size_t)CONFIG_PREPROCESSOR_FORKS,
-			sizeof(zbx_preprocessing_worker_t));
+	manager->workers = (zbx_preprocessing_worker_t *)zbx_calloc(NULL,
+			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR], sizeof(zbx_preprocessing_worker_t));
 	zbx_list_create(&manager->queue);
 	zbx_list_create(&manager->direct_queue);
 	zbx_hashset_create_ext(&manager->item_config, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
@@ -1902,7 +1903,7 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
 	}
 	else
 	{
-		if (CONFIG_PREPROCESSOR_FORKS == manager->worker_count)
+		if (CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR] == manager->worker_count)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);

@@ -17,31 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "selfmon.h"
-
 #include "zbxcommon.h"
-
-extern int	CONFIG_REPORTMANAGER_FORKS;
-extern int	CONFIG_REPORTWRITER_FORKS;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Returns number of processes depending on process type             *
- *                                                                            *
- * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
- *                                                                            *
- * Return value: number of processes                                          *
+ * Comments: replace strerror to print also the error number                  *
  *                                                                            *
  ******************************************************************************/
-int	get_component_process_type_forks(unsigned char proc_type)
+char	*zbx_strerror(int errnum)
 {
-	switch (proc_type)
-	{
-		case ZBX_PROCESS_TYPE_REPORTMANAGER:
-			return CONFIG_REPORTMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_REPORTWRITER:
-			return CONFIG_REPORTWRITER_FORKS;
-	}
+	/* !!! Attention: static !!! Not thread-safe for Win32 */
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
 
-	return 0;
+	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
+
+	return utf8_string;
 }

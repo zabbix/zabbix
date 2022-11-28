@@ -19,16 +19,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup config, userdirectory, usrgrp
+ *
  * @dataSource LoginUsers
  */
-class testFormAdministrationAuthenticationLdap extends CWebTest {
+class testUsersAuthenticationLdap extends CWebTest {
 
 	use TableTrait;
 
@@ -244,9 +245,10 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Test LDAP settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Test($data) {
+	public function testUsersAuthenticationLdap_Test($data) {
 		$form = $this->openLdapForm();
-		$form->query('button:Add')->one()->click();
+		$form->fill(['Enable LDAP authentication' => true]);
+		$form->query('button:Add')->waitUntilCLickable()->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->fill($data['ldap_settings']);
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
 
@@ -268,7 +270,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Check that remove button works.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Remove() {
+	public function testUsersAuthenticationLdap_Remove() {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
@@ -284,24 +286,27 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->assertEquals(['Name', 'Host', 'User groups', 'Default', ''], $table->getHeadersText());
 
 		// Check that LDAP server added in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory'));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 
 		// Click on remove button and check that LDAP server NOT removed from DB.
 		$table->query('button:Remove')->one()->click();
-		$this->query('id:ldap_configured')->asCheckbox()->one()->set(false);
-		$this->assertEquals(1, CDBHelper::getCount('SELECT 1 FROM userdirectory'));
+		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(false);
+		$this->assertEquals(1, CDBHelper::getCount('SELECT 1 FROM userdirectory_ldap'));
 
 		// Submit changes and check that LDAP server removed.
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM userdirectory'));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 	}
 
 	/**
 	 * Check default LDAP server change.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Default() {
+	public function testUsersAuthenticationLdap_Default() {
 		$form = $this->openLdapForm();
+		$this->page->assertHeader('Authentication');
+		$this->page->assertTitle('Configuration of authentication');
+
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
 		// To check default we need at least 2 LDAP servers.
@@ -318,7 +323,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		foreach ($table->getRows() as $row) {
 			$radio = $row->getColumn('Default');
-			$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='
+			$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory_ldap WHERE host='
 					.zbx_dbstr($row->getColumn('Host')->getText())
 			);
 
@@ -337,17 +342,18 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		}
 
 		// Default LDAP server host name.
-		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory WHERE userdirectoryid IN '.
+		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid IN '.
 				'(SELECT ldap_userdirectoryid FROM config)'
 		);
+
 		$form->selectTab('LDAP settings');
 
 		// Find default LDAP server, delete it and check that another LDAP server set as default.
 		$table->findRow('Host', $hostname)->getColumn('')->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory ud INNER JOIN config co ON '.
-				'ud.userdirectoryid = co.ldap_userdirectoryid');
+		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap udl INNER JOIN config co ON '.
+				'udl.userdirectoryid = co.ldap_userdirectoryid');
 
 		// Check that old LDAP server (by host name) is not default now.
 		$this->assertNotEquals($hostname, $new_hostname);
@@ -443,15 +449,16 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => 'updated_name',
-						'host' => 'updated_host',
-						'port' => '777',
-						'base_dn' => 'updated_dn',
-						'bind_dn' => 'updated_bin_dn',
-						'description' => 'updated_description',
-						'search_attribute' => 'updated_search',
-						'search_filter' => 'updated_filter',
-						'start_tls' => '1'
+						'userdirectory' => ['name' => 'updated_name', 'description' => 'updated_description'],
+						'userdirectory_ldap' => [
+							'host' => 'updated_host',
+							'port' => '777',
+							'base_dn' => 'updated_dn',
+							'bind_dn' => 'updated_bin_dn',
+							'search_attribute' => 'updated_search',
+							'search_filter' => 'updated_filter',
+							'start_tls' => '1'
+						]
 					]
 				]
 			]
@@ -463,8 +470,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Update LDAP server settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Update($data) {
-		if (CDBHelper::getCount('SELECT * FROM userdirectory') === 0) {
+	public function testUsersAuthenticationLdap_Update($data) {
+		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
 			$ldap_settings = [
 				'ldap_settings' => [
 					[
@@ -481,29 +488,40 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		}
 
 		if (!array_key_exists('expected', $data)) {
-			$hash_before = CDBHelper::getHash('SELECT * FROM userdirectory');
+			$hash_before = CDBHelper::getHash('SELECT * FROM userdirectory_ldap');
 		}
 
 		$this->checkLdap($data, 'xpath://table[@id="ldap-servers"]//a[contains(text(), "test_")]');
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 		if (!array_key_exists('expected', $data)) {
-			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM userdirectory'));
+			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM userdirectory_ldap'));
 		}
 		else {
-			$this->assertEquals($data['db_check'], CDBHelper::getRow(
-					'SELECT name,host,port,base_dn,bind_dn,description,search_attribute,search_filter,start_tls'.
-					' FROM userdirectory')
+			$this->assertEquals($data['db_check']['userdirectory_ldap'], CDBHelper::getRow(
+					'SELECT host,port,base_dn,bind_dn,search_attribute,search_filter,start_tls'.
+					' FROM userdirectory_ldap')
+			);
+
+			$this->assertEquals($data['db_check']['userdirectory'],
+					CDBHelper::getRow('SELECT name, description'.
+							' FROM userdirectory'.
+							' WHERE userdirectoryid IN ('.
+								'SELECT userdirectoryid'.
+								' FROM userdirectory_ldap'.
+								' WHERE name = '.zbx_dbstr($data['db_check']['userdirectory']['name']).
+							')'
+					)
 			);
 
 			$form = $this->openLdapForm();
-			$form->fill(['Enable LDAP authentication' => false]);
 			$table = $form->query('id:ldap-servers')->asTable()->one();
 
 			foreach ($table->query('button:Remove')->all() as $button) {
 				$button->click();
 			}
 
+			$form->fill(['Enable LDAP authentication' => false]);
 			$form->submit();
 
 			if ($this->page->isAlertPresent()) {
@@ -586,26 +604,26 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				]
 			],
 			// #5 Two LDAP servers with same names.
-			// TODO: Uncomment this part after ZBX-21061 fix.
-//			[
-//				[
-//					'ldap_settings' => [
-//						[
-//							'Name' => 'TEST',
-//							'Host' => 'ldap.forumsys.com',
-//							'Base DN' => 'dc=example,dc=com',
-//							'Search attribute' => 'uid'
-//						],
-//						[
-//							'Name' => 'TEST',
-//							'Host' => 'ldap.forumsys.com',
-//							'Base DN' => 'dc=example,dc=com',
-//							'Search attribute' => 'uid'
-//						]
-//					],
-//					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
-//				]
-//			],
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Name' => 'TEST',
+							'Host' => 'ldap.forumsys.com',
+							'Base DN' => 'dc=example,dc=com',
+							'Search attribute' => 'uid'
+						],
+						[
+							'Name' => 'TEST',
+							'Host' => 'ldap.forumsys.com',
+							'Base DN' => 'dc=example,dc=com',
+							'Search attribute' => 'uid'
+						]
+					],
+					'dialog_submit' => true,
+					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
+				]
+			],
 			// #6 Using cyrillic in settings.
 			[
 				[
@@ -619,13 +637,15 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => 'кириллица',
-						'host' => 'кириллица',
-						'port' => '389',
-						'base_dn' => 'кириллица',
-						'bind_dn' => '',
-						'bind_password' => '',
-						'search_attribute' => 'кириллица'
+						'userdirectory' => ['name' => 'кириллица'],
+						'userdirectory_ldap' => [
+							'host' => 'кириллица',
+							'port' => '389',
+							'base_dn' => 'кириллица',
+							'bind_dn' => '',
+							'bind_password' => '',
+							'search_attribute' => 'кириллица'
+						]
 					]
 				]
 			],
@@ -642,13 +662,15 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => '@#$%^&*.',
-						'host' => '@#$%^&*.',
-						'port' => '389',
-						'base_dn' => '@#$%^&*.',
-						'bind_dn' => '',
-						'bind_password' => '',
-						'search_attribute' => '@#$%^&*.'
+						'userdirectory' => ['name' => '@#$%^&*.'],
+						'userdirectory_ldap' => [
+							'host' => '@#$%^&*.',
+							'port' => '389',
+							'base_dn' => '@#$%^&*.',
+							'bind_dn' => '',
+							'bind_password' => '',
+							'search_attribute' => '@#$%^&*.'
+						]
 					]
 				]
 			],
@@ -673,19 +695,23 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-								'value_long_value_long_value_long_value_long_va',
-						'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-								'value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_'.
-								'value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'port' => '389',
-						'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_'.
-								'long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_'.
-								'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
-						'bind_dn' => '',
-						'bind_password' => '',
-						'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+						'userdirectory' => [
+							'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+									'value_long_value_long_value_long_value_long_va'
+						],
+						'userdirectory_ldap' => [
+							'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+									'value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_'.
+									'value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+							'port' => '389',
+							'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_'.
+									'long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_'.
+									'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+							'bind_dn' => '',
+							'bind_password' => '',
+							'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
 								'long_value_long_value_long_value_long_value_long_value_long_va'
+						]
 					]
 				]
 			],
@@ -709,13 +735,15 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						]
 					],
 					'db_check' => [
-						'name' => 'LDAP',
-						'host' => 'ipa.demo1.freeipa.org',
-						'port' => '389',
-						'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'bind_password' => 'Secret123',
-						'search_attribute' => 'uid'
+						'userdirectory' => ['name' => 'LDAP'],
+						'userdirectory_ldap' => [
+							'host' => 'ipa.demo1.freeipa.org',
+							'port' => '389',
+							'base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+							'bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+							'bind_password' => 'Secret123',
+							'search_attribute' => 'uid'
+						]
 					]
 				]
 			]
@@ -727,7 +755,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * Check authentication with LDAP settings.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Create($data) {
+	public function testUsersAuthenticationLdap_Create($data) {
 		$this->checkLdap($data, 'button:Add');
 
 		// Check error messages.
@@ -735,19 +763,25 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check DB configuration.
-			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM'.
-					' userdirectory WHERE name ='.zbx_dbstr($data['db_check']['name']);
-			$this->assertEquals($data['db_check'], CDBHelper::getRow($sql));
+			$sql = 'SELECT  host, port, base_dn, bind_dn, bind_password, search_attribute '.
+					'FROM userdirectory_ldap '.
+					'WHERE userdirectoryid IN ('.
+						'SELECT userdirectoryid'.
+						' FROM userdirectory '.
+						' WHERE name ='.zbx_dbstr($data['db_check']['userdirectory']['name']).
+					')';
+
+			$this->assertEquals($data['db_check']['userdirectory_ldap'], CDBHelper::getRow($sql));
 		}
 		else {
-			$this->assertMessage(TEST_BAD, $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
 		}
 	}
 
 	/**
 	 * Check that User Group value in table changes after adding LDAP server to any user group.
 	 */
-	public function testFormAdministrationAuthenticationLdap_UserGroups() {
+	public function testUsersAuthenticationLdap_UserGroups() {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
@@ -794,11 +828,11 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Fill and submit LDAP server settings.
 	 *
-	 * @param string $ldaps			 	  form parameters to fill
+	 * @param string $data				  data provider
 	 * @param string $query			      object to click for LDAP creating or updating
 	 * @param string  $values			  simple LDAP server values
 	 */
-	private function setLdap($ldaps, $query, $values = null) {
+	private function setLdap($data, $query, $values = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
@@ -807,9 +841,9 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		}
 
 		// Open and fill LDAP settings form.
-		$this->query('id:ldap_configured')->asCheckbox()->one()->set(true);
+		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(true);
 		if ($values !== null) {
-			$ldaps = [
+			$data['ldap_settings'] = [
 				[
 					'Name' => $values,
 					'Host' => $values,
@@ -820,10 +854,14 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		}
 
 		// Fill LDAP server form.
-		foreach ($ldaps as $ldap) {
-			$form->query($query)->one()->click();
-			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		foreach ($data['ldap_settings'] as $ldap) {
+			$form->query($query)->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$ldap_form = $dialog->asForm();
 			$ldap_form->fill($ldap)->submit();
+			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD || CTestArrayHelper::get($data, 'dialog_submit')) {
+				$dialog->ensureNotPresent();
+			}
 		}
 	}
 
@@ -835,12 +873,10 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 */
 	private function checkLdap($data, $query) {
 		$form = $this->openLdapForm('LDAP');
-		$this->page->assertHeader('Authentication');
-		$this->page->assertTitle('Configuration of authentication');
 
 		// Configuration at 'LDAP settings' tab.
 		if (array_key_exists('ldap_settings', $data)) {
-			$this->setLdap($data['ldap_settings'], $query);
+			$this->setLdap($data, $query);
 
 			// Check error message in ldap creation form.
 			if (array_key_exists('ldap_error', $data)) {

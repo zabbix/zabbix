@@ -19,6 +19,7 @@ OBJS = \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
+	$(OUTPUTDIR)\libc_wrappers.o \
 	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
@@ -152,6 +153,9 @@ $(OUTPUTDIR)\token.o: $(TOPDIR)\src\libs\zbxexpr\token.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\components_strings_representations.o: $(TOPDIR)\src\libs\zbxcommon\components_strings_representations.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\libc_wrappers.o: $(TOPDIR)\src\libs\zbxcommon\libc_wrappers.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\param.o: $(TOPDIR)\src\libs\zbxparam\param.c
