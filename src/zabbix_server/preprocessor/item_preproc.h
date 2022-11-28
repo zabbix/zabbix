@@ -40,15 +40,10 @@ typedef struct
 }
 zbx_preproc_cache_t;
 
-#define ZBX_SNMP_VALUE_PAIR_FLAG_UNDEFINED	0
-#define ZBX_SNMP_VALUE_PAIR_FLAG_HEX		1
-#define ZBX_SNMP_VALUE_PAIR_FLAG_STRING		2
-
 typedef struct
 {
 	char	*oid;
 	char	*value;
-	int	flags;
 }
 zbx_snmp_value_pair_t;
 

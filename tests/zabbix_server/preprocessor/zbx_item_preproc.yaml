@@ -2531,7 +2531,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":"\xFF\xFF","MACRO2":"\x99\xA5\xF1"},{"{#SNMPINDEX}":"1","MACRO1":"\xAA\xBE\xFF","MACRO2":"\xDD\xCD"}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"\\xFF\\xFF","MACRO2":"\\x99\\xA5\\xF1"},{"{#SNMPINDEX}":"1","MACRO1":"\\xAA\\xBE\\xFF","MACRO2":"\\xDD\\xCD"}]'
 ---
 test case: SNMP walk to JSON - Counter/Gauge types
 in:
@@ -2552,7 +2552,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":64,"MACRO2":64},{"{#SNMPINDEX}":"1","MACRO1":32,"MACRO2":32}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"64","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"32","MACRO2":"32"}]'
 ---
 test case: SNMP walk to JSON - Empty type
 in:
@@ -2573,7 +2573,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":64,"MACRO2":64},{"{#SNMPINDEX}":"1","MACRO1":"aaa","MACRO2":""}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"64","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"aaa","MACRO2":""}]'
 ---
 test case: SNMP walk to JSON - Empty type
 in:
@@ -2594,7 +2594,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":456,"MACRO2":64},{"{#SNMPINDEX}":"1","MACRO1":123,"MACRO2":""}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":""}]'
 ---
 test case: SNMP walk to JSON - Integer/Timetick
 in:
@@ -2615,7 +2615,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":2000,"MACRO2":4000},{"{#SNMPINDEX}":"1","MACRO1":1000,"MACRO2":3000}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
 ---
 test case: SNMP walk to JSON - IpAddress
 in:
@@ -2683,7 +2683,7 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":"hello1.2","MACRO2":220000},{"{#SNMPINDEX}":"1","MACRO1":0.110000,"MACRO2":0.210000}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"hello1.2","MACRO2":"220000"},{"{#SNMPINDEX}":"1","MACRO1":"0.110000","MACRO2":"0.210000"}]'
 ---
 test case: SNMP walk to JSON - OID is wanted without prepending dot - 1
 in:
@@ -2704,7 +2704,7 @@ in:
       1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":2000,"MACRO2":4000},{"{#SNMPINDEX}":"1","MACRO1":1000,"MACRO2":3000}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
 ---
 test case: SNMP walk to JSON - OID is wanted without prepending dot - 2
 in:
@@ -2725,5 +2725,5 @@ in:
       .1.3.6.2
 out:
   return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","MACRO1":2000,"MACRO2":4000},{"{#SNMPINDEX}":"1","MACRO1":1000,"MACRO2":3000}]'
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
 ...

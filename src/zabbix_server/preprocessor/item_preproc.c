@@ -179,11 +179,6 @@ static size_t	snmp_parse_type(const char *ptr, zbx_snmp_value_pair_t *p, char **
 	memcpy(*type, start, len);
 	(*type)[len] = '\0';
 
-	if (0 == strcmp(*type, "OID") || 0 == strcmp(*type, "IpAddress"))
-	{
-		p->flags = ZBX_SNMP_VALUE_PAIR_FLAG_STRING;
-	}
-
 	return len;
 }
 
@@ -210,8 +205,7 @@ static size_t	snmp_parse_value(const char *ptr, const char *type, int json, zbx_
 			zbx_strlcpy(buffer, start, len + 1);
 
 			new_str = zbx_string_replace(buffer, " ", "\\x");
-			p->value = zbx_dsprintf(NULL, "\"\\x%s\"", new_str);
-			p->flags = ZBX_SNMP_VALUE_PAIR_FLAG_HEX;
+			p->value = zbx_dsprintf(NULL, "\\x%s", new_str);
 			zbx_free(new_str);
 		}
 		else
@@ -241,7 +235,6 @@ static size_t	snmp_parse_value(const char *ptr, const char *type, int json, zbx_
 
 		len = ++ptr - start;
 		out = p->value = malloc(len - 1);
-		p->flags = ZBX_SNMP_VALUE_PAIR_FLAG_STRING;
 		ptr = start + 1;
 
 		while ('"' != *ptr)
@@ -2643,10 +2636,7 @@ static void	snmp_walk_serialize_json(zbx_hashset_t *grouped_prefixes, char **res
 		{
 			zbx_snmp_value_pair_t	*vv = outobj->values.values[k];
 
-			if (ZBX_SNMP_VALUE_PAIR_FLAG_STRING == vv->flags)
-				zbx_json_addstring(&json, vv->oid, vv->value, ZBX_JSON_TYPE_STRING);
-			else
-				zbx_json_addraw(&json, vv->oid, vv->value);
+			zbx_json_addstring(&json, vv->oid, vv->value, ZBX_JSON_TYPE_STRING);
 		}
 
 		snmp_walk_json_output_obj_free(outobj);
@@ -2739,7 +2729,6 @@ static int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *para
 
 			output_value->oid = zbx_strdup(NULL, param_field.field_name);
 			output_value->value = zbx_strdup(NULL, p->value);
-			output_value->flags = p->flags;
 
 			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
 			{
