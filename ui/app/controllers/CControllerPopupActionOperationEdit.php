@@ -29,7 +29,6 @@ class CControllerPopupActionOperationEdit extends CController {
 								]),
 			'recovery' =>		'db operations.recovery',
 			'actionid' =>		'db actions.actionid',
-			'operation' =>		'array',
 			'operationid' =>	'db operations.operationid',
 			'operationtype' =>	'db operations.operationtype',
 			'data' =>			'array',
