@@ -2668,6 +2668,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [DEV-2301] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44
