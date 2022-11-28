@@ -125,7 +125,11 @@ class CControllerPopupActionEdit extends CController {
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 
-			order_result($data['action']['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+			CArrayHelper::sort($data['action']['filter']['conditions'], [
+				['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
+				['field' => 'value', 'order' => ZBX_SORT_DOWN]
+			]);
+
 			$data['action']['filter']['conditions'] = array_values($data['action']['filter']['conditions']);
 
 			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
