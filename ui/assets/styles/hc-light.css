@@ -5171,8 +5171,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #333333; }
   .action-buttons button {
     margin: 0 10px 10px 0; }
-  .action-buttons .zi-chevron-down {
-    top: -1px; }
 
 .selected-item-count {
   display: inline-block;
