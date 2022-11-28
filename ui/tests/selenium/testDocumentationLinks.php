@@ -121,7 +121,7 @@ class testDocumentationLinks extends CWebTest {
 						]
 					]
 				]
-			], // todo
+			],
 			// #5 Add dashboard page configuration popup.
 			[
 				[
