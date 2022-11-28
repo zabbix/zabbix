@@ -82,7 +82,7 @@ ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
  *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
  *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
  *                      ZBX_REGEXP_MULTILINE.                                 *
- *     regexp    - [OUT] output regexp.                                       *
+ *     regexp    - [OUT] compiled regular expression.                         *
  *     err_msg   - [OUT] error message if any.                                *
  *                       Free with zbx_regexp_err_msg_free()                  *
  *                                                                            *
@@ -189,11 +189,21 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	return SUCCEED;
 }
 
-/*******************************************************
- *                                                     *
- * Purpose: public wrapper for regexp_compile          *
- *                                                     *
- *******************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper to compiles a regular expression                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pattern   - [IN] regular expression as a text string. Empty            *
+ *                      string ("") is allowed, it will match everything.     *
+ *                      NULL is not allowed.                                  *
+ *     regexp    - [OUT] compiled regular expression.                         *
+ *     err_msg   - [OUT] error message if any.                                *
+ *                       Free with zbx_regexp_err_msg_free()                  *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg)
 {
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
@@ -203,11 +213,22 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **
 #endif
 }
 
-/*******************************************************
- *                                                     *
- * Purpose: public wrapper for regexp_compile          *
- *                                                     *
- *******************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: public wrapper for regexp_compile                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pattern   - [IN] regular expression as a text string. Empty            *
+ *                      string ("") is allowed, it will match everything.     *
+ *                      NULL is not allowed.                                  *
+ *     regexp    - [OUT] compiled regular expression.                         *
+ *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
+ *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
+ *                      ZBX_REGEXP_MULTILINE.                                 *
+ *     err_msg   - [OUT] error message if any.                                *
+ *                       Free with zbx_regexp_err_msg_free()                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg)
 {
 	return regexp_compile(pattern, flags, regexp, err_msg);
@@ -425,7 +446,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  *          returning matching groups                                         *
  *                                                                            *
  * Parameters: string - [IN] string to be matched                             *
- *             regex  - [IN] precompiled regular expression                   *
+ *             regexp - [IN] precompiled regular expression                   *
  *                                                                            *
  * Return value: 0 - successful match                                         *
  *               nonzero - no match                                           *
@@ -441,10 +462,10 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
 
 /****************************************************************************************************
  *                                                                                                  *
- * Purpose: compiles and executes a regexp                                                          *
+ * Purpose: compiles and executes a regex pattern                                                   *
  *                                                                                                  *
  * Parameters:                                                                                      *
- *     string     - [IN] string to be matched against 'regexp'                                      *
+ *     string     - [IN] string to be matched against 'pattern'                                     *
  *     pattern    - [IN] regular expression pattern                                                 *
  *     flags      - [IN] execution flags for matching                                               *
  *     len        - [OUT] length of matched string,                                                 *
@@ -749,7 +770,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
- *            out              - [OUT] the output value if the input string      *
+ *             out             - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
  *                                                                               *
@@ -810,8 +831,8 @@ void	zbx_regexp_clean_expressions(zbx_vector_expression_t *expressions)
 	zbx_vector_expression_clear(expressions);
 }
 
-void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const char *expression, int expression_type,
-		char exp_delimiter, int case_sensitive)
+void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const char *expression,
+		int expression_type, char exp_delimiter, int case_sensitive)
 {
 	zbx_expression_t	*regexp;
 
@@ -1229,7 +1250,7 @@ static void	zbx_regexp_escape_string(char *p, const char *string)
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: escaping of symbols for using in regexp expression                    *
+ * Purpose: escaping of symbols for using in regular expression                   *
  *                                                                                *
  * Parameters: string - [IN/OUT] the string to update                             *
  *                                                                                *
