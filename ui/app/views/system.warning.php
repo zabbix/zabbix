@@ -27,10 +27,12 @@ $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
-$buttons = [
-	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-		->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"'
-)];
+$buttons = CMenuHelper::hasMenuItems()
+	? [
+		(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+			->onClick('javascript: document.location = "'.CMenuHelper::getFirstUrl().'"')
+	]
+	: [];
 
 echo '<body';
 
