@@ -19,8 +19,8 @@
 
 #include "zbxregexp.h"
 
-#include "zbxstr.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_PCRE_H
 #ifdef HAVE_PCRE2_H

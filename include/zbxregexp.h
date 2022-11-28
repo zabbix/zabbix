@@ -19,6 +19,8 @@
 #ifndef ZABBIX_ZBXREGEXP_H
 #define ZABBIX_ZBXREGEXP_H
 
+#include <stddef.h>
+
 #include "zbxalgo.h"
 
 #define ZBX_REGEXP_NO_MATCH	0
