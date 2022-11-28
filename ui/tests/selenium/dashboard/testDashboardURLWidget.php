@@ -487,8 +487,10 @@ class testDashboardURLWidget extends CWebTest {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('URL')]);
 		}
 
-		$form->fill($data)->submit()->waitUntilReady();
+		$form->fill($data)->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard->save();
+		$this->page->waitUntilReady();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$dashboard->edit();
