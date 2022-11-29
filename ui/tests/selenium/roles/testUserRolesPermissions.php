@@ -676,7 +676,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Audit log',
 						'Notifications'
 					],
-					'link' => ['auditacts.php']
+					'link' => ['zabbix.php?action=actionlog.list']
 				]
 			],
 			[

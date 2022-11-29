@@ -31,6 +31,8 @@
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 static void	dump_item(const DC_ITEM *item)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "key:'%s'", item->key);
@@ -310,7 +312,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		else
 		{
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.");

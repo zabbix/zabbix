@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:36:30Z'
   template_groups:
     -
@@ -1727,7 +1727,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1742,7 +1742,7 @@ zabbix_export:
                         host: 'MySQL by ODBC'
                         name: 'MySQL: Operations'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1758,7 +1758,7 @@ zabbix_export:
                         host: 'MySQL by ODBC'
                         name: 'MySQL: Queries'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1774,7 +1774,7 @@ zabbix_export:
                         host: 'MySQL by ODBC'
                         name: 'MySQL: Connections'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1791,7 +1791,7 @@ zabbix_export:
                         host: 'MySQL by ODBC'
                         name: 'MySQL: Bandwidth'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -1807,7 +1807,7 @@ zabbix_export:
                         host: 'MySQL by ODBC'
                         name: 'MySQL: InnoDB buffer pool'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'

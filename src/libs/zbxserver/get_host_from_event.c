@@ -21,6 +21,7 @@
 
 #include "zbxnum.h"
 #include "log.h"
+#include "zbx_host_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */

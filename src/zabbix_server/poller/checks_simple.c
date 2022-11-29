@@ -42,6 +42,8 @@ zbx_vmcheck_t;
 #	define VMCHECK_FUNC(func)	NULL
 #endif
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"alarms.get", VMCHECK_FUNC(check_vcenter_alarms_get)},
@@ -231,7 +233,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	{
 		if (NULL != vmfunc)
 		{
-			if (0 == get_process_type_forks(ZBX_PROCESS_TYPE_VMWARE))
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE])
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "No \"vmware collector\" processes started."));
 				goto out;

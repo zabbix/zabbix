@@ -30,7 +30,7 @@
 #include "zbxnum.h"
 #include "proxyconfigread/proxyconfig_read.h"
 
-extern int	CONFIG_REPORTMANAGER_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
@@ -38,7 +38,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		j;
 
-	if (0 == CONFIG_REPORTMANAGER_FORKS)
+	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER])
 	{
 		zbx_send_response(sock, FAIL, "Report manager is disabled.", CONFIG_TIMEOUT);
 		return;

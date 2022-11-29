@@ -33,7 +33,7 @@ class CLimitedSetValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageInvalid;
+	public $messageInvalid = '';
 
 	/**
 	 * Checks if the given value belongs to some set.
