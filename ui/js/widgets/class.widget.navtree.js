@@ -716,6 +716,18 @@ class CWidgetNavTree extends CWidget {
 				$arrow.removeClass('arrow-down a1').addClass('arrow-right');
 			}
 		});
+
+
+		const tree_lists = document.querySelectorAll('.tree-list');
+
+		console.log(tree_lists) // check depth may be error (depth 11 and 12)
+
+		for (const tree_list of tree_lists) {
+			const button = tree_list.querySelector('.js-button-add-child');
+			if (button !== null) {
+				button.disabled = tree_list.dataset.depth >= 10;
+			}
+		}
 	}
 
 	_markTreeItemSelected(itemid) {
