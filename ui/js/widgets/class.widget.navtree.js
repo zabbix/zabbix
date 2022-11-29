@@ -541,6 +541,7 @@ class CWidgetNavTree extends CWidget {
 			button_add_child.title = t('Add child element');
 			button_add_child.classList.add('btn-add', 'js-button-add-child');
 			button_add_child.setAttribute('data-id', item.id);
+			button_add_child.disabled = depth === this._max_depth;
 			tools.appendChild(button_add_child);
 
 			const button_add_maps = document.createElement('input');
@@ -830,142 +831,150 @@ class CWidgetNavTree extends CWidget {
 
 		url.setArgument('action', 'widget.navtree.item.edit');
 
-		jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: {
-				name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
-				sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
-				depth: depth
-			},
-			dataType: 'json',
-			success: (resp) => {
-				if (resp.debug !== undefined) {
-					resp.body += resp.debug;
-				}
+		if (depth <= 10) {
+			jQuery.ajax({
+				url: url.getUrl(),
+				method: 'POST',
+				data: {
+					name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
+					sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
+					depth: depth
+				},
+				dataType: 'json',
+				success: (resp) => {
+					if (resp.debug !== undefined) {
+						resp.body += resp.debug;
+					}
 
-				overlayDialogue({
-					'title': t('Edit tree element'),
-					'class': 'modal-popup',
-					'content': resp.body,
-					'buttons': [
-						{
-							'title': item_edit ? t('Apply') : t('Add'),
-							'class': 'dialogue-widget-save',
-							'action': (overlay) => {
-								const form = document.getElementById('widget-dialogue-form');
-								const form_inputs = form.elements;
-								const url = new Curl('zabbix.php');
+					overlayDialogue({
+						'title': t('Edit tree element'),
+						'class': 'modal-popup',
+						'content': resp.body,
+						'buttons': [
+							{
+								'title': item_edit ? t('Apply') : t('Add'),
+								'class': 'dialogue-widget-save',
+								'action': (overlay) => {
+									const form = document.getElementById('widget-dialogue-form');
+									const form_inputs = form.elements;
+									const url = new Curl('zabbix.php');
 
-								url.setArgument('action', 'widget.navtree.item.update');
+									url.setArgument('action', 'widget.navtree.item.update');
 
-								overlay.setLoading();
+									overlay.setLoading();
 
-								overlay.xhr = $.ajax({
-									url: url.getUrl(),
-									method: 'POST',
-									data: {
-										name: form_inputs.name.value.trim(),
-										sysmapid: form_inputs.sysmapid.value,
-										add_submaps: form_inputs.add_submaps.checked ? 1 : 0,
-										depth: depth
-									},
-									dataType: 'json',
-									complete: () => {
-										overlay.unsetLoading();
-									},
-									success: (resp) => {
-										form.querySelectorAll('.msg-bad').forEach((msg) => {
-											msg.remove();
-										})
+									overlay.xhr = $.ajax({
+										url: url.getUrl(),
+										method: 'POST',
+										data: {
+											name: form_inputs.name.value.trim(),
+											sysmapid: form_inputs.sysmapid.value,
+											add_submaps: () => {
+												if (form_inputs.add_submaps) {
+													return form_inputs.add_submaps.checked ? 1 : 0
+												}
+												else {
+													return 0;
+												}
+											},
+											depth: depth
+										},
+										dataType: 'json',
+										complete: () => {
+											overlay.unsetLoading();
+										},
+										success: (resp) => {
+											form.querySelectorAll('.msg-bad').forEach((msg) => {
+												msg.remove();
+											})
 
-										if (typeof resp.errors === 'object' && resp.errors.length > 0) {
-											form.insertAdjacentHTML('afterbegin', resp.errors);
+											if (typeof resp.errors === 'object' && resp.errors.length > 0) {
+												form.insertAdjacentHTML('afterbegin', resp.errors);
 
-											return false;
-										}
-										else {
-											this._deactivateContentsEvents();
-											if (item_edit) {
-												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
-
-												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
-												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
-													.val(resp['sysmapid']);
-												jQuery('> .tree-row > .content > .item-name', $row)
-													.empty()
-													.attr('title', resp['name'])
-													.append(jQuery('<span>').text(resp.name));
-												$row.toggleClass('no-map', resp.sysmapid == 0);
+												return false;
 											}
 											else {
-												const root = this._target
-													.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
+												this._deactivateContentsEvents();
+												if (item_edit) {
+													const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
-												id = this._getNextId();
-
-												root.append(this._makeTreeItem({
-													id: id,
-													name: resp['name'],
-													sysmapid: resp['sysmapid'],
-													parent: parent
-												}));
-
-												root.closest('.tree-item').classList.remove('closed');
-												root.closest('.tree-item').classList.add('opened', 'is-parent');
-											}
-
-											const add_child_level = (sysmapid, itemid, depth) => {
-												if (typeof resp.hierarchy[sysmapid] !== 'undefined'
-													&& depth <= this._max_depth) {
+													jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
+													jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
+														.val(resp['sysmapid']);
+													jQuery('> .tree-row > .content > .item-name', $row)
+														.empty()
+														.attr('title', resp['name'])
+														.append(jQuery('<span>').text(resp.name));
+													$row.toggleClass('no-map', resp.sysmapid == 0);
+												}
+												else {
 													const root = this._target
-														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+														.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
 
-													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
-														if (typeof resp.submaps[submapid] !== 'undefined') {
-															const submap_item = resp.submaps[submapid];
-															const submap_itemid = this._getNextId();
+													id = this._getNextId();
 
-															root.append(this._makeTreeItem({
-																id: submap_itemid,
-																name: submap_item['name'],
-																sysmapid: submap_item['sysmapid'],
-																parent: itemid
-															}));
-															add_child_level(submapid, submap_itemid, depth + 1);
-														}
-													});
+													root.append(this._makeTreeItem({
+														id: id,
+														name: resp['name'],
+														sysmapid: resp['sysmapid'],
+														parent: parent
+													}, depth));
 
 													root.closest('.tree-item').classList.remove('closed');
 													root.closest('.tree-item').classList.add('opened', 'is-parent');
 												}
-											};
 
-											add_child_level(resp['sysmapid'], id, depth + 1);
+												const add_child_level = (sysmapid, itemid, depth) => {
+													if (typeof resp.hierarchy[sysmapid] !== 'undefined'
+														&& depth <= this._max_depth) {
+														const root = this._target
+															.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
-											overlayDialogueDestroy(overlay.dialogueid);
-											this._updateWidgetFields();
-											this._setTreeHandlers();
-											this._activateContentsEvents();
+														$.each(resp.hierarchy[sysmapid], (i, submapid) => {
+															if (typeof resp.submaps[submapid] !== 'undefined') {
+																const submap_item = resp.submaps[submapid];
+																const submap_itemid = this._getNextId();
+
+																root.append(this._makeTreeItem({
+																	id: submap_itemid,
+																	name: submap_item['name'],
+																	sysmapid: submap_item['sysmapid'],
+																	parent: itemid
+																}));
+																add_child_level(submapid, submap_itemid, depth + 1);
+															}
+														});
+
+														root.closest('.tree-item').classList.remove('closed');
+														root.closest('.tree-item').classList.add('opened', 'is-parent');
+													}
+												};
+
+												add_child_level(resp['sysmapid'], id, depth + 1);
+
+												overlayDialogueDestroy(overlay.dialogueid);
+												this._updateWidgetFields();
+												this._setTreeHandlers();
+												this._activateContentsEvents();
+											}
 										}
-									}
-								});
-
-								return false;
+									});
+									return false;
+								},
+								'isSubmit': true
 							},
-							'isSubmit': true
-						},
-						{
-							'title': t('Cancel'),
-							'class': 'btn-alt',
-							'action': () => {}
-						}
-					],
-					'dialogueid': 'navtreeitem',
-					'script_inline': resp.script_inline
-				}, trigger_elmnt);
-			}
-		});
+							{
+								'title': t('Cancel'),
+								'class': 'btn-alt',
+								'action': () => {}
+							}
+						],
+						'dialogueid': 'navtreeitem',
+						'script_inline': resp.script_inline
+					}, trigger_elmnt);
+				}
+			});
+		}
 	}
 
 	_updateWidgetFields() {
