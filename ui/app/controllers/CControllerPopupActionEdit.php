@@ -74,13 +74,12 @@ class CControllerPopupActionEdit extends CController {
 
 		if ($this->hasInput('actionid')) {
 			$this->action = API::Action()->get([
-				'output' => [
-					'actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'
+				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed',
+					'notify_if_canceled'
 				],
 				'actionids' => $this->getInput('actionid'),
-				'selectOperations' => [
-					'operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype', 'opcommand',
-					'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
+				'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
+					'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 					'opconditions', 'opmessage_usr', 'opmessage_grp'
 				],
 				'selectRecoveryOperations' => $operation_output,
@@ -170,7 +169,7 @@ class CControllerPopupActionEdit extends CController {
 		else {
 			$data = [
 				'eventsource' => $eventsource,
-				'actionid' => $this->getInput('actionid', ''),
+				'actionid' => $this->getInput('actionid', 0),
 				'action' => [
 					'name' => '',
 					'esc_period' => DB::getDefault('actions', 'esc_period'),

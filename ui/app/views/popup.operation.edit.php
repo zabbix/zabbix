@@ -26,8 +26,8 @@
 
 $form = (new CForm())
 	->cleanItems()
-	->setId('popup.operation')
-	->setName('popup.operation')
+	->setId('popup-operation')
+	->setName('popup_operation')
 	->addVar('operation[eventsource]', $data['eventsource'])
 	->addVar('operation[recovery]', $data['recovery'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
@@ -45,56 +45,51 @@ $operationtype_value = $operation['opcommand']['scriptid'] !== '0'
 
 // Operation type row.
 if (count($data['operation_types']) > 1) {
-$select_operationtype = (new CSelect(''))
-	->setFocusableElementId('operationtype')
-	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
-	->setAttribute('value', $operationtype_value ?? 0)
-	->setId('operation-type-select')
-	->setName('operation[operationtype]');
-
-	$form_grid->addItem([
-		(new CLabel(_('Operation'), $select_operationtype
-			->getFocusableElementId()))->setId('operation-type-label'),
-		(new CFormField($select_operationtype))
-			->setId('operation-type')
-	]);
+	$select_operationtype = (new CFormField(
+		(new CSelect('operation[operationtype]'))
+			->setFocusableElementId('operationtype')
+			->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
+			->setValue($operationtype_value ?? 0)
+			->setId('operation-type-select')
+	))->setId('operation-type');
 }
 else {
-	$form_grid->addItem([
-		(new CLabel(_('Operation'), 'operation-type'))->setId('operation-type-label'),
-		(new CFormField([
+	$select_operationtype = (new CFormField([
 			new CLabel($data['operation_types']),
-			(new CInput('hidden', $data['operation_types']))
+			(new CInput('hidden', 'operation[operationtype]', $operationtype_value))
 				->setId('operation-type-select')
-				->setAttribute('value', $operationtype_value)
-				->setName('operation[operationtype]')
-		]))
-			->setId('operation-type')
-	]);
+	]))->setId('operation-type');
 }
+$form_grid->addItem([
+	(new CLabel(_('Operation'), 'operationtype'))->setId('operation-type-label'),
+	$select_operationtype
+]);
 
 // Operation escalation steps row.
 $step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
 	->setAttribute('value', $operation['esc_step_from'] ?? 1)
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	->setId('operation_esc_step_from');
 $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 
-if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL ||
-		$data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
+$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+	->setAttribute('value', $operation['esc_step_to'] ?? 0)
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+
+if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL
+		|| $data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
 		(new CLabel(_('Steps'), 'operation_esc_step_from'))->setId('operation-step-range-label'),
 		(new CFormField([
-			$step_from->setId('operation_esc_step_from'),
+			$step_from,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
-				->setAttribute('value', $operation['esc_step_to'] ?? 0)
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			$step_to,
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
 		]))->setId('operation-step-range')
-]);
+	]);
 
-// Operation steps duration row.
+	// Operation steps duration row.
 	$form_grid->addItem([
 		(new CLabel(_('Step duration'), 'operation_esc_period'))->setId('operation-step-duration-label'),
 		(new CFormField([
@@ -373,9 +368,11 @@ $select_operation_evaltype = (new CSelect('operation[evaltype]'))
 	->setValue($data['operation']['evaltype'])
 	->setId('operation-evaltype')
 	->setFocusableElementId('operation-evaltype')
-	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
-	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
-	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')));
+	->addOptions(CSelect::createOptionsFromArray([
+		CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+		CONDITION_EVAL_TYPE_AND => _('And'),
+		CONDITION_EVAL_TYPE_OR => _('Or')
+	]));
 
 $form_grid->addItem([
 	(new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()))

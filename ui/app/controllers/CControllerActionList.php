@@ -103,8 +103,10 @@ class CControllerActionList extends CController {
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['actions'] = API::Action()->get([
-			'output' => ['name', 'status'],
-			'search' => ['name' => $filter['name'] === '' ? null : $filter['name']],
+			'output' => ['actionid', 'name', 'status'],
+			'search' => [
+				'name' => $filter['name'] === '' ? null : $filter['name']
+			],
 			'filter' => [
 				'eventsource' => $data['eventsource'],
 				'status' => $filter['status'] == -1 ? null : $filter['status']
@@ -126,8 +128,7 @@ class CControllerActionList extends CController {
 		$data['actions'] = API::Action()->get([
 			'actionids' => array_column($data['actions'], 'actionid'),
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
-			'selectOperations' => [
-				'operationid', 'actionid', 'operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
+			'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 				'opconditions', 'opmessage_usr', 'opmessage_grp'
 			],

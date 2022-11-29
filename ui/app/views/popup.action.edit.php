@@ -255,7 +255,7 @@ $form
 		'))->setOnDocumentReady()
 	);
 
-if ($data['actionid'] !== '') {
+if ($data['actionid'] !== 0) {
 	$buttons = [
 		[
 			'title' => _('Update'),
@@ -292,9 +292,8 @@ else {
 	];
 }
 
-$header = $data['actionid'] !== '' ? _('Action') : _('New action');
 $output = [
-	'header' => $header,
+	'header' => $data['actionid'] !== 0 ? _('Action') : _('New action'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

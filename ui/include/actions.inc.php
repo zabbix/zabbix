@@ -461,7 +461,6 @@ function getActionOperationData(array $operations) {
 
 		foreach ($users as $user) {
 			$result['users'][$user['userid']]['name'] = getUserFullname($user);
-			$result['users'][$user['userid']]['userid'] = $user['userid'];
 		}
 	}
 

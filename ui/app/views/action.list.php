@@ -108,9 +108,8 @@ $form = (new CForm())
 
 $action_list = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_actions'))
-				->onClick("checkAll('".$form->getName()."', 'all_actions', 'actionids');")
+		(new CColHeader((new CCheckBox('all_actions'))
+			->onClick("checkAll('".$form->getName()."', 'all_actions', 'actionids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $current_url->getUrl()),
 		_('Conditions'),
