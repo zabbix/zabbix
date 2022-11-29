@@ -229,6 +229,9 @@ $translate_strings = [
 		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
 	],
+	'inputsecret.js' => [
+		'value' => 'value'
+	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
 		'S_JANUARY' => _('January'),
