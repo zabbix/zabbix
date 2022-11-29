@@ -19,29 +19,59 @@
 
 #include "zbxstats.h"
 
-#include "zbxcommon.h"
-#include "zbxcachehistory.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 #include "zbxself.h"
-#include "../../zabbix_server/vmware/vmware.h"
-#include "preproc.h"
-#include "zbxcomms.h"
 
-extern unsigned char	program_type;
-extern int	CONFIG_SERVER_STARTUP_TIME;
+static zbx_get_config_int_f		get_server_startup_time_cb;
+static zbx_get_program_type_f		get_program_type_cb;
+static zbx_vector_stats_ext_func_t	stats_ext_funcs;
 
-static zbx_zabbix_stats_ext_get_func_t	stats_ex_cb;
+static zbx_vector_stats_ext_func_t	stats_data_funcs;
+
+ZBX_PTR_VECTOR_IMPL(stats_ext_func, zbx_stats_ext_func_entry_t *)
+
+void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_config_int_f get_server_startup_time)
+{
+	get_program_type_cb = get_program_type;
+	get_server_startup_time_cb = get_server_startup_time;
+
+	zbx_vector_stats_ext_func_create(&stats_data_funcs);
+	zbx_vector_stats_ext_func_create(&stats_ext_funcs);
+}
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sets stats callback function                                      *
+ * Purpose: register callback to add information                              *
  *                                                                            *
- * Parameters: cb   - [IN] callback function                                  *
+ * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
+void	zbx_register_stats_ext_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
 {
-	stats_ex_cb = cb;
+	zbx_stats_ext_func_entry_t	*entry;
+
+	entry = (zbx_stats_ext_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_func_entry_t));
+	entry->stats_ext_get_cb = stats_ext_get_cb;
+
+	zbx_vector_stats_ext_func_append(&stats_ext_funcs, entry);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register callback to add information to data subelement           *
+ *                                                                            *
+ * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_register_stats_data_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
+{
+	zbx_stats_ext_func_entry_t	*entry;
+
+	entry = (zbx_stats_ext_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_func_entry_t));
+	entry->stats_ext_get_cb = stats_ext_get_cb;
+
+	zbx_vector_stats_ext_func_append(&stats_data_funcs, entry);
 }
 
 /******************************************************************************
@@ -54,8 +84,8 @@ void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
  ******************************************************************************/
 void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
+	int i;
 	zbx_config_cache_info_t	count_stats;
-	zbx_vmware_stats_t	vmware_stats;
 	zbx_wcache_info_t	wcache_info;
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
 	int			proc_type;
@@ -63,10 +93,10 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 	DCget_count_stats_all(&count_stats);
 
 	/* zabbix[boottime] */
-	zbx_json_addint64(json, "boottime", CONFIG_SERVER_STARTUP_TIME);
+	zbx_json_addint64(json, "boottime", get_server_startup_time_cb());
 
 	/* zabbix[uptime] */
-	zbx_json_addint64(json, "uptime", time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+	zbx_json_addint64(json, "uptime", time(NULL) - get_server_startup_time_cb());
 
 	/* zabbix[hosts] */
 	zbx_json_adduint64(json, "hosts", count_stats.hosts);
@@ -80,10 +110,10 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 	/* zabbix[requiredperformance] */
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
 
-	/* zabbix[preprocessing_queue] */
-	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
-
-	stats_ex_cb(json, zbx_config);
+	for (i = 0; i < stats_data_funcs.values_num; i++)
+	{
+		stats_data_funcs.values[i]->stats_ext_get_cb(json, zbx_config);
+	}
 
 	/* zabbix[rcache,<cache>,<mode>] */
 	zbx_json_addobject(json, "rcache");
@@ -129,7 +159,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 			wcache_info.index_total);
 	zbx_json_close(json);
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_json_addobject(json, "trend");
 		zbx_json_addfloat(json, "pfree", 100 * (double)wcache_info.trend_free / wcache_info.trend_total);
@@ -143,17 +173,9 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	zbx_json_close(json);
 
-	/* zabbix[vmware,buffer,<mode>] */
-	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))
+	for (i = 0; i < stats_ext_funcs.values_num; i++)
 	{
-		zbx_json_addobject(json, "vmware");
-		zbx_json_adduint64(json, "total", vmware_stats.memory_total);
-		zbx_json_adduint64(json, "free", vmware_stats.memory_total - vmware_stats.memory_used);
-		zbx_json_addfloat(json, "pfree", (double)(vmware_stats.memory_total - vmware_stats.memory_used) /
-				vmware_stats.memory_total * 100);
-		zbx_json_adduint64(json, "used", vmware_stats.memory_used);
-		zbx_json_addfloat(json, "pused", (double)vmware_stats.memory_used / vmware_stats.memory_total * 100);
-		zbx_json_close(json);
+		stats_ext_funcs.values[i]->stats_ext_get_cb(json, zbx_config);
 	}
 
 	/* zabbix[process,<type>,<mode>,<state>] */

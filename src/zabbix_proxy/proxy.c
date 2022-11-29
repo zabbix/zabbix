@@ -62,6 +62,7 @@
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
+#include "../zabbix_server/preprocessor/preproc_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -231,6 +232,12 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
+int	CONFIG_SERVER_STARTUP_TIME	= 0;
+static int		get_server_startup_time(void)
+{
+	return CONFIG_SERVER_STARTUP_TIME;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -305,9 +312,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-/* zabbix server startup time */
-int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
@@ -1150,6 +1154,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_stats(get_program_type, get_server_startup_time);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1451,7 +1456,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
+	zbx_register_stats_data_func(zbx_preproc_stats_ext_get);
+	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get);
+	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)

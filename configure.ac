@@ -1459,7 +1459,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
-	
+
 	AC_SUBST(SSH2_CFLAGS)
 
 	dnl Check for LIBSSH [by default - skip] at least of version 0.7.0.
@@ -1477,7 +1477,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH_LIBS"
-	
+
 	AC_SUBST(SSH_CFLAGS)
 
 	found_openipmi="no"
@@ -2009,6 +2009,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxstats/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile

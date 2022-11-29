@@ -82,6 +82,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
 #include "zbxicmpping.h"
+#include "preprocessor/preproc_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -266,6 +267,12 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
+int	CONFIG_SERVER_STARTUP_TIME	= 0;
+static int		get_server_startup_time(void)
+{
+	return CONFIG_SERVER_STARTUP_TIME;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -331,8 +338,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 10;
@@ -1205,6 +1210,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_stats(get_program_type, get_server_startup_time);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1914,7 +1920,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
+	zbx_register_stats_data_func(zbx_preproc_stats_ext_get);
+	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get);
+	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)

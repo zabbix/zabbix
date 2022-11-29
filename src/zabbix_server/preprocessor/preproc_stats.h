@@ -17,28 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STATS_H
-#define ZABBIX_STATS_H
+#ifndef ZABBIX_PREPROCESSING_STATS_H
+#define ZABBIX_PREPROCESSING_STATS_H
 
-#include "zbxalgo.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-typedef void (*zbx_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
-
-typedef struct
-{
-	zbx_stats_ext_get_func_t stats_ext_get_cb;
-}
-zbx_stats_ext_func_entry_t;
-
-ZBX_PTR_VECTOR_DECL(stats_ext_func, zbx_stats_ext_func_entry_t *)
-
-void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_config_int_f get_server_startup_time);
-
-void	zbx_register_stats_ext_func(zbx_stats_ext_get_func_t stats_ext_get_cb);
-void	zbx_register_stats_data_func(zbx_stats_ext_get_func_t stats_ext_get_cb);
-
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
+void zbx_preproc_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
 #endif
