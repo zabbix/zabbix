@@ -40,21 +40,6 @@ typedef struct
 }
 zbx_preproc_cache_t;
 
-typedef struct
-{
-	char	*oid;
-	char	*value;
-}
-zbx_snmp_value_pair_t;
-
-ZBX_PTR_VECTOR_DECL(snmp_value_pair, zbx_snmp_value_pair_t *)
-
-typedef struct
-{
-	zbx_hashset_t	pairs;
-}
-zbx_snmp_value_cache_t;
-
 int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_variant_t *value,
 		const zbx_timespec_t *ts, const zbx_preproc_op_t *op, zbx_variant_t *history_value,
 		zbx_timespec_t *history_ts, char **error);
@@ -64,6 +49,8 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
 
+int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
+
 int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error);
@@ -72,8 +59,5 @@ void	*zbx_preproc_cache_get(zbx_preproc_cache_t *cache, unsigned char type);
 void	zbx_preproc_cache_put(zbx_preproc_cache_t *cache, unsigned char type, void *impl);
 void	zbx_preproc_cache_init(zbx_preproc_cache_t *cache);
 void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache);
-
-int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, char **error);
-void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);
 
 #endif

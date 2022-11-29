@@ -189,6 +189,11 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+#ifndef HAVE_NETSNMP
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
+		skip();
+#endif
+
 	read_value("in.value", &value_type, &value, &ts);
 	read_step("in.step", &op);
 

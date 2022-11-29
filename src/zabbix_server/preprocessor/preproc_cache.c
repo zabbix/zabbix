@@ -18,7 +18,7 @@
 **/
 
 #include "zbxprometheus.h"
-
+#include "preproc_snmp.h"
 #include "item_preproc.h"
 
 ZBX_VECTOR_IMPL(ppcache, zbx_preproc_cache_ref_t)

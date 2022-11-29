@@ -2428,19 +2428,34 @@ out:
   return: SUCCEED
   value: 123
 ---
-test case: SNMP walk to value - zbx_snmp_translate
+test case: SNMP walk to value - MIB translation 1
 in:
   value:
     value_type: ITEM_VALUE_TYPE_STR
     time: 2017-10-29 03:15:00 +03:00
     data: |
-      .1.3.6.1.2.1.2.2.1.1 = 10
       .1.3.6.1.2.1.2.2.1.2 = 20
-      .1.3.6.1.2.1.2.2.1.3 = 30
   step:
     type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
     params: |-
       ifDescr
+  netsnmp_required: y
+out:
+  return: SUCCEED
+  value: 20
+---
+test case: SNMP walk to value - MIB translation 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.2.1.1.1 = 20
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      SNMPv2-MIB::sysDescr
+  netsnmp_required: y
 out:
   return: SUCCEED
   value: 20
