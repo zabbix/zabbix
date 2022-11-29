@@ -118,7 +118,7 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check if Apply and Cancel button are clickable.
 		$dashboard->getWidget('LayoutClock')->edit();
-		foreach(['Apply', 'Cancel'] as $button) {
+		foreach (['Apply', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
 	}
