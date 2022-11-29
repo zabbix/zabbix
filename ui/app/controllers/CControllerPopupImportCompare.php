@@ -334,13 +334,6 @@ class CControllerPopupImportCompare extends CController {
 			$outer_change_type = self::CHANGE_NONE;
 		}
 
-		$rows = [[
-			'value' => '-',
-			'depth' => $depth,
-			'change_type' => $outer_change_type,
-			'id' => $id
-		]];
-
 		$all_keys = [];
 
 		foreach (array_keys($before) as $key) {
@@ -368,12 +361,15 @@ class CControllerPopupImportCompare extends CController {
 
 		unset($all_keys['uuid']);
 
+		$prefix = '- ';
+		$prefix_depth = 0;
+
 		foreach ($all_keys as $key => $change_type) {
 			switch ($change_type) {
 				case 'no_change':
 					$rows[] = [
-						'value' => $this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + 1,
+						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + $prefix_depth,
 						'change_type' => self::CHANGE_NONE
 					];
 
@@ -381,13 +377,13 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'updated':
 					$rows[] = [
-						'value' => $this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + 1,
+						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + $prefix_depth,
 						'change_type' => self::CHANGE_REMOVED
 					];
 					$rows[] = [
-						'value' => $this->convertToYaml([$key => $after[$key]]),
-						'depth' => $depth + 1,
+						'value' => $prefix.$this->convertToYaml([$key => $after[$key]]),
+						'depth' => $depth + $prefix_depth,
 						'change_type' => self::CHANGE_ADDED
 					];
 
@@ -395,8 +391,8 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'removed':
 					$rows[] = [
-						'value' => $this->convertToYaml([$key => $before[$key]]),
-						'depth' => $depth + 1,
+						'value' => $prefix.$this->convertToYaml([$key => $before[$key]]),
+						'depth' => $depth + $prefix_depth,
 						'change_type' => self::CHANGE_REMOVED
 					];
 
@@ -404,18 +400,21 @@ class CControllerPopupImportCompare extends CController {
 
 				case 'added':
 					$rows[] = [
-						'value' => $this->convertToYaml([$key => $after[$key]]),
-						'depth' => $depth + 1,
+						'value' => $prefix.$this->convertToYaml([$key => $after[$key]]),
+						'depth' => $depth + $prefix_depth,
 						'change_type' => self::CHANGE_ADDED
 					];
 
 					break;
 
 				case 'updated_array':
-					$rows = array_merge($rows, $this->arrayToRows($key, $before[$key], $after[$key], $depth + 1));
+					$rows = array_merge($this->arrayToRows($key, $before[$key], $after[$key], $depth + 1));
 
 					break;
 			}
+
+			$prefix = '';
+			$prefix_depth = 1;
 		}
 
 		return $rows;
