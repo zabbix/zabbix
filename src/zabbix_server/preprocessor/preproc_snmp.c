@@ -45,6 +45,7 @@ static void snmp_value_pair_free(zbx_snmp_value_pair_t	*p)
 {
 	zbx_free(p->oid);
 	zbx_free(p->value);
+	zbx_free(p);
 }
 
 static void snmp_walk_json_output_obj_free(zbx_snmp_walk_json_output_obj_t *obj)
@@ -63,10 +64,10 @@ static void	snmp_value_pair_hashset_clear(zbx_hashset_t *hs)
 
 	while (NULL != (pair = (zbx_snmp_value_pair_t *)zbx_hashset_iter_next(&iter)))
 	{
-		snmp_value_pair_free(pair);
+		zbx_free(pair->oid);
+		zbx_free(pair->value);
 	}
 
-	zbx_hashset_clear(hs);
 	zbx_hashset_destroy(hs);
 }
 
@@ -409,7 +410,8 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *oid_needle
 			return SUCCEED;
 		}
 		data += len;
-		memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
+		zbx_free(p.oid);
+		zbx_free(p.value);
 	}
 
 	*error = zbx_strdup(NULL, "no data was found");
