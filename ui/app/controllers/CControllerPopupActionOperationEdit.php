@@ -182,14 +182,20 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if ($operation['opcommand_hst']) {
-			$host = CArrayHelper::renameObjectsKeys(API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'hostids' => array_column($operation['opcommand_hst'], 'hostid')
-			]), ['hostid' => 'id']);
+			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
+				unset ($operation['opcommand_hst'][0]);
+			}
 
-			CArrayHelper::sort($host, ['name']);
+			if(count($operation['opcommand_hst']) > 0) {
+				$host = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => array_column($operation['opcommand_hst'], 'hostid')
+				]), ['hostid' => 'id']);
 
-			$result['opcommand_hst'] = array_values($host);
+				CArrayHelper::sort($host, ['name']);
+
+				$result['opcommand_hst'] = array_values($host);
+			}
 		}
 
 		if ($operation['opcommand_grp']) {

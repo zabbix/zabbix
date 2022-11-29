@@ -44,7 +44,7 @@ window.action_edit_popup = new class {
 		// Reload operation table when esc_period is changed.
 		const esc_period = document.querySelector('#esc_period');
 		if (esc_period) {
-			esc_period.addEventListener('input', () => {
+			esc_period.addEventListener('change', () => {
 				this.recovery = <?= ACTION_OPERATION ?>;
 				this._loadOperationTable();
 			});
@@ -111,7 +111,7 @@ window.action_edit_popup = new class {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
-					if (response.messages[0] !== null) {
+					if (response.messages.length > 0) {
 						const message_box = makeMessageBox('bad', response.messages)[0];
 						this.form.parentNode.insertBefore(message_box, this.form);
 					}

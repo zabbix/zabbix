@@ -34,6 +34,10 @@ $output = [
 	'body' => (new CPartial($partials[$data['recovery']], $data))->getOutput()
 ];
 
-$output['messages'] = [CMessageHelper::getMessages()[0]['message']];
+$output['messages'] = [];
+$messages = CMessageHelper::getMessages();
+if (count($messages) !== 0) {
+	$output['messages'] = [$messages[0]['message']];
+}
 
 echo json_encode($output);

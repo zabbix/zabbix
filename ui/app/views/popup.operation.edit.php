@@ -34,11 +34,7 @@ $form = (new CForm())
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
-
-$operationtype = array_key_exists('operationtype', $operation)
-	? $operation['operationtype']
-	: '0';
-
+$operationtype = $operation['operationtype'];
 $operationtype_value = $operation['opcommand']['scriptid'] !== '0'
 	? 'scriptid['.$operation['opcommand']['scriptid'].']'
 	: 'cmd['.$operationtype.']';
@@ -66,18 +62,18 @@ $form_grid->addItem([
 ]);
 
 // Operation escalation steps row.
-$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
-	->setAttribute('value', $operation['esc_step_from'] ?? 1)
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	->setId('operation_esc_step_from');
-$step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
-
-$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
-	->setAttribute('value', $operation['esc_step_to'] ?? 0)
-	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-
 if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL
 		|| $data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
+	$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
+		->setAttribute('value', $operation['esc_step_from'] ?? 1)
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->setId('operation_esc_step_from');
+	$step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
+
+	$step_to = (new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+		->setAttribute('value', $operation['esc_step_to'] ?? 0)
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+
 	$form_grid->addItem([
 		(new CLabel(_('Steps'), 'operation_esc_step_from'))->setId('operation-step-range-label'),
 		(new CFormField([
@@ -231,11 +227,13 @@ $host_ms = [];
 if (array_key_exists('opcommand_hst', $operation)) {
 	foreach ($operation['opcommand_hst'] as $host) {
 		if ($host !== null) {
-			if ($host['id'] == 0) {
-				$opcommand_hst_value = 0;
-			}
-			else {
-				$host_ms[] = $host;
+			if (array_key_exists('id', $host)) {
+				if ($host['id'] == 0) {
+					$opcommand_hst_value = 0;
+				}
+				else {
+					$host_ms[] = $host;
+				}
 			}
 		}
 	}
