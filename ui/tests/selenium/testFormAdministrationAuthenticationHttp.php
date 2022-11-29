@@ -604,6 +604,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$form = $this->query('name:form_auth')->asForm()->one();
 		$http_options = CTestArrayHelper::get($data, 'http_authentication', ['Enable HTTP authentication' => false]);
 		$form->selectTab('HTTP settings');
+
+		if (CTestArrayHelper::get($data, 'http_authentication.Enable HTTP authentication', false) === true) {
+			$form->fill(['Enable HTTP authentication' => true]);
+			$this->query('button:Ok')->one()->click();
+		}
+
 		$form->fill($http_options);
 
 		// Check disabled or enabled fields.

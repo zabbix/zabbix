@@ -689,6 +689,11 @@ class testFormTabIndicators extends CWebTest {
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
 			$this->assertTabIndicator($tab_selector, $old_value);
 
+			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
+				$this->query('id:http_auth_enabled')->one()->click();
+				$this->query('button:Ok')->one()->click();
+			}
+
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
