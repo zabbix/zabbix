@@ -133,11 +133,11 @@ css_icons:
 	cp sass/ms-tile-144x144.png ui/assets/img/
 	cp sass/touch-icon-192x192.png ui/assets/img/
 	cp sass/favicon.ico ui/
-	cp sass/fonts/zabbix-icons.eot ui/assets/fonts
-	cp sass/fonts/zabbix-icons.svg ui/assets/fonts
-	cp sass/fonts/zabbix-icons.ttf ui/assets/fonts
-	cp sass/fonts/zabbix-icons.woff ui/assets/fonts
-	cp sass/fonts/zabbix-icons.woff2 ui/assets/fonts
+	cp sass/fonts/zabbix-icons.eot ui/assets/fonts/
+	cp sass/fonts/zabbix-icons.svg ui/assets/fonts/
+	cp sass/fonts/zabbix-icons.ttf ui/assets/fonts/
+	cp sass/fonts/zabbix-icons.woff ui/assets/fonts/
+	cp sass/fonts/zabbix-icons.woff2 ui/assets/fonts/
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
