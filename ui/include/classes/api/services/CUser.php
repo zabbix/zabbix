@@ -314,7 +314,6 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $i => &$user) {
-
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
@@ -468,7 +467,6 @@ class CUser extends CApiService {
 		$check_roleids = [];
 
 		foreach ($users as $i => &$user) {
-
 			if (!array_key_exists($user['userid'], $db_users)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
