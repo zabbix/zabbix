@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:55Z'
+  date: '2022-10-27T13:38:22Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 7cd8aaa8d18d4b22a79edfb769e839b3
-      template: 'Interfaces Simple SNMP'
-      name: 'Interfaces Simple SNMP'
+      template: 'Interfaces Simple by SNMP'
+      name: 'Interfaces Simple by SNMP'
       description: |
         Template Module Interfaces Simple (no ifXTable). This is the exact copy of Template Module Interfaces template with the exception that metrics from ifXTable are replaced with ifTable counters where possible. Use this template with devices where IF-MIB::ifXtable is not available. If supported by the host - use Template Module Interfaces template instead.
         
@@ -316,9 +316,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 94097ac2b53748aea45fed2f3014c1b6
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFDESCR}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -369,21 +369,21 @@ zabbix_export:
             -
               uuid: 13c523ffdf154e6fb1ab7628e3a2010a
               expression: |
-                change(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                change(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Interfaces Simple SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Interfaces Simple by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -392,8 +392,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -401,13 +401,13 @@ zabbix_export:
             -
               uuid: 7594011ba1964285abd0f232ffeb22e3
               expression: |
-                (avg(/Interfaces Simple SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/Interfaces Simple SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/Interfaces Simple by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
+                avg(/Interfaces Simple by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
+                last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Interfaces Simple SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/Interfaces Simple SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/Interfaces Simple by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
+                avg(/Interfaces Simple by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFDESCR}: High bandwidth usage'
               event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -417,8 +417,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -426,12 +426,12 @@ zabbix_export:
             -
               uuid: 2eb4baaf86a2405b9a1a232241eee72b
               expression: |
-                min(/Interfaces Simple SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Interfaces Simple SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Interfaces Simple by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Interfaces Simple by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Interfaces Simple SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Interfaces Simple SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Interfaces Simple by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Interfaces Simple by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFDESCR}: High error rate'
               event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -441,8 +441,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Simple SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -456,42 +456,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Simple SNMP'
+                    host: 'Interfaces Simple by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
       macros:
         -
@@ -565,8 +565,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'Interfaces Simple by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
-                        host: 'Interfaces Simple SNMP'
       valuemaps:
         -
           uuid: 4578589110ec40e19297e1d35d17c82f

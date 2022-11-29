@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:03Z'
+  date: '2022-10-27T12:59:09Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 75d009cd4dc84ee7a8fc479fa2fbaeee
-      template: 'Cisco ASAv SNMP'
-      name: 'Cisco ASAv SNMP'
+      template: 'Cisco ASAv by SNMP'
+      name: 'Cisco ASAv by SNMP'
       description: |
         Template Net Cisco ASAv
         
@@ -159,11 +159,11 @@ zabbix_export:
           triggers:
             -
               uuid: 7fcf46583d2b42f4be6758e85784f28f
-              expression: 'last(/Cisco ASAv SNMP/cisco.asav.uptime)<10m'
-              name: 'Cisco ASAv: has been restarted'
-              event_name: 'Cisco ASAv: has been restarted (uptime < 10m)'
+              expression: 'last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m'
+              name: 'Cisco ASAv: Host has been restarted'
+              event_name: 'Cisco ASAv: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -192,7 +192,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9ee945a0b0b942d7a7e3fcf218f0e82f
-              expression: 'max(/Cisco ASAv SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'Cisco ASAv: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -232,7 +232,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2e90218795b94ee8b3c01dd79d2dd8b3
-                  expression: 'min(/Cisco ASAv SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Cisco ASAv: High CPU utilization'
                   event_name: 'Cisco ASAv: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -250,7 +250,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.cpu.util[{#SNMPINDEX}]'
         -
           uuid: 072c0dc4527c492592df91115f1621cb
@@ -302,7 +302,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//cisco.asav.memory.used[{#SNMPINDEX}])/(last(//cisco.asav.memory.free[{#SNMPINDEX}])+last(//cisco.asav.memory.used[{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -310,7 +310,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 688975747f664a15a3bca9dd3e1e0b01
-                  expression: 'min(/Cisco ASAv SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Cisco ASAv by SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: 'Cisco ASAv: High memory utilization'
                   event_name: 'Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -330,7 +330,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.memory.util[{#SNMPINDEX}]'
         -
           uuid: 2ced96f9e3ff40de85530b9ef9e4585c
@@ -663,9 +663,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0aca9e16545a46f4a7b150d03cdb1df1
-                  expression: 'last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Cisco ASAv SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'Cisco ASAv: {#CISCO.IF.NAME} Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -839,37 +839,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: 1e252a00f1a14e99b06498a659a0d1d5
@@ -880,13 +880,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.in.util[{#SNMPINDEX}]'
             -
               uuid: 4609522ac9a545b3a5b38129e5110174
@@ -895,13 +895,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.net.if.out.traffic[{#SNMPINDEX}]'
           overrides:
             -
@@ -919,7 +919,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: de837df7c2f84cae86a84c773d7a07dc
@@ -1169,7 +1168,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c9f9bff9e9cd4519807c5be583670d02
-                  expression: 'last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0'
                   name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced'
                   event_name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received)'
                   priority: INFO
@@ -1513,13 +1512,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.session.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'Cisco ASAv SNMP'
+                    host: 'Cisco ASAv by SNMP'
                     key: 'cisco.asav.session.out.traffic[{#SNMPINDEX}]'
       tags:
         -
