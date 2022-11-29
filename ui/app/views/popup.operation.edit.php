@@ -156,9 +156,6 @@ $form_grid->addItem([
 
 array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
 
-$disabled = [];
-$media = [];
-
 $mediatypes = [];
 foreach($data['mediatype_options'] as $mediatype) {
 	$mediatypes[] = (new CSelectOption($mediatype['mediatypeid'], $mediatype['name']))
@@ -222,7 +219,7 @@ $form_grid->addItem([
 ]);
 
 $opcommand_hst_value = null;
-$host_ms = [];
+$hosts_ms = [];
 
 if (array_key_exists('opcommand_hst', $operation)) {
 	foreach ($operation['opcommand_hst'] as $host) {
@@ -232,7 +229,7 @@ if (array_key_exists('opcommand_hst', $operation)) {
 					$opcommand_hst_value = 0;
 				}
 				else {
-					$host_ms[] = $host;
+					$hosts_ms[] = $host;
 				}
 			}
 		}
@@ -259,7 +256,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 					(new CMultiSelect([
 						'name' => 'operation[opcommand_hst][][hostid]',
 						'object_name' => 'hosts',
-						'data' => $host_ms,
+						'data' => $hosts_ms,
 						'popup' => [
 							'parameters' => [
 								'multiselect' => '1',
