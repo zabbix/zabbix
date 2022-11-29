@@ -21,7 +21,6 @@
 #include "log.h"
 #include "setproctitle.h"
 #include "zbxthreads.h"
-#include "zbxprof.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {

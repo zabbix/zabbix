@@ -49,6 +49,7 @@ static int	rtc_parse_scope(const char *str, int *scope)
  *             pid       - [OUT] the target pid (if specified)                *
  *             proc_type - [OUT] the target process type (if specified)       *
  *             proc_num  - [OUT] the target process num (if specified)        *
+ *             scope     - [OUT] the scope (if specified)                     *
  *             error     - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
@@ -88,7 +89,7 @@ int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type
 		{
 			if (FAIL == rtc_parse_scope(scope_ptr, scope))
 			{
-				*error = zbx_dsprintf(NULL, "invalid control target"
+				*error = zbx_dsprintf(NULL, "invalid control target -"
 						" invalid or unsupported scope \"%s\"", scope_ptr);
 				return FAIL;
 			}
