@@ -19,6 +19,7 @@
 
 #include "discoverer.h"
 
+#include "../events/events.h"
 #include "log.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
@@ -28,7 +29,6 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "../events.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -481,7 +481,7 @@ static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, cons
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			zbx_discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
-					service->status, service->value, now);
+					service->status, service->value, now, zbx_add_event);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 		{

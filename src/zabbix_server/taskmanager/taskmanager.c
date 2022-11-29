@@ -20,12 +20,12 @@
 #include "taskmanager.h"
 
 #include "../db_lengths.h"
+#include "../events/events.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
-#include "../events.h"
 #include "../actions.h"
 #include "zbxexport.h"
 #include "zbxdiag.h"

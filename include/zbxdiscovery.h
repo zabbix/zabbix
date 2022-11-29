@@ -21,6 +21,7 @@
 #define ZABBIX_DISCOVERY_H
 
 #include "zbxdbhigh.h"
+#include "zbxevents.h"
 
 typedef struct
 {
@@ -33,7 +34,8 @@ typedef struct
 }
 zbx_service_t;
 
-void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now);
+void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now, zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
-		const char *ip, const char *dns, int port, int status, const char *value, int now);
+		const char *ip, const char *dns, int port, int status, const char *value, int now,
+		zbx_add_event_func_t add_event_cb);
 #endif

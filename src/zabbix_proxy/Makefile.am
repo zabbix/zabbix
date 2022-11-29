@@ -15,7 +15,6 @@ sbin_PROGRAMS = zabbix_proxy
 noinst_LIBRARIES = libzbxproxy.a
 
 libzbxproxy_a_SOURCES = \
-	events.c \
 	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \

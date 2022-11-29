@@ -61,7 +61,7 @@
 #include "lld/lld_worker.h"
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
-#include "events.h"
+#include "events/events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "setproctitle.h"

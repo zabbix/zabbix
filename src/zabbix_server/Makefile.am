@@ -6,6 +6,7 @@ SUBDIRS = \
 	dbconfig \
 	diag \
 	discoverer \
+	events \
 	housekeeper \
 	httppoller \
 	pinger \
@@ -38,8 +39,6 @@ libzbxserver_a_SOURCES = \
 	db_lengths.h \
 	actions.c \
 	actions.h \
-	events.c \
-	events.h \
 	operations.c \
 	operations.h \
 	postinit.c \
@@ -104,6 +103,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_builddir)/src/libs/zbxevents/libzbxevents.a \
 	preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \

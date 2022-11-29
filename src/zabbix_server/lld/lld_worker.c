@@ -24,7 +24,7 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "../events.h"
+#include "../events/events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
 #include "zbxdbwrap.h"

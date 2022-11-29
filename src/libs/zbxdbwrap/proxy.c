@@ -29,7 +29,7 @@
 #include "preproc.h"
 #include "zbxcrypto.h"
 #include "zbxlld.h"
-#include "events.h"
+#include "zbxevents.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
@@ -2365,7 +2365,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+				service->status, service->value, service->itemtime, NULL);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2379,7 +2379,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime);
+				service->status, service->value, service->itemtime, NULL);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
