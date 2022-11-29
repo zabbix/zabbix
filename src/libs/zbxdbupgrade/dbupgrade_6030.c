@@ -1227,7 +1227,7 @@ static int	migrate_saml_data(void)
 
 #define IDP_TYPE_SAML	2	/* user directory of type SAML */
 	int	rc = DBexecute("insert into userdirectory (userdirectoryid,idp_type,description) values"
-			" (" ZBX_FS_UI64 ",%d,'%s')", userdirectoryid, IDP_TYPE_SAML, "");
+			" (" ZBX_FS_UI64 ",%d,'')", userdirectoryid, IDP_TYPE_SAML);
 #undef IDP_TYPE_SAML
 	if (ZBX_DB_OK > rc)
 	{
