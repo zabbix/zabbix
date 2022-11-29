@@ -831,7 +831,7 @@ class CWidgetNavTree extends CWidget {
 
 		url.setArgument('action', 'widget.navtree.item.edit');
 
-		if (depth <= 10) {
+		if (depth <= this._max_depth) {
 			jQuery.ajax({
 				url: url.getUrl(),
 				method: 'POST',
