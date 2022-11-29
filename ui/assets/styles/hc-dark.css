@@ -3484,7 +3484,7 @@ section {
     .filter-container.tabfilter-container .tabfilter-item-label.disabled {
       box-shadow: none;
       pointer-events: none; }
-    .filter-container.tabfilter-container .tabfilter-item-label .icon-filter.tabfilter-item-link[data-counter]::after {
+    .filter-container.tabfilter-container .tabfilter-item-label .zi-filter.tabfilter-item-link[data-counter]::after {
       display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.ui-sortable-helper {
       background-color: #000000; }
