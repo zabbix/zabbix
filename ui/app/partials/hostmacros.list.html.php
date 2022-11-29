@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 if ($data['readonly'] && !$data['macros']) {
@@ -39,6 +40,11 @@ else {
 		]);
 
 	foreach ($data['macros'] as $i => $macro) {
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+			->setReadonly($data['readonly']
+				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+			);
+
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 				->setReadonly($data['readonly']
@@ -56,23 +62,20 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
 
+			if (array_key_exists('allow_revert', $macro)) {
+				$macro_value->addRevertButton();
+				$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+					|| array_key_exists('value', $macro)
+				);
+
+				$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
+			}
+
 			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
 				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
 				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
 				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
 			}
-		}
-
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
-			->setReadonly($data['readonly']
-				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
-			);
-
-		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-			$macro_value->addRevertButton();
-			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
-				&& array_key_exists('hostmacroid', $macro)
-			);
 		}
 
 		if (array_key_exists('value', $macro)) {
