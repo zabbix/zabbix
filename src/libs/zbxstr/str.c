@@ -1879,8 +1879,8 @@ fail:
  * Purpose: extracts substring at the specified location                      *
  *                                                                            *
  * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
+ *             left  - [IN] the left substring position (start)               *
+ *             right - [IN] the right substring position (end)                *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
@@ -1901,8 +1901,8 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
  * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
+ *             left  - [IN] the left substring position (start)               *
+ *             right - [IN] the right substring position (end)                *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *

@@ -19,7 +19,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxcommon.h"
+#include "zbxnum.h"
 #include "zbxtypes.h"
 
 /* unresolved symbols needed for linking */

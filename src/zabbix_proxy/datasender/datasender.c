@@ -30,6 +30,7 @@
 #include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "../taskmanager/taskmanager.h"
 
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
@@ -94,7 +95,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -132,7 +133,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		}
 	}
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 
 	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
 	{
@@ -225,7 +226,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				if (0 != (flags & ZBX_DATASENDER_TASKS))
 				{
 					zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
-					zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+					zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
@@ -266,8 +267,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_disconnect_from_server(&sock);
 	}
 clean:
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 
 	zbx_json_free(&j);
 	zbx_free(buffer);
