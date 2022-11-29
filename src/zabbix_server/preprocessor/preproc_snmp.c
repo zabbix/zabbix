@@ -164,7 +164,7 @@ static size_t	preproc_snmp_pair_parse_oid(const char *ptr, zbx_snmp_value_pair_t
 	return len;
 }
 
-static size_t	preproc_snmp_parse_type(const char *ptr, zbx_snmp_value_pair_t *p, char **type)
+static size_t	preproc_snmp_parse_type(const char *ptr, char **type)
 {
 	const char	*start = ptr++;
 	size_t		len;
@@ -286,7 +286,7 @@ reparse_type:
 
 	if (0 != isupper((unsigned char)*data))
 	{
-		len = preproc_snmp_parse_type(data, p, &type);
+		len = preproc_snmp_parse_type(data, &type);
 		data += len;
 
 		if (':' != *data)
@@ -336,7 +336,6 @@ out:
 static int	preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, int json, char **error)
 {
 	size_t			len;
-	char			*oid, *value;
 	zbx_snmp_value_pair_t	p;
 
 	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
@@ -496,7 +495,7 @@ static void	snmp_walk_serialize_json(zbx_hashset_t *grouped_prefixes, char **res
 int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
-	char	*output, *value_out = NULL, *err = NULL;
+	char	*value_out = NULL, *err = NULL;
 	int	ret = FAIL;
 
 	if (NULL == params || '\0' == *params)
@@ -552,7 +551,7 @@ out:
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	int					ret = SUCCEED;
-	char					*result = NULL, *token, *saveptr;
+	char					*result = NULL;
 	zbx_hashset_t				grouped_prefixes, pairs;
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
 	zbx_hashset_iter_t			iter;
