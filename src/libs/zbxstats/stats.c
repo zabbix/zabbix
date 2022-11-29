@@ -19,8 +19,11 @@
 
 #include "zbxstats.h"
 
+#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
+#include "zbxcomms.h"
+#include "zbxjson.h"
 #include "zbxself.h"
 
 static zbx_get_config_int_f		get_server_startup_time_cb;

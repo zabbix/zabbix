@@ -20,6 +20,7 @@
 #include "preproc_stats.h"
 
 #include "preproc.h"
+#include "zbxjson.h"
 
 void zbx_preproc_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
