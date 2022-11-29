@@ -179,7 +179,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",	threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", threads[i]);
 		}
 		else
 		{

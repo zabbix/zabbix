@@ -96,6 +96,9 @@ static void	rtc_process_option(int code, const char *data, char **result)
 		return;
 	}
 
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+		scope = atoi(buf);
+
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
 	{
 		zbx_uint64_t	pid;
@@ -108,12 +111,17 @@ static void	rtc_process_option(int code, const char *data, char **result)
 
 		if ((pid_t)pid == getpid())
 		{
-			rtc_change_service_loglevel(code);
-			/* temporary message, the signal forwarding command output will be changed later */
-			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+			if (ZBX_RTC_LOG_LEVEL_INCREASE == code || ZBX_RTC_LOG_LEVEL_DECREASE == code)
+			{
+				rtc_change_service_loglevel(code);
+				/* temporary message, the signal forwarding command output will be changed later */
+				*result = zbx_strdup(NULL, "Changed log level for the main process\n");
+			}
+			else
+				*result = zbx_dsprintf(NULL, "Cannot use pid value for runtime command \"%s\"\n", buf);
 		}
 		else
-			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 
 		return;
 	}
@@ -121,12 +129,9 @@ static void	rtc_process_option(int code, const char *data, char **result)
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
 		process_num = atoi(buf);
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
-		scope = atoi(buf);
-
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
 	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 		return;
 	}
 

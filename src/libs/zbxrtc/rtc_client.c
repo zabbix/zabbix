@@ -60,11 +60,20 @@ static int	rtc_parse_runtime_parameter(const char *opt, zbx_uint32_t code, size_
 	{
 		zbx_json_init(&j, 1024);
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_PID, pid);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
 		goto finish;
 	}
 
 	if (ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
+	{
+		if (0 != scope)
+		{
+			zbx_json_init(&j, 1024);
+			zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
+			goto finish;
+		}
 		return SUCCEED;
+	}
 
 	proc_name = get_process_type_string((unsigned char)proc_type);
 
@@ -76,7 +85,6 @@ static int	rtc_parse_runtime_parameter(const char *opt, zbx_uint32_t code, size_
 
 	if (0 != scope)
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
-
 finish:
 	*data = zbx_strdup(NULL, j.buffer);
 	zbx_json_clean(&j);
