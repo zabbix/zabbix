@@ -5168,6 +5168,7 @@ svg {
 				> .content {
 					display: flex;
 					height: 20px;
+					align-items: center;
 
 					> .arrow {
 						flex: 0 0 15px;
@@ -6208,7 +6209,7 @@ button {
 
 // Table column styles
 #itemsTable {
-	.table-col-handle { width: 26px; }
+	.table-col-handle { width: 10px; }
 	.table-col-no { width: 20px; }
 	.table-col-name-normal { width: 285px; }
 	.table-col-name { width: 365px; }
