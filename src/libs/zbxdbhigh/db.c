@@ -20,7 +20,7 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "zbxevents.h"
+//#include "zbxevents.h"
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -1556,14 +1556,15 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
+		int now, zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
+		zbx_clean_events_func_t clean_events_cb)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
+	DBregister_host_flush(&autoreg_hosts, proxy_hostid, add_event_cb, process_events_cb, clean_events_cb);
 
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
@@ -1583,7 +1584,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 		int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	int 			i;
+	int			i;
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
 	{
@@ -1749,7 +1750,8 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
+void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid, zbx_add_event_func_t
+		add_event_cb, zbx_process_events_func_t process_events_cb, zbx_clean_events_func_t clean_events_cb)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid = 0;
@@ -1845,12 +1847,24 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
 
 		ts.sec = autoreg_host->now;
-		zbx_add_event(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+
+		if (NULL != add_event_cb)
+		{
+			add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
+					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+		}
 	}
 
-	zbx_process_events(NULL, NULL);
-	zbx_clean_events();
+	if (NULL != process_events_cb)
+	{
+		process_events_cb(NULL, NULL);
+	}
+
+	if (NULL != clean_events_cb)
+	{
+		clean_events_cb();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

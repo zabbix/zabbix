@@ -29,7 +29,7 @@
 #include "preproc.h"
 #include "zbxcrypto.h"
 #include "zbxlld.h"
-#include "zbxevents.h"
+//#include "zbxevents.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
@@ -2383,7 +2383,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
-	zbx_discovery_update_host(&dhost, service->status, service->itemtime);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime, NULL);
 
 	ret = SUCCEED;
 fail:
@@ -2565,8 +2565,8 @@ json_parse_error:
 			}
 		}
 
-		zbx_process_events(NULL, NULL);
-		zbx_clean_events();
+		//zbx_process_events(NULL, NULL);
+		//zbx_clean_events();
 		DBcommit();
 	}
 json_parse_return:
@@ -2714,14 +2714,14 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
+		DBeegister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
 				itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)
 	{
 		DBbegin();
-		DBregister_host_flush(&autoreg_hosts, proxy_hostid);
+		DBregister_host_flush(&autoreg_hosts, proxy_hostid, NULL, NULL, NULL);
 		DBcommit();
 		DCconfig_delete_autoreg_host(&autoreg_hosts);
 	}

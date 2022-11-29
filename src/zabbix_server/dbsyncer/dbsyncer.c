@@ -25,6 +25,7 @@
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 #include "zbxexport.h"
+#include "../events/events.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char			program_type;
@@ -137,7 +138,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
-		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+
+		zbx_events_funcs_t events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
+				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
+		zbx_sync_history_cache(events_funcs_cbs, &values_num, &triggers_num, &more);
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
@@ -153,7 +157,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
 			stats_offset = 0;
-			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
+			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values",
+					total_values_num);
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{

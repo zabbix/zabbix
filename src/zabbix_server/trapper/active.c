@@ -95,7 +95,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now);
+					(unsigned short)flag, now, zbx_add_event, zbx_process_events, zbx_clean_events);
 		}
 		else
 		{

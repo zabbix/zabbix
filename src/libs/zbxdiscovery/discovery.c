@@ -20,7 +20,7 @@
 #include "zbxdiscovery.h"
 
 #include "log.h"
-#include "zbxevents.h"
+//#include "zbxevents.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 
@@ -441,7 +441,7 @@ static void	discovery_update_host_status(ZBX_DB_DHOST *dhost, int status, int no
 				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
 						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL,
 						NULL);
-			{
+			}
 		}
 	}
 	else	/* DOBJECT_STATUS_DOWN */

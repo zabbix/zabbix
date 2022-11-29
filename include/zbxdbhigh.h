@@ -26,6 +26,8 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
+//#include "zbxevents.h"
+#include "zbxtime.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -574,15 +576,48 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
+
+/* events callbacks */
+typedef ZBX_DB_EVENT	(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
+		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+
+
+typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+typedef void	(*zbx_clean_events_func_t)(void);
+typedef void	(*zbx_reset_event_recovery_func_t)(void);
+typedef void	(*zbx_export_events_func_t)(void);
+typedef void	(*zbx_events_update_itservices_func_t)(void);
+
+typedef struct
+{
+	zbx_add_event_func_t			add_event_cb;
+	zbx_process_events_func_t		process_events_cb;
+	zbx_clean_events_func_t			clean_events_cb;
+	zbx_reset_event_recovery_func_t		reset_event_recovery_cb;
+	zbx_export_events_func_t		export_events_cb;
+	zbx_events_update_itservices_func_t	events_update_itservices_cb;
+} zbx_events_funcs_t;
+
+/* events callbacks end */
+
 int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
+		int now, zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
+		zbx_clean_events_func_t clean_events_cb);
+
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
-void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
+
+void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+		zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
+		zbx_clean_events_func_t clean_events_cb);
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
@@ -889,5 +924,6 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
+
 
 #endif /* ZABBIX_DBHIGH_H */

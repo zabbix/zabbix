@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxdbwrap.h"
-#include "zbxevents.h"
+//#include "zbxevents.h"
 #include "zbxserver.h"
 #include "zbxnum.h"
 

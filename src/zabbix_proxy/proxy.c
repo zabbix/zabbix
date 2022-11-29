@@ -1018,7 +1018,10 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
+
+	zbx_events_funcs_t events_funcs_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
+
+	free_database_cache(ZBX_SYNC_ALL, events_funcs_cbs);
 	free_configuration_cache();
 	DBclose();
 
