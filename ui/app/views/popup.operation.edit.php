@@ -34,10 +34,9 @@ $form = (new CForm())
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
-$operationtype = $operation['operationtype'];
 $operationtype_value = $operation['opcommand']['scriptid'] !== '0'
 	? 'scriptid['.$operation['opcommand']['scriptid'].']'
-	: 'cmd['.$operationtype.']';
+	: 'cmd['. $operation['operationtype'].']';
 
 // Operation type row.
 if (count($data['operation_types']) > 1) {

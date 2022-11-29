@@ -183,7 +183,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		if ($operation['opcommand_hst']) {
 			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
-				unset ($operation['opcommand_hst'][0]);
+				unset($operation['opcommand_hst'][0]);
 			}
 
 			if(count($operation['opcommand_hst']) > 0) {
@@ -221,14 +221,14 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if ($operation['optemplate']) {
-			$template = CArrayHelper::renameObjectsKeys(API::Template()->get([
+			$templates = CArrayHelper::renameObjectsKeys(API::Template()->get([
 				'output' => ['templateid', 'name'],
 				'templateids' => array_column($operation['optemplate'], 'templateid')
 			]), ['templateid' => 'id']);
 
-			CArrayHelper::sort($template, ['name']);
+			CArrayHelper::sort($templates, ['name']);
 
-			$result['optemplate'] = array_values($template);
+			$result['optemplate'] = array_values($templates);
 		}
 
 		return $result;

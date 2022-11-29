@@ -112,6 +112,7 @@ class CControllerActionList extends CController {
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
 			'editable' => true,
+			'sortfield' => $sort_field,
 			'limit' => $limit
 		]);
 
@@ -138,15 +139,17 @@ class CControllerActionList extends CController {
 			'preservekeys' => true
 		]);
 
+		order_result($data['actions'], $sort_field, $sort_order);
+
 		foreach ($data['actions'] as &$action) {
 			order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 		}
-		unset ($action);
+		unset($action);
 
 		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
 
 		$operations = [];
-		foreach($data['actions'] as $action) {
+		foreach ($data['actions'] as $action) {
 			foreach ($action['operations'] as $operation) {
 				$operations[] = $operation;
 			}

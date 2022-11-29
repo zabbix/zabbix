@@ -139,7 +139,7 @@ class CControllerPopupActionEdit extends CController {
 					'name' => $condition_names[0][$row_index]
 				];
 			}
-			unset ($condition);
+			unset($condition);
 
 			if ($data['action']['filter']['formula'] !== '') {
 				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
