@@ -97,6 +97,12 @@ window.action_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title)[0];
 
@@ -105,6 +111,11 @@ window.action_edit_popup = new class {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
+					if (response.messages[0] !== null) {
+						const message_box = makeMessageBox('bad', response.messages)[0];
+						this.form.parentNode.insertBefore(message_box, this.form);
+					}
+
 					this.$operation_table.empty();
 					this.$operation_table.append(response.body);
 				}

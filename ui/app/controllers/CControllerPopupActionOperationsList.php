@@ -77,12 +77,41 @@ class CControllerPopupActionOperationsList extends CController {
 		$eventsource = $this->getInput('eventsource');
 		$new_operation = $this->getInput('new_operation')['operation'] ?? null;
 
+		$operations = $this->getInput('operations', []);
+
+		$unique_operations = [
+			OPERATION_TYPE_HOST_ADD => 0,
+			OPERATION_TYPE_HOST_REMOVE => 0,
+			OPERATION_TYPE_HOST_ENABLE => 0,
+			OPERATION_TYPE_HOST_DISABLE => 0,
+			OPERATION_TYPE_HOST_INVENTORY => 0
+		];
+
 		if ($new_operation) {
+			$result = true;
+
+			if (array_key_exists($new_operation['operationtype'], $unique_operations)) {
+				$unique_operations[$new_operation['operationtype']]++;
+
+				foreach ($operations as $operationId => $operation) {
+					if (array_key_exists($operation['operationtype'], $unique_operations)
+							&& (!array_key_exists('id', $new_operation)
+							|| bccomp($new_operation['id'], $operationId) != 0)) {
+						$unique_operations[$operation['operationtype']]++;
+					}
+				}
+
+				if ($unique_operations[$new_operation['operationtype']] > 1) {
+					$result = false;
+					CMessageHelper::addError(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
+				}
+			}
+
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
 				$data['recovery'] = ACTION_OPERATION;
 				$data['operations'] = $this->getInput('operations', []);
 			}
-			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+			if ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['recovery'] = ACTION_RECOVERY_OPERATION;
 				$data['operations'] = $this->getInput('recovery_operations', []);
 			}
@@ -91,10 +120,10 @@ class CControllerPopupActionOperationsList extends CController {
 				$data['operations'] = $this->getInput('update_operations', []);
 			}
 
-			if ($new_operation['row_index'] != -1) {
+			if ($new_operation['row_index'] != -1 && $result === true) {
 				$data['operations'][(int) $new_operation['row_index']] = $new_operation;
 			}
-			else {
+			elseif ($result === true) {
 				$data['operations'][] = $new_operation;
 			}
 
