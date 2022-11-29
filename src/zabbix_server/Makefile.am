@@ -53,7 +53,9 @@ libzbxserver_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(TLS_CFLAGS)
 
-zabbix_server_SOURCES = server.c
+zabbix_server_SOURCES = \
+	server.h \
+	server.c
 
 zabbix_server_LDADD = \
 	dbsyncer/libzbxdbsyncer.a \
@@ -110,7 +112,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
-	$(top_builddir)/src/libs/zbxself/libzbxself_server.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \

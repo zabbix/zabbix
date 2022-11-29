@@ -180,6 +180,16 @@ static int	DBpatch_3030017(void)
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
 
+/* item data types */
+typedef enum
+{
+	ITEM_DATA_TYPE_DECIMAL = 0,
+	ITEM_DATA_TYPE_OCTAL,
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
+}
+zbx_item_data_type_t;
+
 static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char data_type, const char *formula, unsigned char delta)
 {

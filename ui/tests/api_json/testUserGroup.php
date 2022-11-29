@@ -272,7 +272,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'Апи группа пользователей обновленна УТФ-8'
 					]
 				],
@@ -296,7 +296,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API update user group one',
 						'templategroup_rights' =>[
 							[
@@ -940,9 +940,15 @@ class testUserGroup extends CAPITest {
 	 * Create data to be used in tests.
 	 */
 	public function prepareTestData() {
-		$response = CDataHelper::call('userdirectory.create', [
-			['name' => 'API LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
-		]);
+		$response = CDataHelper::call('userdirectory.create', [[
+			'name' => 'API LDAP #1',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid'
+		]]);
+
 		$this->assertArrayHasKey('userdirectoryids', $response);
 		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
 	}

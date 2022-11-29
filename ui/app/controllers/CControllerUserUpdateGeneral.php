@@ -77,6 +77,8 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @return bool
 	 */
 	protected function validatePassword() {
+		$usrgrps = [];
+
 		if ($this instanceof CControllerUserProfileUpdate) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
@@ -86,7 +88,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				]
 			]);
 		}
-		else {
+		elseif ($this->getInput('user_groups', [])) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
 				'usrgrpids' => $this->getInput('user_groups'),
@@ -122,20 +124,32 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 * @return bool
 	 */
 	protected function validateUserRole(): bool {
-		if (!$this->hasInput('roleid')) {
-			error(_s('Field "%1$s" is mandatory.', 'roleid'));
+		if ($this->hasInput('roleid')) {
+			$role = API::Role()->get(['output' => [], 'roleids' => [$this->getInput('roleid')]]);
 
-			return false;
-		}
+			if (!$role) {
+				error(_('No permissions to referred object or it does not exist!'));
 
-		$role = API::Role()->get(['output' => [], 'roleids' => [$this->getInput('roleid')]]);
-
-		if (!$role) {
-			error(_('No permissions to referred object or it does not exist!'));
-
-			return false;
+				return false;
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get user medias data from form input.
+	 *
+	 * @return array of user medias sent by form.
+	 */
+	protected function getInputUserMedia(): array {
+		$medias = [];
+		$media_fields = array_fill_keys(['mediatypeid', 'sendto', 'active', 'severity', 'period'], '');
+
+		foreach ($this->getInput('medias', []) as $media) {
+			$medias[] = array_intersect_key($media, $media_fields);
+		}
+
+		return $medias;
 	}
 }
