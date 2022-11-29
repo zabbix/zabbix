@@ -117,7 +117,7 @@ class testDashboardClockWidget extends CWebTest {
 
 		// Check if Apply and Cancel button are clickable.
 		$dashboard->getWidget('LayoutClock')->edit();
-		foreach(['Apply', 'Cancel'] as $button) {
+		foreach (['Apply', 'Cancel'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isClickable());
 		}
 	}
@@ -236,7 +236,7 @@ class testDashboardClockWidget extends CWebTest {
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill($data['Fields']);
 
-		if($data['Expected'] === TEST_GOOD) {
+		if ($data['Expected'] === TEST_GOOD) {
 			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$dashboard->save();
@@ -251,7 +251,7 @@ class testDashboardClockWidget extends CWebTest {
 			$created_widget = $fields->asValues();
 			$this->assertEquals($original_widget, $created_widget);
 		}
-		else{
+		else {
 			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
 			$form->getOverlayMessage()->close();
@@ -394,13 +394,13 @@ class testDashboardClockWidget extends CWebTest {
 		$form->waitUntilReady();
 		$form->fill($data['Fields']);
 
-		if($data['Expected'] === TEST_GOOD) {
+		if ($data['Expected'] === TEST_GOOD) {
 			$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Use updated widget as next widget which will be updated.
-			if(array_key_exists('Name', $data['Fields'])) {
+			if (array_key_exists('Name', $data['Fields'])) {
 				self::$name = $data['Fields']['Name'];
 			}
 
@@ -414,7 +414,7 @@ class testDashboardClockWidget extends CWebTest {
 			// Compare if widget fields are not equal with original widget fields.
 			$this->assertNotEquals($original_widget, $updated_widget);
 		}
-		else{
+		else {
 			$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
 			$form->getOverlayMessage()->close();
