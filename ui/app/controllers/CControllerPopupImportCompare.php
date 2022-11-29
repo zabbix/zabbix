@@ -361,6 +361,7 @@ class CControllerPopupImportCompare extends CController {
 
 		unset($all_keys['uuid']);
 
+		$rows = [];
 		$prefix = '- ';
 		$prefix_depth = 0;
 
@@ -408,7 +409,7 @@ class CControllerPopupImportCompare extends CController {
 					break;
 
 				case 'updated_array':
-					$rows = array_merge($this->arrayToRows($key, $before[$key], $after[$key], $depth + 1));
+					$rows = array_merge($rows, $this->arrayToRows($key, $before[$key], $after[$key], $depth + 1));
 
 					break;
 			}
