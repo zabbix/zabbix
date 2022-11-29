@@ -1,7 +1,7 @@
 Changes for 6.4.0beta4
 
 New features:
-A.F.I...S. [ZBXNEXT-276] added LDAP and SAML user provisioning (Andris, epulke, gcalenko, Miks)
+A.F.I...S. [ZBXNEXT-276] added LDAP and SAML user provisioning (Andris, epulke, gcalenko, miks)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 A......... [ZBXNEXT-8051] added new authentications methods for API calls (rlataria)
 ..F.I..... [ZBXNEXT-4714] implemented filters for Action log page; and widget and export to CSV file for Action log page (ashubin, dpetra, vso)
