@@ -334,6 +334,8 @@ int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, char **error)
 		/* allow only socket based runtime control options */
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_PROF_ENABLE:
+		case ZBX_RTC_PROF_DISABLE:
 			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
 			return FAIL;
 	}
