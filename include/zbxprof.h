@@ -20,15 +20,14 @@
 #ifndef ZABBIX_PROF_H
 #define ZABBIX_PROF_H
 
-typedef enum
-{
-	ZBX_PROF_PROCESSING,
-	ZBX_PROF_RWLOCK,
-	ZBX_PROF_MUTEX
-}
-zbx_prof_scope_t;
+#define ZBX_PROF_PROCESSING	0x01
+#define ZBX_PROF_RWLOCK		0x02
+#define ZBX_PROF_MUTEX		0x04
+#define ZBX_PROF_ALL		0xff
 
-void	zbx_prof_enable(void);
+typedef int zbx_prof_scope_t;
+
+void	zbx_prof_enable(zbx_prof_scope_t scope);
 void	zbx_prof_disable(void);
 void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);
 void	zbx_prof_end_wait(void);

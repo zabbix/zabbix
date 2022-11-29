@@ -70,18 +70,18 @@ static void	rtc_change_service_loglevel(int code)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process loglevel runtime control option                           *
+ * Purpose: process runtime control option                                    *
  *                                                                            *
  * Parameters: code   - [IN] the runtime control request code                 *
  *             data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_loglevel(int code, const char *data, char **result)
+static void	rtc_process_option(int code, const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
-	int			process_num = 0, process_type;
+	int			process_num = 0, process_type, scope = 0;
 
 	if (NULL == data)
 	{
@@ -121,6 +121,9 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
 		process_num = atoi(buf);
 
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+		scope = atoi(buf);
+
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
 	{
 		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
@@ -133,7 +136,7 @@ static void	rtc_process_loglevel(int code, const char *data, char **result)
 		return;
 	}
 
-	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 }
 #endif
 
@@ -239,7 +242,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *d
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 		case ZBX_RTC_PROF_ENABLE:
 		case ZBX_RTC_PROF_DISABLE:
-			rtc_process_loglevel(code, (const char *)data, result);
+			rtc_process_option(code, (const char *)data, result);
 			return;
 #endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:

@@ -195,7 +195,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
  *                         default loglevel command handler                   *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_process_loglevel(int direction, const char *data, char **result)
+static int	rtc_process_option(int direction, const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
@@ -473,9 +473,9 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 	{
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			return rtc_process_loglevel(1, (const char *)data, result);
+			return rtc_process_option(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			return rtc_process_loglevel(-1, (const char *)data, result);
+			return rtc_process_option(-1, (const char *)data, result);
 #endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zbx_service_reload_cache();

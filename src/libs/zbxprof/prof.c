@@ -19,10 +19,10 @@ zbx_func_profile_t;
 ZBX_PTR_VECTOR_DECL(func_profiles, zbx_func_profile_t*)
 ZBX_PTR_VECTOR_IMPL(func_profiles, zbx_func_profile_t*)
 
-static volatile int			zbx_prof_enable_requested;
+static volatile int			zbx_prof_scope_requested;
 
 static zbx_vector_func_profiles_t	zbx_func_profiles;
-static int				zbx_prof_enabled;
+static zbx_prof_scope_t			zbx_prof_scope;
 static int				zbx_prof_initialized;
 
 static zbx_func_profile_t		*zbx_func_profile[PROF_LEVEL_MAX];
@@ -54,7 +54,7 @@ static void	func_profile_free(zbx_func_profile_t *func_profile)
 
 void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 {
-	if (1 == zbx_prof_enabled)
+	if (0 != zbx_prof_scope)
 	{
 		int			i;
 		zbx_func_profile_t	*func_profile;
@@ -85,7 +85,7 @@ void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 
 void	zbx_prof_end_wait(void)
 {
-	if (1 == zbx_prof_enabled)
+	if (0 != zbx_prof_scope)
 	{
 		zbx_func_profile_t	*func_profile;
 
@@ -97,7 +97,7 @@ void	zbx_prof_end_wait(void)
 
 void	zbx_prof_end(void)
 {
-	if (1 == zbx_prof_enabled)
+	if (0 != zbx_prof_scope)
 	{
 		zbx_func_profile_t	*func_profile;
 
@@ -122,7 +122,7 @@ static const char	*get_scope_string(zbx_prof_scope_t scope)
 
 static void	zbx_print_prof(void)
 {
-	if (1 == zbx_prof_enabled)
+	if (0 != zbx_prof_scope)
 	{
 		int			i;
 		zbx_func_profile_t	*func_profile;
@@ -134,6 +134,9 @@ static void	zbx_print_prof(void)
 		for (i = 0; i < zbx_func_profiles.values_num; i++)
 		{
 			func_profile = zbx_func_profiles.values[i];
+
+			if (0 == (zbx_prof_scope & func_profile->scope))
+				continue;
 
 			if (ZBX_PROF_PROCESSING == func_profile->scope)
 			{
@@ -162,14 +165,17 @@ static void	zbx_print_prof(void)
 	}
 }
 
-void	zbx_prof_enable(void)
+void	zbx_prof_enable(zbx_prof_scope_t scope)
 {
-	zbx_prof_enable_requested = 1;
+	if (0 == scope)
+		scope = ZBX_PROF_ALL;
+
+	zbx_prof_scope_requested = (int)scope;
 }
 
 void	zbx_prof_disable(void)
 {
-	zbx_prof_enable_requested = 0;
+	zbx_prof_scope_requested = 0;
 }
 
 static void	zbx_reset_prof(void)
@@ -182,19 +188,19 @@ void	zbx_prof_update(double time_now)
 {
 	static double	last_update;
 
-	if (1 == zbx_prof_enable_requested)
+	if (0 != zbx_prof_scope_requested)
 	{
 		zbx_prof_init();
-		zbx_prof_enabled = 1;
+		zbx_prof_scope = zbx_prof_scope_requested;
 	}
 	else
-		zbx_prof_enabled = 0;
+		zbx_prof_scope = 0;
 
 	if (30 < time_now - last_update)
 	{
 		last_update = time_now;
 
-		if (1 == zbx_prof_enabled)
+		if (0 != zbx_prof_scope)
 			zbx_print_prof();
 		else
 			zbx_reset_prof();

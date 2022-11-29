@@ -74,7 +74,7 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		case ZBX_RTC_PROF_ENABLE:
-			zbx_prof_enable();
+			zbx_prof_enable(ZBX_RTC_GET_SCOPE(flags));
 			break;
 		case ZBX_RTC_PROF_DISABLE:
 			zbx_prof_disable();
