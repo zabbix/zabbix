@@ -1555,14 +1555,14 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, zbx_events_funcs_t events_funcs_cbs)
+		int now, zbx_events_funcs_t events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_funcs_cbs);
+	DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
 
 	DBregister_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);

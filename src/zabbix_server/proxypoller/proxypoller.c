@@ -395,7 +395,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_events_funcs_t events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
+	zbx_events_funcs_t events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
 				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
 
 	*more = ZBX_PROXY_DATA_DONE;
@@ -425,7 +425,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, events_funcs_cbs, more,
+	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, events_cbs, more,
 			&error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",

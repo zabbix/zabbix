@@ -55,14 +55,14 @@ typedef struct
 }
 zbx_wcache_info_t;
 
-void	zbx_sync_history_cache(zbx_events_funcs_t events_funcs_cbs, int *values_num, int *triggers_num, int *more);
+void	zbx_sync_history_cache(zbx_events_funcs_t events_cbs, int *values_num, int *triggers_num, int *more);
 void	zbx_log_sync_history_cache_progress(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
 
 int	init_database_cache(char **error);
-void	free_database_cache(int sync, zbx_events_funcs_t events_funcs_cbs);
+void	free_database_cache(int sync, zbx_events_funcs_t events_cbs);
 
 void	change_proxy_history_count(int change_count);
 void	reset_proxy_history_count(int reset);

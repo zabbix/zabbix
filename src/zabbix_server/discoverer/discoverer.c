@@ -880,7 +880,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		if ((int)sec >= nextcheck)
 		{
 			rule_count += process_discovery(&nextcheck,
-					discoverer_args_in->events_funcs_cbs);
+					discoverer_args_in->events_cbs);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

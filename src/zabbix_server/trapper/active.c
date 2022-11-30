@@ -54,7 +54,7 @@ extern unsigned char	program_type;
  ******************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		zbx_events_funcs_t events_funcs_cbs)
+		zbx_events_funcs_t events_cbs)
 {
 	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
@@ -98,7 +98,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now, events_funcs_cbs);
+					(unsigned short)flag, now, events_cbs);
 		}
 		else
 		{
@@ -178,7 +178,7 @@ out:
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		zbx_events_funcs_t events_funcs_cbs, zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
+		zbx_events_funcs_t events_cbs, zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -214,7 +214,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface, events_funcs_cbs);
+							interface, events_cbs);
 				}
 			}
 		}
@@ -233,7 +233,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
-					events_funcs_cbs);
+					events_cbs);
 		}
 	}
 

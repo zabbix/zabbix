@@ -2728,8 +2728,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	{
 		DBbegin();
 
-		zbx_events_funcs_t events_funcs_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
-		DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_funcs_cbs);
+		zbx_events_funcs_t events_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
+		DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
 
 		DBcommit();
 		DCconfig_delete_autoreg_host(&autoreg_hosts);

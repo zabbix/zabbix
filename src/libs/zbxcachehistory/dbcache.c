@@ -3642,7 +3642,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	sync_history_cache_full(zbx_events_funcs_t events_funcs_cbs)
+static void	sync_history_cache_full(zbx_events_funcs_t events_cbs)
 {
 	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
@@ -3691,7 +3691,7 @@ static void	sync_history_cache_full(zbx_events_funcs_t events_funcs_cbs)
 		{
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				sync_server_history(&values_num, &triggers_num, events_funcs_cbs, &more);
+				sync_server_history(&values_num, &triggers_num, events_cbs, &more);
 			}
 			else
 			{
@@ -3771,7 +3771,7 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sync_history_cache(zbx_events_funcs_t events_funcs_cbs, int *values_num, int *triggers_num, int *more)
+void	zbx_sync_history_cache(zbx_events_funcs_t events_cbs, int *values_num, int *triggers_num, int *more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
@@ -3779,7 +3779,7 @@ void	zbx_sync_history_cache(zbx_events_funcs_t events_funcs_cbs, int *values_num
 	*triggers_num = 0;
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		sync_server_history(values_num, triggers_num, events_funcs_cbs, more);
+		sync_server_history(values_num, triggers_num, events_cbs, more);
 	else
 		sync_proxy_history(values_num, more);
 }
@@ -4894,7 +4894,7 @@ int	get_proxy_history_count(void)
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(zbx_events_funcs_t events_funcs_cbs)
+static void	DCsync_all(zbx_events_funcs_t events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
@@ -4902,7 +4902,7 @@ static void	DCsync_all(zbx_events_funcs_t events_funcs_cbs)
 	//		clean_events_cb, events_update_itservices_cb, export_events_cb);
 
 
-	sync_history_cache_full(events_funcs_cbs);
+	sync_history_cache_full(events_cbs);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
@@ -4915,14 +4915,14 @@ static void	DCsync_all(zbx_events_funcs_t events_funcs_cbs)
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-void	free_database_cache(int sync, zbx_events_funcs_t events_funcs_cbs)
+void	free_database_cache(int sync, zbx_events_funcs_t events_cbs)
 
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
 	{
-		DCsync_all(events_funcs_cbs);
+		DCsync_all(events_cbs);
 	}
 
 	cache = NULL;
