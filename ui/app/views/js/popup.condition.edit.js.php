@@ -134,7 +134,7 @@ window.condition_popup = new class {
 		const $host_ms = $('#host_new_condition');
 		const $hostgroup_ms = $('#hostgroup_new_condition');
 		const $template_ms = $('#template_new_condition');
-		const $event_ms = $('#event_hostgroup_new_condition');
+		const $event_ms = $('#groupids_');
 
 		const multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms]
 		multiselects.forEach((multiselect) => {

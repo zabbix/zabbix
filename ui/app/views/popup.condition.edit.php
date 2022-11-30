@@ -69,7 +69,7 @@ switch ($data['type']) {
 						CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]
 					), CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]);
 				$new_condition_tag = (new CTextAreaFlexible('tag'))
-					->setId('old_new_tag_value')
+					->setId('tag')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $new_condition_tag->getPostJS();
@@ -80,7 +80,7 @@ switch ($data['type']) {
 						new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 					])
 					->addItem([
-						new CLabel(_('Tag'), 'old_new_tag_value'),
+						new CLabel(_('Tag'), 'tag'),
 						new CFormField($new_condition_tag)
 					]);
 
@@ -103,12 +103,12 @@ switch ($data['type']) {
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'event_hostgroup_new_condition',
+							'dstfld1' => 'groupids_',
 							'editable' => true
 						]
 					]
 				]))
-					->setId('event_hostgroup_new_condition')
+					->setId('groupids_')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $hostgroup_multiselect->getPostJS();
@@ -119,7 +119,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Host groups'), 'event_hostgroup_new_condition_ms'),
+						new CLabel(_('Host groups'), 'groupids__ms'),
 						new CFormField($hostgroup_multiselect)
 					]);
 
@@ -133,10 +133,10 @@ switch ($data['type']) {
 						CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]
 					), CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]);
 				$new_condition_oldtag = (new CTextAreaFlexible('oldtag'))
-					->setId('old_tag_name')
+					->setId('oldtag')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 				$new_condition_newtag = (new CTextAreaFlexible('newtag'))
-					->setId('new_tag_name')
+					->setId('newtag')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $new_condition_oldtag->getPostJS();
@@ -144,7 +144,7 @@ switch ($data['type']) {
 
 				$form_grid
 					->addItem([
-						new CLabel(_('Old tag name'), 'old_tag_name'),
+						new CLabel(_('Old tag name'), 'oldtag'),
 						new CFormField($new_condition_oldtag)
 					])
 					->addItem([
@@ -152,7 +152,7 @@ switch ($data['type']) {
 						new CFormField([$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
 					])
 					->addItem([
-						new CLabel(_('New tag name'), 'new_tag_name'),
+						new CLabel(_('New tag name'), 'newtag'),
 						new CFormField($new_condition_newtag)
 					]);
 
@@ -167,10 +167,10 @@ switch ($data['type']) {
 				}
 
 				$new_condition_tag = (new CTextAreaFlexible('tag'))
-					->setId('tag_value')
+					->setId('tag')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 				$new_condition_value = (new CTextAreaFlexible('value'))
-					->setId('old_new_tag_event_value')
+					->setId('value')
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $new_condition_tag->getPostJS();
@@ -178,7 +178,7 @@ switch ($data['type']) {
 
 				$form_grid
 					->addItem([
-						new CLabel(_('Tag'), 'tag_value'),
+						new CLabel(_('Tag'), 'tag'),
 						new CFormField($new_condition_tag)
 					])
 					->addItem([
@@ -186,7 +186,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'old_new_tag_event_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
