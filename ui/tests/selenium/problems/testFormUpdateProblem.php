@@ -885,7 +885,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table->waitUntilReloaded();
 
 		// Check suppressed icon and hint.
-		$this->checkIconAndHint($row, 'icon-action-suppress', "Suppressed till: Indefinitely".
+		$this->checkIconAndHint($row, 'icon-action-suppress zi-eye-off', "Suppressed till: Indefinitely".
 				"\nManually by: Admin (Zabbix Administrator)"
 		);
 
@@ -894,7 +894,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
-		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
+		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress zi-eye-off"]')->exists());
 
 		// Unsuppress problem.
 		$row->getColumn('Ack')->query('tag:a')->waitUntilClickable()->one()->click();
