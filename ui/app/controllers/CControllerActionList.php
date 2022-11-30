@@ -140,7 +140,7 @@ class CControllerActionList extends CController {
 			$db_action = $db_actions[$action['actionid']];
 
 			CArrayHelper::sort($db_action['filter']['conditions'], [
-				['field' => 'conditiontype', 'sort' => ZBX_SORT_DOWN]
+				['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN]
 			]);
 
 			$action['filter'] = $db_action['filter'];
