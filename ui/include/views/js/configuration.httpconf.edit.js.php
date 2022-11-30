@@ -45,6 +45,7 @@
 			(new CCol((new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass('zi-drag-handle')
+				->addStyle('top: 0px;')
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),

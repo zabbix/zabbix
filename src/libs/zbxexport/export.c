@@ -20,29 +20,18 @@
 #include "zbxexport.h"
 
 #include "log.h"
+#include "zbxcommon.h"
 #include "zbxstr.h"
+#include "zbxtypes.h"
 
 #define ZBX_OPTION_EXPTYPE_EVENTS	"events"
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"
 #define ZBX_OPTION_EXPTYPE_TRENDS	"trends"
 
-extern char		*CONFIG_EXPORT_DIR;
-extern char		*CONFIG_EXPORT_TYPE;
-extern zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
-
-typedef struct
-{
-	char	*name;
-	FILE	*file;
-	int	missing;
-}
-zbx_export_file_t;
-
-static zbx_export_file_t	*history_file;
-static zbx_export_file_t	*trends_file;
-static zbx_export_file_t	*problems_file;
-
-static char	*export_dir;
+static zbx_get_export_file_f	get_history_file;
+static zbx_get_export_file_f	get_trends_file;
+static zbx_get_export_file_f	get_problems_file;
+static zbx_config_export_t	*config_export;
 
 /******************************************************************************
  *                                                                            *
@@ -111,6 +100,28 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 	return ret;
 }
 
+static int	is_export_enabled(zbx_config_export_t *zbx_config_export, uint32_t flags)
+{
+	int			ret = FAIL;
+	static uint32_t		export_types;
+
+	if (NULL == zbx_config_export || NULL == zbx_config_export->dir)
+		return ret;
+
+	if (NULL != zbx_config_export->type)
+	{
+		if (0 == export_types)
+			zbx_validate_export_type(zbx_config_export->type, &export_types);
+
+		if (0 != (export_types & flags))
+			ret = SUCCEED;
+	}
+	else
+		ret = SUCCEED;
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if export is enabled for given type(s)                     *
@@ -125,72 +136,71 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
  ******************************************************************************/
 int	zbx_is_export_enabled(uint32_t flags)
 {
-	int			ret = FAIL;
-	static uint32_t		export_types;
-
-	if (NULL == CONFIG_EXPORT_DIR)
-		return ret;
-
-	if (NULL != CONFIG_EXPORT_TYPE)
-	{
-		if (0 == export_types)
-			zbx_validate_export_type(CONFIG_EXPORT_TYPE, &export_types);
-
-		if (0 != (export_types & flags))
-			ret = SUCCEED;
-	}
-	else
-		ret = SUCCEED;
-
-	return ret;
+	return is_export_enabled(config_export, flags);
 }
 
-int	zbx_export_init(char **error)
+int	zbx_has_export_dir(void)
+{
+	return NULL != config_export && NULL != config_export->dir;
+}
+
+int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error)
 {
 	struct stat	fs;
 
-	if (FAIL == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_TRENDS | ZBX_FLAG_EXPTYPE_HISTORY))
+	if (FAIL == is_export_enabled(zbx_config_export, ZBX_FLAG_EXPTYPE_EVENTS | ZBX_FLAG_EXPTYPE_TRENDS |
+					ZBX_FLAG_EXPTYPE_HISTORY))
 	{
-		if (NULL != CONFIG_EXPORT_TYPE)
+		if (NULL != zbx_config_export->type)
 		{
 			*error = zbx_dsprintf(*error, "Misconfiguration: \"ExportType\" is set to '%s' "
-					"while \"ExportDir\" is unset.", CONFIG_EXPORT_TYPE);
+					"while \"ExportDir\" is unset.", zbx_config_export->type);
 			return FAIL;
 		}
 		return SUCCEED;
 	}
 
-	if (NULL == CONFIG_EXPORT_TYPE)
+	if (NULL == zbx_config_export->type)
 	{
-		CONFIG_EXPORT_TYPE = zbx_dsprintf(CONFIG_EXPORT_TYPE, "%s,%s,%s", ZBX_OPTION_EXPTYPE_EVENTS,
+		zbx_config_export->type = zbx_dsprintf(zbx_config_export->type, "%s,%s,%s", ZBX_OPTION_EXPTYPE_EVENTS,
 				ZBX_OPTION_EXPTYPE_HISTORY, ZBX_OPTION_EXPTYPE_TRENDS);
 	}
 
-	if (0 != stat(CONFIG_EXPORT_DIR, &fs))
+	if (0 != stat(zbx_config_export->dir, &fs))
 	{
-		*error = zbx_dsprintf(*error, "Failed to stat the specified path \"%s\": %s.", CONFIG_EXPORT_DIR,
+		*error = zbx_dsprintf(*error, "Failed to stat the specified path \"%s\": %s.", zbx_config_export->dir,
 				zbx_strerror(errno));
 		return FAIL;
 	}
 
 	if (0 == S_ISDIR(fs.st_mode))
 	{
-		*error = zbx_dsprintf(*error, "The specified path \"%s\" is not a directory.", CONFIG_EXPORT_DIR);
+		*error = zbx_dsprintf(*error, "The specified path \"%s\" is not a directory.", zbx_config_export->dir);
 		return FAIL;
 	}
 
-	if (0 != access(CONFIG_EXPORT_DIR, W_OK | R_OK))
+	if (0 != access(zbx_config_export->dir, W_OK | R_OK))
 	{
-		*error = zbx_dsprintf(*error, "Cannot access path \"%s\": %s.", CONFIG_EXPORT_DIR, zbx_strerror(errno));
+		*error = zbx_dsprintf(*error, "Cannot access path \"%s\": %s.", zbx_config_export->dir,
+				zbx_strerror(errno));
 		return FAIL;
 	}
 
-	export_dir = zbx_strdup(NULL, CONFIG_EXPORT_DIR);
-
-	if ('/' == export_dir[strlen(export_dir) - 1])
-		export_dir[strlen(export_dir) - 1] = '\0';
+	config_export = zbx_config_export;
 
 	return SUCCEED;
+}
+
+void	zbx_deinit_library_export(void)
+{
+	if (NULL != config_export)
+	{
+		zbx_free(config_export->dir);
+		zbx_free(config_export->type);
+	}
+	get_history_file = NULL;
+	get_trends_file = NULL;
+	get_problems_file = NULL;
 }
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
@@ -206,13 +216,25 @@ static int	open_export_file(zbx_export_file_t *file, char **error)
 	return SUCCEED;
 }
 
-static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *process_type, const char
-				*process_name,	int process_num)
+static zbx_export_file_t	*export_init(const char *process_type, const char *process_name, int process_num)
 {
-	char	*error = NULL;
+	char			*export_dir, *error = NULL;
+	zbx_export_file_t	*file = NULL;
+
+	if (NULL == config_export)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
+		exit(EXIT_FAILURE);
+	}
+
+	export_dir = zbx_strdup(NULL, config_export->dir);
+	if ('/' == export_dir[strlen(export_dir) - 1])
+		export_dir[strlen(export_dir) - 1] = '\0';
 
 	file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
 	file->name = zbx_dsprintf(NULL, "%s/%s-%s-%d.ndjson", export_dir, process_type, process_name, process_num);
+
+	free(export_dir);
 
 	if (FAIL == open_export_file(file, &error))
 	{
@@ -225,22 +247,38 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 	return file;
 }
 
-void	zbx_history_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_history_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	history_file = export_init(history_file, "history", process_name, process_num);
+	get_history_file = get_export_file_cb;
+
+	return export_init("history", process_name, process_num);
 }
 
-void	zbx_trends_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_trends_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	trends_file = export_init(trends_file, "trends", process_name, process_num);
+	get_trends_file = get_export_file_cb;
+
+	return export_init("trends", process_name, process_num);
 }
 
-void	zbx_problems_export_init(const char *process_name, int process_num)
+zbx_export_file_t	*zbx_problems_export_init(zbx_get_export_file_f get_export_file_cb, const char *process_name,
+		int process_num)
 {
-	problems_file = export_init(problems_file, "problems", process_name, process_num);
+	get_problems_file = get_export_file_cb;
+
+	return export_init("problems", process_name, process_num);
 }
 
-static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
+void	zbx_export_deinit(zbx_export_file_t *file)
+{
+	zbx_fclose(file->file);
+	zbx_free(file->name);
+	zbx_free(file);
+}
+
+static void	export_write(const char *buf, size_t count, zbx_export_file_t *file)
 {
 #define ZBX_LOGGING_SUSPEND_TIME	10
 
@@ -249,10 +287,17 @@ static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 	char		*error_msg = NULL;
 	long		file_offset;
 
+	if (NULL == config_export)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "export library is not initialized");
+		exit(EXIT_FAILURE);
+	}
+
 	if (0 == file->missing && 0 != access(file->name, F_OK))
 	{
 		if (NULL != file->file && 0 != fclose(file->file))
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot close export file '%s': %s",file->name, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot close export file '%s': %s",file->name,
+					zbx_strerror(errno));
 
 		file->file = NULL;
 	}
@@ -276,7 +321,7 @@ static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 		goto error;
 	}
 
-	if (CONFIG_EXPORT_FILE_SIZE <= count + (size_t)file_offset + 1)
+	if (config_export->file_size <= count + (size_t)file_offset + 1)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
@@ -341,39 +386,36 @@ error:
 
 void	zbx_problems_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, problems_file);
+	export_write(buf, count, get_problems_file());
 }
 
 void	zbx_history_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, history_file);
+	export_write(buf, count, get_history_file());
 }
 
 void	zbx_trends_export_write(const char *buf, size_t count)
 {
-	file_write(buf, count, trends_file);
+	export_write(buf, count, get_trends_file());
 }
 
-static void	zbx_flush(FILE *file, const char *file_name)
+static void	export_flush(zbx_export_file_t *file)
 {
-	if (0 != fflush(file))
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
+	if (NULL != file && NULL != file->file && 0 != fflush(file->file))
+		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file->name, zbx_strerror(errno));
 }
 
 void	zbx_problems_export_flush(void)
 {
-	if (NULL != problems_file->file)
-		zbx_flush(problems_file->file, problems_file->name);
+	export_flush(get_problems_file());
 }
 
 void	zbx_history_export_flush(void)
 {
-	if (NULL != history_file->file)
-		zbx_flush(history_file->file, history_file->name);
+	export_flush(get_history_file());
 }
 
 void	zbx_trends_export_flush(void)
 {
-	if (NULL != trends_file->file)
-		zbx_flush(trends_file->file, trends_file->name);
+	export_flush(get_trends_file());
 }

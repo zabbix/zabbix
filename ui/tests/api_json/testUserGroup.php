@@ -272,7 +272,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'Апи группа пользователей обновленна УТФ-8'
 					]
 				],
@@ -296,7 +296,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API update user group one',
 						'templategroup_rights' =>[
 							[
