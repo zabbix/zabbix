@@ -145,7 +145,7 @@ class CControllerPopupActionOperationEdit extends CController {
 	}
 
 	/**
-	 * Returns necessarry operation 'element' data for operation popup multiselects.
+	 * Returns necessary operation 'element' data for operation popup multiselects.
 	 *
 	 * @param array $operation  Operation object.
 	 *
