@@ -95,14 +95,14 @@
 	}
 
 	function createRow(input) {
-		let row_count = document.querySelector('#condition_table').rows.length - 2;
-		if (row_count !== 0) {
-			input.row_index = row_count;
-		}
+		const row_ids = [];
+
+		$('#condition_table tr').each(function() {
+			row_ids.push(this.id);
+		});
 
 		if (input.groupids) {
 			Object.keys(input.groupids).map(key => {
-
 				let element = {...input, name: input.groupids[key], value: key};
 				element.groupid = key;
 				let has_row = this.checkConditionRow(element);
@@ -112,13 +112,18 @@
 					return;
 				}
 				else {
-					element.condition_name = getConditionName(input)
-					element.data = element.name
+					while (row_ids.some(id => id === `conditions_${input.row_index}`)) {
+						element.row_index++;
+						input.row_index++;
+					}
+
+					element.condition_name = getConditionName(input);
+					element.data = element.name;
 					element.conditiontype = input.type;
 					element.label = num2letter(element.row_index);
 					element.groupid = key;
 					input.row_index++;
-					const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
+					const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML);
 
 					document
 						.querySelector('#condition_table tbody')
@@ -130,13 +135,18 @@
 		else {
 			let has_row = this.checkConditionRow(input);
 			let template;
+			const result = [has_row.some(element => element === true)];
 
-			const result = [has_row.some(element => element === true)]
 			if (result[0] === true) {
 				return;
 			}
 			else {
+				while (row_ids.some(id => id === `conditions_${input.row_index}`)) {
+					input.row_index++;
+				}
+
 				input.label = num2letter(input.row_index);
+
 				switch (parseInt(input.type)) {
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG?>:
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG?>:
@@ -161,15 +171,15 @@
 						break;
 				}
 				input.condition_name = getConditionName(input)[0];
-				input.data = getConditionName(input)[1]
+				input.data = getConditionName(input)[1];
 				input.conditiontype = input.type;
 
 				document
 					.querySelector('#condition_table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(input))
+					.insertAdjacentHTML('beforeend', template.evaluate(input));
 
 				input.row_index++;
-				processTypeOfCalculation()
+				processTypeOfCalculation();
 			}
 		}
 	}
@@ -194,19 +204,19 @@
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE?> :
-						value = table_row.getElementsByTagName('input')[2].value
-						value2 = table_row.getElementsByTagName('input')[3].value
+						value = table_row.getElementsByTagName('input')[2].value;
+						value2 = table_row.getElementsByTagName('input')[3].value;
 						result.push(input.type === type && input.tag === value && input.value === value2);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?> :
-						value = table_row.getElementsByTagName('input')[2].value
-						value2 = table_row.getElementsByTagName('input')[3].value
+						value = table_row.getElementsByTagName('input')[2].value;
+						value2 = table_row.getElementsByTagName('input')[3].value;
 						result.push(input.type === type && input.oldtag === value && input.newtag === value2);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?> :
-						value = table_row.getElementsByTagName('input')[2].value
+						value = table_row.getElementsByTagName('input')[2].value;
 						result.push(input.type === type && input.groupid === value);
 						break;
 				}
@@ -274,7 +284,7 @@
 	jQuery(document).ready(function() {
 		document.addEventListener('condition.dialogue.submit', e => {
 			createRow(e.detail.inputs);
-		})
+		});
 
 		// Clone button.
 		jQuery('#clone').click(function() {
