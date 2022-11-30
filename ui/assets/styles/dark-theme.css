@@ -2909,13 +2909,13 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .zi-circle-check::after {
     position: absolute;
     top: 4px;
-    left: 0;
+    left: 3px;
     width: 27px;
     height: 25px;
     margin-top: 2px;
     margin-left: 11px;
     color: #ffffff;
-    font-size: 32px; }
+    font-size: 30px; }
 
 .msg-bad {
   border-color: #503434; }
