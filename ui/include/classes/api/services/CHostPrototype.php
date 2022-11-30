@@ -518,7 +518,9 @@ class CHostPrototype extends CHostBase {
 			$link_request['templates'] = array_column($host_prototype['templates'], 'templateid');
 			$link_request['host'] = $host_prototype['host'];
 
-			$this->checkedLinkedDiscoveryItemKeys($link_request);
+			if (count($link_request['templates']) > 1) {
+				$this->checkedLinkedDiscoveryRules($link_request);
+			}
 		}
 		unset($host_prototype);
 
@@ -781,7 +783,9 @@ class CHostPrototype extends CHostBase {
 			$link_request['templates'] = array_column($host_prototype['templates'], 'templateid');
 			$link_request['host'] = $host_prototype['host'];
 
-			$this->checkedLinkedDiscoveryItemKeys($link_request);
+			if (count($link_request['templates']) > 1) {
+				$this->checkedLinkedDiscoveryRules($link_request);
+			}
 
 			$upd_host_prototype = DB::getUpdatedValues('hosts', $host_prototype,
 				$db_host_prototypes[$host_prototype['hostid']]
@@ -1227,40 +1231,38 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException if there are matching item keys.
 	 */
-	private function checkedLinkedDiscoveryItemKeys(array $link_request): void {
-		$linked_discoveries = API::DiscoveryRule()->get([
-			'output' => ['name', 'key_'],
+	private function checkedLinkedDiscoveryRules(array $link_request): void {
+		$linked_discovery_rules = API::DiscoveryRule()->get([
+			'output' => ['key_'],
 			'templateids' => $link_request['templates'],
 			'selectItems' => ['key_']
 		]);
 
-		if ($linked_discoveries) {
-			$duplicate_lld_key = CArrayHelper::findDuplicate($linked_discoveries, 'key_');
+		if ($linked_discovery_rules) {
+			$duplicate_lld = CArrayHelper::findDuplicate($linked_discovery_rules, 'key_');
 
-			if ($duplicate_lld_key !== null) {
+			if ($duplicate_lld !== null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.',
-						$duplicate_lld_key['key_'], $link_request['host']
+						$duplicate_lld['key_'], $link_request['host']
 					)
 				);
 			}
 
 			$linked_item_prototypes = [];
 
-			foreach ($linked_discoveries as $linked_discovery) {
-				if (array_key_exists('items', $linked_discovery)) {
-					foreach ($linked_discovery['items'] as $item) {
-						$linked_item_prototypes[] = $item;
-					}
+			foreach ($linked_discovery_rules as $linked_discovery_rule) {
+				foreach ($linked_discovery_rule['items'] as $item) {
+					$linked_item_prototypes[] = $item;
 				}
 			}
 
-			$duplicate_item_prototype_key = CArrayHelper::findDuplicate($linked_item_prototypes, 'key_');
+			$duplicate_item_prototype = CArrayHelper::findDuplicate($linked_item_prototypes, 'key_');
 
-			if ($duplicate_item_prototype_key !== null) {
+			if ($duplicate_item_prototype !== null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item prototype "%1$s" already exists on "%2$s", inherited from another template.',
-						$duplicate_item_prototype_key['key_'], $link_request['host']
+						$duplicate_item_prototype['key_'], $link_request['host']
 					)
 				);
 			}
