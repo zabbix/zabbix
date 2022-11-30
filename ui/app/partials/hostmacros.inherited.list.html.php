@@ -58,10 +58,11 @@ else {
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly(
-			$data['readonly'] || !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
-			|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
-		);
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+			->setReadonly($data['readonly']
+				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
+			);
 
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
