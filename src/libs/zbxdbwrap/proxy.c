@@ -2225,9 +2225,6 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *                                                                            *
  * Purpose: process services discovered on IP address                         *
  *                                                                            *
- * Parameters: drule_ptr         - [IN] discovery rule structure              *
- *             ip_discovered_ptr - [IN] vector of ip addresses                *
- *                                                                            *
  ******************************************************************************/
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_events_funcs_t events_cbs,
 		zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num,
@@ -2400,6 +2397,7 @@ fail:
  * Purpose: parse discovery data contents and process it                      *
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with discovery data                *
+ *             events_cbs      - [IN]                                         *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -2885,12 +2883,12 @@ static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_sta
  *                                                                            *
  * Purpose: process 'proxy data' request                                      *
  *                                                                            *
- * Parameters: proxy        - [IN] the source proxy                           *
+ * Parameters: proxy        - [IN] source proxy                               *
  *             jp           - [IN] JSON with proxy data                       *
- *             proxy_hostid - [IN] proxy identifier from database             *
  *             ts           - [IN] timestamp when the proxy connection was    *
  *                                 established                                *
  *             proxy_status - [IN] active or passive proxy mode               *
+ *             events_cbs   - [IN]                                            *
  *             more         - [OUT] available data flag                       *
  *             error        - [OUT] address of a pointer to the info string   *
  *                                  (should be freed by the caller)           *

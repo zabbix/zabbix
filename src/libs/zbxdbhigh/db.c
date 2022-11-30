@@ -1550,8 +1550,6 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  * Purpose: register unknown host and generate event                          *
  *                                                                            *
- * Parameters: host - host name                                               *
- *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,

@@ -48,6 +48,7 @@ extern unsigned char	program_type;
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
+ *             events_cbs    - [IN]                                           *
  *                                                                            *
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
@@ -164,8 +165,9 @@ out:
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
- *             revision      - [OUT] host configuration revision              *
+ *             events_cbs    - [IN]                                           *
  *             hostid        - [OUT] host ID                                  *
+ *             revision      - [OUT] host configuration revision              *
  *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
@@ -248,8 +250,9 @@ out:
  *                                                                            *
  * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
- * Parameters: sock - open socket of server-agent connection                  *
- *             request - request buffer                                       *
+ * Parameters: sock       - open socket of server-agent connection            *
+ *             request    - request buffer                                    *
+ *             events_cbs - [IN]                                              *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
@@ -429,8 +432,9 @@ out:
  *                                                                            *
  * Purpose: send list of active checks to the host                            *
  *                                                                            *
- * Parameters: sock - open socket of server-agent connection                  *
- *             jp   - request buffer                                          *
+ * Parameters: sock         - open socket of server-agent connection          *
+ *             jp           - request buffer                                  *
+ *             events_cbs   - [IN]                                            *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *

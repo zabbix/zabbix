@@ -1547,8 +1547,9 @@ static void	DCsync_trends(void)
  * Purpose: 1) calculate changeset of trigger fields to be updated            *
  *          2) generate events                                                *
  *                                                                            *
- * Parameters: trigger - [IN] the trigger to process                          *
- *             diffs   - [OUT] the vector with trigger changes                *
+ * Parameters: trigger      - [IN] trigger to process                         *
+ *             add_event_cb - [IN]                                            *
+ *             diffs        - [OUT] vector with trigger changes               *
  *                                                                            *
  * Return value: SUCCEED - trigger processed successfully                     *
  *               FAIL    - no changes                                         *
@@ -1574,8 +1575,8 @@ static void	DCsync_trends(void)
  *        '-' - should never happen                                           *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs,
-		zbx_add_event_func_t add_event_cb)
+static int	process_trigger(struct _DC_TRIGGER *trigger, zbx_add_event_func_t add_event_cb,
+		zbx_vector_ptr_t *diffs)
 {
 	const char		*new_error;
 	int			new_state, new_value, ret = FAIL;
@@ -1660,7 +1661,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for zbx_process_triggers()                       *
+ * Comments: helper function for process_triggers()                       *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
@@ -1678,15 +1679,16 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
  *                                                                            *
- * Parameters: triggers     - [IN] the triggers to process                    *
- *             trigger_diff - [OUT] the trigger changeset                     *
+ * Parameters: triggers     - [IN] triggers to process                        *
+ *             add_event_cb - [IN]                                            *
+ *             trigger_diff - [OUT] trigger changeset                         *
  *                                                                            *
  * Comments: The trigger_diff changeset must be cleaned by the caller:        *
  *                zbx_vector_ptr_clear_ext(trigger_diff,                      *
  *                              (zbx_clean_func_t)zbx_trigger_diff_free);     *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_t add_event_cb,
+static void	process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_t add_event_cb,
 		zbx_vector_ptr_t *trigger_diff)
 {
 	int	i;
@@ -1699,7 +1701,7 @@ static void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_
 	zbx_vector_ptr_sort(triggers, zbx_trigger_topoindex_compare);
 
 	for (i = 0; i < triggers->values_num; i++)
-		zbx_process_trigger((struct _DC_TRIGGER *)triggers->values[i], trigger_diff, add_event_cb);
+		process_trigger((struct _DC_TRIGGER *)triggers->values[i], add_event_cb, trigger_diff);
 
 	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:
@@ -1716,7 +1718,8 @@ out:
  *                                      (used for item lookup)                *
  *             history_items     - [IN] the items                             *
  *             history_errcodes  - [IN] item error codes                      *
- *             timers            - [IN] the trigger timers                    *
+ *             timers            - [IN] trigger timers                        *
+ *             add_event_cb      - [IN]                                       *
  *             trigger_diff      - [OUT] trigger updates                      *
  *             itemids           - [OUT] the item identifiers                 *
  *                                      (used for item lookup)                *
@@ -1791,7 +1794,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	zbx_evaluate_expressions(trigger_order, history_itemids, history_items, history_errcodes);
-	zbx_process_triggers(trigger_order, add_event_cb, trigger_diff);
+	process_triggers(trigger_order, add_event_cb, trigger_diff);
 
 	DCfree_triggers(trigger_order);
 
@@ -2079,8 +2082,9 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, ZBX_DC_HIS
  *                                                                            *
  * Purpose: calculates what item fields must be updated                       *
  *                                                                            *
- * Parameters: item      - [IN] the item                                      *
- *             h         - [IN] the historical data to process                *
+ * Parameters: item         - [IN]     item                                   *
+ *             h            - [IN]     historical data to process             *
+ *             add_event_cb - [IN]                                            *
  *                                                                            *
  * Return value: The update data. This data must be freed by the caller.      *
  *                                                                            *
@@ -2795,18 +2799,19 @@ static void	DBmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  * Parameters: history             - [IN/OUT] array of history data           *
  *             itemids             - [IN] the item identifiers                *
  *                                        (used for item lookup)              *
- *             items               - [IN] the items                           *
+ *             items               - [IN]                                     *
  *             errcodes            - [IN] item error codes                    *
  *             history_num         - [IN] number of history structures        *
+ *             add_event_cb        - [IN]                                     *
  *             item_diff           - [OUT] the changes in item data           *
  *             inventory_values    - [OUT] the inventory values to add        *
  *             compression_age     - [IN] history compression age             *
- *             proxy_subscribtions - [IN] history compression age             *
+ *             proxy_subscriptions - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_item_t *items, const int *errcodes,
 		int history_num, zbx_add_event_func_t add_event_cb, zbx_vector_ptr_t *item_diff,
-		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscribtions)
+		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscriptions)
 {
 	static time_t	last_history_discard = 0;
 	time_t		now;
@@ -2891,7 +2896,7 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, zbx_history_sync_ite
 		{
 			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
 
-			zbx_vector_uint64_pair_append(proxy_subscribtions, p);
+			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
 	}
 
@@ -3235,9 +3240,10 @@ static void	sync_proxy_history(int *total_num, int *more)
  * Purpose: flush history cache to database, process triggers of flushed      *
  *          and timer triggers from timer queue                               *
  *                                                                            *
- * Parameters: sync_timeout - [IN] the timeout in seconds                     *
+ * Parameters:                                                                *
  *             values_num   - [IN/OUT] the number of synced values            *
  *             triggers_num - [IN/OUT] the number of processed timers         *
+ *             events_cbs   - [IN]                                            *
  *             more         - [OUT] a flag indicating the cache emptiness:    *
  *                               ZBX_SYNC_DONE - nothing to sync, go idle     *
  *                               ZBX_SYNC_MORE - more data to sync            *
@@ -3268,7 +3274,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	zbx_vector_uint64_t		triggerids ;
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers,
 					trigger_order;
-	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
+	zbx_vector_uint64_pair_t	trends_diff, proxy_subscriptions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
 	zbx_uint64_t			trigger_itemids[ZBX_HC_SYNC_MAX];
 	zbx_timespec_t			trigger_timespecs[ZBX_HC_SYNC_MAX];
@@ -3320,7 +3326,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
 	zbx_vector_uint64_pair_create(&trends_diff);
-	zbx_vector_uint64_pair_create(&proxy_subscribtions);
+	zbx_vector_uint64_pair_create(&proxy_subscriptions);
 
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, ZBX_HC_SYNC_MAX);
@@ -3390,7 +3396,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 
 			DCmass_prepare_history(history, items, errcodes, history_num,
 					events_cbs.add_event_cb, &item_diff,
-					&inventory_values, compression_age, &proxy_subscribtions);
+					&inventory_values, compression_age, &proxy_subscriptions);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
 			{
@@ -3517,11 +3523,11 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 			zbx_vector_ptr_clear(&trigger_timers);
 		}
 
-		if (0 != proxy_subscribtions.values_num)
+		if (0 != proxy_subscriptions.values_num)
 		{
-			zbx_vector_uint64_pair_sort(&proxy_subscribtions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_dc_proxy_update_nodata(&proxy_subscribtions);
-			zbx_vector_uint64_pair_clear(&proxy_subscribtions);
+			zbx_vector_uint64_pair_sort(&proxy_subscriptions, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_dc_proxy_update_nodata(&proxy_subscriptions);
+			zbx_vector_uint64_pair_clear(&proxy_subscriptions);
 		}
 
 		if (0 != history_num)
@@ -3626,7 +3632,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	zbx_vector_ptr_destroy(&item_diff);
 	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_uint64_pair_destroy(&trends_diff);
-	zbx_vector_uint64_pair_destroy(&proxy_subscribtions);
+	zbx_vector_uint64_pair_destroy(&proxy_subscriptions);
 
 	zbx_vector_ptr_destroy(&trigger_timers);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -3765,8 +3771,10 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                                                            *
  * Purpose: writes updates and new data from history cache to database        *
  *                                                                            *
- * Parameters: values_num - [OUT] the number of synced values                  *
- *             more      - [OUT] a flag indicating the cache emptiness:       *
+ * Parameters:                                                                *
+ *             events_cbs - [IN]                                              *
+ *             values_num - [OUT] the number of synced values                 *
+ *             more       - [OUT] a flag indicating the cache emptiness:      *
  *                                ZBX_SYNC_DONE - nothing to sync, go idle    *
  *                                ZBX_SYNC_MORE - more data to sync           *
  *                                                                            *
