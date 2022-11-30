@@ -18,8 +18,8 @@
 **/
 
 #include "zbxserver.h"
-
 #include "active.h"
+
 #include "../events/events.h"
 
 #include "log.h"

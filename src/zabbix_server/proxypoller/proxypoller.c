@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "proxypoller.h"
 #include "zbxserver.h"
+#include "proxypoller.h"
 #include "zbxdbwrap.h"
 
 #include "../events/events.h"

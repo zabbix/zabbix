@@ -20,7 +20,6 @@
 #include "zbxdiscovery.h"
 
 #include "log.h"
-//#include "zbxevents.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 
@@ -439,8 +438,8 @@ static void	discovery_update_host_status(ZBX_DB_DHOST *dhost, int status, int no
 			if (NULL != add_event_cb)
 			{
 				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL,
-						NULL);
+						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
+						NULL, NULL, NULL);
 			}
 		}
 	}
@@ -474,8 +473,6 @@ static void	discovery_update_host_status(ZBX_DB_DHOST *dhost, int status, int no
  *                                                                            *
  * Purpose: process new host status                                           *
  *                                                                            *
- * Parameters: host - host info                                               *
- *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now, zbx_add_event_func_t add_event_cb)
 {
@@ -490,8 +487,6 @@ void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now, zbx_add
 /******************************************************************************
  *                                                                            *
  * Purpose: process new service status                                        *
- *                                                                            *
- * Parameters: service - service info                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,

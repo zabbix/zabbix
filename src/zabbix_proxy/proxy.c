@@ -1271,7 +1271,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, events_cbs};
 	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock, events_cbs};
 
-
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",

@@ -4898,10 +4898,6 @@ static void	DCsync_all(zbx_events_funcs_t events_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	//sync_history_cache_full(add_event_cb, process_event_cb, reset_event_recovery_cb,
-	//		clean_events_cb, events_update_itservices_cb, export_events_cb);
-
-
 	sync_history_cache_full(events_cbs);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -4921,9 +4917,7 @@ void	free_database_cache(int sync, zbx_events_funcs_t events_cbs)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-	{
 		DCsync_all(events_cbs);
-	}
 
 	cache = NULL;
 

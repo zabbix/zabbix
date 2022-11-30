@@ -2379,11 +2379,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, NULL);
+				service->status, service->value, service->itemtime, events_cbs.add_event_cb);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
-	zbx_discovery_update_host(&dhost, service->status, service->itemtime, NULL);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime, events_cbs.add_event_cb);
 
 	ret = SUCCEED;
 fail:
