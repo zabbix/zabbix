@@ -261,7 +261,7 @@ static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, s
 	const char	*start = data;
 	char		*type = NULL;
 
-	if ('\0' == *data)
+	if (NULL == data || '\0' == *data)
 		return FAIL;
 
 	if (0 == (len = preproc_snmp_pair_parse_oid(data, p)))
@@ -422,8 +422,26 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 {
 	int			ret;
 	zbx_snmp_value_pair_t	*pair_cached, pair_local;
+#ifdef HAVE_NETSNMP
+	char			buffer[MAX_OID_LEN];
+	const char		*oid_tr;
+	oid			oid[MAX_OID_LEN];
+	size_t			oid_len = MAX_OID_LEN;
 
+	netsnmp_init_mib();
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
+	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
+
+	if (0 != get_node(oid_needle, oid, &oid_len))
+	{
+		snprint_objid(buffer, sizeof(buffer), oid, oid_len);
+		pair_local.oid = buffer;
+	}
+	else
+		pair_local.oid = (char *)oid_needle;
+#else
 	pair_local.oid = (char *)oid_needle;
+#endif
 
 	if (NULL == (pair_cached = (zbx_snmp_value_pair_t *)zbx_hashset_search(&cache->pairs, &pair_local)))
 	{
@@ -448,15 +466,18 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache)
 
 	while (NULL != (pair = (zbx_snmp_value_pair_t *)zbx_hashset_iter_next(&iter)))
 	{
-		snmp_value_pair_free(pair);
+		zbx_free(pair->oid);
+		zbx_free(pair->value);
 	}
 
-	zbx_hashset_clear(&cache->pairs);
 	zbx_hashset_destroy(&cache->pairs);
 }
 
 int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, char **error)
 {
+	zbx_hashset_create(&cache->pairs, 100, snmp_value_pair_hash_func,
+			snmp_value_pair_compare_func);
+
 	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, 0, error))
 		return FAIL;
 
@@ -520,10 +541,10 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)zbx_preproc_cache_get(cache,
 				ZBX_PREPROC_SNMP_WALK_TO_VALUE)))
 		{
-			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
+
+			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
 
 			if (SUCCEED != zbx_snmp_value_cache_init(snmp_cache, value->data.str, &err))
 			{
@@ -545,7 +566,7 @@ out:
 	}
 
 	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
+	zbx_variant_set_str(value, zbx_strdup(NULL, value_out));
 
 	return SUCCEED;
 }
@@ -650,7 +671,7 @@ out:
 	if (SUCCEED == ret)
 	{
 		zbx_variant_clear(value);
-		zbx_variant_set_str(value, result);
+		zbx_variant_set_str(value, zbx_strdup(NULL, result));
 	}
 
 	return ret;
