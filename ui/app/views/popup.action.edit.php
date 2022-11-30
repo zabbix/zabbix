@@ -163,8 +163,10 @@ $action_tab
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),
-		new CFormField((new CCheckBox('status', ACTION_STATUS_ENABLED))
-			->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED))
+		new CFormField(
+			(new CCheckBox('status', ACTION_STATUS_ENABLED))
+				->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
+		)
 	])
 	->addItem(
 		new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())

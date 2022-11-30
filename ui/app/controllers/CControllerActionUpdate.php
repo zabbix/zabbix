@@ -135,7 +135,6 @@ class CControllerActionUpdate extends CController {
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
-
 				if ($operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
 						&& !array_key_exists('opmessage', $operation)) {
 					$operation['opmessage']['default_msg'] = 1;
@@ -232,10 +231,8 @@ class CControllerActionUpdate extends CController {
 						$operation['opcommand_hst'] = [];
 					}
 				}
-				unset(
-					$operation['operationid'], $operation['actionid'], $operation['eventsource'],
-					$operation['recovery'], $operation['id']
-				);
+
+				unset($operation['eventsource'], $operation['recovery']);
 			}
 			unset($operation);
 		}
@@ -261,6 +258,8 @@ class CControllerActionUpdate extends CController {
 		}
 
 		$result = API::Action()->update($action);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Action updated');

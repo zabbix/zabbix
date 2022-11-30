@@ -58,8 +58,7 @@ class CControllerPopupActionEdit extends CController {
 				break;
 
 			case EVENT_SOURCE_SERVICE:
-				$has_permission =
-					$this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 				break;
 		}
 

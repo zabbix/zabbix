@@ -21,17 +21,16 @@
 
 /**
  * @var CPartial $this
- * @var array $data
+ * @var array    $data
  */
 
-$operations = $data['action']['update_operations'];
 $operations_table = (new CTable())
 	->setId('upd-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Details'), _('Action')]);
 
 $i = 0;
-foreach ($operations as $operationid => $operation) {
+foreach ($data['action']['update_operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
 		continue;
 	}
@@ -90,7 +89,7 @@ foreach ($operations as $operationid => $operation) {
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], null, 'update_operations_'.$i)->addClass(ZBX_STYLE_WORDBREAK);
 
-	$i ++;
+	$i++;
 }
 
 $operations_table->addItem(

@@ -192,7 +192,7 @@ window.action_edit_popup = new class {
 			actionid: this.actionid,
 			data: operation_data.data,
 			row_index: row_index
-		}
+		};
 
 		const overlay = PopUp('popup.action.operation.edit', this.parameters, {
 			dialogueid: 'operations',
@@ -265,7 +265,7 @@ window.action_edit_popup = new class {
 						this.condition_operators[element.operator] + ' ';
 					element.data = element.name;
 					element.label = num2letter(element.row_index);
-					input.row_index ++;
+					input.row_index++;
 					template = new Template(document.getElementById('condition-row-tmpl').innerHTML)
 
 					document
@@ -345,7 +345,7 @@ window.action_edit_popup = new class {
 				}
 
 				if (input.row_index == element.dataset.row_index) {
-					input.row_index ++;
+					input.row_index++;
 				}
 			}
 

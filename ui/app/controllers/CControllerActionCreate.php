@@ -132,7 +132,6 @@ class CControllerActionCreate extends CController {
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
-
 				switch ($operation_group) {
 					case 'operations':
 						if ($eventsource == EVENT_SOURCE_TRIGGERS) {
@@ -160,6 +159,7 @@ class CControllerActionCreate extends CController {
 						if (array_key_exists('evaltype', $operation)) {
 							unset($operation['evaltype']);
 						}
+
 						if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
 							unset($operation['opmessage']['mediatypeid']);
 						}
@@ -224,10 +224,9 @@ class CControllerActionCreate extends CController {
 					}
 				}
 
-				unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
-					$operation['id']
-				);
+				unset($operation['eventsource'], $operation['recovery']);
 			}
+
 			unset($operation);
 		}
 
@@ -244,16 +243,17 @@ class CControllerActionCreate extends CController {
 		switch ($eventsource) {
 			case EVENT_SOURCE_DISCOVERY:
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				unset($action['recovery_operations'], $action['update_operations']);
-				break;
+				unset($action['recovery_operations']);
+				// break; is not missing here
 
 			case EVENT_SOURCE_INTERNAL:
-				unset($action['update_operations']);
 				unset($action['update_operations']);
 				break;
 		}
 
 		$result = API::Action()->create($action);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Action added');

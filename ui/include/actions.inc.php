@@ -381,31 +381,30 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 /**
  * Gathers operation data and processes it based on operation type.
  *
- * @param array $operations   Array of operations.
+ * @param array $operations  Array of operations.
  *
- * @return array  Returns an array of processed data
+ * @return array  Returns an array of processed data.
  */
-function getActionOperationData(array $operations) {
+function getActionOperationData(array $operations): array {
+	$result = [];
 	$data = [];
 
 	foreach ($operations as $operation) {
 		switch ($operation['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				$mediatypeid = $operation['opmessage']['mediatypeid'];
-
-				if ($mediatypeid != 0) {
-					$data['mediatypeids'][$mediatypeid] = $mediatypeid;
+				if ($operation['opmessage']['mediatypeid'] != 0) {
+					$data['mediatypeids'][$operation['opmessage']['mediatypeid']] = true;
 				}
 
 				if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
 					foreach ($operation['opmessage_usr'] as $users) {
-						$data['userids'][$users['userid']] = $users['userid'];
+						$data['userids'][$users['userid']] = true;
 					}
 				}
 
 				if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
 					foreach ($operation['opmessage_grp'] as $user_groups) {
-						$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+						$data['usrgrpids'][$user_groups['usrgrpid']] = true;
 					}
 				}
 				break;
@@ -414,7 +413,7 @@ function getActionOperationData(array $operations) {
 				if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 					foreach ($operation['opcommand_hst'] as $host) {
 						if ($host['hostid'] != 0) {
-							$data['hostids'][$host['hostid']] = $host['hostid'];
+							$data['hostids'][$host['hostid']] = true;
 						}
 					}
 				}
@@ -444,7 +443,6 @@ function getActionOperationData(array $operations) {
 		}
 	}
 
-	$result = [];
 	if (array_key_exists('mediatypeids', $data)) {
 		$result['mediatypes'] = API::Mediatype()->get([
 			'output' => ['name'],
@@ -464,13 +462,12 @@ function getActionOperationData(array $operations) {
 		}
 	}
 
-	if (array_key_exists('usr_grpids', $data)) {
+	if (array_key_exists('usrgrpids', $data)) {
 		$result['user_groups'] = API::UserGroup()->get([
 			'output' => ['name'],
-			'usrgrpids' => array_keys($data['usr_grpids']),
+			'usrgrpids' => array_keys($data['usrgrpids']),
 			'preservekeys' => true
 		]);
-
 	}
 
 	if (array_key_exists('hostids', $data)) {
@@ -522,12 +519,12 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 	$result = [];
 
 	$mediatypes = array_key_exists('mediatypes', $operation_values) ? $operation_values['mediatypes'] : [];
+	$users = array_key_exists('users', $operation_values) ? $operation_values['users'] : [];
 	$user_groups = array_key_exists('user_groups', $operation_values) ? $operation_values['user_groups'] : [];
 	$hosts = array_key_exists('hosts', $operation_values) ? $operation_values['hosts'] : [];
 	$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
 	$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
 	$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
-	$users = array_key_exists('users', $operation_values) ? $operation_values['users'] : [];
 
 	foreach ($operations as $i => $operation) {
 		switch ($operation['operationtype']) {
@@ -558,9 +555,9 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 				if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
 					$user_groups_list = [];
 
-					foreach ($operation['opmessage_grp'] as $userGroup) {
-						if (array_key_exists($userGroup['usrgrpid'], $user_groups)) {
-							$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
+					foreach ($operation['opmessage_grp'] as $user_group) {
+						if (array_key_exists($user_group['usrgrpid'], $user_groups)) {
+							$user_groups_list[] = $user_groups[$user_group['usrgrpid']]['name'];
 						}
 					}
 

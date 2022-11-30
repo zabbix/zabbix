@@ -117,7 +117,7 @@
 					element.conditiontype = input.type;
 					element.label = num2letter(element.row_index);
 					element.groupid = key;
-					input.row_index ++;
+					input.row_index++;
 					const template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
 
 					document
@@ -212,7 +212,7 @@
 				}
 
 				if (input.row_index == element.dataset.row_index) {
-					input.row_index ++;
+					input.row_index++;
 				}
 			}
 

@@ -71,8 +71,10 @@
 				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
 				}
+
 				location.href = location.href;
 			});
+
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows('action_' + this.eventsource);
 

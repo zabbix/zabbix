@@ -21,23 +21,24 @@
 
 /**
  * @var CPartial $this
- * @var array $data
+ * @var array    $data
  */
 
 $operations_table = (new CTable())
 	->setId('rec-table')
-	->setAttribute('style', 'width: 100%;');
-
-$operations_table->setHeader([_('Details'), _('Action')]);
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Details'), _('Action')]);
 
 $i = 0;
 foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
 		continue;
 	}
+
 	if (!isset($operation['opconditions'])) {
 		$operation['opconditions'] = [];
 	}
+
 	if (!array_key_exists('opmessage', $operation)) {
 		$operation['opmessage'] = [];
 	}
@@ -70,7 +71,7 @@ foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 		return !in_array($key, [
 			'row_index', 'duration', 'steps', 'details'
 		]);
-	}, ARRAY_FILTER_USE_KEY );
+	}, ARRAY_FILTER_USE_KEY);
 
 	$operations_table->addRow([
 		$details_column,
@@ -100,7 +101,7 @@ foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], null, 'recovery_operations_'.$i)->addClass(ZBX_STYLE_WORDBREAK);
 
-	$i ++;
+	$i++;
 }
 
 $operations_table->addItem(
@@ -119,4 +120,5 @@ $operations_table->addItem(
 			))->setColSpan(4)
 		)
 );
+
 $operations_table->show();

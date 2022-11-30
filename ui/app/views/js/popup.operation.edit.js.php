@@ -427,7 +427,7 @@ window.operation_popup = new class {
 				result.push(input.conditiontype === conditiontype && input.value === value);
 
 				if (input.row_index == element.dataset.id) {
-					input.row_index ++;
+					input.row_index++;
 				}
 			}
 

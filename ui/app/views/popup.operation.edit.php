@@ -34,7 +34,8 @@ $form = (new CForm())
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
-$operationtype_value = $operation['opcommand']['scriptid'] !== '0'
+
+$operationtype_value = $operation['opcommand']['scriptid'] != 0
 	? 'scriptid['.$operation['opcommand']['scriptid'].']'
 	: 'cmd['. $operation['operationtype'].']';
 
@@ -374,8 +375,7 @@ $form_grid->addItem([
 	(new CFormField([
 		$select_operation_evaltype,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())
-			->setId('operation-condition-evaltype-formula'),
+		(new CSpan())->setId('operation-condition-evaltype-formula'),
 	]))->setId('operation-condition-row')
 ]);
 

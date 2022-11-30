@@ -21,7 +21,7 @@
 
 /**
  * @var CPartial $this
- * @var array $data
+ * @var array    $data
  */
 
 $operations_table = (new CTable())
@@ -55,17 +55,16 @@ foreach ($data['action']['operations'] as $operation) {
 		}
 
 		// display N-N as N
-		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to']
-				|| $operation['esc_step_to'] == 0)
+		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'] || $operation['esc_step_to'] == 0)
 			? $operation['esc_step_from']
 			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
 		$esc_period_txt = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS
-			&& timeUnitToSeconds($operation['esc_period']) == 0)
+				&& timeUnitToSeconds($operation['esc_period']) == 0)
 			? _('Default')
 			: $operation['esc_period'];
 
-		$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
+		$esc_delay_txt = $delays[$operation['esc_step_from']] === null
 			? _('Unknown')
 			: ($delays[$operation['esc_step_from']] != 0
 				? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
@@ -86,31 +85,30 @@ foreach ($data['action']['operations'] as $operation) {
 		return !in_array($key, [
 			'row_index', 'duration', 'steps', 'details'
 		]);
-	}, ARRAY_FILTER_USE_KEY );
+	}, ARRAY_FILTER_USE_KEY);
 
-	$buttons =
-		(new CHorList([
-			(new CSimpleButton(_('Edit')))
+	$buttons = (new CHorList([
+		(new CSimpleButton(_('Edit')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('js-edit-operation')
+			->setAttribute('data-operation', json_encode([
+				'operationid' => $i,
+				'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
+				'eventsource' => $data['eventsource'],
+				'operationtype' => $operation['operationtype'],
+				'data' => $operation
+			])),
+		[
+			(new CButton('remove', _('Remove')))
+				->setAttribute('data-operationid', $i)
+				->addClass('js-remove')
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-edit-operation')
-				->setAttribute('data-operation', json_encode([
-					'operationid' => $i,
-					'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
-					'eventsource' => $data['eventsource'],
-					'operationtype' => $operation['operationtype'],
-					'data' => $operation
-				])),
-			[
-				(new CButton('remove', _('Remove')))
-					->setAttribute('data-operationid', $i)
-					->addClass('js-remove')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->removeId(),
-				new CVar('operations['.$i.']', $hidden_data)
-			]
-		]))
-			->setName('button-list')
-			->addClass(ZBX_STYLE_NOWRAP);
+				->removeId(),
+			new CVar('operations['.$i.']', $hidden_data)
+		]
+	]))
+		->setName('button-list')
+		->addClass(ZBX_STYLE_NOWRAP);
 
 	if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 		$operations_table->addRow([
@@ -128,7 +126,7 @@ foreach ($data['action']['operations'] as $operation) {
 		], null, 'operations_'.$i)->addClass(ZBX_STYLE_WORDBREAK);
 	}
 
-	$i ++;
+	$i++;
 }
 
 $operations_table->addItem(

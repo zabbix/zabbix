@@ -38,7 +38,7 @@ $form = (new CForm())
 if ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION) {
 	$form->addVar('source', $data['eventsource']);
 }
-else if ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION) {
+elseif ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION) {
 	$form->addVar('source', $data['source']);
 }
 
@@ -556,7 +556,7 @@ switch ($data['type']) {
 					(new CButton('btn1', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->onClick(
-							'return PopUp("popup.generic", '. json_encode([
+							'return PopUp("popup.generic", '.json_encode([
 								'srctbl' => 'dchecks',
 								'srcfld1' => 'dcheckid',
 								'srcfld2' => 'name',
@@ -564,7 +564,7 @@ switch ($data['type']) {
 								'dstfld1' => 'dcheck_new_condition_value',
 								'dstfld2' => 'dcheck',
 								'writeonly' => '1'
-							], JSON_THROW_ON_ERROR) .', {dialogue_class: "modal-popup-generic"});'
+							], JSON_THROW_ON_ERROR).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
 
@@ -888,7 +888,7 @@ switch ($data['type']) {
 		break;
 
 	case ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION:
-		require_once __DIR__ .'/../../include/actions.inc.php';
+		require_once __DIR__.'/../../include/actions.inc.php';
 
 		// Collect all options for select.
 		$condition_options = [];
