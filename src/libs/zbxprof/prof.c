@@ -131,6 +131,7 @@ static void	zbx_print_prof(void)
 		size_t			str_offset = 0;
 		double			total_wait_lock = 0, total_busy_lock = 0;
 		double			total_mutex_wait_lock = 0, total_mutex_busy_lock = 0;
+		unsigned int		total_locked_mutex = 0, total_locked_rwlock = 0;
 
 		for (i = 0; i < zbx_func_profiles.values_num; i++)
 		{
@@ -155,11 +156,13 @@ static void	zbx_print_prof(void)
 				{
 					total_wait_lock += func_profile->sec_wait;
 					total_busy_lock += func_profile->sec - func_profile->sec_wait;
+					total_locked_rwlock += func_profile->locked;
 				}
 				else
 				{
 					total_mutex_wait_lock += func_profile->sec_wait;
 					total_mutex_busy_lock += func_profile->sec - func_profile->sec_wait;
+					total_locked_mutex += func_profile->locked;
 				}
 			}
 		}
@@ -168,15 +171,28 @@ static void	zbx_print_prof(void)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "Profiling information:\n%s", str);
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "mutexes and rwlocks : holding:" ZBX_FS_DBL " sec"
-					" waiting:" ZBX_FS_DBL " sec", total_busy_lock + total_mutex_busy_lock,
-					total_wait_lock + total_mutex_wait_lock);
+			if (ZBX_PROF_ALL == zbx_prof_scope)
+			{
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "rwlocks : holding:" ZBX_FS_DBL " sec"
-					" waiting:" ZBX_FS_DBL " sec", total_busy_lock, total_wait_lock);
+				zabbix_log(LOG_LEVEL_INFORMATION, "mutexes and rwlocks : locked:%d holding:"
+						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec",
+						total_locked_rwlock + total_locked_mutex,
+						total_busy_lock + total_mutex_busy_lock,
+						total_wait_lock + total_mutex_wait_lock);
+			}
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "mutexes : holding:" ZBX_FS_DBL " sec"
-					" waiting:" ZBX_FS_DBL " sec", total_mutex_busy_lock, total_mutex_wait_lock);
+			if (0 != (ZBX_PROF_RWLOCK & zbx_prof_scope))
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "rwlocks : locked:%d holding:" ZBX_FS_DBL " sec"
+						" waiting:" ZBX_FS_DBL " sec", total_locked_rwlock, total_busy_lock,
+						total_wait_lock);
+			}
+			if (0 != (ZBX_PROF_MUTEX & zbx_prof_scope))
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "mutexes : locked:%d holding:" ZBX_FS_DBL " sec"
+						" waiting:" ZBX_FS_DBL " sec", total_locked_mutex,
+						total_mutex_busy_lock, total_mutex_wait_lock);
+			}
 		}
 	}
 }
