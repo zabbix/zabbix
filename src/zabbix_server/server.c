@@ -1059,8 +1059,6 @@ static void	zbx_on_exit(int ret)
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		DBconnect(ZBX_DB_CONNECT_EXIT);
-//		free_database_cache(ZBX_SYNC_ALL, zbx_add_event, zbx_process_event, zbx_reset_event_recovery,
-//				zbx_clean_events, zbx_events_update_itservices, zbx_export_events);
 
 		zbx_events_funcs_t events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
 				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
@@ -1671,13 +1669,9 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_selfmon_collector();
 	free_configuration_cache();
 
-
 	zbx_events_funcs_t events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
 				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
-//	free_database_cache(ZBX_SYNC_NONE, zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-//			zbx_clean_events, zbx_events_update_itservices, zbx_export_events);
 	free_database_cache(ZBX_SYNC_NONE, events_cbs);
-
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
