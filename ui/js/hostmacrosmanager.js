@@ -174,7 +174,7 @@ class HostMacrosManager {
 					$('#macros_'+macro_num+'_value')
 						.prop('disabled', false)
 						.prop('readonly', false)
-						.attr({'placeholder': 'value'})
+						.attr({'placeholder': t('value')})
 						.val('')
 						.focus();
 					$('#macros_'+macro_num+'_description').prop('readonly', false);
