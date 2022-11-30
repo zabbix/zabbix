@@ -807,17 +807,33 @@ abstract class CItemGeneral extends CApiService {
 		// Check if duplicates do not exist among inherited template item keys.
 		if ($hostids === null) {
 			$duplicate_item = CArrayHelper::findDuplicate($tpl_items, 'key_', 'hostid');
-			$host = $duplicate_item;
+			if ($duplicate_item) {
+				$host = API::Host()->get([
+					'output' => ['host'],
+					'hostids' => $duplicate_item['hostid']
+				]);
+
+				if (!$host) {
+					$host = API::Template()->get([
+						'output' => ['host'],
+						'templateids' => $duplicate_item['hostid']
+					]);
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params(
+					$this->getErrorMsg(self::ERROR_EXISTS), [$duplicate_item['key_'], $host[0]['host']]
+				));
+			}
 		}
 		else {
 			$duplicate_item = CArrayHelper::findDuplicate($tpl_items, 'key_');
-			$host = reset($chd_hosts);
-		}
+			if ($duplicate_item !== null) {
+				$host = reset($chd_hosts);
 
-		if ($duplicate_item !== null) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-				$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$duplicate_item['key_'], $host['host']]
-			));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params(
+					$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$duplicate_item['key_'], $host['host']]
+				));
+			}
 		}
 
 		$chd_items_tpl = [];
