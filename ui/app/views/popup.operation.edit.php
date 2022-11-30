@@ -157,7 +157,7 @@ $form_grid->addItem([
 array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
 
 $mediatypes = [];
-foreach($data['mediatype_options'] as $mediatype) {
+foreach ($data['mediatype_options'] as $mediatype) {
 	$mediatypes[] = (new CSelectOption($mediatype['mediatypeid'], $mediatype['name']))
 		->addClass($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED ? ZBX_STYLE_RED : null);
 }

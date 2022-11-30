@@ -66,12 +66,12 @@ class CControllerPopupActionEdit extends CController {
 			return false;
 		}
 
-		$operation_output = [
-			'operationtype', 'opcommand', 'opcommand_grp', 'opcommand_hst', 'opmessage', 'opmessage_usr',
-			'opmessage_grp'
-		];
-
 		if ($this->hasInput('actionid')) {
+			$operation_output = [
+				'operationtype', 'opcommand', 'opcommand_grp', 'opcommand_hst', 'opmessage', 'opmessage_usr',
+				'opmessage_grp'
+			];
+
 			$this->action = API::Action()->get([
 				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed',
 					'notify_if_canceled'
@@ -89,6 +89,7 @@ class CControllerPopupActionEdit extends CController {
 			if (!$this->action) {
 				return false;
 			}
+
 			$this->action = $this->action[0];
 		}
 		else {
@@ -162,7 +163,6 @@ class CControllerPopupActionEdit extends CController {
 				$operation['recovery'] = ACTION_UPDATE_OPERATION;
 				$data['descriptions']['update'] = getActionOperationData($data['action']['update_operations']);
 			}
-
 			unset($operation);
 		}
 		else {

@@ -226,7 +226,6 @@ class CControllerActionCreate extends CController {
 
 				unset($operation['eventsource'], $operation['recovery']);
 			}
-
 			unset($operation);
 		}
 
