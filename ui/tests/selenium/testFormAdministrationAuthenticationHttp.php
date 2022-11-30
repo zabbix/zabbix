@@ -32,6 +32,76 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_USER		= 2;
 	const LOGIN_HTTP		= 3;
 
+	public function testFormAdministrationAuthenticationHttp_Layout() {
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('name:form_auth')->asForm()->one();
+		$form->selectTab('HTTP settings');
+
+		// Check default values.
+		$default_values = [
+			'Enable HTTP authentication' => false,
+			'Default login form' => 'Zabbix login form',
+			'Remove domain name' => '',
+			'Case-sensitive login' => true
+		];
+
+		foreach ($default_values as $field => $value) {
+			$this->assertEquals($value, $form->getField($field)->getValue());
+		}
+
+		// Check disabled fields.
+		$fields = ['Default login form', 'Remove domain name', 'Case-sensitive login'];
+		foreach ($fields as $field) {
+			$this->assertTrue($form->getField($field)->isEnabled(false));
+		}
+
+		// Check dropdown options.
+		$this->assertEquals(['Zabbix login form', 'HTTP login form'], $form->getField('name:http_login_form')
+				->asDropdown()->getOptions()->asText());
+
+		// Check input field maxlength.
+		$this->assertEquals('2048', $form->getField('name:http_strip_domains')->getAttribute('maxlength'));
+
+		// Check hintbox.
+		$form->query('xpath://label[@for="http_auth_enabled"]//a[@role="button"]')->one()->click();
+		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+		$hint = 'If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
+			' will be authenticated by the web server, not by Zabbix.';
+		$this->assertEquals($hint, $hintbox->one()->getText());
+
+		// Close the hintbox.
+		$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+
+		// Check confirmation popup.
+		$confirmation_message = 'Enable HTTP authentication for all users.';
+		foreach (['button:Cancel', 'class:overlay-close-btn', 'button:Ok'] as $button) {
+			$form->fill(['Enable HTTP authentication' => true]);
+			$dialog = COverlayDialogElement::find()->one();
+			$this->assertEquals('Confirm changes', $dialog->getTitle());
+			$this->assertEquals($confirmation_message, $dialog->query('class:overlay-dialogue-body')->waitUntilReady()->one()->getText());
+			$this->assertTrue($dialog->query($button)->one()->isVisible());
+			$dialog->query($button)->one()->click();
+			COverlayDialogElement::ensureNotPresent();
+
+			if ($button === 'button:Ok') {
+				// Check enabled fields and checkbox.
+				foreach ($fields as $field) {
+					$this->assertTrue($form->getField($field)->isEnabled());
+				}
+
+				$this->assertEquals(true, $form->getField('Enable HTTP authentication')->getValue());
+			}
+			else {
+				// Check disabled fields and checkbox.
+				foreach ($fields as $field) {
+					$this->assertTrue($form->getField($field)->isEnabled(false));
+				}
+
+				$this->assertEquals(false, $form->getField('Enable HTTP authentication')->getValue());
+			}
+		}
+	}
+
 	public function getHttpData() {
 		return [
 			// HTTP authentication disabled, default zabbix login form.
@@ -622,7 +692,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$form->submit();
 
 		// Check DB configuration.
-		$defautl_values = [
+		$default_values = [
 			'authentication_type' => '0',
 			'ldap_host' => '',
 			'ldap_port' => '389',
@@ -638,7 +708,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 				'http_strip_domains,http_case_sensitive'.
 				' FROM config';
 		$result = CDBHelper::getRow($sql);
-		$this->assertEquals(array_merge($defautl_values, $data['db_check']), $result);
+		$this->assertEquals(array_merge($default_values, $data['db_check']), $result);
 
 		$this->page->logout();
 	}

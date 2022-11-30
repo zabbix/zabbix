@@ -690,7 +690,7 @@ class testFormTabIndicators extends CWebTest {
 			$this->assertTabIndicator($tab_selector, $old_value);
 
 			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
-				$this->query('id:http_auth_enabled')->one()->click();
+				$form->fill(['Enable HTTP authentication' => true]);
 				$this->query('button:Ok')->one()->click();
 			}
 
