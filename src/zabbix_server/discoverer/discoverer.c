@@ -607,7 +607,7 @@ static void	process_rule(ZBX_DB_DRULE *drule)
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				zbx_discovery_update_host(&dhost, host_status, now);
+				zbx_discovery_update_host(&dhost, host_status, now, zbx_add_event);
 				zbx_process_events(NULL, NULL);
 				zbx_clean_events();
 			}

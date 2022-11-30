@@ -578,7 +578,7 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
 /* events callbacks */
-typedef ZBX_DB_EVENT	(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+typedef ZBX_DB_EVENT	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,

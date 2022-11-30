@@ -2714,7 +2714,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		DBeegister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
 				itemtime);
 	}
 

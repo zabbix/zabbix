@@ -20,9 +20,9 @@
 #include "events.h"
 #include "zbxserver.h"
 
-#include "db_lengths.h"
+#include "../db_lengths.h"
+#include "../actions.h"
 #include "log.h"
-#include "actions.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"

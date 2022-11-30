@@ -62,6 +62,7 @@ zabbix_server_LDADD = \
 	diag/libzbxdiag_server.a \
 	alerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
+	events/libzbxevents.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
@@ -103,7 +104,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
-	$(top_builddir)/src/libs/zbxevents/libzbxevents.a \
 	preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
