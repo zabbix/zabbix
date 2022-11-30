@@ -1,7 +1,7 @@
+#include "zbxprof.h"
 #include "zbxalgo.h"
 #include "log.h"
 #include "zbxtime.h"
-#include "zbxprof.h"
 
 #define PROF_LEVEL_MAX	10
 
