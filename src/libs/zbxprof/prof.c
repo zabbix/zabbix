@@ -174,7 +174,7 @@ static void	zbx_print_prof(void)
 			if (ZBX_PROF_ALL == zbx_prof_scope)
 			{
 
-				zabbix_log(LOG_LEVEL_INFORMATION, "mutexes and rwlocks : locked:%d holding:"
+				zabbix_log(LOG_LEVEL_INFORMATION, "locks : locked:%d holding:"
 						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec",
 						total_locked_rwlock + total_locked_mutex,
 						total_busy_lock + total_mutex_busy_lock,
