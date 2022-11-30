@@ -1278,7 +1278,6 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int				task_data_type;
 		zbx_proxy_compatibility_t	compatibility;
 
 		ZBX_STR2UINT64(taskid, row[0]);
