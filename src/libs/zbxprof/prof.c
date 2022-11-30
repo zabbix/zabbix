@@ -142,15 +142,16 @@ static void	zbx_print_prof(void)
 
 			if (ZBX_PROF_PROCESSING == func_profile->scope)
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() processing : busy:" ZBX_FS_DBL
-						" sec\n", func_profile->func_name, func_profile->sec);
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\n%s() processing : busy:" ZBX_FS_DBL
+						" sec", func_profile->func_name, func_profile->sec);
 			}
 			else
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() %s : locked:%u holding:"
-						ZBX_FS_DBL " sec waiting:"ZBX_FS_DBL " sec\n", func_profile->func_name,
-						get_scope_string(func_profile->scope), func_profile->locked,
-						func_profile->sec - func_profile->sec_wait, func_profile->sec_wait);
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\n%s() %s : locked:%u holding:"
+						ZBX_FS_DBL " sec waiting:"ZBX_FS_DBL " sec",
+						func_profile->func_name, get_scope_string(func_profile->scope),
+						func_profile->locked, func_profile->sec - func_profile->sec_wait,
+						func_profile->sec_wait);
 
 				if (ZBX_PROF_RWLOCK == func_profile->scope)
 				{
@@ -169,12 +170,9 @@ static void	zbx_print_prof(void)
 
 		if (0 != str_offset)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "Profiling information:\n%s", str);
-
 			if (ZBX_PROF_ALL == zbx_prof_scope)
 			{
-
-				zabbix_log(LOG_LEVEL_INFORMATION, "locks : locked:%d holding:"
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nlocks totals : locked:%d holding:"
 						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec",
 						total_locked_rwlock + total_locked_mutex,
 						total_busy_lock + total_mutex_busy_lock,
@@ -183,16 +181,18 @@ static void	zbx_print_prof(void)
 
 			if (0 != (ZBX_PROF_RWLOCK & zbx_prof_scope))
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "rwlocks : locked:%d holding:" ZBX_FS_DBL " sec"
-						" waiting:" ZBX_FS_DBL " sec", total_locked_rwlock, total_busy_lock,
-						total_wait_lock);
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nrwlocks : locked:%d holding:"
+						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec", total_locked_rwlock,
+						total_busy_lock, total_wait_lock);
 			}
 			if (0 != (ZBX_PROF_MUTEX & zbx_prof_scope))
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "mutexes : locked:%d holding:" ZBX_FS_DBL " sec"
-						" waiting:" ZBX_FS_DBL " sec", total_locked_mutex,
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nmutexes : locked:%d holding:"
+						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec", total_locked_mutex,
 						total_mutex_busy_lock, total_mutex_wait_lock);
 			}
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "=== Profiling statistics === %s", str);
 		}
 	}
 }
