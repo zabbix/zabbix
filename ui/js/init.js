@@ -68,7 +68,7 @@ jQuery(function($) {
 
 	if ($search.length) {
 		createSuggest('search');
-		// TODO (acikuns) icons
+
 		var $search_icon = $search.siblings('.js-search');
 
 		$search.on('keyup', function() {
