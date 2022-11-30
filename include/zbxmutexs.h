@@ -31,6 +31,10 @@
 
 typedef wchar_t * zbx_mutex_name_t;
 typedef HANDLE zbx_mutex_t;
+
+#	define zbx_rwlock_wrlock(rwlock)		__zbx_mutex_lock(__FILE__, __LINE__, rwlock)
+#	define zbx_rwlock_rdlock(rwlock)		__zbx_mutex_lock(__FILE__, __LINE__, rwlock)
+#	define zbx_rwlock_unlock(rwlock)		__zbx_mutex_unlock(__FILE__, __LINE__, rwlock)
 #else	/* not _WINDOWS */
 typedef enum
 {
@@ -150,7 +154,7 @@ void		zbx_locks_destroy(void);
 int		zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
 zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name);
 zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);
-#endif	/* _WINDOWS */
+
 #	define zbx_mutex_lock(mutex)					\
 									\
 	do								\
@@ -169,6 +173,8 @@ zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);
 		zbx_prof_end();						\
 	}								\
 	while(0)
+
+#endif	/* _WINDOWS */
 
 int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex);
