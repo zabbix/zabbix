@@ -407,7 +407,7 @@ switch ($data['type']) {
 				}
 				$new_condition_value = (new CTextAreaFlexible('value'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('tag_name');
+					->setId('value');
 
 				$inline_js .= $new_condition_value->getPostJS();
 
@@ -417,7 +417,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						(new CLabel(_('Tag'), 'tag_name'))->setAsteriskMark(),
+						(new CLabel(_('Tag'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
@@ -431,17 +431,17 @@ switch ($data['type']) {
 				}
 				$new_condition_value2 = (new CTextAreaFlexible('value2'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('tag_value2');
+					->setId('value2');
 				$new_condition_value = (new CTextAreaFlexible('value'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('tag_value');
+					->setId('value');
 
 				$inline_js .= $new_condition_value2->getPostJS();
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_grid
 					->addItem([
-						(new CLabel(_('Tag'), 'tag_value2'))->setAsteriskMark(),
+						(new CLabel(_('Tag'), 'value2'))->setAsteriskMark(),
 						new CFormField($new_condition_value2)
 					])
 					->addItem([
@@ -449,7 +449,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'tag_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -503,7 +503,7 @@ switch ($data['type']) {
 
 				$new_condition_value = (new CTextBox('value', ZBX_DEFAULT_INTERVAL))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('time_period');
+					->setId('value');
 
 				$form_grid
 					->addItem([
@@ -511,7 +511,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'time_period'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -526,7 +526,7 @@ switch ($data['type']) {
 
 				$new_condition_value = (new CTextBox('value', '192.168.0.1-127,192.168.2.1'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('host_ip_value');
+					->setId('value');
 
 				$form_grid
 					->addItem([
@@ -534,7 +534,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'host_ip_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -712,7 +712,7 @@ switch ($data['type']) {
 			case CONDITION_TYPE_DVALUE:
 				$new_condition_value = (new CTextAreaFlexible('value'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('received_value');
+					->setId('value');
 
 				$inline_js .= $new_condition_value->getPostJS();
 
@@ -726,7 +726,7 @@ switch ($data['type']) {
 						)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'received_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -741,7 +741,7 @@ switch ($data['type']) {
 
 				$new_condition_value = (new CTextBox('value', '0-1023,1024-49151'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					->setId('service_port_value');
+					->setId('value');
 
 				$form_grid
 					->addItem([
@@ -749,7 +749,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'service_port_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
@@ -788,7 +788,7 @@ switch ($data['type']) {
 				}
 				$new_condition_value = (new CNumericBox('value', 600, 15))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH)
-					->setId('uptime_downtime_value');
+					->setId('value');
 
 				$form_grid
 					->addItem([
@@ -796,7 +796,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'uptime_downtime_value'),
+						new CLabel(_('Value'), 'value'),
 						new CFormField($new_condition_value)
 					]);
 
