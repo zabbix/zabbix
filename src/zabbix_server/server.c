@@ -1334,8 +1334,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_events_funcs_t events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-                              zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
+	zbx_events_funcs_t	events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
+			zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
 
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
 

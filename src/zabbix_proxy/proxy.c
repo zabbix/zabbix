@@ -1257,7 +1257,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-        zbx_events_funcs_t events_funcs_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
+	zbx_events_funcs_t events_funcs_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
 
