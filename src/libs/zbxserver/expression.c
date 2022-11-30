@@ -2972,7 +2972,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_AGE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_age2str((int)time(NULL) - cause_event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DATE))
 	{
@@ -2981,7 +2981,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION))
 	{
 		if (NULL == r_event)
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str((int)time(NULL) - cause_event->clock));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
 		else
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - cause_event->clock));
 	}
