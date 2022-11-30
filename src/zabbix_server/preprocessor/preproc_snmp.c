@@ -673,7 +673,7 @@ out:
 	if (SUCCEED == ret)
 	{
 		zbx_variant_clear(value);
-		zbx_variant_set_str(value, zbx_strdup(NULL, result));
+		zbx_variant_set_str(value, result);
 	}
 
 	return ret;
