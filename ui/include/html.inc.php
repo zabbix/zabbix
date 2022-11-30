@@ -768,7 +768,8 @@ function makeServerStatusOutput() {
 	return (new CTag('output', true))
 		->setId('msg-global-footer')
 		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
-		->addClass(ZBX_STYLE_MSG_WARNING);
+		->addClass(ZBX_STYLE_MSG_WARNING)
+		->addClass('zi-triangle-warning');
 }
 
 /**

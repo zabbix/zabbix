@@ -2344,7 +2344,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
 .zi-chevron-up:before {
   content: "\ea25"; }
 
-.zi-circle-check-filled:before {
+.zi-circle-check-filled:after {
   content: "\ea26"; }
 
 .zi-circle-check:before {
@@ -2852,7 +2852,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     color: #ffffff; }
 
 .zi-triangle-warning,
-.zi-circle-check {
+.zi-circle-check-filled {
   position: relative;
   padding: 6px 10px 6px 75px;
   margin: 10px;
@@ -2864,23 +2864,23 @@ div.dashboard-widget-tophosts z-bar-gauge {
   border: 2px solid;
   border-radius: 2px; }
   .zi-triangle-warning .overlay-close-btn,
-  .zi-circle-check .overlay-close-btn {
+  .zi-circle-check-filled .overlay-close-btn {
     color: #333333; }
   .zi-triangle-warning .link-action,
-  .zi-circle-check .link-action {
+  .zi-circle-check-filled .link-action {
     margin-right: 10px;
     font-size: 0.85em; }
     .zi-triangle-warning .link-action .arrow-up,
-    .zi-circle-check .link-action .arrow-up {
+    .zi-circle-check-filled .link-action .arrow-up {
       border-bottom-color: #033003; }
     .zi-triangle-warning .link-action .arrow-down,
-    .zi-circle-check .link-action .arrow-down {
+    .zi-circle-check-filled .link-action .arrow-down {
       border-top-color: #033003; }
   .zi-triangle-warning button,
-  .zi-circle-check button {
+  .zi-circle-check-filled button {
     background-color: #ffffff; }
   .zi-triangle-warning::before,
-  .zi-circle-check::before {
+  .zi-circle-check-filled::before {
     content: '';
     position: absolute;
     top: 0;
@@ -2888,7 +2888,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     left: 0;
     width: 61px; }
   .zi-triangle-warning::after,
-  .zi-circle-check::after {
+  .zi-circle-check-filled::after {
     position: absolute;
     top: 4px;
     left: 3px;

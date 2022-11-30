@@ -1777,9 +1777,9 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	}
 
 	$aria_labels = [
-		ZBX_STYLE_MSG_GOOD.' zi-circle-check' => _('Success message'),
+		ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' => _('Success message'),
 		ZBX_STYLE_MSG_BAD.' zi-triangle-warning' => _('Error message'),
-		ZBX_STYLE_MSG_WARNING => _('Warning message')
+		ZBX_STYLE_MSG_WARNING.' zi-triangle-warning' => _('Warning message')
 	];
 
 	// Details link should be in front of title.
@@ -1851,7 +1851,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
@@ -1876,7 +1876,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 
 		if ($has_errors) {
-			$class = ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
+			$class = ZBX_STYLE_MSG_BAD.' zi-triangle-warning-filled';
 			$good = false;
 		}
 		elseif ($has_warnings) {
@@ -1884,12 +1884,12 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			$good = true;
 		}
 		else {
-			$class = ZBX_STYLE_MSG_GOOD.' zi-circle-check';
+			$class = ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled';
 			$good = true;
 		}
 	}
 	else {
-		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning';
+		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning-filled';
 	}
 
 	$title = $good ? $okmsg : $errmsg;
