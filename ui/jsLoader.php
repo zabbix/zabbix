@@ -197,7 +197,7 @@ $translate_strings = [
 		'Warning message' => _('Warning message')
 	],
 	'inputsecret.js' => [
-		'value' => 'value'
+		'value' => _('value')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -296,7 +296,7 @@ $translate_strings = [
 		'Change' => _x('Change', 'verb'),
 		'Remove' => _('Remove'),
 		'Revert' => _('Revert'),
-		'value' => 'value'
+		'value' => _('value')
 	],
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
