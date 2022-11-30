@@ -1183,7 +1183,7 @@ static int	housekeeping_problems(int now)
 	zbx_vector_uint64_create(&ids_uint64);
 
 	zbx_snprintf(buffer, sizeof(buffer),
-		"select * from problem p1"
+		"select p1.eventid from problem p1"
 		" where p1.r_clock<>0 and p1.r_clock<%d and p1.eventid not in ("
 			" select cause_eventid"
 			" from problem p2"
