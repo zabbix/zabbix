@@ -1170,20 +1170,64 @@ static int	housekeeping_events(int now)
 
 static int	housekeeping_problems(int now)
 {
-	int	deleted = 0, rc;
+	int			deleted = 0, rc;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids_uint64;
+	size_t			sql_alloc = 0, sql_offset;
+	char			*sql = NULL;
+	char			buffer[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
-	rc = DBexecute(
-			"delete from problem p1"
-			" where p1.r_clock<>0 and p1.r_clock<%d and not exists("
-				"select cause_eventid"
-				" from problem p2"
-				" where p2.cause_eventid=p1.eventid"
-			")", now - SEC_PER_DAY);
+	zbx_vector_uint64_create(&ids_uint64);
 
-	if (ZBX_DB_OK <= rc)
-		deleted = rc;
+	zbx_snprintf(buffer, sizeof(buffer),
+		"select * from problem p1"
+		" where p1.r_clock<>0 and p1.r_clock<%d and p1.eventid not in ("
+			" select cause_eventid"
+			" from problem p2"
+			" where p1.eventid=p2.cause_eventid"
+		")", now - SEC_PER_DAY);
+
+	while (1)
+	{
+		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
+			result = DBselect("%s", buffer);
+		else
+			result = DBselectN(buffer, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_uint64_t	id;
+
+			ZBX_STR2UINT64(id, row[0]);
+			zbx_vector_uint64_append(&ids_uint64, id);
+		}
+
+		DBfree_result(result);
+
+		if (0 == ids_uint64.values_num)
+			break;
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from problem where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", ids_uint64.values,
+				ids_uint64.values_num);
+
+		rc = DBexecute("%s", sql);
+
+		zbx_vector_uint64_clear(&ids_uint64);
+
+		if (ZBX_DB_OK > rc)
+			break;
+
+		deleted += rc;
+	}
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&ids_uint64);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
