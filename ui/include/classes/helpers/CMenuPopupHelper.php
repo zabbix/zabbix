@@ -90,13 +90,12 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for Ajax map element menu popup.
 	 *
-	 * @param string $sysmapid                   Map ID.
-	 * @param array  $selement                   Map element data (ID, type, URLs, etc...).
-	 * @param string $selement[selementid_orig]  Map element ID.
-	 * @param string $selement[elementtype]      Map element type (host, map, trigger, host group, image).
-	 * @param string $selement[urls]             Map element URLs.
-	 * @param int    $severity_min               Minimum severity.
-	 * @param string $hostid                     Host ID.
+	 * @param string $sysmapid                     Map ID.
+	 * @param array  $selement                     Map element data (ID, type, URLs, etc...).
+	 * @param string $selement['selementid_orig']  Map element ID.
+	 * @param string $selement['unique_id']        Map element unique ID.
+	 * @param int    $severity_min                 Minimum severity.
+	 * @param string $hostid                       Host ID.
 	 *
 	 * @return array
 	 */
@@ -105,9 +104,7 @@ class CMenuPopupHelper {
 			'type' => 'map_element',
 			'data' => [
 				'sysmapid' => $sysmapid,
-				'selementid' => $selement['selementid_orig'],
-				'elementtype' => $selement['elementtype'],
-				'urls' => $selement['urls']
+				'selementid' => $selement['selementid_orig']
 			]
 		];
 

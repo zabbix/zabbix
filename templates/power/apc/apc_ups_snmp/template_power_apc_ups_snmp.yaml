@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:35:35Z'
+  date: '2022-10-26T14:16:34Z'
   groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -8,12 +8,13 @@ zabbix_export:
   templates:
     -
       uuid: 3ec55c9966624ef5bc1b50502812d581
-      template: 'APC UPS SNMP'
-      name: 'APC UPS SNMP'
+      template: 'APC UPS by SNMP'
+      name: 'APC UPS by SNMP'
       description: |
         Template Power APC UPS
         
         MIBs used:
+        HOST-RESOURCES-MIB
         PowerNet-MIB
         SNMPv2-MIB
         
@@ -53,7 +54,7 @@ zabbix_export:
           triggers:
             -
               uuid: aa0bbfb321d440438fb421825f23e140
-              expression: 'last(/APC UPS SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
+              expression: 'last(/APC UPS by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
               name: 'Battery has low capacity'
               event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
@@ -134,7 +135,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7e40918732e74b5e8bd854422989e77d
-              expression: 'last(/APC UPS SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
+              expression: 'last(/APC UPS by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
               name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -201,7 +202,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7ae03f3f307b4f11ad2bc0548911cbd3
-              expression: 'last(/APC UPS SNMP/battery.status[upsBasicBatteryStatus])=4'
+              expression: 'last(/APC UPS by SNMP/battery.status[upsBasicBatteryStatus])=4'
               name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
@@ -211,7 +212,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 1282326bb61d45d88671bbbde3fab8ff
-              expression: 'last(/APC UPS SNMP/battery.status[upsBasicBatteryStatus])=3'
+              expression: 'last(/APC UPS by SNMP/battery.status[upsBasicBatteryStatus])=3'
               name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
@@ -248,7 +249,7 @@ zabbix_export:
           triggers:
             -
               uuid: 36a14fe061d1433e9875373307a4e0f4
-              expression: 'min(/APC UPS SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
+              expression: 'min(/APC UPS by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
               name: 'Battery has high temperature'
               event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -354,7 +355,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1ddd2699b87f452a8893f75f805c0a81
-              expression: 'min(/APC UPS SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC UPS SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC UPS SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
+              expression: 'min(/APC UPS by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC UPS by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC UPS by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
               name: 'Unacceptable input frequency'
               event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
@@ -391,7 +392,7 @@ zabbix_export:
           triggers:
             -
               uuid: f6527c4fed3d41168be23f9367f18405
-              expression: 'min(/APC UPS SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC UPS SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
+              expression: 'min(/APC UPS by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC UPS by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
               name: 'Unacceptable input voltage'
               event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
@@ -454,7 +455,7 @@ zabbix_export:
           triggers:
             -
               uuid: ebef08a42d1e47ffa82ea586c1a5b3d6
-              expression: 'min(/APC UPS SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
+              expression: 'min(/APC UPS by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
               name: 'Output load is high'
               event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
@@ -497,7 +498,7 @@ zabbix_export:
           triggers:
             -
               uuid: c0e0b1db9a1f41379c340c122426778d
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=16'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=16'
               name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
@@ -506,7 +507,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 381a6a75d9084ff1bfcc30b6870a2682
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=10'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=10'
               name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
@@ -515,7 +516,7 @@ zabbix_export:
                   value: notice
             -
               uuid: da75b5277ceb423fac8d90b58d49c21f
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=7'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=7'
               name: 'UPS is Off'
               priority: AVERAGE
               tags:
@@ -524,7 +525,7 @@ zabbix_export:
                   value: notice
             -
               uuid: b0330f707fc64605934ed95233bd2246
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=3'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=3'
               name: 'UPS is on battery'
               priority: AVERAGE
               tags:
@@ -533,7 +534,7 @@ zabbix_export:
                   value: notice
             -
               uuid: f8d75a2fdb6942e6b63831d206c78e56
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=4'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=4'
               name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
@@ -542,7 +543,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 8eb59b4873e14acfa8e05791ed30c9d1
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=12'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=12'
               name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
@@ -551,7 +552,7 @@ zabbix_export:
                   value: notice
             -
               uuid: e06247b357b849d3ad1886f797705320
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=8'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=8'
               name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
@@ -560,7 +561,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 9b4424babc284dcabfb44dc725c03f40
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=11'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=11'
               name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
@@ -569,7 +570,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 9ac2faafee484894bb304da02d6ab0b2
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=6'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=6'
               name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
@@ -578,7 +579,7 @@ zabbix_export:
                   value: notice
             -
               uuid: ce16d33b10e74b129d22378f96ede052
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=9'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=9'
               name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
@@ -587,7 +588,7 @@ zabbix_export:
                   value: notice
             -
               uuid: aa84fc5fd4434101a481481beb616a7c
-              expression: 'last(/APC UPS SNMP/output.status[upsBasicOutputStatus])=5'
+              expression: 'last(/APC UPS by SNMP/output.status[upsBasicOutputStatus])=5'
               name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
@@ -683,6 +684,37 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: b3d5eea37f934efdac4885bcadc73b9b
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 445d7a843340424ab7c09ab001d5865c
           name: 'System location'
           type: SNMP_AGENT
@@ -756,7 +788,7 @@ zabbix_export:
           triggers:
             -
               uuid: facbfd1f8bb04401b563c162d7fe13a5
-              expression: 'last(/APC UPS SNMP/system.name[sysName.0],#1)<>last(/APC UPS SNMP/system.name[sysName.0],#2) and length(last(/APC UPS SNMP/system.name[sysName.0]))>0'
+              expression: 'last(/APC UPS by SNMP/system.name[sysName.0],#1)<>last(/APC UPS by SNMP/system.name[sysName.0],#2) and length(last(/APC UPS by SNMP/system.name[sysName.0]))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -769,6 +801,29 @@ zabbix_export:
                 -
                   tag: scope
                   value: security
+        -
+          uuid: 701fa778bc03444aad94343d0dbe048e
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management
+            portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: 6780faad9fc9492f9f92915db5161e43
           name: 'System object ID'
@@ -822,46 +877,6 @@ zabbix_export:
               tag: component
               value: inventory
         -
-          uuid: 701fa778bc03444aad94343d0dbe048e
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management
-            portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: b0959bdb606542bcb2952e820ac972c9
-              expression: 'last(/APC UPS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/APC UPS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
           uuid: ca3275f69f3c4e7c9c71108451c0b64f
           name: 'SNMP agent availability'
           type: INTERNAL
@@ -890,7 +905,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4572d871f1d944bb855b93fdc6de5e88
-              expression: 'max(/APC UPS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/APC UPS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -1006,7 +1021,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a248194aa30645c5918278b83944b20e
-                  expression: 'find(/APC UPS SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0|1]{15}$")=1'
+                  expression: 'find(/APC UPS by SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0|1]{15}$")=1'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1062,7 +1077,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 834b1a48cbab46a3bfb0209fb4302674
-                  expression: 'find(/APC UPS SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0'
+                  expression: 'find(/APC UPS by SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay'
                   opdata: 'Current bit set: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1112,7 +1127,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 80f084121d56464f90e4a3ef9e198889
-                  expression: 'min(/APC UPS SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
+                  expression: 'min(/APC UPS by SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
                   name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature'
                   event_name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
                   opdata: 'Current temperature: {ITEM.LASTVALUE1}'
@@ -1209,7 +1224,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3a40f3cb0a3b411697fe8d37f82404d4
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=3'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=3'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical'
                   priority: HIGH
                   description: 'The external sensor has returned a value greater than the critical threshold.'
@@ -1219,7 +1234,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 63ba879a2a324ffc958b761f2010ac8e
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=4'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=4'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable'
                   priority: INFO
                   description: 'The external sensor does not work or is not connected.'
@@ -1229,7 +1244,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: dc90cd795879495fa473b71a2ff57b49
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=2'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=2'
                   name: '{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning'
                   priority: AVERAGE
                   description: 'The external sensor has returned a value greater than the warning threshold.'
@@ -1277,7 +1292,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: Humidity
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 06a853147fe646659d066fff34f67faa
@@ -1345,7 +1359,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8a62bc38e49e4779938c45839a190856
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=3'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=3'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical'
                   priority: HIGH
                   description: 'The external sensor has returned a value greater than the critical threshold.'
@@ -1355,7 +1369,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: ca02e8f92e134dce9834bd1d6f3ab469
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=4'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=4'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable'
                   priority: INFO
                   description: 'The external sensor does not work or is not connected.'
@@ -1365,7 +1379,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 36ad29900db7410782daeddb9d7c648f
-                  expression: 'last(/APC UPS SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=2'
+                  expression: 'last(/APC UPS by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=2'
                   name: '{#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning'
                   priority: AVERAGE
                   description: 'The external sensor has returned a value greater than the warning threshold.'
@@ -1413,7 +1427,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: Humidity
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 16e8b3b4d38040a7961b1de4c18a4ea9
@@ -1475,7 +1488,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 63c623a2a9af44f38388a17742c87486
-                  expression: 'min(/APC UPS SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
+                  expression: 'min(/APC UPS by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage'
                   event_name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
@@ -1568,7 +1581,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: feeb23a58ccb4ec1bed9d61f5d2ffc9e
-                  expression: 'min(/APC UPS SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
+                  expression: 'min(/APC UPS by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}'
                   name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage'
                   event_name: '{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
                   opdata: 'Current phase {#PHASEINDEX} voltage: {ITEM.LASTVALUE1}'
@@ -1631,123 +1644,81 @@ zabbix_export:
                 -
                   type: PLAIN_TEXT
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
-                        key: 'system.uptime[sysUpTime.0]'
-                        host: 'APC UPS SNMP'
+                        host: 'APC UPS by SNMP'
+                        key: 'system.net.uptime[sysUpTime.0]'
                 -
                   type: PLAIN_TEXT
                   x: '8'
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
+                        host: 'APC UPS by SNMP'
                         key: 'input.fail[upsAdvInputLineFailCause]'
-                        host: 'APC UPS SNMP'
                 -
                   type: PLAIN_TEXT
                   x: '16'
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
+                        host: 'APC UPS by SNMP'
                         key: 'output.status[upsBasicOutputStatus]'
-                        host: 'APC UPS SNMP'
                 -
                   type: PLAIN_TEXT
-                  'y': '2'
+                  'y': '5'
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
+                        host: 'APC UPS by SNMP'
                         key: 'battery.status[upsBasicBatteryStatus]'
-                        host: 'APC UPS SNMP'
                 -
                   type: PLAIN_TEXT
                   x: '8'
-                  'y': '2'
+                  'y': '5'
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
+                        host: 'APC UPS by SNMP'
                         key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
-                        host: 'APC UPS SNMP'
                 -
                   type: PLAIN_TEXT
                   x: '16'
-                  'y': '2'
+                  'y': '5'
                   width: '8'
+                  height: '5'
                   fields:
-                    -
-                      type: INTEGER
-                      name: show_as_html
-                      value: '0'
-                    -
-                      type: INTEGER
-                      name: show_lines
-                      value: '1'
                     -
                       type: ITEM
                       name: itemids
                       value:
+                        host: 'APC UPS by SNMP'
                         key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
-                        host: 'APC UPS SNMP'
                 -
                   type: GRAPH_CLASSIC
-                  'y': '4'
+                  'y': '10'
                   width: '8'
-                  height: '7'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -1757,14 +1728,14 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'APC UPS by SNMP'
                         name: 'Capacity of the UPS batteries'
-                        host: 'APC UPS SNMP'
                 -
                   type: GRAPH_CLASSIC
                   x: '8'
-                  'y': '4'
+                  'y': '10'
                   width: '8'
-                  height: '7'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -1774,14 +1745,14 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'APC UPS by SNMP'
                         name: Voltage
-                        host: 'APC UPS SNMP'
                 -
                   type: GRAPH_CLASSIC
                   x: '16'
-                  'y': '4'
+                  'y': '10'
                   width: '8'
-                  height: '7'
+                  height: '5'
                   fields:
                     -
                       type: INTEGER
@@ -1791,8 +1762,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'APC UPS by SNMP'
                         name: Output
-                        host: 'APC UPS SNMP'
       valuemaps:
         -
           uuid: a808aadebf964e0cb6b8724bf1165013
@@ -1965,6 +1936,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: b0959bdb606542bcb2952e820ac972c9
+      expression: '(last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/APC UPS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC UPS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/APC UPS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 2f54cf3da7be49108736e46afe0b5904
@@ -1974,7 +1962,7 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'APC UPS SNMP'
+            host: 'APC UPS by SNMP'
             key: 'battery.capacity[upsHighPrecBatteryCapacity]'
     -
       uuid: d4b2320e0515407cb32afa388f91cd29
@@ -1983,13 +1971,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'APC UPS SNMP'
+            host: 'APC UPS by SNMP'
             key: 'output.current[upsHighPrecOutputCurrent]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'APC UPS SNMP'
+            host: 'APC UPS by SNMP'
             key: 'output.load[upsHighPrecOutputLoad]'
     -
       uuid: 4988c266dc15493592112371b061f9e2
@@ -1998,11 +1986,11 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'APC UPS SNMP'
+            host: 'APC UPS by SNMP'
             key: 'input.voltage[upsHighPrecInputLineVoltage]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'APC UPS SNMP'
+            host: 'APC UPS by SNMP'
             key: 'output.voltage[upsHighPrecOutputVoltage]'

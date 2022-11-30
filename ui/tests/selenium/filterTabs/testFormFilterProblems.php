@@ -18,15 +18,119 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
- * @backup profiles
+ * @backup profiles, hosts
+ *
+ * @onBefore prepareProblemsData
  */
 class testFormFilterProblems extends testFormFilter {
 
-	public $url = 'zabbix.php?action=problem.view';
+	/**
+	 * Id of the host with problems.
+	 *
+	 * @var integer
+	 */
+	protected static $hostid;
+
+	/**
+	 * Ids of the triggers for problems.
+	 *
+	 * @var array
+	 */
+	protected static $triggerids;
+
+	/**
+	 * Time when events were created.
+	 *
+	 * @var int
+	 */
+	protected static $two_yeasr_ago_1;
+	protected static $two_years_ago_2;
+
+	public $url = 'zabbix.php?action=problem.view&show_timeline=0';
 	public $table_selector = 'class:list-table';
+
+	public function prepareProblemsData() {
+		// Create hostgroup for hosts with items triggers.
+		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Filter']]);
+		$this->assertArrayHasKey('groupids', $hostgroups);
+		$groupid = $hostgroups['groupids'][0];
+
+		// Create host for items and triggers.
+		$hosts = CDataHelper::call('host.create', [
+			'host' => 'Host for Problems Filter',
+			'groups' => [['groupid' => $groupid]]
+		]);
+
+		$this->assertArrayHasKey('hostids', $hosts);
+		self::$hostid = $hosts['hostids'][0];
+
+		// Create items on previously created host.
+		$item_names = ['float', 'char'];
+
+		$items_data = [];
+		foreach ($item_names as $i => $item) {
+			$items_data[] = [
+				'hostid' => self::$hostid,
+				'name' => $item,
+				'key_' => $item,
+				'type' => 2,
+				'value_type' => $i
+			];
+		}
+
+		$items = CDataHelper::call('item.create', $items_data);
+		$this->assertArrayHasKey('itemids', $items);
+
+		// Create triggers based on items.
+		$triggers_data = [];
+		foreach ($item_names as $i => $item) {
+			$triggers_data[] = [
+				'description' => 'Filter problems trigger '.$i,
+				'expression' => 'last(/Host for Problems Filter/'.$item.')=0',
+				'priority' => $i
+			];
+		}
+
+		$triggers = CDataHelper::call('trigger.create', $triggers_data);
+		$this->assertArrayHasKey('triggerids', $triggers);
+		self::$triggerids = CDataHelper::getIds('description');
+
+		// Make timestamp a little less 1 year ago.
+		self::$two_yeasr_ago_1 = time()-62985600;
+
+		// Make timestamp a little less than 2 years ago.
+		self::$two_years_ago_2 = time()-62983800;
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005500, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, 1, '.
+				zbx_dbstr('Filter problems trigger 0').', 0)'
+		);
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005501, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, 1, '.
+		zbx_dbstr('Filter problems trigger 1').', 1)'
+		);
+
+		// Create problems.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005500, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, '.
+				zbx_dbstr('Filter problems trigger 0').', 0)'
+		);
+
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005501, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, '.
+				zbx_dbstr('Filter problems trigger 1').', 1)'
+		);
+
+		// Change triggers' state to Problem.
+		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Filter problems trigger 0').', '.
+				zbx_dbstr('Filter problems trigger 1').')'
+		);
+	}
 
 	public static function getCheckCreatedFilterData() {
 		return [
@@ -170,7 +274,7 @@ class testFormFilterProblems extends testFormFilter {
 			[
 				[
 					'filter_form' => [
-						'Hosts' => ['Host for tag permissions']
+						'Hosts' => ['Host for Problems Filter']
 					],
 					'filter' => [
 						'Name' => 'Timeselect_1'
@@ -180,7 +284,7 @@ class testFormFilterProblems extends testFormFilter {
 			[
 				[
 					'filter_form' => [
-						'Hosts' => ['Host for tag permissions']
+						'Hosts' => ['Host for Problems Filter']
 					],
 					'filter' => [
 						'Name' => 'Timeselect_2'
@@ -200,7 +304,7 @@ class testFormFilterProblems extends testFormFilter {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
 		$form = $this->query('id:'.$formid)->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking result amount before changing time period.
 		$this->assertEquals($table->getRows()->count(), 2);
@@ -209,19 +313,22 @@ class testFormFilterProblems extends testFormFilter {
 			// Enable Set custom time period option.
 			$filter_container->editProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$dialog->fill(['Set custom time period' => true, 'From' => '2020-10-23 18:00']);
+			$dialog->fill(['Set custom time period' => true, 'From' => 'now-2y']);
 			$dialog->submit();
+			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 		else {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
 			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click();
-			$this->query('xpath://input[@id="from"]')->one()->fill('2020-10-23 18:00');
+			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
 			$this->query('id:apply')->one()->click();
 			$filter_container->selectTab($data['filter']['Name']);
 			$this->query('button:Update')->one()->click();
 			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 
 		// Checking that Show field tabs are disabled or enabled.
@@ -233,6 +340,6 @@ class testFormFilterProblems extends testFormFilter {
 		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_timeselector"]')->one()->isEnabled($value));
 
 		// Checking that table result changed.
-		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertEquals(2, $table->getRows()->count());
 	}
 }

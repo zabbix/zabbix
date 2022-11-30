@@ -1,9 +1,9 @@
 
-# Morningstar TriStar MPPT SNMP
+# Morningstar TriStar MPPT by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 
 ## Setup
 
@@ -61,7 +61,8 @@ There are no template links in this template.
 |Battery |Battery: Voltage{#SINGLETON} |<p>MIB: TRISTAR-MPPT</p><p>Description:Battery voltage</p><p>Scaling Factor:0.0054931640625</p><p>Units:V</p><p>Range:[-10, 180.0]</p><p>Modbus address:0x0018</p> |SNMP |battery.voltage[batteryVoltage.0{#SINGLETON}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.005493164063`</p><p>- REGEX: `^(\d+)(\.\d{1,2})? \1\2`</p> |
 |Counter |Counter: Charge Amp-hours |<p>MIB: TRISTAR-MPPT</p><p>Description:Ah Charge Resettable</p><p>Scaling Factor:0.1</p><p>Units:Ah</p><p>Range:[0.0, 5000]</p><p>Modbus addresses:H=0x0034 L=0x0035</p> |SNMP |counter.charge_amp_hours[ahChargeResetable.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.1`</p> |
 |Counter |Counter: Charge KW-hours |<p>MIB: TRISTAR-MPPT</p><p>Description:kWh Charge Resettable</p><p>Scaling Factor:0.1</p><p>Units:kWh</p><p>Range:[0.0, 65535.0]</p><p>Modbus address:0x0038</p> |SNMP |counter.charge_kw_hours[kwhChargeResetable.0] |
-|Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (network) |<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |status.net.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (hardware) |<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |status.hw.uptime<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |Status: Faults |<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus address:0x002c</p> |SNMP |status.faults[faults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Alarms |<p>MIB: TRISTAR-MPPT</p><p>Description:Faults</p><p>Modbus address:0x002c</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Temperature |Temperature: Battery |<p>MIB: TRISTAR-MPPT</p><p>Description:Batt. Temp</p><p>Scaling Factor:1.0</p><p>Units:C</p><p>Range:[-40, 80]</p><p>Modbus address:0x0025</p> |SNMP |temp.battery[batteryTemperature.0] |
@@ -72,49 +73,49 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Battery: Device charge in warning state |<p>-</p> |`last(/Morningstar TriStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Device charge in critical state</p> |
-|Battery: Device charge in critical state |<p>-</p> |`last(/Morningstar TriStar MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}` |HIGH | |
-|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
-|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
-|Battery: High battery voltage |<p>-</p> |`min(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
-|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar TriStar MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
-|Status: Device has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar TriStar MPPT SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar TriStar MPPT SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
-|Status: Device has "overcurrent" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","overcurrent")=2` |HIGH | |
-|Status: Device has "fetShort" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","fetShort")=2` |HIGH | |
-|Status: Device has "softwareFault" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","softwareFault")=2` |HIGH | |
-|Status: Device has "batteryHvd" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2` |HIGH | |
-|Status: Device has "arrayHvd" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2` |HIGH | |
-|Status: Device has "dipSwitchChange" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2` |HIGH | |
-|Status: Device has "customSettingsEdit" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
-|Status: Device has "rtsShorted" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2` |HIGH | |
-|Status: Device has "rtsDisconnected" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2` |HIGH | |
-|Status: Device has "eepromRetryLimit" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2` |HIGH | |
-|Status: Device has "slaveControlTimeout" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.faults[faults.0],#3,"like","slaveControlTimeout")=2` |HIGH | |
-|Status: Device has "rtsShorted" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2` |WARNING | |
-|Status: Device has "rtsDisconnected" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2` |WARNING | |
-|Status: Device has "heatsinkTempSensorOpen" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2` |WARNING | |
-|Status: Device has "heatsinkTempSensorShorted" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2` |WARNING | |
-|Status: Device has "highTemperatureCurrentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2` |WARNING | |
-|Status: Device has "currentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2` |WARNING | |
-|Status: Device has "currentOffset" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2` |WARNING | |
-|Status: Device has "batterySense" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2` |WARNING | |
-|Status: Device has "batterySenseDisconnected" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2` |WARNING | |
-|Status: Device has "uncalibrated" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2` |WARNING | |
-|Status: Device has "rtsMiswire" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2` |WARNING | |
-|Status: Device has "highVoltageDisconnect" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2` |WARNING | |
-|Status: Device has "systemMiswire" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2` |WARNING | |
-|Status: Device has "mosfetSOpen" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2` |WARNING | |
-|Status: Device has "p12VoltageReferenceOff" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2` |WARNING | |
-|Status: Device has "highArrayVCurrentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2` |WARNING | |
-|Status: Device has "maxAdcValueReached" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2` |WARNING | |
-|Status: Device has "controllerWasReset" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2` |WARNING | |
-|Temperature: Low battery temperature |<p>-</p> |`max(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature</p> |
-|Temperature: Critically low battery temperature |<p>-</p> |`max(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
-|Temperature: High battery temperature |<p>-</p> |`min(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature</p> |
-|Temperature: Critically high battery temperature |<p>-</p> |`min(/Morningstar TriStar MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
+|Battery: Device charge in warning state |<p>-</p> |`last(/Morningstar TriStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Device charge in critical state</p> |
+|Battery: Device charge in critical state |<p>-</p> |`last(/Morningstar TriStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}` |HIGH | |
+|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar TriStar MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
+|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar TriStar MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
+|Battery: High battery voltage |<p>-</p> |`min(/Morningstar TriStar MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
+|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar TriStar MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
+|Status: Device has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Morningstar TriStar MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar MPPT by SNMP/status.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
+|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes.</p> |`nodata(/Morningstar TriStar MPPT by SNMP/status.net.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
+|Status: Device has "overcurrent" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2` |HIGH | |
+|Status: Device has "fetShort" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","fetShort")=2` |HIGH | |
+|Status: Device has "softwareFault" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","softwareFault")=2` |HIGH | |
+|Status: Device has "batteryHvd" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2` |HIGH | |
+|Status: Device has "arrayHvd" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2` |HIGH | |
+|Status: Device has "dipSwitchChange" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2` |HIGH | |
+|Status: Device has "customSettingsEdit" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
+|Status: Device has "rtsShorted" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2` |HIGH | |
+|Status: Device has "rtsDisconnected" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2` |HIGH | |
+|Status: Device has "eepromRetryLimit" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2` |HIGH | |
+|Status: Device has "slaveControlTimeout" faults flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.faults[faults.0],#3,"like","slaveControlTimeout")=2` |HIGH | |
+|Status: Device has "rtsShorted" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2` |WARNING | |
+|Status: Device has "rtsDisconnected" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2` |WARNING | |
+|Status: Device has "heatsinkTempSensorOpen" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2` |WARNING | |
+|Status: Device has "heatsinkTempSensorShorted" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2` |WARNING | |
+|Status: Device has "highTemperatureCurrentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2` |WARNING | |
+|Status: Device has "currentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2` |WARNING | |
+|Status: Device has "currentOffset" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2` |WARNING | |
+|Status: Device has "batterySense" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2` |WARNING | |
+|Status: Device has "batterySenseDisconnected" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2` |WARNING | |
+|Status: Device has "uncalibrated" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2` |WARNING | |
+|Status: Device has "rtsMiswire" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2` |WARNING | |
+|Status: Device has "highVoltageDisconnect" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2` |WARNING | |
+|Status: Device has "systemMiswire" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2` |WARNING | |
+|Status: Device has "mosfetSOpen" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2` |WARNING | |
+|Status: Device has "p12VoltageReferenceOff" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2` |WARNING | |
+|Status: Device has "highArrayVCurrentLimit" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2` |WARNING | |
+|Status: Device has "maxAdcValueReached" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2` |WARNING | |
+|Status: Device has "controllerWasReset" alarm flag |<p>-</p> |`count(/Morningstar TriStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2` |WARNING | |
+|Temperature: Low battery temperature |<p>-</p> |`max(/Morningstar TriStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature</p> |
+|Temperature: Critically low battery temperature |<p>-</p> |`max(/Morningstar TriStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
+|Temperature: High battery temperature |<p>-</p> |`min(/Morningstar TriStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature</p> |
+|Temperature: Critically high battery temperature |<p>-</p> |`min(/Morningstar TriStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

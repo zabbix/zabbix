@@ -30,7 +30,7 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 $maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {

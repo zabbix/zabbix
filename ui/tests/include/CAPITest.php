@@ -97,14 +97,14 @@ class CAPITest extends CTest {
 	/**
 	 * Enable authorization/session for the following API calls.
 	 */
-	public function enableAuthorization() {
+	public static function enableAuthorization() {
 		CAPIHelper::setSessionId(null);
 	}
 
 	/**
 	 * Disable authorization/session for the following API calls.
 	 */
-	public function disableAuthorization() {
+	public static function disableAuthorization() {
 		CAPIHelper::setSessionId(false);
 	}
 

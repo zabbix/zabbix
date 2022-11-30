@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:20Z'
+  date: '2022-08-01T13:47:00Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -17,8 +17,8 @@ zabbix_export:
         3.Create MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
-        For more information read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please.
-        4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default ) or my.cnf in c:\ for Windows. For example:
+        For more information read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please. 
+        4.Create .my.cnf in home directory of Zabbix agent for Linux (/var/lib/zabbix by default) or my.cnf in c:\ for Windows. For example:
         [client]
         user='zbx_monitor'
         password='<password>'
@@ -1696,7 +1696,7 @@ zabbix_export:
           description: 'The maximum number of created tmp tables in memory per second for trigger expressions.'
         -
           macro: '{$MYSQL.HOST}'
-          value: localhost
+          value: 127.0.0.1
           description: 'Hostname or IP of MySQL host or container.'
         -
           macro: '{$MYSQL.INNODB_LOG_FILES}'
@@ -1734,8 +1734,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Operations'
-                        host: 'MySQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1750,8 +1750,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Queries'
-                        host: 'MySQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1766,8 +1766,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'MySQL by Zabbix agent'
                         name: 'MySQL: Connections'
-                        host: 'MySQL by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1783,8 +1783,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: Bandwidth'
                         host: 'MySQL by Zabbix agent'
+                        name: 'MySQL: Bandwidth'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1799,8 +1799,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: InnoDB buffer pool'
                         host: 'MySQL by Zabbix agent'
+                        name: 'MySQL: InnoDB buffer pool'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1816,8 +1816,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'MySQL: Threads'
                         host: 'MySQL by Zabbix agent'
+                        name: 'MySQL: Threads'
       valuemaps:
         -
           uuid: 4f2d7ca3c89246c6b691557447230031

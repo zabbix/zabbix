@@ -34,11 +34,12 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 #define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
-int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int upload_status)
+int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, const char *info, int status,
+		int upload_status)
 {
 	struct zbx_json		json;
 	zbx_vector_ptr_t	tasks;
-	int			ret, flags = ZBX_TCP_PROTOCOL, status;
+	int			ret, flags = ZBX_TCP_PROTOCOL;
 
 	zbx_vector_ptr_create(&tasks);
 
@@ -49,14 +50,11 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 		case ZBX_PROXY_UPLOAD_DISABLED:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
 					ZBX_JSON_TYPE_STRING);
-			status = FAIL;
 			break;
 		case ZBX_PROXY_UPLOAD_ENABLED:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
 					ZBX_JSON_TYPE_STRING);
-			ZBX_FALLTHROUGH;
-		default:
-			status = SUCCEED;
+			break;
 	}
 
 	if (SUCCEED == status)
@@ -88,6 +86,33 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 	zbx_vector_ptr_destroy(&tasks);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the 'proxy data' packet has historical data              *
+ *                                                                            *
+ * Return value: SUCCEED - the 'proxy data' contains no historical records    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxy_data_no_history(const struct zbx_json_parse *jp)
+{
+	struct zbx_json_parse	jp_data;
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_HISTORY_DATA, &jp_data))
+		return FAIL;
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
+		return FAIL;
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
+		return FAIL;
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_INTERFACE_AVAILABILITY, &jp_data))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -131,11 +156,13 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	if (FAIL == (ret = zbx_hc_check_proxy(proxy.hostid)))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
+		ret = proxy_data_no_history(jp);
 	}
 	else
-	{
 		upload_status = ZBX_PROXY_UPLOAD_ENABLED;
 
+	if (SUCCEED == ret)
+	{
 		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
@@ -153,7 +180,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_send_proxy_data_response(&proxy, sock, error, upload_status);
+	zbx_send_proxy_data_response(&proxy, sock, error, ret, upload_status);
 	responded = 1;
 
 out:

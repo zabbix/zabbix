@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-14T11:16:32Z'
+  date: '2022-10-27T13:33:00Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,12 +8,13 @@ zabbix_export:
   templates:
     -
       uuid: cf0947cc05d3450b9a6d66b2eb180482
-      template: 'Supermicro Aten SNMP'
-      name: 'Supermicro Aten SNMP'
+      template: 'Supermicro Aten by SNMP'
+      name: 'Supermicro Aten by SNMP'
       description: |
         Template Server Supermicro Aten
         
         MIBs used:
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         ATEN-IPMI-MIB
         
@@ -40,7 +41,7 @@ zabbix_export:
           triggers:
             -
               uuid: 680c72ab6bb441779553b198081e3bf4
-              expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+              expression: 'max(/Supermicro Aten by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -66,14 +67,14 @@ zabbix_export:
           triggers:
             -
               uuid: e2e4bfca2d0c4f8ebd64bef322d2a368
-              expression: 'min(/Supermicro Aten SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Supermicro Aten by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+                  expression: 'max(/Supermicro Aten by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -99,17 +100,17 @@ zabbix_export:
           triggers:
             -
               uuid: b6fb489c6a624b2994c5e50ba75539b2
-              expression: 'avg(/Supermicro Aten SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Supermicro Aten by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Supermicro Aten SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Supermicro Aten by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+                  expression: 'max(/Supermicro Aten by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -179,6 +180,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: 8b0320157a0144a0b2f1d7df7cbbe08a
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 52169be1d3924c638476a290590066f3
           name: 'System location'
           type: SNMP_AGENT
@@ -227,7 +256,7 @@ zabbix_export:
           triggers:
             -
               uuid: 07b7a49bffea4c03a022eed632754f47
-              expression: 'last(/Supermicro Aten SNMP/system.name,#1)<>last(/Supermicro Aten SNMP/system.name,#2) and length(last(/Supermicro Aten SNMP/system.name))>0'
+              expression: 'last(/Supermicro Aten by SNMP/system.name,#1)<>last(/Supermicro Aten by SNMP/system.name,#2) and length(last(/Supermicro Aten by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -240,6 +269,28 @@ zabbix_export:
                 -
                   tag: scope
                   value: security
+        -
+          uuid: cc33c0e22893432280d642c75020a222
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: a0c0d3ee729b4a159719271232024b45
           name: 'System object ID'
@@ -262,45 +313,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: cc33c0e22893432280d642c75020a222
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 37aab043ea474548ab1e54e504720bed
-              expression: 'last(/Supermicro Aten SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Supermicro Aten SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: e205f1aa96a448a2955e988fa8528600
           name: 'SNMP agent availability'
@@ -325,7 +337,7 @@ zabbix_export:
           triggers:
             -
               uuid: caeb9732846b4ae586ee103ac0c4a65b
-              expression: 'max(/Supermicro Aten SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Supermicro Aten by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -333,7 +345,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Supermicro Aten SNMP/icmpping,#3)=0'
+                  expression: 'max(/Supermicro Aten by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -414,9 +426,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1a48aee477d54d34bdea47fc6027968c
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
+                  expression: 'avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
+                  recovery_expression: 'max(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_DESCR}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -431,9 +443,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 2c2914d1c8c846d180ee308fa861540e
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}'
+                  expression: 'avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_DESCR}"}-3'
+                  recovery_expression: 'max(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_DESCR}"}-3'
                   name: '{#SENSOR_DESCR}: Temperature is above warning threshold'
                   event_name: '{#SENSOR_DESCR}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -442,8 +454,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_DESCR}: Temperature is above critical threshold'
-                      expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
-                      recovery_expression: 'max(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
+                      expression: 'avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}'
+                      recovery_expression: 'max(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_DESCR}"}-3'
                   tags:
                     -
                       tag: scope
@@ -453,9 +465,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 1439e7a34bbf4046836890f208f99a48
-                  expression: 'avg(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
+                  expression: 'avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Supermicro Aten SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}+3'
+                  recovery_expression: 'min(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}+3'
                   name: '{#SENSOR_DESCR}: Temperature is too low'
                   event_name: '{#SENSOR_DESCR}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -520,3 +532,20 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 37aab043ea474548ab1e54e504720bed
+      expression: '(last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Supermicro Aten by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice

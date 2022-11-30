@@ -38,7 +38,7 @@ if ($data['regexid'] != 0) {
 $form = (new CForm())
 	->setId('regex')
 	->setAction($action->getUrl())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 $table = (new CTable())
 	->setId('tbl_expr')

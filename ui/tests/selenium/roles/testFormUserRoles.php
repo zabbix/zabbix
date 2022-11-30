@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -25,9 +26,11 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, module, users
+ *
+ * @dataSource Services
+ *
  * @onBefore prepareRoleData
  * @onBefore prepareUserData
- * @onBefore prepareServiceData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -103,57 +106,6 @@ class testFormUserRoles extends CWebTest {
 				'usrgrps' => [
 					[
 						'usrgrpid' => '7'
-					]
-				]
-			]
-		]);
-	}
-
-	public function prepareServiceData() {
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Service_1',
-				'algorithm' => 1,
-				'sortorder' => 1
-			],
-			[
-				'name' => 'Service_2',
-				'algorithm' => 2,
-				'sortorder' => 2,
-				'problem_tags' => [
-					[
-						'tag' => 'tag1',
-						'value' => 'value1'
-					],
-					[
-						'tag' => 'tag2',
-						'value' => 'value2'
-					],
-					[
-						'tag' => 'tag3',
-						'value' => 'value3'
-					],
-					[
-						'tag' => 'tag4',
-						'value' => 'value4'
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'Service_tag1',
-						'value' => 'value1s'
-					],
-					[
-						'tag' => 'Service_tag2',
-						'value' => 'value2s'
-					],
-					[
-						'tag' => 'Service_tag3',
-						'value' => 'value3s'
-					],
-					[
-						'tag' => 'Service_tag4',
-						'value' => 'value4s'
 					]
 				]
 			]
@@ -770,14 +722,14 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'write_services' => [
-						'xpath:(//div[@class="multiselect-control"])[1]' => 'Service_1',
+						'xpath:(//div[@class="multiselect-control"])[1]' => 'Update service',
 						'Read-write access to services with tag' => [
 							'service-write-tag-tag' => 'tag-write',
 							'service_write_tag_value' => 'value-write'
 						]
 					],
 					'read_services' => [
-						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2'],
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Update service', 'Service for delete 2'],
 						'Read-only access to services with tag' => [
 							'service-read-tag-tag' => 'tag-read',
 							'service_read_tag_value' => 'value-read'
@@ -796,7 +748,7 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'read_services' => [
-						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Update service', 'Service for delete 2']
 					],
 					'message_header' => 'User role created'
 				]
@@ -1154,7 +1106,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [],
-					'api_methods' => [],
+					'api_methods' => '',
 					'message_header' => 'User role updated'
 				]
 			],
@@ -1240,7 +1192,7 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'read_services' => [
-						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
+						'xpath:(//div[@class="multiselect-control"])[2]' => ['Update service', 'Service for delete 2']
 					],
 					'message_header' => 'User role updated'
 				]
@@ -1254,14 +1206,14 @@ class testFormUserRoles extends CWebTest {
 						'Read-only access to services' => 'Service list'
 					],
 					'write_services' => [
-						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service_1', 'Service_2'],
+						'xpath:(//div[@class="multiselect-control"])[1]' => ['Update service', 'Service for delete 2'],
 						'Read-write access to services with tag' => [
 							'service-write-tag-tag' => 'tag-write',
 							'service_write_tag_value' => 'value-write'
 						]
 					],
 					'read_services' => [
-						'xpath:(//div[@class="multiselect-control"])[2]' => 'Service_1',
+						'xpath:(//div[@class="multiselect-control"])[2]' => 'Update service',
 						'Read-only access to services with tag' => [
 							'service-read-tag-tag' => 'tag-read',
 							'service_read_tag_value' => 'value-read'
@@ -1318,6 +1270,7 @@ class testFormUserRoles extends CWebTest {
 			$this->query('button:Delete')->one()->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
+
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'Cannot delete assigned user role "Admin role".');
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
@@ -1388,36 +1341,18 @@ class testFormUserRoles extends CWebTest {
 	public function testFormUserRoles_ServicesLayout() {
 		$services_table = [
 			[
-				'Name' => 'Service with tags for updating',
-				'Tags' => ['action: update', 'tag without value', 'test: update'],
-				'Problem tags' => ['problem action: problem update', 'problem tag without value', 'problem test: problem update']
-			],
-			[
-				'Name' => 'Service with tags for cloning',
-				'Tags' => ['a: :a', 'action: clone', 'common tag on host and element: common value'],
-				'Problem tags' => [
-						'problem a: :problem a',
-						'problem action: problem clone',
-						'problem common tag on host and element: problem common value'
-				]
-			],
-			[
-				'Name' => 'Service for removing tags',
-				'Tags' => ['action: remove', 'tag', 'tag: remove'],
-				'Problem tags' => [
-						'problem remove: problem remove',
-						'problem tag',
-						'problem tag: problem remove'
-				]
-			],
-			[
-				'Name' => 'Service_1',
+				'Name' => 'Service for delete by checkbox',
 				'Tags' => '',
 				'Problem tags' => ''
 			],
 			[
-				'Name' => 'Service_2',
-				'Tags' => ['Service_tag1: value1s', 'Service_tag2: value2s', 'Service_tag3: value3s', 'Service_tag4: value4s'],
+				'Name' => 'Service for delete',
+				'Tags' => ['remove_tag_2: remove_value_2'],
+				'Problem tags' => ''
+			],
+			[
+				'Name' => 'Service for delete 2',
+				'Tags' => ['3rd_tag: 3rd_value', '4th_tag: 4th_value', 'remove_tag_1: remove_value_1', 'remove_tag_2: remove_value_2'],
 				'Problem tags' => ['tag1: value1', 'tag2: value2', 'tag3: value3', 'tag4: value4']
 			]
 		];
@@ -1438,7 +1373,8 @@ class testFormUserRoles extends CWebTest {
 			// Check filter form.
 			$filter_form = $dialog->query('name:services_filter_form')->one();
 			$this->assertEquals('Name', $filter_form->query('xpath:.//label')->one()->getText());
-			$this->assertEquals(255, $filter_form->query('name:filter_name')->one()->getAttribute('maxlength'));
+			$filter_input = $filter_form->query('name:filter_name')->one();
+			$this->assertEquals(255, $filter_input->getAttribute('maxlength'));
 			$this->assertEquals(4, $dialog->query('button', ['Filter', 'Reset', 'Select', 'Cancel'])->all()
 					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
@@ -1470,16 +1406,22 @@ class testFormUserRoles extends CWebTest {
 				unset($tags);
 			}
 
+			// Filter out all unwanted services before checking table content.
+			$filter_input->fill('Service for delete');
+			$filter_button = $dialog->query('button:Filter')->one();
+			$filter_button->click();
+			$dialog->waitUntilReady();
+
 			// Check the content of the services list with modified expected value in tags column.
 			$this->assertTableData($services_table);
 
 			// Check filtering of services by name.
 			$searches = [
-				'ice_' => ['Service_1', 'Service_2'],
-				'1' => ['Service_1'],
-				'Service_123' => null
+				'child 1' => ['Child 1', 'Clone child 1'],
+				' 2 ' => ['Parent for 2 levels of child services'],
+				'empty result' => null
 			];
-			$filter_button = $filter_form->query('button:Filter')->one();
+
 			foreach ($searches as $string => $result) {
 				$filter_form->query('name:filter_name')->one()->fill($string);
 				$filter_button->click();
@@ -1500,14 +1442,18 @@ class testFormUserRoles extends CWebTest {
 			// Select one of the Services and make sure its not displayed in the list anymore.
 			$filter_form->query('button:Reset')->one()->click();
 			$dialog->invalidate();
-			$dialog->query('link:Service_1')->waitUntilClickable()->one()->click();
+			$dialog->query('link:Service for delete by checkbox')->waitUntilClickable()->one()->click();
 			$dialog->ensureNotPresent();
 
 			$multiselect->edit();
 			$dialog->invalidate();
-			$this->assertTableDataColumn(['Service with tags for updating', 'Service with tags for cloning',
-					'Service for removing tags', 'Service_2']
-			);
+
+			// Filter out all unwanted services befoce checking table content.
+			$dialog->query('name:filter_name')->one()->fill('Service for delete');
+			$dialog->query('button:Filter')->one()->click();
+			$dialog->waitUntilReady();
+
+			$this->assertTableDataColumn(['Service for delete', 'Service for delete 2']);
 			$dialog->close();
 
 			// Check the layout of tag related fields in Service section of user role config form.
@@ -1589,7 +1535,9 @@ class testFormUserRoles extends CWebTest {
 
 			if (array_key_exists('api_methods', $data)) {
 				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();
-				rsort($api_methods);
+				if (is_array($api_methods)) {
+					rsort($api_methods);
+				}
 				$this->assertEquals($data['api_methods'], $api_methods);
 			}
 		}

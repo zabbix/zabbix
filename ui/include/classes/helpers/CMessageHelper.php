@@ -74,7 +74,7 @@ class CMessageHelper {
 			self::addWarning($message['message']);
 		}
 		else {
-			self::addError($message['message'], $message['source']);
+			self::addError($message['message'], $message['is_technical_error']);
 		}
 	}
 
@@ -82,9 +82,9 @@ class CMessageHelper {
 	 * Add message with type error.
 	 *
 	 * @param string $message
-	 * @param string $source
+	 * @param bool   $is_technical_error
 	 */
-	public static function addError(string $message, string $source = ''): void {
+	public static function addError(string $message, bool $is_technical_error = false): void {
 		if (self::$type === null) {
 			self::$type = self::MESSAGE_TYPE_ERROR;
 		}
@@ -92,7 +92,7 @@ class CMessageHelper {
 		self::$messages[] = [
 			'type' => self::MESSAGE_TYPE_ERROR,
 			'message' => $message,
-			'source' => $source
+			'is_technical_error' => $is_technical_error
 		];
 	}
 

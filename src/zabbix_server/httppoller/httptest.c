@@ -663,8 +663,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -979,7 +978,7 @@ httptest_error:
 	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
 	{
 		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				0 > ts.sec ? ZBX_JAN_2038 : ts.sec, httptest->httptest.httptestid);
+				0 > ts.sec ? ZBX_JAN_2038 : ts.sec + SEC_PER_MIN, httptest->httptest.httptestid);
 	}
 	else if (0 > ts.sec + delay)
 	{

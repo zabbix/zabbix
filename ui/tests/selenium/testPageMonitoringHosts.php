@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageMonitoringHosts extends CWebTest {
@@ -52,7 +54,9 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
-			$this->assertTrue($this->query('xpath://li[contains(@class, "expanded")]')->one()->isPresent($status));
+			$this->assertTrue($this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]//li[contains(@class, "selected")]')
+					->one()->isPresent($status)
+			);
 			$this->query('xpath://a[@aria-label="Home"]')->one()->click();
 		}
 
@@ -351,14 +355,15 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHosts_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
+		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$result_form->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 	}
 
 	public static function getTagsFilterData() {
@@ -780,16 +785,19 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TagsFilter($data) {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('class:list-table')->waitUntilPresent()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		$this->query('button:Reset')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 	}
 
 	public function testPageMonitoringHosts_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -802,7 +810,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -810,7 +818,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$this->query('button:Reset')->one()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
 		$this->assertTableStats($reset_rows_count);
@@ -819,19 +827,20 @@ class testPageMonitoringHosts extends CWebTest {
 
 	// Checking that Show suppressed problems filter works.
 	public function testPageMonitoringHosts_ShowSuppresed() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 		foreach ([true, false] as $show) {
 			$form->query('id:show_suppressed_0')->asCheckbox()->one()->fill($show);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
 		}
+		$this->query('button:Reset')->one()->click();
 	}
 
 	public static function getEnabledLinksData() {
@@ -880,7 +889,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Check enabled links and that correct host is displayed.
 	 */
 	public function testPageMonitoringHosts_EnabledLinks($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		switch ($data['name']) {
 			case 'Dynamic widgets H1':
@@ -1002,7 +1011,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Click on host name from the table and check displayed popup context.
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
 		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
@@ -1075,7 +1084,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		foreach (['Name', 'Status'] as $listing) {
 			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
 			$query->one()->click();

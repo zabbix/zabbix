@@ -40,7 +40,7 @@ if (!hasRequest('form_refresh')) {
 $form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
@@ -180,7 +180,8 @@ $tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'template',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
-		'tabs_id' => 'tabs'
+		'tabs_id' => 'tabs',
+		'tags_tab_id' => 'tags-tab'
 	]), TAB_INDICATOR_TAGS
 );
 

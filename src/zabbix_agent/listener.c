@@ -126,7 +126,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+	memcpy(&s, ((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 

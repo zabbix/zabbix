@@ -1,9 +1,9 @@
 
-# Morningstar ProStar PWM SNMP
+# Morningstar ProStar PWM by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 
 ## Setup
 
@@ -60,7 +60,8 @@ There are no template links in this template.
 |Load |Load: State |<p>MIB: PROSTAR-PWM</p><p>Description:Load State</p><p>Modbus address:0x002E</p><p>0: Start</p><p>1: Normal</p><p>2: LvdWarning</p><p>3: Lvd</p><p>4: Fault</p><p>5: Disconnect</p><p>6: NormalOff</p><p>7: Override</p><p>8: NotUsed</p> |SNMP |load.state[loadState.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Load |Load: Voltage |<p>MIB: PROSTAR-PWM</p><p>Description:Load Voltage</p><p>Scaling Factor:1.0</p><p>Units:V</p><p>Range:[0, 80]</p><p>Modbus address:0x0014</p> |SNMP |load.voltage[loadVoltage.0] |
 |Load |Load: Current |<p>MIB: PROSTAR-PWM</p><p>Description:Load Current</p><p>Scaling Factor:1.0</p><p>Units:A</p><p>Range:[0, 60]</p><p>Modbus address:0x0016</p> |SNMP |load.current[loadCurrent.0] |
-|Status |Status: Uptime |<p>Device uptime in seconds</p> |SNMP |status.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (network) |<p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |status.net.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Status: Uptime (hardware) |<p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |status.hw.uptime<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |Status: Array Faults |<p>MIB: PROSTAR-PWM</p><p>Description:Array Faults</p><p>Modbus address:0x0022</p> |SNMP |status.array_faults[arrayFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Load Faults |<p>MIB: PROSTAR-PWM</p><p>Description:Load Faults</p><p>Modbus address:0x002F</p> |SNMP |status.load_faults[loadFaults.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Status |Status: Alarms |<p>MIB: PROSTAR-PWM</p><p>Description:Alarms</p><p>Modbus addresses:H=0x0038 L=0x0039</p> |SNMP |status.alarms[alarms.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
@@ -73,66 +74,66 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Battery: Device charge in warning state |<p>-</p> |`last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Device charge in critical state</p> |
-|Battery: Device charge in critical state |<p>-</p> |`last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}` |HIGH | |
-|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
-|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
-|Battery: High battery voltage |<p>-</p> |`min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
-|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
-|Load: Device load in warning state |<p>-</p> |`last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}` |WARNING |<p>**Depends on**:</p><p>- Load: Device load in critical state</p> |
-|Load: Device load in critical state |<p>-</p> |`last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}` |HIGH | |
-|Status: Device has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Morningstar ProStar PWM SNMP/status.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes</p> |`nodata(/Morningstar ProStar PWM SNMP/status.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
-|Status: Device has "overcurrent" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2` |HIGH | |
-|Status: Device has "mosfetSShorted" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2` |HIGH | |
-|Status: Device has "software" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2` |HIGH | |
-|Status: Device has "batteryHvd" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2` |HIGH | |
-|Status: Device has "arrayHvd" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2` |HIGH | |
-|Status: Device has "customSettingsEdit" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
-|Status: Device has "rtsShorted" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2` |HIGH | |
-|Status: Device has "rtsNoLongerValid" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2` |HIGH | |
-|Status: Device has "localTempSensorDamaged" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2` |HIGH | |
-|Status: Device has "batteryLowVoltageDisconnect" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2` |HIGH | |
-|Status: Device has "slaveTimeout" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2` |HIGH | |
-|Status: Device has "dipSwitchChanged" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2` |HIGH | |
-|Status: Device has "p3Fault" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2` |HIGH | |
-|Status: Device has "externalShortCircuit" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2` |HIGH | |
-|Status: Device has "overcurrent" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2` |HIGH | |
-|Status: Device has "mosfetShorted" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2` |HIGH | |
-|Status: Device has "software" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2` |HIGH | |
-|Status: Device has "loadHvd" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2` |HIGH | |
-|Status: Device has "highTempDisconnect" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2` |HIGH | |
-|Status: Device has "dipSwitchChanged" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2` |HIGH | |
-|Status: Device has "customSettingsEdit" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
-|Status: Device has "p3Fault" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2` |HIGH | |
-|Status: Device has "rtsShorted" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2` |WARNING | |
-|Status: Device has "rtsDisconnected" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2` |WARNING | |
-|Status: Device has "heatsinkTempSensorOpen" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2` |WARNING | |
-|Status: Device has "heatsinkTempSensorShorted" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2` |WARNING | |
-|Status: Device has "heatsinkTempLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2` |WARNING | |
-|Status: Device has "currentLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2` |WARNING | |
-|Status: Device has "currentMeasurementError" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2` |WARNING | |
-|Status: Device has "batterySenseOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2` |WARNING | |
-|Status: Device has "batterySenseDisconnected" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2` |WARNING | |
-|Status: Device has "uncalibrated" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2` |WARNING | |
-|Status: Device has "batteryTempOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2` |WARNING | |
-|Status: Device has "fp10SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2` |WARNING | |
-|Status: Device has "mosfetOpen" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2` |WARNING | |
-|Status: Device has "arrayCurrentOffset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2` |WARNING | |
-|Status: Device has "loadCurrentOffset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2` |WARNING | |
-|Status: Device has "p33SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2` |WARNING | |
-|Status: Device has "p12SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2` |WARNING | |
-|Status: Device has "hightInputVoltageLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2` |WARNING | |
-|Status: Device has "controllerReset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2` |WARNING | |
-|Status: Device has "loadLvd" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2` |WARNING | |
-|Status: Device has "logTimeout" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2` |WARNING | |
-|Status: Device has "eepromAccessFailure" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2` |WARNING | |
-|Temperature: Low battery temperature |<p>-</p> |`max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature</p> |
-|Temperature: Critically low battery temperature |<p>-</p> |`max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
-|Temperature: High battery temperature |<p>-</p> |`min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature</p> |
-|Temperature: Critically high battery temperature |<p>-</p> |`min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
+|Battery: Device charge in warning state |<p>-</p> |`last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Device charge in critical state</p> |
+|Battery: Device charge in critical state |<p>-</p> |`last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}` |HIGH | |
+|Battery: Low battery voltage |<p>-</p> |`max(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically low battery voltage</p> |
+|Battery: Critically low battery voltage |<p>-</p> |`max(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}` |HIGH | |
+|Battery: High battery voltage |<p>-</p> |`min(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Battery: Critically high battery voltage</p> |
+|Battery: Critically high battery voltage |<p>-</p> |`min(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}` |HIGH | |
+|Load: Device load in warning state |<p>-</p> |`last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}` |WARNING |<p>**Depends on**:</p><p>- Load: Device load in critical state</p> |
+|Load: Device load in critical state |<p>-</p> |`last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}` |HIGH | |
+|Status: Device has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar PWM by SNMP/status.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
+|Status: Failed to fetch data |<p>Zabbix has not received data for items for the last 5 minutes.</p> |`nodata(/Morningstar ProStar PWM by SNMP/status.net.uptime,5m)=1` |WARNING |<p>Manual close: YES</p> |
+|Status: Device has "overcurrent" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2` |HIGH | |
+|Status: Device has "mosfetSShorted" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2` |HIGH | |
+|Status: Device has "software" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2` |HIGH | |
+|Status: Device has "batteryHvd" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2` |HIGH | |
+|Status: Device has "arrayHvd" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2` |HIGH | |
+|Status: Device has "customSettingsEdit" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
+|Status: Device has "rtsShorted" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2` |HIGH | |
+|Status: Device has "rtsNoLongerValid" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2` |HIGH | |
+|Status: Device has "localTempSensorDamaged" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2` |HIGH | |
+|Status: Device has "batteryLowVoltageDisconnect" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2` |HIGH | |
+|Status: Device has "slaveTimeout" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2` |HIGH | |
+|Status: Device has "dipSwitchChanged" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2` |HIGH | |
+|Status: Device has "p3Fault" array faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2` |HIGH | |
+|Status: Device has "externalShortCircuit" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2` |HIGH | |
+|Status: Device has "overcurrent" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2` |HIGH | |
+|Status: Device has "mosfetShorted" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2` |HIGH | |
+|Status: Device has "software" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2` |HIGH | |
+|Status: Device has "loadHvd" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2` |HIGH | |
+|Status: Device has "highTempDisconnect" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2` |HIGH | |
+|Status: Device has "dipSwitchChanged" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2` |HIGH | |
+|Status: Device has "customSettingsEdit" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2` |HIGH | |
+|Status: Device has "p3Fault" load faults flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2` |HIGH | |
+|Status: Device has "rtsShorted" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2` |WARNING | |
+|Status: Device has "rtsDisconnected" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2` |WARNING | |
+|Status: Device has "heatsinkTempSensorOpen" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2` |WARNING | |
+|Status: Device has "heatsinkTempSensorShorted" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2` |WARNING | |
+|Status: Device has "heatsinkTempLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2` |WARNING | |
+|Status: Device has "currentLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2` |WARNING | |
+|Status: Device has "currentMeasurementError" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2` |WARNING | |
+|Status: Device has "batterySenseOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2` |WARNING | |
+|Status: Device has "batterySenseDisconnected" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2` |WARNING | |
+|Status: Device has "uncalibrated" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2` |WARNING | |
+|Status: Device has "batteryTempOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2` |WARNING | |
+|Status: Device has "fp10SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2` |WARNING | |
+|Status: Device has "mosfetOpen" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2` |WARNING | |
+|Status: Device has "arrayCurrentOffset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2` |WARNING | |
+|Status: Device has "loadCurrentOffset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2` |WARNING | |
+|Status: Device has "p33SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2` |WARNING | |
+|Status: Device has "p12SupplyOutOfRange" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2` |WARNING | |
+|Status: Device has "hightInputVoltageLimit" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2` |WARNING | |
+|Status: Device has "controllerReset" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2` |WARNING | |
+|Status: Device has "loadLvd" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2` |WARNING | |
+|Status: Device has "logTimeout" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2` |WARNING | |
+|Status: Device has "eepromAccessFailure" alarm flag |<p>-</p> |`count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2` |WARNING | |
+|Temperature: Low battery temperature |<p>-</p> |`max(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically low battery temperature</p> |
+|Temperature: Critically low battery temperature |<p>-</p> |`max(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}` |HIGH | |
+|Temperature: High battery temperature |<p>-</p> |`min(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Temperature: Critically high battery temperature</p> |
+|Temperature: Critically high battery temperature |<p>-</p> |`min(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}` |HIGH | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

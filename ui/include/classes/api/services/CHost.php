@@ -490,7 +490,7 @@ class CHost extends CHostGeneral {
 		/*
 		 * Cleaning the output from write-only properties.
 		 */
-		$write_only_keys = ['tls_psk_identity', 'tls_psk'];
+		$write_only_keys = ['tls_psk_identity', 'tls_psk', 'name_upper'];
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
@@ -542,6 +542,7 @@ class CHost extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['name_upper'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -580,6 +581,12 @@ class CHost extends CHostGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
 			$sqlParts['select']['inventory_mode'] =
@@ -2383,7 +2390,8 @@ class CHost extends CHostGeneral {
 				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				'skipDependent' => true,
 				'status' => TRIGGER_STATUS_ENABLED,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'nopermissions' => true
 			]);
 
 			$problems = API::Problem()->get([
@@ -2392,7 +2400,8 @@ class CHost extends CHostGeneral {
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'suppressed' => $options['withProblemsSuppressed'],
-				'severities' => $options['severities']
+				'severities' => $options['severities'],
+				'nopermissions' => true
 			]);
 
 			if (!$problems) {

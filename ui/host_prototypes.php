@@ -426,8 +426,9 @@ if (hasRequest('form')) {
 
 	// add parent host
 	$parentHost = API::Host()->get([
-		'output' => API_OUTPUT_EXTEND,
-		'selectGroups' => ['groupid', 'name'],
+		'output' => ['hostid', 'proxy_hostid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+			'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
+		],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
