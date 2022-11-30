@@ -254,7 +254,8 @@ static size_t	preproc_snmp_parse_value(const char *ptr, const char *type, int js
 	}
 }
 
-static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, size_t *line_len, int json, char **error)
+static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, size_t *line_len, int json,
+		char **error)
 {
 	int		ret = FAIL;
 	size_t		len;
@@ -312,6 +313,7 @@ reparse_type:
 
 	if ('\0' == *data)
 	{
+		*line_len = data - start;
 		ret = SUCCEED;
 		goto out;
 	}
