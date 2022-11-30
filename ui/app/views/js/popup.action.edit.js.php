@@ -97,6 +97,7 @@ window.action_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				this.$operation_table.empty();
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -105,9 +106,6 @@ window.action_edit_popup = new class {
 
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title)[0];
-
-					this.$operation_table.empty();
-					this.loaderStart();
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
@@ -116,7 +114,6 @@ window.action_edit_popup = new class {
 						this.form.parentNode.insertBefore(message_box, this.form);
 					}
 
-					this.$operation_table.empty();
 					this.$operation_table.append(response.body);
 				}
 			})
@@ -148,9 +145,7 @@ window.action_edit_popup = new class {
 
 	loaderStart() {
 		this.$preloader = $('<span>', {class: 'is-loading'});
-		this.$operation_table
-			.empty()
-			.append(this.$preloader);
+		this.$operation_table.append(this.$preloader);
 	}
 
 	_initActionButtons() {
