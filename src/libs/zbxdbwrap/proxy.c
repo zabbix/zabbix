@@ -29,7 +29,6 @@
 #include "preproc.h"
 #include "zbxcrypto.h"
 #include "zbxlld.h"
-//#include "zbxevents.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
@@ -2230,8 +2229,9 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  *             ip_discovered_ptr - [IN] vector of ip addresses                *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
-		zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
+static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_events_funcs_t events_cbs,
+		zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num,
+		int ip_idx)
 {
 	ZBX_DB_DHOST		dhost;
 	zbx_service_t		*service;
@@ -2365,7 +2365,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, NULL);
+				service->status, service->value, service->itemtime, events_cbs.add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2407,7 +2407,8 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char **error)
+static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_events_funcs_t events_cbs,
+		char **error)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2548,7 +2549,9 @@ json_parse_error:
 			ZBX_STR2UINT64(unique_dcheckid, row[0]);
 		else
 			unique_dcheckid = 0;
+
 		DBfree_result(result);
+
 		for (j = 0; j < drule->ips.values_num && SUCCEED == ret2; j++)
 		{
 			int	processed_num = 0;
@@ -2557,16 +2560,19 @@ json_parse_error:
 
 			while (processed_num != drule_ip->services.values_num)
 			{
-				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, drule->druleid,
-						&drule->dcheckids, unique_dcheckid, &processed_num, j)))
+				if (FAIL == (ret2 = process_services(&drule_ip->services, drule_ip->ip, events_cbs,
+						drule->druleid, &drule->dcheckids, unique_dcheckid, &processed_num, j)))
 				{
 					break;
 				}
 			}
 		}
 
-		//zbx_process_events(NULL, NULL);
-		//zbx_clean_events();
+		if (NULL != events_cbs.process_events_cb)
+			events_cbs.process_events_cb(NULL, NULL);
+		if (NULL != events_cbs.clean_events_cb)
+			events_cbs.clean_events_cb();
+
 		DBcommit();
 	}
 json_parse_return:
@@ -2894,7 +2900,7 @@ static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_sta
  *                                                                            *
  ******************************************************************************/
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, int *more, char **error)
+		unsigned char proxy_status, zbx_events_funcs_t events_cbs, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old;
@@ -2992,7 +2998,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DISCOVERY_DATA, &jp_data))
 	{
-		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, &error_step)))
+		if (SUCCEED != (ret = process_discovery_data_contents(&jp_data, events_cbs, &error_step)))
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 	}
 

@@ -20,7 +20,6 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-//#include "zbxevents.h"
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcrypto.h"

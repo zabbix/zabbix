@@ -22,7 +22,6 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
-//#include "zbxevents.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -63,9 +62,6 @@ void	zbx_log_sync_history_cache_progress(void);
 #define ZBX_SYNC_ALL	1
 
 int	init_database_cache(char **error);
-//void	free_database_cache(int, zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_event_cb,
-//		 zbx_reset_event_recovery_func_t reset_event_recovery_cb);
-
 void	free_database_cache(int sync, zbx_events_funcs_t events_funcs_cbs);
 
 void	change_proxy_history_count(int change_count);

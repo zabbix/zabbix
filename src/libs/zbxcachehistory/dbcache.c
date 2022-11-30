@@ -23,7 +23,6 @@
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxserver.h"
-//#include "zbxevents.h"
 #include "zbxmodules.h"
 #include "module.h"
 #include "zbxexport.h"
@@ -3253,14 +3252,6 @@ static void	sync_proxy_history(int *total_num, int *more)
  *            b) less than 500 (full batch) timer triggers were processed     *
  *                                                                            *
  ******************************************************************************/
-//static void	sync_server_history(int *values_num, int *triggers_num, zbx_add_event_func_t add_event_cb,
-//		zbx_process_events_func_t process_events_cb,
-//		zbx_reset_event_recovery_func_t reset_event_recovery_cb,
-//		zbx_clean_events_func_t clean_events_cb,
-//		zbx_events_update_itservices_func_t events_update_itservices_cb,
-//		zbx_export_events_func_t export_events_cb, int *more)
-
-
 static void	sync_server_history(int *values_num, int *triggers_num,
 		zbx_events_funcs_t events_cbs, int *more)
 {
@@ -3651,11 +3642,6 @@ static void	sync_server_history(int *values_num, int *triggers_num,
  *           unnecessary.                                                     *
  *                                                                            *
  ******************************************************************************/
-//static void	sync_history_cache_full(zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
-//		zbx_reset_event_recovery_func_t reset_event_recovery_cb, zbx_clean_events_func_t clean_events_cb,
-//		zbx_events_update_itservices_func_t events_update_itservices_cb,
-//		zbx_export_events_func_t export_events_cb)
-
 static void	sync_history_cache_full(zbx_events_funcs_t events_funcs_cbs)
 {
 	int			values_num = 0, triggers_num = 0, more;
@@ -3705,11 +3691,6 @@ static void	sync_history_cache_full(zbx_events_funcs_t events_funcs_cbs)
 		{
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				//sync_server_history(&values_num, &triggers_num, add_event_cb, process_events_cb,
-				//		reset_event_recovery_cb, clean_events_cb, events_update_itservices_cb,
-				//		export_events_cb, &more);
-
-
 				sync_server_history(&values_num, &triggers_num, events_funcs_cbs, &more);
 			}
 			else
@@ -4913,12 +4894,6 @@ int	get_proxy_history_count(void)
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-//static void	DCsync_all(zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_event_cb,
-//		zbx_reset_event_recovery_func_t reset_event_recovery_cb, zbx_clean_events_func_t clean_events_cb,
-//		zbx_events_update_itservices_func_t events_update_itservices_cb,
-//		zbx_export_events_func_t export_events_cb)
-
-
 static void	DCsync_all(zbx_events_funcs_t events_funcs_cbs)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
@@ -4940,11 +4915,6 @@ static void	DCsync_all(zbx_events_funcs_t events_funcs_cbs)
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
  ******************************************************************************/
-//void	free_database_cache(int sync, zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_event_cb,
-//		zbx_reset_event_recovery_func_t reset_event_recovery_cb, zbx_clean_events_func_t clean_events_cb,
-//		zbx_events_update_itservices_func_t events_update_itservices_cb,
-//		zbx_export_events_func_t export_events_cb)
-
 void	free_database_cache(int sync, zbx_events_funcs_t events_funcs_cbs)
 
 {
@@ -4952,9 +4922,6 @@ void	free_database_cache(int sync, zbx_events_funcs_t events_funcs_cbs)
 
 	if (ZBX_SYNC_ALL == sync)
 	{
-		//DCsync_all(add_event_cb, process_event_cb, reset_event_recovery_cb, clean_events_cb,
-		//		zbx_events_update_itservices_func_t events_update_itservices_cb, export_events_cb);
-
 		DCsync_all(events_funcs_cbs);
 	}
 

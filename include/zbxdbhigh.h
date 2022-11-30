@@ -26,7 +26,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
-//#include "zbxevents.h"
 #include "zbxtime.h"
 
 extern char	*CONFIG_DBHOST;
@@ -585,7 +584,6 @@ typedef ZBX_DB_EVENT	*(*zbx_add_event_func_t)(unsigned char source, unsigned cha
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-
 typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
@@ -922,6 +920,5 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
-
 
 #endif /* ZABBIX_DBHIGH_H */

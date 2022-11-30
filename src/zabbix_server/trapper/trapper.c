@@ -1112,7 +1112,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_recv_proxy_data(sock, &jp, ts);
+				zbx_recv_proxy_data(sock, &jp, ts, events_cbs);
 			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				zbx_send_proxy_data(sock, ts, zbx_config);
 		}

@@ -21,7 +21,6 @@
 #define ZABBIX_DISCOVERY_H
 
 #include "zbxdbhigh.h"
-//#include "zbxevents.h"
 
 typedef struct
 {

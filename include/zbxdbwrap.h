@@ -65,7 +65,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, 
 int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, int *more, char **error);
+		unsigned char proxy_status, zbx_events_funcs_t events_cbs, int *more, char **error);
 int	zbx_check_protocol_version(DC_PROXY *proxy, int version);
 
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,

@@ -22,6 +22,7 @@
 #include "cfg.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"

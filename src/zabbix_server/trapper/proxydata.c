@@ -128,7 +128,8 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *             ts   - [IN] the connection timestamp                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts)
+void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
+		zbx_events_funcs_t events_cbs)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
@@ -170,7 +171,8 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, NULL, &error)))
+		if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, HOST_STATUS_PROXY_ACTIVE, events_cbs, NULL,
+				&error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.host, sock->peer, error);
