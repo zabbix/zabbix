@@ -50,6 +50,12 @@
 
 extern unsigned char			program_type;
 
+zbx_export_file_t		*problems_export = NULL;
+static zbx_export_file_t	*get_problems_export(void)
+{
+	return problems_export;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: close the specified problem event and remove task                 *
@@ -1398,7 +1404,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("task-manager", process_num);
+		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
 	sec1 = zbx_time();
 
@@ -1446,6 +1452,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_export_deinit(problems_export);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

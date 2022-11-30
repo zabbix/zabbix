@@ -1,35 +1,50 @@
+Changes for 6.4.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0beta4
 
 New features:
+A.F.I...S. [ZBXNEXT-276] added LDAP and SAML user provisioning (Andris, epulke, gcalenko, miks)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 A......... [ZBXNEXT-8051] added new authentications methods for API calls (rlataria)
-..F.I..... [ZBXNEXT-4714] implemented filters for Action log page and widget and export to CSV file for Action log page (ashubin, dpetra, vso)
-.........T [ZBX-21588] optimized template k8s nodes by http (egordymov)
-.........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
+..F.I..... [ZBXNEXT-4714] implemented filters for Action log page; and widget and export to CSV file for Action log page (ashubin, dpetra, vso)
+.........T [ZBXNEXT-6844] added a Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBXNEXT-7903] added templates for Azure PostgreSQL servers (vkhaliev)
-.........T [ZBXNEXT-7949] added a suffix "by" of template names (egordymov)
-.........T [ZBX-20478] fixed script k8s cluster state (egordymov)
+.........T [ZBXNEXT-7949] added a suffix "by" in template names (egordymov)
+.......PS. [ZBXNEXT-7948] optimized preprocessing manager cache refresh (wiper)
 
 Bug fixes:
-.........T [ZBX-21929] fixed field 'type' of widgets (abakaldin)
+.........T [ZBX-21929] fixed widgets' field "type" (abakaldin)
 A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
 .........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
 ........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
-........S. [ZBX-21830] fixed syntax of message identifier in the In-Reply-To e-mail header field (askolmeisters)
-..F....... [ZBX-21828] fixed undefined index "suppress_until" in Problems by severity widget (kkuzmina)
-..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
-........S. [ZBX-19813] reworked inteface updates in template linking and lld (wiper)
-..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
+........S. [ZBX-21830] fixed syntax of a message identifier in the "In-Reply-To e-mail" header field (askolmeisters)
+..F....... [ZBX-21828] fixed undefined index "suppress_until" in the "Problems by severity widget" (kkuzmina)
+..F....... [ZBX-21816] fixed an incorrect "i" icon alignment in "Compact view" info column of the Problems section (kkuzmina)
+........S. [ZBX-19813] reworked inteface updates in template linking and LLD (wiper)
+..F....... [ZBX-20320] fixed order of checkboxes in User role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
 .......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
-.........T [ZBX-21620] changed update interval for passwd checksum item in OS templates to 15m (drasihov)
+.........T [ZBX-21620] changed an update interval for a "passwd checksum" item in OS templates to 15m (drasihov)
 ........S. [ZBX-21825] improved history syncer performance (vso)
-..F....... [ZBX-21785] updated Actions checkboxes in Audit log form filter for User directory and Autoregistration (kkuzmina)
+..F....... [ZBX-21785] updated "Actions checkboxes" in Audit log form filter for User directory and Autoregistration (kkuzmina)
 ........S. [ZBX-21765] removed HTTP header "Accept-Encoding" from defaults in a web scenario step request (dimir)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 ........S. [ZBX-21616] fixed error due to non-existent macros in custom expressions (dgoloscapov, wiper)
-.......PS. [ZBX-21786] fixed 'invalid timeout' error occurring after script item parameters removal (asestakovs)
-...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+.......PS. [ZBX-21786] fixed "invalid timeout" error occurring after removal of script item parameters (asestakovs)
+...G...... [ZBX-21823] fixed "vfs.fs.inode" and "vfs.fs.get" to handle the file systems with zero total inodes count (asestakovs)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header so that it allows to access the frontend in maintenace mode (agriscenko)
+.........T [ZBX-21588] optimized template k8s nodes by HTTP (egordymov)
+.........T [ZBX-20478] fixed script for k8s cluster state (egordymov)
+.........T [ZBX-20296] fixed swap trigger function for windows os and modules by Zabbix agent templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+..F....... [ZBX-21000] fixed possibility to update host interface on items from templates (dpetra)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+...G...... [ZBX-21456] fixed net.tcp.socket.count and net.udp.socket.count problem on Zabbix agent 2 when ipv6 is disabled (dgoloscapov)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta3
@@ -131,6 +146,13 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
 .D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.6rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.2.5
@@ -612,6 +634,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.11
@@ -2846,6 +2875,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.31rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.30
