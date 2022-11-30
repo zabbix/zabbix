@@ -2916,6 +2916,32 @@ static const char	*trigger_value_string(unsigned char value)
 	}
 }
 
+static const ZBX_DB_EVENT	*get_cause_recovery_event(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *eventids,
+		zbx_vector_ptr_t *r_events)
+{
+	const ZBX_DB_EVENT		*c_event = event;
+	zbx_vector_uint64_t		r_eventids;
+	zbx_vector_uint64_pair_t	dummy_event_pairs;
+
+	zbx_vector_uint64_create(&r_eventids);
+	zbx_vector_uint64_pair_create(&dummy_event_pairs);
+
+	zbx_db_get_eventid_r_eventid_pairs(eventids, &dummy_event_pairs, &r_eventids);
+
+	if (0 != r_eventids.values_num)
+	{
+		zbx_db_get_events_by_eventids(&r_eventids, r_events);
+
+		if (0 != r_events->values_num)
+			c_event = r_events->values[0];
+	}
+
+	zbx_vector_uint64_destroy(&r_eventids);
+	zbx_vector_uint64_pair_destroy(&dummy_event_pairs);
+
+	return c_event;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: request cause event value by macro                                *
@@ -2924,10 +2950,9 @@ static const char	*trigger_value_string(unsigned char value)
 static void	get_event_cause_value(const char *macro, char **replace_to, const ZBX_DB_EVENT *event,
 		const zbx_uint64_t *recipient_userid, const char *tz, char *error, int maxerrlen)
 {
-	const ZBX_DB_EVENT		*cause_event, *r_event, *c_event;
-	zbx_vector_uint64_t		eventids, r_eventids;
-	zbx_vector_ptr_t		events, r_events;
-	zbx_vector_uint64_pair_t	dummy_event_pairs;
+	const ZBX_DB_EVENT	*cause_event;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_ptr_t	events, r_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
 			event->name);
@@ -2938,29 +2963,15 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_ptr_create(&events);
 
-	zbx_vector_uint64_create(&r_eventids);
-	zbx_vector_ptr_create(&r_events);
-	zbx_vector_uint64_pair_create(&dummy_event_pairs);
-
 	zbx_vector_uint64_append(&eventids, event->cause_eventid);
 	zbx_db_get_events_by_eventids(&eventids, &events);
-	cause_event = events.values[0];
 
-	zbx_db_get_eventid_r_eventid_pairs(&eventids, &dummy_event_pairs, &r_eventids);
-
-	if (r_eventids.values_num == 0)
-	{
-		c_event = cause_event;
-	}
-	else
-	{
-		zbx_db_get_events_by_eventids(&r_eventids, &r_events);
-		r_event = r_events.values[0];
-		c_event = r_event;
-	}
-
-	if (EVENT_SOURCE_TRIGGERS != c_event->source)
+	if (0 == events.values_num)
 		goto clean;
+
+	zbx_vector_ptr_create(&r_events);
+
+	cause_event = events.values[0];
 
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_HISTORY))
 	{
@@ -2980,10 +2991,10 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION))
 	{
-		if (NULL == r_event)
+		if (cause_event == (event = get_cause_recovery_event(cause_event, &eventids, &r_events)))
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
 		else
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - cause_event->clock));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(event->clock - cause_event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ID))
 	{
@@ -2995,8 +3006,10 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_STATUS))
 	{
-		*replace_to = zbx_strdup(*replace_to, event_value_string((unsigned char)c_event->source,
-				(unsigned char)c_event->object, (unsigned char)c_event->value));
+		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
+
+		*replace_to = zbx_strdup(*replace_to, event_value_string((unsigned char)cause_event->source,
+				(unsigned char)cause_event->object, (unsigned char)cause_event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
 	{
@@ -3016,7 +3029,8 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->value);
+		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
+		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->value);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
@@ -3037,18 +3051,16 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OPDATA))
 	{
-		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
+		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
+		resolve_opdata(cause_event, replace_to, tz, error, maxerrlen);
 	}
 
+	zbx_vector_ptr_clear_ext(&r_events, (zbx_clean_func_t)zbx_db_free_event);
+	zbx_vector_ptr_destroy(&r_events);
 clean:
 	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
 	zbx_vector_ptr_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);
-
-	zbx_vector_ptr_clear_ext(&r_events, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&r_events);
-	zbx_vector_uint64_destroy(&r_eventids);
-	zbx_vector_uint64_pair_destroy(&dummy_event_pairs);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
