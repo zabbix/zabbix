@@ -759,7 +759,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	 */
 	public function testPageMonitoringLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid'])
+		$this->page->login()->open('zabbix.php?&action=latest.view&filter_set=1&filter_name=&show_details=0&hostids%5B%5D='.$data['hostid'])
 				->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.

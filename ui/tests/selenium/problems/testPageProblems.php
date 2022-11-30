@@ -34,7 +34,7 @@ class testPageProblems extends CLegacyWebTest {
 	use TableTrait;
 
 	public function testPageProblems_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckTitle('Problems');
 		$this->zbxTestCheckHeader('Problems');
 
@@ -48,7 +48,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_History_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 
 		$this->zbxTestClickXpathWait("//label[text()='History']");
@@ -67,7 +67,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by "AND" or "OR" tag options
 	 */
 	public function testPageProblems_FilterByTagsOptionAndOr() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 
 		// Check the default tag filter option AND and tag value option Contains
@@ -100,7 +100,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by partial or exact tag value match
 	 */
 	public function testPageProblems_FilterByTagsOptionContainsEquals() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');
@@ -127,7 +127,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search problems by partial and exact tag value match and then remove one
 	 */
 	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');
@@ -373,7 +373,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsExceptContainsEqualsData
 	 */
 	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
-		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
+		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&filter_set=1&filter_name=&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
 		$this->setTagSelector('id:filter-tags_0');
@@ -407,7 +407,7 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_FilterByAllOptions() {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$this->zbxTestClickButtonText('Reset');
@@ -454,7 +454,7 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_ShowTags() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 		$form = $this->query('id:tabfilter_0')->asForm()->one()->waitUntilVisible();
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
@@ -614,7 +614,7 @@ class testPageProblems extends CLegacyWebTest {
 	 * @dataProvider getTagPriorityData
 	 */
 	public function testPageProblems_TagPriority($data) {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$table = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');
 		$table->waitUntilReloaded();
@@ -657,7 +657,7 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_SuppressedProblems() {
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$this->zbxTestLogin('zabbix.php?&action=problem.view&filter_set=1&filter_name=&show_suppressed=1&');
 		$this->zbxTestCheckHeader('Problems');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');

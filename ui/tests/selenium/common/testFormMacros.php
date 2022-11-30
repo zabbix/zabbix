@@ -2403,7 +2403,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Latest data page. Macro is resolved only in key.
 			[
 				[
-					'url' => 'zabbix.php?action=latest.view&hostids%5B%5D='.$this->macro_resolve_hostid.'&show_details=1',
+					'url' => 'zabbix.php?action=latest.view&filter_set=1&filter_name=&hostids%5B%5D='.$this->macro_resolve_hostid.'&show_details=1',
 					'name' => 'Macro value: '.$this->macro_resolve,
 					'key' => 'trap[Value 2 B resolved]',
 					'key_secret' => 'trap[******]'
@@ -2412,7 +2412,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Hosts items page. Macro is not resolved in any field.
 			[
 				[
-					'url' => 'items.php?filter_set=1&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
+					'url' => 'items.php?filter_set=1&filter_name=&filter_hostids%5B0%5D='.$this->macro_resolve_hostid.'&context=host',
 					'name' => 'Macro value: '.$this->macro_resolve,
 					'key' => 'trap['.$this->macro_resolve.']',
 					'key_secret' => 'trap['.$this->macro_resolve.']'
