@@ -187,37 +187,37 @@ class CControllerPopupActionOperationEdit extends CController {
 			}
 
 			if(count($operation['opcommand_hst']) > 0) {
-				$host = CArrayHelper::renameObjectsKeys(API::Host()->get([
+				$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'hostids' => array_column($operation['opcommand_hst'], 'hostid')
 				]), ['hostid' => 'id']);
 
-				CArrayHelper::sort($host, ['name']);
+				CArrayHelper::sort($hosts, ['name']);
 
-				$result['opcommand_hst'] = array_values($host);
+				$result['opcommand_hst'] = array_values($hosts);
 			}
 		}
 
 		if ($operation['opcommand_grp']) {
-			$group = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			$groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => array_column($operation['opcommand_grp'], 'groupid')
 			]), ['groupid' => 'id']);
 
-			CArrayHelper::sort($group, ['name']);
+			CArrayHelper::sort($groups, ['name']);
 
-			$result['opcommand_grp'] = array_values($group);
+			$result['opcommand_grp'] = array_values($groups);
 		}
 
 		if ($operation['opgroup']) {
-			$group = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+			$groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => array_column($operation['opgroup'], 'groupid')
 			]), ['groupid' => 'id']);
 
-			CArrayHelper::sort($group, ['name']);
+			CArrayHelper::sort($groups, ['name']);
 
-			$result['opgroup'] = array_values($group);
+			$result['opgroup'] = array_values($groups);
 		}
 
 		if ($operation['optemplate']) {
