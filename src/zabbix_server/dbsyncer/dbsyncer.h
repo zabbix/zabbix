@@ -21,6 +21,13 @@
 #define ZABBIX_DBSYNCER_H
 
 #include "zbxthreads.h"
+#include "zbxdbhigh.h"
+
+typedef struct
+{
+	zbx_events_funcs_t events_funcs_cbs; 
+}
+zbx_thread_dbsyncer_args;
 
 ZBX_THREAD_ENTRY(dbsyncer_thread, args);
 

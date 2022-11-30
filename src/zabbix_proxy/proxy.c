@@ -1257,6 +1257,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
+        zbx_events_funcs_t events_funcs_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
+
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
 
 	zbx_thread_args_t		thread_args;
@@ -1264,8 +1266,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
 	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
 	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, events_funcs_cbs};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock, events_funcs_cbs};
+
+	zbx_thread_dbsyncer_args        dbsyncer_args = {events_funcs_cbs};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1510,6 +1514,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:

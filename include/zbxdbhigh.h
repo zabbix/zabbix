@@ -608,16 +608,14 @@ int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **s
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
-		zbx_clean_events_func_t clean_events_cb);
+		int now, zbx_events_funcs_t events_funcs_cbs);
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
 
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
-		zbx_add_event_func_t add_event_cb, zbx_process_events_func_t process_events_cb,
-		zbx_clean_events_func_t clean_events_cb);
+		zbx_events_funcs_t events_cbs);
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,

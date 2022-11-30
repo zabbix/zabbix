@@ -53,7 +53,8 @@ extern unsigned char	program_type;
  *                                                                            *
  ******************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
+		zbx_events_funcs_t events_funcs_cbs)
 {
 	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
@@ -97,7 +98,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now, zbx_add_event, zbx_process_events, zbx_clean_events);
+					(unsigned short)flag, now, events_funcs_cbs);
 		}
 		else
 		{
@@ -176,8 +177,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char *error)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
+		zbx_events_funcs_t events_funcs_cbs, zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -213,7 +214,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface);
+							interface, events_funcs_cbs);
 				}
 			}
 		}
@@ -231,7 +232,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))
 		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
+					events_funcs_cbs);
 		}
 	}
 
@@ -256,7 +258,7 @@ out:
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_funcs_t events_cbs)
 {
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
@@ -278,8 +280,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, &revision,
-			error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  events_cbs,
+			&hostid, &revision, error))
 	{
 		goto out;
 	}
@@ -434,7 +436,7 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_events_funcs_t events_cbs)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
@@ -519,8 +521,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, events_cbs, &hostid,
+			&revision, error))
+	{
 		goto error;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
 			FAIL == (version = zbx_get_component_version_without_patch(tmp)))

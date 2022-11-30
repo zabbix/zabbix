@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 
+#include "zbxdbhigh.h"
 #include "zbxcomms.h"
 
 extern int	CONFIG_TIMEOUT;
@@ -35,6 +36,7 @@ typedef struct
 	zbx_config_comms_args_t	*zbx_config;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_socket_t		*listen_sock;
+	zbx_events_funcs_t      events_cbs;
 }
 zbx_thread_trapper_args;
 

@@ -25,7 +25,6 @@
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 #include "zbxexport.h"
-#include "../events/events.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char			program_type;
@@ -94,6 +93,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
+	zbx_thread_dbsyncer_args	*dbsyncer_args_in = (zbx_thread_dbsyncer_args *)
+			((((zbx_thread_args_t *)args))->args);
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
 			(process_name = get_process_type_string(process_type)), process_num);
 
@@ -139,9 +141,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
 
-		zbx_events_funcs_t events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
-		zbx_sync_history_cache(events_funcs_cbs, &values_num, &triggers_num, &more);
+//		zbx_events_funcs_t events_funcs_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
+//				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
+		zbx_sync_history_cache(dbsyncer_args_in->events_funcs_cbs, &values_num, &triggers_num, &more);
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
