@@ -3611,6 +3611,7 @@ z-select,
     font-style: italic; }
   z-select .zi-chevron-down,
   .z-select .zi-chevron-down {
+    border-radius: unset;
     text-align: left;
     padding: 3px 2px 3px 4px; }
     z-select .zi-chevron-down:active, z-select .zi-chevron-down:hover, z-select .zi-chevron-down:focus,
