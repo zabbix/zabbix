@@ -31,17 +31,17 @@ class testPageReportsActionLog extends CLegacyWebTest {
 
 	use TableTrait;
 
-	public static function prepareInsertActionsData() {
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (8, 13, 1, 1, ".
-				"1329724870, 10, 'test.test@zabbix.com', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 13, 1, 9, ".
-				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
-		);
-	}
+//	public static function prepareInsertActionsData() {
+//		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+//				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (8, 13, 1, 1, ".
+//				"1329724870, 10, 'test.test@zabbix.com', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
+//		);
+//
+//		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+//				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 13, 1, 9, ".
+//				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
+//		);
+//	}
 
 	public function testPageReportsActionLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=now-2y&to=now');
@@ -77,6 +77,11 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->assertEquals(['In progress', 'Sent/Executed', 'Failed'], $this->query('id:filter_status')
 				->asCheckboxList()->one()->getLabels()->asText()
 		);
+
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
 	}
 
 	public static function getCheckFilterData() {
@@ -85,7 +90,307 @@ class testPageReportsActionLog extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Recipients' => 'test-timezone'
+						'Recipients' => ['test-timezone']
+					],
+					'result_amount' => 1
+				]
+			],
+			// #1
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Tag-user', 'test-timezone']
+					],
+					'result_amount' => 1
+				]
+			],
+			// #2
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Administrator']
+					],
+					'result_amount' => 6
+				]
+			],
+			// #3
+			[
+				[
+					'fields' => [
+						'Actions' => ['Trigger action 2']
+					],
+					'result_amount' => 7
+				]
+			],
+			// #4
+			[
+				[
+					'fields' => [
+						'Actions' => ['Simple action']
+					]
+				]
+			],
+			// #5
+			[
+				[
+					'fields' => [
+						'Recipients' => ['filter-update']
+					]
+				]
+			],
+			// #6
+			[
+				[
+					'fields' => [
+						'Media types' => ['Discord']
+					],
+					'result_amount' => 1
+				]
+			],
+			// #7
+			[
+				[
+					'fields' => [
+						'Media types' => ['Discord', 'SMS']
+					],
+					'result_amount' => 2
+				]
+			],
+			// #8
+			[
+				[
+					'fields' => [
+						'Media types' => ['Github']
+					]
+				]
+			],
+			// #9
+			[
+				[
+					'fields' => [
+						'Actions' => ['Trigger action 2'],
+						'Media types' => ['Discord']
+					]
+				]
+			],
+			// #10
+			[
+				[
+					'fields' => [
+						'Actions' => ['Trigger action 3'],
+						'Media types' => ['Discord']
+					],
+					'result_amount' => 1
+				]
+			],
+			// #11
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Administrator'],
+						'Actions' => ['Trigger action 3']
+					],
+					'result_amount' => 1
+				]
+			],
+			// #12
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Administrator'],
+						'Media types' => ['Email']
+					],
+					'result_amount' => 5
+				]
+			],
+			// #13
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Administrator', 'test-timezone'],
+						'Media types' => ['Email', 'Discord', 'SMS'],
+						'Actions' => ['Trigger action 2', 'Trigger action 3']
+					],
+					'result_amount' => 7
+				]
+			],
+			// #14
+			[
+				[
+					'status' => ['Failed'],
+					'result_amount' => 1,
+					'result_status' => ['Failed']
+				]
+			],
+			// #15
+			[
+				[
+					'status' => ['Sent/Executed'],
+					'result_amount' => 7,
+					'result_status' => [
+						'Sent',
+						'Sent',
+						'Executed',
+						'Executed',
+						'Sent',
+						'Sent',
+						'Sent'
+					]
+				]
+			],
+			// #16
+			[
+				[
+					'status' => ['In progress'],
+					'result_amount' => 1,
+					'result_status' => ["In progress:\n3 retries left"]
+				]
+			],
+			// #17
+			[
+				[
+					'status' => ['Failed', 'In progress'],
+					'result_amount' => 2,
+					'result_status' => [
+						"In progress:\n3 retries left",
+						'Failed'
+					]
+				]
+			],
+			// #18
+			[
+				[
+					'status' => ['Failed', 'Sent/Executed', 'In progress'],
+					'result_amount' => 9,
+					'result_status' => [
+						'Sent',
+						'Sent',
+						'Executed',
+						'Executed',
+						"In progress:\n3 retries left",
+						'Failed',
+						'Sent',
+						'Sent',
+						'Sent'
+					]
+				]
+			],
+			// #19
+			[
+				[
+					'fields' => [
+						'Actions' => ['Trigger action 3']
+					],
+					'status' => ['Sent/Executed'],
+					'result_amount' => 2,
+					'result_status' => [
+						'Sent',
+						'Sent'
+					]
+				]
+			],
+			// #20
+			[
+				[
+					'fields' => [
+						'Actions' => ['Trigger action 3']
+					],
+					'status' => ['In progress']
+				]
+			],
+			// #21
+			[
+				[
+					'fields' => [
+						'Recipients' => ['Administrator', 'test-timezone']
+					],
+					'status' => ['In progress'],
+					'result_amount' => 1,
+					'result_status' => [
+						"In progress:\n3 retries left"
+					]
+				]
+			],
+			// #22
+			[
+				[
+					'fields' => [
+						'Recipients' => ['test-timezone']
+					],
+					'status' => ['In progress']
+				]
+			],
+			// #23
+			[
+				[
+					'fields' => [
+						'Media types' => ['Email']
+					],
+					'status' => ['In progress'],
+					'result_amount' => 1,
+					'result_status' => [
+						"In progress:\n3 retries left"
+					]
+				]
+			],
+			// #24
+			[
+				[
+					'fields' => [
+						'Media types' => ['Email']
+					],
+					'status' => ['Sent/Executed'],
+					'result_amount' => 3,
+					'result_status' => [
+						'Sent',
+						'Sent',
+						'Sent'
+					]
+				]
+			],
+			// #25
+			[
+				[
+					'fields' => [
+						'Media types' => ['Email']
+					],
+					'status' => ['Failed'],
+					'result_amount' => 1,
+					'result_status' => [
+						'Failed'
+					]
+				]
+			],
+			// #26
+			[
+				[
+					'fields' => [
+						'Media types' => ['Email'],
+						'Actions' => ['Trigger action 2'],
+						'Recipients' => ['Administrator']
+					],
+					'status' => ['Sent/Executed'],
+					'result_amount' => 3,
+					'result_status' => [
+						'Sent',
+						'Sent',
+						'Sent'
+					]
+				]
+			],
+			// #27
+			[
+				[
+					'fields' => [
+						'Search string' => 'test'
+					]
+				]
+			],
+			// #28
+			[
+				[
+					'fields' => [
+						'Search string' => '10:00:40'
 					],
 					'result_amount' => 1
 				]
@@ -100,32 +405,116 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
 				'filter_messages=&filter_set=1');
 
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
-
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->fill($data['fields'])->submit();
+
+		if (array_key_exists('fields', $data)) {
+			$form->fill($data['fields']);
+		}
+
+		if (array_key_exists('status', $data)) {
+			$this->query('id:filter_status')->asCheckboxList()->one()->check($data['status']);
+		}
+
+		$form->submit();
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('result_amount', $data)) {
-			$this->assertEquals($data['result_amount'], $table->getRows()->count());
+			$this->assertEquals($data['result_amount'], $this->query('class:list-table')->asTable()->one()->getRows()->count());
 			$this->assertTableStats($data['result_amount']);
 
 			if (array_key_exists('fields', $data)) {
 				foreach ($data['fields'] as $column => $values) {
-					$column_values = $this->getTableColumnData(substr($column, 0, -1));
-					foreach ($column_values as $column_value) {
-						foreach ($values as $value) {
+					$column = ($column === 'Search string') ? 'Message' : substr($column, 0, -1);
+					$column_values = $this->getTableColumnData($column);
+					foreach ($values as $value) {
+						foreach ($column_values as $column_value) {
 							if (str_contains($column_value, $value)) {
 								$column_values = array_values(array_diff($column_values, [$column_value]));
 							}
 						}
 					}
 				}
+
+				$this->assertEquals(0, count($column_values));
 			}
+
+			if (array_key_exists('result_status', $data)) {
+				$this->assertEquals($data['result_status'], $this->getTableColumnData('Status'));
+			}
+		}
+		else {
+			$this->assertTableStats(0);
+			$this->assertTableData();
 		}
 	}
 }
+
+//	/**
+//	* @dataProvider allAuditActions
+//	*/
+//	public function testPageReportsActionLog_CheckValues($auditactions) {
+//		$time = $auditactions['clock'];
+//		$today = date("Y-m-d H:i:s", $time);
+//
+//		$this->zbxTestLogin('zabbix.php?action=actionlog.list&'.http_build_query([
+//			'from' => date('Y-m-d H:i:s', $time - 3600),
+//			'to' => date('Y-m-d H:i:s', $time + 3600)
+//		]));
+//		$this->zbxTestCheckTitle('Action log');
+//		$this->zbxTestAssertElementPresentId('config');
+//		$this->zbxTestCheckHeader('Action log');
+//
+//		$status = '';
+//		$type = '';
+//		$retries = '';
+//
+//		if ($auditactions['status'] == 1 && $auditactions['alerttype'] == 0) {
+//			$status = 'Sent';
+//		}
+//		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] == 0) {
+//			$status = 'Failed';
+//		}
+//		if ($auditactions['status'] == 0 && $auditactions['alerttype'] == 0 && $auditactions['retries'] <> 0) {
+//			$status = 'In progress';
+//		}
+//		if ($auditactions['status'] == 1 && $auditactions['alerttype'] == 1) {
+//			$status = 'Executed';
+//		}
+//
+//		$sql = 'SELECT mt.name FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alertid='.zbx_dbstr($auditactions['alertid']);
+//		$type = DBfetch(DBselect($sql));
+//
+//		if ($auditactions['status'] == 1) {
+//			$retries = '';
+//		}
+//		if ($status == 'In progress' || $status == 'not sent') {
+//			$retries = $auditactions['retries'];
+//		}
+//
+//		$message = str_replace('>', '&gt;', $auditactions['message']);
+//		$subject = str_replace('>', '&gt;', $auditactions['subject']);
+//		$info = str_replace('"', '&amp;quot;', $auditactions['error']);
+//
+//		$this->zbxTestTextPresent(
+//				[
+//					$today,
+//					CTestArrayHelper::get($type, 'name'),
+//					$status,
+//					$retries,
+//					$auditactions['sendto'],
+//					$subject,
+//					$message,
+//					$info
+//				]
+//		);
+//
+//		$this->zbxTestExpandFilterTab();
+//		$this->zbxTestClickButtonMultiselect('filter_userids_');
+//		$this->zbxTestLaunchOverlayDialog('Users');
+//		$this->zbxTestClickLinkText('guest');
+//		$this->zbxTestClickXpathWait("//button[@name='filter_set']");
+//		$this->zbxTestTextPresent('No data found.');
+//
+//		$this->zbxTestClickButtonText('Reset');
+//	}
