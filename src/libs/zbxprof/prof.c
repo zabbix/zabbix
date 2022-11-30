@@ -130,6 +130,7 @@ static void	zbx_print_prof(void)
 		static size_t		str_alloc;
 		size_t			str_offset = 0;
 		double			total_wait_lock = 0, total_busy_lock = 0;
+		double			total_mutex_wait_lock = 0, total_mutex_busy_lock = 0;
 
 		for (i = 0; i < zbx_func_profiles.values_num; i++)
 		{
@@ -140,27 +141,42 @@ static void	zbx_print_prof(void)
 
 			if (ZBX_PROF_PROCESSING == func_profile->scope)
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "processing %s() busy:" ZBX_FS_DBL
-						"\n", func_profile->func_name, func_profile->sec);
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() processing : busy:" ZBX_FS_DBL
+						" sec\n", func_profile->func_name, func_profile->sec);
 			}
 			else
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() %s locked:%u busy:" ZBX_FS_DBL
-						" wait:"ZBX_FS_DBL "\n", func_profile->func_name,
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "%s() %s : locked:%u holding:"
+						ZBX_FS_DBL " sec waiting:"ZBX_FS_DBL " sec\n", func_profile->func_name,
 						get_scope_string(func_profile->scope), func_profile->locked,
 						func_profile->sec - func_profile->sec_wait, func_profile->sec_wait);
 
-				total_wait_lock += func_profile->sec_wait;
-				total_busy_lock += func_profile->sec - func_profile->sec_wait;
+				if (ZBX_PROF_RWLOCK == func_profile->scope)
+				{
+					total_wait_lock += func_profile->sec_wait;
+					total_busy_lock += func_profile->sec - func_profile->sec_wait;
+				}
+				else
+				{
+					total_mutex_wait_lock += func_profile->sec_wait;
+					total_mutex_busy_lock += func_profile->sec - func_profile->sec_wait;
+				}
 			}
 		}
 
 		if (0 != str_offset)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "Profiling information: %s", str);
-			zabbix_log(LOG_LEVEL_INFORMATION, "Time spent holding locks:" ZBX_FS_DBL
-					" Time spent waiting for locks:" ZBX_FS_DBL "\n", total_busy_lock,
-					total_wait_lock);
+			zabbix_log(LOG_LEVEL_INFORMATION, "Profiling information:\n%s", str);
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "mutexes and rwlocks : holding:" ZBX_FS_DBL " sec"
+					" waiting:" ZBX_FS_DBL " sec", total_busy_lock + total_mutex_busy_lock,
+					total_wait_lock + total_mutex_wait_lock);
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "rwlocks : holding:" ZBX_FS_DBL " sec"
+					" waiting:" ZBX_FS_DBL " sec", total_busy_lock, total_wait_lock);
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "mutexes : holding:" ZBX_FS_DBL " sec"
+					" waiting:" ZBX_FS_DBL " sec", total_mutex_busy_lock, total_mutex_wait_lock);
 		}
 	}
 }
