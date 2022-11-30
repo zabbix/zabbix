@@ -54,13 +54,13 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 		// Check dropdown options.
 		$this->assertEquals(['Zabbix login form', 'HTTP login form'], $form->getField('Default login form')
-				->asDropdown()->getOptions()->asText());
+				->getOptions()->asText());
 
 		// Check input field maxlength.
 		$this->assertEquals('2048', $form->getField('Remove domain name')->getAttribute('maxlength'));
 
 		// Check hintbox.
-		$form->query('xpath://label[@for="http_auth_enabled"]//a[@role="button"]')->one()->click();
+		$form->getLabel('Enable HTTP authentication')->query('class:icon-help-hint')->one()->click();
 		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
 		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
 			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
@@ -69,32 +69,20 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
 
 		// Check confirmation popup.
-		$confirmation_message = 'Enable HTTP authentication for all users.';
 		foreach (['button:Cancel', 'class:overlay-close-btn', 'button:Ok'] as $button) {
 			$form->fill(['Enable HTTP authentication' => true]);
 			$dialog = COverlayDialogElement::find()->one();
 			$this->assertEquals('Confirm changes', $dialog->getTitle());
-			$this->assertEquals($confirmation_message, $dialog->query('class:overlay-dialogue-body')->waitUntilReady()->one()->getText());
-			$this->assertTrue($dialog->query($button)->one()->isVisible());
+			$this->assertEquals('Enable HTTP authentication for all users.', $dialog->getContent()->getText());
 			$dialog->query($button)->one()->click();
 			COverlayDialogElement::ensureNotPresent();
 
-			if ($button === 'button:Ok') {
-				// Check enabled fields and checkbox.
-				foreach ($fields as $field) {
-					$this->assertTrue($form->getField($field)->isEnabled());
-				}
-
-				$this->assertEquals(true, $form->getField('Enable HTTP authentication')->getValue());
+			// Check disabled fields and checkbox status.
+			$status = ($button === 'button:Ok') ? true : false;
+			foreach ($fields as $field) {
+				$this->assertTrue($form->getField($field)->isEnabled($status));
 			}
-			else {
-				// Check disabled fields and checkbox.
-				foreach ($fields as $field) {
-					$this->assertTrue($form->getField($field)->isEnabled(false));
-				}
-
-				$this->assertEquals(false, $form->getField('Enable HTTP authentication')->getValue());
-			}
+			$this->assertEquals($status, $form->getField('Enable HTTP authentication')->getValue());
 		}
 	}
 
