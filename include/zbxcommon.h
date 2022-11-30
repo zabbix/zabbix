@@ -745,6 +745,9 @@ int	zbx_alarm_timed_out(void);
 
 void	__zbx_update_env(double time_now);
 
+#ifdef _WINDOWS
+#define zbx_update_env(time_now)	__zbx_update_env(time_now);
+#else
 #define zbx_update_env(time_now)	\
 					\
 do					\
@@ -753,6 +756,7 @@ do					\
 	zbx_prof_update(time_now);	\
 }					\
 while (0)
+#endif
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
