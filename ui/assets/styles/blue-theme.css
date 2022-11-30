@@ -2905,54 +2905,54 @@ div.dashboard-widget-tophosts z-bar-gauge {
     font-size: 30px; }
 
 .msg-bad {
-  border-color: #ed9898; }
+  border-color: #ae1e1e; }
   .msg-bad .link-action {
-    color: #93201e; }
+    color: #ae1e1e; }
     .msg-bad .link-action .arrow-up {
-      border-bottom-color: #93201e; }
+      border-bottom-color: #ae1e1e; }
     .msg-bad .link-action .arrow-down {
-      border-top-color: #93201e; }
+      border-top-color: #ae1e1e; }
   .msg-bad ul {
-    border-top-color: #ed9898; }
+    border-top-color: #ae1e1e; }
   .msg-bad button {
-    color: #93201e;
-    border-color: #ed9898; }
+    color: #ae1e1e;
+    border-color: #ae1e1e; }
   .msg-bad::before {
-    background-color: #ed9898; }
+    background-color: #ae1e1e; }
 
 .msg-good {
-  border-color: #a5d6a7; }
+  border-color: #3e6140; }
   .msg-good .link-action {
-    color: #2a502c; }
+    color: #3e6140; }
     .msg-good .link-action .arrow-up {
-      border-bottom-color: #2a502c; }
+      border-bottom-color: #3e6140; }
     .msg-good .link-action .arrow-down {
-      border-top-color: #2a502c; }
+      border-top-color: #3e6140; }
   .msg-good ul {
-    border-top-color: #a5d6a7; }
+    border-top-color: #3e6140; }
   .msg-good button {
-    color: #2a502c;
-    border-color: #a5d6a7; }
+    color: #3e6140;
+    border-color: #3e6140; }
   .msg-good::before {
-    background-color: #a5d6a7; }
+    background-color: #3e6140; }
 
 .msg-warning {
-  border-color: #ffd788; }
+  border-color: #f4af25; }
   .msg-warning .link-action {
-    color: #9a7938; }
+    color: #f4af25; }
     .msg-warning .link-action .arrow-up {
-      border-bottom-color: #9a7938; }
+      border-bottom-color: #f4af25; }
     .msg-warning .link-action .arrow-down {
-      border-top-color: #9a7938; }
+      border-top-color: #f4af25; }
   .msg-warning ul {
-    border-top-color: #ffd788; }
+    border-top-color: #f4af25; }
   .msg-warning button {
-    color: #9a7938;
-    border-color: #ffd788; }
+    color: #f4af25;
+    border-color: #f4af25; }
   .msg-warning::before {
-    background-color: #ffd788; }
+    background-color: #f4af25; }
   .msg-warning::after {
-    background-position: -122px -325px; }
+    color: #1f2c33; }
 
 .msg-details {
   font-size: 1em;

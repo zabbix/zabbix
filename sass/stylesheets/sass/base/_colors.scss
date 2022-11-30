@@ -153,12 +153,12 @@ $form-disabled-border-color: #ccd5d9 !default;
 $input-placeholder-color: #9d9d9d !default;
 
 // Error messages
-$msg-bad-color: darken(desaturate($red, 10%), 20%) !default;
-$msg-bad-border-color: $light-red !default;
-$msg-good-color: darken(desaturate($green, 10%), 20%) !default;
-$msg-good-border-color: $light-green !default;
-$msg-warning-color: #9a7938 !default;
-$msg-warning-border-color: #ffd788 !default;
+$msg-bad-color: #ae1e1e !default;
+$msg-bad-border-color: #ae1e1e !default;
+$msg-good-color: #3e6140 !default;
+$msg-good-border-color: #3e6140 !default;
+$msg-warning-color: #f4af25 !default;
+$msg-warning-border-color: #f4af25 !default;
 
 // Buttons
 $btn-font-color: #ffffff !default;
