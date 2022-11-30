@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-21T18:00:03Z</date>
+   <date>2022-08-01T08:01:15Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -129,7 +129,7 @@ for (var i = 0; i &lt; lines.length; i++) {
 
 // Multiversion metrics
 output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
-output.ServerVersion = output.Server || output.ServerVersion;
+output.ServerVersion = output.ServerVersion || output.Server;
 
 // Parse "Scoreboard" to get worker count.
 if (typeof output.Scoreboard === 'string') {
@@ -247,7 +247,7 @@ ReqPerSec is not used, as it counts average since last Apache server start.</des
                      <expression>{last()}&lt;10m</expression>
                      <name>Apache: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

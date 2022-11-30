@@ -27,17 +27,6 @@
 #include "zbxalgo.h"
 #include "cfg.h"
 
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_COLLATION	"utf8_bin,utf8mb3_bin"
-#endif
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
@@ -938,6 +927,31 @@ out:
 #undef ZBX_TIMESCALE_MIN_VERSION
 #undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
 #undef ZBX_TIMESCALE_LICENSE_COMMUNITY
+}
+
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where "
+				"hypertable_name in (%s) and compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = DBselect("select hypertable_name from timescaledb_information.chunks where hypertable_name "
+			"in (%s) and is_compressed='t'", table_names);
+	}
+
+	if (NULL != DBfetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+
+	return ret;
 }
 #endif
 
@@ -3650,4 +3664,7 @@ char	*zbx_db_get_schema_esc(void)
 
 	return name;
 }
+
+
+
 #endif

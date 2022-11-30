@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-12-24T06:27:25Z</date>
+   <date>2022-07-22T07:50:31Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1312,7 +1312,7 @@ or due to startup without ZooKeeper configured."</description>
                      <expression>{last()}&lt;10m</expression>
                      <name>ClickHouse: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1388,7 +1388,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.exceptions.rate</key>
+               <key>clickhouse.zookeeper.exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1417,7 +1417,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper hardware exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.hw_exceptions.rate</key>
+               <key>clickhouse.zookeeper.hw_exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1446,7 +1446,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper requests</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.request</key>
+               <key>clickhouse.zookeeper.request</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of requests to ZooKeeper in progress.</description>
@@ -1468,7 +1468,7 @@ or due to startup without ZooKeeper configured."</description>
             <item>
                <name>ClickHouse: ZooKeeper sessions</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.session</key>
+               <key>clickhouse.zookeeper.session</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of sessions (connections) to ZooKeeper. Should be no more than one.</description>
@@ -1499,7 +1499,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper user exceptions per second</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.user_exceptions.rate</key>
+               <key>clickhouse.zookeeper.user_exceptions.rate</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1528,7 +1528,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper wait time</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.wait.time</key>
+               <key>clickhouse.zookeeper.wait.time</key>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
@@ -1562,7 +1562,7 @@ Should be no more than one, because using more than one connection to ZooKeeper 
             <item>
                <name>ClickHouse: ZooKeeper watches</name>
                <type>DEPENDENT</type>
-               <key>clickhouse.zookeper.watch</key>
+               <key>clickhouse.zookeeper.watch</key>
                <delay>0</delay>
                <history>7d</history>
                <description>Number of watches (e.g., event subscriptions) in ZooKeeperr.</description>
@@ -2648,7 +2648,7 @@ This mode is turned on if the config doesn't have sections with ZooKeeper, if an
                <color>1A7C11</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.exceptions.rate</key>
+                  <key>clickhouse.zookeeper.exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2656,7 +2656,7 @@ This mode is turned on if the config doesn't have sections with ZooKeeper, if an
                <color>2774A4</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.hw_exceptions.rate</key>
+                  <key>clickhouse.zookeeper.hw_exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2664,7 +2664,7 @@ This mode is turned on if the config doesn't have sections with ZooKeeper, if an
                <color>F63100</color>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.user_exceptions.rate</key>
+                  <key>clickhouse.zookeeper.user_exceptions.rate</key>
                </item>
             </graph_item>
             <graph_item>
@@ -2674,7 +2674,7 @@ This mode is turned on if the config doesn't have sections with ZooKeeper, if an
                <yaxisside>RIGHT</yaxisside>
                <item>
                   <host>Template DB ClickHouse by HTTP</host>
-                  <key>clickhouse.zookeper.watch</key>
+                  <key>clickhouse.zookeeper.watch</key>
                </item>
             </graph_item>
          </graph_items>

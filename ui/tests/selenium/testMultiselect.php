@@ -66,6 +66,7 @@ class testMultiselect extends CWebTest {
 		$element = $field->query('tag:input')->one();
 		$element->type('Zabbix server');
 		$this->query('class:multiselect-matches')->waitUntilVisible();
+
 		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
 			[$element]
 		);

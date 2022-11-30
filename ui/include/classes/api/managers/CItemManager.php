@@ -206,15 +206,19 @@ class CItemManager {
 			'value_id' => $del_itemids
 		]);
 
-		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
-			'history', 'events'
-		];
+		$config = select_config();
 
-		$ins_housekeeper = [];
+		$table_names = ['events'];
+
+		if ($config['hk_history_mode'] != 0) {
+			array_push($table_names, 'history', 'history_str', 'history_uint', 'history_log', 'history_text');
+		}
+
+		if ($config['hk_trends_mode'] != 0) {
+			array_push($table_names,'trends', 'trends_uint');
+		}
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			$config = select_config();
-
 			if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				if ($config['hk_history_mode'] != 0 && $config['hk_history_global'] == 1) {
 					$table_names = array_diff($table_names,
@@ -227,6 +231,8 @@ class CItemManager {
 				}
 			}
 		}
+
+		$ins_housekeeper = [];
 
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {

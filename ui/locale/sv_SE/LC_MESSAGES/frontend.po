@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-04 19:52+0200\n"
+"POT-Creation-Date: 2022-04-01 16:26+0300\n"
 "PO-Revision-Date: 2022-05-23 11:11+0000\n"
 "Last-Translator: Johan <johan.lindgren@metricio.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -10719,6 +10719,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr ""
 
+#: include/func.inc.php:597 jsLoader.php:144
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
 msgstr ""
@@ -12899,6 +12904,10 @@ msgstr ""
 
 #: include/blocks.inc.php:648
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr ""
+
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
 msgstr ""
 
 #: include/httptest.inc.php:430
@@ -16926,6 +16935,16 @@ msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39

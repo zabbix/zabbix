@@ -32,7 +32,7 @@ if ($data['hostid'] != 0) {
 // Create form.
 $form = (new CForm())
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['itemids'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('action', $data['action']);

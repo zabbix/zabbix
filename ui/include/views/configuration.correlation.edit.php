@@ -30,7 +30,7 @@ $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 $form = (new CForm())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['correlationid']) {

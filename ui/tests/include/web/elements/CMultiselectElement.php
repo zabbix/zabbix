@@ -111,6 +111,10 @@ class CMultiselectElement extends CElement {
 			throw new Exception('Select of multiple labels is not supported in single select mode.');
 		}
 
+		if ($label === '') {
+			return $this->clear();
+		}
+
 		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
 
 		return $this;
@@ -338,7 +342,12 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function getValue() {
-		return $this->getSelected();
+		$selected = $this->getSelected();
+		if (is_array($selected) && count($selected) === 0) {
+			$selected = '';
+		}
+
+		return $selected;
 	}
 
 	/**

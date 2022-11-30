@@ -29,7 +29,7 @@ $widget = (new CWidget())
 
 // create form
 $applicationForm = (new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['applicationid'])) {

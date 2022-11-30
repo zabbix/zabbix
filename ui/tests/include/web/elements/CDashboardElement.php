@@ -113,6 +113,19 @@ class CDashboardElement extends CElement {
 	}
 
 	/**
+	 * Open dashboard properties overlay dialog.
+	 *
+	 * @return COverlayDialogElement
+	 */
+	public function editProperties() {
+		$this->checkIfEditable();
+		$this->getControls()->query('id:dashbrd-config')->one()->click();
+
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
+				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+	}
+
+	/**
 	 * Open widget adding form.
 	 * Dashboard should be in editing mode.
 	 *
@@ -155,7 +168,9 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-save')->one()->waitUntilClickable()->click(true);
+			$button = $controls->query('id:dashbrd-save')->one()->waitUntilClickable();
+			$button->getLocationOnScreenOnceScrolledIntoView();
+			$button->click();
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 

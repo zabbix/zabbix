@@ -35,7 +35,7 @@ $form = (new CForm())
 		->setArgument('action', ($data['valuemapid'] == 0) ? 'valuemap.create' : 'valuemap.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['valuemapid'] != 0) {
 	$form->addVar('valuemapid', $data['valuemapid']);
