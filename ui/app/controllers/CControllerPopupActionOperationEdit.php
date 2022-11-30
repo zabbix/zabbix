@@ -174,8 +174,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			$fullnames = [];
 
 			foreach ($users as $user) {
-				$fullnames[$user['userid']] = getUserFullname($user);
-				$user['name'] = $fullnames[$user['userid']];
+				$fullnames[$user['id']] = getUserFullname($user);
+				$user['name'] = $fullnames[$user['id']];
 				$result['users'][] = $user;
 			}
 			CArrayHelper::sort($result['users'], ['name']);
