@@ -44,10 +44,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			'Remove domain name' => '',
 			'Case-sensitive login' => true
 		];
-
-		foreach ($default_values as $field => $value) {
-			$this->assertEquals($value, $form->getField($field)->getValue());
-		}
+		$form->checkValue($default_values);
 
 		// Check disabled fields.
 		$fields = ['Default login form', 'Remove domain name', 'Case-sensitive login'];
@@ -56,18 +53,17 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		}
 
 		// Check dropdown options.
-		$this->assertEquals(['Zabbix login form', 'HTTP login form'], $form->getField('name:http_login_form')
+		$this->assertEquals(['Zabbix login form', 'HTTP login form'], $form->getField('Default login form')
 				->asDropdown()->getOptions()->asText());
 
 		// Check input field maxlength.
-		$this->assertEquals('2048', $form->getField('name:http_strip_domains')->getAttribute('maxlength'));
+		$this->assertEquals('2048', $form->getField('Remove domain name')->getAttribute('maxlength'));
 
 		// Check hintbox.
 		$form->query('xpath://label[@for="http_auth_enabled"]//a[@role="button"]')->one()->click();
 		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-		$hint = 'If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
-			' will be authenticated by the web server, not by Zabbix.';
-		$this->assertEquals($hint, $hintbox->one()->getText());
+		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
+			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
 
 		// Close the hintbox.
 		$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
