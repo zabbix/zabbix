@@ -97,7 +97,6 @@ window.action_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				this.$operation_table.empty();
 				for (const element of this.form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -109,6 +108,7 @@ window.action_edit_popup = new class {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
+					this.$operation_table.empty();
 					if (response.messages.length > 0) {
 						const message_box = makeMessageBox('bad', response.messages)[0];
 						this.form.parentNode.insertBefore(message_box, this.form);
