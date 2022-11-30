@@ -717,7 +717,7 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good zi-circle-check-filled', bad: 'msg-bad zi-triangle-warning', warning: 'msg-warning zi-triangle-warning'},
+	var classes = {good: 'msg-good zi-circle-check-filled', bad: 'msg-bad zi-circle-info-filled', warning: 'msg-warning zi-triangle-warning'},
 		msg_class = classes[type];
 
 	if (show_details === null) {

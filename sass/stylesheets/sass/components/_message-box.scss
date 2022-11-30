@@ -1,7 +1,7 @@
-.zi-triangle-warning,
+.zi-circle-info-filled,
 .zi-circle-check-filled {
 	position: relative;
-	padding: 6px 10px 6px 75px;
+	padding: 9px 10px 9px 75px;
 	margin: 10px;
 	font-size: $font-top-nav-size;
 	color: $font-color;
@@ -38,13 +38,13 @@
 		top: 0;
 		bottom: 0;
 		left: 0;
-		width: 61px;
+		width: 48px;
 	}
 
 	&::after {
 		position: absolute;
-		top: 4px;
-		left: 3px;
+		top: 6px;
+		left: -3px;
 		width: 27px;
 		height: 25px;
 		margin-top: 2px;

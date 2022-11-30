@@ -769,7 +769,7 @@ function makeServerStatusOutput() {
 		->setId('msg-global-footer')
 		->addClass(ZBX_STYLE_MSG_GLOBAL_FOOTER)
 		->addClass(ZBX_STYLE_MSG_WARNING)
-		->addClass('zi-triangle-warning');
+		->addClass('zi-circle-info-filled');
 }
 
 /**

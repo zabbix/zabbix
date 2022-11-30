@@ -1338,26 +1338,38 @@ footer {
       .dashboard-grid-widget-head ul li select {
         margin: 4px 0; }
 
-.dashboard-grid-widget-actions {
-  opacity: 0;
+.dashboard-grid-widget-actions,
+.dashboard-grid-iterator-actions {
   transition: opacity .2s ease-out;
   padding-right: 2px; }
   .dashboard-grid-widget-actions .zi-more,
-  .dashboard-grid-widget-actions .zi-cog-filled {
+  .dashboard-grid-widget-actions .zi-cog-filled,
+  .dashboard-grid-iterator-actions .zi-more,
+  .dashboard-grid-iterator-actions .zi-cog-filled {
     padding: 0;
     width: 24px;
     height: 24px;
     position: relative;
     top: 2px;
-    color: #768d99;
     opacity: .5;
     transition: opacity .2s ease-out; }
     .dashboard-grid-widget-actions .zi-more:hover, .dashboard-grid-widget-actions .zi-more:focus, .dashboard-grid-widget-actions .zi-more:active,
     .dashboard-grid-widget-actions .zi-cog-filled:hover,
     .dashboard-grid-widget-actions .zi-cog-filled:focus,
-    .dashboard-grid-widget-actions .zi-cog-filled:active {
+    .dashboard-grid-widget-actions .zi-cog-filled:active,
+    .dashboard-grid-iterator-actions .zi-more:hover,
+    .dashboard-grid-iterator-actions .zi-more:focus,
+    .dashboard-grid-iterator-actions .zi-more:active,
+    .dashboard-grid-iterator-actions .zi-cog-filled:hover,
+    .dashboard-grid-iterator-actions .zi-cog-filled:focus,
+    .dashboard-grid-iterator-actions .zi-cog-filled:active {
       box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
       opacity: 1; }
+    .dashboard-grid-widget-actions .zi-more::before,
+    .dashboard-grid-widget-actions .zi-cog-filled::before,
+    .dashboard-grid-iterator-actions .zi-more::before,
+    .dashboard-grid-iterator-actions .zi-cog-filled::before {
+      color: #768d99; }
 
 .dashboard-grid-widget-content {
   flex-grow: 1;
@@ -2363,7 +2375,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
 .zi-circle-check:after {
   content: "\ea27"; }
 
-.zi-circle-info-filled:before {
+.zi-circle-info-filled:after {
   content: "\ea28"; }
 
 .zi-circle-info:after {
@@ -2869,10 +2881,10 @@ div.dashboard-widget-tophosts z-bar-gauge {
     color: #ffffff;
     opacity: 1; }
 
-.zi-triangle-warning,
+.zi-circle-info-filled,
 .zi-circle-check-filled {
   position: relative;
-  padding: 6px 10px 6px 75px;
+  padding: 9px 10px 9px 75px;
   margin: 10px;
   font-size: 1.167em;
   color: #f2f2f2;
@@ -2881,35 +2893,35 @@ div.dashboard-widget-tophosts z-bar-gauge {
   background-color: #2b2b2b;
   border: 2px solid;
   border-radius: 2px; }
-  .zi-triangle-warning .overlay-close-btn,
+  .zi-circle-info-filled .overlay-close-btn,
   .zi-circle-check-filled .overlay-close-btn {
     color: #737373; }
-  .zi-triangle-warning .link-action,
+  .zi-circle-info-filled .link-action,
   .zi-circle-check-filled .link-action {
     margin-right: 10px;
     font-size: 0.85em; }
-    .zi-triangle-warning .link-action .arrow-up,
+    .zi-circle-info-filled .link-action .arrow-up,
     .zi-circle-check-filled .link-action .arrow-up {
       border-bottom-color: #2f9f5e; }
-    .zi-triangle-warning .link-action .arrow-down,
+    .zi-circle-info-filled .link-action .arrow-down,
     .zi-circle-check-filled .link-action .arrow-down {
       border-top-color: #2f9f5e; }
-  .zi-triangle-warning button,
+  .zi-circle-info-filled button,
   .zi-circle-check-filled button {
     background-color: #ffffff; }
-  .zi-triangle-warning::before,
+  .zi-circle-info-filled::before,
   .zi-circle-check-filled::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
-    width: 61px; }
-  .zi-triangle-warning::after,
+    width: 48px; }
+  .zi-circle-info-filled::after,
   .zi-circle-check-filled::after {
     position: absolute;
-    top: 4px;
-    left: 3px;
+    top: 6px;
+    left: -3px;
     width: 27px;
     height: 25px;
     margin-top: 2px;
@@ -2934,7 +2946,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
     background-color: #ae1e1e; }
 
 .msg-good {
-  border-color: #3e6140; }
+  border-color: #2f6533; }
   .msg-good .link-action {
     color: #2f9f5e; }
     .msg-good .link-action .arrow-up {
@@ -2942,12 +2954,12 @@ div.dashboard-widget-tophosts z-bar-gauge {
     .msg-good .link-action .arrow-down {
       border-top-color: #2f9f5e; }
   .msg-good ul {
-    border-top-color: #3e6140; }
+    border-top-color: #2f6533; }
   .msg-good button {
     color: #2f9f5e;
-    border-color: #3e6140; }
+    border-color: #2f6533; }
   .msg-good::before {
-    background-color: #3e6140; }
+    background-color: #2f6533; }
 
 .msg-warning {
   border-color: #614f32; }
@@ -5145,7 +5157,9 @@ button {
 .list-table a.zi-arrow-down,
 .list-table a.zi-arrows-top-bottom,
 .list-table a.zi-alert, .list-table .zi-more, .dashboard-edit .zi-cog-filled, .dashboard-navigation-tabs .zi-more, .dashboard-grid-widget-actions .zi-more,
-.dashboard-grid-widget-actions .zi-cog-filled, section .zi-chevron-up, .service-info .service-actions .zi-pencil, z-select .zi-chevron-down button,
+.dashboard-grid-widget-actions .zi-cog-filled,
+.dashboard-grid-iterator-actions .zi-more,
+.dashboard-grid-iterator-actions .zi-cog-filled, section .zi-chevron-up, .service-info .service-actions .zi-pencil, z-select .zi-chevron-down button,
 .z-select .zi-chevron-down button, .zi-bell,
 .zi-bell-off,
 .zi-speaker,

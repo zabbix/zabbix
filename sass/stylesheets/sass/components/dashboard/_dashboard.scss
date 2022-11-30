@@ -410,8 +410,8 @@
 	}
 }
 
-.dashboard-grid-widget-actions {
-	opacity: 0;
+.dashboard-grid-widget-actions,
+.dashboard-grid-iterator-actions {
 	transition: opacity .2s ease-out;
 
 	padding-right: 2px;
@@ -424,7 +424,6 @@
 		position: relative;
 		top: 2px;
 
-		color: $icon-header-controls-color;
 		opacity: .5;
 		transition: opacity .2s ease-out;
 		&:hover,
@@ -432,6 +431,9 @@
 		&:active {
 			box-shadow: 0 0 0 2px $btn-border-focus-color;
 			opacity: 1;
+		}
+		&::before {
+			color: $icon-header-controls-color;
 		}
 		@extend %btn-reset;
 	}

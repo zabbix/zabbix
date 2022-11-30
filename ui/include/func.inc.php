@@ -1778,8 +1778,8 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 
 	$aria_labels = [
 		ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' => _('Success message'),
-		ZBX_STYLE_MSG_BAD.' zi-triangle-warning' => _('Error message'),
-		ZBX_STYLE_MSG_WARNING.' zi-triangle-warning' => _('Warning message')
+		ZBX_STYLE_MSG_BAD.' zi-circle-info-filled' => _('Error message'),
+		ZBX_STYLE_MSG_WARNING.' zi-circle-info-filled' => _('Warning message')
 	];
 
 	// Details link should be in front of title.
@@ -1791,7 +1791,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	if ($show_close_box) {
 		$msg_box->addItem((new CSimpleButton())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
+			->onClick('jQuery(this).parent().remove();')
 			->setTitle(_('Close')));
 	}
 
@@ -1851,7 +1851,7 @@ function getMessages(bool $good = false, string $title = null, bool $show_close_
 	$messages = get_and_clear_messages();
 
 	$message_box = ($title || $messages)
-		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning', $messages, $title, $show_close_box, !$good)
+		? makeMessageBox($good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-circle-info-filled', $messages, $title, $show_close_box, !$good)
 		: null;
 
 	return $message_box;
@@ -1876,7 +1876,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 
 		if ($has_errors) {
-			$class = ZBX_STYLE_MSG_BAD.' zi-triangle-warning-filled';
+			$class = ZBX_STYLE_MSG_BAD.' zi-circle-info-filled';
 			$good = false;
 		}
 		elseif ($has_warnings) {
@@ -1889,7 +1889,7 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 		}
 	}
 	else {
-		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-triangle-warning-filled';
+		$class = $good ? ZBX_STYLE_MSG_GOOD.' zi-circle-check-filled' : ZBX_STYLE_MSG_BAD.' zi-circle-info-filled';
 	}
 
 	$title = $good ? $okmsg : $errmsg;

@@ -65,7 +65,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		if ($this->getAttribute('class') === 'msg-bad zi-triangle-warning msg-global'){
+		if ($this->getAttribute('class') === 'msg-bad zi-circle-info-filled msg-global'){
 			return strtok($this->getText(), "\n");
 		}
 		else {

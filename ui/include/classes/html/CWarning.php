@@ -25,7 +25,7 @@ class CWarning extends Ctag {
 		parent::__construct('output', true);
 		$this->addItem($header);
 		$this->addClass(ZBX_STYLE_MSG_BAD);
-		$this->addClass('zi-triangle-warning');
+		$this->addClass('zi-circle-info-filled');
 		$this->addClass('msg-global');
 		if ($messages) {
 			parent::addItem(
