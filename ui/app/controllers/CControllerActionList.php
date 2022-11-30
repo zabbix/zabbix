@@ -113,36 +113,38 @@ class CControllerActionList extends CController {
 			],
 			'editable' => true,
 			'sortfield' => $sort_field,
+			'sortorder' => $sort_order,
 			'limit' => $limit
 		]);
+		CArrayHelper::sort($data['actions'], [['field' => $sort_field, 'order' => $sort_order]]);
 
-		order_result($data['actions'], $sort_field, $sort_order);
-
-		// pager
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('action.list', $page_num);
-
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['actions'], $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'action.list')
 			->setArgument('eventsource', $eventsource)
 		);
 
-		$data['actions'] = API::Action()->get([
-			'actionids' => array_column($data['actions'], 'actionid'),
+		$db_actions = API::Action()->get([
+			'output' => [],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 				'opconditions', 'opmessage_usr', 'opmessage_grp'
 			],
-			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
+			'actionids' => array_column($data['actions'], 'actionid'),
 			'preservekeys' => true
 		]);
 
-		order_result($data['actions'], $sort_field, $sort_order);
-
 		foreach ($data['actions'] as &$action) {
-			order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
+			$db_action = $db_actions[$action['actionid']];
+
+			CArrayHelper::sort($db_action['filter']['conditions'], [
+				['field' => 'conditiontype', 'sort' => ZBX_SORT_DOWN]
+			]);
+
+			$action['filter'] = $db_action['filter'];
+			$action['operations'] = $db_action['operations'];
 		}
 		unset($action);
 

@@ -122,7 +122,6 @@ if ($data['actions']) {
 
 	foreach ($data['actions'] as $aIdx => $action) {
 		$conditions = [];
-		$operations = [];
 
 		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
 			$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
@@ -131,11 +130,11 @@ if ($data['actions']) {
 			$conditions[] = BR();
 		}
 
-		$operations[] = getActionOperationDescriptions(
-			$data['actions'][$aIdx]['operations'],$data['eventsource'], $data['operation_descriptions']
+		$operations = getActionOperationDescriptions(
+			$data['actions'][$aIdx]['operations'], $data['eventsource'], $data['operation_descriptions']
 		);
 
-		$status = ($action['status'] == ACTION_STATUS_ENABLED)
+		$status = $action['status'] == ACTION_STATUS_ENABLED
 			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
@@ -191,7 +190,7 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'eventsource' => $data['eventsource'],
+		'eventsource' => $data['eventsource']
 	]).');
 '))
 	->setOnDocumentReady()
