@@ -48,9 +48,9 @@ type systemInfo struct {
 	OSType        string `json:"os_type"`
 	ProductName   string `json:"product_name,omitempty"`
 	Architecture  string `json:"architecture,omitempty"`
-	Major         string `json:"major,omitempty"`
-	Minor         string `json:"minor,omitempty"`
-	Patch         string `json:"patch,omitempty"`
+	Major         string `json:"kernel_major,omitempty"`
+	Minor         string `json:"kernel_minor,omitempty"`
+	Patch         string `json:"kernel_patch,omitempty"`
 	Kernel        string `json:"kernel,omitempty"`
 	VersionPretty string `json:"version_pretty,omitempty"`
 	VersionFull   string `json:"version_full"`
@@ -327,7 +327,9 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	}
 
 	jsonArray, err = json.Marshal(info)
-	result = string(jsonArray)
+	if err == nil {
+		result = string(jsonArray)
+	}
 
 	return
 }

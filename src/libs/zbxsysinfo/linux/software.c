@@ -56,7 +56,7 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int get_line_from_file(char **line, size_t size, FILE *f)
+static int	get_line_from_file(char **line, size_t size, FILE *f)
 {
 	if (NULL == fgets(*line, size, f))
 	{
@@ -68,7 +68,7 @@ static int get_line_from_file(char **line, size_t size, FILE *f)
 	return SUCCEED;
 }
 
-static int get_os_name(char **line)
+static int	get_os_name(char **line)
 {
 	char	tmp_line[MAX_STRING_LEN];
 	FILE	*f = NULL;
@@ -127,7 +127,7 @@ error:
 	return FAIL;
 }
 
-static int get_os_info_file(char **line, const char *filename)
+static int	get_os_info_file(char **line, const char *filename)
 {
 	FILE	*f = NULL;
 	int	ret = FAIL;
@@ -348,24 +348,46 @@ next:
 	return ret;
 }
 
+static void append_to_pretty_ver(char **pretty, const char *str)
+{
+	size_t	prt_alloc = 0, prt_offset = 0;
+
+	if (*pretty == NULL)
+		zbx_strcatnl_alloc(pretty, &prt_alloc, &prt_offset, str);
+	else
+		*pretty = zbx_dsprintf(*pretty, "%s %s", *pretty, str);
+
+	return;
+}
+
 int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#define SW_OS_GET_TYPE		"os_type"
+#define SW_OS_GET_PROD_NAME	"product_name"
+#define SW_OS_GET_ARCH		"architecture"
+#define SW_OS_GET_KRNL_MAJOR	"kernel_major"
+#define SW_OS_GET_KRNL_MINOR	"kernel_minor"
+#define SW_OS_GET_KRNL_PATCH	"kernel_patch"
+#define SW_OS_GET_KRNL		"kernel"
+#define SW_OS_GET_VER_PRETTY	"version_pretty"
+#define SW_OS_GET_VER_FULL	"version_full"
+
 	struct zbx_json	j;
 	struct utsname	info;
 	int		read;
-	char		*str, pretty_version[MAX_STRING_LEN];
+	char		*str, *prt_version = NULL;
+
 	char		major[sizeof(info.release)], minor[sizeof(info.release)], patch[sizeof(info.release)];
 
 	ZBX_UNUSED(request);
-	memset(pretty_version, 0, sizeof(pretty_version));
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addstring(&j, "os_type", "linux", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, SW_OS_GET_TYPE, "linux", ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == get_os_name(&str))
 	{
-		zbx_json_addstring(&j, "product_name", str, ZBX_JSON_TYPE_STRING);
-		strcat(pretty_version, str);
+		zbx_json_addstring(&j, SW_OS_GET_PROD_NAME, str, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, str);
 	}
 	zbx_free(str);
 
@@ -374,10 +396,8 @@ int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 != strlen(info.machine))
 	{
-		zbx_json_addstring(&j, "architecture", info.machine, ZBX_JSON_TYPE_STRING);
-
-		strcat(pretty_version, " ");
-		strcat(pretty_version, info.machine);
+		zbx_json_addstring(&j, SW_OS_GET_ARCH, info.machine, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, info.machine);
 	}
 
 	if (0 != strlen(info.release))
@@ -385,25 +405,23 @@ int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		read = sscanf(info.release, "%[0-9].%[0-9].%[0-9]", major, minor, patch);
 
 		if (0 < read)
-			zbx_json_addstring(&j, "major", major, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_MAJOR, major, ZBX_JSON_TYPE_STRING);
 		if (1 < read)
-			zbx_json_addstring(&j, "minor", minor, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_MINOR, minor, ZBX_JSON_TYPE_STRING);
 		if (2 < read)
-			zbx_json_addstring(&j, "patch", patch, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_PATCH, patch, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&j, "kernel", info.release, ZBX_JSON_TYPE_STRING);
-
-		strcat(pretty_version, " ");
-		strcat(pretty_version, info.release);
+		zbx_json_addstring(&j, SW_OS_GET_KRNL, info.release, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, info.release);
 	}
 out:
-	if (0 != strlen(pretty_version))
-		zbx_json_addstring(&j, "version_pretty", pretty_version, ZBX_JSON_TYPE_STRING);
+	if (NULL != prt_version && 0 != strlen(prt_version))
+		zbx_json_addstring(&j, SW_OS_GET_VER_PRETTY, prt_version, ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == get_os_info_file(&str, SW_OS_FULL))
-		zbx_json_addstring(&j, "version_full", str, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, str, ZBX_JSON_TYPE_STRING);
 	else
-		zbx_json_addstring(&j, "version_full", "", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, "", ZBX_JSON_TYPE_STRING);
 	zbx_free(str);
 
 	zbx_json_close(&j);
@@ -411,4 +429,14 @@ out:
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
+
+#undef SW_OS_GET_TYPE
+#undef SW_OS_GET_PROD_NAME
+#undef SW_OS_GET_ARCH
+#undef SW_OS_GET_KRNL_MAJOR
+#undef SW_OS_GET_KRNL_MINOR
+#undef SW_OS_GET_KRNL_PATCH
+#undef SW_OS_GET_KRNL
+#undef SW_OS_GET_VER_PRETTY
+#undef SW_OS_GET_VER_FULL
 }

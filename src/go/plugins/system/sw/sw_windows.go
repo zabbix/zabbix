@@ -27,6 +27,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"golang.org/x/sys/windows/registry"
 	"git.zabbix.com/ap/plugin-support/plugin"
@@ -60,8 +61,9 @@ type system_info struct {
 	OSType         string `json:"os_type"`
 	ProductName    string `json:"product_name,omitempty"`
 	Architecture   string `json:"architecture,omitempty"`
-	Major          string `json:"major,omitempty"`
-	Minor          string `json:"minor,omitempty"`
+	Major          string `json:"build_number,omitempty"`
+	Minor          string `json:"build_revision,omitempty"`
+	Build          string `json:"build,omitempty"`
 	Edition        string `json:"edition,omitempty"`
 	Composition    string `json:"composition,omitempty"`
 	DisplayVersion string `json:"display_version,omitempty"`
@@ -70,6 +72,17 @@ type system_info struct {
 	Version        string `json:"version,omitempty"`
 	VersionPretty  string `json:"version_pretty,omitempty"`
 	VersionFull    string `json:"version_full"`
+}
+
+func joinNonEmptyStrings(delim string, strs []string) (res string) {
+	var nonEmpty []string
+	for _, s := range strs {
+		if len(s) > 0 {
+			nonEmpty = append(nonEmpty, s)
+		}
+	}
+
+	return strings.Join(nonEmpty, delim)
 }
 
 func getRegistryValue(handle registry.Key, value string, valueType uint32) (result string, err error) {
@@ -94,55 +107,58 @@ func openRegistrySysInfoKey() (handle registry.Key, err error) {
 	return registry.OpenKey(registry.LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", registry.QUERY_VALUE)
 }
 
-func getBuildString(handle registry.Key) (result string, err error) {
-	var tmp string
-	var minor_err error
+func getBuildString(handle registry.Key, inclDesc bool) (result string, err error) {
+	var minor, major string
 
-	tmp, err = getRegistryValue(handle, regMajor, registry.SZ)
+	major, err = getRegistryValue(handle, regMajor, registry.SZ)
 	if err == nil {
-		result += "Build " + tmp
+		minor, _ = getRegistryValue(handle, regMinor, registry.DWORD)
+	}
 
-		tmp, minor_err = getRegistryValue(handle, regMinor, registry.DWORD)
-		if minor_err == nil {
-			result += "." + tmp
+	result = joinNonEmptyStrings(".", []string{major, minor})
+	if len(result) > 0 {
+		if inclDesc {
+			result = fmt.Sprintf("Build %s", result);
 		}
+		return result, nil
+	}
+
+	return "", err
+}
+
+func setErrorIfEmpty(eIn error, eOut *error) {
+	if eIn != nil && *eOut == nil {
+		*eOut = eIn
 	}
 
 	return
-}
-
-func joinNonEmptyStrings(strs []string) (res string) {
-	var nonEmpty []string
-	for _, s := range strs {
-		if len(s) > 0 {
-			nonEmpty = append(nonEmpty, s)
-		}
-	}
-
-	return strings.Join(nonEmpty, " ")
 }
 
 func getFullOSInfoString(handle registry.Key) (result string, err error) {
 	var name, lab, build string
 	var internal_err error
+
 	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
+	setErrorIfEmpty(internal_err, &err)
 
 	lab, internal_err = getRegistryValue(handle, regLabEX, registry.SZ)
+	setErrorIfEmpty(internal_err, &err)
 
 	if len(lab) == 0 {
 		lab, internal_err = getRegistryValue(handle, regLab, registry.SZ)
+		setErrorIfEmpty(internal_err, &err)
 	}
 
-	build, internal_err = getBuildString(handle)
+	build, internal_err = getBuildString(handle, true)
+	setErrorIfEmpty(internal_err, &err)
 
-	result = joinNonEmptyStrings([]string{name, lab, build})
+	result = joinNonEmptyStrings(" ", []string{name, lab, build})
+
 	if len(result) > 0 {
-		result = strings.TrimSpace(result)
+		return strings.TrimSpace(result), nil
 	} else {
-		err = internal_err
+		return "", err
 	}
-
-	return
 }
 
 func getPrettyOSInfoString(handle registry.Key) (result string, err error) {
@@ -150,19 +166,21 @@ func getPrettyOSInfoString(handle registry.Key) (result string, err error) {
 	var internal_err error
 
 	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
+	setErrorIfEmpty(internal_err, &err)
 
-	build, internal_err = getBuildString(handle)
+	build, internal_err = getBuildString(handle, true)
+	setErrorIfEmpty(internal_err, &err)
 
 	spVer, internal_err = getRegistryValue(handle, regSPVersion, registry.SZ)
+	setErrorIfEmpty(internal_err, &err)
 
-	result = joinNonEmptyStrings([]string{name, build, spVer})
+	result = joinNonEmptyStrings(" ",[]string{name, build, spVer})
+
 	if len(result) > 0 {
-		result = strings.TrimSpace(result)
+		return strings.TrimSpace(result), nil
 	} else {
-		err = internal_err
+		return "", err
 	}
-
-	return
 }
 
 func (p *Plugin) getPackages(params []string) (result interface{}, err error) {
@@ -212,12 +230,13 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 
 	handle, err = openRegistrySysInfoKey()
 	if err != nil {
-		return nil, err
+		goto out
 	}
 	defer handle.Close()
 
 	info.VersionFull, _ = getFullOSInfoString(handle)
 	info.VersionPretty, _ = getPrettyOSInfoString(handle)
+	info.Build, _ =  getBuildString(handle, false)
 
 	info.ProductName, _ = getRegistryValue(handle, regProductName, registry.SZ)
 	info.Major, _ = getRegistryValue(handle, regMajor, registry.SZ)
@@ -252,6 +271,7 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 		}
 	}
 
+out:
 	jsonArray, err = json.Marshal(info)
 	if err == nil {
 		result = string(jsonArray)

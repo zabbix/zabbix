@@ -67,6 +67,8 @@ type SystemInfo struct {
 }
 
 func init() {
+	var err error
+
 	hKernel32 = mustLoadLibrary("kernel32.dll")
 
 	globalMemoryStatusEx = hKernel32.mustGetProcAddress("GlobalMemoryStatusEx")
@@ -76,7 +78,11 @@ func init() {
 	getDiskFreeSpaceW = hKernel32.mustGetProcAddress("GetDiskFreeSpaceW")
 	getVolumePathNameW = hKernel32.mustGetProcAddress("GetVolumePathNameW")
 	getProcessHandleCount = hKernel32.mustGetProcAddress("GetProcessHandleCount")
-	getNativeSystemInfo = hKernel32.mustGetProcAddress("GetNativeSystemInfo")
+
+	getNativeSystemInfo, err = hKernel32.getProcAddress("GetNativeSystemInfo")
+	if err != nil {
+		hKernel32.mustGetProcAddress("GetSystemInfo")
+	}
 }
 
 func GlobalMemoryStatusEx() (m *MEMORYSTATUSEX, err error) {
@@ -203,5 +209,5 @@ func GetNativeSystemInfo() (sysInfo SystemInfo, err error) {
 		err = nil
 	}
 
-	return
+	return sysInfo, err
 }

@@ -648,6 +648,19 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: appends text to the string on a new line                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_offset, const char *text)
+{
+	if (0 != *info_offset)
+		zbx_chrcpy_alloc(info, info_alloc, info_offset, '\n');
+
+	zbx_strcpy_alloc(info, info_alloc, info_offset, text);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: src       - [IN] source string                                 *
  *             delimiter - [IN] delimiter                                     *
  *             last      - [IN] split after last delimiter                    *
