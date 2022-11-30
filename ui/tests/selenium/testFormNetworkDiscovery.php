@@ -175,7 +175,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClick('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad zi-circle-info-filled', $data['error']);
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
@@ -422,7 +422,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClick('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad zi-circle-info-filled', $data['error']);
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
 		$this->assertEquals($old_dchecks, CDBHelper::getHash($sql_dchecks));
