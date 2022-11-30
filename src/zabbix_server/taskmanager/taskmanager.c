@@ -328,7 +328,7 @@ static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
 
 	if (ZBX_DB_OK > DBexecute("update problem set cause_eventid=null where eventid=" ZBX_FS_UI64, eventid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to convert problem with eventid " ZBX_FS_UI64 " from symptom to"
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert problem (eventid:" ZBX_FS_UI64 ") from symptom to"
 				" cause", eventid);
 		ret = FAIL;
 		goto out;
@@ -336,7 +336,7 @@ static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
 
 	if (ZBX_DB_OK > DBexecute("delete from event_symptom where eventid=" ZBX_FS_UI64, eventid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to convert event " ZBX_FS_UI64 " from symptom to cause",
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert event (id:" ZBX_FS_UI64 ") from symptom to cause",
 				eventid);
 		ret = FAIL;
 	}
@@ -348,8 +348,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: rank event/problem with eventid as symptom of event/problem with  *
- *          event id cause_eventid                                            *
+ * Purpose: rank event/problem as symptom                                     *
  *                                                                            *
  * Parameters:                                                                *
  *     eventid           - [IN] event id of the new symptom                   *
@@ -374,8 +373,8 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
 			cause_eventid, eventid, eventid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause with eventid " ZBX_FS_UI64 " for problem with"
-				" eventid" ZBX_FS_UI64, cause_eventid, eventid);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for problem"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
 		ret = FAIL;
 		goto out;
 	}
@@ -386,8 +385,8 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
 			cause_eventid, eventid, eventid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause " ZBX_FS_UI64 " for event " ZBX_FS_UI64,
-				cause_eventid, eventid);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for event"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
 		ret = FAIL;
 		goto out;
 	}
