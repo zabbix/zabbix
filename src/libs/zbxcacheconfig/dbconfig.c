@@ -346,6 +346,15 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	if (ITEM_TYPE_SNMP == type)
 	{
 		ZBX_DC_SNMPINTERFACE	*snmp;
+		ZBX_DC_SNMPITEM		*snmpitem;
+
+		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
+		{
+			if (0 == strncmp(snmpitem->snmp_oid, "snmp.walk[", 10))
+			{
+				return itemid;
+			}
+		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
 				|| SNMP_BULK_ENABLED != snmp->bulk)
