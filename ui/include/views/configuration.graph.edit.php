@@ -508,7 +508,7 @@ if ($data['graphid'] != 0) {
 		url_params(['graphid', 'parent_discoveryid', 'hostid'])
 	);
 
-	if ($readonly && array_key_exists('flags', $data) && $data['flags'] | ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+	if ($readonly && $data['parent_discoveryid'] === null) {
 		$updateButton->setEnabled(false);
 	}
 
