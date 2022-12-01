@@ -1,8 +1,13 @@
 Changes for 6.4.0rc1
 
 New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta4
@@ -151,8 +156,14 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.6rc1
 
 New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.5
@@ -639,8 +650,14 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.12rc1
 
 New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.11
@@ -2880,6 +2897,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.31rc1
 
 New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
 
