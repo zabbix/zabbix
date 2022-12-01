@@ -1670,7 +1670,7 @@ class CUser extends CApiService {
 	public function checkAuthentication(array $session): array
 	{
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' => ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sessions', 'sessionid')],
+			'sessionid' => ['type' => API_STRING_UTF8],
 			'extend' => ['type' => API_BOOLEAN, 'default' => true],
 			'token' => ['type' => API_STRING_UTF8]
 		]];
@@ -1686,10 +1686,6 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Sessionid or token is expected.'));
 		}
 
-		if (strlen($token) != 64) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', 'token', _s('value must be %1$d characters long', 64));
-		}
-
 		$time = time();
 
 		// access DB only once per page load
@@ -1698,13 +1694,12 @@ class CUser extends CApiService {
 		}
 
 		if ($token !== null) {
-			$api_tokens = $this->tokenAuthentication($token, $time);
-			$userid = $api_tokens['userid'];
+			$db_tokens = self::tokenAuthentication($token, $time);
+			$userid = $db_tokens['userid'];
 		}
-
-		if ($sessionid !== null) {
-			$db_session = $this->sessionidAuthentication($sessionid);
-			$userid = $db_session['userid'];
+		else {
+			$db_sessions = self::sessionidAuthentication($sessionid);
+			$userid = $db_sessions['userid'];
 		}
 
 		$db_users = DB::select('users', [
@@ -1736,17 +1731,16 @@ class CUser extends CApiService {
 
 			DB::update('token', [
 				'values' => ['lastaccess' => $time],
-				'where' => ['tokenid' => $api_tokens['tokenid']]
+				'where' => ['tokenid' => $db_tokens['tokenid']]
 			]);
 		}
-
-		if ($sessionid !== null) {
+		else {
 			$db_user['sessionid'] = $sessionid;
 			$autologout = timeUnitToSeconds($db_user['autologout']);
 
 			// Check system permissions.
-			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
+			if (($autologout != 0 && $db_sessions['lastaccess'] + $autologout <= $time)
+					|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
 				DB::delete('sessions', [
 					'status' => ZBX_SESSION_PASSIVE,
 					'userid' => $db_user['userid']
@@ -1759,7 +1753,7 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 			}
 
-			if ($session['extend'] && $time != $db_session['lastaccess']) {
+			if ($session['extend'] && $time != $db_sessions['lastaccess']) {
 				DB::update('sessions', [
 					'values' => ['lastaccess' => $time],
 					'where' => ['sessionid' => $sessionid]
@@ -1776,13 +1770,13 @@ class CUser extends CApiService {
 	 * Authenticates user based on token.
 	 *
 	 * @param string $auth_token
-	 * @param int $time
+	 * @param int    $time
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	protected function tokenAuthentication(string $auth_token, int $time): array {
+	private static function tokenAuthentication(string $auth_token, int $time): array {
 		$api_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
@@ -1793,14 +1787,13 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$api_tokens = $api_tokens[0];
-		$expires_at = $api_tokens['expires_at'];
+		$api_token = $api_tokens[0];
 
-		if ($expires_at != 0 && $expires_at < $time) {
+		if ($api_token['expires_at'] != 0 && $api_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		return $api_tokens;
+		return $api_token;
 	}
 
 	/**
@@ -1812,7 +1805,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function sessionidAuthentication(string $sessionid): array {
+	private static function sessionidAuthentication(string $sessionid): array {
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
 			'sessionids' => $sessionid,
