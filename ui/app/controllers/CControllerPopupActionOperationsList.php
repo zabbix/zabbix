@@ -94,10 +94,21 @@ class CControllerPopupActionOperationsList extends CController {
 				$unique_operations[$new_operation['operationtype']]++;
 
 				foreach ($operations as $operationId => $operation) {
-					if (array_key_exists($operation['operationtype'], $unique_operations)
-							&& (!array_key_exists('id', $new_operation)
-							|| bccomp($new_operation['id'], $operationId) != 0)) {
-						$unique_operations[$operation['operationtype']]++;
+					if ($new_operation['row_index'] == $operationId) {
+						unset($new_operation['row_index']);
+
+						if ($operation === $new_operation) {
+							$unique_operations[$operation['operationtype']]--;
+						}
+
+						$new_operation['row_index'] = $operationId;
+					}
+					else {
+						if (array_key_exists($operation['operationtype'], $unique_operations)
+								&& (!array_key_exists('id', $new_operation)
+								|| bccomp($new_operation['id'], $operationId) != 0)) {
+							$unique_operations[$operation['operationtype']]++;
+						}
 					}
 				}
 
