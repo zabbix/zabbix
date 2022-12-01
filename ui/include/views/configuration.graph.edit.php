@@ -497,6 +497,10 @@ if ($data['graphid'] != 0) {
 		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
 	);
 
+	if ($readonly && $data['flags'] | ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		$updateButton->setEnabled(false);
+	}
+
 	if ($is_templated) {
 		$deleteButton->setEnabled(false);
 	}
