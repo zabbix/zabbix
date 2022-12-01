@@ -489,8 +489,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.12rc1
 
 New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.11
