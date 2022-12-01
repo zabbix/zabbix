@@ -2590,6 +2590,7 @@ json_parse_return:
  *                                                                            *
  * Parameters: jp_data         - [IN] JSON with autoregistration data         *
  *             proxy_hostid    - [IN] proxy identifier from database          *
+ *             events_cbs      - [IN]                                         *
  *             error           - [OUT] address of a pointer to the info       *
  *                                     string (should be freed by the caller) *
  *                                                                            *
@@ -2598,7 +2599,7 @@ json_parse_return:
  *                                                                            *
  ******************************************************************************/
 static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
-		char **error)
+		zbx_events_funcs_t events_cbs, char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -2725,8 +2726,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	if (0 != autoreg_hosts.values_num)
 	{
 		DBbegin();
-
-		zbx_events_funcs_t events_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
 		DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
 
 		DBcommit();
@@ -3002,8 +3001,11 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
 	{
-		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->hostid, &error_step)))
+		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->hostid, events_cbs,
+				&error_step)))
+		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
+		}
 	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))

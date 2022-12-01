@@ -337,6 +337,16 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 zbx_vector_ptr_t	zbx_addrs;
 
+/* proxy has no any events processing */
+static  zbx_events_funcs_t      events_cbs = {
+	.add_event_cb                   = NULL,
+	.process_events_cb              = NULL,
+	.clean_events_cb                = NULL,
+	.reset_event_recovery_cb        = NULL,
+	.export_events_cb               = NULL,
+	.events_update_itservices_cb    = NULL
+};
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1016,9 +1026,6 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
-
-	zbx_events_funcs_t	events_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
-
 	free_database_cache(ZBX_SYNC_ALL, events_cbs);
 	free_configuration_cache();
 	DBclose();
@@ -1255,7 +1262,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_events_funcs_t		events_cbs = {NULL, NULL, NULL, NULL, NULL, NULL};
 	zbx_thread_dbsyncer_args	dbsyncer_args = {events_cbs};
 
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};

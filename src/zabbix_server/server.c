@@ -391,6 +391,15 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
+static	zbx_events_funcs_t      events_cbs = {
+	.add_event_cb                   = zbx_add_event,
+	.process_events_cb              = zbx_process_events,
+	.clean_events_cb                = zbx_clean_events,
+	.reset_event_recovery_cb	= zbx_reset_event_recovery,
+	.export_events_cb               = zbx_export_events,
+	.events_update_itservices_cb    = zbx_events_update_itservices
+};
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
@@ -1076,10 +1085,6 @@ static void	zbx_on_exit(int ret)
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		zbx_events_funcs_t events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-				zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
-
 		free_database_cache(ZBX_SYNC_ALL, events_cbs);
 		DBclose();
 	}
@@ -1358,9 +1363,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 {
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
-
-	zbx_events_funcs_t	events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-			zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
 
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
 
@@ -1695,9 +1697,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vmware_destroy();
 	zbx_free_selfmon_collector();
 	free_configuration_cache();
-
-	zbx_events_funcs_t	events_cbs = {zbx_add_event, zbx_process_events, zbx_reset_event_recovery,
-			zbx_clean_events, zbx_events_update_itservices, zbx_export_events};
 	free_database_cache(ZBX_SYNC_NONE, events_cbs);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
