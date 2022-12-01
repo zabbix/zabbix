@@ -2006,6 +2006,12 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 					break;
 				}
 			}
+
+			if (NULL != response)
+			{
+				snmp_free_pdu(response);
+				response = NULL;
+			}
 		}
 	}
 
