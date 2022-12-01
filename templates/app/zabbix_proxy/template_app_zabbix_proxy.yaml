@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:37:59Z'
   template_groups:
     -
@@ -982,7 +982,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -997,7 +997,7 @@ zabbix_export:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix proxy performance'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1013,7 +1013,7 @@ zabbix_export:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix data gathering process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1029,7 +1029,7 @@ zabbix_export:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix internal process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'

@@ -47,6 +47,7 @@
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *

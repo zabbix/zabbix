@@ -39,10 +39,10 @@ class testDashboardViewMode extends CLegacyWebTest {
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
 					break;
 				case 'admin' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 40);
 					break;
 				case 'user';
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 50);
 					break;
 				case 'guest';
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);

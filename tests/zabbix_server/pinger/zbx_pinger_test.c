@@ -26,12 +26,6 @@
 
 #define MAX_ERR_LEN 256
 
-int	CONFIG_ALERTDB_FORKS		= 1;
-int	CONFIG_LLDWORKER_FORKS		= 2;
-int	CONFIG_LLDMANAGER_FORKS		= 1;
-int	CONFIG_REPORTMANAGER_FORKS	= 0;
-int	CONFIG_REPORTWRITER_FORKS	= 0;
-
 void	zbx_mock_test_entry(void **state)
 {
 	icmpping_t		icmpping;

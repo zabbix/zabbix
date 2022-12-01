@@ -27,7 +27,6 @@
 #include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "dir.h"
 #include "zbxalgo.h"
 

@@ -22,6 +22,10 @@
 
 #include "zbxcommon.h"
 
+/* database double precision upgrade states */
+#define ZBX_DB_DBL_PRECISION_DISABLED	0
+#define ZBX_DB_DBL_PRECISION_ENABLED	1
+
 #define zbx_is_ushort(str, value) \
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
 

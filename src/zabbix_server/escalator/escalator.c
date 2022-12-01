@@ -18,10 +18,11 @@
 **/
 
 #include "escalator.h"
+#include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"
-#include "zbxserver.h"
 #include "zbxself.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
@@ -33,8 +34,11 @@
 #include "zbxtime.h"
 #include "zbxexpr.h"
 #include "zbxdbwrap.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
-extern int	CONFIG_ESCALATOR_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -1761,6 +1765,8 @@ err_alert:
 
 		if (NULL != r_event)
 		{
+/* max number of retries for alerts */
+#define ALERT_MAX_RETRIES	3
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
 					esc_step, (int)ALERT_TYPE_MESSAGE, ackid, event->eventid);
@@ -2384,6 +2390,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		}
 	}
 
+/* action escalation processing mode */
+/*#define ACTION_PAUSE_SUPPRESSED_FALSE	0	 process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
 			HOST_MAINTENANCE_STATUS_ON == maintenance &&
@@ -2405,6 +2414,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			goto out;
 		}
 	}
+#undef ACTION_PAUSE_SUPPRESSED_TRUE
 
 	if (0 != skip)
 	{
@@ -2458,6 +2468,9 @@ static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const
 static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
 		const char *error, const char *default_timezone, const ZBX_DB_SERVICE *service, zbx_hashset_t *roles)
 {
+/* action escalation canceled notification mode */
+/* #define ACTION_NOTIFY_IF_CANCELED_TRUE	1 notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 	ZBX_USER_MSG	*user_msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
@@ -2476,6 +2489,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef ACTION_NOTIFY_IF_CANCELED_FALSE
 }
 
 /******************************************************************************
@@ -3321,41 +3335,41 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(triggerid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_ITEM:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is null and"
 					" itemid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(itemid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_SERVICE:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is not null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(serviceid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null and serviceid is null");
-			if (1 < CONFIG_ESCALATOR_FORKS)
+			if (1 < CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR])
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
 						" and " ZBX_SQL_MOD(escalationid, %d) "=%d",
-						CONFIG_ESCALATOR_FORKS, process_num - 1);
+						CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR], process_num - 1);
 			}
 			break;
 	}

@@ -83,4 +83,13 @@ char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
 int	zbx_iso8601_utc(const char *str, time_t *time);
 
+typedef enum
+{
+	TIMEPERIOD_TYPE_ONETIME = 0,
+/*	TIMEPERIOD_TYPE_HOURLY,*/
+	TIMEPERIOD_TYPE_DAILY = 2,
+	TIMEPERIOD_TYPE_WEEKLY,
+	TIMEPERIOD_TYPE_MONTHLY
+}
+zbx_timeperiod_type_t;
 #endif /* ZABBIX_TIME_H */

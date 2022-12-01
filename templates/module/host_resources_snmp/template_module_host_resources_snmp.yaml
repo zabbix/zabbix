@@ -402,7 +402,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -417,7 +417,7 @@ zabbix_export:
                         host: 'HOST-RESOURCES-MIB by SNMP'
                         name: 'CPU utilization'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -441,7 +441,7 @@ zabbix_export:
                         host: 'HOST-RESOURCES-MIB by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '12'
                   height: '5'

@@ -20,9 +20,11 @@
 #ifndef ZABBIX_PROXY_TASKMANAGER_H
 #define ZABBIX_PROXY_TASKMANAGER_H
 
-#include "zbxthreads.h"
+#include "zbxtasks.h"
 
 #include "zbxcomms.h"
+#include "zbxthreads.h"
+#include "zbxversion.h"
 
 typedef struct
 {
@@ -30,6 +32,9 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 zbx_thread_taskmanager_args;
+
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility);
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 

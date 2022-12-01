@@ -25,6 +25,10 @@
 #include "zbxeval.h"
 #include "zbxnum.h"
 
+/* global correlation constants */
+#define ZBX_CORRELATION_ENABLED				0
+/*#define ZBX_CORRELATION_DISABLED			1*/
+
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2
 #define ZBX_DBSYNC_OBJ_ITEM		3
