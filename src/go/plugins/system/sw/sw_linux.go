@@ -37,6 +37,8 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
+const timeFmt = "Mon Jan 02 15:04:05 2006"
+
 type manager struct {
 	name          string
 	testCmd       string
@@ -47,7 +49,7 @@ type manager struct {
 }
 
 type TimeDetails struct {
-	Timestamp uint64 `json:"timestamp"`
+	Timestamp int64  `json:"timestamp"`
 	Value     string `json:"value"`
 }
 
@@ -77,7 +79,7 @@ func getManagers() []manager {
 			"rpm -qa",
 			"rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
 			parseRegex,
-			dpkgDetails,
+			rpmDetails,
 		},
 		{
 			"pacman",
@@ -147,7 +149,7 @@ func dpkgList(in []string, regex string) (out []string, err error) {
 }
 
 func appendPackage(name string, manager string, version string, arch string, size uint64, buildtime_value string,
-	buildtime_timestamp uint64, installtime_value string, installtime_timestamp uint64) PackageDetails {
+	buildtime_timestamp int64, installtime_value string, installtime_timestamp int64) PackageDetails {
 	return PackageDetails{
 		Name:    name,
 		Manager: manager,
@@ -210,6 +212,75 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 
 		// dpkg has no build/install time information
 		pd = append(pd, appendPackage(split[1], manager, split[2], split[3], size, "", 0, "", 0))
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(pd)
+
+	if err != nil {
+		return
+	}
+
+	out = string(b)
+
+	return
+}
+
+func rpmDetails(manager string, in []string, regex string) (out string, err error) {
+	const num_fields = 6
+
+	rgx, err := regexp.Compile(regex)
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
+
+		return
+	}
+
+	// initialize empty slice instead of nil slice
+	pd := []PackageDetails{}
+
+	for _, s := range in {
+		split := strings.Split(s, ",")
+
+		if len(split) != num_fields {
+			log.Debugf("unexpected number of fields while expected %d in \"%s\", ignoring", num_fields, s)
+
+			continue
+		}
+
+		matched := rgx.MatchString(split[0])
+
+		if !matched {
+			continue
+		}
+
+		var size uint64
+		var buildtime_timestamp, installtime_timestamp int64
+
+		size, err = strconv.ParseUint(split[3], 10, 64)
+
+		if err != nil {
+			return
+		}
+
+		buildtime_timestamp, err = strconv.ParseInt(split[4], 10, 64)
+
+		if err != nil {
+			return
+		}
+
+		installtime_timestamp, err = strconv.ParseInt(split[5], 10, 64)
+
+		if err != nil {
+			return
+		}
+
+		buildtime_tm := time.Unix(buildtime_timestamp, 0)
+		installtime_tm := time.Unix(installtime_timestamp, 0)
+
+		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, buildtime_tm.Format(timeFmt),
+			buildtime_timestamp, installtime_tm.Format(timeFmt), installtime_timestamp))
 	}
 
 	var b []byte
