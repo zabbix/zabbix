@@ -57,7 +57,10 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			API::getWrapper()->auth = self::$data['sessionid'];
+			API::getWrapper()->auth = [
+				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+				'auth' => self::$data['sessionid']
+			];
 
 			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				error(_('GUI access disabled.'));

@@ -40,7 +40,6 @@ extern char	*CONFIG_DB_TLS_CA_FILE;
 extern char	*CONFIG_DB_TLS_CIPHER;
 extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
 #define ZBX_DB_CONNECT_NORMAL	0
@@ -272,6 +271,60 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 ZBX_DB_EVENT;
+
+/* media types */
+typedef enum
+{
+	MEDIA_TYPE_EMAIL = 0,
+	MEDIA_TYPE_EXEC,
+	MEDIA_TYPE_SMS,
+	MEDIA_TYPE_WEBHOOK = 4
+}
+zbx_media_type_t;
+
+/* alert statuses */
+typedef enum
+{
+	ALERT_STATUS_NOT_SENT = 0,
+	ALERT_STATUS_SENT,
+	ALERT_STATUS_FAILED,
+	ALERT_STATUS_NEW
+}
+zbx_alert_status_t;
+
+/* escalation statuses */
+typedef enum
+{
+	ESCALATION_STATUS_ACTIVE = 0,
+	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB, deprecated */
+	ESCALATION_STATUS_SLEEP,
+	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
+}
+zbx_escalation_status_t;
+
+/* alert types */
+typedef enum
+{
+	ALERT_TYPE_MESSAGE = 0,
+	ALERT_TYPE_COMMAND
+}
+zbx_alert_type_t;
+
+typedef enum
+{
+	ZBX_PROTOTYPE_STATUS_ENABLED,
+	ZBX_PROTOTYPE_STATUS_DISABLED,
+	ZBX_PROTOTYPE_STATUS_COUNT
+}
+zbx_prototype_status_t;
+
+typedef enum
+{
+	ZBX_PROTOTYPE_DISCOVER,
+	ZBX_PROTOTYPE_NO_DISCOVER,
+	ZBX_PROTOTYPE_DISCOVER_COUNT
+}
+zbx_prototype_discover_t;
 
 typedef struct ZBX_DB_MEDIATYPE
 {
@@ -553,6 +606,7 @@ const char	*DBget_inventory_field(unsigned char inventory_link);
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name);
 int	DBindex_exists(const char *table_name, const char *index_name);
 int	DBpk_exists(const char *table_name);
 #endif

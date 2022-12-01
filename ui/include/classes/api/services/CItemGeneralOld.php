@@ -1313,7 +1313,9 @@ abstract class CItemGeneralOld extends CApiService {
 					);
 				}
 
-				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
+				if (array_key_exists('params', $preprocessing) && $preprocessing['params'] !== null) {
+					$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
+				}
 
 				switch ($preprocessing['type']) {
 					case ZBX_PREPROC_MULTIPLIER:

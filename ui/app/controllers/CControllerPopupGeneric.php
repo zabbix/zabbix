@@ -471,6 +471,30 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
+			],
+			'actions' => [
+				'title' => _('Actions'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'actionid,name',
+				'form' => [
+					'name' => 'actionform',
+					'id' => 'actions'
+				],
+				'table_columns' => [
+					_('Actions')
+				]
+			],
+			'media_types' => [
+				'title' => _('Media types'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'mediatypeid,name',
+				'form' => [
+					'name' => 'media_typeform',
+					'id' => 'media_types'
+				],
+				'table_columns' => [
+					_('Media type')
+				]
 			]
 		];
 	}
@@ -533,6 +557,7 @@ class CControllerPopupGeneric extends CController {
 			'filter_hostid_rst' =>					'in 1',
 			'filter_templateid_rst' =>				'in 1',
 			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'group_status' =>						'in '.implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),
 			'hostids' =>							'array',
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
@@ -1206,6 +1231,10 @@ class CControllerPopupGeneric extends CController {
 					'output' => API_OUTPUT_EXTEND
 				];
 
+				if ($this->hasInput('group_status')) {
+					$options['status'] = $this->getInput('group_status');
+				}
+
 				$records = API::UserGroup()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
@@ -1720,6 +1749,20 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Sla()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['slaid' => 'id']);
+				break;
+
+			case 'actions':
+				$options += ['output' => ['name']];
+
+				$records = API::Action()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'media_types':
+				$options += ['output' => ['name']];
+
+				$records = API::MediaType()->get($options);
+				CArrayHelper::sort($records, ['name']);
 				break;
 		}
 

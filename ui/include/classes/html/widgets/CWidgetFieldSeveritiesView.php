@@ -27,10 +27,13 @@ class CWidgetFieldSeveritiesView extends CWidgetFieldView {
 		$this->field = $field;
 	}
 
-	public function getView(): CSeverityCheckBoxList {
-		return (new CSeverityCheckBoxList($this->field->getName()))
+	public function getView(): CCheckBoxList {
+		return (new CCheckBoxList($this->field->getName()))
+			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($this->field->getValue())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled(!$this->isDisabled());
+			->setEnabled(!$this->isDisabled())
+			->setColumns(3)
+			->setVertical();
 	}
 }
