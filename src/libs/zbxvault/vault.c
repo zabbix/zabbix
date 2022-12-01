@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vault.h"
-#include "../zbxhashicorp/hashicorp.h"
-#include "../zbxcyberark/cyberark.h"
-#include "../zbxkvs/kvs.h"
+#include "zbxvault.h"
+#include "hashicorp.h"
+#include "cyberark.h"
 
+#include "zbxkvs.h"
 #include "zbxstr.h"
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
@@ -41,6 +41,13 @@ static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(char **error)
 {
+#define ZBX_HASHICORP_NAME		"HashiCorp"
+#define ZBX_HASHICORP_DBUSER_KEY	"username"
+#define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
+
+#define ZBX_CYBERARK_NAME		"CyberArk"
+#define ZBX_CYBERARK_DBUSER_KEY		"UserName"
+#define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
 	if (NULL == CONFIG_VAULT || '\0' == *CONFIG_VAULT || 0 == strcmp(CONFIG_VAULT, ZBX_HASHICORP_NAME))
 	{
 		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(CONFIG_VAULT, ZBX_HASHICORP_NAME))
@@ -75,6 +82,13 @@ int	zbx_vault_init(char **error)
 	}
 
 	return SUCCEED;
+#undef ZBX_HASHICORP_NAME
+#undef ZBX_HASHICORP_DBUSER_KEY
+#undef ZBX_HASHICORP_DBPASSWORD_KEY
+
+#undef ZBX_CYBERARK_NAME
+#undef ZBX_CYBERARK_DBUSER_KEY
+#undef ZBX_CYBERARK_DBPASSWORD_KEY
 }
 
 int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error)

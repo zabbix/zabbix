@@ -67,7 +67,7 @@
 #include "setproctitle.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "../libs/zbxvault/vault.h"
+#include "zbxvault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "zbxrtc.h"
