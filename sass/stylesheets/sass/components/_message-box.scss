@@ -43,15 +43,17 @@
 
 	&::after {
 		position: absolute;
-		top: 6px;
+		top: 7px;
 		left: -3px;
 		width: 27px;
 		height: 25px;
 		margin-top: 2px;
 		margin-left: 11px;
 
-		color: $white;
 		font-size: 30px;
+		color: $white;
+		text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
+		opacity: 0.9;
 	}
 }
 
@@ -139,10 +141,6 @@
 
 	&::before {
 		background-color: $msg-warning-border-color;
-	}
-
-	&::after {
-		color: $font-color;
 	}
 }
 

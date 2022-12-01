@@ -3095,64 +3095,64 @@ div.dashboard-widget-tophosts z-bar-gauge {
   .zi-circle-info-filled::after,
   .zi-circle-check-filled::after {
     position: absolute;
-    top: 6px;
+    top: 7px;
     left: -3px;
     width: 27px;
     height: 25px;
     margin-top: 2px;
     margin-left: 11px;
+    font-size: 30px;
     color: #ffffff;
-    font-size: 30px; }
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
+    opacity: 0.9; }
 
 .msg-bad {
-  border-color: #ae1e1e; }
+  border-color: #dc3545; }
   .msg-bad .link-action {
-    color: #ae1e1e; }
+    color: #dc3545; }
     .msg-bad .link-action .arrow-up {
-      border-bottom-color: #ae1e1e; }
+      border-bottom-color: #dc3545; }
     .msg-bad .link-action .arrow-down {
-      border-top-color: #ae1e1e; }
+      border-top-color: #dc3545; }
   .msg-bad ul {
-    border-top-color: #ae1e1e; }
+    border-top-color: #dc3545; }
   .msg-bad button {
-    color: #ae1e1e;
-    border-color: #ae1e1e; }
+    color: #dc3545;
+    border-color: #dc3545; }
   .msg-bad::before {
-    background-color: #ae1e1e; }
+    background-color: #dc3545; }
 
 .msg-good {
-  border-color: #2f6533; }
+  border-color: #28a745; }
   .msg-good .link-action {
-    color: #2f6533; }
+    color: #28a745; }
     .msg-good .link-action .arrow-up {
-      border-bottom-color: #2f6533; }
+      border-bottom-color: #28a745; }
     .msg-good .link-action .arrow-down {
-      border-top-color: #2f6533; }
+      border-top-color: #28a745; }
   .msg-good ul {
-    border-top-color: #2f6533; }
+    border-top-color: #28a745; }
   .msg-good button {
-    color: #2f6533;
-    border-color: #2f6533; }
+    color: #28a745;
+    border-color: #28a745; }
   .msg-good::before {
-    background-color: #2f6533; }
+    background-color: #28a745; }
 
 .msg-warning {
-  border-color: #f4af25; }
+  border-color: #ffc107; }
   .msg-warning .link-action {
-    color: #f4af25; }
+    color: #ffc107; }
     .msg-warning .link-action .arrow-up {
-      border-bottom-color: #f4af25; }
+      border-bottom-color: #ffc107; }
     .msg-warning .link-action .arrow-down {
-      border-top-color: #f4af25; }
+      border-top-color: #ffc107; }
   .msg-warning ul {
-    border-top-color: #f4af25; }
+    border-top-color: #ffc107; }
   .msg-warning button {
-    color: #f4af25;
-    border-color: #f4af25; }
+    color: #ffc107;
+    border-color: #ffc107; }
   .msg-warning::before {
-    background-color: #f4af25; }
-  .msg-warning::after {
-    color: #1f2c33; }
+    background-color: #ffc107; }
 
 .msg-details {
   font-size: 1em;
