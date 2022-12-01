@@ -283,7 +283,7 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
  *                                                                            *
  * Purpose: get cause event id                                                *
  *                                                                            *
- * Parameters: eventid   - [IN] event id                                      *
+ * Parameters: eventid   - [IN] event id of the symptom                       *
  *                                                                            *
  * Return value: cause event id, or '0' if no cause event id found            *
  *                                                                            *
