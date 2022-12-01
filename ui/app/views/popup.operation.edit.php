@@ -51,9 +51,9 @@ if (count($data['operation_types']) > 1) {
 }
 else {
 	$select_operationtype = (new CFormField([
-			new CLabel($data['operation_types']),
-			(new CInput('hidden', 'operation[operationtype]', $operationtype_value))
-				->setId('operation-type-select')
+		new CLabel($data['operation_types']),
+		(new CInput('hidden', 'operation[operationtype]', $operationtype_value))
+			->setId('operation-type-select')
 	]))->setId('operation-type');
 }
 $form_grid->addItem([
@@ -202,20 +202,20 @@ $form_grid->addItem([
 
 // Operation custom message subject row.
 $form_grid->addItem([
-	(new CLabel(_('Subject'), 'operation-message-subject'))->setId('operation-message-subject-label'),
+	(new CLabel(_('Subject'), 'operation-opmessage-subject'))->setId('operation-message-subject-label'),
 	(new CTextBox('operation[opmessage][subject]'))
 		->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('operation-message-subject')
+		->setId('operation-opmessage-subject')
 ]);
 
 // Operation custom message body row.
 $form_grid->addItem([
-	(new CLabel(_('Message'), 'operation-message-body'))->setId('operation-message-label'),
+	(new CLabel(_('Message'), 'operation_opmessage_message'))->setId('operation-message-label'),
 	(new CTextArea('operation[opmessage][message]'))
 		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('operation-message-body')
+		->setId('operation_opmessage_message')
 ]);
 
 $opcommand_hst_value = null;
@@ -246,9 +246,11 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 			(new CFormGrid())
 				->cleanItems()
 				->addItem([
-					new CLabel(_('Current host'), 'operation_opcommand_hst__hostid_current_host'),
-					(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
-						->setChecked($opcommand_hst_value === 0)
+					new CLabel(_('Current host'), 'operation-command-chst'),
+					(new CFormField(
+						(new CCheckBox('operation[opcommand_hst][][hostid]', '0'))
+							->setChecked($opcommand_hst_value === 0)
+							->setId('operation-command-chst')
 					))->setId('operation-command-checkbox')
 				])
 				->addItem([

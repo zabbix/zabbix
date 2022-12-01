@@ -129,7 +129,7 @@ window.operation_popup = new class {
 
 	_allInvolvedRecoveryFields() {
 		const fields = [
-			'operation-message-custom', 'operation-message-subject', 'operation-message-body',
+			'operation-message-custom', 'operation-opmessage-subject', 'operation_opmessage_message',
 			'operation-message-subject-label', 'operation_opmessage_default_msg'
 		];
 
@@ -139,8 +139,8 @@ window.operation_popup = new class {
 
 	_allInvolvedFieldsUpdate() {
 		const fields = [
-			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
-			'operation-message-body', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
+			'operation-message-custom-label', 'operation-message-custom', 'operation-opmessage-subject',
+			'operation_opmessage_message', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
 		];
 
 		this._enableFormFields(fields);
@@ -561,8 +561,8 @@ window.operation_popup = new class {
 	_customMessageFields() {
 		const default_msg = document.querySelector('#operation_opmessage_default_msg');
 		const message_fields = [
-			'operation-message-subject-label', 'operation-message-subject', 'operation-message-label',
-			'operation-message-body'
+			'operation-message-subject-label', 'operation-opmessage-subject', 'operation-message-label',
+			'operation_opmessage_message'
 		];
 
 		default_msg.onchange = function() {
