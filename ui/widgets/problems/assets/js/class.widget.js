@@ -21,18 +21,16 @@
 class CWidgetProblems extends CWidget {
 
 	// Must be synced with PHP ZBX_STYLE_BTN_WIDGET_EXPAND;
-	static ZBX_STYLE_BTN_WIDGET_EXPAND;
+	static ZBX_STYLE_BTN_WIDGET_EXPAND = 'btn-widget-expand';
 
 	// Must be synced with PHP ZBX_STYLE_BTN_WIDGET_COLLAPSE;
-	static ZBX_STYLE_BTN_WIDGET_COLLAPSE;
+	static ZBX_STYLE_BTN_WIDGET_COLLAPSE = 'btn-widget-collapse';
 
 	_init() {
 		super._init();
 
 		this._has_contents = false;
 		this._opened_eventids = [];
-		this.ZBX_STYLE_BTN_WIDGET_EXPAND = 'btn-widget-expand';
-		this.ZBX_STYLE_BTN_WIDGET_COLLAPSE = 'btn-widget-collapse';
 	}
 
 	_registerEvents() {
@@ -77,7 +75,9 @@ class CWidgetProblems extends CWidget {
 				const rows = this._target.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
 
 				if (rows[0].classList.contains('hidden')) {
-					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_EXPAND, this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+					button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND,
+						CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE
+					);
 					button.title = t('Collapse');
 
 					this._opened_eventids.push(button.dataset.eventid);
@@ -85,7 +85,9 @@ class CWidgetProblems extends CWidget {
 					[...rows].forEach(row => row.classList.remove('hidden'));
 				}
 				else {
-					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_COLLAPSE, this.ZBX_STYLE_BTN_WIDGET_EXPAND);
+					button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE,
+						CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND
+					);
 					button.title = t('Expand');
 
 					this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
@@ -153,7 +155,9 @@ class CWidgetProblems extends CWidget {
 
 					[...rows].forEach(row => row.classList.remove('hidden'));
 
-					button.classList.replace(this.ZBX_STYLE_BTN_WIDGET_EXPAND, this.ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+					button.classList.replace(CWidgetProblems.ZBX_STYLE_BTN_WIDGET_EXPAND,
+						CWidgetProblems.ZBX_STYLE_BTN_WIDGET_COLLAPSE
+					);
 					button.title = t('Collapse');
 				}
 			}
