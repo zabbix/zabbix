@@ -40,13 +40,13 @@
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
-static  zbx_events_funcs_t      events_cbs = {
-	.add_event_cb                   = zbx_add_event,
-	.process_events_cb              = zbx_process_events,
-	.clean_events_cb                = zbx_clean_events,
-	.reset_event_recovery_cb        = zbx_reset_event_recovery,
-	.export_events_cb               = zbx_export_events,
-	.events_update_itservices_cb    = zbx_events_update_itservices
+static zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= zbx_add_event,
+	.process_events_cb		= zbx_process_events,
+	.clean_events_cb		= zbx_clean_events,
+	.reset_event_recovery_cb	= zbx_reset_event_recovery,
+	.export_events_cb		= zbx_export_events,
+	.events_update_itservices_cb	= zbx_events_update_itservices
 };
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)

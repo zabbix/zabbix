@@ -391,13 +391,13 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
-static	zbx_events_funcs_t      events_cbs = {
-	.add_event_cb                   = zbx_add_event,
-	.process_events_cb              = zbx_process_events,
-	.clean_events_cb                = zbx_clean_events,
+static	zbx_events_funcs_t	events_cbs = {
+	.add_event_cb			= zbx_add_event,
+	.process_events_cb		= zbx_process_events,
+	.clean_events_cb		= zbx_clean_events,
 	.reset_event_recovery_cb	= zbx_reset_event_recovery,
-	.export_events_cb               = zbx_export_events,
-	.events_update_itservices_cb    = zbx_events_update_itservices
+	.export_events_cb		= zbx_export_events,
+	.events_update_itservices_cb	= zbx_events_update_itservices
 };
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);

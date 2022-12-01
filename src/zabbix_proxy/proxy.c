@@ -339,12 +339,12 @@ zbx_vector_ptr_t	zbx_addrs;
 
 /* proxy has no any events processing */
 static  zbx_events_funcs_t      events_cbs = {
-	.add_event_cb                   = NULL,
-	.process_events_cb              = NULL,
-	.clean_events_cb                = NULL,
-	.reset_event_recovery_cb        = NULL,
-	.export_events_cb               = NULL,
-	.events_update_itservices_cb    = NULL
+	.add_event_cb			= NULL,
+	.process_events_cb		= NULL,
+	.clean_events_cb		= NULL,
+	.reset_event_recovery_cb	= NULL,
+	.export_events_cb		= NULL,
+	.events_update_itservices_cb	= NULL
 };
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
