@@ -132,6 +132,8 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
+	zbx_init_library_cfg(program_type);
+
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
 			&zbx_optind)))

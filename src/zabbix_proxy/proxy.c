@@ -1146,6 +1146,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
+	zbx_init_library_cfg(program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)

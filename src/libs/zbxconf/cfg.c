@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxip.h"
 
-extern unsigned char	program_type;
+static const char	*program_type_str = NULL;
 
 int	CONFIG_TIMEOUT		= 3;
 
@@ -569,7 +569,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 	if (0 != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -581,7 +581,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	if (NULL != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -703,4 +703,9 @@ fail:
 	zbx_vector_ptr_destroy(&addrs);
 
 	return ret;
+}
+
+void	zbx_init_library_cfg(unsigned char program_type)
+{
+	program_type_str = get_program_type_string(program_type);
 }

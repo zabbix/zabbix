@@ -81,4 +81,6 @@ typedef int	(*add_serveractive_host_f)(const zbx_vector_ptr_t *addrs, zbx_vector
 int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
 		zbx_vector_str_t *hostnames, void *data, char **error);
 
+void	zbx_init_library_cfg(unsigned char program_type);
+
 #endif
