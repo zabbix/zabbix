@@ -2319,6 +2319,7 @@ static const char	*escalation_status_string(unsigned char status)
  *                                                                            *
  * Parameters: escalation - [IN]  escalation to check                         *
  *             action     - [IN]  action responsible for the escalation       *
+ *             s_eventids - [IN]  symptom event ids                           *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
  * Return value: ZBX_ESCALATION_CANCEL   - the relevant event, item, trigger  *
@@ -2334,7 +2335,7 @@ static const char	*escalation_status_string(unsigned char status)
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
-		char **error)
+		zbx_vector_uint64_t *s_eventids, char **error)
 {
 	DC_ITEM		item;
 	int		errcode, ret = ZBX_ESCALATION_CANCEL;
@@ -2416,9 +2417,6 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 #undef ACTION_PAUSE_SUPPRESSED_TRUE
 
-/* action escalation symptom event processing mode */
-#define ACTION_PAUSE_SYMPTOMS_FALSE	0	/* process escalation for symptom events */
-#define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
 	if (0 != skip)
 	{
 		/* one of trigger dependencies is in PROBLEM state, process escalation later */
@@ -2426,9 +2424,12 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		goto out;
 	}
 
+/* action escalation symptom event processing mode */
+#define ACTION_PAUSE_SYMPTOMS_FALSE	0	/* process escalation for symptom events */
+#define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource && ACTION_PAUSE_SYMPTOMS_TRUE == action->pause_symptoms &&
 			0 == escalation->acknowledgeid && 0 == escalation->r_eventid &&
-			0 < zbx_db_get_cause_eventid(event->eventid))
+			FAIL != zbx_vector_uint64_bsearch(s_eventids, event->eventid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 	{
 		/* suppress escalations for trigger-based symptom events */
 		ret = ZBX_ESCALATION_SUPPRESS;
@@ -2939,7 +2940,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone)
 {
 	int				i, ret;
-	zbx_vector_uint64_t		escalationids;
+	zbx_vector_uint64_t		escalationids, symptom_eventids;
 	zbx_vector_ptr_t		diffs, actions, events;
 	zbx_escalation_diff_t		*diff;
 	zbx_vector_uint64_pair_t	event_pairs;
@@ -2951,6 +2952,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_dc_um_handle_t		*um_handle;
 
 	zbx_vector_uint64_create(&escalationids);
+	zbx_vector_uint64_create(&symptom_eventids);
 	zbx_vector_ptr_create(&diffs);
 	zbx_vector_ptr_create(&actions);
 	zbx_vector_ptr_create(&events);
@@ -2968,6 +2970,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
+	zbx_db_select_symptom_eventids(eventids, &symptom_eventids);
 
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
@@ -3082,7 +3085,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		/* Handle escalation taking into account status of items, triggers, hosts, */
 		/* maintenance and trigger dependencies.                                   */
 		if (ZBX_ESCALATION_UNSET == state)
-			state = check_escalation(escalation, action, event, &error);
+			state = check_escalation(escalation, action, event, &symptom_eventids, &error);
 
 		switch (state)
 		{
@@ -3278,6 +3281,7 @@ out:
 	ret = escalationids.values_num; /* performance metric */
 
 	zbx_vector_uint64_destroy(&escalationids);
+	zbx_vector_uint64_destroy(&symptom_eventids);
 
 	return ret;
 }

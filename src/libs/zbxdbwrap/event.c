@@ -281,6 +281,43 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: select symptom event IDs                                          *
+ *                                                                            *
+ * Parameters: eventids          - [IN] events to be evaluated                *
+ *             symptom_eventids  - [OUT] array of symptom event IDs           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	s_eventid;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values,
+			eventids->values_num);
+
+	result = DBselect("select eventid"
+			" from event_symptom"
+			" where event_causeid is not null and%s",
+			sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(s_eventid, row[0]);
+		zbx_vector_uint64_append(symptom_eventids, s_eventid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get cause event id                                                *
  *                                                                            *
  * Parameters: eventid   - [IN] event id of the symptom                       *
