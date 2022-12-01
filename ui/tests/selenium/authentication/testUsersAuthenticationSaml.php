@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup config
  */
-class testFormAdministrationAuthenticationSaml extends CWebTest {
+class testUsersAuthenticationSaml extends CWebTest {
 
 	protected function onBeforeTestSuite() {
 		if (!defined('PHPUNIT_SAML_TESTS_ENABLED') || !PHPUNIT_SAML_TESTS_ENABLED) {
@@ -54,7 +55,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_idp_entityid": cannot be empty.'
+					'error' => 'Incorrect value for field "idp_entityid": cannot be empty.'
 				]
 			],
 			// Missing SSO service URL
@@ -66,7 +67,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_sso_url": cannot be empty.'
+					'error' => 'Incorrect value for field "sso_url": cannot be empty.'
 				]
 			],
 			// Missing Username attribute
@@ -78,7 +79,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'IdP entity ID' => 'IdP',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_username_attribute": cannot be empty.'
+					'error' => 'Incorrect value for field "username_attribute": cannot be empty.'
 				]
 			],
 			// Missing SP entity ID
@@ -90,7 +91,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'IdP entity ID' => 'IdP',
 						'Username attribute' => 'UA'
 					],
-					'error' => 'Incorrect value for field "saml_sp_entityid": cannot be empty.'
+					'error' => 'Incorrect value for field "sp_entityid": cannot be empty.'
 				]
 			],
 			// Configure SAML with only
@@ -140,27 +141,41 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'SLO service URL' => 'SLO_saml_zabbix.com',
 						'Username attribute' => 'Username attribute',
 						'SP entity ID' => 'SP entity ID',
+						'Enable JIT provisioning' => true,
 						'SP name ID format' => 'SP name ID format',
-						'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
-						'Encrypt' => ['Name ID', 'Assertions'],
+						// Sign.
+						'id:sign_messages' => true,
+						'id:sign_assertions' => true,
+						'id:sign_authn_requests' => true,
+						'id:sign_logout_requests' => true,
+						'id:sign_logout_responses' => true,
+						// Encrypt.
+						'id:encrypt_nameid' => true,
+						'id:encrypt_assertions' => true,
 						'Case-sensitive login' => true
 					],
+					'Deprovisioned users group' => 'Disabled',
 					'db_check' => [
-						'saml_auth_enabled' => '1',
-						'saml_idp_entityid' => 'IdP_saml_zabbix.com',
-						'saml_sso_url' => 'SSO_saml_zabbix.com',
-						'saml_slo_url' => 'SLO_saml_zabbix.com',
-						'saml_username_attribute' => 'Username attribute',
-						'saml_sp_entityid' => 'SP entity ID',
-						'saml_nameid_format' => 'SP name ID format',
-						'saml_sign_messages' => '1',
-						'saml_sign_assertions' => '1',
-						'saml_sign_authn_requests' => '1',
-						'saml_sign_logout_requests' => '1',
-						'saml_sign_logout_responses' => '1',
-						'saml_encrypt_nameid' => '1',
-						'saml_encrypt_assertions' => '1',
-						'saml_case_sensitive' => '1'
+						'config' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 1,
+							'saml_jit_status' => 1
+						],
+						'userdirectory_saml' => [
+							'idp_entityid' => 'IdP_saml_zabbix.com',
+							'sso_url' => 'SSO_saml_zabbix.com',
+							'slo_url' => 'SLO_saml_zabbix.com',
+							'username_attribute' => 'Username attribute',
+							'sp_entityid' => 'SP entity ID',
+							'nameid_format' => 'SP name ID format',
+							'sign_messages' => 1,
+							'sign_assertions' => 1,
+							'sign_authn_requests' => 1,
+							'sign_logout_requests' => 1,
+							'sign_logout_responses' => 1,
+							'encrypt_nameid' => 1,
+							'encrypt_assertions' => 1
+						]
 					]
 				]
 			]
@@ -171,16 +186,16 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * @backup config
 	 * @dataProvider getSamlData
 	 */
-	public function testFormAdministrationAuthenticationSaml_Configure($data) {
+	public function testUsersAuthenticationSaml_Configure($data) {
 		$old_hash = CDBHelper::getHash('SELECT * FROM config');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
 		// Check that SAML settings are disabled by default and configure SAML authentication.
-		$this->configureSamlAuthentication($data['fields'], true);
+		$this->configureSamlAuthentication($data['fields'], true, $data);
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot update authentication',  $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 		else {
@@ -188,24 +203,24 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			$form = $this->query('id:authentication-form')->asForm()->one();
 			$form->selectTab('SAML settings');
 			$this->assertTrue($form->getField('Enable SAML authentication')->isChecked());
+
 			// Trim trailing and leading spaces in expected values before comparison.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$data['fields'] = array_map('trim', $data['fields']);
 			}
+
 			$form->checkValue($data['fields']);
+
 			if (array_key_exists('db_check', $data)) {
-				$sql = 'SELECT saml_auth_enabled, saml_idp_entityid, saml_sso_url, saml_slo_url, saml_username_attribute,'.
-						' saml_sp_entityid, saml_nameid_format, saml_sign_messages, saml_sign_assertions,'.
-						' saml_sign_authn_requests, saml_sign_logout_requests, saml_sign_logout_responses,'.
-						' saml_encrypt_nameid, saml_encrypt_assertions, saml_case_sensitive'.
-						' FROM config';
-				$result = CDBHelper::getRow($sql);
-				$this->assertEquals($data['db_check'], $result);
+				foreach ($data['db_check'] as $table => $values) {
+					$sql = 'SELECT '.implode(",", array_keys($values)).' FROM '.$table;
+					$this->assertEquals($values, CDBHelper::getRow($sql));
+				}
 			}
 		}
 	}
 
-	public function testFormAdministrationAuthenticationSaml_CheckStatusChange() {
+	public function testUsersAuthenticationSaml_CheckStatusChange() {
 		$settings = [
 			'IdP entity ID' => 'IdP',
 			'SSO service URL' => 'SSO',
@@ -322,7 +337,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * @backup config
 	 * @dataProvider getAuthenticationDetails
 	 */
-	public function testFormAdministrationAuthenticationSaml_Authenticate($data) {
+	public function testUsersAuthenticationSaml_Authenticate($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$settings = [
 			'IdP entity ID' => PHPUNIT_IDP_ENTITY_ID,
@@ -385,17 +400,25 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 	 * Function checks that SAML settings are disabled by default, if the corresponding flag is specified, enables and
 	 * fills SAML settings, and submits the form.
 	 */
-	private function configureSamlAuthentication($fields, $check_enabled = false) {
+	private function configureSamlAuthentication($fields, $check_enabled = false, $data = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
+
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
 			foreach($fields as $name => $value){
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
+
 		$form->getField('Enable SAML authentication')->check();
 		$form->fill($fields);
+
+		if ($data !== null && array_key_exists('Deprovisioned users group', $data)) {
+			$form->selectTab('Authentication');
+			$form->fill(['Deprovisioned users group' => 'Disabled']);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 	}
