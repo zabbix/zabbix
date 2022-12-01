@@ -1,6 +1,7 @@
 Changes for 5.0.31rc1
 
 New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
 
