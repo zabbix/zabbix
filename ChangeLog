@@ -163,6 +163,7 @@ Bug fixes:
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
 A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.5
@@ -656,6 +657,7 @@ Bug fixes:
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
 A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.11
