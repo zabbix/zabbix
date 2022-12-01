@@ -1542,8 +1542,9 @@ footer {
 
 .dashboard-grid-widget-actions,
 .dashboard-grid-iterator-actions {
-  transition: opacity .2s ease-out;
-  padding-right: 2px; }
+  padding-right: 2px;
+  opacity: 0;
+  transition: opacity .2s ease-out; }
   .dashboard-grid-widget-actions .zi-more,
   .dashboard-grid-widget-actions .zi-cog-filled,
   .dashboard-grid-iterator-actions .zi-more,
@@ -3500,7 +3501,7 @@ section {
 
 .svg-graph-percentile text,
 .svg-graph-simple-trigger text {
-  filter: drop-shadow(1px 1px 0px rgba(128, 128, 128, 0.1)); }
+  filter: drop-shadow(1px 1px 0 rgba(128, 128, 128, 0.1)); }
 
 .svg-graph-legend {
   position: relative;
@@ -4273,7 +4274,7 @@ form.is-loading {
     display: none; }
   .filter-btn-container .zi-chevron-left,
   .filter-btn-container .zi-chevron-right {
-    padding: 0 4px;
+    padding: 0 3px;
     vertical-align: top;
     border: none;
     background-color: transparent;
@@ -4290,6 +4291,15 @@ form.is-loading {
       .filter-btn-container .zi-chevron-right:not(:disabled):focus::before,
       .filter-btn-container .zi-chevron-right:not(:disabled):active::before {
         opacity: 1; }
+    .filter-btn-container .zi-chevron-left:disabled,
+    .filter-btn-container .zi-chevron-right:disabled {
+      opacity: .4; }
+      .filter-btn-container .zi-chevron-left:disabled:focus,
+      .filter-btn-container .zi-chevron-right:disabled:focus {
+        background-color: #000000; }
+        .filter-btn-container .zi-chevron-left:disabled:focus:hover,
+        .filter-btn-container .zi-chevron-right:disabled:focus:hover {
+          background-color: transparent; }
     .filter-btn-container .zi-chevron-left::before,
     .filter-btn-container .zi-chevron-right::before {
       top: -1px;
@@ -5000,7 +5010,10 @@ button {
     background-position: -279px -621px;
     top: 1px; }
   .ui-tabs-nav .ui-tabs-active .zi-clock {
-    padding: 0 10px 7px 10px !important; }
+    padding: 1px 6px 6px 10px !important; }
+    .ui-tabs-nav .ui-tabs-active .zi-clock::before {
+      top: -1px;
+      left: -2px; }
   .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-info,
   .ui-tabs-nav .ui-state-hover.ui-tabs-active .btn-time,
   .ui-tabs-nav .ui-state-hover.ui-tabs-active .filter-trigger {
@@ -5027,7 +5040,7 @@ button {
 
 .btn-time-out {
   left: 1px;
-  margin: 0 3px 0 5px;
+  margin: 0 5px 0 5px;
   height: 24px;
   line-height: 22px;
   vertical-align: top;
@@ -7786,7 +7799,7 @@ z-select .zi-chevron-down:focus,
     background: transparent url("../img/icon-sprite.svg?20220722") no-repeat -165px -624px; }
 
 .overlay-dialogue .list-table th:first-child {
-  padding-left: 0px; }
+  padding-left: 0; }
 .overlay-dialogue .list-table td:first-child {
   padding-left: 42px; }
 
@@ -8178,7 +8191,7 @@ td.inactive-bg {
     transform: translateY(-50%); }
 
 .btn-undo.is-focused {
-  box-shadow: 0 1px 0px #111111, 0 -1px 0px #111111; }
+  box-shadow: 0 1px 0 #111111, 0 -1px 0 #111111; }
 
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #111111; }

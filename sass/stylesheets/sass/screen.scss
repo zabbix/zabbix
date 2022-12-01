@@ -635,15 +635,12 @@ form {
 
 	.zi-chevron-left,
 	.zi-chevron-right {
-		padding: 0 4px;
+		padding: 0 3px;
 		vertical-align: top;
-
 		border: none;
 		background-color: transparent;
 		border-radius: 2px;
-
 		color: $icon-color;
-
 		&:not(:disabled) {
 			&:hover,
 			&:focus,
@@ -653,6 +650,16 @@ form {
 
 				&::before {
 					opacity: 1;
+				}
+			}
+		}
+
+		&:disabled {
+			opacity: .4;
+			&:focus {
+				background-color: $form-border-focus-color;
+				&:hover {
+					background-color: transparent;
 				}
 			}
 		}
@@ -1796,7 +1803,12 @@ button {
 		}
 
 		.zi-clock {
-			padding: 0 10px 7px 10px !important;
+			padding: 1px 6px 6px 10px !important;
+
+			&::before {
+				top: -1px;
+				left: -2px;
+			}
 		}
 	}
 
@@ -1843,7 +1855,7 @@ button {
 
 .btn-time-out {
 	left: 1px;
-	margin: 0 3px 0 5px;
+	margin: 0 5px 0 5px;
 	height: 24px;
 	line-height: 22px;
 	vertical-align: top;

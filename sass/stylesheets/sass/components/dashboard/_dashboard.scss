@@ -412,9 +412,9 @@
 
 .dashboard-grid-widget-actions,
 .dashboard-grid-iterator-actions {
-	transition: opacity .2s ease-out;
-
 	padding-right: 2px;
+	opacity: 0;
+	transition: opacity .2s ease-out;
 
 	.zi-more,
 	.zi-cog-filled {

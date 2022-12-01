@@ -765,7 +765,7 @@ a.link-action {
 .overlay-dialogue {
 	.list-table {
 		th:first-child {
-			padding-left: 0px;
+			padding-left: 0;
 		}
 
 		td:first-child {
@@ -1291,7 +1291,7 @@ td.inactive-bg {
 // InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
-	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
+	box-shadow: 0 1px 0 $blue, 0 -1px 0 $blue;
 }
 
 // Tabfilter
