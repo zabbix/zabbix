@@ -96,10 +96,11 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		const zbx_uint64_t hostid);
 
 /* event support */
-void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void	zbx_db_free_event(ZBX_DB_EVENT *event);
-void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
+void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void		zbx_db_free_event(ZBX_DB_EVENT *event);
+void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
+zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid);
 
 void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);

@@ -2950,6 +2950,7 @@ static const ZBX_DB_EVENT	*get_cause_recovery_event(const ZBX_DB_EVENT *event, z
 static void	get_event_cause_value(const char *macro, char **replace_to, const ZBX_DB_EVENT *event,
 		const zbx_uint64_t *recipient_userid, const char *tz, char *error, int maxerrlen)
 {
+	zbx_uint64_t		cause_eventid;
 	const ZBX_DB_EVENT	*cause_event;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events, r_events;
@@ -2957,13 +2958,13 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const ZB
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
 			event->name);
 
-	if (0 == event->cause_eventid)
+	if (0 == (cause_eventid = zbx_db_get_cause_eventid(event->eventid)))
 		goto out;
 
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_ptr_create(&events);
 
-	zbx_vector_uint64_append(&eventids, event->cause_eventid);
+	zbx_vector_uint64_append(&eventids, cause_eventid);
 	zbx_db_get_events_by_eventids(&eventids, &events);
 
 	if (0 == events.values_num)

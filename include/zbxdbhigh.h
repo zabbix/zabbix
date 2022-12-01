@@ -251,7 +251,6 @@ ZBX_DB_SERVICE;
 typedef struct
 {
 	zbx_uint64_t		eventid;
-	zbx_uint64_t		cause_eventid;
 	ZBX_DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
 	char			*name;

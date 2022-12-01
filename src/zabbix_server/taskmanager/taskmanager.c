@@ -38,6 +38,7 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
+#include "zbxdbwrap.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -461,8 +462,6 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 	}
 	else if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
 	{
-		DB_ROW		row;
-		DB_RESULT	result;
 		zbx_uint64_t	requested_cause_eventid, target_cause_eventid, old_cause_eventid;
 
 		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_CAUSE_EVENTID, tmp, sizeof(tmp), NULL) ||
@@ -473,37 +472,20 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 			goto out;
 		}
 
-		result = DBselect(
-				"select cause_eventid"
-				" from event_symptom"
-				" where eventid=" ZBX_FS_UI64, requested_cause_eventid);
-
 		/* the event specified in task data by cause_eventid might be a symptom, find the actual target cause */
-		if (NULL != (row = DBfetch(result)))
-			ZBX_STR2UINT64(target_cause_eventid, row[0]);
-		else
+		if (0 == (target_cause_eventid = zbx_db_get_cause_eventid(requested_cause_eventid)))
 			target_cause_eventid = requested_cause_eventid;
-
-		DBfree_result(result);
 
 		if (target_cause_eventid == eventid)
 		{
 			/* cause and its symptom should be swapped, start by turning the symptom into a cause */
 			if (SUCCEED != tm_rank_event_as_cause(requested_cause_eventid))
 				goto out;
+
 			target_cause_eventid = requested_cause_eventid;
 		}
 
-		result = DBselect("select cause_eventid"
-				" from event_symptom"
-				" where eventid=" ZBX_FS_UI64, eventid);
-
-		if (NULL != (row = DBfetch(result)))
-			ZBX_STR2UINT64(old_cause_eventid, row[0]);
-		else
-			old_cause_eventid = 0;
-
-		DBfree_result(result);
+		old_cause_eventid = zbx_db_get_cause_eventid(eventid);
 
 		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid))
 			goto out;
