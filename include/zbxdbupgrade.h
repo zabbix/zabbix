@@ -20,7 +20,9 @@
 #ifndef ZABBIX_UPGRADE_H
 #define ZABBIX_UPGRADE_H
 
-int	DBcheck_version(void);
+#include "zbxcommon.h"
+
+int	DBcheck_version(zbx_get_program_type_f get_program_type_cb);
 int	DBcheck_double_type(void);
 
 #endif

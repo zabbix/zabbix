@@ -53,6 +53,8 @@ zbx_dbpatch_t;
 #define ZBX_FS_SQL_NAME "%s"
 #endif
 
+extern zbx_get_program_type_f	DBget_program_type_cb;
+
 int	DBcreate_table(const ZBX_TABLE *table);
 int	DBrename_table(const char *table_name, const char *new_name);
 int	DBdrop_table(const char *table_name);

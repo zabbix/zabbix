@@ -1275,7 +1275,7 @@ static void	zbx_check_db(void)
 #ifdef HAVE_POSTGRESQL
 			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
 #endif
-			SUCCEED != DBcheck_version()))
+			SUCCEED != DBcheck_version(get_program_type)))
 	{
 		result = FAIL;
 	}
