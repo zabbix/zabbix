@@ -113,6 +113,8 @@ abstract class CGraphGeneral extends CApiService {
 				}
 				else {
 					unset($graph);
+
+					continue;
 				}
 			}
 
