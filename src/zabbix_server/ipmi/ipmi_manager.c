@@ -35,12 +35,12 @@
 #include "zbxavailability.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
+#include "zbx_item_constants.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 
-extern unsigned char			program_type;
-
-extern int	CONFIG_IPMIPOLLER_FORKS;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_IPMI_POLLER_INIT		0
 #define ZBX_IPMI_POLLER_READY		1
@@ -338,7 +338,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 	zbx_ipmi_poller_t	*poller;
 	zbx_binary_heap_elem_t	elem = {0};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_IPMIPOLLER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]);
 
 	zbx_vector_ptr_create(&manager->pollers);
 	zbx_hashset_create(&manager->pollers_client, 0, poller_hash_func, poller_compare_func);
@@ -346,7 +346,7 @@ static void	ipmi_manager_init(zbx_ipmi_manager_t *manager)
 
 	manager->next_poller_index = 0;
 
-	for (i = 0; i < CONFIG_IPMIPOLLER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]; i++)
 	{
 		poller = (zbx_ipmi_poller_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_poller_t));
 
@@ -399,7 +399,7 @@ static void	ipmi_manager_host_cleanup(zbx_ipmi_manager_t *manager, int now)
 	zbx_ipmi_poller_t	*poller;
 	int			i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_IPMIPOLLER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pollers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER]);
 
 	zbx_hashset_iter_reset(&manager->hosts, &iter);
 	while (NULL != (host = (zbx_ipmi_manager_host_t *)zbx_hashset_iter_next(&iter)))

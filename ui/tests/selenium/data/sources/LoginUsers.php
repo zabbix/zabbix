@@ -137,15 +137,15 @@ class LoginUsers {
 				"(11, 12, 1, ".zbx_dbstr($userids['test-user']).", 1488545571, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.03 12:52:51', 1, 0, '', 1, 0, ''),".
 				"(12, 12, 1, ".zbx_dbstr($userids['test-user']).", 1488382034, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.01 15:27:14', 1, 0, '', 1, 0, ''),".
 				"(13, 12, 1, ".zbx_dbstr($userids['test-user']).", 1490701552, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.03.28 11:45:52', 1, 0, '', 1, 0, ''),".
-				"(14, 12, 1, 4, 1491310371, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.04 12:52:51', 2, 0, '', 1, 0, ''),".
-				"(15, 12, 1, 4, 1493096321, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.25 04:58:41', 2, 0, '', 1, 0, ''),".
-				"(16, 12, 1, 4, 1492456511, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.17 19:15:11', 2, 0, '', 1, 0, ''),".
-				"(17, 12, 1, 4, 1493585245, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.30 23:47:25', 2, 0, '', 1, 0, ''),".
-				"(18, 12, 1, 5, 1493988771, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.05 12:52:51', 0, 0, '', 1, 0, ''),".
-				"(19, 12, 1, 5, 1493693050, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.02 02:44:10', 0, 0, '', 1, 0, ''),".
-				"(20, 12, 1, 5, 1494674768, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.13 11:26:08', 0, 0, '', 1, 0, ''),".
-				"(21, 12, 1, 5, 1495924312, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.27 22:31:52', 0, 0, '', 1, 0, ''),".
-				"(22, 12, 1, 5, 1496256062, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.31 21:41:02', 0, 0, '', 1, 0, ''),".
+				"(14, 12, 1, 40, 1491310371, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.04 12:52:51', 2, 0, '', 1, 0, ''),".
+				"(15, 12, 1, 40, 1493096321, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.25 04:58:41', 2, 0, '', 1, 0, ''),".
+				"(16, 12, 1, 40, 1492456511, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.17 19:15:11', 2, 0, '', 1, 0, ''),".
+				"(17, 12, 1, 40, 1493585245, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.04.30 23:47:25', 2, 0, '', 1, 0, ''),".
+				"(18, 12, 1, 50, 1493988771, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.05 12:52:51', 0, 0, '', 1, 0, ''),".
+				"(19, 12, 1, 50, 1493693050, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.02 02:44:10', 0, 0, '', 1, 0, ''),".
+				"(20, 12, 1, 50, 1494674768, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.13 11:26:08', 0, 0, '', 1, 0, ''),".
+				"(21, 12, 1, 50, 1495924312, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.27 22:31:52', 0, 0, '', 1, 0, ''),".
+				"(22, 12, 1, 50, 1496256062, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.05.31 21:41:02', 0, 0, '', 1, 0, ''),".
 				"(23, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1496753571, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.06 12:52:51', 1, 0, '', 1, 1, ''),".
 				"(24, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1496524375, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.03 21:12:55', 1, 0, '', 1, 1, ''),".
 				"(25, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1497731966, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.06.17 20:39:26', 1, 0, '', 1, 1, ''),".
@@ -197,31 +197,31 @@ class LoginUsers {
 				"(71, 12, 1, ".zbx_dbstr($userids['test-user']).", 1510245640, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.09 16:40:40', 1, 0, '', 1, 1, ''),".
 				"(72, 12, 1, ".zbx_dbstr($userids['test-user']).", 1510335701, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.10 17:41:41', 1, 0, '', 1, 1, ''),".
 				"(73, 12, 1, ".zbx_dbstr($userids['test-user']).", 1510425762, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.11.11 18:42:42', 1, 0, '', 1, 1, ''),".
-				"(74, 12, 1, 4, 1513083171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 12:52:51', 1, 0, '', 1, 1, ''),".
-				"(75, 12, 1, 4, 1513107823, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 19:43:43', 1, 0, '', 1, 1, ''),".
-				"(76, 12, 1, 4, 1513197884, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.13 20:44:44', 1, 0, '', 1, 1, ''),".
-				"(77, 12, 1, 4, 1513287945, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.14 21:45:45', 1, 0, '', 1, 1, ''),".
-				"(78, 12, 1, 4, 1513378006, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.15 22:46:46', 1, 0, '', 1, 1, ''),".
-				"(79, 12, 1, 4, 1513468067, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.16 23:47:47', 1, 0, '', 1, 1, ''),".
-				"(80, 12, 1, 4, 1513471728, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.17 00:48:48', 1, 0, '', 1, 1, ''),".
-				"(81, 12, 1, 4, 1513561789, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.18 01:49:49', 1, 0, '', 1, 1, ''),".
-				"(82, 12, 1, 4, 1513651850, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.19 02:50:50', 1, 0, '', 1, 1, ''),".
-				"(83, 12, 1, 4, 1513741911, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.20 03:51:51', 1, 0, '', 1, 1, ''),".
-				"(84, 12, 1, 4, 1513831972, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.21 04:52:52', 1, 0, '', 1, 1, ''),".
-				"(85, 12, 1, 4, 1513922033, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.22 05:53:53', 1, 0, '', 1, 1, ''),".
-				"(86, 12, 1, 5, 1453524894, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.23 06:54:54', 1, 0, '', 1, 1, ''),".
-				"(87, 12, 1, 5, 1453614955, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.24 07:55:55', 1, 0, '', 1, 1, ''),".
-				"(88, 12, 1, 5, 1453705016, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.25 08:56:56', 1, 0, '', 1, 1, ''),".
-				"(89, 12, 1, 5, 1453795077, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.26 09:57:57', 1, 0, '', 1, 1, ''),".
-				"(90, 12, 1, 5, 1453885138, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.27 10:58:58', 1, 0, '', 1, 1, ''),".
-				"(91, 12, 1, 5, 1453975199, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.28 11:59:59', 1, 0, '', 1, 1, ''),".
-				"(92, 12, 1, 5, 1454061600, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.29 12:00:00', 1, 0, '', 1, 1, ''),".
-				"(93, 12, 1, 5, 1454151661, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.30 13:01:01', 1, 0, '', 1, 1, ''),".
-				"(94, 12, 1, 5, 1454241722, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.31 14:02:02', 1, 0, '', 1, 1, ''),".
-				"(95, 12, 1, 5, 1451653383, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.01 15:03:03', 1, 0, '', 1, 1, ''),".
-				"(96, 12, 1, 5, 1451743444, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.02 16:04:04', 1, 0, '', 1, 1, ''),".
-				"(97, 12, 1, 5, 1451833505, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.03 17:05:05', 1, 0, '', 1, 1, ''),".
-				"(98, 12, 1, 5, 1451923566, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.04 18:06:06', 1, 0, '', 1, 1, ''),".
+				"(74, 12, 1, 40, 1513083171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 12:52:51', 1, 0, '', 1, 1, ''),".
+				"(75, 12, 1, 40, 1513107823, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.12 19:43:43', 1, 0, '', 1, 1, ''),".
+				"(76, 12, 1, 40, 1513197884, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.13 20:44:44', 1, 0, '', 1, 1, ''),".
+				"(77, 12, 1, 40, 1513287945, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.14 21:45:45', 1, 0, '', 1, 1, ''),".
+				"(78, 12, 1, 40, 1513378006, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.15 22:46:46', 1, 0, '', 1, 1, ''),".
+				"(79, 12, 1, 40, 1513468067, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.16 23:47:47', 1, 0, '', 1, 1, ''),".
+				"(80, 12, 1, 40, 1513471728, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.17 00:48:48', 1, 0, '', 1, 1, ''),".
+				"(81, 12, 1, 40, 1513561789, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.18 01:49:49', 1, 0, '', 1, 1, ''),".
+				"(82, 12, 1, 40, 1513651850, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.19 02:50:50', 1, 0, '', 1, 1, ''),".
+				"(83, 12, 1, 40, 1513741911, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.20 03:51:51', 1, 0, '', 1, 1, ''),".
+				"(84, 12, 1, 40, 1513831972, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.21 04:52:52', 1, 0, '', 1, 1, ''),".
+				"(85, 12, 1, 40, 1513922033, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.12.22 05:53:53', 1, 0, '', 1, 1, ''),".
+				"(86, 12, 1, 50, 1453524894, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.23 06:54:54', 1, 0, '', 1, 1, ''),".
+				"(87, 12, 1, 50, 1453614955, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.24 07:55:55', 1, 0, '', 1, 1, ''),".
+				"(88, 12, 1, 50, 1453705016, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.25 08:56:56', 1, 0, '', 1, 1, ''),".
+				"(89, 12, 1, 50, 1453795077, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.26 09:57:57', 1, 0, '', 1, 1, ''),".
+				"(90, 12, 1, 50, 1453885138, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.27 10:58:58', 1, 0, '', 1, 1, ''),".
+				"(91, 12, 1, 50, 1453975199, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.28 11:59:59', 1, 0, '', 1, 1, ''),".
+				"(92, 12, 1, 50, 1454061600, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.29 12:00:00', 1, 0, '', 1, 1, ''),".
+				"(93, 12, 1, 50, 1454151661, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.30 13:01:01', 1, 0, '', 1, 1, ''),".
+				"(94, 12, 1, 50, 1454241722, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.31 14:02:02', 1, 0, '', 1, 1, ''),".
+				"(95, 12, 1, 50, 1451653383, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.01 15:03:03', 1, 0, '', 1, 1, ''),".
+				"(96, 12, 1, 50, 1451743444, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.02 16:04:04', 1, 0, '', 1, 1, ''),".
+				"(97, 12, 1, 50, 1451833505, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.03 17:05:05', 1, 0, '', 1, 1, ''),".
+				"(98, 12, 1, 50, 1451923566, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.01.04 18:06:06', 1, 0, '', 1, 1, ''),".
 				"(99, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1467734827, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.05 19:07:07', 1, 0, '', 1, 1, ''),".
 				"(100, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1467824888, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.06 20:08:08', 1, 0, '', 1, 1, ''),".
 				"(101, 12, 1, ".zbx_dbstr($userids['user-for-blocking']).", 1467914949, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.07.07 21:09:09', 1, 0, '', 1, 1, ''),".

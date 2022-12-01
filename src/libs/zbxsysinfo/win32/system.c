@@ -20,7 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
 #include "cfg.h"
 #include "zbxtime.h"
 

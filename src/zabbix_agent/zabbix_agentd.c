@@ -26,6 +26,7 @@
 #include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -252,40 +253,45 @@ static const char	*get_progname(void)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
-int	CONFIG_ALERTER_FORKS		= 0;
-int	CONFIG_DISCOVERER_FORKS		= 0;
-int	CONFIG_HOUSEKEEPER_FORKS	= 0;
-int	CONFIG_PINGER_FORKS		= 0;
-int	CONFIG_POLLER_FORKS		= 0;
-int	CONFIG_UNREACHABLE_POLLER_FORKS	= 0;
-int	CONFIG_HTTPPOLLER_FORKS		= 0;
-int	CONFIG_IPMIPOLLER_FORKS		= 0;
-int	CONFIG_TIMER_FORKS		= 0;
-int	CONFIG_TRAPPER_FORKS		= 0;
-int	CONFIG_SNMPTRAPPER_FORKS	= 0;
-int	CONFIG_JAVAPOLLER_FORKS		= 0;
-int	CONFIG_ESCALATOR_FORKS		= 0;
-int	CONFIG_SELFMON_FORKS		= 0;
-int	CONFIG_DATASENDER_FORKS		= 0;
-int	CONFIG_PROXYPOLLER_FORKS	= 0;
-int	CONFIG_HISTSYNCER_FORKS		= 0;
-int	CONFIG_CONFSYNCER_FORKS		= 0;
-int	CONFIG_VMWARE_FORKS		= 0;
-int	CONFIG_COLLECTOR_FORKS		= 1;
-int	CONFIG_PASSIVE_FORKS		= 3;	/* number of listeners for processing passive checks */
-int	CONFIG_ACTIVE_FORKS		= 0;
-int	CONFIG_TASKMANAGER_FORKS	= 0;
-int	CONFIG_IPMIMANAGER_FORKS	= 0;
-int	CONFIG_ALERTMANAGER_FORKS	= 0;
-int	CONFIG_PREPROCMAN_FORKS		= 0;
-int	CONFIG_PREPROCESSOR_FORKS	= 0;
-int	CONFIG_LLDMANAGER_FORKS		= 0;
-int	CONFIG_LLDWORKER_FORKS		= 0;
-int	CONFIG_ALERTDB_FORKS		= 0;
-int	CONFIG_HISTORYPOLLER_FORKS	= 0;
-int	CONFIG_AVAILMAN_FORKS		= 0;
-int	CONFIG_SERVICEMAN_FORKS		= 0;
-int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
+int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+	0, /* ZBX_PROCESS_TYPE_POLLER */
+	0, /* ZBX_PROCESS_TYPE_UNREACHABLE */
+	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
+	0, /* ZBX_PROCESS_TYPE_PINGER */
+	0, /* ZBX_PROCESS_TYPE_JAVAPOLLER */
+	0, /* ZBX_PROCESS_TYPE_HTTPPOLLER */
+	0, /* ZBX_PROCESS_TYPE_TRAPPER */
+	0, /* ZBX_PROCESS_TYPE_SNMPTRAPPER */
+	0, /* ZBX_PROCESS_TYPE_PROXYPOLLER */
+	0, /* ZBX_PROCESS_TYPE_ESCALATOR */
+	0, /* ZBX_PROCESS_TYPE_HISTSYNCER */
+	0, /* ZBX_PROCESS_TYPE_DISCOVERER */
+	0, /* ZBX_PROCESS_TYPE_ALERTER */
+	0, /* ZBX_PROCESS_TYPE_TIMER */
+	0, /* ZBX_PROCESS_TYPE_HOUSEKEEPER */
+	0, /* ZBX_PROCESS_TYPE_DATASENDER */
+	0, /* ZBX_PROCESS_TYPE_CONFSYNCER */
+	0, /* ZBX_PROCESS_TYPE_SELFMON */
+	0, /* ZBX_PROCESS_TYPE_VMWARE */
+	1, /* ZBX_PROCESS_TYPE_COLLECTOR */
+	3, /* ZBX_PROCESS_TYPE_LISTENER */
+	0, /* ZBX_PROCESS_TYPE_ACTIVE_CHECKS */
+	0, /* ZBX_PROCESS_TYPE_TASKMANAGER */
+	0, /* ZBX_PROCESS_TYPE_IPMIMANAGER */
+	0, /* ZBX_PROCESS_TYPE_ALERTMANAGER */
+	0, /* ZBX_PROCESS_TYPE_PREPROCMAN */
+	0, /* ZBX_PROCESS_TYPE_PREPROCESSOR */
+	0, /* ZBX_PROCESS_TYPE_LLDMANAGER */
+	0, /* ZBX_PROCESS_TYPE_LLDWORKER */
+	0, /* ZBX_PROCESS_TYPE_ALERTSYNCER */
+	0, /* ZBX_PROCESS_TYPE_HISTORYPOLLER */
+	0, /* ZBX_PROCESS_TYPE_AVAILMAN */
+	0, /* ZBX_PROCESS_TYPE_REPORTMANAGER */
+	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
+	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
+	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
+	0 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+};
 
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
@@ -310,21 +316,21 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (local_server_num <= (server_count += CONFIG_COLLECTOR_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_COLLECTOR]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*local_process_num = local_server_num - server_count + CONFIG_COLLECTOR_FORKS;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_COLLECTOR];
 	}
-	else if (local_server_num <= (server_count += CONFIG_PASSIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*local_process_num = local_server_num - server_count + CONFIG_PASSIVE_FORKS;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER];
 
 	}
-	else if (local_server_num <= (server_count += CONFIG_ACTIVE_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*local_process_num = local_server_num - server_count + CONFIG_ACTIVE_FORKS;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
 	}
 	else
 		return FAIL;
@@ -649,7 +655,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	char	*ch_error;
 	int	err = 0;
 
-	if (0 != CONFIG_PASSIVE_FORKS)
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
 		if (NULL == CONFIG_HOSTS_ALLOWED)
 		{
@@ -672,7 +678,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	/* make sure active or passive check is enabled */
-	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
+	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] && 0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		err = 1;
@@ -733,10 +739,10 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
 
-	forks = CONFIG_ACTIVE_FORKS;
-	CONFIG_ACTIVE_FORKS += new_forks;
+	forks = CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
+	CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] += new_forks;
 	config_active_args = (zbx_thread_activechk_args *)zbx_realloc(config_active_args,
-			sizeof(zbx_thread_activechk_args) * (size_t)CONFIG_ACTIVE_FORKS);
+			sizeof(zbx_thread_activechk_args) * (size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]);
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
@@ -873,7 +879,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			5},
-		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
+		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
 			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
@@ -994,7 +1000,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
+				CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_program_type);
 #endif
 	}
 
@@ -1159,7 +1166,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 != CONFIG_PASSIVE_FORKS)
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
@@ -1201,8 +1208,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	/* --- START THREADS ---*/
 
-	/* allocate memory for a collector, all listeners and active checks */
-	threads_num = CONFIG_COLLECTOR_FORKS + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
+	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+		threads_num += CONFIG_FORKS[i];
 
 #ifdef _WINDOWS
 	if (MAXIMUM_WAIT_OBJECTS < threads_num)

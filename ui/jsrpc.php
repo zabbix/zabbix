@@ -447,11 +447,17 @@ switch ($data['method']) {
 				break;
 
 			case 'usersGroups':
-				$groups = API::UserGroup()->get([
+				$options = [
 					'output' => ['usrgrpid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $limit
-				]);
+				];
+
+				if (array_key_exists('group_status', $data)) {
+					$options['status'] = $data['group_status'];
+				}
+
+				$groups = API::UserGroup()->get($options);
 
 				if ($groups) {
 					CArrayHelper::sort($groups, [
@@ -633,6 +639,58 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($slas, ['slaid' => 'id']);
+				}
+				break;
+
+			case 'actions':
+				$actions = API::Action()->get([
+					'output' => ['actionid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'searchByAny' => true,
+					'limit' => $limit
+				]);
+
+				if ($actions) {
+					CArrayHelper::sort($actions, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$actions = array_slice($actions, 0, $data['limit']);
+					}
+
+					foreach ($actions as $action) {
+						$result[] = [
+							'id' => $action['actionid'],
+							'name' => $action['name']
+						];
+					}
+				}
+				break;
+
+			case 'media_types':
+				$media_types = API::MediaType()->get([
+					'output' => ['mediatypeid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'searchByAny' => true,
+					'limit' => $limit
+				]);
+
+				if ($media_types) {
+					CArrayHelper::sort($media_types, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$media_types = array_slice($media_types, 0, $data['limit']);
+					}
+
+					foreach ($media_types as $media_type) {
+						$result[] = [
+							'id' => $media_type['mediatypeid'],
+							'name' => $media_type['name']
+						];
+					}
 				}
 				break;
 		}

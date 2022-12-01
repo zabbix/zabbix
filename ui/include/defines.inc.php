@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0beta4');
+define('ZABBIX_VERSION',		'6.4.0rc1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030074);
+define('ZABBIX_DB_VERSION',		6030149);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -98,6 +98,12 @@ define('ZBX_UNITS_ROUNDOFF_UNSUFFIXED',		4);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
+define('IDP_TYPE_LDAP',	1);
+define('IDP_TYPE_SAML',	2);
+
+define('JIT_PROVISIONING_DISABLED',	0);
+define('JIT_PROVISIONING_ENABLED',	1);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
@@ -140,6 +146,7 @@ define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
+define('ZBX_AUTH_NONE',		-1);
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
 define('ZBX_AUTH_HTTP_DISABLED',	0);
@@ -148,6 +155,8 @@ define('ZBX_AUTH_LDAP_DISABLED',	0);
 define('ZBX_AUTH_LDAP_ENABLED',		1);
 define('ZBX_AUTH_SAML_DISABLED',	0);
 define('ZBX_AUTH_SAML_ENABLED',		1);
+define('ZBX_AUTH_SCIM_PROVISIONING_DISABLED',	0);
+define('ZBX_AUTH_SCIM_PROVISIONING_ENABLED',	1);
 define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
@@ -846,8 +855,8 @@ define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
 define('SCREEN_SORT_TRIGGERS_TIME_ASC',				3);
 define('SCREEN_SORT_TRIGGERS_TIME_DESC',			4);
-define('SCREEN_SORT_TRIGGERS_TYPE_ASC',				5);
-define('SCREEN_SORT_TRIGGERS_TYPE_DESC',			6);
+define('SCREEN_SORT_TRIGGERS_MEDIA_TYPE_ASC',				5);
+define('SCREEN_SORT_TRIGGERS_MEDIA_TYPE_DESC',			6);
 define('SCREEN_SORT_TRIGGERS_STATUS_ASC',			7);
 define('SCREEN_SORT_TRIGGERS_STATUS_DESC',			8);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_ASC',		11);
@@ -1654,6 +1663,9 @@ define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 define('ZBX_WIDGET_FIELD_TYPE_SERVICE',			9);
 define('ZBX_WIDGET_FIELD_TYPE_SLA',				10);
+define('ZBX_WIDGET_FIELD_TYPE_USER',			11);
+define('ZBX_WIDGET_FIELD_TYPE_ACTION',			12);
+define('ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE',		13);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',					0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',			1);
@@ -1833,6 +1845,7 @@ define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
+define('ZBX_STYLE_CHECKBOX_LIST', 'checkbox-list');
 define('ZBX_STYLE_CLOCK_SVG', 'clock-svg');
 define('ZBX_STYLE_CLOCK_FACE', 'clock-face');
 define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');

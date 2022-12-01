@@ -27,6 +27,7 @@
 #include <delayimp.h>
 #include <sddl.h>
 #include "zbxstr.h"
+#include "zbx_item_constants.h"
 
 #define MAX_NAME			256
 

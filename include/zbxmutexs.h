@@ -58,6 +58,7 @@ zbx_mutex_name_t;
 typedef enum
 {
 	ZBX_RWLOCK_CONFIG = 0,
+	ZBX_RWLOCK_CONFIG_HISTORY,
 	ZBX_RWLOCK_VALUECACHE,
 	ZBX_RWLOCK_COUNT,
 }

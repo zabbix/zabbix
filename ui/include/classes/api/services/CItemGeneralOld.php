@@ -1321,7 +1321,7 @@ abstract class CItemGeneralOld extends CApiService {
 						return $value;
 					}, $preprocessing['params']);
 				}
-				else {
+				elseif (array_key_exists('params', $preprocessing) && $preprocessing['params'] !== null) {
 					$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
 				}
 

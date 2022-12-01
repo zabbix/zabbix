@@ -475,7 +475,7 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'LDAP settings',
 							'entries' => [
-								'selector' => 'id:ldap_configured',
+								'selector' => 'id:ldap_auth_enabled',
 								'value' => true,
 								'old_value' => false
 							],
