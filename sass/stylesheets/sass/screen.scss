@@ -14,6 +14,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "base/reset";
 @import "base/colors";
 @import "base/typography";
+@import "base/icons";
 @import "base/common";
 
 @import "utils/indicator";
@@ -28,7 +29,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "layout/grid-columns";
 @import "layout/form-grid";
 
-@import "components/list-table";
 @import "components/buttons";
 @import "components/checkbox-list";
 @import "components/color-picker";
@@ -43,8 +43,8 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "components/diff";
 @import "components/expandable-subfilter";
 @import "components/form-search";
-@import "base/icons";
 @import "components/inline-filter";
+@import "components/list-table";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
@@ -642,7 +642,7 @@ form {
 		background-color: transparent;
 		border-radius: 2px;
 
-		color: $icon-header-controls-color;
+		color: $icon-color;
 
 		&:not(:disabled) {
 			&:hover,
@@ -1087,7 +1087,7 @@ form {
 	.zi-check,
 	.zi-alert-more {
 		&::before {
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 }
@@ -1665,7 +1665,7 @@ button {
 	@extend %btn-reset;
 	&::before {
 		left: -1px;
-		color: $icon-header-controls-color;
+		color: $icon-color;
 	}
 
 	transition: opacity .3s ease-out;
@@ -2449,7 +2449,7 @@ $trigger-expression-tree-icons: (
 				padding: 0 4px;
 				top: -2px;
 				font-size: 16px;
-				color: $icon-header-controls-color;
+				color: $icon-color;
 			}
 		}
 
@@ -2501,7 +2501,7 @@ $trigger-expression-tree-icons: (
 		vertical-align: middle;
 
 		font-size: 16px;
-		color: $icon-header-controls-color;
+		color: $icon-color;
 	}
 }
 
@@ -2788,7 +2788,7 @@ $trigger-expression-tree-icons: (
 	.zi-pencil {
 		padding: 0 2px;
 		&::before {
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 }
@@ -3144,7 +3144,7 @@ $trigger-expression-tree-icons: (
 	.zi-bell-off {
 		&::before {
 			left: -6px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 }
@@ -4195,7 +4195,7 @@ svg {
 			top: -1px;
 			left: 2px;
 			font-size: 16px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 
@@ -4500,7 +4500,7 @@ svg {
 						transition: transform $ui-transition-duration;
 						&::before {
 							vertical-align: middle;
-							color: $icon-header-controls-color;
+							color: $icon-color;
 							font-size: 18px;
 						}
 
@@ -4934,7 +4934,7 @@ a.icon-count {
 			border-bottom: 1px solid $form-border-color;
 			border-radius: 0;
 			background-color: $form-bg-color;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 			transition: border-color .2s ease-out, box-shadow .2s ease-out;
 
 			&.is-focused {
@@ -4995,7 +4995,7 @@ a.icon-count {
 		padding: 0 5px;
 		&::before {
 			font-size: 15px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 		&:hover,
 		&:active,
@@ -5214,7 +5214,7 @@ a.icon-count {
 				&::before {
 					top: -1px;
 					font-size: 16px;
-					color: $icon-header-controls-color;
+					color: $icon-color;
 				}
 				&::after {
 					display: none;
@@ -5456,7 +5456,7 @@ z-select,
 		&::before {
 			top: -1px;
 			font-size: 12px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 }
@@ -5601,7 +5601,7 @@ z-select,
 		&::before {
 			top: -1px;
 			font-size: 19px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 	}
 }

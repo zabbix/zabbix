@@ -26,13 +26,13 @@ section {
 		top: -1px;
 
 
-		color: $icon-header-controls-color;
+		color: $icon-color;
 		opacity: 0.5;
 
 		&:hover,
 		&:active,
 		&:focus {
-			color: $icon-header-controls-color;
+			color: $icon-color;
 			opacity: 1;
 		}
 

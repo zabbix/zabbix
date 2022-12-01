@@ -16,10 +16,6 @@
 			@extend %overflow-ellipsis;
 		}
 
-		//[class*='icon-'] {
-		//	flex-shrink: 0;
-		//}
-
 		.rel-container {
 			display: flex;
 		}
@@ -381,7 +377,7 @@
 			padding: 0 2px;
 			vertical-align: middle;
 
-			color: $icon-header-controls-color;
+			color: $icon-color;
 
 			@extend %btn-reset;
 
@@ -404,8 +400,8 @@
 		}
 	}
 
-	button,
-	a {
+	a,
+	button {
 		&.zi-bullet-right,
 		&.zi-bullet-alt-up,
 		&.zi-bullet-alt-down,
@@ -462,14 +458,14 @@
 		top: -1px;
 
 		&::before {
+			top: 2px;
 			margin-left: -1px;
 			font-size: 20px;
-			top: 2px;
 		}
+
 		&::after {
 			top: -3px;
 			right: 19px;
-
 			color: $font-color;
 		}
 	}
@@ -478,10 +474,10 @@
 		&::before {
 			top: -2px;
 			right: 1px;
-
 			font-size: 20px;
 			color: $icon-action-list-table-color;
 		}
+
 		&::after {
 			top: -1px;
 			right: 19.5px;
@@ -526,6 +522,7 @@
 	.zi-wrench-alt {
 		cursor: pointer;
 		border-bottom: none;
+
 		&::before {
 			padding-left: 6px;
 			font-size: 12px;
@@ -534,15 +531,17 @@
 	}
 
 	.zi-more {
-		padding: 0 2px;
 		top: -1px;
-
+		padding: 0 2px;
 		opacity: .5;
 
-		transition: opacity .3s ease-out;
+		@if $ui-transitions {
+			transition: opacity .3s ease-out;
+		}
+
 		&::before {
 			font-size: 18px;
-			color: $icon-header-controls-color;
+			color: $icon-color;
 		}
 
 		&:hover,
