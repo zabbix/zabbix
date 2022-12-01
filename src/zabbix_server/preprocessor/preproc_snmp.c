@@ -452,7 +452,7 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 	}
 	else
 	{
-		*output = pair_cached->value;
+		*output = zbx_strdup(NULL, pair_cached->value);
 		ret = SUCCEED;
 	}
 
@@ -568,7 +568,7 @@ out:
 	}
 
 	zbx_variant_clear(value);
-	zbx_variant_set_str(value, zbx_strdup(NULL, value_out));
+	zbx_variant_set_str(value, value_out);
 
 	return SUCCEED;
 }
