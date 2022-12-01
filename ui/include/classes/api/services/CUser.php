@@ -1694,12 +1694,12 @@ class CUser extends CApiService {
 		}
 
 		if ($token !== null) {
-			$db_tokens = self::tokenAuthentication($token, $time);
-			$userid = $db_tokens['userid'];
+			$db_token = self::tokenAuthentication($token, $time);
+			$userid = $db_token['userid'];
 		}
 		else {
-			$db_sessions = self::sessionidAuthentication($sessionid);
-			$userid = $db_sessions['userid'];
+			$db_session = self::sessionidAuthentication($sessionid);
+			$userid = $db_session['userid'];
 		}
 
 		$db_users = DB::select('users', [
@@ -1731,7 +1731,7 @@ class CUser extends CApiService {
 
 			DB::update('token', [
 				'values' => ['lastaccess' => $time],
-				'where' => ['tokenid' => $db_tokens['tokenid']]
+				'where' => ['tokenid' => $db_token['tokenid']]
 			]);
 		}
 		else {
@@ -1739,7 +1739,7 @@ class CUser extends CApiService {
 			$autologout = timeUnitToSeconds($db_user['autologout']);
 
 			// Check system permissions.
-			if (($autologout != 0 && $db_sessions['lastaccess'] + $autologout <= $time)
+			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
 					|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
 				DB::delete('sessions', [
 					'status' => ZBX_SESSION_PASSIVE,
@@ -1753,7 +1753,7 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 			}
 
-			if ($session['extend'] && $time != $db_sessions['lastaccess']) {
+			if ($session['extend'] && $time != $db_session['lastaccess']) {
 				DB::update('sessions', [
 					'values' => ['lastaccess' => $time],
 					'where' => ['sessionid' => $sessionid]
