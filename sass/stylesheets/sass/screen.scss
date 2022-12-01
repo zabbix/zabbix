@@ -1668,7 +1668,7 @@ button {
 		color: $icon-color;
 	}
 
-	transition: opacity .3s ease-out;
+	transition: opacity $ui-transition-duration ease-out;
 
 	&:hover,
 	&:active,
@@ -1842,14 +1842,14 @@ button {
 }
 
 .btn-time-out {
+	left: 1px;
+	margin: 0 3px 0 5px;
+	height: 24px;
+	line-height: 22px;
+	vertical-align: top;
 	background: none;
 	border: 1px solid transparent;
 	color: $font-color;
-	height: 24px;
-	line-height: 22px;
-	margin: 0 5px;
-	vertical-align: top;
-
 	&:disabled {
 		background: transparent !important;
 		border-color: transparent !important;
@@ -1970,7 +1970,7 @@ button {
 			opacity: 1;
 		}
 
-		transition: opacity .3s ease-out;
+		transition: opacity $ui-transition-duration ease-out;
 	}
 }
 
@@ -4184,7 +4184,7 @@ svg {
 		@extend %btn-reset;
 
 		opacity: .5;
-		transition: opacity .3s ease-out;
+		transition: opacity $ui-transition-duration ease-out;
 		&:hover,
 		&:active,
 		&:focus {
@@ -5086,7 +5086,7 @@ a.icon-count {
 				top: 1px;
 				font-size: 12px;
 
-				transition: .3s;
+				transition: $ui-transition-duration;
 			}
 
 			&[aria-expanded="true"] {
@@ -5204,7 +5204,7 @@ a.icon-count {
 
 				opacity: 0.5;
 
-				transition: opacity .3s ease-out;
+				transition: opacity $ui-transition-duration ease-out;
 				&:hover,
 				&:active,
 				&:focus {

@@ -263,7 +263,7 @@
 	}
 
 	@if $ui-transitions {
-		transition: margin-top .3s;
+		transition: margin-top $ui-transition-duration;
 	}
 }
 
@@ -517,7 +517,7 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-head {
 			height: 0;
-			transition: height .3s, margin-top .3s, box-shadow .3s;
+			transition: height $ui-transition-duration, margin-top $ui-transition-duration, box-shadow $ui-transition-duration;
 		}
 
 		.dashboard-grid-widget-content {
@@ -593,7 +593,7 @@
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
+	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out, opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -646,7 +646,7 @@
 	// To allow overflowing of the floating headers of child widgets.
 	overflow: visible;
 
-	transition: margin-top .3s ease-out;
+	transition: margin-top $ui-transition-duration ease-out;
 }
 
 .dashboard-grid-iterator-placeholder {
@@ -715,7 +715,7 @@
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out;
+			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out, box-shadow $ui-transition-duration ease-out;
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
