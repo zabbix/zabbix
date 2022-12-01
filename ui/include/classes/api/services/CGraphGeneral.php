@@ -103,7 +103,7 @@ abstract class CGraphGeneral extends CApiService {
 
 		$this->validateUpdate($graphs, $db_graphs);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			unset($graph['templateid']);
 
 			// Allow for template inherited graphs to update discover parameter.
@@ -112,7 +112,7 @@ abstract class CGraphGeneral extends CApiService {
 					$graph = ['graphid' => $graph['graphid'], 'discover' => $graph['discover']];
 				}
 				else {
-					unset($graph);
+					unset($graphs[$key]);
 
 					continue;
 				}
