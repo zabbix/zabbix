@@ -483,9 +483,10 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 				goto out;
 
 			target_cause_eventid = requested_cause_eventid;
+			old_cause_eventid = 0;
 		}
-
-		old_cause_eventid = zbx_db_get_cause_eventid(eventid);
+		else
+			old_cause_eventid = zbx_db_get_cause_eventid(eventid);
 
 		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid))
 			goto out;
