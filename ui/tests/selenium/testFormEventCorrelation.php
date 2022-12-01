@@ -335,7 +335,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		}
 
 		if ($data['select_tag'] === 'New event host group') {
-			$this->zbxTestClickButtonMultiselect('event_hostgroup_new_condition');
+			$this->zbxTestClickButtonMultiselect('groupids_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
 			$this->zbxTestClickLinkText($host_group);
 		}

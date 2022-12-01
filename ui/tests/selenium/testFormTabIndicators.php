@@ -717,7 +717,8 @@ class testFormTabIndicators extends CWebTest {
 
 		// Open Operations tab and check indicator value.
 
-		$form = $this->query('id:action-form')->asForm()->one();
+		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$form->selectTab('Operations');
 		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
