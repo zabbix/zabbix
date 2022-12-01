@@ -186,6 +186,24 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
+static zbx_export_file_t	*problems_export = NULL;
+static zbx_export_file_t	*get_problems_export(void)
+{
+	return problems_export;
+}
+
+static zbx_export_file_t	*history_export = NULL;
+static zbx_export_file_t	*get_history_export(void)
+{
+	return history_export;
+}
+
+static zbx_export_file_t	*trends_export = NULL;
+static zbx_export_file_t	*get_trends_export(void)
+{
+	return trends_export;
+}
+
 unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
 static unsigned char	get_program_type(void)
 {
@@ -289,7 +307,6 @@ zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -315,8 +332,6 @@ char	*CONFIG_DB_TLS_KEY_FILE		= NULL;
 char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
-char	*CONFIG_EXPORT_DIR		= NULL;
-char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
@@ -348,7 +363,8 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-static zbx_config_tls_t	*zbx_config_tls = NULL;
+static zbx_config_tls_t		*zbx_config_tls = NULL;
+static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
 char	*CONFIG_NODE_ADDRESS	= NULL;
@@ -683,9 +699,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != zbx_validate_export_type(CONFIG_EXPORT_TYPE, NULL))
+	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", CONFIG_EXPORT_TYPE);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
+				zbx_config_export.type);
 		err = 1;
 	}
 
@@ -971,11 +988,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"ExportDir",			&CONFIG_EXPORT_DIR,			TYPE_STRING,
+		{"ExportDir",			&(zbx_config_export.dir),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExportType",			&CONFIG_EXPORT_TYPE,			TYPE_STRING_LIST,
+		{"ExportType",			&(zbx_config_export.type),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ExportFileSize",		&CONFIG_EXPORT_FILE_SIZE,		TYPE_UINT64,
+		{"ExportFileSize",		&(zbx_config_export.file_size),		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
 			PARM_OPT,	1,			100},
@@ -1100,7 +1117,17 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_export_deinit(problems_export);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_export_deinit(history_export);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_export_deinit(trends_export);
+
 	zbx_config_tls_free(zbx_config_tls);
+	zbx_deinit_library_export();
 
 	exit(EXIT_SUCCESS);
 }
@@ -1679,6 +1706,48 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: restart HA manager when working in standby mode                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_restart_ha(zbx_rtc_t *rtc)
+{
+	char	*error = NULL;
+
+	zbx_unset_child_signal_handler();
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	/* Disable locks so main process doesn't hang on logging if a process was              */
+	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
+	zbx_locks_disable();
+#endif
+	zbx_ha_kill();
+
+	zbx_set_child_signal_handler();
+
+	/* restart logger because it could have been stuck in lock */
+	if (SUCCEED != server_restart_logger(&error))
+	{
+		zbx_error("cannot restart logger: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_enable();
+#endif
+
+	if (SUCCEED != zbx_ha_start(rtc, ZBX_NODE_STATUS_STANDBY, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	ha_status = ZBX_NODE_STATUS_STANDBY;
+}
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
@@ -1868,7 +1937,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	if (FAIL == zbx_export_init(&error))
+	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);
@@ -1899,13 +1968,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("main-process", 0);
+		problems_export = zbx_problems_export_init(get_problems_export, "main-process", 0);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-		zbx_history_export_init("main-process", 0);
+		history_export = zbx_history_export_init(get_history_export, "main-process", 0);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-		zbx_trends_export_init("main-process", 0);
+		trends_export = zbx_trends_export_init(get_trends_export, "main-process", 0);
 
 	if (SUCCEED != zbx_ha_get_status(CONFIG_HA_NODE_NAME, &ha_status, &ha_failover_delay, &error))
 	{
@@ -1986,6 +2055,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (ZBX_NODE_STATUS_ERROR == ha_status)
 			break;
+
+		if (ZBX_NODE_STATUS_HATIMEOUT == ha_status)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "HA manager is not responding in standby mode, "
+					"restarting it.");
+			server_restart_ha(&rtc);
+			continue;
+		}
 
 		now = time(NULL);
 
