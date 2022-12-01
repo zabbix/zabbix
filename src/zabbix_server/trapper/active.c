@@ -29,6 +29,8 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbxversion.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 
 extern unsigned char	program_type;
 

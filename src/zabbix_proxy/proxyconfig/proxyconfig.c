@@ -30,6 +30,7 @@
 #include "zbxcommshigh.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
 #include "zbx_rtc_constants.h"
+#include "zbx_host_constants.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 

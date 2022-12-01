@@ -28,7 +28,7 @@
 #include "zbxtime.h"
 #include "history_compress.h"
 #include "zbx_rtc_constants.h"
-
+#include "zbx_host_constants.h"
 
 static struct zbx_db_version_info_t	*db_version_info;
 

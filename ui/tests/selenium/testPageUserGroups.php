@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testPageUserGroups extends CLegacyWebTest {
 	public static function allGroups() {
-		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' order by usrgrpid");
+		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' and name<>'Internal' order by usrgrpid");
 	}
 
 	public function testPageUserGroups_CheckLayout() {

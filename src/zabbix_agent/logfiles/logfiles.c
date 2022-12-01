@@ -26,6 +26,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_item_constants.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsymbols.h"

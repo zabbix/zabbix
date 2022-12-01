@@ -29,6 +29,8 @@
 #include "zbxcommshigh.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+#include "../taskmanager/taskmanager.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -40,10 +42,10 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 		int upload_status)
 {
 	struct zbx_json		json;
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 	int			ret, flags = ZBX_TCP_PROTOCOL;
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -84,8 +86,8 @@ int	zbx_send_proxy_data_response(const DC_PROXY *proxy, zbx_socket_t *sock, cons
 
 	zbx_json_free(&json);
 
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 
 	return ret;
 }
@@ -264,7 +266,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char			*error = NULL, *buffer = NULL;
 	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay;
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 	size_t			buffer_size, reserved;
 
@@ -287,7 +289,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 	proxy_get_host_active_availability(&j);
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
 	if (0 != tasks.values_num)
@@ -350,7 +352,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 		if (0 != tasks.values_num)
 		{
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
-			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+			zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
 		}
 
 		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
@@ -370,8 +372,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 		zbx_free(error);
 	}
 clean:
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 
 	zbx_json_free(&j);
 	UNLOCK_PROXY_HISTORY;
@@ -393,7 +395,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 {
 	struct zbx_json		j;
 	char			*error = NULL, *buffer = NULL;
-	zbx_vector_ptr_t	tasks;
+	zbx_vector_tm_task_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 	size_t			buffer_size, reserved;
 
@@ -408,7 +410,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_vector_ptr_create(&tasks);
+	zbx_vector_tm_task_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
 	if (0 != tasks.values_num)
@@ -435,7 +437,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 		if (0 != tasks.values_num)
 		{
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
-			zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
+			zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
 		}
 
 		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
@@ -455,8 +457,8 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 		zbx_free(error);
 	}
 clean:
-	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
-	zbx_vector_ptr_destroy(&tasks);
+	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
+	zbx_vector_tm_task_destroy(&tasks);
 
 	zbx_json_free(&j);
 out:
