@@ -979,7 +979,7 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['check_operationtype']) && $eventsource === EVENT_SOURCE_INTERNAL) {
 			$form=$dialog->asForm();
-			$this->assertFalse($form->query('id:operation-message-subject')->one(false)->isValid());
+			$this->assertFalse($form->query('id:operation-opmessage-subject')->one(false)->isValid());
 			$this->zbxTestAssertVisibleXpath('//div[contains(@id, "operation-type")]/label[text()="Send message"]');
 		}
 		elseif (isset($data['check_operationtype'])) {
@@ -1060,18 +1060,18 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_operation_opmessage_custom_msg) {
 			case 'unchecked':
 				$operation_details = $this->query('id:popup-operation')->asForm()->one();
-				$this->assertFalse($operation_details->query('id:operation-message-subject')->one()->isVisible());
-				$this->assertFalse($operation_details->query('id:operation-message-body')->one()->isVisible());
+				$this->assertFalse($operation_details->query('id:operation-opmessage-subject')->one()->isVisible());
+				$this->assertFalse($operation_details->query('id:operation_opmessage_message')->one()->isVisible());
 				break;
 			case 'checked':
 				$operation_details = $this->query('id:popup-operation')->asForm()->one();
 				$this->zbxTestTextPresent('Subject');
-				$this->assertTrue($operation_details->query('id:operation-message-subject')->one()->isVisible());
-				$this->assertEquals(255, $operation_details->getField('id:operation-message-subject')->getAttribute('maxlength'));
+				$this->assertTrue($operation_details->query('id:operation-opmessage-subject')->one()->isVisible());
+				$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->getAttribute('maxlength'));
 
 				$this->zbxTestTextPresent('Message');
-				$this->assertTrue($operation_details->query('id:operation-message-body')->one()->isVisible());
-				$this->assertEquals(7, $operation_details->getField('id:operation-message-body')->getAttribute('rows'));
+				$this->assertTrue($operation_details->query('id:operation_opmessage_message')->one()->isVisible());
+				$this->assertEquals(7, $operation_details->getField('id:operation_opmessage_message')->getAttribute('rows'));
 				break;
 			default:
 				$this->zbxTestAssertElementNotPresentId('operation_message_subject');
@@ -1166,7 +1166,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible(['Subject','Message']);
 		// Set the Custom message option and check Subject and Message fields.
 		$operation_details->getField('Custom message')->set(true);
-		$this->assertEquals(255, $operation_details->getField('id:operation-message-subject')->waitUntilVisible()->getAttribute('maxlength'));
+		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
 		$this->assertFalse($operation_details->getField('Message')->isAttributePresent('maxlength'));
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@title='Close']");
 	}
@@ -1516,7 +1516,7 @@ class testFormAction extends CLegacyWebTest {
 					$list->query('link', $value)->waitUntilClickable()->one()->click();
 				}
 				elseif ($data['eventsource'] !== EVENT_SOURCE_SERVICE) {
-					$operation_form->query('id:operation_opcommand_hst__hostid_current_host')->asCheckbox()->waitUntilVisible()->one()->check();
+					$operation_form->query('id:operation-command-chst')->asCheckbox()->waitUntilVisible()->one()->check();
 				}
 
 				if (array_key_exists('media', $operation)) {
@@ -1641,7 +1641,7 @@ class testFormAction extends CLegacyWebTest {
 		$operation_form->getField('Operation')->select('Reboot');
 
 		// add target current host
-		$this->zbxTestCheckboxSelect('operation_opcommand_hst__hostid_current_host');
+		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		// add target host Zabbix server
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_hst__hostid');
@@ -1671,7 +1671,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
 		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
-		$this->zbxTestCheckboxSelect('operation_opcommand_hst__hostid_current_host');
+		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		$operation_form->submit();
 		$dialog->waitUntilReady();
