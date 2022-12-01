@@ -38,9 +38,7 @@
 	}									\
 	while(0)
 
-
-#define zbx_serialize_prepare_value(len, value)			\
-	do { len += (zbx_uint32_t)sizeof(value); } while(0)
+#define zbx_serialize_prepare_value(len, value)	do { len += (zbx_uint32_t)sizeof(value); } while(0)
 
 #define zbx_serialize_uint64(buffer, value)			\
 	(memcpy(buffer, (const zbx_uint64_t *)&value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
@@ -53,8 +51,7 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str_null(buffer)	\
-	(memset(buffer, 0, sizeof(zbx_uint32_t)), sizeof(zbx_uint32_t))
+#define zbx_serialize_str_null(buffer)	(memset(buffer, 0, sizeof(zbx_uint32_t)), sizeof(zbx_uint32_t))
 
 #define zbx_serialize_str(buffer, value, len)						\
 	(										\
