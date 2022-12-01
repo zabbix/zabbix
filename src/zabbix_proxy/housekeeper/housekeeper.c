@@ -28,8 +28,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern unsigned char			program_type;
-
 static int	hk_period;
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
@@ -152,7 +150,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	int			server_num = info->server_num;
 	int			process_num = info->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

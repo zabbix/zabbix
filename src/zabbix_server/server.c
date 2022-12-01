@@ -1364,8 +1364,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
-	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
+							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
+	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1427,6 +1427,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
 	zbx_set_exit_on_terminate();
+
+	thread_args.info.program_type = program_type;
 
 	for (i = 0; i < threads_num; i++)
 	{

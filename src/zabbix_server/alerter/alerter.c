@@ -33,8 +33,6 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-extern unsigned char			program_type;
-
 static zbx_es_t	es_engine;
 
 /******************************************************************************
@@ -294,7 +292,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

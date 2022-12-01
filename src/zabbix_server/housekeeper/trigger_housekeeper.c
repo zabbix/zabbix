@@ -28,8 +28,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern unsigned char			program_type;
-
 extern int		CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY;
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
@@ -98,7 +96,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

@@ -36,8 +36,6 @@
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
 
-extern unsigned char			program_type;
-
 extern int	CONFIG_CONFSYNCER_FREQUENCY;
 
 typedef struct
@@ -921,7 +919,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (SUCCEED != am_db_init(&amdb, &error))

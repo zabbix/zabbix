@@ -1451,6 +1451,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
+	thread_args.info.program_type = program_type;
+
 	for (i = 0; i < threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
