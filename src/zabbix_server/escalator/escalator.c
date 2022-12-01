@@ -2391,7 +2391,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 
 /* action escalation processing mode */
-/*#define ACTION_PAUSE_SUPPRESSED_FALSE	0	 process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
@@ -2417,7 +2417,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 #undef ACTION_PAUSE_SUPPRESSED_TRUE
 
 /* action escalation symptom event processing mode */
-/*#define ACTION_PAUSE_SYMPTOMS_FALSE	0	 process escalation for symptom events */
+#define ACTION_PAUSE_SYMPTOMS_FALSE	0	/* process escalation for symptom events */
 #define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
 	if (0 != skip)
 	{
