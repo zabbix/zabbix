@@ -421,25 +421,6 @@ class CMenuHelper {
 	}
 
 	/**
-	 * Check if menu is accessible and it as items.
-	 *
-	 * @return bool
-	 */
-	public static function hasMenuItems(): bool {
-		$menu = self::getMainMenu();
-
-		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {
-			$section_submenu = $menu->find($section_label);
-
-			if ($section_submenu instanceof CMenuItem) {
-				return true;
-			}
-		}
-
-		return (bool) ($menu->getMenuItems());
-	}
-
-	/**
 	 * Get first menu item from main menu.
 	 *
 	 * @return CMenuItem
@@ -449,7 +430,6 @@ class CMenuHelper {
 
 		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {
 			$section_submenu = $menu->find($section_label);
-
 			if ($section_submenu instanceof CMenuItem) {
 				$menu = $section_submenu
 					->getSubMenu()
@@ -461,25 +441,13 @@ class CMenuHelper {
 		return $menu->getMenuItems()[0];
 	}
 
-	/**
-	 * Get first menu URL from main menu.
-	 *
-	 * @return string
-	 */
 	public static function getFirstUrl(): string {
-		return self::hasMenuItems()
-			? self::getFirstMenuItem()
-				->getUrl()
-				->getUrl()
-			: '';
+		return self::getFirstMenuItem()
+			->getUrl()
+			->getUrl();
 	}
 
-	/**
-	 * Get first menu label from main menu.
-	 *
-	 * @return string
-	 */
 	public static function getFirstLabel(): string {
-		return self::hasMenuItems() ? self::getFirstMenuItem()->getLabel() : '';
+		return self::getFirstMenuItem()->getLabel();
 	}
 }
