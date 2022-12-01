@@ -32,6 +32,13 @@ require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
 
+// Authentication.
+require_once dirname(__FILE__).'/authentication/testUsersAuthentication.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationHttp.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
+require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
+
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
@@ -200,7 +207,6 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -211,9 +217,6 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
-require_once dirname(__FILE__).'/testFormAdministrationAuthenticationSaml.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
@@ -282,6 +285,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
+
+		// Authentication.
+		$suite->addTestSuite('testUsersAuthentication');
+		$suite->addTestSuite('testUsersAuthenticationHttp');
+		$suite->addTestSuite('testUsersAuthenticationLdap');
+		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
@@ -459,11 +469,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageWeb');
-		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
-		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
-		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
-		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');

@@ -764,6 +764,72 @@ switch ($data['popup_type']) {
 			$table->addRow([$check_box, $name, $status_tag]);
 		}
 		break;
+
+	case 'actions':
+		foreach ($data['table_records'] as &$action) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$action['actionid'].']', $action['actionid'])
+				: null;
+
+			$name = (new CLink($action['name']))
+				->setId('spanid'.$action['actionid'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.actionid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+
+			$entry = [];
+
+			if ($options['srcfld1'] === 'actionid') {
+				$entry['id'] = $action['actionid'];
+			}
+
+			if ($options['srcfld2'] === 'name') {
+				$entry['name'] = $action['name'];
+			}
+
+			$action = $entry;
+		}
+		unset($action);
+		break;
+
+	case 'media_types':
+		foreach ($data['table_records'] as &$media_type) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$media_type['mediatypeid'].']', $media_type['mediatypeid'])
+				: null;
+
+			$name = (new CLink($media_type['name']))
+				->setId('spanid'.$media_type['mediatypeid'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.mediatypeid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+
+			$entry = [];
+
+			if ($options['srcfld1'] === 'mediatypeid') {
+				$entry['id'] = $media_type['mediatypeid'];
+			}
+
+			if ($options['srcfld2'] === 'name') {
+				$entry['name'] = $media_type['name'];
+			}
+
+			$media_type = $entry;
+		}
+		unset($media_type);
+		break;
 }
 
 // Add submit button at footer.
@@ -787,6 +853,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = [
+	'actions',
 	'api_methods',
 	'dashboard',
 	'graphs',
@@ -797,6 +864,7 @@ $types = [
 	'template_groups',
 	'items',
 	'item_prototypes',
+	'media_types',
 	'proxies',
 	'roles',
 	'templates',

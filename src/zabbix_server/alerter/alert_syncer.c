@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"

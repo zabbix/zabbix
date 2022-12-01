@@ -49,6 +49,8 @@ class CLdapAuthValidatorTest extends CValidatorTest {
 	}
 
 	protected function createValidator(array $params = []) {
-		return new CLdapAuthValidator($params);
+		$ldap = new CLdap($params['conf']);
+
+		return new CLdapAuthValidator(['ldap' => $ldap]);
 	}
 }
