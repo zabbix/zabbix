@@ -363,7 +363,7 @@ class testUserRolesPermissions extends CWebTest {
 					$dialog->query('button:Update')->one()->click();
 					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
-					$row->getColumn('Actions')->query('xpath:.//button[contains(@class, "zi-alert")]')->one()->click();
+					$row->getColumn('Actions')->query('xpath:.//button[contains(@class, "icon-action-msgs")]')->one()->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 					$value = $message_hint->query('class:list-table')->asTable()->one()->getRow(0)->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $value);

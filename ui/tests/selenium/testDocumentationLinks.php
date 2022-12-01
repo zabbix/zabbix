@@ -117,7 +117,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[@class="btn-widget-edit js-widget-edit zi-cog-filled"])[1]'
+							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
 						]
 					]
 				]
@@ -422,7 +422,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://button[@class="btn-action zi-menu"]'
+							'element' => 'xpath://button[@class="btn-action"]'
 						],
 						[
 							'callback' => 'openFormWithLink',

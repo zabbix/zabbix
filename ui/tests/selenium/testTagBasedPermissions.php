@@ -180,7 +180,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
@@ -289,7 +289,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
@@ -393,7 +393,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//h4[text()="Current problems"]/../../..//div[contains(@class, "is-loading")]'));
