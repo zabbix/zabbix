@@ -2416,6 +2416,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 #undef ACTION_PAUSE_SUPPRESSED_TRUE
 
+/* action escalation symptom event processing mode */
+/*#define ACTION_PAUSE_SYMPTOMS_FALSE	0	 process escalation for symptom events */
+#define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
 	if (0 != skip)
 	{
 		/* one of trigger dependencies is in PROBLEM state, process escalation later */
@@ -2431,6 +2434,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		ret = ZBX_ESCALATION_SUPPRESS;
 		goto out;
 	}
+#undef ACTION_PAUSE_SYMPTOMS_TRUE
 
 	ret = ZBX_ESCALATION_PROCESS;
 out:

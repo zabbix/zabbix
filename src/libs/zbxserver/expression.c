@@ -70,17 +70,6 @@ ZBX_VECTOR_IMPL(eventdata, zbx_eventdata_t)
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 
-/* acknowledgment actions (flags) */
-#define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
-#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
-#define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
-#define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
-#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
-#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
-#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
-
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	7
-
 static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event,
 		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
@@ -217,6 +206,18 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, co
 	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unsuppressed");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as symptom");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
 	}
 
 	zbx_free(*out);
@@ -1392,7 +1393,9 @@ static void	get_event_update_history(const ZBX_DB_EVENT *event, char **replace_t
 		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
-					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, &actions))
+					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS |
+					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
+					tz, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);
