@@ -102,7 +102,7 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setDisabled($readonly)
+			->setReadonly($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -508,7 +508,7 @@ if ($data['graphid'] != 0) {
 		url_params(['graphid', 'parent_discoveryid', 'hostid'])
 	);
 
-	if ($readonly) {
+	if ($readonly && $data['flags'] | ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$updateButton->setEnabled(false);
 	}
 
