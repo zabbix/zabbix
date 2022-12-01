@@ -10557,7 +10557,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int config_timeout, DC_
  *                                                                            *
  * Parameters: now            - [IN] current timestamp                        *
  *             items_num      - [IN] the number of items to get               *
- *             config_timeout - [IN] the number of items to get               *
+ *             config_timeout - [IN]                                          *
  *             items          - [OUT] array of items                          *
  *             nextcheck      - [OUT] the next scheduled check                *
  *                                                                            *

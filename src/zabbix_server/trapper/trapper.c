@@ -857,9 +857,10 @@ out:
  *                                                                            *
  * Purpose: process Zabbix stats request                                      *
  *                                                                            *
- * Parameters: sock             - [IN] the request socket                     *
- *             jp               - [IN] the request data                       *
-*              zbx_config_comms - [IN] server/proxy comms config              *
+ * Parameters: sock             - [IN] request socket                         *
+ *             jp               - [IN] request data                           *
+ *             zbx_config_comms - [IN] server/proxy configuration for         *
+ *                                     communication                          *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *

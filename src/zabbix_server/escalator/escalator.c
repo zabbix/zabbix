@@ -2499,7 +2499,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *                                                                            *
  * Purpose: execute next escalation step                                      *
  *                                                                            *
- * Parameters: escalation       - [IN/OUT]     escalation to execute          *
+ * Parameters: escalation       - [IN/OUT] escalation to execute              *
  *             action           - [IN]                                        *
  *             event            - [IN]                                        *
  *             service          - [IN]                                        *
@@ -2523,11 +2523,14 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  * Purpose: process escalation recovery                                       *
  *                                                                            *
- * Parameters: escalation     - [IN/OUT] the escalation to recovery           *
- *             action         - [IN]                                          *
- *             event          - [IN]                                          *
- *             r_event        - [IN]     the recovery event                   *
- *             config_timeout - [IN]                                          *
+ * Parameters: escalation       - [IN/OUT]     escalation to recovery         *
+ *             action           - [IN]                                        *
+ *             event            - [IN]                                        *
+ *             r_event          - [IN]     recovery event                     *
+ *             service          - [IN]                                        *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
@@ -2549,13 +2552,13 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  * Purpose: process escalation acknowledgment                                 *
  *                                                                            *
- * Parameters: escalation       - [IN/OUT] the escalation to recovery         *
- *             action           - [IN]     the action                         *
- *             event            - [IN]     the event                          *
- *             r_event          - [IN]     the recovery event                 *
+ * Parameters: escalation       - [IN/OUT]     escalation to recovery         *
+ *             action           - [IN]         action                         *
+ *             event            - [IN]         event                          *
+ *             r_event          - [IN]         recovery event                 *
  *             default_timezone - [IN]                                        *
  *             roles            - [IN]                                        *
- *             config_timeout   - [IN]     the recovery event                 *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
@@ -2601,7 +2604,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
  *                                                                            *
  * Purpose: process update escalation                                         *
  *                                                                            *
- * Parameters: escalation       - [IN/OUT]     escalation to recovery         *
+ * Parameters: escalation       - [IN/OUT] escalation to recovery             *
  *             action           - [IN]                                        *
  *             event            - [IN]                                        *
  *             service_alarm    - [IN]                                        *
@@ -3165,8 +3168,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			}
 			else
 			{
-				escalation_recover(escalation, action, event, r_event, service, default_timezone, &service_roles,
-						config_timeout);
+				escalation_recover(escalation, action, event, r_event, service, default_timezone,
+						&service_roles, config_timeout);
 			}
 		}
 		else if (escalation->nextcheck <= now)
@@ -3311,7 +3314,7 @@ out:
  *          delete completed escalations from the database;                   *
  *          cancel escalations due to changed configuration, etc.             *
  *                                                                            *
- * Parameters: now               - [IN]     current time                      *
+ * Parameters: now               - [IN] current time                          *
  *             nextcheck         - [IN/OUT] time of the next invocation       *
  *             escalation_source - [IN] type of escalations to be handled     *
  *             default_timezone  - [IN]                                       *

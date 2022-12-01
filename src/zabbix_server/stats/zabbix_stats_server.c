@@ -32,8 +32,8 @@
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
- * Parameters: json             - [IN/OUT] the json data                      *
- *             zbx_config_comms - [IN] server comms config                    *
+ * Parameters: json             - [IN/OUT]                                    *
+ *             zbx_config_comms - [IN] server configuration for communication *
  *                                                                            *
  * Comments: This function is used to gather server specific internal         *
  *           statistics.                                                      *

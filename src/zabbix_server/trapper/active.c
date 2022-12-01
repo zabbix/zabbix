@@ -163,8 +163,8 @@ out:
  *             flag           - [IN] flag describing interface type           *
  *             interface      - [IN] interface value if flag is not default   *
  *             config_timeout - [IN]                                          *
- *             revision       - [OUT] host configuration revision             *
  *             hostid         - [OUT] host ID                                 *
+ *             revision       - [OUT] host configuration revision             *
  *             error          - [OUT] error message                           *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *

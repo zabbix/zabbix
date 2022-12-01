@@ -177,7 +177,8 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
  *             result           - [OUT] value of the requested item           *
- *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
+ *             zbx_config_comms - [IN] Zabbix server/proxy configuration for  *
+ *                                     communication                          *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *

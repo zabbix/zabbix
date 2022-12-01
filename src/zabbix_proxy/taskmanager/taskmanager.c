@@ -48,10 +48,10 @@ extern char 				*CONFIG_HOSTNAME;
  *                                                                            *
  * Purpose: execute remote command task                                       *
  *                                                                            *
- * Parameters: taskid         - [IN]     task identifier                      *
- *             clock          - [IN]     task creation time                   *
- *             ttl            - [IN]     task expiration period in seconds    *
- *             now            - [IN]     current time                         *
+ * Parameters: taskid         - [IN] task identifier                          *
+ *             clock          - [IN] task creation time                       *
+ *             ttl            - [IN] task expiration period in seconds        *
+ *             now            - [IN] current time                             *
  *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value: SUCCEED -     remote command was executed                    *
@@ -354,7 +354,8 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 		switch (type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now, zbx_config_comms->config_timeout))
+				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
+						zbx_config_comms->config_timeout))
 				{
 					processed_num++;
 				}

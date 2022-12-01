@@ -1287,7 +1287,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_tcp_close(&listen_sock);
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
-		/* CONFIG_TIMEOUT    seconds if they're waiting for external processes to finish / timeout */
+		/* CONFIG_TIMEOUT seconds if they're waiting for external processes to finish / timeout */
 		zbx_sleep(CONFIG_TIMEOUT);
 
 		THIS_SHOULD_NEVER_HAPPEN;

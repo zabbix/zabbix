@@ -749,7 +749,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	zbx_ipmi_request_t	*request;
 	char			*error = NULL;
 
-	num = DCconfig_get_ipmi_poller_items(now, MAX_POLLER_ITEMS, config_timeout, items,nextcheck);
+	num = DCconfig_get_ipmi_poller_items(now, MAX_POLLER_ITEMS, config_timeout, items, nextcheck);
 
 	for (i = 0; i < num; i++)
 	{
@@ -953,7 +953,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_ipmi_manager_args	*ipmi_manager_args_in  = (zbx_thread_ipmi_manager_args *)
+	zbx_thread_ipmi_manager_args	*ipmi_manager_args_in = (zbx_thread_ipmi_manager_args *)
 			((((zbx_thread_args_t *)args))->args);
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */

@@ -29,7 +29,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *                                                                            *
  * Purpose: retrieve data from script executed on Zabbix server               *
  *                                                                            *
- * Parameters: item           - item we are interested in                     *
+ * Parameters: item           - [IN] item we are interested in                *
  *             config_timeout - [IN]                                          *
  *             result         - [OUT]                                         *
  *                                                                            *

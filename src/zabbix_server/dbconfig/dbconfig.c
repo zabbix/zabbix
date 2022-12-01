@@ -48,7 +48,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zbx_thread_dbconfig_args	*dbconfig_args_in  = (zbx_thread_dbconfig_args *)
+	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
 			((((zbx_thread_args_t *)args))->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),

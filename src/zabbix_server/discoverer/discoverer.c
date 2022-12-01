@@ -583,6 +583,7 @@ static void	process_rule(ZBX_DB_DRULE *drule, int config_timeout)
 
 			if (0 != drule->unique_dcheckid)
 				process_checks(drule, &host_status, ip, 1, now, &services, &dcheckids, config_timeout);
+
 			process_checks(drule, &host_status, ip, 0, now, &services, &dcheckids, config_timeout);
 
 			DBbegin();

@@ -255,9 +255,10 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock             - [IN] the connection socket                  *
- *             ts               - [IN] the connection timestamp               *
- *             zbx_config_comms - [IN] proxy comms config                     *
+ * Parameters: sock             - [IN] connection socket                      *
+ *             ts               - [IN] connection timestamp                   *
+ *             zbx_config_comms - [IN] proxy configuration for communication  *
+ *                                     with server                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms)
@@ -386,9 +387,10 @@ out:
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock             - [IN] the connection socket                  *
- *             ts               - [IN] the connection timestamp               *
- *             zbx_config_comms - [IN] proxy comms config                     *
+ * Parameters: sock             - [IN] connection socket                      *
+ *             ts               - [IN] connection timestamp                   *
+ *             zbx_config_comms - [IN] proxy configuration for communication  *
+ *                                     with server                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms)

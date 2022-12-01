@@ -799,7 +799,8 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  * Parameters: poller_type       - [IN] poller type (ZBX_POLLER_TYPE_...)     *
  *             nextcheck         - [OUT] item nextcheck                       *
- *             zbx_config_comms  - [IN] server/proxy comms config             *
+ *             zbx_config_comms  - [IN] server/proxy configuration for        *
+ *                                      communication                         *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
@@ -974,7 +975,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(poller_args_in->zbx_config_comms->zbx_config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(poller_args_in->zbx_config_comms->zbx_config_tls,
+			poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
