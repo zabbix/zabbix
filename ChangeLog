@@ -1,9 +1,12 @@
 Changes for 6.4.0rc1
 
 New features:
+.........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.......PS. [ZBX-22001] enabled back support for response decompression (HTTP header "Accept-Encoding") in web monitoring (revert of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in lld filters/overrides (wiper)
 .......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
