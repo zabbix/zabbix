@@ -144,7 +144,7 @@ class CTableRowElement extends CElement {
 	}
 
 	/**
-	 * Check column value to have a specific value.
+	 * Check text of defined columns.
 	 *
 	 * @param mixed   $expected		values to be checked in column
 	 *
@@ -158,7 +158,8 @@ class CTableRowElement extends CElement {
 		foreach ($expected as $column => $value) {
 			if ($value !== $this->getColumn($column)->getText()) {
 				throw new \Exception('Column "'.$column.'" value "'.$this->getColumn($column)->getText().
-						'" is not equal to "'.$value.'".');
+						'" is not equal to "'.$value.'".'
+				);
 			}
 		}
 	}
