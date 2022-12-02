@@ -680,7 +680,7 @@ func (r *runner) parseOutput(jsonRunner bool) {
 }
 
 func (dp *deviceParser) checkErr() (err error) {
-	if dp.Smartctl.ExitStatus != 2 {
+	if dp.Smartctl.ExitStatus != 2 && dp.Smartctl.ExitStatus != 1 {
 		return
 	}
 
