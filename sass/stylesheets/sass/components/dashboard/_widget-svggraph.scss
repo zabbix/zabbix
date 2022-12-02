@@ -120,20 +120,19 @@ form.dashboard-widget-svggraph {
 			line-height: 24px;
 			cursor: grab;
 			overflow: hidden;
-			text-overflow: ellipsis
+			text-overflow: ellipsis;
 		}
 
 		&.list-accordion-item-opened {
 			&::before {
 				content: ' ';
 				position: absolute;
-				top: 29px;
+				top: 24px;
 				bottom: 0;
 				left: 121px;
 				width: 2px;
 				background: $ui-border-color;
 			}
-
 		}
 
 		&.list-accordion-item-closed {

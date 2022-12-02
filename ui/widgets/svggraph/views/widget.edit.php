@@ -73,8 +73,8 @@ function getDatasetTab(CWidgetFormView $form, array $fields) {
 	$dataset = new CWidgetFieldGraphDataSetView($fields['ds']);
 
 	return $form->makeCustomField($dataset, [
-		(new CFormField($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
-		(new CFormField($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
+		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+		(new CDiv($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 	]);
 }
 

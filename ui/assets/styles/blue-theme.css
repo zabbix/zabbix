@@ -1811,7 +1811,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
     position: absolute;
-    top: 29px;
+    top: 24px;
     bottom: 0;
     left: 121px;
     width: 2px;
