@@ -310,8 +310,8 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-static zbx_config_tls_t	*zbx_config_tls = NULL;
-static zbx_config_vault_t       *zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_tls_t		*config_tls = NULL;
+static zbx_config_vault_t       config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -543,8 +543,8 @@ static void	zbx_set_defaults(void)
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
-	if (NULL == CONFIG_VAULTURL)
-		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+	if (NULL == config_vault.url)
+		config_vault.url = zbx_strdup(config_vault.url, "https://127.0.0.1:8200");
 
 	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
@@ -632,9 +632,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", config_vault.name, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", config_vault.token, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", config_vault.db_path, "cURL library"));
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],
@@ -648,34 +648,34 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSConnect", zbx_config_tls->connect, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSAccept", zbx_config_tls->accept, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->server_cert_issuer,
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", config_tls->connect, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", config_tls->accept, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", config_tls->ca_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", config_tls->crl_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", config_tls->server_cert_issuer,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->server_cert_subject,
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", config_tls->server_cert_subject,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->psk_identity,
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", config_tls->cert_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", config_tls->key_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", config_tls->psk_identity,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", zbx_config_tls->psk_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", config_tls->psk_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", config_tls->cipher_cert13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", config_tls->cipher_psk13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", config_tls->cipher_all13,
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
@@ -832,17 +832,17 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+		{"VaultToken",			&config_vault.token,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
+		{"Vault",			&config_vault.name,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
+		{"VaultTLSCertFile",		&config_vault.tls_cert_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSKeyFile",		&CONFIG_VAULTTLSKEYFILE,		TYPE_STRING,
+		{"VaultTLSKeyFile",		&config_vault.tls_key_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+		{"VaultURL",			&config_vault.url,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
+		{"VaultDBPath",			&config_vault.db_path,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -890,37 +890,37 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
+		{"TLSConnect",			&(config_tls->connect),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&(zbx_config_tls->accept),		TYPE_STRING_LIST,
+		{"TLSAccept",			&(config_tls->accept),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
+		{"TLSCAFile",			&(config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
+		{"TLSCRLFile",			&(config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
+		{"TLSServerCertIssuer",		&(config_tls->server_cert_issuer),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	TYPE_STRING,
+		{"TLSServerCertSubject",	&(config_tls->server_cert_subject),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
+		{"TLSCertFile",			&(config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
+		{"TLSKeyFile",			&(config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	TYPE_STRING,
+		{"TLSPSKIdentity",		&(config_tls->psk_identity),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		TYPE_STRING,
+		{"TLSPSKFile",			&(config_tls->psk_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
+		{"TLSCipherCert13",		&(config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
+		{"TLSCipherCert",		&(config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
+		{"TLSCipherPSK13",		&(config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
+		{"TLSCipherPSK",		&(config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
+		{"TLSCipherAll13",		&(config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
+		{"TLSCipherAll",		&(config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -968,7 +968,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_db_validate_config();
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
+	zbx_tls_validate_config(config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
 			CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_program_type);
 #endif
 }
@@ -1035,7 +1035,7 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
-	zbx_config_tls_free(zbx_config_tls);
+	zbx_config_tls_free(config_tls);
 
 	exit(EXIT_SUCCESS);
 }
@@ -1065,7 +1065,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
-	zbx_config_tls = zbx_config_tls_new();
+	config_tls = zbx_config_tls_new();
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -1246,15 +1246,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
+	zbx_config_comms_args_t		zbx_config = {config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
-	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
+	zbx_thread_proxyconfig_args	proxyconfig_args = {config_tls, &config_vault, get_program_type};
+	zbx_thread_datasender_args	datasender_args = {config_tls, get_program_type};
 	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, zbx_config_vault, get_program_type, &listen_sock};
+	zbx_thread_discoverer_args	discoverer_args = {config_tls, get_program_type};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, &config_vault, get_program_type, &listen_sock};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1399,21 +1399,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&(config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&error))
+	if (SUCCEED != zbx_vault_init(&config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
+	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

@@ -1168,7 +1168,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
-		zbx_hashset_t *activated_hosts)
+		zbx_hashset_t *activated_hosts, const zbx_config_vault_t *config_vault)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -1471,7 +1471,7 @@ done:
 				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED &
 				host->tls_accept)))
 		{
-			if (NULL != CONFIG_VAULTTOKEN || NULL != CONFIG_VAULT)
+			if (NULL != config_vault->token || NULL != config_vault->name)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "connection with Zabbix proxy \"%s\" should not be"
 						" unencrypted when using Vault", host->host);
@@ -1841,7 +1841,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, zbx_config_vault_t *config_vault)
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -6466,7 +6466,8 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids,
+		const zbx_config_vault_t *config_vault)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
@@ -6632,7 +6633,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 	START_SYNC;
 	sec = zbx_time();
-	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync);
+	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
+			config_vault);
 	um_cache_sec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6701,7 +6703,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, config_vault);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 

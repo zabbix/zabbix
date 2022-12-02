@@ -363,7 +363,7 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-static zbx_config_tls_t		*zbx_config_tls = NULL;
+static zbx_config_tls_t		*config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
 static zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
@@ -747,25 +747,25 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", config_tls->ca_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", config_tls->crl_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", config_tls->cert_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", config_tls->key_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", config_tls->cipher_cert13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", config_tls->cipher_psk13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", config_tls->cipher_all13,
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
@@ -957,25 +957,25 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
+		{"TLSCAFile",			&(config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->crl_file),		TYPE_STRING,
+		{"TLSCRLFile",			&(config_tls->crl_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&(zbx_config_tls->cert_file),		TYPE_STRING,
+		{"TLSCertFile",			&(config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
+		{"TLSKeyFile",			&(config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
+		{"TLSCipherCert13",		&(config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),		TYPE_STRING,
+		{"TLSCipherCert",		&(config_tls->cipher_cert),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
+		{"TLSCipherPSK13",		&(config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),		TYPE_STRING,
+		{"TLSCipherPSK",		&(config_tls->cipher_psk),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
+		{"TLSCipherAll13",		&(config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),		TYPE_STRING,
+		{"TLSCipherAll",		&(config_tls->cipher_all),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1032,7 +1032,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_db_validate_config();
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
+	zbx_tls_validate_config(config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
 			CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_program_type);
 #endif
 }
@@ -1127,7 +1127,7 @@ static void	zbx_on_exit(int ret)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		zbx_export_deinit(trends_export);
 
-	zbx_config_tls_free(zbx_config_tls);
+	zbx_config_tls_free(config_tls);
 	zbx_deinit_library_export();
 
 	exit(EXIT_SUCCESS);
@@ -1158,7 +1158,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
-	zbx_config_tls = zbx_config_tls_new();
+	config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1356,17 +1356,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
+	zbx_config_comms_args_t		zbx_config = {config_tls, NULL, 0};
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_dbconfig_args	dbconfig_args = {&config_vault};
 	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_trapper_args		trapper_args = {&zbx_config, &config_vault, get_program_type, listen_sock};
-	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &config_vault, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
+	zbx_thread_escalator_args	escalator_args = {config_tls, get_program_type};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {config_tls, &config_vault, get_program_type};
+	zbx_thread_discoverer_args	discoverer_args = {config_tls, get_program_type};
+	zbx_thread_report_writer_args	report_writer_args = {config_tls->ca_file, config_tls->cert_file,
+							config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
 
 	if (SUCCEED != init_database_cache(&error))

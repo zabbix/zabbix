@@ -22,6 +22,7 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
+#include "zbxvault.h"
 
 int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error);
 
