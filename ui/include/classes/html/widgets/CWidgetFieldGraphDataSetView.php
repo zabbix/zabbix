@@ -211,7 +211,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
-			(new CLabel())
+			(new CLabel(''))
 				->setId($field_name.'_'.$row_num.'_dataset_label')
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-dataset-label'),
