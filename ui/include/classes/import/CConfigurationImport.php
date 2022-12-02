@@ -1087,7 +1087,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// if rule was not processed we should not create/update any of its prototypes
-				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (array_key_exists($hostid, $processed_discovery_rules)
+						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
@@ -1336,7 +1337,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// If rule was not processed we should not create/update any of its prototypes.
-				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (array_key_exists($hostid, $processed_discovery_rules)
+						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
@@ -2153,7 +2155,10 @@ class CConfigurationImport {
 				// In import file host graph can have UUID assigned after conversion, such should be searched by name.
 				foreach ($graph['gitems'] as $gitem) {
 					$gitem_hostid = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
-					$graphid = $this->referencer->findGraphidByName($gitem_hostid, $graph['name']);
+
+					if ($gitem_hostid !== null) {
+						$graphid = $this->referencer->findGraphidByName($gitem_hostid, $graph['name']);
+					}
 
 					if ($graphid !== null) {
 						$graphids[$graphid] = [];
@@ -2699,6 +2704,12 @@ class CConfigurationImport {
 		$entities_order = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				continue;
+			}
+
 			foreach ($discovery_rules as $discovery_rule) {
 				if ($discovery_rule['item_prototypes']) {
 					$item_prototypes = [$host => $discovery_rule['item_prototypes']];
