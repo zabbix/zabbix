@@ -7941,7 +7941,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(items, &item_local)))
 		{
 			if (item->update_time == dc_preprocitem->update_time &&
-					item->preproc_ops_num == dc_preprocitem->preproc_ops.values_num)
+					item->preproc_ops_num == dc_preprocitem->preproc_ops.values_num &&
+					item->value_type == item_local.value_type)
 			{
 				for (i = 0; i < dc_preprocitem->preproc_ops.values_num; i++)
 				{
