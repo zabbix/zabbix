@@ -717,10 +717,10 @@ class CWidgetNavTree extends CWidget {
 			}
 		});
 
-		for (const tree_list of document.querySelectorAll('.tree-list')) {
-			const button = tree_list.querySelector('.js-button-add-child');
+		for (const tree_element of document.querySelectorAll('.tree-list')) {
+			const button = tree_element.querySelector('.js-button-add-child');
 			if (button !== null) {
-				button.disabled = tree_list.dataset.depth >= this._max_depth;
+				button.disabled = tree_element.dataset.depth >= this._max_depth;
 			}
 		}
 	}
@@ -1003,12 +1003,15 @@ class CWidgetNavTree extends CWidget {
 			if (id) {
 				const parent = document.getElementById(`${prefix}navtree.parent.${id}`).value;
 				const sysmapid = document.getElementById(`${prefix}navtree.sysmapid.${id}`).value;
-				const sibling = document.getElementById(`${prefix}children-of-${parent}`).childNodes;
+				const element = document.getElementById(`${prefix}children-of-${parent}`);
 
 				let order = 0;
 
-				while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
-					order++;
+				if (element !== null) {
+					const sibling = element.childNodes;
+					while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
+						order++;
+					}
 				}
 
 				this._fields[`navtree.name.${id}`] = field.value;
