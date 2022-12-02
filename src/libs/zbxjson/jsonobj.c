@@ -264,7 +264,7 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
  ******************************************************************************/
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj)
 {
-	char			*tmp, buf[32], delim;
+	char			*tmp, buf[32];
 	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_jsonobj_el_t	*el;
@@ -291,22 +291,23 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx
 			zbx_strcpy_alloc(str, str_alloc, str_offset, buf);
 			break;
 		case ZBX_JSON_TYPE_ARRAY:
-			delim = '[';
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '[');
 			for (i = 0; i < obj->data.array.values_num; i++)
 			{
-				zbx_chrcpy_alloc(str, str_alloc, str_offset, delim);
-				delim = ',';
+				if (0 != i)
+					zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
+
 				zbx_jsonobj_to_string(str, str_alloc, str_offset, obj->data.array.values[i]);
 			}
 			zbx_chrcpy_alloc(str, str_alloc, str_offset, ']');
 			break;
 		case ZBX_JSON_TYPE_OBJECT:
-			delim = '{';
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '{');
 			zbx_hashset_iter_reset(&obj->data.object, &iter);
 			while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)))
 			{
-				zbx_chrcpy_alloc(str, str_alloc, str_offset, delim);
-				delim = ',';
+				if ((*str)[*str_offset - 1] != '{')
+					zbx_chrcpy_alloc(str, str_alloc, str_offset, ',');
 
 				tmp = zbx_strdup(NULL, el->name);
 				zbx_json_escape(&tmp);
@@ -335,6 +336,8 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 {
 	int	ret = FAIL;
 	char	*error = NULL;
+
+	SKIP_WHITESPACE(data);
 
 	switch (*data)
 	{
