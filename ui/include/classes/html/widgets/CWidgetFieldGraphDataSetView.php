@@ -92,7 +92,6 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	private function getGraphDataSetLayout(array $value, int $dataset_type, bool $is_opened,
 			$row_num = '#{rowNum}'): CListItem {
 		$field_name = $this->field->getName();
-		$dataset_num = (string) ((int) $row_num + 1);
 
 		$dataset_head = [
 			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
@@ -212,9 +211,10 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
-			(new CLabel($value['legend_label'] ?: _('Data set').' #'.$dataset_num))
+			(new CLabel(''))
 				->setId($field_name.'_'.$row_num.'_dataset_label')
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE),
+				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
+				->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
@@ -255,7 +255,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(294)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -266,7 +266,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-									->setWidth(294)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(1)
 									->setMax(10)
@@ -278,7 +278,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 									(int) $value['transparency'])
 								)
-									->setWidth(294)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -289,7 +289,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(294)
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
@@ -379,9 +379,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Approximation'),
-								'label-'.$field_name.'_'.$row_num.'_approximation'
-							),
+							new CLabel(_('Approximation'), 'label-'.$field_name.'_'.$row_num.'_approximation'),
 							new CFormField(
 								(new CSelect($field_name.'['.$row_num.'][approximation]'))
 									->setId($field_name.'_'.$row_num.'_approximation')
@@ -400,16 +398,11 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Legend label'),
-								'label-'.$field_name.'_'.$row_num.'_legend_label'
-							),
+							new CLabel(_('Legend label'), 'label-'.$field_name.'_'.$row_num.'_legend_label'),
 							new CFormField(
-								(new CTextBox($field_name.'['.$row_num.'][legend_label]',
-									$value['legend_label']
-								))
+								(new CTextBox($field_name.'['.$row_num.'][legend_label]', $value['legend_label']))
 									->setId($field_name.'_'.$row_num.'_legend_label')
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-									->setAttribute('placeholder', _('Data set').' #'.$dataset_num)
 							)
 						])
 				])

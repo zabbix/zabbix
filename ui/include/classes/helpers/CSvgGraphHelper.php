@@ -543,8 +543,8 @@ class CSvgGraphHelper {
 				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 			}
 			else {
-				$name = $data_sets[$dataset_num]['legend_label'] !== '' ?
-					$data_sets[$dataset_num]['legend_label']
+				$name = $data_sets[$dataset_num]['legend_label'] !== ''
+					? $data_sets[$dataset_num]['legend_label']
 					: 'Data set #'.($dataset_num + 1);
 			}
 
