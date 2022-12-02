@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup scripts
@@ -59,8 +59,8 @@ class testFormAdministrationScripts extends CWebTest {
 		$response = CDataHelper::call('script.create', [
 			[
 				'name' => 'Script for Clone',
-				'type' => 5,
-				'scope' => 2,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'test',
 				'parameters' => [
 					[
@@ -76,8 +76,8 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				'name' => 'SSH_api_clone_1',
-				'type' => 2,
-				'scope' => 1,
+				'type' => ZBX_SCRIPT_TYPE_SSH,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'username' => 'SSH_username',
 				'password' => 'SSH_password',
 				'command' => 'test',
@@ -85,9 +85,9 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				'name' => 'SSH_api_clone_2',
-				'type' => 2,
-				'scope' => 1,
-				'authtype' => '1',
+				'type' => ZBX_SCRIPT_TYPE_SSH,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
 				'username' => 'SSH_username',
 				'privatekey' => 'private_key',
 				'publickey' => 'public_key',
@@ -95,8 +95,8 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				'name' => 'TELNET_api_clone',
-				'type' => 3,
-				'scope' => 1,
+				'type' => ZBX_SCRIPT_TYPE_TELNET,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'username' => 'TELNET_username',
 				'password' => 'TELNET_password',
 				'command' => 'test'
@@ -108,8 +108,8 @@ class testFormAdministrationScripts extends CWebTest {
 		$scripts = CDataHelper::call('script.create', [
 			[
 				'name' => 'Script for Update',
-				'type' => 5,
-				'scope' => 2,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'test',
 				'parameters' => [
 					[
@@ -125,8 +125,8 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				'name' => 'Script for Delete',
-				'type' => 5,
-				'scope' => 2,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
 				'command' => 'test',
 				'description' => 'delete description'
 			]
@@ -911,8 +911,8 @@ class testFormAdministrationScripts extends CWebTest {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		$this->page->login()->open($link);
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+		$this->page->login()->open($link)->waitUntilReady();
+		$form = $this->query('id:script-form')->asForm()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -1000,12 +1000,10 @@ class testFormAdministrationScripts extends CWebTest {
 		if (CTestArrayHelper::get($data['fields'], 'Confirmation text')) {
 			$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->one();
-			$this->assertEquals('Execution confirmation', $dialog->getTitle());
 			$this->assertEquals($data['fields']['Confirmation text'],
-					$dialog->query('xpath://span[@class="confirmation-msg"]')->waitUntilReady()->one()->getText());
-			$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
-			$dialog->query('button:Cancel')->one()->click();
-			$dialog->ensureNotPresent();
+					$dialog->query('xpath:.//span[@class="confirmation-msg"]')->waitUntilVisible()->one()->getText()
+			);
+			$dialog->close();
 		}
 	}
 
@@ -1015,8 +1013,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update'])->waitUntilReady();
+		$form = $this->query('id:script-form')->asForm()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -1043,7 +1041,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
-		$this->query('id:script-form')->waitUntilReady()->asForm()->one()->submit();
+		$this->query('id:script-form')->waitUntilVisible()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -1054,8 +1052,8 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		foreach (self::$clone_scriptids as $scriptid) {
-			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
-			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid)->waitUntilReady();
+			$form = $this->query('id:script-form')->asForm()->one();
 			$values = $form->getFields()->asValues();
 			$script_name = $values['Name'];
 			$this->query('button:Clone')->waitUntilReady()->one()->click();
@@ -1086,7 +1084,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Delete() {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
-		$this->query('button:Delete')->waitUntilReady()->one()->click();
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
@@ -1095,10 +1093,83 @@ class testFormAdministrationScripts extends CWebTest {
 		);
 	}
 
-		/**
-	 * Check the default values, visible and required fields in the script form based on the selected scope and type.
+	/**
+	 * Check all fields default values, lengths, placeholders, element options and table headers.
 	 */
 	public function testFormAdministrationScripts_Layout() {
+		$this->page->login()->open('zabbix.php?action=script.edit');
+		$form = $this->query('id:script-form')->waitUntilVisible()->asForm()->one();
+
+		$default_values = ['Scope' => 'Action operation', 'Type' => 'Webhook', 'Host group' => 'All',
+			'User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false, 'Timeout' => '30s',
+			'Execute on' => 'Zabbix agent', 'Authentication method' => 'Password'
+		];
+		$form->checkValue($default_values);
+
+		// Check table headers.
+		$this->assertEquals(['Name', 'Value', 'Action'], $form->query('id:parameters-table')->asTable()->one()->getHeadersText());
+
+		// Check fields' lengths.
+		$field_maxlength = ['Name' => 255, 'Timeout' => 32, 'Description' => 65535, 'Menu path' => 255,
+			'Confirmation text' => 255, 'Commands' => 65535, 'Username' => 64, 'Password' => 64, 'Port' => 64,
+			'Public key file' => 64, 'Private key file' => 64, 'Key passphrase' => 64, 'Command' => 65535
+		];
+		foreach ($field_maxlength as $input => $value) {
+			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
+		}
+
+		// Check fields' placeholders.
+		$this->assertEquals('script', $form->getField('Script')->query('xpath:.//input[@type="text"]')->one()->getAttribute('placeholder'));
+		$this->assertEquals('<sub-menu/sub-menu/...>', $form->getField('Menu path')->getAttribute('placeholder'));
+
+		// Check dropdown options.
+		$user_groups = CDBHelper::getColumn('SELECT name FROM usrgrp', 'name');
+		$dropdowns = [
+			'Host group' => ['All', 'Selected'],
+			'User group' => array_merge(['All'], $user_groups),
+			'Authentication method' => ['Password', 'Public key']
+		];
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		// Check segmented radio element options.
+		$segmented_elements = [
+			'Scope' => ['Action operation', 'Manual host action', 'Manual event action'],
+			'Type' => ['Webhook', 'Script', 'SSH', 'Telnet', 'IPMI'],
+			'Execute on' => ['Zabbix agent', 'Zabbix server (proxy)', 'Zabbix server'],
+			'Required host permissions' => ['Read', 'Write']
+		];
+		foreach ($segmented_elements as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getLabels()->asText());
+		}
+
+		// Check "Script" dialog window.
+		$script_dialog = $form->getField('Script')->edit();
+		$this->assertEquals('JavaScript', $script_dialog->getTitle());
+		$this->assertEquals(65535, $script_dialog->query('tag:textarea')->one()->getAttribute('maxlength'));
+		$this->assertEquals('return value', $script_dialog->query('tag:textarea')->one()->getAttribute('placeholder'));
+		$this->assertEquals('65535 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
+		$script_dialog->query('tag:textarea')->one()->type('aaa');
+		$this->assertEquals('65532 characters remaining', $script_dialog->query('class:multilineinput-char-count')->one()->getText());
+		$script_dialog->query('button:Cancel')->one()->click();
+		$script_dialog->ensureNotPresent();
+		$form->checkValue(['Script' => '']);
+
+		// Check "Confirmation" dialog window.
+		$form->fill(['Scope' => 'Manual host action', 'Enable confirmation' => true, 'Confirmation text' => 'test']);
+		$this->query('button:Test confirmation')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one();
+		$this->assertEquals('Execution confirmation', $dialog->getTitle());
+		$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
+		$dialog->query('button:Cancel')->one()->click();
+		$dialog->ensureNotPresent();
+	}
+
+	/**
+	 * Check the visible fields and their default values, and the required class based on the selected scope and type.
+	 */
+	public function testFormAdministrationScripts_VisibleFields() {
 		$common_all_scopes = [
 			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
 			'required' => ['Name'],
@@ -1124,7 +1195,8 @@ class testFormAdministrationScripts extends CWebTest {
 				'required' => ['Username', 'Commands'],
 				'default' => ['Authentication method' => 'Password'],
 				'fields_public_key' => ['Authentication method', 'Username', 'Public key file', 'Private key file',
-						'Key passphrase', 'Port', 'Commands'],
+						'Key passphrase', 'Port', 'Commands'
+				],
 				'required_public_key' => ['Username', 'Public key file', 'Private key file', 'Commands'],
 			],
 			'Telnet' => [
@@ -1140,7 +1212,7 @@ class testFormAdministrationScripts extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:script-form')->waitUntilVisible()->asForm()->one();
 		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
 
 		foreach (['Action operation', 'Manual host action', 'Manual event action'] as $scope) {
@@ -1163,13 +1235,12 @@ class testFormAdministrationScripts extends CWebTest {
 						$form->getLabels(CElementFilter::VISIBLE)->asText()
 				);
 
-				// Check defaul values.
+				// Check default values.
 				$form->checkValue(array_merge($scope_default, $type_fields['default']));
 
 				// Check required fields.
 				$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
-						$form->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
-						->filter(CElementFilter::VISIBLE)->asText()
+						$form->getRequiredLabels()
 				);
 
 				if ($type === 'SSH') {
@@ -1180,8 +1251,7 @@ class testFormAdministrationScripts extends CWebTest {
 							$form->getLabels(CElementFilter::VISIBLE)->asText()
 					);
 					$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
-							$form->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
-							->filter(CElementFilter::VISIBLE)->asText()
+							$form->getRequiredLabels()
 					);
 
 					// Reset the value of the "Authentication method" field.
