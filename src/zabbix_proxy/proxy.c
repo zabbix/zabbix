@@ -62,6 +62,7 @@
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
 #include "zbxicmpping.h"
+#include "zbxipcservice.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
