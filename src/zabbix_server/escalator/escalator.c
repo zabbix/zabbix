@@ -2937,7 +2937,8 @@ static void	service_role_clean(zbx_service_role_t *role)
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
-		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone)
+		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, zbx_vector_uint64_t *problem_eventids,
+		const char *default_timezone)
 {
 	int				i, ret;
 	zbx_vector_uint64_t		escalationids, symptom_eventids;
@@ -2970,7 +2971,9 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
-	zbx_db_select_symptom_eventids(eventids, &symptom_eventids);
+
+	zbx_db_select_symptom_eventids(problem_eventids, &symptom_eventids);
+	zbx_vector_uint64_sort(&symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != ((DB_ESCALATION *)escalations->values[0])->serviceid)
 	{
@@ -3317,7 +3320,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	size_t			filter_alloc = 0, filter_offset = 0;
 
 	zbx_vector_ptr_t		escalations;
-	zbx_vector_uint64_t		actionids, eventids;
+	zbx_vector_uint64_t		actionids, eventids, problem_eventids;
 
 	DB_ESCALATION		*escalation;
 
@@ -3326,6 +3329,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_ptr_create(&escalations);
 	zbx_vector_uint64_create(&actionids);
 	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_create(&problem_eventids);
 
 	/* Selection of escalations to be processed:                                                          */
 	/*                                                                                                    */
@@ -3422,6 +3426,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		zbx_vector_ptr_append(&escalations, escalation);
 		zbx_vector_uint64_append(&actionids, escalation->actionid);
 		zbx_vector_uint64_append(&eventids, escalation->eventid);
+		zbx_vector_uint64_append(&problem_eventids, escalation->eventid);
 
 		if (0 < escalation->r_eventid)
 			zbx_vector_uint64_append(&eventids, escalation->r_eventid);
@@ -3429,23 +3434,26 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		if (escalations.values_num >= ZBX_ESCALATIONS_PER_STEP)
 		{
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids,
-					default_timezone);
+					&problem_eventids, default_timezone);
 			zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
+			zbx_vector_uint64_clear(&problem_eventids);
 		}
 	}
 	DBfree_result(result);
 
 	if (0 < escalations.values_num)
 	{
-		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, default_timezone);
+		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, &problem_eventids,
+				default_timezone);
 		zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 	}
 
 	zbx_vector_ptr_destroy(&escalations);
 	zbx_vector_uint64_destroy(&actionids);
 	zbx_vector_uint64_destroy(&eventids);
+	zbx_vector_uint64_destroy(&problem_eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

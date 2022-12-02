@@ -300,7 +300,7 @@ void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ui
 
 	result = DBselect("select eventid"
 			" from event_symptom"
-			" where event_causeid is not null and%s",
+			" where%s",
 			sql);
 
 	while (NULL != (row = DBfetch(result)))
@@ -309,9 +309,6 @@ void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ui
 		zbx_vector_uint64_append(symptom_eventids, s_eventid);
 	}
 	DBfree_result(result);
-
-	zbx_vector_uint64_sort(symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(symptom_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_free(sql);
 }
