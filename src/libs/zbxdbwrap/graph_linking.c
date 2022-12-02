@@ -17,12 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbwrap.h"
 #include "graph_linking.h"
 
 #include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
 #include "zbxnum.h"
+
+typedef enum
+{
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+}
+zbx_graph_yaxis_types_t;
 
 typedef struct
 {

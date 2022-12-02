@@ -26,6 +26,7 @@
 #include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -751,8 +752,9 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_timeout = CONFIG_TIMEOUT;
 		config_active_args[forks].config_file = config_file;
+		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 
 	return SUCCEED;
@@ -1229,7 +1231,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
-								config_file};
+								config_file, CONFIG_TIMEOUT};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;

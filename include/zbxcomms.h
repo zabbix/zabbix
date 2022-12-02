@@ -95,6 +95,7 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	const char		*hostname;
 	const int		proxymode;
+	const int		config_timeout;
 }
 zbx_config_comms_args_t;
 
@@ -190,7 +191,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01

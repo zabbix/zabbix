@@ -19,7 +19,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxcommon.h"
+#include "zbxnum.h"
 #include "zbxtypes.h"
 
 /* unresolved symbols needed for linking */
@@ -87,7 +87,6 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * 0;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
-zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
@@ -96,9 +95,6 @@ int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-char	*CONFIG_TMPDIR			= NULL;
-char	*CONFIG_FPING_LOCATION		= NULL;
-char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -117,8 +113,6 @@ char	*CONFIG_DB_TLS_KEY_FILE		= NULL;
 char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
-char	*CONFIG_EXPORT_DIR		= NULL;
-char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;

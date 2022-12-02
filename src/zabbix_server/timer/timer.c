@@ -25,6 +25,7 @@
 #include "zbxself.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 

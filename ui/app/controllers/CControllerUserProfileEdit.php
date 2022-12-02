@@ -71,7 +71,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone'
+				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
 				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
@@ -133,6 +133,13 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			}
 
 			$data = $this->setUserMedias($data);
+		}
+
+		$data['readonly'] = false;
+		$data['userdirectoryid'] = $this->user['userdirectoryid'];
+
+		if ($this->user['userdirectoryid'] != 0) {
+			$data['readonly'] = true;
 		}
 
 		$data['mediatypes'] = API::MediaType()->get([

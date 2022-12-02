@@ -41,6 +41,11 @@
 
 extern char	*CONFIG_SSL_CA_LOCATION;
 
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *
@@ -699,6 +704,9 @@ out:
 #undef OK_354
 }
 
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
@@ -958,6 +966,8 @@ clean:
 
 	return ret;
 }
+#undef SMTP_AUTHENTICATION_NONE
+#undef SMTP_AUTHENTICATION_NORMAL_PASSWORD
 
 char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
 		const char *attachment_type, const char *attachment, size_t attachment_size)

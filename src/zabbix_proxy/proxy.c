@@ -50,7 +50,7 @@
 #include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../libs/zbxvault/vault.h"
+#include "zbxvault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
@@ -60,6 +60,8 @@
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
+#include "zbxicmpping.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -153,6 +155,32 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+char	*CONFIG_SOURCE_IP = NULL;
+static const char	*get_source_ip(void)
+{
+	return CONFIG_SOURCE_IP;
+}
+
+char	*CONFIG_TMPDIR	= NULL;
+static const char	*get_tmpdir(void)
+{
+	return CONFIG_TMPDIR;
+}
+
+char	*CONFIG_FPING_LOCATION	= NULL;
+static const char	*get_fping_location(void)
+{
+	return CONFIG_FPING_LOCATION;
+}
+
+char	*CONFIG_FPING6_LOCATION		= NULL;
+#ifdef HAVE_IPV6
+static const char	*get_fping6_location(void)
+{
+	return CONFIG_FPING6_LOCATION;
+}
+#endif
+
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
@@ -205,7 +233,6 @@ static int	get_config_forks(unsigned char process_type)
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
@@ -231,7 +258,6 @@ zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
 
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
@@ -239,9 +265,6 @@ int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-char	*CONFIG_TMPDIR			= NULL;
-char	*CONFIG_FPING_LOCATION		= NULL;
-char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -260,8 +283,6 @@ char	*CONFIG_DB_TLS_KEY_FILE		= NULL;
 char	*CONFIG_DB_TLS_CA_FILE		= NULL;
 char	*CONFIG_DB_TLS_CIPHER		= NULL;
 char	*CONFIG_DB_TLS_CIPHER_13	= NULL;
-char	*CONFIG_EXPORT_DIR		= NULL;
-char	*CONFIG_EXPORT_TYPE		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
@@ -1031,15 +1052,23 @@ static void	zbx_on_exit(int ret)
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch;
-	int		opt_c = 0, opt_r = 0;
+	static zbx_config_icmpping_t	config_icmpping = {
+		get_source_ip,
+		get_fping_location,
+#ifdef HAVE_IPV6
+		get_fping6_location,
+#endif
+		get_tmpdir};
+
+	ZBX_TASK_EX			t = {ZBX_TASK_START};
+	char				ch;
+	int				opt_c = 0, opt_r = 0;
 
 	/* see description of 'optarg' in 'man 3 getopt' */
-	char		*zbx_optarg = NULL;
+	char				*zbx_optarg = NULL;
 
 	/* see description of 'optind' in 'man 3 getopt' */
-	int		zbx_optind = 0;
+	int				zbx_optind = 0;
 
 	zbx_config_tls = zbx_config_tls_new();
 
@@ -1117,6 +1146,8 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
+	zbx_init_library_icmpping(&config_icmpping);
+
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
 		int	ret;
@@ -1129,7 +1160,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1220,15 +1251,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
-
-	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
-	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
-	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+	zbx_config_comms_args_t			zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
+								CONFIG_TIMEOUT};
+	zbx_thread_args_t			thread_args;
+	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_taskmanager_args		taskmanager_args = {&zbx_config_comms, get_program_type};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_trapper_args			trapper_args = {&zbx_config_comms, get_program_type, &listen_sock};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_pinger_args			pinger_args = {get_program_type, CONFIG_TIMEOUT};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1459,9 +1492,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
+				thread_args.args = &pinger_args;
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				thread_args.args = &housekeeper_args;
 				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:

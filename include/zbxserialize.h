@@ -22,16 +22,23 @@
 
 #include "zbxcommon.h"
 
-#define zbx_serialize_prepare_str(len, str)				\
-	str##_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
-	len += str##_len + (zbx_uint32_t)sizeof(zbx_uint32_t)
+#define zbx_serialize_prepare_str(len, str)					\
+	do									\
+	{									\
+		str##_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
+		len += str##_len + (zbx_uint32_t)sizeof(zbx_uint32_t);		\
+	}									\
+	while(0)
 
 #define zbx_serialize_prepare_str_len(len, str, str_len)			\
-	str_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);		\
-	len += str_len + (zbx_uint32_t)sizeof(zbx_uint32_t)
+	do									\
+	{									\
+		str_len = (NULL != str ? (zbx_uint32_t)strlen(str) + 1 : 0);	\
+		len += str_len + (zbx_uint32_t)sizeof(zbx_uint32_t);		\
+	}									\
+	while(0)
 
-#define zbx_serialize_prepare_value(len, value)			\
-	len += (zbx_uint32_t)sizeof(value)
+#define zbx_serialize_prepare_value(len, value)	do { len += (zbx_uint32_t)sizeof(value); } while(0)
 
 #define zbx_serialize_uint64(buffer, value)			\
 	(memcpy(buffer, (const zbx_uint64_t *)&value, sizeof(zbx_uint64_t)), sizeof(zbx_uint64_t))
@@ -44,11 +51,7 @@
 
 #define zbx_serialize_char(buffer, value) (*buffer = (char)value, sizeof(char))
 
-#define zbx_serialize_str_null(buffer)				\
-	(							\
-		memset(buffer, 0, sizeof(zbx_uint32_t)),	\
-		sizeof(zbx_uint32_t)				\
-	)
+#define zbx_serialize_str_null(buffer)	(memset(buffer, 0, sizeof(zbx_uint32_t)), sizeof(zbx_uint32_t))
 
 #define zbx_serialize_str(buffer, value, len)						\
 	(										\
@@ -81,28 +84,13 @@
 
 #define zbx_deserialize_str(buffer, value, value_len)					\
 	(										\
-			memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
-			0 < value_len ? (						\
+		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
+		0 < value_len ? (							\
 			*value = (char *)zbx_malloc(NULL, (zbx_uint64_t)value_len + 1),	\
 			memcpy(*(value), buffer + sizeof(zbx_uint32_t), value_len),	\
 			(*value)[value_len] = '\0'					\
-			) : (*value = NULL, 0),						\
+		) : (*value = NULL, 0),							\
 		value_len + sizeof(zbx_uint32_t)					\
-	)
-
-#define zbx_deserialize_str_s(buffer, value, value_len)				\
-	(									\
-		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),		\
-		memcpy(value, buffer + sizeof(zbx_uint32_t), value_len),	\
-		value[value_len] = '\0',					\
-		value_len + sizeof(zbx_uint32_t)				\
-	)
-
-#define zbx_deserialize_str_ptr(buffer, value, value_len)				\
-	(										\
-		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
-		0 < value_len ? (value = (char *)(buffer + sizeof(zbx_uint32_t))) :	\
-		(value = NULL), value_len + sizeof(zbx_uint32_t)			\
 	)
 
 #define zbx_deserialize_value(buffer, value) \
@@ -116,11 +104,10 @@
 		memcpy(*(value), buffer, value_len + sizeof(zbx_uint32_t)),		\
 		value_len + sizeof(zbx_uint32_t)					\
 	)
-#endif
 
 /* complex serialization/deserialization functions */
 
 zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value);
 zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32_t *value);
 
-/* ZABBIX_SERIALIZE_H */
+#endif /* ZABBIX_SERIALIZE_H */
