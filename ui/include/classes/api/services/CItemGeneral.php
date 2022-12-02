@@ -551,7 +551,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$tpl_items = array_column(array_intersect_key($items, array_flip($indexes)), null, 'hostid');
 			$templateids = array_keys($tpl_items);
-			$template_count = count($templateids) - 1;
+			$template_count = count($templateids);
 
 			for ($i = 0; $i < $template_count - 1; $i++) {
 				for ($j = $i + 1; $j < $template_count; $j++) {
