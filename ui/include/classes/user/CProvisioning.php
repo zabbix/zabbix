@@ -304,7 +304,10 @@ class CProvisioning {
 			return $user;
 		}
 
-		$user['usrgrps'] = $user_groups;
+		foreach (array_column($user_groups, 'usrgrpid', 'usrgrpid') as $usrgrpid) {
+			$user['usrgrps'][] = ['usrgrpid' => $usrgrpid];
+		}
+
 		$roles = array_intersect_key($this->mapping_roles, $roleids);
 
 		if ($roles) {
