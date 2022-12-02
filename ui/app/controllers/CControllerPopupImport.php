@@ -62,7 +62,6 @@ class CControllerPopupImport extends CController {
 
 	protected function doAction() {
 		$rules = [];
-		$advanced_config = false;
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
@@ -78,7 +77,6 @@ class CControllerPopupImport extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
-				$advanced_config = true;
 				break;
 
 			case 'template':
@@ -97,7 +95,6 @@ class CControllerPopupImport extends CController {
 				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
-				$advanced_config = true;
 				break;
 
 			case 'mediatype':
@@ -166,7 +163,7 @@ class CControllerPopupImport extends CController {
 				'title' => _('Import'),
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
-				'advanced_config' => $advanced_config,
+				'advanced_config' => in_array($this->getInput('rules_preset'), ['host', 'template']),
 				'user' => [
 					'type' => $this->getUserType(),
 					'can_edit_maps' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS),

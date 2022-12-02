@@ -50,7 +50,7 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options                IDs of elements that should be exported.
+	 * @param array $options IDs of elements that should be exported.
 	 */
 	public function __construct(array $options) {
 		$this->options = array_merge([
@@ -917,7 +917,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherHttpTests(array $hosts) {
 		$httptests = API::HttpTest()->get([
-			'output' =>  $this->dataFields['httptests'],
+			'output' => $this->dataFields['httptests'],
 			'selectSteps' => ['no', 'name', 'url', 'query_fields', 'posts', 'variables', 'headers', 'follow_redirects',
 				'retrieve_mode', 'timeout', 'required', 'status_codes'
 			],

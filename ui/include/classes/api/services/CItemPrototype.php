@@ -477,7 +477,6 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ITEM_PROTOTYPE, $items);
 
-
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
 			$item['flags'] = array_shift($flags);

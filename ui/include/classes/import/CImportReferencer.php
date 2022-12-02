@@ -1297,6 +1297,7 @@ class CImportReferencer {
 			'preservekeys' => true
 		]);
 
+
 		foreach ($db_graphs as $graph) {
 			$graph['hosts'] = array_column($graph['hosts'], 'hostid');
 			$this->db_graphs[$graph['graphid']] = $graph;

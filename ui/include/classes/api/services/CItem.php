@@ -628,7 +628,6 @@ class CItem extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
 			'uuid' => 	['type' => API_UUID],

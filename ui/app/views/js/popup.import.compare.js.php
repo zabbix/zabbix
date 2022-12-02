@@ -54,17 +54,16 @@ window.popup_import_compare = new class {
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
 			}
-		})
+		});
 	}
 
 	submitImportComparePopup() {
 		if (popup_import.isDeleteMissingChecked()) {
 			return popup_import.confirmSubmit(this.overlay);
 		}
-		else {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-			popup_import.submitImportPopup();
-		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+		popup_import.submitImportPopup();
 	}
 }
 

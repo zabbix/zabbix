@@ -93,13 +93,13 @@ window.popup_import = new class {
 		if (document.getElementById('rules_preset').value === "template") {
 			return this.openImportComparePopup();
 		}
-		else {
-			if (this.isDeleteMissingChecked()) {
-				return this.confirmSubmit();
-			}
 
-			return this.submitImportPopup();
+		if (this.isDeleteMissingChecked()) {
+			return this.confirmSubmit();
 		}
+
+		return this.submitImportPopup();
+
 	}
 
 	isDeleteMissingChecked() {
