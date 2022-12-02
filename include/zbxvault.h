@@ -24,12 +24,12 @@
 
 typedef struct
 {
-	char    *name;
-	char    *url;
-	char    *token;
-	char    *tls_cert_file;
-	char    *tls_key_file;
-	char    *db_path;
+	char	*name;
+	char	*url;
+	char	*token;
+	char	*tls_cert_file;
+	char	*tls_key_file;
+	char	*db_path;
 }
 zbx_config_vault_t;
 

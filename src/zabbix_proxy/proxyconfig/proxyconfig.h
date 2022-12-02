@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 
+#include "zbxvault.h"
 #include "zbxcomms.h"
 
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;

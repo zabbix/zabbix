@@ -30,7 +30,7 @@ extern int	CONFIG_TRAPPER_TIMEOUT;
 typedef struct
 {
 	zbx_config_tls_t	*zbx_config_tls;
-	zbx_config_vault_t      *config_vault;
+	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 zbx_thread_proxy_poller_args;
