@@ -708,7 +708,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == CONFIG_PROXYCONFIG_FREQUENCY)
 		CONFIG_PROXYCONFIG_FREQUENCY = 10;
 
-	err |= (FAIL == zbx_db_validate_config_features());
+	err |= (FAIL == zbx_db_validate_config_features(program_type));
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
@@ -1178,7 +1178,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	if (FAIL == zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS))
+	if (FAIL == zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type))
 	{
 		zbx_free(db_version_info.friendly_current_version);
 		exit(EXIT_FAILURE);

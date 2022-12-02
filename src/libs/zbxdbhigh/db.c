@@ -43,7 +43,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
 static int	connection_failure;
-extern unsigned char	program_type;
 
 static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
 
@@ -52,9 +51,11 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
-int	zbx_db_validate_config_features(void)
+int	zbx_db_validate_config_features(unsigned char program_type)
 {
 	int	err = 0;
+
+	ZBX_UNUSED(program_type);
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
 	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "PostgreSQL or MySQL library"
@@ -808,7 +809,8 @@ void	zbx_db_flush_version_requirements(const char *version)
  * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
  *                                                                               *
  *********************************************************************************/
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type)
 {
 	zbx_db_extract_version_info(info);
 

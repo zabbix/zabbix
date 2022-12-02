@@ -475,7 +475,7 @@ void	DBinit_autoincrement_options(void);
 int	DBconnect(int flag);
 void	DBclose(void);
 
-int	zbx_db_validate_config_features(void);
+int	zbx_db_validate_config_features(unsigned char program_type);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(void);
 #endif
@@ -825,7 +825,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #define ZBX_MAX_HRECORDS	1000

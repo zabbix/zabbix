@@ -773,7 +773,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"IPMI support"));
 #endif
 
-	err |= (FAIL == zbx_db_validate_config_features());
+	err |= (FAIL == zbx_db_validate_config_features(program_type));
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)
 	{
@@ -1265,7 +1265,7 @@ static void	zbx_check_db(void)
 	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
 
 	if (SUCCEED == result)
 	{
