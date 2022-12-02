@@ -30,6 +30,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageWeb extends CWebTest {
 
+	use TableTrait;
+
 	private static $hostid;
 
 	public function prepareHostWebData() {
@@ -110,8 +112,6 @@ class testPageWeb extends CWebTest {
 		]);
 	}
 
-	use TableTrait;
-
 	/**
 	 * Function which checks the layout of Web page.
 	 */
@@ -128,14 +128,14 @@ class testPageWeb extends CWebTest {
 		$this->assertEquals(['Host groups', 'Hosts'], $form->getLabels()->asText());
 
 		// Check if Apply and Reset button are clickable.
-		foreach(['Apply', 'Reset'] as $button) {
+		foreach (['Apply', 'Reset'] as $button) {
 			$this->assertTrue($form->query('button', $button)->one()->isClickable());
 		}
 
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
 			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
-						->one()->isPresent()
+					->one()->isPresent()
 			);
 			$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
 		}
@@ -225,29 +225,52 @@ class testPageWeb extends CWebTest {
 
 	/**
 	 * Function which checks Hosts context menu.
-	 *
-	 * @dataProvider getHostContextMenuData
 	 */
-	public function testPageWeb_CheckHostContextMenu($data) {
+	public function testPageWeb_CheckHostContextMenu() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', $data['name']);
-		$row->query('link', $data['name'])->one()->click();
-		$this->page->waitUntilReady();
-		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-		$this->assertTrue($popup->hasItems($data['titles']));
-		foreach ($data['disabled'] as $disabled) {
-			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-					$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+
+		$titles = [
+			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
+			'Ping',	'Reboot', 'Script for Clone', 'Script for Delete', 'Script for Update', 'Selenium script', 'Traceroute'
+		];
+
+		foreach (['WebData Host', 'Simple form test host'] as $name) {
+			if ($name === 'WebData Host') {
+				$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
+				$this->page->waitUntilReady();
+				$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+				$this->assertTrue($popup->hasItems($titles));
+
+				foreach (['Graphs', 'Screens'] as $disabled) {
+					$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
+						$disabled.'" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+				}
+			}
+			else {
+				$this->query('class:list-table')->asTable()->one()->findRow('Host', $name)->query('link', $name)->one()->click();
+				$this->page->waitUntilReady();
+				$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+				$this->assertTrue($popup->hasItems($titles));
+				$this->assertTrue($popup->query('xpath://a[@aria-label="Host, Screens" and @class="menu-popup-item-disabled"]')->one()->isPresent());
+			}
 		}
 	}
+
+
+	public function testPageWeb_CheckHostContextMenu() {
+
+
+
+	}
+
 
 	/**
 	 * Function which resets data provided to filter.
 	 */
 	private function resetFilter() {
-		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$filter->query('button:Reset')->one()->click();
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->query('button:Reset')->one()->click();
 	}
 
 	public static function getDisabledServiceData() {
