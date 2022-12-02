@@ -268,17 +268,12 @@ window.widget_svggraph_form = new class {
 	}
 
 	_updateDatasetsLegend() {
-		console.log('_updateDatasetsLegend - all');
-
 		for (const dataset of this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
 			this._updateDatasetLegend(dataset);
 		}
 	}
 
 	_updateDatasetLegend(dataset) {
-		console.log('_updateDatasetLegend');
-
-
 		const placeholder_text = <?= json_encode(_('Data set')) ?> + ` #${parseInt(dataset.dataset.set) + 1}`;
 
 		const legend_label = dataset.querySelector('.js-dataset-label');
