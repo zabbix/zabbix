@@ -69,7 +69,7 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDatasetTab(CWidgetFormView $form, array $fields) {
+function getDatasetTab(CWidgetFormView $form, array $fields): array {
 	$dataset = new CWidgetFieldGraphDataSetView($fields['ds']);
 
 	return $form->makeCustomField($dataset, [
