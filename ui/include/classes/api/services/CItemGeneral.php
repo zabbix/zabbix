@@ -2025,6 +2025,39 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Check prerpocessing steps for specifics validation rules.
+	 *
+	 * @param array $items
+	 */
+	protected static function checkPreprocessingSteps(array $items): void {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as $j => $step) {
+				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+					$params = explode("\n", $step['params']);
+
+					if (count($params) % 2 !== 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
+						);
+					}
+
+					foreach ($params as $param) {
+						if ($param === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Get master item links starting from the given master items and till the lowest level master items.
 	 *
 	 * @param  array $items
@@ -2385,22 +2418,6 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 		}
-	}
-
-	protected static function normalizePreprocessingSteps(array $items): array {
-		foreach ($items as &$item) {
-			if (!array_key_exists('preprocessing', $item)) {
-				continue;
-			}
-
-			foreach ($item['preprocessing'] as &$item_preproc) {
-				if ($item_preproc['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-					$item_preproc['params'] = json_encode($item_preproc['params']);
-				}
-			}
-		}
-
-		return $items;
 	}
 
 	/**

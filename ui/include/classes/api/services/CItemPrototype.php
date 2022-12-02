@@ -441,6 +441,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -472,8 +473,6 @@ class CItemPrototype extends CItemGeneral {
 		if ($ins_items_discovery) {
 			DB::insertBatch('item_discovery', $ins_items_discovery);
 		}
-
-		$items = self::normalizePreprocessingSteps($items);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -585,6 +584,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -717,8 +717,6 @@ class CItemPrototype extends CItemGeneral {
 		if ($upd_items) {
 			DB::update('items', $upd_items);
 		}
-
-		$items = self::normalizePreprocessingSteps($items);
 
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);

@@ -48,14 +48,9 @@
 			};
 
 			if (type == <?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>) {
-				const rows = document.querySelectorAll(`.group-json-mapping[data-index="${num}"] .group-json-row`);
+				const inputs = document.querySelectorAll(`.group-json-mapping[data-index="${num}"] input`);
 
-				[...rows].map((row, i) => {
-					params.push({
-						name: row.querySelector(`[name="preprocessing[${num}][params][${i}][name]"]`).value,
-						oid: row.querySelector(`[name="preprocessing[${num}][params][${i}][oid]"]`).value
-					});
-				});
+				[...inputs].map((input) => params.push(input.value));
 			} else {
 				if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
 					params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());

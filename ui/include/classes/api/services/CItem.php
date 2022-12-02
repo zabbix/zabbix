@@ -570,6 +570,7 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -596,8 +597,6 @@ class CItem extends CItemGeneral {
 		if ($ins_items_rtdata) {
 			DB::insertBatch('item_rtdata', $ins_items_rtdata, false);
 		}
-
-		$items = self::normalizePreprocessingSteps($items);
 
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
@@ -712,6 +711,7 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -849,8 +849,6 @@ class CItem extends CItemGeneral {
 		if ($upd_items) {
 			DB::update('items', $upd_items);
 		}
-
-		$items = self::normalizePreprocessingSteps($items);
 
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);

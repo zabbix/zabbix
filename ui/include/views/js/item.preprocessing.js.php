@@ -145,11 +145,13 @@
 					->addItem(
 						(new CRow([
 							new CCol(
-								(new CTextBox('preprocessing[#{rowNum}][params][#{index}][name]', ''))
+								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+									->removeId()
 									->setAttribute('placeholder', _('Output field name')),
 							),
 							new CCol(
-								(new CTextBox('preprocessing[#{rowNum}][params][#{index}][oid]', ''))
+								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+									->removeId()
 									->setAttribute('placeholder', _('Key value prefix')),
 							),
 							(new CCol(
@@ -171,7 +173,6 @@
 							)
 					)
 					->setAttribute('data-index', '#{rowNum}')
-					->setAttribute('data-last-row-index', '#{index}')
 			))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 	?>
 </script>
@@ -180,12 +181,14 @@
 	<?php
 		echo (new CRow([
 			new CCol(
-				(new CTextBox('preprocessing[#{rowNum}][params][#{index}][name]', ''))
+				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+					->removeId()
 					->setAttribute('placeholder', _('Output field name')),
 			),
 			new CCol(
-				(new CTextBox('preprocessing[#{rowNum}][params][#{index}][oid]', ''))
-				->setAttribute('placeholder', _('Key value prefix')),
+				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
+					->removeId()
+					->setAttribute('placeholder', _('Key value prefix')),
 			),
 			(new CCol(
 				(new CSimpleButton(_('Remove')))
@@ -326,8 +329,7 @@
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
 					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({
-						rowNum: index,
-						index: 1
+						rowNum: index
 					}));
 
 				default:
@@ -577,17 +579,14 @@
 				const container = this.closest('.group-json-mapping');
 
 				const row_numb = container.dataset.index;
-				const last_index = parseInt(container.dataset.lastRowIndex, 10);
 
 				[...container.querySelectorAll('.js-group-json-action-delete')].map((btn) => {
 					btn.disabled = false;
 				});
 
-				container.dataset.lastRowIndex = last_index + 1;
-
 				container
 					.querySelector('tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb, index: last_index + 1}));
+					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
 			});
 	});
 </script>

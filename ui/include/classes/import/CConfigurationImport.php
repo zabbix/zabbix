@@ -837,12 +837,7 @@ class CConfigurationImport {
 				}
 
 				foreach ($item['preprocessing'] as &$preprocessing_step) {
-					if ($preprocessing_step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-						$preprocessing_step['params'] = json_decode($preprocessing_step['parameters'][0], true);
-					}
-					else {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-					}
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
 					unset($preprocessing_step['parameters']);
 				}
@@ -1083,12 +1078,7 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
-					if ($preprocessing_step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-						$preprocessing_step['params'] = json_decode($preprocessing_step['parameters'][0], true);
-					}
-					else {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-					}
+					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
 					unset($preprocessing_step['parameters']);
 				}
@@ -1259,12 +1249,7 @@ class CConfigurationImport {
 					}
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
-						if ($preprocessing_step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-							$preprocessing_step['params'] = json_decode($preprocessing_step['parameters'][0], true);
-						}
-						else {
-							$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-						}
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
 						unset($preprocessing_step['parameters']);
 					}

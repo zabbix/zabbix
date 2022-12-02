@@ -1313,15 +1313,7 @@ abstract class CItemGeneralOld extends CApiService {
 					);
 				}
 
-				if ($preprocessing['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-					$preprocessing['params'] = array_map(static function(array $value): array {
-						$value['name'] = str_replace("\r\n", "\n", $value['name']);
-						$value['oid'] = str_replace("\r\n", "\n", $value['oid']);
-
-						return $value;
-					}, $preprocessing['params']);
-				}
-				elseif (array_key_exists('params', $preprocessing) && $preprocessing['params'] !== null) {
+				if (array_key_exists('params', $preprocessing) && $preprocessing['params'] !== null) {
 					$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
 				}
 
@@ -1702,15 +1694,26 @@ abstract class CItemGeneralOld extends CApiService {
 						break;
 
 					case ZBX_PREPROC_SNMP_WALK_TO_JSON:
-						$params = $preprocessing['params'];
+						$params = explode("\n", $preprocessing['params']);
 
-						$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-							'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-							'oid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
-						]];
+						$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'length' => 255];
 
 						if (!CApiInputValidator::validate($api_input_rules, $params, '/params', $error)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
+
+						if (count($params) % 2 !== 0) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						foreach ($params as $param) {
+							if ($param === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+								);
+							}
 						}
 						break;
 				}
@@ -2979,11 +2982,6 @@ abstract class CItemGeneralOld extends CApiService {
 	 */
 	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		foreach ($preprocessing as &$step) {
-			if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-				$step['params'] = json_encode($step['params']);
-				continue;
-			}
-
 			$step['params'] = str_replace("\r\n", "\n", $step['params']);
 			$params = explode("\n", $step['params']);
 

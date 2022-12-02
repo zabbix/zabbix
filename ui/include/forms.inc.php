@@ -1452,33 +1452,29 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 				$mapping_rows = [];
-				$step_params = array_key_exists('0', $step['params']) && is_string($step['params'][0])
-					? json_decode($step['params'][0], true)
-					: $step['params'];
-				$count = count($step_params);
+				$count = count($step['params']);
 
-				$numb = 0;
-				foreach ($step_params as $row) {
+				for ($j = 0; $j < $count; $j+=2) {
 					$mapping_rows[] = [
 						(new CRow([
 							new CCol(
-								(new CTextBox('preprocessing['.$i.'][params]['.$numb.'][name]', $row['name']))
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+									->removeId()
 									->setAttribute('placeholder', _('Output field name')),
 							),
 							new CCol(
-								(new CTextBox('preprocessing['.$i.'][params]['.$numb.'][oid]', $row['oid']))
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+									->removeId()
 									->setAttribute('placeholder', _('Key value prefix')),
 							),
 							(new CCol(
 								(new CSimpleButton(_('Remove')))
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->addClass('js-group-json-action-delete')
-									->setEnabled($count > 1)
+									->setEnabled($count > 2)
 							))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass('group-json-row')
 					];
-
-					$numb++;
 				}
 
 				$params = (new CDiv())
@@ -1504,7 +1500,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 									)
 							)
 							->setAttribute('data-index', $i)
-							->setAttribute('data-last-row-index', $numb)
 					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 				break;
 		}

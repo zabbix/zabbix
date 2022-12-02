@@ -2235,15 +2235,6 @@ class CDiscoveryRule extends CItemGeneralOld {
 			unset($dstDiscovery['overrides']);
 		}
 
-		if (array_key_exists('preprocessing', $dstDiscovery)) {
-			foreach ($dstDiscovery['preprocessing'] as &$step) {
-				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-					$step['params'] = json_decode($step['params'], true);
-				}
-			}
-			unset($step);
-		}
-
 		// if this is a plain host, map discovery interfaces
 		if ($src_host['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
@@ -2535,15 +2526,6 @@ class CDiscoveryRule extends CItemGeneralOld {
 
 				if ($src_item['type'] == ITEM_TYPE_DEPENDENT) {
 					$dst_item['master_itemid'] = $master_item_links[$src_item['master_itemid']][$dst_host['hostid']];
-				}
-
-				if (array_key_exists('preprocessing', $src_item)) {
-					foreach ($dst_item['preprocessing'] as &$step) {
-						if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-							$step['params'] = json_decode($step['params'], true);
-						}
-					}
-					unset($step);
 				}
 
 				$dst_items[] = ['hostid' => $dst_host['hostid'], 'ruleid' => $dst_ruleid] + $dst_item;

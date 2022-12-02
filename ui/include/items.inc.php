@@ -650,15 +650,6 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 					$dst_item['master_itemid'] = $master_item_links[$src_item['master_itemid']][$dst_hostid];
 				}
 
-				if (array_key_exists('preprocessing', $src_item)) {
-					foreach ($dst_item['preprocessing'] as &$step) {
-						if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-							$step['params'] = json_decode($step['params'], true);
-						}
-					}
-					unset($step);
-				}
-
 				$dst_items[] = ['hostid' => $dst_hostid] + $dst_item;
 			}
 		}
@@ -2162,11 +2153,9 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 				$step['params'] = array_values($step['params']);
 
-				foreach ($step['params'] as &$fields) {
-					$fields['name'] = trim($fields['name']);
-					$fields['oid'] = trim($fields['oid']);
-				}
-				unset($fields);
+				$step['params'] = implode("\n", array_map(function (string $value): string {
+					return trim($value);
+				}, $step['params']));
 				break;
 
 			default:

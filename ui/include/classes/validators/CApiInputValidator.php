@@ -3953,46 +3953,24 @@ class CApiInputValidator {
 
 		$params = [];
 
-		if ($preproc_type == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
-			$length = 0;
+		if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
+			return false;
+		}
 
-			$data = array_map(function(array $value) use (&$length): array {
-				$value['name'] = str_replace("\r\n", "\n", $value['name']);
-				$value['oid'] = str_replace("\r\n", "\n", $value['oid']);
+		$data = str_replace("\r\n", "\n", $data);
 
-				$length += mb_strlen($value['name']) + mb_strlen($value['oid']);
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 
-				return $value;
-			}, $data);
+			return false;
+		}
 
-			if (array_key_exists('length', $rule) && $length > $rule['length']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-
-				return false;
-			}
-
-			$params = $data;
+		if ($preproc_type == ZBX_PREPROC_SCRIPT) {
+			$params[1] = $data;
 		}
 		else {
-			if (self::checkStringUtf8(0x00, $data, $path, $error) === false) {
-				return false;
-			}
-
-			$data = str_replace("\r\n", "\n", $data);
-
-			if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-
-				return false;
-			}
-
-			if ($preproc_type == ZBX_PREPROC_SCRIPT) {
-				$params[1] = $data;
-			}
-			else {
-				foreach (explode("\n", $data) as $i => $param) {
-					$params[$i + 1] = $param;
-				}
+			foreach (explode("\n", $data) as $i => $param) {
+				$params[$i + 1] = $param;
 			}
 		}
 
@@ -4116,17 +4094,12 @@ class CApiInputValidator {
 				break;
 
 			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
-				$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-					'oid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
-				]];
+				$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'length' => 255];
 				break;
 		}
 
 		if (self::validate($api_input_rules, $params, $path, $error)) {
-			$data = $preproc_type == ZBX_PREPROC_SNMP_WALK_TO_JSON
-				? $params
-				: implode("\n", $params);
+			$data = implode("\n", $params);
 
 			return true;
 		}
