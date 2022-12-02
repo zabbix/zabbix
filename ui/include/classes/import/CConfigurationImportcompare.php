@@ -82,7 +82,6 @@ class CConfigurationImportcompare {
 			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
 			'host_prototypes' => ['host'],
 			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]]
-
 		];
 
 		$this->options = $options;
@@ -203,21 +202,14 @@ class CConfigurationImportcompare {
 		$before = $this->addUniquenessParameterByEntityType($before, $type);
 		$after = $this->addUniquenessParameterByEntityType($after, $type);
 
-		// Be sure that every entity has uuid.
-		foreach ($before as &$entity) {
-			$entity += ['uuid' => ''];
-		}
-		unset($entity);
-
-		foreach ($after as &$entity) {
-			$entity += ['uuid' => ''];
-		}
-		unset($entity);
-
 		$same_entities = [];
+		foreach ($after as $a_key => $after_entity) {
+			if (!array_key_exists('uuid', $after_entity)) {
+				unset($after[$a_key]);
+				continue;
+			}
 
-		foreach ($before as $b_key => $before_entity){
-			foreach ($after as $a_key => $after_entity) {
+			foreach ($before as $b_key => $before_entity) {
 				if ($before_entity['uuid'] == $after_entity['uuid']
 						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
@@ -228,7 +220,6 @@ class CConfigurationImportcompare {
 					$same_entities[$b_key]['after'] = $after_entity;
 
 					unset($before[$b_key], $after[$a_key]);
-
 					break;
 				}
 			}
@@ -291,9 +282,8 @@ class CConfigurationImportcompare {
 	/**
 	 * Get entity field values by giving field key path constructed.
 	 *
-	 * @param array  $entity            entity
-	 * @param        $field_key         string when field key to get and array when field key path given.
-	 *
+	 * @param array        $entity    entity
+	 * @param string|array $field_key
 	 */
 	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
 		if (is_array($field_key_path)) {
