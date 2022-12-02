@@ -3485,10 +3485,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
-#endif
 	int				now, nextcheck, sleeptime = -1, escalations_count = 0,
 					old_escalations_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
