@@ -118,14 +118,6 @@ if ($data['action'] === 'user.edit') {
 if ($data['change_password']) {
 	$user_form->disablePasswordAutofill();
 
-	$password1 = (new CPassBox('password1', $data['password1']))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired();
-
-	if ($data['action'] !== 'user.edit') {
-		$password1->setAttribute('autofocus', 'autofocus');
-	}
-
 	$password_requirements = [];
 
 	if ($data['password_requirements']['min_length'] > 1) {
@@ -168,13 +160,29 @@ if ($data['change_password']) {
 		])
 		: null;
 
+	$current_password = (new CPassBox('current_password', $data['current_password']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAriaRequired();
+
+	if ($data['action'] !== 'user.edit') {
+		$current_password->setAttribute('autofocus', 'autofocus');
+	}
+
+	if ($data['action'] === 'userprofile.edit'
+			|| CWebUser::$data['userid'] == $data['userid'] && CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
+		$user_form_list
+			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
+	}
+
 	$user_form_list
 		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
 			// Hidden dummy login field for protection against chrome error when password autocomplete.
 			(new CInput('text', null, null))
 				->setAttribute('tabindex', '-1')
 				->addStyle('position: absolute; left: -100vw;'),
-			$password1
+			(new CPassBox('password1', $data['password1']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
 		])
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
@@ -184,14 +192,29 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$user_form_list->addRow(_('Password'),
+	$change_password_enabled = false;
+
+	if ($data['internal_authentication']) {
+		$change_password_enabled = $data['action'] === 'userprofile.edit'
+				|| $data['db_user']['username'] !== ZBX_GUEST_USER;
+
+	}
+
+	$hint = null;
+
+	if (!$data['internal_authentication']) {
+		$hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
+			->addStyle('margin-left: 5px; margin-top: 4px');
+	}
+
+	$user_form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
+			->setEnabled($change_password_enabled)
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->setEnabled(!$data['readonly'])
-	);
+			->addClass(ZBX_STYLE_BTN_GREY),
+		$hint
+	]);
 }
 
 // Append languages, timezones & themes to form list.

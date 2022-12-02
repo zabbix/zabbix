@@ -406,6 +406,7 @@ class CUser extends CApiService {
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
+			'current_passwd' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'passwd' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			'url' =>			['type' => API_URL, 'length' => DB::getFieldLength('users', 'url')],
 			'autologin' =>		['type' => API_INT32, 'in' => '0,1'],
@@ -491,6 +492,19 @@ class CUser extends CApiService {
 			if (array_key_exists('username', $user) && $user['username'] !== $db_user['username']) {
 				$usernames[] = $user['username'];
 			}
+
+			if (array_key_exists('current_passwd', $user)) {
+				if (!password_verify($user['current_passwd'], $db_user['passwd'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect current password.'));
+				}
+			}
+
+			if ($user['userid'] == self::$userData['userid'] && self::$userData['roleid'] == USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists('current_passwd', $user)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Current password is mandatory.!!!!!'));
+			}
+
+			unset($user['current_passwd']);
 
 			if (array_key_exists('passwd', $user) && $this->checkPassword($user + $db_user, '/'.($i + 1).'/passwd')) {
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
@@ -610,6 +624,15 @@ class CUser extends CApiService {
 
 		if ($upd_users) {
 			DB::update('users', $upd_users);
+		}
+
+		foreach ($users as $user) {
+			if (array_key_exists('passwd', $user)) {
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['userid' => $user['userid']]
+				]);
+			}
 		}
 
 		self::updateUsersGroups($users, $db_users);
