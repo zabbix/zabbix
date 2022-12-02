@@ -1,0 +1,1 @@
+.......PS. [ZBX-22001] enabled back support for response decompression (HTTP header "Accept-Encoding") in web monitoring (revert of ZBX-21765) (dimir)
