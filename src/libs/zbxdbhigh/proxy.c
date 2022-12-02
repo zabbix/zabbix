@@ -1512,11 +1512,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "macro");
 	}
-	else if (0 == strcmp("hstgrp", table->table))
-	{
-		move_out = 1;
-		move_field_nr = find_field_by_name(fields, fields_count, "name");
-	}
 	else if (0 == strcmp("items", table->table))
 	{
 		move_out = 1;
@@ -1924,6 +1919,19 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto clean;
+	}
+
+	if (0 != ins.values_num && 0 == strcmp("hstgrp", table->table))
+	{
+		/* Host groups are not used by proxy and the discovery group record is sent  */
+		/* only because of config table foreign key. To keep compatibility between   */
+		/* minor versions and comply with hstgrp unique index (name, type) force the */
+		/* group name to groupid.                                                    */
+		if (ZBX_DB_OK > DBexecute("update hstgrp set name='"  ZBX_FS_UI64 "' where groupid=" ZBX_FS_UI64,
+				ins.values[0], ins.values[0]))
+		{
+			goto clean;
+		}
 	}
 
 	/* delete operations are performed by the caller using the returned del vector */
