@@ -28,6 +28,7 @@ extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
 typedef struct
 {
 	struct zbx_db_version_info_t	*db_version_info;
+	int				config_timeout;
 }
 zbx_thread_housekeeper_args;
 

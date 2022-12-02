@@ -22,8 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-extern int	CONFIG_TIMEOUT;
-
 void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templateids);
 void	op_groups_add(const ZBX_DB_EVENT *event,  zbx_config_t *cfg, zbx_vector_uint64_t *groupids);

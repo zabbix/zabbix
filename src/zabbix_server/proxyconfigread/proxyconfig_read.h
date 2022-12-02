@@ -31,6 +31,6 @@ zbx_proxyconfig_status_t;
 int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, char **error);
 
-void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp);
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout);
 
 #endif

@@ -27,6 +27,12 @@
 void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
 		zbx_proxy_compatibility_t compatibility);
 
+typedef struct
+{
+	int                     config_timeout;
+}
+zbx_thread_taskmanager_args;
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 
 #endif /* ZABBIX_SERVER_TASKMANAGER */

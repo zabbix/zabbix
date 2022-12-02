@@ -63,9 +63,9 @@ int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func_t c
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 
 /* client API */
-void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc);
+void	zbx_rtc_notify_config_sync(int config_timeout, zbx_ipc_async_socket_t *rtc);
 
-void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int proc_num);
+void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout, zbx_ipc_async_socket_t *rtc);
 int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, const zbx_thread_info_t *info, zbx_uint32_t *cmd,
 		unsigned char **data, int timeout);
 int	zbx_rtc_reload_config_cache(char **error);
@@ -74,6 +74,5 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char
 void	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
 		const unsigned char *data, zbx_uint32_t size);
 
-int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, char **error);
-
+int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, int config_timeout, char **error);
 #endif
