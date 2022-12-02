@@ -156,6 +156,15 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.6rc2
+
+Bug fixes:
+.......PS. [ZBX-22019] fixed item value type change not being updated in preprocessing manager cache (wiper)
+.......PS. [ZBX-22001] enabled back support for response decompression (HTTP header "Accept-Encoding") in web monitoring (revert of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in lld filters/overrides (wiper)
+.......PS. [ZBX-21995] fixed configuration sync compatibility problems betwen minor versions (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.6rc1
 
 New features:
@@ -648,6 +657,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc2
+
+Bug fixes:
+.......PS. [ZBX-22001] enabled back support for response decompression (HTTP header "Accept-Encoding") in web monitoring (revert of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in lld filters/overrides (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12rc1
