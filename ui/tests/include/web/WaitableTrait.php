@@ -97,6 +97,8 @@ trait WaitableTrait {
 	/**
 	 * Wait until object text is present.
 	 *
+	 * @param string $text    text to be present
+	 *
 	 * @return $this
 	 */
 	public function waitUntilTextPresent($text) {
@@ -108,7 +110,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object text is not present.
 	 *
-	 * @param string $text    text to be present
+	 * @param string $text    text not to be present
 	 *
 	 * @return $this
 	 */
@@ -121,7 +123,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object attribute is present.
 	 *
-	 * @param string $attributes    attributes to be present
+	 * @param string|array $attributes    attributes to be present
 	 *
 	 * @return $this
 	 */
@@ -134,7 +136,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object attribute is not present.
 	 *
-	 * @param string $attributes    attributes not be present
+	 * @param string|array $attributes    attributes not be present
 	 *
 	 * @return $this
 	 */
@@ -147,7 +149,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object class is present.
 	 *
-	 * @param string $classes    classes to be present
+	 * @param string|array $classes    classes to be present
 	 *
 	 * @return $this
 	 */
@@ -160,7 +162,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object class is not present.
 	 *
-	 * @param string $classes    classes not be present
+	 * @param string|array $classes    classes not be present
 	 *
 	 * @return $this
 	 */
