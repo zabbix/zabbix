@@ -109,7 +109,7 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_reset=1&filter_set=1&filter_name=&')->waitUntilReady();
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -758,7 +758,7 @@ class testPageLatestData extends CWebTest {
 	 */
 	public function testPageLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid'])
+		$this->page->login()->open('zabbix.php?&action=latest.view&filter_set=1&filter_name=&show_details=0&hostids%5B%5D='.$data['hostid'])
 				->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
