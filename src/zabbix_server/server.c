@@ -365,6 +365,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
+static zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
 char	*CONFIG_NODE_ADDRESS	= NULL;
@@ -636,8 +637,8 @@ static void	zbx_set_defaults(void)
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
-	if (NULL == CONFIG_VAULTURL)
-		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+	if (NULL == config_vault.url)
+		config_vault.url = zbx_strdup(config_vault.url, "https://127.0.0.1:8200");
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
@@ -1358,10 +1359,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
 
 	zbx_thread_args_t		thread_args;
+	zbx_thread_dbconfig_args	dbconfig_args = {&config_vault};
 	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, listen_sock};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, &config_vault, get_program_type, listen_sock};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &config_vault, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
@@ -1448,6 +1450,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_vc_enable();
+				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
@@ -1875,21 +1878,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&(config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&error))
+	if (SUCCEED != zbx_vault_init(&config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
+	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

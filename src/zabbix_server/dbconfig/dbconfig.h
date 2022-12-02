@@ -21,6 +21,13 @@
 #define ZABBIX_DBCONFIG_H
 
 #include "zbxthreads.h"
+#include "zbxvault.h"
+
+typedef struct
+{
+	zbx_config_vault_t	*config_vault;
+}
+zbx_thread_dbconfig_args;
 
 ZBX_THREAD_ENTRY(dbconfig_thread, args);
 

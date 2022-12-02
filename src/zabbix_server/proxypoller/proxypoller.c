@@ -254,7 +254,7 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_send_configuration(DC_PROXY *proxy)
+static int	proxy_send_configuration(DC_PROXY *proxy, const zbx_config_vault_t *config_vault)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
@@ -290,7 +290,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	zbx_json_clean(&j);
 
-	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, &error)))
+	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
@@ -533,7 +533,7 @@ out:
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy(void)
+static int	process_proxy(const zbx_config_vault_t *config_vault)
 {
 	DC_PROXY		proxy, proxy_old;
 	int			num, i;
@@ -587,7 +587,7 @@ static int	process_proxy(void)
 
 			if (proxy.proxy_config_nextcheck <= now && proxy.compatibility == ZBX_PROXY_VERSION_CURRENT)
 			{
-				if (SUCCEED != (ret = proxy_send_configuration(&proxy)))
+				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault)))
 					goto error;
 			}
 
@@ -685,7 +685,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 					old_processed, old_total_sec);
 		}
 
-		processed += process_proxy();
+		processed += process_proxy(proxy_poller_args_in->config_vault);
 		total_sec += zbx_time() - sec;
 
 		nextcheck = DCconfig_get_proxypoller_nextcheck();

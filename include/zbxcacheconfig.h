@@ -25,6 +25,7 @@
 #include "zbxeval.h"
 #include "zbxavailability.h"
 #include "zbxversion.h"
+#include "zbxvault.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -639,7 +640,7 @@ zbx_synced_new_config_t;
 #define ZBX_ITEM_GET_PROCESS		0
 
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
-void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
+void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, zbx_config_vault_t *config_vault);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
 

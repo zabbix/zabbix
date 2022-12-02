@@ -41,7 +41,8 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *zbx_config_tls, const zbx_thread_info_t *thread_info)
+		const zbx_config_tls_t *zbx_config_tls, const zbx_config_vault_t *config_vault,
+		const zbx_thread_info_t *thread_info)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -128,7 +129,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			DCsync_kvs_paths(&jp_kvs_paths);
+			DCsync_kvs_paths(&jp_kvs_paths, config_vault);
 
 		DCupdate_interfaces_availability();
 	}
@@ -319,7 +320,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls, info);
+		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls,
+				proxyconfig_args_in->config_vault, info);
 		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

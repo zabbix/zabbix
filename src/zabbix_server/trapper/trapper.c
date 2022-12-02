@@ -1064,7 +1064,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 }
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config, const zbx_config_vault_t *config_vault)
 {
 	int	ret = SUCCEED;
 
@@ -1163,7 +1163,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, zbx_config->zbx_config_tls,
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, zbx_config->zbx_config_tls, config_vault,
 				zbx_get_program_type_cb))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
@@ -1249,14 +1249,15 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	return ret;
 }
 
-static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config)
+static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config,
+		zbx_config_vault_t *config_vault)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, zbx_config);
+	process_trap(sock, sock->buffer, bytes_received, ts, zbx_config, config_vault);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1345,7 +1346,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			}
 #endif
 			sec = zbx_time();
-			process_trapper_child(&s, &ts, trapper_args_in->zbx_config);
+			process_trapper_child(&s, &ts, trapper_args_in->zbx_config, trapper_args_in->config_vault);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

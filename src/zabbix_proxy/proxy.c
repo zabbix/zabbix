@@ -270,12 +270,6 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULT			= NULL;
-char	*CONFIG_VAULTURL		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
-char	*CONFIG_VAULTTLSCERTFILE	= NULL;
-char	*CONFIG_VAULTTLSKEYFILE		= NULL;
-char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -317,6 +311,7 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
+static zbx_config_vault_t       *zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -1259,7 +1254,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
 	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, zbx_config_vault, get_program_type, &listen_sock};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1404,7 +1399,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);

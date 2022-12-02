@@ -29,6 +29,7 @@ extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 typedef struct
 {
 	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 zbx_thread_proxyconfig_args;

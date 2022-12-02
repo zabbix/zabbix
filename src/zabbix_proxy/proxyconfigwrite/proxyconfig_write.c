@@ -2060,7 +2060,8 @@ out:
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls)
+void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls,
+		const zbx_config_vault_t *config_vault)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -2113,7 +2114,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				DCsync_kvs_paths(&jp_kvs_paths);
+				DCsync_kvs_paths(&jp_kvs_paths, config_vault);
 		}
 		else
 		{
