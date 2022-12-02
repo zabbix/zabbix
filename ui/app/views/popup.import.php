@@ -24,7 +24,9 @@
  * @var array $data
  */
 
-$rules_table = (new CTable())->setId('rules_table');
+$rules_table = (new CTable())
+	->setId('rules_table')
+	->addClass('table-initial-width');
 
 $titles = [
 	'template_groups' => _('Template groups'),
@@ -76,18 +78,21 @@ foreach ($titles as $key => $title) {
 
 if ($data['advanced_config']) {
 	$rules_table->addRow([
-		(new CCol('All'))->addStyle('width: 124px;'),
+		(new CCol('All'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		$col_update
-			? (new CCol((new CCheckBox('update_all'))->setChecked(true)))
-			->addClass(ZBX_STYLE_CENTER)
+			? (new CCol(
+				(new CCheckBox('update_all'))->setChecked(true)
+			))->addClass(ZBX_STYLE_CENTER)
 			: null,
 		$col_create
-			? (new CCol((new CCheckBox('create_all'))->setChecked(true)))
-			->addClass(ZBX_STYLE_CENTER)
+			? (new CCol(
+				(new CCheckBox('create_all'))->setChecked(true)
+			))->addClass(ZBX_STYLE_CENTER)
 			: null,
 		$col_delete
-			? (new CCol((new CCheckBox('delete_all'))->setChecked(true)))
-			->addClass(ZBX_STYLE_CENTER)
+			? (new CCol(
+				(new CCheckBox('delete_all'))->setChecked(true)
+			))->addClass(ZBX_STYLE_CENTER)
 			: null
 	]);
 }
@@ -162,7 +167,7 @@ foreach ($titles as $key => $title) {
 $rules_table->setHeader([
 	'',
 	$col_update ? (new CColHeader(_('Update existing')))->addClass(ZBX_STYLE_CENTER) : null,
-	$col_create ?(new CColHeader( _('Create new') ))->addClass(ZBX_STYLE_CENTER) : null,
+	$col_create ? (new CColHeader( _('Create new') ))->addClass(ZBX_STYLE_CENTER) : null,
 	$col_delete ? (new CColHeader(_('Delete missing')))->addClass(ZBX_STYLE_CENTER) : null
 ]);
 
