@@ -364,7 +364,7 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t		*config_tls = NULL;
-static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
+static zbx_config_export_t	config_export = {NULL, NULL, ZBX_GIBIBYTE};
 static zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
@@ -387,7 +387,6 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
-
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -700,10 +699,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
+	if (SUCCEED != zbx_validate_export_type(config_export.type, NULL))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
-				zbx_config_export.type);
+				config_export.type);
 		err = 1;
 	}
 
@@ -989,11 +988,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"ExportDir",			&(zbx_config_export.dir),		TYPE_STRING,
+		{"ExportDir",			&(config_export.dir),			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExportType",			&(zbx_config_export.type),		TYPE_STRING_LIST,
+		{"ExportType",			&(config_export.type),			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ExportFileSize",		&(zbx_config_export.file_size),		TYPE_UINT64,
+		{"ExportFileSize",		&(config_export.file_size),		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
 			PARM_OPT,	1,			100},
@@ -1246,7 +1245,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1356,18 +1355,26 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config = {config_tls, NULL, 0};
+	zbx_config_comms_args_t		config_comms = {config_tls, NULL, 0, CONFIG_TIMEOUT};
 
 	zbx_thread_args_t		thread_args;
-	zbx_thread_dbconfig_args	dbconfig_args = {&config_vault};
-	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, &config_vault, get_program_type, listen_sock};
-	zbx_thread_escalator_args	escalator_args = {config_tls, get_program_type};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {config_tls, &config_vault, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {config_tls, get_program_type};
+	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &config_vault, get_program_type, listen_sock};
+	zbx_thread_escalator_args	escalator_args = {config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {config_tls, &config_vault, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_discoverer_args	discoverer_args = {config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_report_writer_args	report_writer_args = {config_tls->ca_file, config_tls->cert_file,
 							config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
-	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
+	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info, CONFIG_TIMEOUT};
+
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type,
+							CONFIG_TIMEOUT};
+	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, &config_vault, CONFIG_TIMEOUT};
+	zbx_thread_pinger_args		pinger_args = {get_program_type, CONFIG_TIMEOUT};
+#ifdef HAVE_OPENIPMI
+	zbx_thread_ipmi_manager_args	ipmi_manager_args = {get_program_type, CONFIG_TIMEOUT};
+#endif
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1452,6 +1459,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_vc_enable();
 				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
+
 				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
 
@@ -1499,6 +1507,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
+				thread_args.args = &pinger_args;
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ALERTER:
@@ -1545,6 +1554,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
+				thread_args.args = &taskmanager_args;
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
@@ -1555,6 +1565,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
+				thread_args.args = &ipmi_manager_args;
 				zbx_thread_start(ipmi_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
@@ -1590,6 +1601,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(report_writer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
+				thread_args.args = &trigger_housekeeper_args;
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -1940,7 +1952,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
+	if (FAIL == zbx_init_library_export(&config_export, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);

@@ -56,7 +56,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, dbconfig_args_in->config_timeout, &rtc);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -69,7 +69,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
 
-	zbx_rtc_notify_config_sync(&rtc);
+	zbx_rtc_notify_config_sync(dbconfig_args_in->config_timeout, &rtc);
 
 	nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 

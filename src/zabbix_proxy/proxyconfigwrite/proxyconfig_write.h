@@ -27,6 +27,6 @@
 int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error);
 
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls,
-		const zbx_config_vault_t *config_vault);
+		const zbx_config_vault_t *config_vault, int config_timeout);
 
 #endif
