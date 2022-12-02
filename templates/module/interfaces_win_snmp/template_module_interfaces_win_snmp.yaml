@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:56Z'
+  date: '2022-10-27T13:38:26Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d7af232ed629481e95d2df9952c519c8
-      template: 'Interfaces Windows SNMP'
-      name: 'Interfaces Windows SNMP'
+      template: 'Interfaces Windows by SNMP'
+      name: 'Interfaces Windows by SNMP'
       description: |
         Template Interfaces Windows
         
@@ -329,9 +329,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: efe4c7dbbd804e41bc1bcd0630afcf09
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -382,21 +382,21 @@ zabbix_export:
             -
               uuid: 31393aeac3b44062b98267fc1f594c52
               expression: |
-                change(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Interfaces Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Interfaces Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -405,8 +405,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -414,13 +414,13 @@ zabbix_export:
             -
               uuid: 232019e4163a4e7ebd63876751721824
               expression: |
-                (avg(/Interfaces Windows SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Interfaces Windows SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Interfaces Windows by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Interfaces Windows by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Interfaces Windows SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Interfaces Windows SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Interfaces Windows by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Interfaces Windows by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -430,8 +430,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -439,12 +439,12 @@ zabbix_export:
             -
               uuid: 9ee9204a4a4044ae82bd0f75299f2a5d
               expression: |
-                min(/Interfaces Windows SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Interfaces Windows SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Interfaces Windows by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Interfaces Windows by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Interfaces Windows SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Interfaces Windows SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Interfaces Windows by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Interfaces Windows by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -454,8 +454,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Interfaces Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Interfaces Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -469,42 +469,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Interfaces Windows SNMP'
+                    host: 'Interfaces Windows by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
       macros:
         -
@@ -583,8 +583,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
+                        host: 'Interfaces Windows by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                        host: 'Interfaces Windows SNMP'
       valuemaps:
         -
           uuid: 4b84f531e2df454a8824070608bfbf49

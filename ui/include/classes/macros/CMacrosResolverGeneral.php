@@ -782,30 +782,34 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param string $function	a trigger function
 	 * @param array  $macros	the list of macros (['{<MACRO>}' => '<value>', ...])
+	 * @param array  $types		the types of macros (see getMacroPositions() for more details)
 	 *
 	 * @return string
 	 */
-	protected function resolveFunctionMacros($function, array $macros) {
+	protected function resolveFunctionMacros($function, array $macros, array $types) {
 		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 
 		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			foreach (array_reverse($hist_function_parser->getParameters(), true) as $i => $parameter) {
-				switch ($parameter['type']) {
-					case CHistFunctionParser::PARAM_TYPE_PERIOD:
-					case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
-					case CHistFunctionParser::PARAM_TYPE_QUOTED:
-						$param = strtr($hist_function_parser->getParam($i), $macros);
+			foreach (array_reverse($hist_function_parser->getParameters()) as $parameter) {
+				$param = $parameter['match'];
+				$forced = false;
 
-						if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-							$param = CExpressionParser::quoteString($param, true,
-								$parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
-							);
-						}
-
-						$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
-
-						break;
+				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED) {
+					$param = CHistFunctionParser::unquoteParam($param);
+					$forced = true;
 				}
+
+				$matched_macros = $this->getMacroPositions($param, $types);
+
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
+				}
+
+				if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+					$param = quoteFunctionParam($param, $forced);
+				}
+
+				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
 			}
 		}
 

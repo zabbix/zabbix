@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2013-10-15 07:19+0300\n"
-"Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
+"PO-Revision-Date: 2022-11-03 08:57+0000\n"
+"Last-Translator: Edgars <edgars.voroboks@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1381814349.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -1338,12 +1339,16 @@ msgstr ""
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2273,12 +2278,11 @@ msgid "Cannot delete graphs"
 msgstr "Grafikus nav iespējams izdzēst"
 
 #: hostgroups.php:134 hostgroups.php:156
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
-msgstr[0] "Grupu nav iespējams dzēst"
-msgstr[1] "Grupu nav iespējams dzēst"
-msgstr[2] "Grupu nav iespējams dzēst"
+msgstr[0] "Nevar izdzēst grupu"
+msgstr[1] "Nevar izdzēst grupas"
+msgstr[2] "Nevar izdzēst grupas"
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
@@ -2403,12 +2407,11 @@ msgid "Cannot delete selected actions"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
-msgstr[0] "Servisu nav iespējams izdzēst"
-msgstr[1] "Servisu nav iespējams izdzēst"
-msgstr[2] "Servisu nav iespējams izdzēst"
+msgstr[0] "Nevar izdzēst servisu"
+msgstr[1] "Nevar izdzēst servisus"
+msgstr[2] "Nevar izdzēst servisus"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -3786,6 +3789,10 @@ msgstr ""
 #: app/views/configuration.correlation.edit.php:155
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
+msgstr ""
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
 msgstr ""
 
 #: app/views/configuration.correlation.edit.php:149
@@ -6634,9 +6641,8 @@ msgid "Event ID"
 msgstr "Notikuma ID"
 
 #: include/actions.inc.php:61
-#, fuzzy
 msgid "Event acknowledged"
-msgstr "Notikums apstiprināts"
+msgstr "Notikums atzīts"
 
 #: app/controllers/CControllerAuditLogList.php:213
 #: app/views/configuration.correlation.list.php:31
@@ -7661,12 +7667,11 @@ msgid "Group added"
 msgstr "Grupa pievienota"
 
 #: hostgroups.php:134 hostgroups.php:155
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Grupa izdzēsta"
-msgstr[1] "Grupa izdzēsta"
-msgstr[2] "Grupa izdzēsta"
+msgstr[1] "Grupas izdzēstas"
+msgstr[2] "Grupas izdzēstas"
 
 #: app/views/administration.miscconfig.edit.php:39
 msgid "Group for discovered hosts"
@@ -7989,12 +7994,11 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:161
 #: include/views/reports.toptriggers.php:86 jsLoader.php:182 jsLoader.php:265
 #: jsLoader.php:373 report2.php:507
-#, fuzzy
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Iekārta"
-msgstr[1] "Iekārta"
-msgstr[2] "Iekārta"
+msgstr[1] "Iekārtas"
+msgstr[2] "Iekārtas"
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71

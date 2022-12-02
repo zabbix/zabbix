@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-28 09:52+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-11-16 13:56+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: \n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -135,12 +135,12 @@ msgstr[1] "%1$s действия"
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s знака"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "остават %1$s знака"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -226,8 +226,8 @@ msgstr[1] "Общо %1$s проблема"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s опит/а остава/т"
+msgstr[1] "Остават %1$s повторни опита"
 
 #: app/views/administration.user.edit.php:667
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -258,13 +258,13 @@ msgstr ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, само за четене"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, избрани"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -288,11 +288,11 @@ msgstr ""
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - безкрайно)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - използвай действие по подразбиране)"
 
 #: include/views/configuration.hostgroups.list.php:36
 msgid "(Only super admins can create groups)"
@@ -307,7 +307,7 @@ msgstr "(без прокси)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - използвай порт по подразбиране"
 
 #: include/triggers.inc.php:1595
 msgid "0 or 1"
@@ -357,11 +357,11 @@ msgstr "500 последни стойности"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<празен низ>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<име на етикет>"
 
 #: include/views/monitoring.sysmap.edit.php:127
 msgid "<manual>"
@@ -417,22 +417,22 @@ msgstr[1] ""
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "API токенът е деактивиран"
 msgstr[1] ""
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
+msgstr[0] "API токенът е активиран"
 msgstr[1] ""
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API токенът е изтекъл"
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "API токенът е актуализиран"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -450,15 +450,15 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:397 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API токени"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Над стойността"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Абциса"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
@@ -471,12 +471,12 @@ msgstr "Достъпът отказан!"
 #: app/views/administration.user.edit.php:599
 #: app/views/administration.userrole.edit.php:271
 msgid "Access to API"
-msgstr ""
+msgstr "Достъп до API"
 
 #: app/views/administration.user.edit.php:452
 #: app/views/administration.userrole.edit.php:81
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Достъп до UI елементи"
 
 #: app/views/administration.user.edit.php:628
 #: app/views/administration.userrole.edit.php:320
@@ -486,7 +486,7 @@ msgstr "Достъп до действия"
 #: app/views/administration.user.edit.php:570
 #: app/views/administration.userrole.edit.php:222
 msgid "Access to modules"
-msgstr ""
+msgstr "Достъп до модули"
 
 #: app/views/administration.user.edit.php:474
 #: app/views/administration.userrole.edit.php:134
@@ -507,7 +507,7 @@ msgstr "Потвърждавам"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Потвърди проблемите"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -520,7 +520,7 @@ msgstr "Потвърдени събития ПРОБЛЕМ"
 
 #: app/views/administration.trigdisplay.edit.php:76
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Потвърдени РАЗРЕШЕНИ събития"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -844,7 +844,7 @@ msgstr ""
 
 #: jsLoader.php:149
 msgid "Add a new widget"
-msgstr ""
+msgstr "Добавете нова джаджа"
 
 #: jsLoader.php:204
 msgid "Add child element"
@@ -860,7 +860,7 @@ msgstr ""
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Добавяне от"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -868,25 +868,25 @@ msgstr "Добави хост"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Добавете колона за елемент"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Добавете липсващо"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Добавете няколко карти"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Добавете нов набор от данни"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
 msgid "Add new interface"
-msgstr ""
+msgstr "Добавете нов интерфейс"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -952,7 +952,7 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Добавено"
 
 #: jsLoader.php:340
 #, c-format
@@ -970,7 +970,7 @@ msgstr ""
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Адрес"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1014,7 +1014,7 @@ msgstr ""
 
 #: app/views/configuration.host.list.php:196
 msgid "Agent encryption"
-msgstr ""
+msgstr "Криптиране от агент"
 
 #: include/classes/data/CItemData.php:817
 msgid "Agent host metadata. Returns string"
@@ -1052,11 +1052,11 @@ msgstr ""
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Предупредително съобщение"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Алгоритъм"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1064,7 +1064,7 @@ msgstr "Псевдоним"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Подравнете елементите на картата"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1087,21 +1087,21 @@ msgstr "Всички"
 
 #: app/views/monitoring.dashboard.view.php:185
 msgid "All dashboards"
-msgstr ""
+msgstr "Всички табла"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Всички графики"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
 #: app/views/administration.user.edit.php:431
 msgid "All groups"
-msgstr ""
+msgstr "Всички групи"
 
 #: app/views/monitoring.host.dashboard.view.php:118 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Всички хостове"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -1109,25 +1109,25 @@ msgstr "Във всички връзки трябва да са уточнени
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Всички карти"
 
 #: include/views/configuration.trigger.prototype.edit.php:513
 #: include/views/configuration.triggers.edit.php:541
 msgid "All problems"
-msgstr ""
+msgstr "Всички проблеми"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:542
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Всички проблеми, ако стойностите на етикета съвпадат"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Всички услуги"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Всички етикети"
 
 #: include/html.inc.php:267
 msgid "All templates"
@@ -1135,7 +1135,7 @@ msgstr ""
 
 #: app/views/administration.userrole.edit.php:289
 msgid "Allow list"
-msgstr ""
+msgstr "Списък с разрешени"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:526
@@ -1176,7 +1176,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:181
 #: include/views/configuration.triggers.edit.php:381
 msgid "And"
-msgstr ""
+msgstr "И"
 
 #: app/partials/monitoring.host.filter.php:32
 #: app/partials/monitoring.latest.filter.php:93
@@ -1199,11 +1199,11 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:141
 #: include/views/js/monitoring.sysmaps.js.php:236
 msgid "And/Or"
-msgstr ""
+msgstr "И/Или"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Ежегодно"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:59
@@ -1295,7 +1295,7 @@ msgstr ""
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Както е"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1402,13 +1402,13 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:340
 msgid "Attempt interval"
-msgstr ""
+msgstr "Интервал на опитите"
 
 #: app/views/administration.mediatype.edit.php:335 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:76
 #: include/views/configuration.httpconf.list.php:137
 msgid "Attempts"
-msgstr ""
+msgstr "Опити"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -1426,7 +1426,7 @@ msgstr "Одит"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr ""
+msgstr "Одитен дневник"
 
 #: app/views/administration.housekeeping.edit.php:179
 msgid "Audit settings"
@@ -1499,22 +1499,22 @@ msgstr ""
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:76
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: app/views/administration.miscconfig.edit.php:86
 msgid "Authorization"
-msgstr ""
+msgstr "Упълномощаване"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Автоматичен"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:228
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Автоматичен"
 
 #: app/views/administration.user.edit.php:257
 msgid "Auto-login"
@@ -1526,7 +1526,7 @@ msgstr ""
 
 #: app/views/administration.user.edit.php:262
 msgid "Auto-logout"
-msgstr ""
+msgstr "Автоматично излизане"
 
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
@@ -1538,7 +1538,6 @@ msgid "Automatic"
 msgstr "Автоматично"
 
 #: include/views/monitoring.sysmap.edit.php:138
-#, fuzzy
 msgid "Automatic icon mapping"
 msgstr "Автоматично съответствие на икона"
 
@@ -1555,7 +1554,7 @@ msgstr "Автоматичен избор на икона"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Автоматично регистриране"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
@@ -1601,12 +1600,12 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Оси"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:755
 msgid "Back"
-msgstr ""
+msgstr "Обратно"
 
 #: app/views/administration.image.edit.php:73
 #: app/views/administration.image.list.php:51
@@ -1617,7 +1616,7 @@ msgstr "Фон"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:564
 msgid "Background color"
-msgstr ""
+msgstr "Цвят на фона"
 
 #: include/views/monitoring.sysmap.edit.php:121
 msgid "Background image"
@@ -1642,15 +1641,15 @@ msgstr ""
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Основен"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Преди стойност"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Под стойност"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1663,7 +1662,7 @@ msgstr " Парола за връзката (Bind password)"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Битове за отместване"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
@@ -1675,14 +1674,14 @@ msgstr "Блокиран"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Син"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:399
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Body"
-msgstr ""
+msgstr "Тяло"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:401
@@ -1696,7 +1695,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Удебелен"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
 #: include/views/js/monitoring.sysmaps.js.php:870
@@ -1709,7 +1708,7 @@ msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:409
 msgid "Border"
-msgstr ""
+msgstr "Рамка"
 
 #: include/views/js/monitoring.sysmaps.js.php:595
 msgid "Border color"
@@ -1775,7 +1774,7 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:376
 msgid "CLOSING"
-msgstr ""
+msgstr "ЗАТВАРЯНЕ"
 
 #: include/classes/data/CItemData.php:1073
 msgid "CPU information. Returns string or integer"
@@ -1825,7 +1824,7 @@ msgstr "Изчислено"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Календар"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -2026,7 +2025,7 @@ msgstr "Не може да се добави потребител"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Не може да се добави потребителска група"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2039,7 +2038,7 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Не може да се премахне"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2151,7 +2150,6 @@ msgid "Cannot create discovery rule"
 msgstr "Не може да се създаде правило за откриване"
 
 #: app/controllers/CControllerIconMapCreate.php:56
-#, fuzzy
 msgid "Cannot create icon map"
 msgstr "Не може да се създаде съответствие на икона"
 
@@ -2219,11 +2217,10 @@ msgid "Cannot delete dependency"
 msgstr "Не може да се изтрие зависимостта"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "Не може да се изтрие правило за откриване"
-msgstr[1] "Не може да се изтрие правило за откриване"
+msgstr[0] "Не може да се изтрие правило за \"откриване\""
+msgstr[1] ""
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2246,11 +2243,10 @@ msgid "Cannot delete graphs"
 msgstr "Не може да се изтрият графиките"
 
 #: hostgroups.php:134 hostgroups.php:156
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Не може да се изтрие групата"
-msgstr[1] "Не може да се изтрие групата"
+msgstr[1] ""
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
@@ -2275,7 +2271,6 @@ msgid "Cannot delete host prototypes"
 msgstr ""
 
 #: app/controllers/CControllerIconMapDelete.php:65
-#, fuzzy
 msgid "Cannot delete icon map"
 msgstr "Не може да се изтрие съответствие на икона"
 
@@ -2368,11 +2363,10 @@ msgid "Cannot delete selected actions"
 msgstr "Не може да се изтрият избраните действия "
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Не може да се изтрие услугата"
-msgstr[1] "Не може да се изтрие услугата"
+msgstr[1] ""
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -2444,7 +2438,7 @@ msgstr[1] ""
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "Не може да се изтрие потребителска групата"
 msgstr[1] ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
@@ -2460,13 +2454,13 @@ msgstr "Не може да се изтрие уеб сценарий"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
+msgstr[0] "API токенът не може да се деактивира"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
+msgstr[0] "Не може да се деактивира SLA"
 msgstr[1] ""
 
 #: actionconf.php:499
@@ -2491,13 +2485,13 @@ msgstr[1] ""
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
+msgstr[0] "Не може да деактивира хоста"
 msgstr[1] ""
 
 #: items.php:925
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
+msgstr[0] "Елементът не може да бъде деактивиран"
 msgstr[1] ""
 
 #: app/controllers/CControllerMediatypeDisable.php:75
@@ -3136,7 +3130,7 @@ msgstr ""
 #: app/controllers/CControllerTokenUpdate.php:47
 #: app/controllers/CControllerTokenUpdate.php:122
 msgid "Cannot update API token"
-msgstr ""
+msgstr "API токенът не може да бъде обновен"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3719,6 +3713,10 @@ msgstr "Затвори израз конструктора"
 #: app/views/configuration.correlation.edit.php:155
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
+msgstr ""
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
 msgstr ""
 
 #: app/views/configuration.correlation.edit.php:149
@@ -8423,7 +8421,6 @@ msgstr "Икона изпъкване"
 
 #: app/views/administration.iconmap.edit.php:132
 #: app/views/administration.iconmap.list.php:39
-#, fuzzy
 msgid "Icon map"
 msgstr "Съответствие на икона"
 
@@ -8448,7 +8445,6 @@ msgid "Icon map deleted"
 msgstr "Съответствие на икона изтрита"
 
 #: app/controllers/CControllerIconMapUpdate.php:60
-#, fuzzy
 msgid "Icon map updated"
 msgstr "Съответствие на икона актуализирана"
 
@@ -8456,7 +8452,6 @@ msgstr "Съответствие на икона актуализирана"
 #: app/views/administration.iconmap.edit.php:29
 #: app/views/administration.iconmap.list.php:27
 #: include/classes/helpers/CMenuHelper.php:258 include/html.inc.php:894
-#, fuzzy
 msgid "Icon mapping"
 msgstr "Съответствие на икона"
 
@@ -19927,11 +19922,10 @@ msgid "Web scenario deleted"
 msgstr "Уеб сценарий изтрит"
 
 #: httpconf.php:413
-#, fuzzy
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Уеб сценарий изключен"
-msgstr[1] "Уеб сценарий изключен"
+msgstr[1] ""
 
 #: httpconf.php:412
 msgid "Web scenario enabled"

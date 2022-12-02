@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-15T18:02:46Z'
+  date: '2022-10-27T12:58:38Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: a326034825984bbd8a3a5885f3939bb3
-      template: 'Juniper SNMP'
-      name: 'Juniper SNMP'
+      template: 'Juniper by SNMP'
+      name: 'Juniper by SNMP'
       description: |
         Template Net Juniper
         
@@ -44,7 +44,7 @@ zabbix_export:
           triggers:
             -
               uuid: d90e80fd900246dcab90447ee2a6a7a1
-              expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+              expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -70,14 +70,14 @@ zabbix_export:
           triggers:
             -
               uuid: d3911ede372e4eb3b89b30e8e340a716
-              expression: 'min(/Juniper SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+                  expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -103,17 +103,17 @@ zabbix_export:
           triggers:
             -
               uuid: 751d9855903f4f00b674b511fe992121
-              expression: 'avg(/Juniper SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Juniper by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Juniper SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+                  expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -231,7 +231,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9f1f3316ed6f4d50a4c9f71a15f35d50
-              expression: 'last(/Juniper SNMP/system.hw.serialnumber,#1)<>last(/Juniper SNMP/system.hw.serialnumber,#2) and length(last(/Juniper SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Juniper by SNMP/system.hw.serialnumber,#1)<>last(/Juniper by SNMP/system.hw.serialnumber,#2) and length(last(/Juniper by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -318,7 +318,7 @@ zabbix_export:
           triggers:
             -
               uuid: 97157acd882944e29d6fb9fa1a2d9506
-              expression: 'last(/Juniper SNMP/system.name,#1)<>last(/Juniper SNMP/system.name,#2) and length(last(/Juniper SNMP/system.name))>0'
+              expression: 'last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -404,7 +404,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1190bb9c05424ac5a0052bd191c274f2
-              expression: 'count(/Juniper SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              expression: 'count(/Juniper by SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -445,7 +445,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9249511ecf4a4a2d952aa0c4fe55a5d0
-              expression: 'last(/Juniper SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper SNMP/system.sw.os[sysDescr.0]))>0'
+              expression: 'last(/Juniper by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper by SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -453,7 +453,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Juniper SNMP/system.name,#1)<>last(/Juniper SNMP/system.name,#2) and length(last(/Juniper SNMP/system.name))>0'
+                  expression: 'last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -482,7 +482,7 @@ zabbix_export:
           triggers:
             -
               uuid: 417527b3749c4a1c891d761c0978fb2e
-              expression: 'max(/Juniper SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -490,7 +490,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Juniper SNMP/icmpping,#3)=0'
+                  expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -533,7 +533,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 248c49bc4f47437b9b91e20b57da197d
-                  expression: 'min(/Juniper SNMP/system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Juniper by SNMP/system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#SNMPVALUE}: High CPU utilization'
                   event_name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -563,7 +563,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ab1f3dcba55d41da974c3ac60ca5b8f2
-                  expression: 'min(/Juniper SNMP/vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Juniper by SNMP/vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
                   event_name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -586,7 +586,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]'
             -
               uuid: 646779d729d8417383eb0e1240a69767
@@ -598,7 +598,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]'
         -
           uuid: 6e60561a198d43cf8c0fbe9a8ba1c492
@@ -628,7 +628,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f8f1dee0b0ff465d98c6f6bcdfaff17f
-                  expression: 'count(/Juniper SNMP/sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Juniper by SNMP/sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -671,7 +671,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e577226331f6483fbd1e414bb7d365f7
-                  expression: 'count(/Juniper SNMP/sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Juniper by SNMP/sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -719,9 +719,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c82ca2b550f540b7a4c8f9548e15cfb0
-                  expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -736,9 +736,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 51113c80e4bd46de8ea247e0bd3b19dd
-                  expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above warning threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -747,8 +747,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above critical threshold'
-                      expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
-                      recovery_expression: 'max(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                      expression: 'avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                      recovery_expression: 'max(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
                   tags:
                     -
                       tag: scope
@@ -758,9 +758,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 35b56753b2424f0989ca09cb67f7d9a3
-                  expression: 'avg(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Juniper SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
+                  recovery_expression: 'min(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low'
                   event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1076,9 +1076,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c993121dca984691bd2cdf0d41c318b4
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1129,21 +1129,21 @@ zabbix_export:
             -
               uuid: faabf122af7e4cca8fdc6e57060b2e69
               expression: |
-                change(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Juniper SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1152,8 +1152,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1161,13 +1161,13 @@ zabbix_export:
             -
               uuid: f937622c6f7540579a60328398430f00
               expression: |
-                (avg(/Juniper SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Juniper SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Juniper by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Juniper by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Juniper SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Juniper SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Juniper SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Juniper by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Juniper by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1177,8 +1177,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1186,12 +1186,12 @@ zabbix_export:
             -
               uuid: 5731e4345a544b45b6a70a71284b878d
               expression: |
-                min(/Juniper SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Juniper SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Juniper by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Juniper by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Juniper SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Juniper SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Juniper by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Juniper by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1201,8 +1201,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Juniper SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1219,42 +1219,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Juniper SNMP'
+                    host: 'Juniper by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: f4446053584f49fcb1375a3a4ba537e9
@@ -1324,7 +1324,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a2f686bf06cc4e0a8aa24675abd5d557
-                  expression: 'last(/Juniper SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Juniper by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1475,7 +1475,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Juniper SNMP'
+                        host: 'Juniper by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2439,7 +2439,7 @@ zabbix_export:
   triggers:
     -
       uuid: 23e25e580543411ab8ffc2a4c1ca3c54
-      expression: '(last(/Juniper SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2448,7 +2448,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Juniper SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
