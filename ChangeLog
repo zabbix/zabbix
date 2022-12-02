@@ -1,8 +1,8 @@
 Changes for 6.0.12rc2
 
 Bug fixes:
-.......PS. [ZBX-22001] enabled back support for response decompression (HTTP header "Accept-Encoding") in web monitoring (revert of ZBX-21765) (dimir)
-........S. [ZBX-22000] fixed and/or evaluation in lld filters/overrides (wiper)
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12rc1
