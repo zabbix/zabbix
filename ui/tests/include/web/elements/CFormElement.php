@@ -115,7 +115,7 @@ class CFormElement extends CElement {
 	 * Get collection of form label elements.
 	 *
 	 * @param CElementFilter $filter        condition to be filtered
-	 * @param array          $filter_params filter params
+	 * @param array          $filter_params filter parameters
 	 *
 	 * @return CElementCollection
 	 */
@@ -213,10 +213,11 @@ class CFormElement extends CElement {
 	 * Get collection of element fields indexed by label name.
 	 *
 	 * @param CElementFilter $filter    condition to be filtered by
+	 * @param array			 $params	condition parameters to be set
 	 *
 	 * @return CElementCollection
 	 */
-	public function getFields($filter = null) {
+	public function getFields($filter = null, $params = []) {
 		$fields = [];
 
 		foreach ($this->getLabels() as $label) {
@@ -233,7 +234,7 @@ class CFormElement extends CElement {
 		$this->fields = new CElementCollection($fields);
 
 		if ($filter !== null) {
-			$this->fields = $this->fields->filter(new CElementFilter($filter));
+			$this->fields = $this->fields->filter(new CElementFilter($filter, $params));
 		}
 
 		return $this->fields;
@@ -451,8 +452,8 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	 * @inheritdoc
+	 */
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
@@ -550,6 +551,16 @@ class CFormElement extends CElement {
 	 */
 	public function isRequired($label) {
 		return $this->getLabel($label)->hasClass('form-label-asterisk');
+	}
+
+	/**
+	 * Get the mandatory labels marked with an asterisk.
+	 *
+	 * @return array
+	 */
+	public function getRequiredLabels() {
+		return $this->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
+				->filter(CElementFilter::VISIBLE)->asText();
 	}
 
 	/**

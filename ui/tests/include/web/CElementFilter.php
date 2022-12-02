@@ -134,7 +134,7 @@ class CElementFilter {
 	 * Determine whether this element matches the filter or not.
 	 *
 	 * @param CElement $element		element to be checked
-	 * @param mix	   $key			element кеу in the collection array
+	 * @param mixed	   $key			element кеу in the collection array
 	 *
 	 * @return boolean
 	 */
@@ -145,7 +145,7 @@ class CElementFilter {
 
 		$method = self::getConditionCallable($this->type);
 
-		$callable = call_user_func_array([$element, $method], $this->params);
+		$callable = call_user_func_array([$element, $method], [$this->params]);
 		try {
 			if (call_user_func($callable) === true) {
 				return true;
