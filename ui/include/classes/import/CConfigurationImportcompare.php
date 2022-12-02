@@ -200,21 +200,15 @@ class CConfigurationImportcompare {
 		$before = $this->addUniquenessParameterByEntityType($before, $type);
 		$after = $this->addUniquenessParameterByEntityType($after, $type);
 
-		// Be sure that every entity has uuid.
-		foreach ($before as &$entity) {
-			$entity += ['uuid' => ''];
-		}
-		unset($entity);
-
-		foreach ($after as &$entity) {
-			$entity += ['uuid' => ''];
-		}
-		unset($entity);
-
 		$same_entities = [];
 
-		foreach ($before as $b_key => $before_entity){
-			foreach ($after as $a_key => $after_entity) {
+		foreach ($after as $a_key => $after_entity) {
+			if (!array_key_exists('uuid', $after_entity)) {
+				unset($after[$a_key]);
+				continue;
+			}
+
+			foreach ($before as $b_key => $before_entity) {
 				if ($before_entity['uuid'] == $after_entity['uuid']
 						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
