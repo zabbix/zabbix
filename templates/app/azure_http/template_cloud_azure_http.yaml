@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-01T13:17:07Z'
+  date: '2022-12-02T06:07:08Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -3135,7 +3135,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are number of the current flows in the outbound direction (traffic going out of the VM).'
+          description: 'Outbound Flows are a number of the current flows in the outbound direction (traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
