@@ -834,10 +834,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(discoverer_thread, args)
 {
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_thread_discoverer_args	*discoverer_args_in = (zbx_thread_discoverer_args *)
 							(((zbx_thread_args_t *)args)->args);
-#endif
 	int				sleeptime = -1, rule_count = 0, old_rule_count = 0;
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
