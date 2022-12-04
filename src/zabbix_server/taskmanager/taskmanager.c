@@ -575,7 +575,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity"
+			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity,a.action"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -596,6 +596,10 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 					" was removed");
 			continue;
 		}
+
+		/* do not notify about rank changes */
+		if (0 != (atoi(row[5]) & (ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)))
+			continue;
 
 		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));
 
