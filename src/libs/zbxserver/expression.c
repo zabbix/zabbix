@@ -2933,152 +2933,150 @@ static const char	*trigger_value_string(unsigned char value)
 	}
 }
 
-static const ZBX_DB_EVENT	*get_cause_recovery_event(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *eventids,
-		zbx_vector_ptr_t *r_events)
-{
-	const ZBX_DB_EVENT		*c_event = event;
-	zbx_vector_uint64_t		r_eventids;
-	zbx_vector_uint64_pair_t	dummy_event_pairs;
-
-	zbx_vector_uint64_create(&r_eventids);
-	zbx_vector_uint64_pair_create(&dummy_event_pairs);
-
-	zbx_db_get_eventid_r_eventid_pairs(eventids, &dummy_event_pairs, &r_eventids);
-
-	if (0 != r_eventids.values_num)
-	{
-		zbx_db_get_events_by_eventids(&r_eventids, r_events);
-
-		if (0 != r_events->values_num)
-			c_event = r_events->values[0];
-	}
-
-	zbx_vector_uint64_destroy(&r_eventids);
-	zbx_vector_uint64_pair_destroy(&dummy_event_pairs);
-
-	return c_event;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: request cause event value by macro                                *
  *                                                                            *
  ******************************************************************************/
 static void	get_event_cause_value(const char *macro, char **replace_to, const ZBX_DB_EVENT *event,
-		const zbx_uint64_t *recipient_userid, const char *tz, char *error, int maxerrlen)
+		ZBX_DB_EVENT **cause_event, ZBX_DB_EVENT **cause_recovery_event, const zbx_uint64_t *recipient_userid,
+		const char *tz, char *error, int maxerrlen)
 {
-	zbx_uint64_t		cause_eventid;
-	const ZBX_DB_EVENT	*cause_event;
-	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events, r_events;
+	ZBX_DB_EVENT		*c_event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
 			event->name);
 
-	if (0 == (cause_eventid = zbx_db_get_cause_eventid(event->eventid)))
+	if (NULL == *cause_event)
+		zbx_db_prepare_empty_event(zbx_db_get_cause_eventid(event->eventid), cause_event);
+
+	if (0 == (*cause_event)->eventid)
 		goto out;
 
-	zbx_vector_uint64_create(&eventids);
-	zbx_vector_ptr_create(&events);
+	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION) ||
+			0 == strcmp(macro, MVAR_EVENT_CAUSE_STATUS) ||
+			0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE) ||
+			0 == strcmp(macro, MVAR_EVENT_CAUSE_OPDATA))
+	{
+		if (NULL == *cause_recovery_event)
+		{
+			zbx_vector_uint64_t		eventids, r_eventids;
+			zbx_vector_uint64_pair_t	dummy_event_pairs;
 
-	zbx_vector_uint64_append(&eventids, cause_eventid);
-	zbx_db_get_events_by_eventids(&eventids, &events);
+			zbx_vector_uint64_create(&eventids);
+			zbx_vector_uint64_create(&r_eventids);
+			zbx_vector_uint64_pair_create(&dummy_event_pairs);
 
-	if (0 == events.values_num)
-		goto clean;
+			zbx_vector_uint64_append(&eventids, (*cause_event)->eventid);
+			zbx_db_get_eventid_r_eventid_pairs(&eventids, &dummy_event_pairs, &r_eventids);
 
-	zbx_vector_ptr_create(&r_events);
+			zbx_db_prepare_empty_event(0 != r_eventids.values_num ? r_eventids.values[0] : 0,
+					cause_recovery_event);
 
-	cause_event = events.values[0];
+			zbx_vector_uint64_destroy(&eventids);
+			zbx_vector_uint64_destroy(&r_eventids);
+			zbx_vector_uint64_pair_destroy(&dummy_event_pairs);
+		}
+
+		c_event = (0 != (*cause_recovery_event)->eventid) ? *cause_recovery_event : *cause_event;
+	}
+	else
+		c_event = *cause_event;
+
+	zbx_db_get_event_data_core(c_event);
+
+	if (0 == (ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE & c_event->flags))
+		goto out;
 
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_HISTORY))
 	{
-		get_event_update_history(cause_event, replace_to, recipient_userid, tz);
+		get_event_update_history(c_event, replace_to, recipient_userid, tz);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ACK_STATUS))
 	{
-		*replace_to = zbx_strdup(*replace_to, cause_event->acknowledged ? "Yes" : "No");
+		*replace_to = zbx_strdup(*replace_to, c_event->acknowledged ? "Yes" : "No");
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_AGE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - c_event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DATE))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_date2str(cause_event->clock, tz));
+		*replace_to = zbx_strdup(*replace_to, zbx_date2str(c_event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION))
 	{
-		if (cause_event == (event = get_cause_recovery_event(cause_event, &eventids, &r_events)))
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+		if (NULL != cause_recovery_event && 0 != (*cause_recovery_event)->eventid)
+		{
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str((*cause_recovery_event)->clock -
+					c_event->clock));
+		}
 		else
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(event->clock - cause_event->clock));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - c_event->clock));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ID))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, cause_event->eventid);
+		*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, c_event->eventid);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NAME))
 	{
-		*replace_to = zbx_strdup(*replace_to, cause_event->name);
+		*replace_to = zbx_strdup(*replace_to, c_event->name);
 	}
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_STATUS))
 	{
-		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
-
-		*replace_to = zbx_strdup(*replace_to, event_value_string((unsigned char)cause_event->source,
-				(unsigned char)cause_event->object, (unsigned char)cause_event->value));
+		*replace_to = zbx_strdup(*replace_to, event_value_string((unsigned char)c_event->source,
+				(unsigned char)c_event->object, (unsigned char)c_event->value));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
 	{
-		get_event_tags(cause_event, replace_to);
+		zbx_db_get_event_data_tags(c_event);
+		get_event_tags(c_event, replace_to);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGSJSON))
 	{
-		get_event_tags_json(cause_event, replace_to);
+		zbx_db_get_event_data_tags(c_event);
+		get_event_tags_json(c_event, replace_to);
 	}
 	else if (0 == strncmp(macro, MVAR_EVENT_CAUSE_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX)))
 	{
-		get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX), cause_event, replace_to);
+		zbx_db_get_event_data_tags(c_event);
+		get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX), c_event, replace_to);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TIME))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_time2str(cause_event->clock, tz));
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(c_event->clock, tz));
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE))
 	{
-		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
-		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->value);
+		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->value);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
-		if (FAIL == get_trigger_severity_name((unsigned char)cause_event->severity, replace_to))
+		if (FAIL == get_trigger_severity_name((unsigned char)c_event->severity, replace_to))
 			*replace_to = zbx_strdup(*replace_to, "unknown");
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NSEVERITY))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", (int)cause_event->severity);
+		*replace_to = zbx_dsprintf(*replace_to, "%d", (int)c_event->severity);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OBJECT))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->object);
+		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->object);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SOURCE))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->source);
+		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->source);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OPDATA))
 	{
-		cause_event = get_cause_recovery_event(cause_event, &eventids, &r_events);
-		resolve_opdata(cause_event, replace_to, tz, error, maxerrlen);
-	}
+		zbx_db_get_event_data_tags(c_event);
+		zbx_db_get_event_data_triggers(c_event);
 
-	zbx_vector_ptr_clear_ext(&r_events, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&r_events);
-clean:
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&events);
-	zbx_vector_uint64_destroy(&eventids);
+		if (0 == (ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS & c_event->flags))
+			goto out;
+
+		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -3107,6 +3105,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 	char				*expression = NULL, *user_username = NULL, *user_name = NULL,
 					*user_surname = NULL;
 	zbx_dc_um_handle_t		*um_handle;
+	ZBX_DB_EVENT			*cause_event = NULL, *cause_recovery_event = NULL;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -3265,7 +3264,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 				{
-					get_event_cause_value(m, &replace_to, event, userid, tz, error, maxerrlen);
+					get_event_cause_value(m, &replace_to, event, &cause_event,
+							&cause_recovery_event, userid, tz, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
 				{
@@ -5229,6 +5229,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 	zbx_vector_uint64_destroy(&hostids);
 
 	zbx_dc_close_user_macros(um_handle);
+
+	if (NULL != cause_event)
+		zbx_db_free_event(cause_event);
+
+	if (NULL != cause_recovery_event)
+		zbx_db_free_event(cause_recovery_event);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __func__, *data);
 

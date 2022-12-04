@@ -268,6 +268,10 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
 #define ZBX_FLAGS_DB_EVENT_RECOVER		0x0004
+/* flags to indicate data retrieved from DB, used for cause event macros */
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE	0x0008
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS	0x0010
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
 ZBX_DB_EVENT;
