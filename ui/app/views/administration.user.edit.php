@@ -872,3 +872,7 @@ $user_form->addItem($tabs);
 $html_page
 	->addItem($user_form)
 	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

@@ -25,15 +25,42 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function($) {
-		$('form[name="user_form"]').submit(function() {
-			$(this).trimValues(['#autologout', '#refresh', '#url']);
-		});
 
-		$('#messages_enabled').on('change', function() {
-			$('input, button, z-select', $('#messagingTab'))
-				.not('[name="messages[enabled]"]')
-				.prop('disabled', !this.checked);
-		}).trigger('change');
-	});
+	const view = new class {
+
+		init() {
+			document.getElementById('user-form').addEventListener('submit', (e) => {
+				if (!this._userFormSubmit()) {
+					e.preventDefault();
+				}
+			});
+
+			$('#messages_enabled').on('change', function() {
+				$('input, button, z-select', $('#messagingTab'))
+					.not('[name="messages[enabled]"]')
+					.prop('disabled', !this.checked);
+			}).trigger('change');
+
+		}
+
+		_userFormSubmit() {
+			const fields_to_trim = ['#autologout', '#refresh', '#url'];
+			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
+				elem.value = elem.value.trim();
+			});
+
+			const password1 = document.getElementById('password1').value;
+			const password2 = document.getElementById('password2').value;
+
+			const warning_msg = <?= json_encode(
+				_('In case of successful password change user will be logged out of all active sessions. Continue?')
+			) ?>;
+
+			if (password1 !== '' && password2 !== '' ) {
+				return confirm(warning_msg);
+			} else {
+				return true;
+			}
+		}
+	}
 </script>

@@ -499,16 +499,16 @@ class CUser extends CApiService {
 				}
 			}
 
-			if ($user['userid'] == self::$userData['userid'] && self::$userData['roleid'] == USER_TYPE_SUPER_ADMIN
-					&& !array_key_exists('current_passwd', $user)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Current password is mandatory.!!!!!'));
+			if (array_key_exists('passwd', $user) && $this->checkPassword($user + $db_user, '/'.($i + 1).'/passwd')) {
+				if ($user['userid'] == self::$userData['userid'] && self::$userData['roleid'] == USER_TYPE_SUPER_ADMIN
+						&& !array_key_exists('current_passwd', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Current password is mandatory.'));
+				}
+
+				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
 
 			unset($user['current_passwd']);
-
-			if (array_key_exists('passwd', $user) && $this->checkPassword($user + $db_user, '/'.($i + 1).'/passwd')) {
-				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
-			}
 
 			if (array_key_exists('roleid', $user) && $user['roleid'] && $user['roleid'] != $db_user['roleid']) {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
@@ -626,15 +626,7 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		foreach ($users as $user) {
-			if (array_key_exists('passwd', $user)) {
-				DB::update('sessions', [
-					'values' => ['status' => ZBX_SESSION_PASSIVE],
-					'where' => ['userid' => $user['userid']]
-				]);
-			}
-		}
-
+		self::terminateActiveSessionsOnPasswordUpdate($users);
 		self::updateUsersGroups($users, $db_users);
 		self::updateMedias($users, $db_users);
 	}
@@ -1068,6 +1060,24 @@ class CUser extends CApiService {
 		}
 
 		return $user;
+	}
+
+	/**
+	 * Terminate all active sessions for user whose password was successfully updated.
+	 *
+	 * @static
+	 *
+	 * @param array      $users
+	 */
+	private static function terminateActiveSessionsOnPasswordUpdate(array $users): void {
+		foreach ($users as $user) {
+			if (array_key_exists('passwd', $user)) {
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['userid' => $user['userid']]
+				]);
+			}
+		}
 	}
 
 	/**

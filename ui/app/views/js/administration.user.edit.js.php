@@ -25,15 +25,41 @@
 ?>
 
 <script type="text/javascript">
-	jQuery(function($) {
-		let $form = $('form[name="user_form"]').submit(function() {
-			$(this).trimValues(['#username', '#name', '#surname', '#autologout', '#refresh', '#url']);
-		});
+	const view = new class {
 
-		$('#roleid').change(function() {
-			if ($(this).find('[name=roleid]').length) {
-				$form.submit();
+		init() {
+			document.getElementById('user-form').addEventListener('submit', (e) => {
+				if (!this._userFormSubmit()) {
+					e.preventDefault();
+				}
+			});
+
+			$('#roleid').change(function() {
+				if (this.querySelectorAll('[name="roleid"]').length > 0) {
+					document.getElementById('user-form').submit();
+				}
+			});
+		}
+
+		_userFormSubmit() {
+			const fields_to_trim = ['#username', '#name', '#surname', '#autologout', '#refresh', '#url'];
+			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
+				elem.value = elem.value.trim();
+			});
+
+			const password1 = document.getElementById('password1').value;
+			const password2 = document.getElementById('password2').value;
+
+			if (password1 !== '' && password2 !== '') {
+				const warning_msg = <?= json_encode(
+					_('In case of successful password change user will be logged out of all active sessions. Continue?')
+				) ?>;
+
+				return confirm(warning_msg);
 			}
-		});
-	});
+			else {
+				return true;
+			}
+		}
+	}
 </script>
