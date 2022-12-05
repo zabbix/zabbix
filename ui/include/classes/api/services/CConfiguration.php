@@ -240,9 +240,6 @@ class CConfiguration extends CApiService {
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
 
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
-
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
@@ -304,9 +301,6 @@ class CConfiguration extends CApiService {
 
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
-
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
