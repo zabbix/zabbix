@@ -50,7 +50,7 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_con
  * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_register_stats_ext_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
+void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
 {
 	zbx_stats_ext_func_entry_t	*entry;
 
@@ -67,7 +67,7 @@ void	zbx_register_stats_ext_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
  * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_register_stats_data_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
+void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
 {
 	zbx_stats_ext_func_entry_t	*entry;
 
@@ -81,11 +81,11 @@ void	zbx_register_stats_data_func(zbx_stats_ext_get_func_t stats_ext_get_cb)
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
- * Parameters: json       - [OUT] the json data                               *
- *             zbx_config - [IN] Zabbix server/proxy config                   *
+ * Parameters: json             - [OUT] the json data                         *
+ *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	int i;
 	zbx_config_cache_info_t	count_stats;
@@ -115,7 +115,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_data_funcs.values_num; i++)
 	{
-		stats_data_funcs.values[i]->stats_ext_get_cb(json, zbx_config);
+		stats_data_funcs.values[i]->stats_ext_get_cb(json, zbx_config_comms);
 	}
 
 	/* zabbix[rcache,<cache>,<mode>] */
@@ -178,7 +178,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_ext_funcs.values_num; i++)
 	{
-		stats_ext_funcs.values[i]->stats_ext_get_cb(json, zbx_config);
+		stats_ext_funcs.values[i]->stats_ext_get_cb(json, zbx_config_comms);
 	}
 
 	/* zabbix[process,<type>,<mode>,<state>] */

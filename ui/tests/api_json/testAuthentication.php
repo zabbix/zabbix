@@ -22,9 +22,18 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup userdirectory_ldap, userdirectory, config
+ * @backup userdirectory, userdirectory_ldap, userdirectory_saml, userdirectory_idpgroup, userdirectory_usrgrp, userdirectory_media, config, usrgrp
  */
 class testAuthentication extends CAPITest {
+
+	public const TEST_DATA_TO_RESOLVE = [
+		'disabled_usrgrpid' => 'Disabled user group for API tests'
+	];
+
+	public static $data = [
+		'disabled_usrgrpid' => null
+	];
+
 	public static function authentication_get_data() {
 		return [
 			'Test getting authentication general data' => [
@@ -167,7 +176,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": a number is expected.'
 			],
 			'Cannot set default authentication ldap when ldap is disabled' => [
 				'authentication' => [
@@ -221,7 +230,7 @@ class testAuthentication extends CAPITest {
 			],
 			'Test valid deprovisioning group setup' => [
 				'authentication' => [
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
 				],
 				'expected_error' => null
 			],
@@ -262,7 +271,7 @@ class testAuthentication extends CAPITest {
 			'Test valid LDAP JIT status' => [
 				'authentication' => [
 					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
 				],
 				'expected_error' => null
 			],
@@ -295,7 +304,7 @@ class testAuthentication extends CAPITest {
 			'Test valid SAML JIT status' => [
 				'authentication' => [
 					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
 				],
 				'expected_error' => null
 			]
@@ -307,6 +316,8 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
+		$authentication = self::resolveInstanceData($authentication);
+
 		if ($expected_error === null) {
 			// Before updating, collect old authentication data.
 			$fields = '';
@@ -347,5 +358,30 @@ class testAuthentication extends CAPITest {
 			// Call method and make sure it really returns the error.
 			$this->call('authentication.update', $authentication, $expected_error);
 		}
+	}
+
+	public static function resolveInstanceData(array $test_data): array {
+
+		foreach (self::TEST_DATA_TO_RESOLVE as $field => $value_not_set) {
+			if (array_key_exists($field, $test_data) && $test_data[$field] === $value_not_set) {
+				switch ($field) {
+					case 'disabled_usrgrpid':
+						if (!self::$data['disabled_usrgrpid']) {
+							$params = [[
+								'name' => 'Disabled user group for API tests',
+								'users_status' => GROUP_STATUS_DISABLED
+							]];
+							$response = CDataHelper::call('usergroup.create', $params);
+							self::$data['disabled_usrgrpid'] = reset($response['usrgrpids']);
+						}
+
+						$test_data['disabled_usrgrpid'] = self::$data['disabled_usrgrpid'];
+
+						break;
+				}
+			}
+		}
+
+		return $test_data;
 	}
 }

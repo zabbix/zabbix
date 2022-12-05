@@ -10,7 +10,6 @@ DIST_SUBDIRS = \
 	zbxcompress \
 	zbxconf \
 	zbxcrypto \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -29,7 +28,6 @@ DIST_SUBDIRS = \
 	zbxgetopt \
 	zbxha \
 	zbxhash \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
@@ -69,7 +67,6 @@ SERVER_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
 	zbxcompress \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -84,7 +81,6 @@ SERVER_SUBDIRS = \
 	zbxexport \
 	zbxexpr \
 	zbxha \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
@@ -115,7 +111,6 @@ PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxavailability \
 	zbxcompress \
-	zbxcyberark \
 	zbxdb \
 	zbxcacheconfig \
 	zbxcachehistory \
@@ -128,7 +123,6 @@ PROXY_SUBDIRS = \
 	zbxembed \
 	zbxeval \
 	zbxexport \
-	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
 	zbxicmpping \
@@ -194,3 +188,9 @@ EXTRA_DIST = \
 	zbxsymbols \
 	zbxwin32 \
 	zbxwinservice
+
+## hashicorp and cyberark used to be a separate libraries, remove them at some point in the future
+clean: clean-recursive
+	rm -rf hashicorp && \
+	rm -rf cyberark
+.PHONY: clean
