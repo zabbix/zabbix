@@ -41,8 +41,9 @@ JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \
+	../../../src/zabbix_server/preprocessor/preproc_snmp.c \
 	zbx_item_preproc.c
-
+	
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@

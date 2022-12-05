@@ -25,6 +25,8 @@ ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t *)
 
+static char	zbx_snmp_init_done;
+
 static zbx_hash_t	snmp_value_pair_hash_func(const void *d)
 {
 	const zbx_snmp_value_pair_t	*s;
@@ -103,6 +105,22 @@ static int	snmp_cache_pair_compare_func(const void *d1, const void *d2)
 	return strcmp(s1->oid, s2->oid);
 }
 
+static int	preproc_snmp_translate_oid(const char *oid_in, char **oid_out)
+{
+	char			buffer[MAX_OID_LEN];
+	oid			oid[MAX_OID_LEN];
+	size_t			oid_len = MAX_OID_LEN;
+
+	if (0 != get_node(oid_in, oid, &oid_len))
+	{
+		snprint_objid(buffer, sizeof(buffer), oid, oid_len);
+		*oid_out = zbx_strdup(NULL, buffer);
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
 {
 	char	*token = NULL, *saveptr, *field_name, *params2;
@@ -123,9 +141,17 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 		else
 		{
 			zbx_snmp_walk_to_json_param_t	parsed_param;
+#ifdef HAVE_NETSNMP
+			char				*oid_tr_tmp = NULL;
 
-			parsed_param.field_name = zbx_strdup(NULL, field_name);
+			if (SUCCEED == preproc_snmp_translate_oid(token, &oid_tr_tmp))
+				parsed_param.oid_prefix = oid_tr_tmp;
+			else
+				parsed_param.oid_prefix = zbx_strdup(NULL, token);
+#else
 			parsed_param.oid_prefix = zbx_strdup(NULL, token);
+#endif
+			parsed_param.field_name = zbx_strdup(NULL, field_name);
 
 			zbx_vector_snmp_walk_to_json_param_append(parsed_params, parsed_param);
 		}
@@ -378,38 +404,35 @@ static void	zbx_vector_snmp_walk_to_json_param_clear_ext(zbx_vector_snmp_walk_to
 
 static int	preproc_snmp_value_from_walk(const char *data, const char *oid_needle, char **output, char **error)
 {
-	size_t			len;
+	int			ret = FAIL;
+	size_t			len, offset;
 	zbx_snmp_value_pair_t	p;
 #ifdef HAVE_NETSNMP
-	char			buffer[MAX_OID_LEN];
+	char			*oid_tr_tmp = NULL;
 	const char		*oid_tr;
-	oid			oid[MAX_OID_LEN];
-	size_t			oid_len = MAX_OID_LEN;
 
-	netsnmp_init_mib();
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
-	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
-
-	if (0 != get_node(oid_needle, oid, &oid_len))
-	{
-		snprint_objid(buffer, sizeof(buffer), oid, oid_len);
-		oid_tr = buffer;
-	}
+	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
+		oid_tr = oid_tr_tmp;
 	else
 		oid_tr = oid_needle;
+
+	offset = ('.' == oid_tr[0] ? 0 : 1);
+#else
+	offset = ('.' == oid_needle[0] ? 0 : 1);
 #endif
 
 	while (FAIL != preproc_snmp_parse_line(data, &p, &len, 0, error))
 	{
 #ifdef HAVE_NETSNMP
-		if (0 == strcmp(oid_tr, p.oid) || ('.' != oid_tr[0] && 0 == strcmp(oid_tr, p.oid + 1)))
+		if (0 == strcmp(oid_tr, p.oid + offset))
 #else
-		if (0 == strcmp(oid_needle, p.oid) || ('.' != oid_needle[0] && 0 == strcmp(oid_needle, p.oid + 1)))
+		if (0 == strcmp(oid_needle, p.oid + offset))
 #endif
 		{
 			zbx_free(p.oid);
 			*output = p.value;
-			return SUCCEED;
+			ret = SUCCEED;
+			goto out;
 		}
 		data += len;
 		zbx_free(p.oid);
@@ -417,7 +440,11 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *oid_needle
 	}
 
 	*error = zbx_strdup(NULL, "no data was found");
-	return FAIL;
+out:
+#ifdef HAVE_NETSNMP
+	zbx_free(oid_tr_tmp);
+#endif
+	return ret;
 }
 
 static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *oid_needle, char **output, char **error)
@@ -429,10 +456,6 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 	const char		*oid_tr;
 	oid			oid[MAX_OID_LEN];
 	size_t			oid_len = MAX_OID_LEN;
-
-	netsnmp_init_mib();
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
-	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
 
 	if (0 != get_node(oid_needle, oid, &oid_len))
 	{
@@ -679,3 +702,48 @@ out:
 	return ret;
 }
 
+/* This function has to be moved to separate SNMP library when such refactoring will be done in future */
+static void	zbx_init_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	if (1 == zbx_snmp_init_done)
+		return;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	init_snmp(progname);
+	netsnmp_init_mib();
+	zbx_snmp_init_done = 1;
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
+void	zbx_preproc_init_snmp(void)
+{
+	zbx_init_snmp();
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
+	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
+}
+
+void	zbx_preproc_shutdown_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+
+	snmp_shutdown(progname);
+	zbx_snmp_init_done = 0;
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+}

@@ -30,6 +30,10 @@
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 
+#ifdef HAVE_NETSNMP
+#include "../../../src/zabbix_server/preprocessor/preproc_snmp.h"
+#endif
+
 zbx_es_t	es_engine;
 
 static int	str_to_preproc_type(const char *str)
@@ -189,7 +193,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-#ifndef HAVE_NETSNMP
+#ifdef HAVE_NETSNMP
+	zbx_preproc_init_snmp();
+#else
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		skip();
 #endif
@@ -281,4 +287,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_clear(&history_value);
 	zbx_free(error);
 
+#ifdef HAVE_NETSNMP
+	zbx_preproc_shutdown_snmp();
+#endif
 }
