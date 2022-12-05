@@ -417,6 +417,7 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
+		this._updateDatasetLegend(cloned_dataset);
 		this._updatePreview();
 	}
 
