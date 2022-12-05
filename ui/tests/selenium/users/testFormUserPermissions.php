@@ -90,10 +90,9 @@ class testFormUserPermissions extends CWebTest {
 		return [
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'user_name' => 'http-auth-admin',
-					'new_role' => '',
-					'user_type' => 'Admin'
+					'new_role' => ''
 				]
 			],
 			[
@@ -143,7 +142,11 @@ class testFormUserPermissions extends CWebTest {
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->selectTab('Permissions');
 		$form->getField('Role')->fill($data['new_role']);
-		$form->checkValue(['User type' => $data['user_type']]);
+
+		if (array_key_exists('User type', $data)) {
+			$form->checkValue(['User type' => $data['user_type']]);
+		}
+
 		$form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
@@ -161,11 +164,13 @@ class testFormUserPermissions extends CWebTest {
 			$this->query('link', $data['user_name'])->one()->click();
 			$this->page->waitUntilReady();
 			$this->query('link:Permissions')->one()->click();
+			$form->invalidate();
 
-			$form->checkValue([
-					'Role' => $data['new_role'],
-					'User type' => $data['user_type']
-			]);
+			$values = array_key_exists('User type', $data)
+				? ['Role' => $data['new_role'], 'User type' => $data['user_type']]
+				: ['Role' => $data['new_role']];
+
+			$form->checkValue($values);
 		}
 	}
 
@@ -238,7 +243,7 @@ class testFormUserPermissions extends CWebTest {
 	 * @dataProvider getUpdateUserRoletypeData
 	 */
 	public function testFormUserPermissions_UpdateUserRoletype($data) {
-		$this->page->login()->open('zabbix.php?action=user.edit&userid=4');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=40');
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->fill($data);
