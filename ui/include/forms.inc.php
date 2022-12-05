@@ -1446,7 +1446,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$params = $step_param_0
-					->setAttribute('placeholder', _('list of characters'))
+					->setAttribute('placeholder', _('OID'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 				break;
 
