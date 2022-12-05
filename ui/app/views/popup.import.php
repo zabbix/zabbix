@@ -26,7 +26,7 @@
 
 $rules_table = (new CTable())
 	->setId('rules_table')
-	->addClass('table-initial-width');
+	->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
 $titles = [
 	'template_groups' => _('Template groups'),
