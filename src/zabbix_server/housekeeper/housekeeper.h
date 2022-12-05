@@ -29,6 +29,7 @@ typedef struct
 {
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	struct zbx_db_version_info_t	*db_version_info;
+	int				config_timeout;
 }
 zbx_thread_housekeeper_args;
 
