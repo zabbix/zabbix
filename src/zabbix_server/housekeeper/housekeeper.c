@@ -1236,7 +1236,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
 
 #if defined(HAVE_POSTGRESQL)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

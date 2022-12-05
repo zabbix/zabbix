@@ -144,7 +144,7 @@ class testDashboardForm extends CWebTest {
 				'pages' => [[]],
 				'users' => [
 					[
-						'userid' => 4,
+						'userid' => 40,
 						'permission' => 3
 					],
 					[

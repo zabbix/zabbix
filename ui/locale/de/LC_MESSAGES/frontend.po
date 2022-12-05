@@ -151,6 +151,11 @@ msgid_plural "%1$s events"
 msgstr[0] "%1$s Ereignis"
 msgstr[1] "%1$s Ereignisse"
 
+#: app/views/popup.usergroupmapping.edit.php:90
+#, c-format
+msgid "%1$s group pattern"
+msgstr ""
+
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
@@ -690,6 +695,11 @@ msgstr "Aktion Vorgang"
 #: actionconf.php:293
 msgid "Action updated"
 msgstr "Aktion geändert"
+
+#: include/classes/api/services/CDashboardGeneral.php:672
+#, c-format
+msgid "Action with ID \"%1$s\" is not available."
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -1530,6 +1540,12 @@ msgstr "Versuchsintervall"
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
 msgstr "Versuche"
+
+#: app/views/administration.authentication.edit.php:520
+#: app/views/popup.ldap.edit.php:265
+#: app/views/popup.mediatypemapping.edit.php:59
+msgid "Attribute"
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -3361,6 +3377,12 @@ msgstr "Kann keine Änderung der Tabelle \"%1$s\" ohne Werte durchführen."
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Kann keine Änderung auf Tabelle \"%1$s\" durchführen ohne WHERE-Bedingung."
 
+#: app/controllers/CControllerUserProvision.php:69
+msgid "Cannot provision user"
+msgid_plural "Cannot provision users"
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
@@ -4545,6 +4567,11 @@ msgstr "Konfiguration geändert"
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
 msgstr "Konfiguration Datenbankverbindung"
+
+#: app/views/administration.authentication.edit.php:417
+#: app/views/popup.ldap.edit.php:115
+msgid "Configure JIT provisioning"
+msgstr ""
 
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
@@ -6058,6 +6085,23 @@ msgstr "Veraltet"
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr "Der veraltete Parameter „%1$s“ kann nicht mit „%2$s“ verwendet werden."
 
+#: app/views/administration.authentication.edit.php:50
+msgid "Deprovisioned users group"
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1011
+msgid "Deprovisioned users group cannot be deleted."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:183
+msgid "Deprovisioned users group cannot be empty."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:178
+#: include/classes/api/services/CUserGroup.php:321
+msgid "Deprovisioned users group cannot be enabled."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
@@ -6919,6 +6963,11 @@ msgstr "Aktiviere"
 msgid "Enable HTTP authentication"
 msgstr "Aktiviere HTTP Authentifizierung"
 
+#: app/views/administration.authentication.edit.php:202
+#: app/views/administration.authentication.edit.php:276
+msgid "Enable JIT provisioning"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Aktiviere LDAP Authentifizierung"
@@ -6926,6 +6975,10 @@ msgstr "Aktiviere LDAP Authentifizierung"
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
 msgstr "SAML Auth einschalten"
+
+#: app/views/administration.authentication.edit.php:543
+msgid "Enable SCIM provisioning"
+msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -8273,20 +8326,41 @@ msgstr "Gruppe \"%1$s\" für Host \"%2$s\" existiert nicht."
 msgid "Group added"
 msgstr "Gruppe hinzugefügt"
 
+#: app/views/popup.ldap.edit.php:134
+msgid "Group base DN"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:122
+msgid "Group configuration"
+msgstr ""
+
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Gruppe gelöscht"
 msgstr[1] "Gruppe gelöscht"
 
+#: app/views/popup.ldap.edit.php:182
+msgid "Group filter"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
 msgstr "Gruppe für entdeckte Hosts"
+
+#: app/views/popup.ldap.edit.php:156
+msgid "Group member attribute"
+msgstr ""
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
 msgid "Group name"
 msgstr "Gruppenname"
+
+#: app/views/administration.authentication.edit.php:427
+#: app/views/popup.ldap.edit.php:148
+msgid "Group name attribute"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9381,6 +9455,10 @@ msgstr "Im Bereich"
 msgid "Inaccessible SLA"
 msgstr "Unzugängliche SLA"
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:452
+msgid "Inaccessible action"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
@@ -9429,6 +9507,10 @@ msgstr "Unzugängliche Wartung"
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:63
 msgid "Inaccessible map"
 msgstr "Unerreichbare Karte"
+
+#: app/controllers/CControllerDashboardWidgetEdit.php:453
+msgid "Inaccessible media type"
+msgstr ""
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -10539,12 +10621,28 @@ msgstr "Ungültige IP-Adresse \"%1$s\"."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Ungültiges JSON. Beim Parsen am Server trat ein Fehler auf."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:171
+msgid "Invalid LDAP JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:164
+msgid "Invalid LDAP JIT provisioning user group mapping configuration."
+msgstr ""
+
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
 msgstr "Ungültige LDAP-Konfiguration"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:214
+msgid "Invalid SAML JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:208
+msgid "Invalid SAML JIT provisioning user group mapping configuration."
+msgstr ""
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10607,6 +10705,12 @@ msgstr "Ungültiger Schlüssel \"%1$s\" für Datenpunkt-Prototyp \"%2$s\"auf \"%
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Ungültiger Schlüssel \"%1$s\": %2$s."
+
+#: app/controllers/CControllerPopupLdapCheck.php:67
+#: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
+#: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
+msgid "Invalid media type mapping configuration."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10908,6 +11012,12 @@ msgstr "Ungültige Marker \"%1$s\": %2$s."
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "Ungültige Zeitspanne."
+
+#: app/controllers/CControllerPopupLdapCheck.php:62
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
+#: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
+msgid "Invalid user group mapping configuration."
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11378,6 +11488,10 @@ msgstr "LDAP-Authentifizierung"
 #: include/classes/api/services/CUser.php:1491
 msgid "LDAP authentication is disabled."
 msgstr "Die LDAP-Authentifizierung ist deaktiviert."
+
+#: app/views/popup.ldap.edit.php:235
+msgid "LDAP group pattern"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -12147,6 +12261,14 @@ msgstr "Tafelform"
 msgid "Map update failed."
 msgstr "Karten Aktualisierung fehlgeschlagen."
 
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:508
+msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
@@ -12325,6 +12447,12 @@ msgstr "Medien"
 msgid "Media type"
 msgstr "Medientyp"
 
+#: widgets/actionlog/views/widget.view.php:40
+#: widgets/actionlog/views/widget.view.php:41
+msgctxt "compact table header"
+msgid "Media type"
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
@@ -12355,6 +12483,12 @@ msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Medientyp aktiviert"
 msgstr[1] "Medientyp aktiviert"
+
+#: app/views/administration.authentication.edit.php:506
+#: app/views/popup.ldap.edit.php:255
+#: app/views/popup.mediatypemapping.edit.php:85
+msgid "Media type mapping"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12996,6 +13130,10 @@ msgctxt "user first name"
 msgid "Name"
 msgstr "Vorname"
 
+#: app/views/administration.authentication.edit.php:520
+msgid "Name "
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
 msgstr "Name ID"
@@ -13007,6 +13145,10 @@ msgstr "Der Name des Formularfeldes sollte nicht länger als 255 Zeichen sein."
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
 msgstr "Namensraum"
+
+#: app/views/popup.usergroupmapping.edit.php:80
+msgid "Naming requirements:"
+msgstr ""
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13132,6 +13274,10 @@ msgstr "Neuer Host"
 msgid "New host group"
 msgstr "Neue Hostgruppe"
 
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "New media type mapping"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "Neue Operation"
@@ -13160,6 +13306,10 @@ msgstr "Neue Vorlagengruppe"
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "Neue Auslöser"
+
+#: app/views/popup.usergroupmapping.edit.php:114
+msgid "New user group mapping"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13772,6 +13922,11 @@ msgstr "Nicht erlaubt, Passwort für Benutzer \"guest\" zu setzen."
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr "Es ist nicht erlaubt, das Thema für den Benutzer \"Gast\" festzulegen."
 
+#: include/classes/api/services/CUser.php:484
+#, c-format
+msgid "Not allowed to update field \"%1$s\" for provisioned user."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
@@ -14133,6 +14288,10 @@ msgstr "Nur Zabbix Agent, SNMPv1, SNMPv2 und SNMPv3 Checks können einzigartig g
 msgid "Only administrators can set map owner."
 msgstr "Nur Administratoren können Kartenbesitzer festlegen."
 
+#: app/views/administration.authentication.edit.php:51
+msgid "Only disabled group can be set for deprovisioned users."
+msgstr ""
+
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Nur Datenpunkte, die mit aktiven Hosts verbunden sind, werden gezählt"
@@ -14157,6 +14316,11 @@ msgstr "Es ist nur eine Prüfung auf nicht unterstützte Werte zulässig."
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
 msgstr "Es ist nur eine Drosselungsstufe zulässig."
+
+#: include/classes/api/services/CUserDirectory.php:519
+#, c-format
+msgid "Only one user directory of type \"%1$s\" can exist."
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -15391,6 +15555,26 @@ msgstr "Der angegebene geheime Pfad „%1$s“ ist ungültig."
 msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr "Die angegebene geheime Abfragezeichenfolge \"%1$s\" ist ungültig."
 
+#: app/views/administration.user.list.php:301
+msgid "Provision now"
+msgstr ""
+
+#: app/views/administration.user.list.php:303
+msgid "Provision selected LDAP users?"
+msgstr ""
+
+#: app/views/administration.user.list.php:141
+msgid "Provisioned"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:251
+msgid "Provisioning period"
+msgstr ""
+
+#: app/controllers/CControllerUserProvision.php:65
+msgid "Provisioning successful."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
 #: app/views/administration.proxy.list.php:34
@@ -15654,6 +15838,18 @@ msgstr ""
 msgid "Recipient already exists."
 msgstr "Empfänger existiert bereits"
 
+#: app/views/reports.actionlog.list.csv.php:39
+msgid "Recipient's Zabbix username"
+msgstr ""
+
+#: app/views/reports.actionlog.list.csv.php:40
+msgid "Recipient's name"
+msgstr ""
+
+#: app/views/reports.actionlog.list.csv.php:41
+msgid "Recipient's surname"
+msgstr ""
+
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
 msgstr "Empfänger"
@@ -15706,6 +15902,10 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:531
 msgid "Rectangle"
 msgstr "Rechteck"
+
+#: app/views/popup.ldap.edit.php:168
+msgid "Reference attribute"
+msgstr ""
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -16436,6 +16636,16 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "So"
 
+#: app/views/administration.user.list.php:224
+#: app/views/administration.user.list.php:225
+#: app/views/popup.usergroupmapping.edit.php:77
+msgid "SAML"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:483
+msgid "SAML group pattern"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
 msgstr "SAML Einstellungen"
@@ -16927,6 +17137,11 @@ msgstr "Suchfilter"
 msgid "Search pattern is empty"
 msgstr "Suchmuster ist leer"
 
+#: app/views/reports.actionlog.list.php:108
+#: widgets/actionlog/includes/WidgetForm.php:61
+msgid "Search string"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
@@ -17091,6 +17306,11 @@ msgstr "An Benutzer senden"
 #: include/views/administration.auditacts.list.php:79
 msgid "Sent"
 msgstr "Verschickt"
+
+#: app/controllers/CControllerActionLogList.php:210
+#: widgets/actionlog/includes/WidgetForm.php:56
+msgid "Sent/Executed"
+msgstr ""
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -18684,6 +18904,11 @@ msgstr "Text"
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
 msgstr "Text, unterstützt die Makros {INVENTORY.*}, {HOST.*}"
 
+#: include/classes/api/clients/CLocalApiClient.php:96
+#, c-format
+msgid "The \"%1$s.%2$s\" method must be called without authorization header."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
@@ -18820,6 +19045,10 @@ msgstr "Heute vor einer Woche"
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "Dieses Feld wird automatisch gefüllt vom Datenpunkt \"%1$s\"."
 
+#: include/classes/scim/API.php:77
+msgid "This filter is not supported"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
 msgstr "Dies ist eine Testnachricht von Zabbix"
@@ -18854,6 +19083,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
 msgstr "Diese Art von Informationen stimmt möglicherweise nicht mit dem Schlüssel überein."
+
+#: app/views/administration.user.edit.php:59
+msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
+msgstr ""
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -19708,6 +19941,11 @@ msgstr "Die Konfigurationsdatei konnte nicht erstellt werden."
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "Die aktuelle Version der Zabbix-Datenbank kann nicht ermittelt werden: %1$s."
 
+#: include/classes/helpers/CAuthenticationHelper.php:88
+#: include/classes/helpers/CAuthenticationHelper.php:107
+msgid "Unable to find SAML userdirectory."
+msgstr ""
+
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
 msgstr "Authentifizierungs-API-Parameter können nicht geladen werden."
@@ -20142,6 +20380,10 @@ msgstr "Laufzeit Zabbix Serverprozess in Sekunden."
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
 
+#: app/views/popup.ldap.edit.php:169
+msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Massenanfragen nutzen"
@@ -20219,6 +20461,11 @@ msgstr "Benutzer „%1$s“ wird in Aktion „%2$s“ verwendet."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "Benutzer „%1$s“ ist der Benutzer, in dessen Auftrag der Bericht „%2$s“ erstellt wird."
 
+#: app/controllers/CControllerUserProvision.php:61
+#, c-format
+msgid "User \"%1$s\" provisioned."
+msgstr ""
+
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
@@ -20264,6 +20511,19 @@ msgstr "Benutzerverzeichnis"
 #, c-format
 msgid "User directory \"%1$s\" already exists."
 msgstr "Das Benutzerverzeichnis „%1$s“ existiert bereits."
+
+#: include/classes/api/services/CUser.php:715
+#, c-format
+msgid "User directory with ID \"%1$s\" is not available."
+msgstr ""
+
+#: app/views/administration.user.list.php:211
+msgid "User does not have user groups."
+msgstr ""
+
+#: app/views/administration.user.list.php:232
+msgid "User does not have user role."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20314,6 +20574,16 @@ msgstr[1] "Benutzergruppen gelöscht"
 msgid "User group for database down message"
 msgstr "Bei Datenbankausfall an folgende Benutzergruppe senden"
 
+#: app/views/administration.authentication.edit.php:471
+#: app/views/popup.ldap.edit.php:226
+#: app/views/popup.usergroupmapping.edit.php:126
+msgid "User group mapping"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:196
+msgid "User group membership attribute"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -20350,6 +20620,11 @@ msgstr "Benutzergruppen"
 msgid "User is not allowed to delete himself."
 msgstr "Benutzer darf sich nicht selbst löschen."
 
+#: app/views/administration.authentication.edit.php:457
+#: app/views/popup.ldap.edit.php:218
+msgid "User last name attribute"
+msgstr ""
+
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
 msgstr "Benutzer Macros"
@@ -20368,6 +20643,11 @@ msgstr "Benutzermenu"
 #: include/views/configuration.item.prototype.edit.php:655 items.php:94
 msgid "User name"
 msgstr "Benutzername"
+
+#: app/views/administration.authentication.edit.php:443
+#: app/views/popup.ldap.edit.php:210
+msgid "User name attribute"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -22716,6 +22996,11 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globale Einstellungen Bereinigungsprozess"
 
+#: app/views/popup.usergroupmapping.edit.php:82
+#, c-format
+msgid "group name must match %1$s group name"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -23128,6 +23413,10 @@ msgstr "maximale Anzahl abhängiger Datenpunkte erreicht"
 #: include/classes/import/CConfigurationImport.php:2828
 msgid "maximum number of dependency levels reached"
 msgstr "maximale Anzahl von Abhängigkeitsebenen erreicht"
+
+#: app/views/popup.ldap.edit.php:123
+msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
@@ -23661,6 +23950,10 @@ msgstr "Standardabweichung der Population"
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp() - Stichproben-Standardabweichung"
 
+#: widgets/actionlog/views/widget.edit.php:49
+msgid "subject or body text"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
 msgstr "Summe"
@@ -24174,6 +24467,10 @@ msgstr "per"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: app/views/popup.usergroupmapping.edit.php:83
+msgid "wildcard patterns with '*' may be used"
 msgstr ""
 
 #: include/classes/api/services/CTask.php:443

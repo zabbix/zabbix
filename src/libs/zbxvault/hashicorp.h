@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
+#ifndef ZABBIX_HASHICORP_H
+#define ZABBIX_HASHICORP_H
 
-#include "../zbxkvs/kvs.h"
+#include "zbxalgo.h"
 
-int	zbx_vault_init(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
-int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
-
-int	zbx_vault_token_from_env_get(char **token, char **error);
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
 
 #endif
