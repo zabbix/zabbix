@@ -719,6 +719,7 @@ class CWidgetNavTree extends CWidget {
 
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
 			const button = tree_element.querySelector('.js-button-add-child');
+
 			if (button !== null) {
 				button.disabled = tree_element.dataset.depth >= this._max_depth;
 			}
@@ -1009,6 +1010,7 @@ class CWidgetNavTree extends CWidget {
 
 				if (element !== null) {
 					const sibling = element.childNodes;
+
 					while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
 						order++;
 					}
