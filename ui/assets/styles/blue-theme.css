@@ -1803,10 +1803,8 @@ form.dashboard-widget-svggraph .list-accordion-item {
   align-items: start;
   padding: 5px 0; }
   form.dashboard-widget-svggraph .list-accordion-item > label {
-    height: 24px;
-    line-height: 24px;
-    cursor: grab;
     overflow: hidden;
+    line-height: 24px;
     text-overflow: ellipsis; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
@@ -6126,12 +6124,12 @@ span.is-loading {
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head, .drag-icon,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head, form.dashboard-widget-svggraph .list-accordion-item > label, .drag-icon,
 .ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
 
-.dashboard-navigation-tabs .sortable-dragging .sortable-item > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head, .ui-draggable .drag-icon,

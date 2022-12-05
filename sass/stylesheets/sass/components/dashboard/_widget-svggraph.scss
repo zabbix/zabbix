@@ -116,10 +116,9 @@ form.dashboard-widget-svggraph {
 		padding: 5px 0;
 
 		> label {
-			height: 24px;
-			line-height: 24px;
-			cursor: grab;
+			@extend %cursor-drag;
 			overflow: hidden;
+			line-height: 24px;
 			text-overflow: ellipsis;
 		}
 
