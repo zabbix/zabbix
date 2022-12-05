@@ -1882,6 +1882,7 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *
 static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
 		int *errcode, char *error, size_t max_error_len)
 {
+#define ZBX_SNMP_BULKWALK_DEFAULT_MAX_REPETITIONS	10
 	struct snmp_pdu		*pdu = NULL, *response = NULL;
 	int			i, ret = SUCCEED, status, num_vars, pdu_type;
 	AGENT_REQUEST		request;
@@ -1946,7 +1947,9 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 			if (SNMP_MSG_GETBULK == pdu_type)
 			{
 				pdu->non_repeaters = 0;
-				pdu->max_repetitions = item->snmp_max_repetitions;
+
+				pdu->max_repetitions = (item->snmp_max_repetitions == 0 ?
+						ZBX_SNMP_BULKWALK_DEFAULT_MAX_REPETITIONS : item->snmp_max_repetitions);
 			}
 
 			if (NULL == snmp_add_null_var(pdu, name, name_length))
@@ -2029,6 +2032,7 @@ out:
 	}
 
 	return ret;
+#undef ZBX_SNMP_BULKWALK_DEFAULT_MAX_REPETITIONS
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,

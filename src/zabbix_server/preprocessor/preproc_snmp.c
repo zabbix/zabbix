@@ -447,25 +447,34 @@ out:
 	return ret;
 }
 
+static int	snmp_prepend_oid_dot(const char *oid_in, zbx_snmp_value_pair_t *p)
+{
+	if ('.' != oid_in[0])
+	{
+		p->oid = zbx_dsprintf(p->oid, ".%s", oid_in);
+		return 1;
+	}
+
+	return 0;
+}
+
 static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *oid_needle, char **output, char **error)
 {
 	int			ret;
 	zbx_snmp_value_pair_t	*pair_cached, pair_local;
+	int			transformed = 0;
 #ifdef HAVE_NETSNMP
-	char			buffer[MAX_OID_LEN];
-	const char		*oid_tr;
-	oid			oid[MAX_OID_LEN];
-	size_t			oid_len = MAX_OID_LEN;
+	char			*oid_tr_tmp = NULL;
 
-	if (0 != get_node(oid_needle, oid, &oid_len))
+	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
 	{
-		snprint_objid(buffer, sizeof(buffer), oid, oid_len);
-		pair_local.oid = buffer;
+		pair_local.oid = oid_tr_tmp;
+		transformed = 1;
 	}
 	else
-		pair_local.oid = (char *)oid_needle;
+		transformed = snmp_prepend_oid_dot(oid_needle, &pair_local);
 #else
-	pair_local.oid = (char *)oid_needle;
+	transformed = snmp_prepend_oid_dot(oid_needle, &pair_local);
 #endif
 
 	if (NULL == (pair_cached = (zbx_snmp_value_pair_t *)zbx_hashset_search(&cache->pairs, &pair_local)))
@@ -478,6 +487,9 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 		*output = zbx_strdup(NULL, pair_cached->value);
 		ret = SUCCEED;
 	}
+
+	if (1 == transformed)
+		zbx_free(pair_local.oid);
 
 	return ret;
 }
@@ -599,11 +611,12 @@ out:
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	int					ret = SUCCEED;
-	char					*result = NULL;
-	zbx_hashset_t				grouped_prefixes, pairs;
+	char					*result = NULL, *data;
+	zbx_hashset_t				grouped_prefixes;
+	size_t					len, offset;
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
 	zbx_hashset_iter_t			iter;
-	zbx_snmp_value_pair_t			*p;
+	zbx_snmp_value_pair_t			p;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -613,9 +626,6 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_hashset_create(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
 			snmp_walk_json_output_obj_compare_func);
 
-	zbx_hashset_create(&pairs, 100, snmp_value_pair_hash_func,
-			snmp_value_pair_compare_func);
-
 	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "failed to parse step parameters");
@@ -623,15 +633,10 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 		goto out;
 	}
 
-	if (FAIL == preproc_snmp_walk_to_pairs(&pairs, value->data.str, 1, errmsg))
-	{
-		ret = FAIL;
-		goto out;
-	}
+	data = value->data.str;
+	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
 
-	zbx_hashset_iter_reset(&pairs, &iter);
-
-	while (NULL != (p = zbx_hashset_iter_next(&iter)))
+	while (FAIL != preproc_snmp_parse_line(data, &p, &len, 1, errmsg))
 	{
 		int				i;
 		zbx_snmp_walk_to_json_param_t	param_field;
@@ -647,22 +652,22 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 			if ('.' != param_field.oid_prefix[0])
 			{
-				if (0 != strncmp(param_field.oid_prefix, p->oid + 1, prefix_len))
+				if (0 != strncmp(param_field.oid_prefix, p.oid + 1, prefix_len))
 					continue;
 
 				prefix_len++;
 			}
-			else if (0 != strncmp(param_field.oid_prefix, p->oid, prefix_len))
+			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
 				continue;
 
-			oobj_local.key = zbx_strdup(NULL, prefix_len + p->oid + 1);
+			oobj_local.key = zbx_strdup(NULL, prefix_len + p.oid + 1);
 			zbx_rtrim(oobj_local.key, " ");
 
 			output_value = (zbx_snmp_value_pair_t *)zbx_malloc(NULL,
 					sizeof(zbx_snmp_value_pair_t));
 
 			output_value->oid = zbx_strdup(NULL, param_field.field_name);
-			output_value->value = zbx_strdup(NULL, p->value);
+			output_value->value = zbx_strdup(NULL, p.value);
 
 			if (NULL == (oobj_cached = zbx_hashset_search(&grouped_prefixes, &oobj_local)))
 			{
@@ -676,6 +681,18 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 				zbx_vector_snmp_value_pair_append(&oobj_cached->values, output_value);
 			}
 		}
+
+		data += len;
+		zbx_free(p.oid);
+		zbx_free(p.value);
+	}
+
+	if (NULL != *errmsg)
+	{
+		zbx_free(p.oid);
+		zbx_free(p.value);
+		ret = FAIL;
+		goto out;
 	}
 
 	if (0 < grouped_prefixes.num_data)
@@ -691,7 +708,6 @@ out:
 	zbx_vector_snmp_walk_to_json_param_clear_ext(&parsed_params);
 	zbx_vector_snmp_walk_to_json_param_destroy(&parsed_params);
 	zbx_hashset_destroy(&grouped_prefixes);
-	snmp_value_pair_hashset_clear(&pairs);
 
 	if (SUCCEED == ret)
 	{
