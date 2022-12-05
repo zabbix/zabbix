@@ -1,13 +1,16 @@
 Changes for 6.4.0rc1
 
 New features:
+.........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
-.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
-A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta4
@@ -153,16 +156,25 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.6rc2
+
+Bug fixes:
+.......PS. [ZBX-22019] fixed item value type change not being updated in preprocessing manager cache (wiper)
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+.......PS. [ZBX-21995] fixed configuration sync compatibility problems between minor versions (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.6rc1
 
 New features:
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
-.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
-A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
 ..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------
@@ -647,16 +659,23 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.12rc2
+
+Bug fixes:
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.12rc1
 
 New features:
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
-.......PS. [ZBX-21997] fixed parsing json starting with whitespace and empty array/object jsonpath ouput (wiper)
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
 .........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
-A.F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
 ..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
 
 --------------------------------------------------------------------------------

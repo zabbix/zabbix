@@ -768,7 +768,8 @@ static int	DBpatch_6030082(void)
 
 static int	DBpatch_6030083(void)
 {
-	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 11, &field);
 }
