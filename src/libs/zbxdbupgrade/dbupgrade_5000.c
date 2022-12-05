@@ -150,66 +150,6 @@ static int	DBpatch_5000007(void)
 #undef ZBX_DB_CHAR_LENGTH
 }
 
-static int	DBpatch_5000008(void)
-{
-	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("hosts", &field);
-}
-
-static int	DBpatch_5000009(void)
-{
-	return DBcreate_index("hosts", "hosts_6", "name_upper", 0);
-}
-
-static int	DBpatch_5000010(void)
-{
-	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5000011(void)
-{
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert("hosts", "name", "name_upper", "upper", "hostid");
-}
-
-static int	DBpatch_5000012(void)
-{
-	return zbx_dbupgrade_attach_trigger_with_function_on_update("hosts", "name", "name_upper", "upper", "hostid");
-}
-
-static int	DBpatch_5000013(void)
-{
-	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBadd_field("items", &field);
-}
-
-static int	DBpatch_5000014(void)
-{
-	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
-}
-
-static int	DBpatch_5000015(void)
-{
-	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5000016(void)
-{
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert("items", "name", "name_upper", "upper", "itemid");
-}
-
-static int	DBpatch_5000017(void)
-{
-	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
-}
-
 #endif
 
 DBPATCH_START(5000)
@@ -224,15 +164,5 @@ DBPATCH_ADD(5000004, 0, 0)
 DBPATCH_ADD(5000005, 0, 0)
 DBPATCH_ADD(5000006, 0, 0)
 DBPATCH_ADD(5000007, 0, 0)
-DBPATCH_ADD(5000008, 0, 0)
-DBPATCH_ADD(5000009, 0, 0)
-DBPATCH_ADD(5000010, 0, 0)
-DBPATCH_ADD(5000011, 0, 0)
-DBPATCH_ADD(5000012, 0, 0)
-DBPATCH_ADD(5000013, 0, 0)
-DBPATCH_ADD(5000014, 0, 0)
-DBPATCH_ADD(5000015, 0, 0)
-DBPATCH_ADD(5000016, 0, 0)
-DBPATCH_ADD(5000017, 0, 0)
 
 DBPATCH_END()
