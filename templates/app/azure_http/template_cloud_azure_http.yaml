@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-02T06:07:08Z'
+  date: '2022-12-05T11:04:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -502,26 +502,6 @@ zabbix_export:
           value: 15s
           description: 'A response timeout for API.'
         -
-          macro: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
-        -
-          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
-        -
-          macro: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
-        -
-          macro: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
-        -
-          macro: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
-          value: ^System$
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
-        -
           macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
           description: 'This macro is used in MySQL servers discovery rule.'
@@ -541,22 +521,6 @@ zabbix_export:
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
-        -
-          macro: '{$AZURE.PGSQL.DB.LOCATION.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
-        -
-          macro: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
-        -
-          macro: '{$AZURE.PGSQL.DB.NAME.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
-        -
-          macro: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.RESOURCE_GROUP.MATCHES}'
           value: '.*'
@@ -1394,11 +1358,11 @@ zabbix_export:
               value: '3'
               newvalue: Unknown
     -
-      uuid: d023e2cd326c486f908e3e361d1fe157
+      uuid: c1396bf1e8cf46f6a407e88ddceef0b8
       template: 'Azure MySQL single server by HTTP'
       name: 'Azure MySQL single server by HTTP'
       description: |
-        This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
+        This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -1416,10 +1380,10 @@ zabbix_export:
           name: Templates/Applications
       items:
         -
-          uuid: 9eb43a5ffb0d4e07be8d1fccfdecd2aa
-          name: 'Azure PostgreSQL: Availability status detailed'
+          uuid: c7771aa67d3c424490d8de2d6c2d609a
+          name: 'Azure MySQL: Availability status detailed'
           type: DEPENDENT
-          key: azure.db.pgsql.availability.details
+          key: azure.db.mysql.availability.details
           delay: '0'
           history: 7d
           trends: '0'
@@ -1435,16 +1399,16 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: health
         -
-          uuid: df4c66646f864f79b5f5e9f71dbefe82
-          name: 'Azure PostgreSQL: Availability state'
+          uuid: c325b977b26e4e00acc3ea8703895f05
+          name: 'Azure MySQL: Availability state'
           type: DEPENDENT
-          key: azure.db.pgsql.availability.state
+          key: azure.db.mysql.availability.state
           delay: '0'
           history: 7d
           description: 'The availability status of the resource.'
@@ -1489,16 +1453,16 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: health
           triggers:
             -
-              uuid: 699ca12c916746b1bf1e121261771cc3
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.pgsql.availability.state)=1'
-              name: 'Azure PostgreSQL: PostgreSQL server is degraded'
+              uuid: 91a32645266547d78df3a70b44c7782b
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1'
+              name: 'Azure MySQL: MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -1507,9 +1471,9 @@ zabbix_export:
                   tag: scope
                   value: availability
             -
-              uuid: 14e45ba0bc26409a89d92edfda152947
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.pgsql.availability.state)=3'
-              name: 'Azure PostgreSQL: PostgreSQL server is in unknown state'
+              uuid: 852aba88476a40aeb2170b933726b7d8
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3'
+              name: 'Azure MySQL: MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -1518,9 +1482,9 @@ zabbix_export:
                   tag: scope
                   value: availability
             -
-              uuid: 4dc9113f8a914ac098d8736dba5aed4a
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.pgsql.availability.state)=2'
-              name: 'Azure PostgreSQL: PostgreSQL server is unavailable'
+              uuid: 5f2d2254dfc24f5481207585bed0d933
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2'
+              name: 'Azure MySQL: MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -1529,10 +1493,10 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
-          uuid: 3d0d3e1fe77740e4bd7b720368707214
-          name: 'Azure PostgreSQL: Connections active'
+          uuid: 69aba8caa6874c9d9423926a2ee78e99
+          name: 'Azure MySQL: Connections active'
           type: DEPENDENT
-          key: azure.db.pgsql.connections.active
+          key: azure.db.mysql.connections.active
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1543,16 +1507,16 @@ zabbix_export:
               parameters:
                 - $.metrics.active_connections.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: network
         -
-          uuid: 353a6ba543a84b32b16a5809ae63b4e1
-          name: 'Azure PostgreSQL: Connections failed'
+          uuid: e185b56984914507bc40c07c55153967
+          name: 'Azure MySQL: Connections failed'
           type: DEPENDENT
-          key: azure.db.pgsql.connections.failed
+          key: azure.db.mysql.connections.failed
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1564,16 +1528,28 @@ zabbix_export:
                 - $.metrics.connections_failed.total
               error_handler: DISCARD_VALUE
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: network
+          triggers:
+            -
+              uuid: 5b3a09ca04704e6a9972ee4865d358cd
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has failed connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
-          uuid: 537330b2372b434ebcea8a77a809c2f3
-          name: 'Azure PostgreSQL: Percentage CPU'
+          uuid: d0b5864a56094166b76fbc58a5e05c7c
+          name: 'Azure MySQL: Percentage CPU'
           type: DEPENDENT
-          key: azure.db.pgsql.cpu.percentage
+          key: azure.db.mysql.cpu.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1585,16 +1561,16 @@ zabbix_export:
               parameters:
                 - $.metrics.cpu_percent.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: cpu
           triggers:
             -
-              uuid: 33bd2ef88ad3468b9f0b2b1358cc7448
-              expression: 'min(/Azure MySQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High CPU utilization'
+              uuid: 7115fb320e2b4cc1ad1739c8a6cee155
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -1603,10 +1579,10 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: 5b132ff050c94daa92b252529a52c535
-          name: 'Azure PostgreSQL: Get errors'
+          uuid: 2fc253a20100478d91cac13590a64bfc
+          name: 'Azure MySQL: Get errors'
           type: DEPENDENT
-          key: azure.db.pgsql.data.errors
+          key: azure.db.mysql.data.errors
           delay: '0'
           history: 7d
           trends: '0'
@@ -1622,16 +1598,16 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: raw
           triggers:
             -
-              uuid: dd3d0be997204f8b9968ef5839fb7a9b
-              expression: 'length(last(/Azure MySQL single server by HTTP/azure.db.pgsql.data.errors))>0'
-              name: 'Azure PostgreSQL: There are errors in requests to API'
+              uuid: df5fa33f8c13413bb9d61ea4470b9b2d
+              expression: 'length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0'
+              name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -1640,10 +1616,10 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
-          uuid: e47d863822e64e6292bfa3e684bc2839
-          name: 'Azure PostgreSQL: Get data'
+          uuid: cd62d92ef0384ea9acf0cae71c88ebc6
+          name: 'Azure MySQL: Get data'
           type: SCRIPT
-          key: azure.db.pgsql.data.get
+          key: azure.db.mysql.data.get
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -1712,11 +1688,10 @@ zabbix_export:
                 'serverlog_storage_limit',
                 'active_connections',
                 'connections_failed',
+                'seconds_behind_master',
                 'backup_storage_used',
                 'network_bytes_egress',
-                'network_bytes_ingress',
-                'pg_replica_log_delay_in_seconds',
-                'pg_replica_log_delay_in_bytes'
+                'network_bytes_ingress'
             ],
                 prepared_metrics = [],
                 data = {};
@@ -1822,31 +1797,31 @@ zabbix_export:
               tag: component
               value: raw
         -
-          uuid: 9eade85c49bc462aab33b03e37581d87
-          name: 'Azure PostgreSQL: IO consumption percent'
+          uuid: a17c365253eb4821841ec82ac8f61106
+          name: 'Azure MySQL: IO consumption percent'
           type: DEPENDENT
-          key: azure.db.pgsql.io.consumption.percent
+          key: azure.db.mysql.io.consumption.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The IO Percent.'
+          description: 'The IO percent.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.metrics.io_consumption_percent.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: operations
         -
-          uuid: e2ee4882b08f45788e6abb698265810e
-          name: 'Azure PostgreSQL: Memory utilization'
+          uuid: 5c19c08912634993b1f96fb11e5d1ae2
+          name: 'Azure MySQL: Memory utilization'
           type: DEPENDENT
-          key: azure.db.pgsql.memory.percentage
+          key: azure.db.mysql.memory.percentage
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1858,16 +1833,16 @@ zabbix_export:
               parameters:
                 - $.metrics.memory_percent.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: memory
           triggers:
             -
-              uuid: 3119f21167a546369c05d31cda2e0147
-              expression: 'min(/Azure MySQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High memory utilization'
+              uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -1876,10 +1851,10 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: f81eeb98d5e942f296c360ff71e8bf8d
-          name: 'Azure PostgreSQL: Network out'
+          uuid: fe1b9846a634412aaa6a76fc05dbe46a
+          name: 'Azure MySQL: Network out'
           type: DEPENDENT
-          key: azure.db.pgsql.network.egress
+          key: azure.db.mysql.network.egress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1894,18 +1869,18 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '0.1333'
+                - '0.0088'
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: network
         -
-          uuid: 51f7e35042d04ddb88c7703d1b015d3b
-          name: 'Azure PostgreSQL: Network in'
+          uuid: 1cc97817bda5470887e3d5d9f2d78650
+          name: 'Azure MySQL: Network in'
           type: DEPENDENT
-          key: azure.db.pgsql.network.ingress
+          key: azure.db.mysql.network.ingress
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1920,18 +1895,18 @@ zabbix_export:
             -
               type: MULTIPLIER
               parameters:
-                - '0.1333'
+                - '0.0088'
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: network
         -
-          uuid: 1db9e470b527476fae1d26d4b67f855b
-          name: 'Azure PostgreSQL: Replication lag'
+          uuid: 8e60794282ea42c7bad1573811b2e498
+          name: 'Azure MySQL: Replication lag'
           type: DEPENDENT
-          key: azure.db.pgsql.replica.log.delay
+          key: azure.db.mysql.replication.lag
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1941,41 +1916,19 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.metrics.pg_replica_log_delay_in_seconds.maximum
+                - $.metrics.seconds_behind_master.maximum
               error_handler: DISCARD_VALUE
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: replication
         -
-          uuid: 6cdfda8f9e6640f8a8536f88729d75d6
-          name: 'Azure PostgreSQL: Max lag across replicas in bytes'
+          uuid: 1303a659d17a4e4fa9fa03cef35fef5a
+          name: 'Azure MySQL: Backup storage used'
           type: DEPENDENT
-          key: azure.db.pgsql.replica.log.delay.bytes
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: B
-          description: 'Lag expressed in bytes for the most lagging replica.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.metrics.pg_replica_log_delay_in_bytes.maximum
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: azure.db.pgsql.data.get
-          tags:
-            -
-              tag: component
-              value: replication
-        -
-          uuid: 6b06fb0e008640839dc3cda5bcc3f91a
-          name: 'Azure PostgreSQL: Backup storage used'
-          type: DEPENDENT
-          key: azure.db.pgsql.storage.backup.used
+          key: azure.db.mysql.storage.backup.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1987,16 +1940,16 @@ zabbix_export:
               parameters:
                 - $.metrics.backup_storage_used.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
         -
-          uuid: b8d5ac0b049a4d73b2f35f59c7e7609c
-          name: 'Azure PostgreSQL: Storage limit'
+          uuid: 4aed6d0c01d1458fbd1f7c7ea5386303
+          name: 'Azure MySQL: Storage limit'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.limit
+          key: azure.db.mysql.storage.limit
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2008,16 +1961,16 @@ zabbix_export:
               parameters:
                 - $.metrics.storage_limit.maximum
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
         -
-          uuid: 750b4d3438614cc992694136d309c3cb
-          name: 'Azure PostgreSQL: Storage percent'
+          uuid: 5b1b350be6f0409fb7ab842571c3f086
+          name: 'Azure MySQL: Storage percent'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.percent
+          key: azure.db.mysql.storage.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2029,16 +1982,16 @@ zabbix_export:
               parameters:
                 - $.metrics.storage_percent.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
           triggers:
             -
-              uuid: 6538d2c8ed774feb951204308f1458ce
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure PostgreSQL: Storage space is critically low'
+              uuid: 3afcb840e8004822a2dada2a89971f69
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -2047,9 +2000,9 @@ zabbix_export:
                   tag: scope
                   value: capacity
             -
-              uuid: 7f7a004cfc2a492092dd74c475888e8b
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure PostgreSQL: Storage space is low'
+              uuid: 2e605f906b284f769e7c880d4e642b43
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -2058,10 +2011,10 @@ zabbix_export:
                   tag: scope
                   value: capacity
         -
-          uuid: 399ef67426494a5cb7a820d056dfd4d5
-          name: 'Azure PostgreSQL: Server log storage limit'
+          uuid: 7f553d8a0898477b87a2828e51efcfcc
+          name: 'Azure MySQL: Server log storage limit'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.server.log.limit
+          key: azure.db.mysql.storage.server.log.limit
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2073,16 +2026,16 @@ zabbix_export:
               parameters:
                 - $.metrics.serverlog_storage_limit.maximum
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
         -
-          uuid: ef6890330ebe4fe09f46b0d2f6d3f827
-          name: 'Azure PostgreSQL: Server log storage percent'
+          uuid: cf5a77306c554a24b3741ef065b6d27a
+          name: 'Azure MySQL: Server log storage percent'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.server.log.percent
+          key: azure.db.mysql.storage.server.log.percent
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2094,16 +2047,16 @@ zabbix_export:
               parameters:
                 - $.metrics.serverlog_storage_percent.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
         -
-          uuid: 36bd10a959964083ae47349dd83ec695
-          name: 'Azure PostgreSQL: Server log storage used'
+          uuid: 8ed99a951e264185b1e0f343d7ea0aec
+          name: 'Azure MySQL: Server log storage used'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.server.log.used
+          key: azure.db.mysql.storage.server.log.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2115,16 +2068,16 @@ zabbix_export:
               parameters:
                 - $.metrics.serverlog_storage_usage.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
               value: storage
         -
-          uuid: dcbb87d442a04938b23e68f739f1e36f
-          name: 'Azure PostgreSQL: Storage used'
+          uuid: 0c9a5496d9884c8e9a434fb232b3208f
+          name: 'Azure MySQL: Storage used'
           type: DEPENDENT
-          key: azure.db.pgsql.storage.used
+          key: azure.db.mysql.storage.used
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -2136,7 +2089,7 @@ zabbix_export:
               parameters:
                 - $.metrics.storage_used.average
           master_item:
-            key: azure.db.pgsql.data.get
+            key: azure.db.mysql.data.get
           tags:
             -
               tag: component
@@ -2150,7 +2103,7 @@ zabbix_export:
           value: azure
         -
           tag: target
-          value: postgresql
+          value: mysql
       macros:
         -
           macro: '{$AZURE.APP_ID}'
@@ -2163,6 +2116,10 @@ zabbix_export:
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+          value: '25'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
@@ -2181,7 +2138,7 @@ zabbix_export:
           description: 'Microsoft Azure password.'
         -
           macro: '{$AZURE.RESOURCE_ID}'
-          description: 'Microsoft Azure PostgreSQL server ID.'
+          description: 'Microsoft Azure MySQL server ID.'
         -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
@@ -2190,7 +2147,7 @@ zabbix_export:
           description: 'Microsoft Azure tenant ID.'
       valuemaps:
         -
-          uuid: 61fc206aaae04abda4012e031f0e27ac
+          uuid: 323a5259fb854724891515767f341540
           name: 'Azure resource health state'
           mappings:
             -
@@ -3884,6 +3841,21 @@ zabbix_export:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.connections.aborted
     -
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure MySQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.failed
+    -
       uuid: f929f47602734f82a79f22a5f4446f61
       name: 'Azure MySQL: Network traffic'
       graph_items:
@@ -3898,6 +3870,36 @@ zabbix_export:
           item:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.network.ingress
+    -
+      uuid: dc6840162405481ebc1c3c98fdfcaef1
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: 3fcf43fd338e4902874d940fc0bec8b9
+      name: 'Azure MySQL: Server log storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.server.log.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.server.log.limit
     -
       uuid: 4210e6b4ed8744589dce88217e961a56
       name: 'Azure MySQL: Storage utilization'
@@ -3914,62 +3916,17 @@ zabbix_export:
             host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.limit
     -
-      uuid: c76cf8ec6a584af6be815ec4a9257a8c
-      name: 'Azure PostgreSQL: Connections'
+      uuid: bdc178e6faaa4850badc0c60c7c80d40
+      name: 'Azure MySQL: Storage utilization'
       graph_items:
         -
           color: 1A7C11
           item:
             host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.connections.active
+            key: azure.db.mysql.storage.used
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.connections.failed
-    -
-      uuid: 8bc17d843775414ea971e640e1fe5ec0
-      name: 'Azure PostgreSQL: Network traffic'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.network.egress
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.network.ingress
-    -
-      uuid: 9e750a5a462b4429ac5a36a72bd60c66
-      name: 'Azure PostgreSQL: Server log storage utilization'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.storage.server.log.used
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.storage.server.log.limit
-    -
-      uuid: 9ecd071a77364c4486fa5f63125cd985
-      name: 'Azure PostgreSQL: Storage utilization'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.storage.used
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL single server by HTTP'
-            key: azure.db.pgsql.storage.limit
+            key: azure.db.mysql.storage.limit
