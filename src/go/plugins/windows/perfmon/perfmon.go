@@ -103,7 +103,6 @@ func (p *Plugin) Collect() (err error) {
 	}
 
 	p.collectError = win32.PdhCollectQueryData(p.query)
-	err = p.collectError
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 	for index, c := range p.counters {
@@ -119,7 +118,8 @@ func (p *Plugin) Collect() (err error) {
 			c.head = c.head.inc(c.interval)
 		}
 	}
-	return
+
+	return p.collectError
 }
 
 func (p *Plugin) Period() int {
