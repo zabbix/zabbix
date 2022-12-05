@@ -4867,7 +4867,7 @@ svg {
 	}
 
 	.preprocessing-step {
-		align-items: flex-start;
+		align-items: baseline;
 	}
 
 	.step-name {
@@ -4887,6 +4887,10 @@ svg {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
+		}
+
+		.table-forms-separator {
+			width: 100%;
 		}
 	}
 
