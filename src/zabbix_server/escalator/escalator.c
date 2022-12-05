@@ -2415,6 +2415,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			goto out;
 		}
 	}
+#undef ACTION_PAUSE_SUPPRESSED_FALSE
 #undef ACTION_PAUSE_SUPPRESSED_TRUE
 
 	if (0 != skip)
@@ -2435,6 +2436,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		ret = ZBX_ESCALATION_SUPPRESS;
 		goto out;
 	}
+#undef ACTION_PAUSE_SYMPTOMS_FALSE
 #undef ACTION_PAUSE_SYMPTOMS_TRUE
 
 	ret = ZBX_ESCALATION_PROCESS;
