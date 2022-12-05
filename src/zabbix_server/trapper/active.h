@@ -22,10 +22,6 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_funcs_t events_cbs);
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_events_funcs_t events_cbs);
-
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_funcs_t events_cbs, int config_timeout);
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_events_funcs_t events_cbs, int config_timeout);
 #endif

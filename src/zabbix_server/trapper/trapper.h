@@ -25,7 +25,6 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 
-extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_STATS_ALLOWED_IP;
 
@@ -33,10 +32,10 @@ extern char	*CONFIG_STATS_ALLOWED_IP;
 
 typedef struct
 {
-	zbx_config_comms_args_t	*zbx_config;
+	zbx_config_comms_args_t	*zbx_config_comms;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	zbx_socket_t		*listen_sock;
 	zbx_events_funcs_t	events_cbs;
+	zbx_socket_t		*listen_sock;
 }
 zbx_thread_trapper_args;
 

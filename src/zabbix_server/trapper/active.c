@@ -36,26 +36,27 @@
 
 extern unsigned char	program_type;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: perform active agent auto registration                            *
- *                                                                            *
- * Parameters: host          - [IN] name of the host to be added or updated   *
- *             ip            - [IN] IP address of the host                    *
- *             port          - [IN] port of the host                          *
- *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                *
- *                             ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT    *
- *             host_metadata - [IN] host metadata                             *
- *             flag          - [IN] flag describing interface type            *
- *             interface     - [IN] interface value if flag is not default    *
- *             events_cbs    - [IN]                                           *
- *                                                                            *
- * Comments: helper function for get_hostid_by_host                           *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: perform active agent auto registration                                *
+ *                                                                                *
+ * Parameters: host            - [IN] name of the host to be added or updated     *
+ *             ip              - [IN] IP address of the host                      *
+ *             port            - [IN] port of the host                            *
+ *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                    *
+ *                                    ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT *
+ *             host_metadata   - [IN] host metadata                               *
+ *             flag            - [IN] flag describing interface type              *
+ *             interface       - [IN] interface value if flag is not default      *
+ *             events_cbs      - [IN]                                             *
+ *             config_timeout  - [IN]                                             *
+ *                                                                                *
+ * Comments: helper function for get_hostid_by_host                               *
+ *                                                                                *
+ **********************************************************************************/
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		zbx_events_funcs_t events_cbs)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_events_funcs_t events_cbs,
+		int config_timeout)
 {
 	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
@@ -71,7 +72,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	else if (ZBX_CONN_IP == flag)
 		p_ip = p = interface;
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (ZBX_CONN_DEFAULT == flag || ZBX_CONN_IP == flag)
 	{
 		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == zbx_is_ip4(p + 7))
@@ -158,17 +159,18 @@ out:
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: sock          - [IN] open socket of server-agent connection    *
- *             host          - [IN] host name                                 *
- *             ip            - [IN] IP address of the host                    *
- *             port          - [IN] port of the host                          *
- *             host_metadata - [IN] host metadata                             *
- *             flag          - [IN] flag describing interface type            *
- *             interface     - [IN] interface value if flag is not default    *
- *             events_cbs    - [IN]                                           *
- *             hostid        - [OUT] host ID                                  *
- *             revision      - [OUT] host configuration revision              *
- *             error         - [OUT] error message                            *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             host           - [IN] host name                                *
+ *             ip             - [IN] IP address of the host                   *
+ *             port           - [IN] port of the host                         *
+ *             host_metadata  - [IN] host metadata                            *
+ *             flag           - [IN] flag describing interface type           *
+ *             interface      - [IN] interface value if flag is not default   *
+ *             events_cbs     - [IN]                                          *
+ *             config_timeout - [IN]                                          *
+ *             hostid         - [OUT] host ID                                 *
+ *             revision       - [OUT] host configuration revision             *
+ *             error          - [OUT] error message                           *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -179,8 +181,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
-		zbx_events_funcs_t events_cbs, zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_events_funcs_t events_cbs,
+		int config_timeout, zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -216,7 +218,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface, events_cbs);
+							interface, events_cbs, config_timeout);
 				}
 			}
 		}
@@ -235,7 +237,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				heartbeat))
 		{
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
-					events_cbs);
+					events_cbs, config_timeout);
 		}
 	}
 
@@ -250,9 +252,10 @@ out:
  *                                                                            *
  * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
- * Parameters: sock       - open socket of server-agent connection            *
- *             request    - request buffer                                    *
- *             events_cbs - [IN]                                              *
+ * Parameters: sock           - open socket of server-agent connection        *
+ *             request        - request buffer                                *
+ *             events_cbs     - [IN]                                          *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
@@ -261,7 +264,8 @@ out:
  *           format of the list: key:delay:last_log_size                      *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_funcs_t events_cbs)
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request,  zbx_events_funcs_t events_cbs,
+		int config_timeout)
 {
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
@@ -284,7 +288,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_fun
 
 	/* no host metadata in older versions of agent */
 	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  events_cbs,
-			&hostid, &revision, error))
+			config_timeout, &hostid, &revision, error))
 	{
 		goto out;
 	}
@@ -345,7 +349,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_fun
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, buffer);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
@@ -432,15 +436,17 @@ out:
  *                                                                            *
  * Purpose: send list of active checks to the host                            *
  *                                                                            *
- * Parameters: sock         - open socket of server-agent connection          *
- *             jp           - request buffer                                  *
- *             events_cbs   - [IN]                                            *
+ * Parameters: sock           - open socket of server-agent connection        *
+ *             jp             - request buffer                                *
+ *             events_cbs     - [IN]                                          *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_events_funcs_t events_cbs)
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_events_funcs_t events_cbs,
+		int config_timeout)
 {
 	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
@@ -525,8 +531,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, events_cbs, &hostid,
-			&revision, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, events_cbs, config_timeout,
+			&hostid, &revision, error))
 	{
 		goto error;
 	}
@@ -692,7 +698,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_json_free(&json);	/* json buffer can be large, free as fast as possible */
 
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, sock->protocol,
-				CONFIG_TIMEOUT)))
+				config_timeout)))
 		{
 			zbx_strscpy(error, zbx_socket_strerror());
 		}
@@ -700,7 +706,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	else
 	{
 		if (SUCCEED != (ret = zbx_tcp_send_ext(sock, json.buffer, json.buffer_size, 0, sock->protocol,
-				CONFIG_TIMEOUT)))
+				config_timeout)))
 		{
 			zbx_strscpy(error, zbx_socket_strerror());
 		}

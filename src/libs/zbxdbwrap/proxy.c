@@ -350,6 +350,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
  *     req            - [IN] request, included into error message             *
  *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *     config_timeout - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed                                            *
@@ -357,7 +358,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
 {
 	char	*msg = NULL;
 
@@ -367,7 +368,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				zbx_socket_strerror());
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", config_timeout);
 
 		return FAIL;
 	}
@@ -381,7 +382,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				msg, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, msg, config_timeout);
 
 		zbx_free(msg);
 		return FAIL;
@@ -399,7 +400,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", config_timeout);
 
 		zbx_free(msg);
 		return FAIL;
@@ -413,7 +414,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 				" configured for proxy communication with server", req, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
+			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", config_timeout);
 
 		return FAIL;
 	}

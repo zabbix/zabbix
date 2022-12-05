@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "cyberark.h"
+#include "hashicorp.h"
+
+#include "zbxkvs.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
+#include "zbxstr.h"
 
-int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
@@ -32,26 +35,38 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 	ZBX_UNUSED(path);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(kvs);
-
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
 #else
-	char			*out = NULL, *url;
-	struct zbx_json_parse	jp, jp_data;
+	char			*out = NULL, *url, header[MAX_STRING_LEN], *left, *right;
+	struct zbx_json_parse	jp, jp_data, jp_data_data;
 	int			ret = FAIL;
 	long			response_code;
 
-	ZBX_UNUSED(token);
-
-	url = zbx_dsprintf(NULL, "%s/AIMWebService/api/Accounts?%s", vault_url, path);
-
-	if (SUCCEED != zbx_http_get(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file, &out,
-			&response_code, error))
+	if (NULL == token)
 	{
-		goto fail;
+		*error = zbx_dsprintf(*error, "\"VaultToken\" configuration parameter or \"VAULT_TOKEN\" environment"
+				" variable should be defined");
+		return FAIL;
 	}
 
-	if (200 != response_code)
+	zbx_strsplit_first(path, '/', &left, &right);
+	if (NULL == right)
+	{
+		*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
+		free(left);
+		return FAIL;
+	}
+	url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
+	zbx_free(right);
+	zbx_free(left);
+
+	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
+
+	if (SUCCEED != zbx_http_get(url, header, timeout, ssl_cert_file, ssl_key_file, &out, &response_code, error))
+		goto fail;
+
+	if (200 != response_code && 204 != response_code)
 	{
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
@@ -63,13 +78,21 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_brackets_open(out, &jp_data))
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, "data", &jp_data))
 	{
-		*error = zbx_dsprintf(*error, "cannot parse secrets from vault: %s", zbx_json_strerror());
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received JSON object.",
+				ZBX_PROTO_TAG_DATA);
 		goto fail;
 	}
 
-	zbx_kvs_from_json_get(&jp_data, kvs);
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "data", &jp_data_data))
+	{
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received \"%s\" JSON object.",
+				ZBX_PROTO_TAG_DATA, ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	zbx_kvs_from_json_get(&jp_data_data, kvs);
 
 	ret = SUCCEED;
 fail:
