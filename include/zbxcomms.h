@@ -87,12 +87,12 @@ typedef struct
 } zbx_config_tls_t;
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
-void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
+void	zbx_config_tls_free(zbx_config_tls_t *config_tls);
 
 
 typedef struct
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
 	const char		*hostname;
 	const int		proxymode;
 	const int		config_timeout;

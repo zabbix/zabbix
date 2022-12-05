@@ -40,9 +40,6 @@ extern unsigned char			program_type;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
-	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
-			(((zbx_thread_args_t *)args)->args);
-
 	double			sec = 0.0;
 	int			nextcheck = 0, sleeptime, secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
@@ -50,6 +47,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+
+	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
+			(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);

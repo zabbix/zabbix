@@ -255,7 +255,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
 
 	zbx_rtc_subscribe(process_type, process_num, proxyconfig_args_in->config_timeout, &rtc);
@@ -320,8 +320,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->config_vault, info,
-				proxyconfig_args_in->config_timeout);
+		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->config_tls,
+				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout);
 
 		interval = zbx_time() - sec;
 
