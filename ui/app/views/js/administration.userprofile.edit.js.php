@@ -35,12 +35,20 @@
 				}
 			});
 
-			$('#messages_enabled').on('change', function() {
-				$('input, button, z-select', $('#messagingTab'))
-					.not('[name="messages[enabled]"]')
-					.prop('disabled', !this.checked);
-			}).trigger('change');
+			document.getElementById('messages_enabled').addEventListener('click', () => {
+				this._updateForm();
+			})
 
+			this._updateForm();
+		}
+
+		_updateForm() {
+			document
+				.getElementById('messagingTab')
+				.querySelectorAll('input:not([name="messages[enabled]"]),button')
+				.forEach(node => {
+					node.toggleAttribute('disabled', !document.getElementById('messages_enabled').checked);
+				});
 		}
 
 		_userFormSubmit() {
