@@ -57,22 +57,6 @@ static void snmp_walk_json_output_obj_free(zbx_snmp_walk_json_output_obj_t *obj)
 	zbx_vector_snmp_value_pair_destroy(&obj->values);
 }
 
-static void	snmp_value_pair_hashset_clear(zbx_hashset_t *hs)
-{
-	zbx_snmp_value_pair_t		*pair;
-	zbx_hashset_iter_t		iter;
-
-	zbx_hashset_iter_reset(hs, &iter);
-
-	while (NULL != (pair = (zbx_snmp_value_pair_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_free(pair->oid);
-		zbx_free(pair->value);
-	}
-
-	zbx_hashset_destroy(hs);
-}
-
 static zbx_hash_t	snmp_walk_json_output_obj_hash_func(const void *d)
 {
 	const zbx_snmp_walk_json_output_obj_t	*s;
@@ -87,22 +71,6 @@ static int	snmp_walk_json_output_obj_compare_func(const void *d1, const void *d2
 	const zbx_snmp_walk_json_output_obj_t	*s2 = (const zbx_snmp_walk_json_output_obj_t *)d2;
 
 	return strcmp(s1->key, s2->key);
-}
-
-static zbx_hash_t	snmp_cache_pair_hash_func(const void *d)
-{
-	const zbx_snmp_value_pair_t	*s;
-	s = (const zbx_snmp_value_pair_t *)d;
-
-	return ZBX_DEFAULT_STRING_HASH_FUNC(s->oid);
-}
-
-static int	snmp_cache_pair_compare_func(const void *d1, const void *d2)
-{
-	const zbx_snmp_value_pair_t	*s1 = (const zbx_snmp_value_pair_t *)d1;
-	const zbx_snmp_value_pair_t	*s2 = (const zbx_snmp_value_pair_t *)d2;
-
-	return strcmp(s1->oid, s2->oid);
 }
 
 static int	preproc_snmp_translate_oid(const char *oid_in, char **oid_out)
@@ -613,9 +581,8 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	int					ret = SUCCEED;
 	char					*result = NULL, *data;
 	zbx_hashset_t				grouped_prefixes;
-	size_t					len, offset;
+	size_t					len;
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
-	zbx_hashset_iter_t			iter;
 	zbx_snmp_value_pair_t			p;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
