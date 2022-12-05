@@ -52,6 +52,8 @@ switch ($data['rules_preset']) {
 		break;
 	case 'template':
 		$doc_url = CDocHelper::POPUP_TEMPLATE_IMPORT;
+
+		unset($titles['templateLinkage']);
 		break;
 	case 'host':
 		$doc_url = CDocHelper::POPUP_HOST_IMPORT;

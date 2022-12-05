@@ -1523,11 +1523,6 @@ class testInitialConfSync extends CIntegrationTest
 					'createMissing' => true,
 					'deleteMissing' => false
 				],
-				'templateLinkage' =>
-				[
-					'createMissing' => true,
-					'deleteMissing' => false
-				],
 				'items' =>
 				[
 					'updateExisting' => true,
@@ -1594,11 +1589,6 @@ class testInitialConfSync extends CIntegrationTest
 				'templateDashboards' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => false,
-					'deleteMissing' => false
-				],
-				'templateLinkage' =>
-				[
 					'createMissing' => false,
 					'deleteMissing' => false
 				],

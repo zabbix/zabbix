@@ -267,18 +267,6 @@ class CConfigurationImportcompare {
 					continue;
 				}
 
-				if (!$options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
-					$entity['after']['templates'] = $entity['before']['templates'];
-				}
-				elseif ($options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
-					$entity['after']['templates'] = $this->afterForInnerCreateMissing($entity['before']['templates'],
-						$entity['after']['templates']);
-				}
-				elseif ($options['templateLinkage']['deleteMissing'] && !$options['templateLinkage']['createMissing']) {
-					$entity['after']['templates'] = $this->afterForInnerDeleteMissing($entity['before']['templates'],
-						$entity['after']['templates']);
-				}
-
 				if ($entity['before'] === $entity['after'] && count($entity) === 2) {
 					unset($diff['updated'][$key]);
 				}
