@@ -903,6 +903,7 @@ class CWidgetNavTree extends CWidget {
 											}
 											else {
 												this._deactivateContentsEvents();
+
 												if (item_edit) {
 													const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
