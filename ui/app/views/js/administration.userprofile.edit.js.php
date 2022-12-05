@@ -57,6 +57,7 @@
 				elem.value = elem.value.trim();
 			});
 
+			const current_password = document.getElementById('current_password').value;
 			const password1 = document.getElementById('password1').value;
 			const password2 = document.getElementById('password2').value;
 
@@ -64,7 +65,7 @@
 				_('In case of successful password change user will be logged out of all active sessions. Continue?')
 			) ?>;
 
-			if (password1 !== '' && password2 !== '' ) {
+			if (password1 !== '' && password2 !== '' && current_password !== '') {
 				return confirm(warning_msg);
 			} else {
 				return true;
