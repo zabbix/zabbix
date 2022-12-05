@@ -41,7 +41,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *zbx_config_tls, const zbx_config_vault_t *config_vault,
+		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
 		const zbx_thread_info_t *thread_info, int config_timeout)
 {
 	zbx_socket_t		sock;
@@ -75,7 +75,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
 	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, zbx_config_tls))	/* retry till have a connection */
+			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, config_tls)) /* retry till have a connection */
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 		goto out;

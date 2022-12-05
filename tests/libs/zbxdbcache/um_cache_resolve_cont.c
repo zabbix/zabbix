@@ -163,7 +163,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		zbx_mock_step_t		*step;
 		zbx_dbsync_t		gmacros, hmacros, htmpls;
 		struct zbx_json_parse	jp;
-		zbx_config_vault_t      config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+		zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 		step = (zbx_mock_step_t *)zbx_malloc(NULL, sizeof(zbx_mock_step_t));
 

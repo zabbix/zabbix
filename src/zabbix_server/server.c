@@ -1361,14 +1361,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &config_vault, get_program_type, listen_sock};
 	zbx_thread_escalator_args	escalator_args = {config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {config_tls, &config_vault, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {config_tls, &config_vault, get_program_type,
+							CONFIG_TIMEOUT};
 	zbx_thread_discoverer_args	discoverer_args = {config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_report_writer_args	report_writer_args = {config_tls->ca_file, config_tls->cert_file,
 							config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info, CONFIG_TIMEOUT};
-
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type,
-							CONFIG_TIMEOUT};
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, &config_vault, CONFIG_TIMEOUT};
 	zbx_thread_pinger_args		pinger_args = {get_program_type, CONFIG_TIMEOUT};

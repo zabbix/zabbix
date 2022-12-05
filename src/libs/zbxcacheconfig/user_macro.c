@@ -610,10 +610,11 @@ out:
  *                                                                               *
  * Purpose: sync global/host user macros                                         *
  *                                                                               *
- * Parameters: cache  - [IN] the user macro cache                                *
- *             sync   - [IN] the synchronization object containing inserted,     *
+ * Parameters: cache        - [IN] user macro cache                              *
+ *             sync         - [IN] synchronization object containing inserted,   *
  *                            updated and deleted rows                           *
- *             offset - [IN] macro column offset in the row                      *
+ *             offset       - [IN] macro column offset in row                    *
+ *             config_vault - [IN]                                               *
  *                                                                               *
  *********************************************************************************/
 static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int offset,

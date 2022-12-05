@@ -1352,8 +1352,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			}
 #endif
 			sec = zbx_time();
-			process_trapper_child(&s, &ts, trapper_args_in->config_comms,
-					trapper_args_in->config_vault);
+			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

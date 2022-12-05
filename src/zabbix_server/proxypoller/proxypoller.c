@@ -246,7 +246,8 @@ out:
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy - [IN/OUT] proxy data                                    *
+ * Parameters: proxy        - [IN/OUT] proxy data                             *
+ *             config_vault - [IN]                                            *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *

@@ -311,7 +311,7 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t		*config_tls = NULL;
-static zbx_config_vault_t       config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 

@@ -119,8 +119,7 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, const zbx_con
 	zbx_kvs_create(&kvs, 2);
 
 	if (SUCCEED != zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
-		config_vault->tls_key_file, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs,
-			error))
+			config_vault->tls_key_file, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs, error))
 	{
 		goto fail;
 	}
