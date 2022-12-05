@@ -290,7 +290,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check form labels.
 		$count = count($data['problems']);
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Close problem', ''];
+				'Acknowledge', 'Convert to cause', 'Close problem', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
 
 		// Check "Problem" field value.
