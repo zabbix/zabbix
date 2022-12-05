@@ -98,18 +98,26 @@ class CControllerScriptList extends CController {
 		]);
 
 		// Data sort and pager.
+		$name_path = [];
+
+		foreach ($data['scripts'] as $script) {
+			if ($script['menu_path'] != null) {
+				$script['name_path'] = ($script['menu_path'].'/'.$script['name']);
+			}
+			else {
+				$script['name_path'] = (' /'.$script['name']);
+			}
+			$name_path[] = $script;
+		}
+		unset($script);
+
+		$data['scripts'] = $name_path;
+
 		if ($sortField != 'name') {
 			order_result($data['scripts'], $sortField, $sortOrder);
 		}
-		else if ($sortOrder === ZBX_SORT_DOWN){
-			$sortOrder = ZBX_SORT_UP;
-			order_result($data['scripts'], $sortField, $sortOrder);
-			$sortOrder = ZBX_SORT_DOWN;
-			order_result($data['scripts'], 'menu_path', $sortOrder);
-		}
 		else {
-			order_result($data['scripts'], $sortField, $sortOrder);
-			order_result($data['scripts'], 'menu_path', $sortOrder);
+			order_result($data['scripts'], 'name_path', $sortOrder);
 		}
 
 		$page_num = getRequest('page', 1);
