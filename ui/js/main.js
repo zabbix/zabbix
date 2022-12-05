@@ -655,11 +655,11 @@ var hintBox = {
 };
 
 /**
- * Perform Json-RPC Zabbix API call.
+ * Perform JSON-RPC Zabbix API call.
  *
- * @param method
- * @param params
- * @param id
+ * @param {string} method
+ * @param {object} params
+ * @param {int}    id
  *
  * @returns {Promise<any>}
  */
@@ -667,8 +667,9 @@ function ApiCall(method, params, id = 1) {
 	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
 		method: 'POST',
 		headers: {
-			'Content-Type': 'application/json',
+			'Content-Type': 'application/json'
 		},
+		credentials: 'same-origin',
 		body: JSON.stringify({
 			jsonrpc: '2.0',
 			method,

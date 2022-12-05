@@ -25,6 +25,9 @@
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 #define OVERRIDE_STOP_TRUE	1
 
@@ -314,7 +317,7 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 				}
 				else if (0 != strcmp(lastmacro, condition->macro))
 				{
-					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, ") and ");
+					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, ") and (");
 				}
 				else
 					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, " or ");
@@ -348,15 +351,10 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 			zbx_vector_ptr_append(&errmsgs, errmsg);
 			errmsg = NULL;
 		}
-
-		if (filter->conditions.values_num == i + 1)
-		{
-			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
-				zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
-
-			expression_offset++;
-		}
 	}
+
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+		zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
 
 	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), &errmsgs))
 	{

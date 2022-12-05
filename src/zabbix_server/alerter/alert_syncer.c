@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+#include "../server.h"
 
 #include "alerter_protocol.h"
 #include "log.h"

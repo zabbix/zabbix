@@ -142,7 +142,7 @@ class testUserGroup extends CAPITest {
 		return [
 			[
 				'group' => [[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API update with non existent parameter',
 					'value' => '4'
 				]],
@@ -186,14 +186,14 @@ class testUserGroup extends CAPITest {
 			// Check user group name.
 			[
 				'group' => [[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => ''
 				]],
 				'expected_error' => 'Invalid parameter "/1/name": cannot be empty.'
 			],
 			[
 				'group' => [[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'Zabbix administrators'
 				]],
 				'expected_error' => 'User group "Zabbix administrators" already exists.'
@@ -245,7 +245,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'User group with the same names'
 					],
 					[
@@ -258,21 +258,21 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'API user group with the same ids1'
 					],
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'API user group with the same ids2'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (usrgrpid)=(13) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (usrgrpid)=(23) already exists.'
 			],
 			// Check successfully update of user group.
 			[
 				'group' => [
 					[
-						'usrgrpid' => '13',
+						'usrgrpid' => '23',
 						'name' => 'Апи группа пользователей обновленна УТФ-8'
 					]
 				],
@@ -296,7 +296,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					[
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API update user group one',
 						'templategroup_rights' =>[
 							[
@@ -727,7 +727,7 @@ class testUserGroup extends CAPITest {
 				'method' => 'usergroup.update',
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'usergroup' => [
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API user group update as admin user without permissions'
 				],
 				'expected_error' => 'No permissions to call "usergroup.update".'
@@ -748,7 +748,7 @@ class testUserGroup extends CAPITest {
 				'method' => 'usergroup.update',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'usergroup' => [
-					'usrgrpid' => '13',
+					'usrgrpid' => '23',
 					'name' => 'API user group update as zabbix user without permissions'
 				],
 				'expected_error' => 'No permissions to call "usergroup.update".'
@@ -940,9 +940,15 @@ class testUserGroup extends CAPITest {
 	 * Create data to be used in tests.
 	 */
 	public function prepareTestData() {
-		$response = CDataHelper::call('userdirectory.create', [
-			['name' => 'API LDAP #1', 'host' => 'ldap.forumsys.com', 'port' => 389, 'base_dn' => 'dc=example,dc=com', 'search_attribute' => 'uid']
-		]);
+		$response = CDataHelper::call('userdirectory.create', [[
+			'name' => 'API LDAP #1',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid'
+		]]);
+
 		$this->assertArrayHasKey('userdirectoryids', $response);
 		self::$data['userdirectoryid'] = array_combine(['API LDAP #1'], $response['userdirectoryids']);
 	}

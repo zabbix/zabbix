@@ -651,10 +651,10 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		foreach ($data['users'] as $alias => $user) {
 			switch ($alias) {
 				case 'admin-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , 4);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 40);
 					break;
 				case 'user-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , 5);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 50);
 					break;
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {

@@ -314,6 +314,13 @@ class CUserGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$enabled_groupids = array_keys(array_column($usrgrps, 'users_status', 'usrgrpid'), GROUP_STATUS_ENABLED);
+		$disabled_user_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+
+		if ($enabled_groupids && in_array($disabled_user_groupid, $enabled_groupids)) {
+			static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be enabled.'));
+		}
+
 		$names = [];
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
@@ -1000,6 +1007,10 @@ class CUserGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID), $usrgrpids)) {
+			static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be deleted.'));
+		}
+
 		$db_usrgrps = DB::select('usrgrp', [
 			'output' => ['usrgrpid', 'name'],
 			'usrgrpids' => $usrgrpids,
@@ -1318,6 +1329,7 @@ class CUserGroup extends CApiService {
 		$db_userdirectories = API::UserDirectory()->get([
 			'output' => [],
 			'userdirectoryids' => $userdirectoryids,
+			'filter' => ['idp_type' => IDP_TYPE_LDAP],
 			'preservekeys' => true
 		]);
 

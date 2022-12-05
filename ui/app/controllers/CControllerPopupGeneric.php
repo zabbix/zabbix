@@ -557,6 +557,7 @@ class CControllerPopupGeneric extends CController {
 			'filter_hostid_rst' =>					'in 1',
 			'filter_templateid_rst' =>				'in 1',
 			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'group_status' =>						'in '.implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]),
 			'hostids' =>							'array',
 			'host_pattern' =>						'array|not_empty',
 			'host_pattern_wildcard_allowed' =>		'in 1',
@@ -1229,6 +1230,10 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => API_OUTPUT_EXTEND
 				];
+
+				if ($this->hasInput('group_status')) {
+					$options['status'] = $this->getInput('group_status');
+				}
 
 				$records = API::UserGroup()->get($options);
 				CArrayHelper::sort($records, ['name']);
