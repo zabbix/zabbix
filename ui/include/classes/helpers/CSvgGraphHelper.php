@@ -545,7 +545,7 @@ class CSvgGraphHelper {
 			else {
 				$name = $data_sets[$dataset_num]['legend_label'] !== ''
 					? $data_sets[$dataset_num]['legend_label']
-					: 'Data set #'.($dataset_num + 1);
+					: _('Data set').' #'.($dataset_num + 1);
 			}
 
 			$item = [
