@@ -1696,7 +1696,9 @@ abstract class CItemGeneralOld extends CApiService {
 					case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 						$params = explode("\n", $preprocessing['params']);
 
-						$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'length' => 255];
+						$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE,
+							'length' => 255
+						];
 
 						if (!CApiInputValidator::validate($api_input_rules, $params, '/params', $error)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, $error);

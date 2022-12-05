@@ -2028,6 +2028,8 @@ abstract class CItemGeneral extends CApiService {
 	 * Check prerpocessing steps for specifics validation rules.
 	 *
 	 * @param array $items
+	 *
+	 * @throws APIException
 	 */
 	protected static function checkPreprocessingSteps(array $items): void {
 		foreach ($items as $i => $item) {
