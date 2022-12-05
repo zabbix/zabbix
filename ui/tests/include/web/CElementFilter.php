@@ -134,7 +134,7 @@ class CElementFilter {
 	 * Determine whether this element matches the filter or not.
 	 *
 	 * @param CElement $element		element to be checked
-	 * @param mixed	   $key			element кеу in the collection array
+	 * @param mixed	   $key			element key in the collection array
 	 *
 	 * @return boolean
 	 */
