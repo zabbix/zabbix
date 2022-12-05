@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:50:27Z'
+  date: '2022-10-27T12:00:46Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: fe5b8448661f41b9a6d948fccd7f9045
-      template: 'DELL PowerEdge R720 SNMP'
-      name: 'DELL PowerEdge R720 SNMP'
+      template: 'DELL PowerEdge R720 by SNMP'
+      name: 'DELL PowerEdge R720 by SNMP'
       description: |
         Template for DELL PowerEdge R720 servers with iDRAC version 7 and later.
         
@@ -97,7 +97,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8b88b49aa9584e0e99f1ac5933ece512
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R720 SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R720 SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R720 by SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
               name: 'Dell R720: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -154,7 +154,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7d8f8509b7c24cd495ca16f3b66311a2
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R720 SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R720 SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R720 by SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
               name: 'Dell R720: Device has been replaced'
               event_name: 'Dell R720: Device has been replaced (new serial number received)'
               priority: INFO
@@ -240,7 +240,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8223bb1771ff435eab1e2473073daf63
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R720 SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R720 SNMP/dell.server.name[sysName]))>0'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R720 by SNMP/dell.server.name[sysName]))>0'
               name: 'Dell R720: System name has changed'
               event_name: 'Dell R720: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -321,7 +321,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8a3c959a946b4945848857b249b6384e
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.DISASTER}'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.DISASTER}'
               name: 'Dell R720: System is in unrecoverable state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: DISASTER
@@ -332,7 +332,7 @@ zabbix_export:
                   value: availability
             -
               uuid: 922bb76a936741aab560a6c7fdf1609f
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
               name: 'Dell R720: System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -343,7 +343,7 @@ zabbix_export:
                   value: availability
             -
               uuid: e5335391a2a74e87a4f9964e2b421150
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.WARN}'
               name: 'Dell R720: System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -351,7 +351,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Dell R720: System status is in critical state'
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.status[globalSystemStatus])={$HEALTH.STATUS.CRIT}'
               tags:
                 -
                   tag: scope
@@ -382,7 +382,7 @@ zabbix_export:
           triggers:
             -
               uuid: a9556b21495c4ee4acba1c7b2be8b5b6
-              expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R720 SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R720 SNMP/dell.server.sw.os[systemOSName]))>0'
+              expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R720 by SNMP/dell.server.sw.os[systemOSName]))>0'
               name: 'Dell R720: Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Ack to close.'
@@ -428,7 +428,7 @@ zabbix_export:
           triggers:
             -
               uuid: ff70ec8e9ea64cbf9638e6d8f5282b0f
-              expression: 'max(/DELL PowerEdge R720 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/DELL PowerEdge R720 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'Dell R720: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -483,7 +483,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 560ced8dc58a498db8f511e8ecbd7a7d
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                   name: 'Dell R720: {#BATTERY_NAME} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -494,7 +494,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: c3f0750f9d0f4875b81a9381570a9cca
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
                   name: 'Dell R720: {#BATTERY_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -502,14 +502,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#BATTERY_NAME} is in critical state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
                   uuid: d79579790be2485e9f8227be9f460b18
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
                   name: 'Dell R720: {#BATTERY_NAME} is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -517,10 +517,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#BATTERY_NAME} is in critical state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                     -
                       name: 'Dell R720: {#BATTERY_NAME} is in warning state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
                   tags:
                     -
                       tag: scope
@@ -598,7 +598,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: dfd11c71843c4d19b8c216864146217a
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                   name: 'Dell R720: {#CNTLR_NAME} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -606,14 +606,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#CNTLR_NAME} is in unrecoverable state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
                   uuid: 73b701ac3ef448ceab5df956c9ebefe6
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
                   name: 'Dell R720: {#CNTLR_NAME} is in unrecoverable state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
@@ -624,7 +624,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: 4c17ab46f1624c81b5f6ccebaddf76e2
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
                   name: 'Dell R720: {#CNTLR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -632,10 +632,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#CNTLR_NAME} is in critical state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                     -
                       name: 'Dell R720: {#CNTLR_NAME} is in unrecoverable state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
@@ -705,7 +705,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 02e8e8e511c04ce6b1ced1c9515e4960
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
                   name: 'Dell R720: {#FAN_DESCR} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -716,7 +716,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: 50a0052574744bc0870bfaab56637f16
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.WARN:"nonCriticalLower"}'
                   name: 'Dell R720: {#FAN_DESCR} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -724,7 +724,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#FAN_DESCR} is in critical state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"failed"}'
                   tags:
                     -
                       tag: scope
@@ -822,7 +822,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 10427c2fdc4243ff9735c3491c65e935
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
                   name: 'Dell R720: {#DISK_NAME} has been replaced'
                   event_name: 'Dell R720: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
@@ -888,7 +888,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7da1638a51604539a0e1c01b4b038504
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: 'Dell R720: {#DISK_NAME} S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -896,7 +896,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#DISK_NAME} failed'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
                   tags:
                     -
                       tag: scope
@@ -936,7 +936,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 38cfba465f624cf897d0650e5a4290c3
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
                   name: 'Dell R720: {#DISK_NAME} failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -947,7 +947,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: 779c4a8c62f24d238b53f0ed8ebfcf5b
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN:"nonCritical"}'
                   name: 'Dell R720: {#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -955,7 +955,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#DISK_NAME} failed'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R720 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"nonRecoverable"}'
                   tags:
                     -
                       tag: scope
@@ -999,7 +999,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b40edbb84f174a98be55b659c7766554
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
                   name: 'Dell R720: Power supply {#PSU_DESCR} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1010,7 +1010,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: 217985fe9aed41338e8c2a48af3ceb99
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.WARN:"nonCritical"}'
                   name: 'Dell R720: Power supply {#PSU_DESCR} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1018,7 +1018,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: Power supply {#PSU_DESCR} is in critical state'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"nonRecoverable"}'
                   tags:
                     -
                       tag: scope
@@ -1074,7 +1074,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 153e7512141f489b84dcc35a7350d6bf
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
                   name: 'Dell R720: Probe {#SENSOR_LOCALE} is in critical status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1085,7 +1085,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: eec3e64901d44a60a268ed30a8394d36
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
                   name: 'Dell R720: Probe {#SENSOR_LOCALE} is in warning status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1093,14 +1093,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: Probe {#SENSOR_LOCALE} is in critical status'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
                   uuid: 16dec7f89d9a44c0954bf29c3e32040b
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$SENSOR.TEMP.STATUS.OK}'
                   name: 'Dell R720: Probe {#SENSOR_LOCALE} is not in optimal status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1109,10 +1109,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: Probe {#SENSOR_LOCALE} is in critical status'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
                     -
                       name: 'Dell R720: Probe {#SENSOR_LOCALE} is in warning status'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R720 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
                   tags:
                     -
                       tag: scope
@@ -1302,7 +1302,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 42bcb2a7d63a46e082f3b6a1c5997fee
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
                   name: 'Dell R720: {#DISK_NAME} failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1313,7 +1313,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: ea36db6addcf4bcb9f1c3b822e6c4422
-                  expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
+                  expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.WARN:"degraded"}'
                   name: 'Dell R720: {#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1321,7 +1321,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Dell R720: {#DISK_NAME} failed'
-                      expression: 'last(/DELL PowerEdge R720 SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
+                      expression: 'last(/DELL PowerEdge R720 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$VDISK.STATUS.CRIT:"failed"}'
                   tags:
                     -
                       tag: scope
@@ -1736,7 +1736,7 @@ zabbix_export:
   triggers:
     -
       uuid: a5505bd8d3f64ea1ae02e421a4114d2f
-      expression: '(last(/DELL PowerEdge R720 SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R720 SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R720 SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R720 SNMP/dell.server.net.uptime[sysUpTime])<10m)'
+      expression: '(last(/DELL PowerEdge R720 by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R720 by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R720 by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R720 by SNMP/dell.server.net.uptime[sysUpTime])<10m)'
       name: 'Dell R720: Host has been restarted'
       event_name: 'Dell R720: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING

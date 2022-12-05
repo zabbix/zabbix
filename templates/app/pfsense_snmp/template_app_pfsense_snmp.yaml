@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-08T11:23:14Z'
+  date: '2022-10-27T12:16:54Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 16f281aeb8904d3db8b66dda94611fcc
-      template: 'PFSense SNMP'
-      name: 'PFSense SNMP'
+      template: 'PFSense by SNMP'
+      name: 'PFSense by SNMP'
       description: |
         Template for monitoring pfSense by SNMP
         Setup:
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 80fc3672290d45d49c250ccc120f3606
-              expression: 'last(/PFSense SNMP/pfsense.dhcpd.status)=0'
+              expression: 'last(/PFSense by SNMP/pfsense.dhcpd.status)=0'
               name: 'PFSense: DHCP server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -88,7 +88,7 @@ zabbix_export:
           triggers:
             -
               uuid: 67b862f6aa3a4833af44d513aad517b5
-              expression: 'last(/PFSense SNMP/pfsense.dns.status)=0'
+              expression: 'last(/PFSense by SNMP/pfsense.dns.status)=0'
               name: 'PFSense: DNS server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -123,7 +123,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9f7a47055ee64edcbb70b047a35f7774
-              expression: 'last(/PFSense SNMP/pfsense.nginx.status)=0'
+              expression: 'last(/PFSense by SNMP/pfsense.nginx.status)=0'
               name: 'PFSense: Web server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -280,7 +280,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4a7ff4c437054ce88c6c069ffcb6434f
-              expression: 'last(/PFSense SNMP/pfsense.pf.status)<>1'
+              expression: 'last(/PFSense by SNMP/pfsense.pf.status)<>1'
               name: 'PFSense: Packet filter is not running'
               opdata: 'Current running state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -348,7 +348,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7983ee28646d4327ae0814c88c7b213f
-              expression: 'min(/PFSense SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
+              expression: 'min(/PFSense by SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
               name: 'PFSense: Source tracking table usage is high'
               event_name: 'PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -403,7 +403,7 @@ zabbix_export:
           triggers:
             -
               uuid: ce0e7dec597e4148abd9b699c787decd
-              expression: 'min(/PFSense SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
+              expression: 'min(/PFSense by SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
               name: 'PFSense: State table usage is high'
               event_name: 'PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -437,7 +437,7 @@ zabbix_export:
           triggers:
             -
               uuid: d06bdb79a48c438798286a89680eb3e1
-              expression: 'max(/PFSense SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/PFSense by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'PFSense: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -694,9 +694,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f5cbc2b7d91f4fa5aab8eb96d8a0550f
-                  expression: 'min(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/PFSense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/PFSense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
                   event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
@@ -705,7 +705,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -1045,9 +1045,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5fb5f37490d04dbc8e0553c6aa881547
-                  expression: 'min(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/PFSense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/PFSense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
                   event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
@@ -1056,7 +1056,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -1304,7 +1304,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d4392162d62541aeb148718ddd7f5d57
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1349,21 +1349,21 @@ zabbix_export:
             -
               uuid: eb3090605ba14407a91736ac9768d65a
               expression: |
-                change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                change(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0
                 and (
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=6 or
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=7 or
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=11 or
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=62 or
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=69 or
-                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=117
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=6 or
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=7 or
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=11 or
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=62 or
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=69 or
+                last(/PFSense by SNMP/net.if.type[{#SNMPINDEX}])=117
                 )
                 and
-                (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])<>2)
+                (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
-                (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)
+                (change(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
+                (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)
               name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1371,7 +1371,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1379,10 +1379,10 @@ zabbix_export:
             -
               uuid: 90c99a9c4ce44b3ca929c4b3200286fb
               expression: |
-                (avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/PFSense by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/PFSense by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
               event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1391,7 +1391,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1399,10 +1399,10 @@ zabbix_export:
             -
               uuid: 6be52ce31bab4250b421de1bfe84263c
               expression: |
-                (avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/PFSense by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/PFSense by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
               event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1411,7 +1411,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1424,53 +1424,53 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.pass.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.block.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.pass.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.block.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.pass.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.block.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.pass.v6.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '7'
                   color: 611F27
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
             -
               uuid: 3acc01b7ad11441ca2ea4dab13274efa
@@ -1480,42 +1480,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.discards[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
             -
               uuid: 58b7aa7618274c9e9285d4c0b63c2ca8
@@ -1524,53 +1524,53 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.pass.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.block.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.pass.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.block.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.pass.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.block.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.pass.v6.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '7'
                   color: 611F27
                   yaxisside: RIGHT
                   item:
-                    host: 'PFSense SNMP'
+                    host: 'PFSense by SNMP'
                     key: 'net.if.out.block.v6.pps[{#SNMPINDEX}]'
       tags:
         -
@@ -2583,35 +2583,35 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.match
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.bad.offset
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.fragment
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.short
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.normalize
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'PFSense SNMP'
+            host: 'PFSense by SNMP'
             key: pfsense.packets.mem.drop

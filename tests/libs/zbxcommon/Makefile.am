@@ -29,7 +29,8 @@ SERVER_tests = \
 	zbx_get_report_nextcheck \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
-	zbx_get_week_number
+	zbx_get_week_number \
+	zbx_iso8601_utc
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -75,7 +76,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
@@ -88,6 +88,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -537,6 +538,21 @@ zbx_get_week_number_LDADD += @SERVER_LIBS@
 zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# zbx_iso8601_utc
+
+zbx_iso8601_utc_SOURCES = \
+	zbx_iso8601_utc.c \
+	$(COMMON_SRC_FILES)
+
+zbx_iso8601_utc_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_iso8601_utc_LDADD += @SERVER_LIBS@
+
+zbx_iso8601_utc_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_iso8601_utc_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 endif

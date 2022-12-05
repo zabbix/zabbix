@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:01:10Z'
+  date: '2022-10-27T12:09:26Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: c55052212c774e3fbab00343050b3db5
-      template: 'Brocade_Foundry Performance SNMP'
-      name: 'Brocade_Foundry Performance SNMP'
+      template: 'Brocade_Foundry Performance by SNMP'
+      name: 'Brocade_Foundry Performance by SNMP'
       description: |
         Template Module Brocade_Foundry Performance
         
@@ -40,7 +40,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7b068eb5d43846d987148f38f66b1f1a
-              expression: 'min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Brocade_Foundry Performance by SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -71,7 +71,7 @@ zabbix_export:
           triggers:
             -
               uuid: 929046c4439741a9aa3ab00933322a86
-              expression: 'min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Brocade_Foundry Performance by SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -101,7 +101,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Brocade_Foundry Performance SNMP'
+            host: 'Brocade_Foundry Performance by SNMP'
             key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
     -
       uuid: 8e5d8b8e81d2473c99df3d7ad5c147c3
@@ -113,5 +113,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Brocade_Foundry Performance SNMP'
+            host: 'Brocade_Foundry Performance by SNMP'
             key: 'vm.memory.util[snAgGblDynMemUtil.0]'

@@ -1261,11 +1261,32 @@ out:
  ******************************************************************************/
 int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
 {
+	return zbx_xml_node_read_num(xdoc, NULL, xpath, num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves numeric xpath value                                     *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] xml document                                      *
+ *             node  - [IN] the XML node                                     *
+ *             xpath - [IN] xpath                                             *
+ *             num   - [OUT] numeric value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the count was retrieved successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_node_read_num(xmlDoc *xdoc, xmlNode *node, const char *xpath, int *num)
+{
 	int		ret = FAIL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 
 	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL != node)
+		xpathCtx->node = node;
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto out;

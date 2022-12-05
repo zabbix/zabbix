@@ -25,6 +25,7 @@
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxmutexs.h"
+#include "zbxcomms.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"
@@ -37,6 +38,8 @@ static pid_t			ha_pid = ZBX_THREAD_ERROR;
 
 extern char	*CONFIG_HA_NODE_NAME;
 extern char	*CONFIG_NODE_ADDRESS;
+extern char	*CONFIG_LISTEN_IP;
+extern int	CONFIG_LISTEN_PORT;
 
 extern zbx_cuid_t	ha_sessionid;
 
@@ -206,7 +209,7 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
 static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
 {
 	if (SUCCEED != zbx_ipc_async_socket_send(rtc_socket, ZBX_IPC_SERVICE_HA_HEARTBEAT, NULL, 0) ||
-		SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
+			SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
 		exit(EXIT_FAILURE);
@@ -257,6 +260,8 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -278,6 +283,8 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -458,7 +465,28 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
  ******************************************************************************/
 static void	ha_get_external_address(char **address, unsigned short *port)
 {
-	(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 10051);
+	if (NULL != CONFIG_NODE_ADDRESS)
+	{
+		(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 0);
+	}
+	else if (NULL != CONFIG_LISTEN_IP)
+	{
+		char	*tmp;
+
+		zbx_strsplit_first(CONFIG_LISTEN_IP, ',', address, &tmp);
+		zbx_free(tmp);
+	}
+
+	if (NULL == *address || 0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
+		*address = zbx_strdup(*address, "localhost");
+
+	if (0 == *port)
+	{
+		if (0 != CONFIG_LISTEN_PORT)
+			*port = (unsigned short)CONFIG_LISTEN_PORT;
+		else
+			*port = ZBX_DEFAULT_SERVER_PORT;
+	}
 }
 
 /******************************************************************************
@@ -1561,10 +1589,17 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 		}
 	}
 
-	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
+	if (ZBX_HA_IS_CLUSTER() && 0 != last_hb)
 	{
 		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
-			*ha_status = ZBX_NODE_STATUS_STANDBY;
+		{
+			last_hb = 0;
+
+			if (ZBX_NODE_STATUS_ACTIVE == *ha_status)
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			else
+				*ha_status = ZBX_NODE_STATUS_HATIMEOUT;
+		}
 	}
 out:
 	return ret;
@@ -1799,10 +1834,10 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	nextcheck = ZBX_HA_POLL_PERIOD;
 
-	/* double the initial database check delay in standby mode to avoid the same node becoming active */
+	/* triple the initial database check delay in standby mode to avoid the same node becoming active */
 	/* immediately after switching to standby mode or crashing and being restarted                    */
 	if (ZBX_NODE_STATUS_STANDBY == info.ha_status)
-		nextcheck *= 2;
+		nextcheck *= 3;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
@@ -1836,7 +1871,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					nextcheck += delay;
 			}
 
-			if (ZBX_DB_OK <= info.db_status)
+			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)
 				ha_send_heartbeat(&rtc_socket);
 
 			while (tick <= now)

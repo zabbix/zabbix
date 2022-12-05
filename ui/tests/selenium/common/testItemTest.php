@@ -889,7 +889,7 @@ class testItemTest extends CWebTest {
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
 						'Calculated'])) {
-					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
+					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
 				}
 				else {
 					$details = ($data['fields']['Type'] === 'SNMP agent')

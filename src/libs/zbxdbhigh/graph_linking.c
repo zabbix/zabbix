@@ -1050,7 +1050,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					d2 = ",";
 
 					zbx_audit_graph_update_json_update_gitem_update_drawtype(graphid,
-							(int)graph_flags, host_items_entry->gitemid,
+							graph_flags, host_items_entry->gitemid,
 							host_items_entry->drawtype_orig,
 							host_items_entry->drawtype_new);
 				}
@@ -1062,7 +1062,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					d2 = ",";
 
 					zbx_audit_graph_update_json_update_gitem_update_sortorder(graphid,
-							(int)graph_flags, host_items_entry->gitemid,
+							graph_flags, host_items_entry->gitemid,
 							host_items_entry->sortorder_orig,
 							host_items_entry->sortorder_new);
 				}
@@ -1076,7 +1076,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					zbx_free(color_esc);
 					d2 = ",";
 
-					zbx_audit_graph_update_json_update_gitem_update_color(graphid, (int)graph_flags,
+					zbx_audit_graph_update_json_update_gitem_update_color(graphid, graph_flags,
 							host_items_entry->gitemid, host_items_entry->color_orig,
 							host_items_entry->color_new);
 				}
@@ -1088,7 +1088,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					d2 = ",";
 
 					zbx_audit_graph_update_json_update_gitem_update_yaxisside(graphid,
-							(int)graph_flags, host_items_entry->gitemid,
+							graph_flags, host_items_entry->gitemid,
 							host_items_entry->yaxisside_orig,
 							host_items_entry->yaxisside_new);
 				}
@@ -1100,7 +1100,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					d2 = ",";
 
 					zbx_audit_graph_update_json_update_gitem_update_calc_fnc(graphid,
-							(int)graph_flags, host_items_entry->gitemid,
+							graph_flags, host_items_entry->gitemid,
 							host_items_entry->calc_fnc_orig,
 							host_items_entry->calc_fnc_new);
 				}
@@ -1110,7 +1110,7 @@ static int	update_graphs_items_updates(char **sql, size_t *sql_alloc, size_t *sq
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%stype=%d", d2,
 							host_items_entry->type_new);
 
-					zbx_audit_graph_update_json_update_gitem_update_type(graphid, (int)graph_flags,
+					zbx_audit_graph_update_json_update_gitem_update_type(graphid, graph_flags,
 							host_items_entry->gitemid, host_items_entry->type_orig,
 							host_items_entry->type_new);
 				}

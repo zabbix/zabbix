@@ -532,6 +532,7 @@ typedef struct
 							/* disabled then trigger is counted as disabled) */
 	double		required_performance;		/* required performance of server (values per second) */
 	time_t		last_update;
+	int		sync_ts;
 }
 ZBX_DC_STATUS;
 

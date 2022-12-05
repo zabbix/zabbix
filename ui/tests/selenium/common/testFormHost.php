@@ -1691,7 +1691,7 @@ class testFormHost extends CWebTest {
 
 		// Get values from form.
 		$form->fill($data['fields']);
-		$original = $form->getFields()->asValues();
+		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
@@ -2093,12 +2093,16 @@ class testFormHost extends CWebTest {
 
 					$expected_tags = [
 						[
-							'tag' => 'discovered',
-							'value' => 'true'
+							'tag' => 'action',
+							'value' => 'update'
 						],
 						[
-							'tag' => 'host',
-							'value' => 'no'
+							'tag' => 'tag without value',
+							'value' => ''
+						],
+						[
+							'tag' => 'test',
+							'value' => 'update'
 						]
 					];
 					$tags_table->checkValue($expected_tags);

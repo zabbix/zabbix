@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:21:01Z'
+  date: '2022-10-27T12:00:44Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 43dc5c8a9a0e4786b64e44422c7f32b4
-      template: 'Dell iDRAC SNMP'
-      name: 'Dell iDRAC SNMP'
+      template: 'Dell iDRAC by SNMP'
+      name: 'Dell iDRAC by SNMP'
       description: |
         Template Server iDRAC
         
@@ -41,7 +41,7 @@ zabbix_export:
           triggers:
             -
               uuid: a6e3c67a99104c6f8672e3826cba009f
-              expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+              expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -67,14 +67,14 @@ zabbix_export:
           triggers:
             -
               uuid: 145ea57d03d3460cb86272493e99356a
-              expression: 'min(/Dell iDRAC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Dell iDRAC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -100,17 +100,17 @@ zabbix_export:
           triggers:
             -
               uuid: cd49c04001c74051b585f519503861d0
-              expression: 'avg(/Dell iDRAC SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Dell iDRAC by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Dell iDRAC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Dell iDRAC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -204,7 +204,7 @@ zabbix_export:
           triggers:
             -
               uuid: e816b86474e6471eb48cbda563dfddd6
-              expression: 'last(/Dell iDRAC SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC SNMP/system.hw.firmware,#2) and length(last(/Dell iDRAC SNMP/system.hw.firmware))>0'
+              expression: 'last(/Dell iDRAC by SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC by SNMP/system.hw.firmware,#2) and length(last(/Dell iDRAC by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -263,7 +263,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6f5b00a889804fbeb41c4246b29bd5f1
-              expression: 'last(/Dell iDRAC SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC SNMP/system.hw.serialnumber,#2) and length(last(/Dell iDRAC SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Dell iDRAC by SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC by SNMP/system.hw.serialnumber,#2) and length(last(/Dell iDRAC by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -350,7 +350,7 @@ zabbix_export:
           triggers:
             -
               uuid: ce1b064b2a07450d9b51b6b12bd752a9
-              expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
+              expression: 'last(/Dell iDRAC by SNMP/system.name,#1)<>last(/Dell iDRAC by SNMP/system.name,#2) and length(last(/Dell iDRAC by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -428,7 +428,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6d07848a4ded4e4fb0383ff12234ed25
-              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
+              expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               name: 'System is in unrecoverable state!'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -442,7 +442,7 @@ zabbix_export:
                   value: performance
             -
               uuid: b47601a02003409896d79e3c99093aca
-              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -450,7 +450,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System is in unrecoverable state!'
-                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               tags:
                 -
                   tag: scope
@@ -460,7 +460,7 @@ zabbix_export:
                   value: performance
             -
               uuid: a323c8f5ca8d4517b0451677bd43c4db
-              expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
+              expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -468,10 +468,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System is in unrecoverable state!'
-                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
                 -
                   name: 'System status is in critical state'
-                  expression: 'count(/Dell iDRAC SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 -
                   tag: scope
@@ -505,7 +505,7 @@ zabbix_export:
           triggers:
             -
               uuid: fba72cbc4f12495b9f35d0f77a9330b8
-              expression: 'last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC SNMP/system.sw.os[systemOSName]))>0'
+              expression: 'last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC by SNMP/system.sw.os[systemOSName]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -513,7 +513,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Dell iDRAC SNMP/system.name,#1)<>last(/Dell iDRAC SNMP/system.name,#2) and length(last(/Dell iDRAC SNMP/system.name))>0'
+                  expression: 'last(/Dell iDRAC by SNMP/system.name,#1)<>last(/Dell iDRAC by SNMP/system.name,#2) and length(last(/Dell iDRAC by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -542,7 +542,7 @@ zabbix_export:
           triggers:
             -
               uuid: 22ae441fffdd48919be0041e1507a479
-              expression: 'max(/Dell iDRAC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Dell iDRAC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -550,7 +550,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Dell iDRAC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -599,7 +599,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7b9a7b970ac049589912d8e208baf2e2
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -613,7 +613,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: fc2eeac871464a65930bbbb2341c803f
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -621,7 +621,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -631,7 +631,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: d36acb231d99493b9a760bf231001b4d
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1'
                   name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -639,10 +639,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1'
                     -
                       name: 'Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -705,7 +705,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a1bca91682e84a7b8866ce443cfcbd44
-                  expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   name: '{#FAN_DESCR}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -719,7 +719,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 981f52ec4ba44b558bdbc5775622bc0c
-                  expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalLower\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalUpper\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"nonCriticalLower\"}")=1'
                   name: '{#FAN_DESCR}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -727,7 +727,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#FAN_DESCR}: Fan is in critical state'
-                      expression: 'count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalUpper\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableUpper\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"criticalLower\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"nonRecoverableLower\"}")=1 or count(/Dell iDRAC by SNMP/sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"failed\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -799,7 +799,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b037fad011764721a030bdde50f6ede3
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -807,7 +807,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -817,7 +817,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 55a0631d0ab24bc6ad5a6c4ef7d1be30
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: DISASTER
@@ -831,7 +831,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 226ab2efc25d46c9adda8f763fe4a65f
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"nonCritical\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#CNTLR_NAME}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -839,10 +839,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in critical state'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"critical\"}")=1'
                     -
                       name: '{#CNTLR_NAME}: Disk array controller is in unrecoverable state!'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -945,7 +945,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: eb26b6915b9f4ce6983566df9ee4db96
-                  expression: 'last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Dell iDRAC by SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/Dell iDRAC by SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/Dell iDRAC by SNMP/system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
                   name: '{#DISK_NAME}: Disk has been replaced'
                   event_name: '{#DISK_NAME}: Disk has been replaced (new serial number received)'
                   priority: INFO
@@ -1003,7 +1003,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7dc1a088ebd74702b0fb4e0a20edbed2
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS}")=1'
                   name: '{#DISK_NAME}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1011,7 +1011,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -1049,7 +1049,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5eedc39db9a348df8e547be6401c0814
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#DISK_NAME}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1063,7 +1063,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 6defa44f91ee4fb5b11b92ba64f07b48
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS:\"nonCritical\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#DISK_NAME}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1071,7 +1071,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_NAME}: Physical disk failed'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"critical\"}")=1 or count(/Dell iDRAC by SNMP/system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"nonRecoverable\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -1109,7 +1109,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9f57b49984864af188b178dc2da85b71
-                  expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
                   name: '{#PSU_DESCR}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1123,7 +1123,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: d7d1b3d889254ae288348cd6b77bad5f
-                  expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"nonCritical\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"nonCritical\"}")=1'
                   name: '{#PSU_DESCR}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1131,7 +1131,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#PSU_DESCR}: Power supply is in critical state'
-                      expression: 'count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Dell iDRAC by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"nonRecoverable\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -1198,9 +1198,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 992e0a871cef40f6b859e251fd5d75fd
-                  expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
+                  expression: 'avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
+                  recovery_expression: 'min(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Ambient"}+3'
                   name: '{#SENSOR_LOCALE}: Temperature is too low'
                   event_name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1216,13 +1216,13 @@ zabbix_export:
             -
               uuid: 8d659cefdff143bbaff8d6cdc8bbf7a3
               expression: |
-                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
+                avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
+              recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
               event_name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1238,11 +1238,11 @@ zabbix_export:
             -
               uuid: 45ab3beb5a3b4271861330632ff37c55
               expression: |
-                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}
+                avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
+              recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Ambient"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold'
               event_name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"Ambient"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1252,12 +1252,12 @@ zabbix_export:
                 -
                   name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
                   expression: |
-                    avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
+                    avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}
                     or
-                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                    last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
-                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
-                  recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
+                    last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                  recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Ambient"}-3'
               tags:
                 -
                   tag: scope
@@ -1324,9 +1324,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: edb89d83ecc144cdbccdb41f8842d572
-                  expression: 'avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  expression: 'avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: '{#SENSOR_LOCALE}: Temperature is too low'
                   event_name: '{#SENSOR_LOCALE}: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1342,13 +1342,13 @@ zabbix_export:
             -
               uuid: 54c2b7095b7d4550a2d1dbe14990dd0a
               expression: |
-                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
+                avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+              recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
               event_name: '{#SENSOR_LOCALE}: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1364,11 +1364,11 @@ zabbix_export:
             -
               uuid: eb2182b46c294fa381b35ab31c7ac6d4
               expression: |
-                avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}
+                avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}
                 or
-                last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
+                last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+              recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
               name: '{#SENSOR_LOCALE}: Temperature is above warning threshold'
               event_name: '{#SENSOR_LOCALE}: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1378,12 +1378,12 @@ zabbix_export:
                 -
                   name: '{#SENSOR_LOCALE}: Temperature is above critical threshold'
                   expression: |
-                    avg(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
+                    avg(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}
                     or
-                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                    last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
                     or
-                    last(/Dell iDRAC SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
-                  recovery_expression: 'max(/Dell iDRAC SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                    last(/Dell iDRAC by SNMP/sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                  recovery_expression: 'max(/Dell iDRAC by SNMP/sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
               tags:
                 -
                   tag: scope
@@ -1533,7 +1533,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 457783fb014a4cae9d47a1cb17d8d31e
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
                   name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1547,7 +1547,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: d0c6dbaa042f40559d855acb1b61977a
-                  expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_WARN_STATUS:\"degraded\"}")=1'
+                  expression: 'count(/Dell iDRAC by SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_WARN_STATUS:\"degraded\"}")=1'
                   name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1555,7 +1555,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Disk {#SNMPVALUE}({#DISK_NAME}): Virtual disk failed'
-                      expression: 'count(/Dell iDRAC SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
+                      expression: 'count(/Dell iDRAC by SNMP/system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS:\"failed\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -1947,7 +1947,7 @@ zabbix_export:
   triggers:
     -
       uuid: c0efbe61effc494a970e0e02b9ce8f55
-      expression: '(last(/Dell iDRAC SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell iDRAC SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell iDRAC SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell iDRAC SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell iDRAC by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -1956,7 +1956,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Dell iDRAC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Dell iDRAC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

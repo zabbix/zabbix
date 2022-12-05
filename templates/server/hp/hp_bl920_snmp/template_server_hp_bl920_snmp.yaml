@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:52:42Z'
+  date: '2022-10-27T12:00:42Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 586119e5e27e4062a3cce8601ecb8d71
-      template: 'HPE ProLiant BL920 SNMP'
-      name: 'HPE ProLiant BL920 SNMP'
+      template: 'HPE ProLiant BL920 by SNMP'
+      name: 'HPE ProLiant BL920 by SNMP'
       description: |
         Template for HPE ProLiant BL920 servers with HP iLO version 4 and later.
         
@@ -120,7 +120,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9eb77df5f95149e49d63a7191e68756c
-              expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant BL920 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant BL920 SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
+              expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: c0eed9d2eccc4ae99128a318de92df8d
-              expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant BL920 SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant BL920 SNMP/hp.server.name[sysName]))>0'
+              expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName]))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -314,7 +314,7 @@ zabbix_export:
           triggers:
             -
               uuid: 187f7a3872a2481f962f16c422911827
-              expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+              expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -325,7 +325,7 @@ zabbix_export:
                   value: available
             -
               uuid: 51c633cbed0d4684b2e0619e2f0ab64d
-              expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
+              expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -333,7 +333,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System status is in critical state'
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               tags:
                 -
                   tag: scope
@@ -375,7 +375,7 @@ zabbix_export:
           triggers:
             -
               uuid: 35cce5a461c04163a0575d7f831ea3d9
-              expression: 'max(/HPE ProLiant BL920 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/HPE ProLiant BL920 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -441,7 +441,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 507e925180034f2d97d09f9fd5c9e311
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -452,7 +452,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 20625bb4b0b74d98818685991ac5df66
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -460,7 +460,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}'
                   tags:
                     -
                       tag: scope
@@ -522,7 +522,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a470d994b661401882162dc2267eaa3d
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -533,7 +533,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 5d0fd4a9b8bc49aaaeb213b310b85606
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -541,14 +541,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                   tags:
                     -
                       tag: scope
                       value: available
                 -
                   uuid: 1efe26e2e6a8404b86143b3fea812f23
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}'
                   name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -556,10 +556,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}'
                     -
                       name: '#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}'
                   tags:
                     -
                       tag: scope
@@ -632,7 +632,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a8c87ea0b6ba42e7ba6f97a2441237bb
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -643,7 +643,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 1cb40d36fda945df940c39f0ea1adf22
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}'
                   name: '{#CNTLR_LOCATION}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -651,7 +651,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#CNTLR_LOCATION}: Disk array controller is in critical state'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -700,7 +700,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c2a1f0726e6e46658bf236c7daea432c
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
                   name: 'Fan {#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -711,7 +711,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: f8e66a8a7df84962be215388d6fd567b
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}'
                   name: 'Fan {#SNMPINDEX}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -719,7 +719,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Fan {#SNMPINDEX}: Fan is in critical state'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -770,7 +770,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 880d8c11080043f4a1b8e31823bee081
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
                   name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -781,7 +781,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 7894c073515c42abac3a3704acaf124c
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4'
                   name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has lost link'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -789,7 +789,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3'
                   tags:
                     -
                       tag: scope
@@ -893,7 +893,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 97b42a2ce49f4a1786cfa8db1f6477ac
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
                   event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
@@ -968,7 +968,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: fdd888b4e72344eda1845fdfe7d261e4
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: '{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -976,7 +976,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
@@ -1014,7 +1014,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1e8640dc080c4d19a94c6fcda2451cfb
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   name: '{#DISK_LOCATION}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1025,7 +1025,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 74eef1a7f26145d7963d8801c8a625e7
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}'
                   name: '{#DISK_LOCATION}: Physical disk is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1033,7 +1033,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}'
                   tags:
                     -
                       tag: scope
@@ -1081,7 +1081,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a256fdd66c0043dfb337163bcf0c5ebe
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1092,7 +1092,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 18e8aca665b34fb5a2af5d94cdd40f84
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}'
                   name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1100,7 +1100,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1166,7 +1166,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 74b07fcf8ef34e20a142ae11f6dbfeb4
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1'
                   name: 'Ambient: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1177,7 +1177,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 0df275f3b0dd4c6d93936b39a88052fa
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4'
                   name: 'Ambient: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1187,7 +1187,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 1052d51569c543619e38b48318baaa29
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3'
                   name: 'Ambient: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1276,7 +1276,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 602bbb3e632540d4a46830c2c67d3b1c
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1'
                   name: 'CPU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1287,7 +1287,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 25ea3db9def64b21b08f25f019c15fbd
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1297,7 +1297,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: f5ecaae4989f4e249138916b3657210d
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3'
                   name: 'CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1386,7 +1386,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6ea76d08b1e64364b15a9daa95c72d7c
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1'
                   name: '{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1397,7 +1397,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 6287b204066e47d68871bc0783840b4c
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4'
                   name: '{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1407,7 +1407,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 8010259635ef4d92af61e935c9f62ff7
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3'
                   name: '{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1514,7 +1514,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5f7818d02b764218a481e59cbcfe5fd7
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1'
                   name: 'I/O-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1525,7 +1525,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: fffdfe1c6d254f3fb096ab0561705223
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1535,7 +1535,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: a00a767a3b8349c2846139a6c76f826d
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3'
                   name: 'I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1624,7 +1624,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 78d936059d744eae8be8150dab2a6e5e
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1'
                   name: 'Memory-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1635,7 +1635,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: a6db4978fa834a7facd46a76f45f92a3
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1645,7 +1645,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: ee7cbf1997ca476283e3301856d22a5a
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3'
                   name: 'Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1737,7 +1737,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 809aea1302064232a321c12f2256414f
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1'
                   name: 'PSU-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1748,7 +1748,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: b70bb5f4fe4b4d3bb6fa7027200f2b25
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1758,7 +1758,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: a4e3939f59a64dbfab377f68a62fa26b
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3'
                   name: 'PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1847,7 +1847,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6848521afcb54d72b136ee53176bc01d
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1'
                   name: 'System-{#SNMPINDEX}: Temperature could not be determined'
                   priority: INFO
                   description: 'Temperature could not be determined.'
@@ -1858,7 +1858,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 6b15c19600f9433093aa8d7d624fb623
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4'
                   name: 'System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.'
                   priority: HIGH
                   description: 'The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.'
@@ -1868,7 +1868,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: 407c07a6d4f94ca1a8cf1f9db9d685db
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3'
                   name: 'System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range'
                   priority: WARNING
                   description: 'If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.'
@@ -1992,7 +1992,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7dadede9eb5640c5920b95dafc7191bb
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -2003,7 +2003,7 @@ zabbix_export:
                       value: available
                 -
                   uuid: ffdd42c48a7b493a941887b46be64fb0
-                  expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}'
+                  expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}'
                   name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2011,7 +2011,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed'
-                      expression: 'last(/HPE ProLiant BL920 SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
+                      expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -2767,7 +2767,7 @@ zabbix_export:
   triggers:
     -
       uuid: 97f107c88b6048f1b74412e8dfedc857
-      expression: '(last(/HPE ProLiant BL920 SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant BL920 SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant BL920 SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant BL920 SNMP/hp.server.net.uptime[sysUpTime])<10m)'
+      expression: '(last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant BL920 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING

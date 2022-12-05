@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
@@ -244,6 +245,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '{ITEM.ID}', 'value' => '{ITEM.KEY}']
 					],
 					'parsed_url' => $url
+				]
+			],
+			// Call to Prometheus API.
+			[
+				[
+					'step_name' => 'Step call to Prometheus API',
+					'url' => 'http://localhost:9090/api/v1/query?query=irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])',
+					'parsed_query' => [
+						['name' => 'query', 'value' => 'irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])']
+					],
+					'parsed_url' => 'http://localhost:9090/api/v1/query'
 				]
 			],
 			// URL parse failed.

@@ -1921,6 +1921,19 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto clean;
 	}
 
+	if (0 != ins.values_num && 0 == strcmp("hstgrp", table->table))
+	{
+		/* Host groups are not used by proxy and the discovery group record is sent  */
+		/* only because of config table foreign key. To keep compatibility between   */
+		/* minor versions and comply with hstgrp unique index (name, type) force the */
+		/* group name to groupid.                                                    */
+		if (ZBX_DB_OK > DBexecute("update hstgrp set name='"  ZBX_FS_UI64 "' where groupid=" ZBX_FS_UI64,
+				ins.values[0], ins.values[0]))
+		{
+			goto clean;
+		}
+	}
+
 	/* delete operations are performed by the caller using the returned del vector */
 
 	if (0 != availability_interfaceids.values_num)
@@ -3525,7 +3538,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
 
 	sec = zbx_time();
@@ -4342,7 +4355,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4351,7 +4363,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type;
+		unsigned int		connection_type;
+		zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
@@ -4832,6 +4845,15 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		}
 
 		zbx_vector_proxy_hostdata_ptr_destroy(&host_avails);
+	}
+	else
+	{
+		unsigned char	*data = NULL;
+		zbx_uint32_t	data_len;
+
+		data_len = zbx_availability_serialize_active_proxy_hb_update(&data, proxy->hostid);
+		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE, data, data_len, NULL);
+		zbx_free(data);
 	}
 
 out:

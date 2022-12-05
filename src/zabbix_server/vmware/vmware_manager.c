@@ -69,7 +69,7 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
  * Return value: job for object or NULL                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
+static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
@@ -151,7 +151,7 @@ out:
  *             time_now - [IN] the current time                               *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int time_now)
+static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now)
 {
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
@@ -236,7 +236,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			}
 
 			services_updated += vmware_job_exec(job);
-			vmware_job_schedule(vmware, job, (int)time_now);
+			vmware_job_schedule(vmware, job, (time_t)time_now);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)

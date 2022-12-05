@@ -136,7 +136,6 @@ extern "C" static void	get_error_code_text(HRESULT hres, char **error)
 			zabbix_log(LOG_LEVEL_DEBUG, "GetErrorCodeText() failed with code:" ZBX_FS_I64 " when retrieving error"
 					" code for " ZBX_FS_I64, sc, hres);
 		}
-		pStatus->Release();
 	}
 	else
 	{

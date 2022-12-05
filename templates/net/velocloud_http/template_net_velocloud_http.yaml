@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:37:53Z'
+  date: '2022-11-28T23:35:08Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -403,7 +403,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].activationState.first()'
+                    - $.activationState
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -421,7 +421,7 @@ zabbix_export:
                               return 10
                       }
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -449,13 +449,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].description.first()'
+                    - $.description
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -483,7 +483,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].haState.first()'
+                    - $.haState
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -505,7 +505,7 @@ zabbix_export:
                               return 10
                       }
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -544,13 +544,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].modelNumber.first()'
+                    - $.modelNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -577,7 +577,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].serviceUpSince.first()'
+                    - $.serviceUpSince
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -585,7 +585,7 @@ zabbix_export:
                       value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
                       return value
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -613,13 +613,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].softwareVersion.first()'
+                    - $.softwareVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -647,7 +647,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].edgeState.first()'
+                    - $.edgeState
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -667,7 +667,7 @@ zabbix_export:
                               return 10
                       }
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -705,7 +705,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edges[?(@.id==''{#ID}'')].systemUpSince.first()'
+                    - $.systemUpSince
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -713,7 +713,7 @@ zabbix_export:
                       value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
                       return value
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.edge[{#ID}]'
               tags:
                 -
                   tag: city
@@ -739,6 +739,27 @@ zabbix_export:
                     -
                       tag: scope
                       value: notice
+            -
+              uuid: 95e2e7f9b89a4c958c3fd2909a181cd9
+              name: 'Edge [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'velocloud.get.edge[{#ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for velocloud edge.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
           master_item:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
@@ -795,9 +816,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].connectedEdges.first()'
+                    - $.connectedEdges
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -837,13 +858,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].description.first()'
+                    - $.description
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -871,13 +892,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].ipAddress.first()'
+                    - $.ipAddress
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -904,7 +925,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].serviceUpSince.first()'
+                    - $.serviceUpSince
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -912,7 +933,7 @@ zabbix_export:
                       value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
                       return value
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -940,13 +961,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].gatewayState.first()'
+                    - $.gatewayState
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -973,7 +994,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].systemUpSince.first()'
+                    - $.systemUpSince
                 -
                   type: JAVASCRIPT
                   parameters:
@@ -981,7 +1002,7 @@ zabbix_export:
                       value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
                       return value
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -1021,9 +1042,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.cpu.first()'
+                    - $.utilizationDetail.cpu
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -1054,9 +1075,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.load.first()'
+                    - $.utilizationDetail.load
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -1084,9 +1105,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.memory.first()'
+                    - $.utilizationDetail.memory
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -1117,9 +1138,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.overall.first()'
+                    - $.utilizationDetail.overall
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.gateway[{#ID}]'
               tags:
                 -
                   tag: city
@@ -1133,6 +1154,27 @@ zabbix_export:
                 -
                   tag: state
                   value: '{#STATE}'
+            -
+              uuid: 5c11969073ab415abe08c74626bd5dd1
+              name: 'Gateway [{#NAME}]: Raw data'
+              type: DEPENDENT
+              key: 'velocloud.get.gateway[{#ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for velocloud gateway.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
           graph_prototypes:
             -
               uuid: d8d9b176f439436ba6fe69ec8bc6409e
@@ -1206,6 +1248,27 @@ zabbix_export:
           description: 'Metrics for links statistics.'
           item_prototypes:
             -
+              uuid: 37988766bc694c699bfde578174c6623
+              name: 'Link [{#NAME}]:[{#IP}]: Raw data'
+              type: DEPENDENT
+              key: 'velocloud.get.link[{#ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for velocloud link.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 6b3351b9187d47ba804e5fcd8c6f474f
               name: 'Link [{#NAME}]:[{#IP}]: Best loss rx, %'
               type: DEPENDENT
@@ -1218,9 +1281,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].bestLossPctRx.first()'
+                    - $.bestLossPctRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1253,9 +1316,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].bestLossPctTx.first()'
+                    - $.bestLossPctTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1288,9 +1351,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].bytesRx.first()'
+                    - $.bytesRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1323,9 +1386,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].bytesTx.first()'
+                    - $.bytesTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1358,13 +1421,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].link.linkLastActive.first()'
+                    - $.link.linkLastActive
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return Math.round((Date.now() - new Date(value).valueOf()) / 1000)'
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1397,9 +1460,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId== ''{#ID}'')].packetsRx.first()'
+                    - $.packetsRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1432,9 +1495,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].packetsTx.first()'
+                    - $.packetsTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1468,7 +1531,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].link.linkState.first()'
+                    - $.link.linkState
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1488,7 +1551,7 @@ zabbix_export:
                               return 10
                       }
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1532,9 +1595,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].totalBytes.first()'
+                    - $.totalBytes
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1567,9 +1630,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.links[?(@.linkId==''{#ID}'')].totalPackets.first()'
+                    - $.totalPackets
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.link[{#ID}]'
               tags:
                 -
                   tag: component
@@ -1686,6 +1749,27 @@ zabbix_export:
           description: 'Metrics for SDWAN peers path.'
           item_prototypes:
             -
+              uuid: d82c61b41c8744e9bfb39993faadeb67
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Raw data'
+              type: DEPENDENT
+              key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for velocloud sdwan peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 2fafb7d1b4c1429381f2f46c60dafa28
               name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes in'
               type: DEPENDENT
@@ -1698,9 +1782,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesRx.first()'
+                    - $.metrics.bytesRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1727,9 +1811,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesTx.first()'
+                    - $.metrics.bytesTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1756,9 +1840,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsRx.first()'
+                    - $.metrics.packetsRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1785,9 +1869,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsTx.first()'
+                    - $.metrics.packetsTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1815,9 +1899,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossRx.first()'
+                    - $.metrics.packetLossRx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1845,9 +1929,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossTx.first()'
+                    - $.metrics.packetLossTx
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1874,9 +1958,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalBytes.first()'
+                    - $.metrics.totalBytes
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1903,9 +1987,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalPackets.first()'
+                    - $.metrics.totalPackets
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_path[{{#NAME}/{#SOURCE}/{#DESTINATION}]'
               tags:
                 -
                   tag: component
@@ -1949,6 +2033,27 @@ zabbix_export:
           description: 'Metrics for SDWAN peers.'
           item_prototypes:
             -
+              uuid: 26fde8ba5568406cabd29464505c4715
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Raw data'
+              type: DEPENDENT
+              key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for velocloud sdwan peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 25f6dc87f6014502a5eeb36ed3ddd7ed
               name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Dead path'
               type: DEPENDENT
@@ -1960,9 +2065,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.dead.first()'
+                    - $.pathStatusCount.dead
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -1990,13 +2095,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].description.first()'
+                    - $.description
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -2022,9 +2127,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.stable.first()'
+                    - $.pathStatusCount.stable
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -2050,9 +2155,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.standby.first()'
+                    - $.pathStatusCount.standby
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -2078,9 +2183,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.total.first()'
+                    - $.pathStatusCount.total
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -2106,9 +2211,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.unknown.first()'
+                    - $.pathStatusCount.unknown
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component
@@ -2134,9 +2239,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.unstable.first()'
+                    - $.pathStatusCount.unstable
               master_item:
-                key: velocloud.get.clear_metrics
+                key: 'velocloud.get.sdwan_peer[{#EDGE.ID}/{#ID}]'
               tags:
                 -
                   tag: component

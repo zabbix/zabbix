@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2022-06-07T04:55:32Z'
+  version: '6.2'
+  date: '2022-10-06T12:57:20Z'
   media_types:
     -
       name: 'MS Teams'
@@ -101,7 +101,7 @@ zabbix_export:
         
         try {
             var params = JSON.parse(value);
-
+        
             if (typeof params.teams_endpoint !== 'string' || params.teams_endpoint.trim() === '') {
                 throw 'Cannot get teams_endpoint';
             }
@@ -112,8 +112,8 @@ zabbix_export:
             params.zabbix_url = (params.zabbix_url.endsWith('/'))
                 ? params.zabbix_url.slice(0, -1) : params.zabbix_url;
         
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            if ([0, 1, 2, 3, 4].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-4.';
             }
         
             // Set "use_default_message" to true for non trigger-based events.
@@ -149,7 +149,6 @@ zabbix_export:
                         {
                             markdown: 'false',
                             activityTitle: params.alert_subject,
-                            activitySubtitle: 'On ' + params.host_name + ' [' + params.host_ip + ']',
                             text: (params.use_default_message.toLowerCase() == 'true')
                                 ? params.alert_message
                                 : params.trigger_description
@@ -181,6 +180,10 @@ zabbix_export:
                         name: 'Event time',
                         value: params.event_time + ' ' + params.event_date
                     });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
+                    });
                 }
                 // Update message.
                 else if (params.event_update_status === '1') {
@@ -194,12 +197,20 @@ zabbix_export:
                         name: 'Event update time',
                         value: params.event_update_time + ' ' + params.event_update_date
                     });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
+                    });
                 }
                 // Resolved message.
                 else {
                     facts.push({
                         name: 'Recovery time',
                         value: params.event_recovery_time + ' ' + params.event_recovery_date
+                    });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
                     });
                 }
         
@@ -277,30 +288,6 @@ zabbix_export:
         }
       message_templates:
         -
-          event_source: DISCOVERY
-          operation_mode: PROBLEM
-          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
-          message: |
-            Discovery rule: {DISCOVERY.RULE.NAME}
-            
-            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
-            Device DNS: {DISCOVERY.DEVICE.DNS}
-            Device status: {DISCOVERY.DEVICE.STATUS}
-            Device uptime: {DISCOVERY.DEVICE.UPTIME}
-            
-            Device service name: {DISCOVERY.SERVICE.NAME}
-            Device service port: {DISCOVERY.SERVICE.PORT}
-            Device service status: {DISCOVERY.SERVICE.STATUS}
-            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
-          operation_mode: PROBLEM
-          subject: 'Autoregistration: {HOST.HOST}'
-          message: |
-            Host name: {HOST.HOST}
-            Host IP: {HOST.IP}
-            Agent port: {HOST.PORT}
-        -
           event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
@@ -332,3 +319,61 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        -
+          event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        -
+          event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        -
+          event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

@@ -1264,12 +1264,13 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check it is not possible to select write-only fields' => [
 				'request' => [
-					'output' => ['host', 'tls_psk', 'tls_psk_identity'],
+					'output' => ['host', 'tls_psk', 'tls_psk_identity', 'name_upper'],
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1280,12 +1281,13 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check direct request of inventory_mode and other properties' => [
 				'request' => [
-					'output' => ['inventory_mode', 'tls_connect', 'name'],
+					'output' => ['inventory_mode', 'tls_connect', 'name', 'name_upper'],
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1294,7 +1296,8 @@ class testHost extends CAPITest {
 
 					// Samples of other specified properties.
 					'tls_connect' => '1',
-					'name' => 'API test hosts - write-only fields'
+					'name' => 'API test hosts - write-only fields',
+					'name_upper' => null
 				]
 			]
 		];

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:33Z'
+  date: '2022-10-18T14:07:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -333,8 +333,8 @@ zabbix_export:
             -
               uuid: 95622a29bd58444b9f0bd985db99f922
               expression: 'last(/Nginx Plus by HTTP/nginx.info.uptime)<10m'
-              name: 'Nginx: has been restarted'
-              event_name: 'Nginx: has been restarted (uptime < 10m)'
+              name: 'Nginx: Host has been restarted'
+              event_name: 'Nginx: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

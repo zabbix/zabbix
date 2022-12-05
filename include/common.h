@@ -1315,6 +1315,7 @@ zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
+int	zbx_iso8601_utc(const char *str, time_t *time);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
