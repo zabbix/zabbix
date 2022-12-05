@@ -102,11 +102,12 @@ func (p *Plugin) Collect() (err error) {
 		return
 	}
 
-	err = win32.PdhCollectQueryData(p.query)
+	p.collectError = win32.PdhCollectQueryData(p.query)
+	err = p.collectError
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) || nil != err {
+		if c.lastAccess.Before(expireTime) || nil != p.collectError {
 			if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
 				p.Debugf("error while removing counter '%s': %s", index.path, cerr)
 			}
@@ -237,10 +238,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.mutex.Lock()
 		defer p.mutex.Unlock()
 
-		if p.collectError != nil {
-			return nil, p.collectError
-		}
-
 		if p.query == 0 {
 			if p.query, err = win32.PdhOpenQuery(nil, 0); err != nil {
 				return
@@ -249,9 +246,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		index := perfCounterIndex{path, lang}
 		if counter, ok := p.counters[index]; ok {
+			if p.collectError != nil {
+				return nil, p.collectError
+			}
+
 			return counter.getHistory(int(interval))
 		} else {
-			return nil, p.addCounter(index, interval)
+			if err = p.addCounter(index, interval); err != nil {
+				return nil, err
+			}
+
+			return nil, p.collectError
 		}
 	}
 }
