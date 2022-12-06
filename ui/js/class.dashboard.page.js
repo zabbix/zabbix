@@ -323,19 +323,26 @@ class CDashboardPage extends CBaseComponent {
 		return null;
 	}
 
-	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
-		const widget = this._createWidget(this._widget_defaults[type].js_class, {
-			type,
-			name,
-			view_mode,
-			fields,
-			configuration,
-			widgetid,
-			pos,
-			is_new,
-			rf_rate,
-			unique_id
-		});
+	addWidget({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
+		let widget;
+
+		if (type in this._widget_defaults) {
+			widget = this._createWidget(eval(this._widget_defaults[type].js_class), {
+				type,
+				name,
+				view_mode,
+				fields,
+				defaults: this._widget_defaults[type],
+				widgetid,
+				pos,
+				is_new,
+				rf_rate,
+				unique_id
+			});
+		}
+		else {
+			widget = this._createInaccessibleWidget({name, widgetid, pos, unique_id});
+		}
 
 		this._doAddWidget(widget);
 
@@ -406,14 +413,13 @@ class CDashboardPage extends CBaseComponent {
 		return this.addWidget(widget_data);
 	}
 
-	_createWidget(js_class, {type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
-		return new (eval(js_class))({
+	_createWidget(widget_class, {type, name, view_mode, fields, defaults, widgetid, pos, is_new, rf_rate, unique_id}) {
+		return new widget_class({
 			type,
 			name,
 			view_mode,
 			fields,
-			configuration,
-			defaults: this._widget_defaults[type],
+			defaults,
 			widgetid,
 			pos,
 			is_new,
@@ -433,18 +439,34 @@ class CDashboardPage extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
-			scope_id: this._unique_id,
+			unique_id
+		});
+	}
+
+	_createInaccessibleWidget({name, widgetid, pos, unique_id}) {
+		return this._createWidget(CWidgetInaccessible, {
+			type: 'inaccessible',
+			name,
+			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
+			fields: {},
+			defaults: {
+				name: t('Inaccessible widget')
+			},
+			widgetid,
+			pos,
+			is_new: false,
+			rf_rate: 0,
 			unique_id
 		});
 	}
 
 	_createPastePlaceholderWidget({type, name, view_mode, pos, unique_id}) {
-		return this._createWidget('CWidgetPastePlaceholder', {
-			type,
+		return this._createWidget(CWidgetPastePlaceholder, {
+			type: 'paste-placeholder',
 			name,
 			view_mode,
 			fields: {},
-			configuration: {},
+			defaults: this._widget_defaults[type],
 			widgetid: null,
 			pos,
 			is_new: false,

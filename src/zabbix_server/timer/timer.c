@@ -20,18 +20,19 @@
 #include "timer.h"
 
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
 #define ZBX_EVENT_BATCH_SIZE	1000
 
-extern unsigned char			program_type;
-extern int				CONFIG_TIMER_FORKS;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct
@@ -260,7 +261,8 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 				" and " ZBX_SQL_MOD(p.eventid, %d) "=%d"
 			" order by p.eventid",
 			tag_fields, tag_join,
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER],
+			process_num - 1);
 
 	event_queries_fetch(result, event_queries);
 	DBfree_result(result);
@@ -273,7 +275,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			" from event_suppress"
 			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
 			" order by eventid",
-			CONFIG_TIMER_FORKS, process_num - 1);
+			CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER], process_num - 1);
 
 	while (NULL != (row = DBfetch(result)))
 	{

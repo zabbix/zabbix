@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
@@ -162,7 +163,17 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 		// Check Audit record about autoregistration update.
 		$this->page->open('zabbix.php?action=auditlog.list');
+
+		// Click on Filter tab if it is not selected.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
+		// Reset filter to delete deependencies from previous tests.
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+
 		// Get first row data.
 		$row = $rows->get(0);
 		foreach ($data['audit'] as $column => $value) {

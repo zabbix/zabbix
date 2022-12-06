@@ -20,13 +20,15 @@
 #include "zbxserver.h"
 
 #include "log.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "evalfunc.h"
 #include "zbxeval.h"
 #include "expression.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -933,6 +935,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	DC_ITEM			*item;
 	int			i, ret = FAIL;
 	zbx_expression_query_one_t	*data;
+	DC_EVALUATE_ITEM		evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int )len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
@@ -981,9 +984,15 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		goto out;
 	}
 
+	evaluate_item.itemid = item->itemid;
+	evaluate_item.value_type = item->value_type;
+	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.host = item->host.host;
+	evaluate_item.key_orig = item->key_orig;
+
 	if (0 == args_num)
 	{
-		ret = evaluate_function(value, item, func_name, "", ts, error);
+		ret = evaluate_function(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -1014,7 +1023,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 

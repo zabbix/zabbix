@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "actions.h"
 #include "zbxserver.h"
+#include "server.h"
+#include "actions.h"
 
 #include "log.h"
 #include "operations.h"
@@ -27,6 +28,8 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -2587,14 +2590,14 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " eventsource:%d", __func__,
 			action->actionid, (int)action->eventsource);
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_condition_t *)action->conditions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype &&
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype &&
 				old_type == condition->conditiontype && SUCCEED == ret)
 		{
 			continue;	/* short-circuit true OR condition block to the next AND condition */
@@ -2609,7 +2612,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 
 		switch (action->evaltype)
 		{
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition->conditiontype) /* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
@@ -2625,7 +2628,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
+			case ZBX_CONDITION_EVAL_TYPE_AND:
 				if (FAIL == condition_result)	/* break if any AND condition is FALSE */
 				{
 					ret = FAIL;
@@ -2633,7 +2636,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+			case ZBX_CONDITION_EVAL_TYPE_OR:
 				if (SUCCEED == condition_result)	/* break if any OR condition is TRUE */
 				{
 					ret = SUCCEED;
@@ -2642,7 +2645,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				ret = FAIL;
 
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
+			case ZBX_CONDITION_EVAL_TYPE_EXPRESSION:
 				zbx_snprintf(tmp, sizeof(tmp), "{" ZBX_FS_UI64 "}", condition->conditionid);
 				id_len = strlen(tmp);
 
@@ -2659,7 +2662,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 		}
 	}
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
 		if (SUCCEED == zbx_evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
@@ -3053,7 +3056,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
 			}
 			else
 			{
-				if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+				if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 				{
 					char	search[ZBX_MAX_UINT64_LEN + 2];
 					char	replace[ZBX_MAX_UINT64_LEN + 2];
@@ -3111,7 +3114,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
@@ -3338,7 +3341,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 
 	if (0 == actions.values_num)

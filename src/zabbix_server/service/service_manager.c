@@ -18,6 +18,7 @@
 **/
 
 #include "service_manager.h"
+#include "../server.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -28,6 +29,8 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "zbxcacheconfig.h"
+#include "zbx_trigger_constants.h"
 
 extern unsigned char			program_type;
 extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
@@ -966,14 +969,14 @@ static void	update_action_formula(zbx_service_action_t *action)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
 
-	if (0 == action->conditions.values_num || ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (0 == action->conditions.values_num || ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		goto out;
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_service_action_condition_t *)action->conditions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		{
 			if (last_type != condition->conditiontype)
 			{
@@ -1000,7 +1003,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		last_type = condition->conditiontype;
 	}
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ')');
 
 	zbx_free(action->formula);
@@ -2000,6 +2003,9 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 		return zbx_dsprintf(NULL, "Status of unknown service changed to %s", severity);
 }
 
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
 /******************************************************************************
  *                                                                            *
  * Purpose: create service events based on service updates                    *
@@ -2312,6 +2318,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+#undef SERVICE_VALUE_OK
+#undef SERVICE_VALUE_PROBLEM
 
 static int	compare_uint64_pair_second(const void *d1, const void *d2)
 {

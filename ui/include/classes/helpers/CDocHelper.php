@@ -21,7 +21,7 @@
 
 class CDocHelper {
 
-	const ADMINISTRATION_AUDITACTS_LIST =						'web_interface/frontend_sections/reports/action_log';
+	const ADMINISTRATION_ACTIONLOG_LIST =						'web_interface/frontend_sections/reports/action_log';
 	const ADMINISTRATION_AUDITLOG_EDIT =						'web_interface/frontend_sections/administration/audit_log';
 	const ADMINISTRATION_AUTOREG_EDIT =							'web_interface/frontend_sections/administration/general#autoregistration';
 	const ADMINISTRATION_GEOMAPS_EDIT =							'web_interface/frontend_sections/administration/general#geographical-maps';
@@ -153,15 +153,15 @@ class CDocHelper {
 	const USERS_USERROLE_EDIT =									'web_interface/frontend_sections/users/user_roles#default-user-roles';
 	const USERS_USERROLE_LIST =									'web_interface/frontend_sections/users/user_roles';
 
-	public static function getUrl($path): ?string {
+	public static function getUrl($path): string {
 		if (CBrandHelper::isRebranded()) {
-			return null;
+			return '';
 		}
 
 		if (preg_match('/^\d+\.\d+/', ZABBIX_VERSION, $version)) {
 			return ZBX_DOCUMENTATION_URL.'/'.$version[0].'/en/manual/'.$path;
 		}
 
-		return null;
+		return '';
 	}
 }

@@ -97,10 +97,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 */
 	private function getModuleSectionRules(): array {
 		$db_modules = API::Module()->get([
-			'output' => ['moduleid'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
+			'output' => [],
+			'preservekeys' => true
 		]);
 
 		$modules = $this->getInput('modules', []);
@@ -113,7 +111,7 @@ abstract class CControllerUserroleEditGeneral extends CController {
 						'status' => $modules[$moduleid]
 					];
 				},
-				array_column($db_modules, 'moduleid')
+				array_keys($db_modules)
 			),
 			'modules.default_access' => $this->getInput('modules_default_access')
 		];

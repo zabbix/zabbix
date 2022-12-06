@@ -19,6 +19,7 @@
 
 #include "report_manager.h"
 #include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxself.h"
@@ -47,7 +48,7 @@
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
 extern unsigned char			program_type;
-extern int				CONFIG_REPORTWRITER_FORKS;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* report manager data */
 typedef struct
@@ -249,7 +250,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	int		i, ret;
 	zbx_rm_writer_t	*writer;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_REPORTWRITER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_REPORTER, error)))
 		goto out;
@@ -270,7 +271,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	manager->zabbix_url = NULL;
 	manager->last_batchid = 0;
 
-	for (i = 0; i < CONFIG_REPORTWRITER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]; i++)
 	{
 		writer = (zbx_rm_writer_t *)zbx_malloc(NULL, sizeof(zbx_rm_writer_t));
 		writer->client = NULL;

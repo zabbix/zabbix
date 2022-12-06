@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"
@@ -25,7 +26,7 @@
 #include "log.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"

@@ -88,7 +88,7 @@ $filter = (new CFilter())
 	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [$filter_column_left, $filter_column_right]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
@@ -115,10 +115,10 @@ $widget = (new CWidget())
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
+	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])
@@ -237,10 +237,9 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 	$data['hostid']
 )]);
 
-// Append form to widget.
-$widget->addItem($httpForm);
-
-$widget->show();
+$html_page
+	->addItem($httpForm)
+	->show();
 
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()

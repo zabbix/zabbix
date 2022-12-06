@@ -170,7 +170,7 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy Favourite graphs',
+								'name' => 'Test copy Favorite graphs',
 								'type' => 'favgraphs',
 								'x' => 20,
 								'y' => 7,
@@ -186,7 +186,7 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy Favourite maps',
+								'name' => 'Test copy Favorite maps',
 								'type' => 'favmaps',
 								'x' => 14,
 								'y' => 10,

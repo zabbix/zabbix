@@ -21,7 +21,7 @@
 #define ZABBIX_DBWRAP_H
 
 #include "zbxdbhigh.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
@@ -29,8 +29,6 @@
 #define ZBX_PROXY_UPLOAD_UNDEFINED	0
 #define ZBX_PROXY_UPLOAD_DISABLED	1
 #define ZBX_PROXY_UPLOAD_ENABLED	2
-
-#define ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT		30
 
 typedef enum
 {
@@ -40,7 +38,7 @@ typedef enum
 zbx_host_template_link_type;
 
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls);
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout);
 
 int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
@@ -58,8 +56,8 @@ int	proxy_get_host_active_availability(struct zbx_json *j);
 int	proxy_get_history_count(void);
 int	proxy_get_delay(zbx_uint64_t lastid);
 
-int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win);
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, int lastaccess, int compress,
 		zbx_uint64_t flags_add);
@@ -100,5 +98,24 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(ZBX_DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
+
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
+
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
+		const zbx_timespec_t *, char **);
+
+void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
+		zbx_trigger_func_t eval_func_cb, int recovery);
+void	zbx_db_trigger_get_function_value(const ZBX_DB_TRIGGER *trigger, int index, char **value,
+		zbx_trigger_func_t eval_func_cb, int recovery);
 
 #endif /* ZABBIX_DBWRAP_H */

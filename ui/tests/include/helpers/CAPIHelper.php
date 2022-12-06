@@ -47,13 +47,14 @@ class CAPIHelper {
 	/**
 	 * Make API call.
 	 *
-	 * @param mixed $data     string containing request data as json.
+	 * @param mixed  $data       String containing request data as json.
+	 * @param string $sessionid  Authorization token.
 	 *
 	 * @return array
 	 *
 	 * @throws Exception      if API call fails.
 	 */
-	public static function callRaw($data) {
+	public static function callRaw($data, string $sessionid = null) {
 		global $URL;
 		if (!is_string($URL)) {
 			$URL = PHPUNIT_URL.'api_jsonrpc.php';
@@ -78,6 +79,10 @@ class CAPIHelper {
 				]
 			]
 		];
+
+		if ($sessionid !== null) {
+			$params['http']['header'][] = 'Authorization: Bearer '.$sessionid;
+		}
 
 		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
 		if ($handle) {
@@ -120,18 +125,12 @@ class CAPIHelper {
 	 * @return array
 	 */
 	public static function call($method, $params) {
-		$data = [
+		return static::callRaw([
 			'jsonrpc' => '2.0',
 			'method' => $method,
 			'params' => $params,
 			'id' => static::$request_id
-		];
-
-		if (static::$session) {
-			$data['auth'] = static::$session;
-		}
-
-		return static::callRaw($data);
+		], static::$session);
 	}
 
 	/**

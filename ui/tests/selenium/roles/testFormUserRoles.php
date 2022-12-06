@@ -24,12 +24,11 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
+ * @dataSource EntitiesTags, Services
+ *
  * @backup role, module, users
  *
- * @dataSource Services
- *
- * @onBefore prepareRoleData
- * @onBefore prepareUserData
+ * @onBefore prepareRoleData, prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
@@ -954,7 +953,7 @@ class testFormUserRoles extends CWebTest {
 						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
 						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'user.delete', 'user.get', 'user.logout', 'user.provision', 'user.unblock', 'user.update', 'userdirectory.create',
 						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update',
 						'usergroup.create', 'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
 						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
@@ -1346,12 +1345,19 @@ class testFormUserRoles extends CWebTest {
 	 */
 	public function testFormUserRoles_Modules() {
 		$this->page->login();
+
 		foreach ([true, false] as $enable_modules) {
 			$modules = ['4th Module', '5th Module'];
 			$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+
 			if ($enable_modules === true) {
-				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
+				foreach ($modules as $module) {
+					$this->assertFalse($form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($module)."]")
+							->one(false)->isValid()
+					);
+				}
+
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
 				$table = $this->query('class:list-table')->asTable()->one();
@@ -1361,7 +1367,6 @@ class testFormUserRoles extends CWebTest {
 				$this->page->waitUntilReady();
 			}
 			else {
-				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($enable_modules)->isDisplayed());
 				foreach ($modules as $module) {
 					$form->getField($module)->isChecked();
 				}

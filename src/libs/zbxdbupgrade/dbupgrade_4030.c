@@ -20,6 +20,7 @@
 #include "dbupgrade.h"
 
 #include "zbxdbhigh.h"
+#include "zbx_host_constants.h"
 
 /*
  * 4.4 development database patches
