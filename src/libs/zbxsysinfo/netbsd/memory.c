@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 #include <uvm/uvm_extern.h>
 
 static int			mib[] = {CTL_VM, VM_UVMEXP2};

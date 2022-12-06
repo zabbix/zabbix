@@ -30,8 +30,6 @@
 #define ZBX_PROXY_UPLOAD_DISABLED	1
 #define ZBX_PROXY_UPLOAD_ENABLED	2
 
-#define ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT		30
-
 typedef enum
 {
 	ZBX_TEMPLATE_LINK_MANUAL = 0,
@@ -40,7 +38,7 @@ typedef enum
 zbx_host_template_link_type;
 
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls);
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout);
 
 int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
@@ -58,8 +56,8 @@ int	proxy_get_host_active_availability(struct zbx_json *j);
 int	proxy_get_history_count(void);
 int	proxy_get_delay(zbx_uint64_t lastid);
 
-int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win);
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, int lastaccess, int compress,
 		zbx_uint64_t flags_add);
@@ -112,7 +110,7 @@ void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
 void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
