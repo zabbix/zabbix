@@ -1161,7 +1161,7 @@ class CScreenProblem extends CScreenBase {
 		// Make tags from all events.
 		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
 
-		// Get cause event names for symtoms.
+		// Get cause event names for symptoms.
 		$causes = [];
 		if ($symptom_cause_eventids) {
 			$options = [
@@ -1265,7 +1265,7 @@ class CScreenProblem extends CScreenBase {
 	}
 
 	/**
-	 * Add problems and symtoms to table.
+	 * Add problems and symptoms to table.
 	 *
 	 * @param CTableInfo $table                                 Table object to which problems are added to.
 	 * @param array      $problems                              List of problems.

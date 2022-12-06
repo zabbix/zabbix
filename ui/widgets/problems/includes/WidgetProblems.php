@@ -136,7 +136,7 @@ class WidgetProblems extends CTableInfo {
 	}
 
 	/**
-	 * Add problems and symtoms to table.
+	 * Add problems and symptoms to table.
 	 *
 	 * @param array      $problems                              List of problems.
 	 * @param array      $data                                  Additional data to build the table.

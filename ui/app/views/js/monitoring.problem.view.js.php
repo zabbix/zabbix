@@ -191,7 +191,7 @@
 					btn.title = '<?= _('Collapse') ?>';
 				}
 
-				// Fix last row border depeding if it is opened or closed.
+				// Fix last row border depending if it is opened or closed.
 				if (idx === array.length - 1) {
 					const tr = btn.closest('tr');
 					const tds = [...tr.children];
@@ -230,7 +230,7 @@
 				[...rows].forEach(row => row.classList.add('hidden'));
 			}
 
-			// Fix last row border depeding if it is opened or closed.
+			// Fix last row border depending if it is opened or closed.
 			if (idx === array.length - 1) {
 				const tr = btn.closest('tr');
 				const tds = [...tr.children];
