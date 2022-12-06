@@ -1,3 +1,35 @@
+Changes for 6.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12
+
+6.0.12rc2 was released as 6.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc2
+
+Bug fixes:
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc1
+
+New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
+
+Bug fixes:
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.11
 
 6.0.11rc2 was released as 6.0.11 without any changes
@@ -2230,6 +2262,14 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.31rc1
+
+New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.30
