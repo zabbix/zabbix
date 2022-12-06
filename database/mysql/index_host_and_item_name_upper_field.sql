@@ -1,6 +1,6 @@
 ALTER TABLE `hosts` ADD `name_upper` varchar(128) DEFAULT '' NOT NULL;
 
-CREATE index hosts_6 ON hosts (name_upper);
+CREATE INDEX hosts_6 ON hosts (name_upper);
 
 UPDATE hosts SET name_upper=UPPER(name);
 
