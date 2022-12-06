@@ -11,15 +11,24 @@ z-select,
 	}
 
 	.zi-chevron-down {
-		border-radius: unset;
-		text-align: left;
-		padding: 3px 2px 3px 4px;
-
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
 
+		padding: 3px 2px 3px 4px;
+		border-radius: unset;
+		text-align: left;
+
 		& button {
 			@extend %btn-reset;
+		}
+
+		&::before {
+			display: none;
+		}
+
+		&::after {
+			float: right;
+			top: 1px;
 		}
 
 		&:active,
@@ -29,15 +38,6 @@ z-select,
 			background-color: $form-bg-color;
 			border-color: $form-border-color;
 			box-shadow: none;
-		}
-
-		&::after {
-			float: right;
-			top: 1px;
-		}
-
-		&::before {
-			display: none;
 		}
 	}
 

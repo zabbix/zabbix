@@ -11,13 +11,11 @@ $fonts-path: '../fonts/';
 [class^="zi-"], [class*=" zi-"]{
 	&::before {
 		position: relative;
-
 		font-family: 'zabbix-icons';
 		font-size: 18px;
 		font-style:normal;
 		line-height: 0;
 		vertical-align: middle;
-
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}

@@ -76,10 +76,9 @@ $menu-user-icons-opacity: .75 !default;
 	.has-submenu {
 		& > a {
 			&::after {
+				top: 1px;
 				display: inline-block;
 				float: right;
-				top: 1px;
-
 				font-size: 7px;
 				font-family: 'zabbix-icons' !important;
 				font-style:normal;
@@ -255,12 +254,11 @@ $menu-user-icons-opacity: .75 !default;
 			width: 15px;
 			height: 15px;
 			padding-right: 17px;
-
 			font-size: 15px;
-
 			color: $menu-icon-color;
 			opacity: $menu-main-icons-opacity;
 		}
+
 		&:hover,
 		&:focus {
 			&::before {

@@ -19,13 +19,13 @@ section {
 	}
 
 	.zi-chevron-up {
-		width: 24px;
-		height: 24px;
+		@extend %btn-reset;
+
 		margin: 2px 2px 0 auto;
 		padding: 0 1px;
 		top: -1px;
-
-
+		width: 24px;
+		height: 24px;
 		color: $icon-color;
 		opacity: 0.5;
 
@@ -37,8 +37,6 @@ section {
 		}
 
 		transition: opacity .2s ease-out;
-
-		@extend %btn-reset;
 	}
 
 	.section-foot {

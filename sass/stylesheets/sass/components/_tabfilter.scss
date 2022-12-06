@@ -104,13 +104,13 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		.zi-chevron-left,
 		.zi-chevron-right,
 		.zi-chevron-down {
+			@extend %btn-icon;
+
 			margin: 0 1px;
 			width: 24px;
 			height: 24px;
 			color: $icon-color;
 			opacity: .5;
-
-			@extend %btn-icon;
 
 			&::before {
 				font-size: 16px;
@@ -133,6 +133,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		.btn-time-right {
 			left: 1px;
 			position: relative;
+
 			@if ($ui-transitions) {
 				transition: background-color $ui-transition-duration ease-out;
 			}
@@ -140,6 +141,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			&:not(:disabled) {
 				opacity: 1;
 				cursor: pointer;
+
 				&:focus,
 				&:hover {
 					border: 1px solid $ui-border-color;
@@ -155,6 +157,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 			&:focus {
 				background-color: $form-border-focus-color;
+
 				&:hover {
 					background-color: transparent;
 				}

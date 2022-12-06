@@ -52,10 +52,9 @@ $menu-main-icons-opacity: .75 !default;
 	.has-submenu {
 		& > a {
 			&::after {
+				top: 1px;
 				display: inline-block;
 				float: right;
-				top: 1px;
-
 				font-size: 7px;
 				font-family: 'zabbix-icons' !important;
 				font-style:normal;

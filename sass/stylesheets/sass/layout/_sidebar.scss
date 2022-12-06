@@ -33,13 +33,12 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		.zi-collapse,
 		.zi-expand,
 		.zi-chevron-double-right {
+			@extend %btn-reset;
+
 			padding: 0;
 			width: 24px;
 			height: 24px;
-
 			font-size: 0;
-
-			@extend %btn-reset;
 
 			&::before {
 				font-size: 15px;
@@ -260,23 +259,23 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 	margin-right: 10px;
 
 	.zi-menu {
+		@extend %btn-reset;
+
 		padding: 0 2px;
 		width: 24px;
 		height: 24px;
 
-		@extend %btn-reset;
-
 		font-size: 0;
 		opacity: .75;
-
-		&:hover {
-			opacity: 1;
-		}
 
 		&::before {
 			font-size: 18px;
 			color: $icon-menu-toggle-color;
 			text-indent: unset;
+		}
+
+		&:hover {
+			opacity: 1;
 		}
 
 		@if $ui-transitions {

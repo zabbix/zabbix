@@ -4703,21 +4703,10 @@ a.icon-count {
 	color: $input-placeholder-color;
 }
 
-//[data-count][class*='icon-']::after {
-//	position: absolute;
-//	top: -2px;
-//	content: attr(data-count);
-//	text-align: center;
-//	font-size: 9px;
-//	letter-spacing: -.25px;
-//	line-height: 18px;
-//	width: 18px;
-//}
-
 .zi-circle-question-filled {
 	&::before {
 		top: -2px;
-		color: $icon-hint-color;
+		color: $icon-color;
 	}
 	&:focus,
 	&:hover,

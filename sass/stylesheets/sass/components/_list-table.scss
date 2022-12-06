@@ -82,6 +82,11 @@
 		.link-action {
 			color: $font-color;
 
+			&:hover,
+			&:focus {
+				color: $link-hover-color;
+			}
+
 			&.red {
 				color: $red;
 			}
@@ -96,11 +101,6 @@
 
 			&.green {
 				color: $green;
-			}
-
-			&:hover,
-			&:focus {
-				color: $link-hover-color;
 			}
 		}
 
@@ -368,6 +368,8 @@
 	}
 
 	.list-table-actions {
+		@extend %btn-reset;
+
 		.zi-plus,
 		.zi-pencil {
 			width: 18px;
@@ -376,10 +378,15 @@
 			margin-left: 5px;
 			padding: 0 2px;
 			vertical-align: middle;
-
 			color: $icon-color;
 
-			@extend %btn-reset;
+			&::before {
+				top: -1px;
+				right: 2px;
+				vertical-align: middle;
+				font-size: 18px;
+				opacity: 0.5;
+			}
 
 			&:hover,
 			&:focus,
@@ -387,15 +394,6 @@
 				&::before {
 					opacity: 1;
 				}
-			}
-
-			&::before {
-				top: -1px;
-				right: 2px;
-				vertical-align: middle;
-
-				font-size: 18px;
-				opacity: 0.5;
 			}
 		}
 	}
@@ -409,6 +407,8 @@
 		&.zi-arrow-down,
 		&.zi-arrows-top-bottom,
 		&.zi-alert {
+			@extend %btn-reset;
+
 			vertical-align: top;
 			width: 18px;
 			height: 18px;
@@ -423,12 +423,10 @@
 				display: inline-flex;
 				justify-content: center;
 				align-items: center;
-
 				font-size: 9px;
 				font-family: inherit;
 				content: attr(data-count);
 			}
-			@extend %btn-reset;
 		}
 	}
 
@@ -437,19 +435,20 @@
 			display: inline-block;
 			margin-left: 5px;
 
-			&:focus,
-			&:active {
-				box-shadow: 0 0 0 2px $btn-border-focus-color;
+			&::before {
+				top: 0;
 			}
 
 			&::after {
-				display: inline;
-				right: 13.5px;
 				top: -2px;
+				right: 13.5px;
+				display: inline;
 				content: '?';
 			}
-			&::before {
-				top: 0;
+
+			&:focus,
+			&:active {
+				box-shadow: 0 0 0 2px $btn-border-focus-color;
 			}
 		}
 	}
@@ -491,6 +490,7 @@
 		&::before {
 			font-size: 13px;
 		}
+
 		&::after {
 			display: none !important;
 		}
@@ -501,6 +501,7 @@
 		&::before {
 			color: $icon-action-list-table-color;
 		}
+
 		&::after {
 			display: none !important;
 		}
@@ -531,6 +532,8 @@
 	}
 
 	.zi-more {
+		@extend %btn-reset;
+
 		top: -1px;
 		padding: 0 2px;
 		opacity: .5;
@@ -549,6 +552,5 @@
 		&:focus {
 			opacity: 1;
 		}
-		@extend %btn-reset;
 	}
 }

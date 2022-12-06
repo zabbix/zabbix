@@ -42,14 +42,13 @@
 	}
 
 	&::after {
-		position: absolute;
 		top: 7px;
 		left: -3px;
 		width: 27px;
 		height: 25px;
 		margin-top: 2px;
 		margin-left: 11px;
-
+		position: absolute;
 		font-size: 30px;
 		color: $white;
 		text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
