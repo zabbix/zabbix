@@ -188,6 +188,7 @@ class CControllerPopupActionEdit extends CController {
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 		}
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

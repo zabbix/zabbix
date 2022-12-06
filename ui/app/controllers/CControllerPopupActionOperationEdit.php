@@ -138,7 +138,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
-			'mediatype_options' => $media_types
+			'mediatype_options' => $media_types,
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
