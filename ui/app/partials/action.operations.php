@@ -55,7 +55,7 @@ foreach ($data['action']['operations'] as $operation) {
 		}
 
 		// display N-N as N
-		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'] || $operation['esc_step_to'] == 0)
+		$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
 			? $operation['esc_step_from']
 			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
