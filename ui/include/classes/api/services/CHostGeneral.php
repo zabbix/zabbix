@@ -309,8 +309,9 @@ abstract class CHostGeneral extends CHostBase {
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array $db_hosts = null): void {
+	protected function updateTemplates(array &$hosts, ?array $db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);

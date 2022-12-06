@@ -421,29 +421,25 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $host_prototypes
+	 * @param array $hosts
 	 *
 	 * @return array
 	 */
-	public function create(array $host_prototypes): array {
-		$this->validateCreate($host_prototypes);
+	public function create(array $hosts): array {
+		$this->validateCreate($hosts);
 
-		$this->createForce($host_prototypes);
-		[$tpl_host_prototypes] = $this->getTemplatedObjects($host_prototypes);
+		$this->createForce($hosts);
+		$this->inherit($hosts);
 
-		if ($tpl_host_prototypes) {
-			$this->inherit($tpl_host_prototypes);
-		}
-
-		return ['hostids' => array_column($host_prototypes, 'hostid')];
+		return ['hostids' => array_column($hosts, 'hostid')];
 	}
 
 	/**
-	 * @param array $host_prototypes
+	 * @param array $hosts
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	private function validateCreate(array &$host_prototypes): void {
+	private function validateCreate(array &$hosts): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'uuid' =>				['type' => API_UUID],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -478,111 +474,190 @@ class CHostPrototype extends CHostBase {
 			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkAndAddUuid($host_prototypes);
-		self::checkDiscoveryRules($host_prototypes);
-		self::checkDuplicates($host_prototypes);
-		self::checkMainInterfaces($host_prototypes);
-		self::checkGroupLinks($host_prototypes);
-		$this->checkTemplates($host_prototypes);
+		self::checkDiscoveryRuleAccess($hosts);
+		self::checkRulesAndAddParentDetails($hosts);
+
+		self::checkAndAddUuid($hosts);
+		self::checkDuplicates($hosts);
+		self::checkMainInterfaces($hosts);
+		self::checkGroupLinks($hosts);
+		$this->checkTemplates($hosts);
+		self::addFlags($hosts, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 	}
 
 	/**
-	 * @param array $host_prototypes
+	 * Check that LLD rule IDs of given prototypes are valid. Add parent_hostid and parent_status properties to $hosts.
+	 *
+	 * @param array      $hosts
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkRulesAndAddParentDetails(array &$hosts): void {
+		$rows = DBfetchArray(DBselect(
+			'SELECT i.itemid AS ruleid,h.hostid AS parent_hostid'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', array_column($hosts, 'ruleid', 'ruleid'))
+		));
+
+		$hostids = array_column($rows, 'parent_hostid');
+
+		$db_templates = API::Template()->get([
+			'output' => [],
+			'templateids' => $hostids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$_hostids = array_diff($hostids, array_keys($db_templates));
+
+		$db_hosts = $_hostids
+			? API::Host()->get([
+				'output' => ['status'],
+				'hostids' => $_hostids,
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		if (count($db_templates) + count($db_hosts) != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$lld_links = array_column($rows, 'parent_hostid', 'ruleid');
+		self::addParentDetails($hosts, $lld_links, $db_hosts, $db_templates);
+	}
+
+	/**
+	 * Add parent_hostid and parent_status properties from their discovery rule's parent host or template.
+	 *
+	 * @param array $hosts
+	 * @param array $ldd_links
+	 * @param array $db_hosts
+	 * @param array $db_templates
+	 */
+	private static function addParentDetails(array &$hosts, array $ldd_links, array $db_hosts,
+			array $db_templates): void {
+		foreach ($hosts as &$host) {
+			$parent_hostid = $ldd_links[$host['ruleid']];
+
+			$host['parent_hostid'] = $parent_hostid;
+			$host['parent_status'] = array_key_exists($parent_hostid, $db_templates)
+				? HOST_STATUS_TEMPLATE
+				: $db_hosts[$parent_hostid]['status'];
+		}
+		unset($host);
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param int   $flags
+	 */
+	private static function addFlags(array &$hosts, int $flags): void {
+		foreach ($hosts as &$host) {
+			$host['flags'] = $flags;
+		}
+		unset($host);
+	}
+
+	/**
+	 * @param array $hosts
 	 * @param bool  $inherited
 	 */
-	protected function createForce(array &$host_prototypes, bool $inherited = false): void {
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-		unset($host_prototype);
+	protected function createForce(array &$hosts, bool $inherited = false): void {
+		$hostids = DB::insert('hosts', $hosts);
 
-		$hostids = DB::insert('hosts', $host_prototypes);
+		$parent_fields = [];
 
-		foreach ($host_prototypes as $index => &$host_prototype) {
-			$host_prototype['hostid'] = $hostids[$index];
+		foreach ($hosts as $i => &$host) {
+			$host['hostid'] = $hostids[$i];
+
+			$parent_fields[$i] = array_intersect_key($host, array_flip(['parent_status', 'parent_hostid']));
+			$host = array_diff_key($host, $parent_fields[$i]);
 		}
-		unset($host_prototype);
+		unset($host);
 
 		if (!$inherited) {
-			$this->checkTemplatesLinks($host_prototypes);
+			$this->checkTemplatesLinks($hosts);
 		}
 
-		self::createHostDiscoveries($host_prototypes);
+		self::createHostDiscoveries($hosts);
 
-		self::updateInterfaces($host_prototypes);
-		self::updateGroupLinks($host_prototypes);
-		self::updateGroupPrototypes($host_prototypes);
-		$this->updateTemplates($host_prototypes);
-		$this->updateTagsNew($host_prototypes);
-		$this->updateMacros($host_prototypes);
-		self::updateHostInventories($host_prototypes);
+		self::updateInterfaces($hosts);
+		self::updateGroupLinks($hosts);
+		self::updateGroupPrototypes($hosts);
+		$this->updateTemplates($hosts);
+		$this->updateTagsNew($hosts);
+		$this->updateMacros($hosts);
+		self::updateHostInventories($hosts);
 
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts);
+
+		foreach ($hosts as $i => &$host) {
+			$host += $parent_fields[$i];
+		}
+		unset($host);
 	}
 
 	/**
-	 * @param array $host_prototypes
+	 * @param array $hosts
 	 *
 	 * @return array
 	 */
-	public function update(array $host_prototypes): array {
-		$this->validateUpdate($host_prototypes, $db_host_prototypes);
+	public function update(array $hosts): array {
+		$this->validateUpdate($hosts, $db_hosts);
 
-		$this->updateForce($host_prototypes, $db_host_prototypes);
+		$hostids = array_column($hosts, 'hostid');
 
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] =
-			$this->getTemplatedObjects($host_prototypes, $db_host_prototypes);
+		$this->updateForce($hosts, $db_hosts);
+		$this->inherit($hosts, $db_hosts);
 
-		if ($tpl_host_prototypes) {
-			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
-		}
-
-		return ['hostids' => array_column($host_prototypes, 'hostid')];
+		return ['hostids' => $hostids];
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
+	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $host_prototypes, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$count = $this->get([
 			'countOutput' => true,
-			'hostids' => array_column($host_prototypes, 'hostid'),
+			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true
 		]);
 
-		if (count($host_prototypes) != $count) {
+		if (count($hosts) != $count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+		$db_hosts = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
 				'hd.parent_itemid AS ruleid,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
-			' WHERE '.dbConditionId('h.hostid', array_column($host_prototypes, 'hostid'))
+			' WHERE '.dbConditionId('h.hostid', array_column($hosts, 'hostid', 'hostid'))
 		), 'hostid');
 
-		foreach ($host_prototypes as $i => &$host_prototype) {
-			if ($db_host_prototypes[$host_prototype['hostid']]['templateid'] == 0) {
-				$host_prototype += array_intersect_key($db_host_prototypes[$host_prototype['hostid']],
+		foreach ($hosts as $i => &$host) {
+			if ($db_hosts[$host['hostid']]['templateid'] == 0) {
+				$host += array_intersect_key($db_hosts[$host['hostid']],
 					array_flip(['host', 'name', 'custom_interfaces'])
 				);
 
@@ -592,14 +667,14 @@ class CHostPrototype extends CHostBase {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 
-			if (!CApiInputValidator::validate($api_input_rules, $host_prototype, '/'.($i + 1), $error)) {
+			if (!CApiInputValidator::validate($api_input_rules, $host, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
-		unset($host_prototype);
+		unset($host);
 
-		$host_prototypes = $this->extendObjectsByKey($host_prototypes, $db_host_prototypes, 'hostid',
-			['ruleid', 'custom_interfaces']
+		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid',
+			['host', 'name', 'ruleid', 'custom_interfaces']
 		);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
@@ -608,18 +683,19 @@ class CHostPrototype extends CHostBase {
 			'name' =>	['type' => API_STRING_UTF8]
 		]];
 
-		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host_prototypes, '/', $error)) {
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		self::checkRulesAndAddParentDetails($hosts);
+		$this->addAffectedObjects($hosts, $db_hosts);
 
-		self::checkDuplicates($host_prototypes, $db_host_prototypes);
-		self::checkMainInterfaces($host_prototypes);
-		self::checkGroupLinks($host_prototypes, $db_host_prototypes);
-		$this->checkTemplates($host_prototypes, $db_host_prototypes);
-		$this->checkTemplatesLinks($host_prototypes, $db_host_prototypes);
-		$host_prototypes = parent::validateHostMacros($host_prototypes, $db_host_prototypes);
+		self::checkDuplicates($hosts, $db_hosts);
+		self::checkMainInterfaces($hosts);
+		self::checkGroupLinks($hosts, $db_hosts);
+		$this->checkTemplates($hosts, $db_hosts);
+		$this->checkTemplatesLinks($hosts, $db_hosts);
+		$hosts = parent::validateHostMacros($hosts, $db_hosts);
 	}
 
 	/**
@@ -754,52 +830,73 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * @param array $hosts
+	 * @param array $db_hosts
 	 */
-	protected function updateForce(array &$host_prototypes, array $db_host_prototypes): void {
-		$upd_host_prototypes = [];
+	protected function updateForce(array &$hosts, array $db_hosts): void {
+		// Helps to avoid deadlocks.
+		CArrayHelper::sort($hosts, ['hostid', 'order' => ZBX_SORT_DOWN]);
 
-		// save the host prototypes
-		foreach ($host_prototypes as $host_prototype) {
-			$upd_host_prototype = DB::getUpdatedValues('hosts', $host_prototype,
-				$db_host_prototypes[$host_prototype['hostid']]
+		$upd_hosts = [];
+		$upd_hostids = [];
+
+		$internal_fields = array_flip(['hostid', 'host', 'ruleid', 'custom_interfaces', 'inventory_mode']);
+		$nested_object_fields = array_flip(['interfaces', 'groupLinks', 'groupPrototypes', 'templates', 'tags',
+			'macros', 'host_inventory'
+		]);
+		$parent_fields = [];
+
+		foreach ($hosts as $i => &$host) {
+			$upd_host = DB::getUpdatedValues('hosts', $host, $db_hosts[$host['hostid']]);
+
+			if ($upd_host) {
+				$upd_hosts[] = [
+					'values' => $upd_host,
+					'where' => ['hostid' => $host['hostid']]
+				];
+
+				$upd_hostids[$i] = $host['hostid'];
+			}
+
+			$parent_fields[$host['hostid']] = array_intersect_key($host,
+				array_flip(['parent_hostid', 'parent_status'])
 			);
 
-			if ($upd_host_prototype) {
-				$upd_host_prototypes[] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
+			$host = array_intersect_key($host, $internal_fields + $upd_host + $nested_object_fields);
 		}
 
-		if ($upd_host_prototypes) {
-			DB::update('hosts', $upd_host_prototypes);
+		if ($upd_hosts) {
+			DB::update('hosts', $upd_hosts);
 		}
 
-		self::updateInterfaces($host_prototypes, $db_host_prototypes);
-		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
-		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
-		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
-		$this->updateMacros($host_prototypes, $db_host_prototypes);
-		self::updateHostInventories($host_prototypes, $db_host_prototypes);
+		self::updateInterfaces($hosts, $db_hosts, $upd_hostids);
+		self::updateGroupLinks($hosts, $db_hosts, $upd_hostids);
+		self::updateGroupPrototypes($hosts, $db_hosts, $upd_hostids);
+		$this->updateTemplates($hosts, $db_hosts, $upd_hostids);
+		$this->updateTagsNew($hosts, $db_hosts, $upd_hostids);
+		$this->updateMacros($hosts, $db_hosts, $upd_hostids);
+		self::updateHostInventories($hosts, $db_hosts, $upd_hostids);
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_PROTOTYPE, $host_prototypes,
-			$db_host_prototypes
-		);
+		$hosts = array_intersect_key($hosts, $upd_hostids);
+		$db_hosts = array_intersect_key($db_hosts, array_flip($upd_hostids));
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts, $db_hosts);
+
+		foreach ($hosts as &$host) {
+			$host += $parent_fields[$host['hostid']];
+		}
+		unset($host);
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * @param array $hosts
+	 * @param array $db_hosts
 	 */
-	protected function addAffectedObjects(array $host_prototypes, array &$db_host_prototypes): void {
-		self::addAffectedInterfaces($host_prototypes, $db_host_prototypes);
-		self::addAffectedGroupLinks($host_prototypes, $db_host_prototypes);
-		self::addAffectedGroupPrototypes($host_prototypes, $db_host_prototypes);
-		parent::addAffectedObjects($host_prototypes, $db_host_prototypes);
+	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+		self::addAffectedInterfaces($hosts, $db_hosts);
+		self::addAffectedGroupLinks($hosts, $db_hosts);
+		self::addAffectedGroupPrototypes($hosts, $db_hosts);
+		parent::addAffectedObjects($hosts, $db_hosts);
 	}
 
 	/**
@@ -921,13 +1018,13 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check for unique host prototype names.
+	 * Check for unique host prototype names per LLD rule.
 	 *
 	 * @param array      $host_prototypes
 	 * @param array|null $db_host_prototypes
 	 * @param bool       $inherited
 	 *
-	 * @throws APIException if host prototype names are not unique.
+	 * @throws APIException
 	 */
 	private static function checkDuplicates(array $host_prototypes, array $db_host_prototypes = null,
 			bool $inherited = false): void {
@@ -1024,39 +1121,31 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check that only host prototypes on templates have UUID. Add UUID to all host prototypes on templates,
-	 * if it doesn't exist.
+	 * Check and add UUID to all host prototypes on templates, if it doesn't exist.
 	 *
-	 * @param array $host_prototypes
+	 * @param array $hosts
 	 *
 	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$host_prototypes): void {
-		$templated_ruleids = DBfetchColumn(DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-			' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid'))).
-			' AND h.status='.HOST_STATUS_TEMPLATE
-		), 'itemid');
-
-		foreach ($host_prototypes as $index => &$host_prototype) {
-			if (!in_array($host_prototype['ruleid'], $templated_ruleids) && array_key_exists('uuid', $host_prototype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
-			}
-
-			if (in_array($host_prototype['ruleid'], $templated_ruleids) && !array_key_exists('uuid', $host_prototype)) {
-				$host_prototype['uuid'] = generateUuidV4();
+	private static function checkAndAddUuid(array &$hosts): void {
+		foreach ($hosts as $i => &$host) {
+			if ($host['parent_status'] == HOST_STATUS_TEMPLATE) {
+				if (array_key_exists('uuid', $host)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/' . ($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+					);
+				}
+				else {
+					$host['uuid'] = generateUuidV4();
+				}
 			}
 		}
-		unset($host_prototype);
+		unset($host);
 
 		$duplicates = DB::select('hosts', [
 			'output' => ['uuid'],
 			'filter' => [
-				'uuid' => array_column($host_prototypes, 'uuid')
+				'uuid' => array_column($hosts, 'uuid')
 			],
 			'limit' => 1
 		]);
@@ -1069,14 +1158,12 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Checks if the current user has access to the given LLD rules.
+	 * @param array $hosts
 	 *
-	 * @param array $host_prototypes
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given LLD rules
+	 * @throws APIException
 	 */
-	private static function checkDiscoveryRules(array $host_prototypes): void {
-		$ruleids = array_keys(array_flip(array_column($host_prototypes, 'ruleid')));
+	private static function checkDiscoveryRuleAccess(array $hosts): void {
+		$ruleids = array_column($hosts, 'ruleid', 'ruleid');
 
 		$count = API::DiscoveryRule()->get([
 			'countOutput' => true,
@@ -1088,7 +1175,7 @@ class CHostPrototype extends CHostBase {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		// Check if the host is discovered.
+		// Check if a rule's parent host is discovered.
 		$db_hosts = DBfetchArray(DBselect(
 			'SELECT h.host'.
 			' FROM items i,hosts h'.
@@ -1222,34 +1309,36 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	private static function updateInterfaces(array &$host_prototypes, array $db_host_prototypes = null): void {
+	private static function updateInterfaces(array &$hosts, array $db_hosts = null,
+			array &$upd_hostids = null): void {
 		$ins_interfaces = [];
 		$del_interfaceids = [];
 
-		foreach ($host_prototypes as &$host_prototype) {
+		foreach ($hosts as $i => &$host) {
 			$update = false;
 
-			if ($db_host_prototypes === null) {
-				$update = ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
-					&& array_key_exists('interfaces', $host_prototype)
+			if ($db_hosts === null) {
+				$update = ($host['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
+					&& array_key_exists('interfaces', $host)
 				);
 			}
 			else {
-				if ($host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-					$update = array_key_exists('interfaces', $host_prototype);
+				if ($host['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+					$update = array_key_exists('interfaces', $host);
 				}
 				else {
-					$db_host_prototype = $db_host_prototypes[$host_prototype['hostid']];
+					$db_host = $db_hosts[$host['hostid']];
 
-					if ($db_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
-							&& $db_host_prototype['interfaces']) {
+					if ($db_host['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM
+							&& $db_host['interfaces']) {
 						$update = true;
 
-						if (!array_key_exists('interfaces', $host_prototype)) {
-							$host_prototype['interfaces'] = [];
+						if (!array_key_exists('interfaces', $host)) {
+							$host['interfaces'] = [];
 						}
 					}
 				}
@@ -1259,11 +1348,12 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_interfaces = ($db_host_prototypes !== null)
-				? $db_host_prototypes[$host_prototype['hostid']]['interfaces']
+			$changed = false;
+			$db_interfaces = ($db_hosts !== null)
+				? $db_hosts[$host['hostid']]['interfaces']
 				: [];
 
-			foreach ($host_prototype['interfaces'] as &$interface) {
+			foreach ($host['interfaces'] as &$interface) {
 				$db_interfaceid = self::getInterfaceId($interface, $db_interfaces);
 
 				if ($db_interfaceid !== null) {
@@ -1271,14 +1361,27 @@ class CHostPrototype extends CHostBase {
 					unset($db_interfaces[$db_interfaceid]);
 				}
 				else {
-					$ins_interfaces[] = ['hostid' => $host_prototype['hostid']] + $interface;
+					$ins_interfaces[] = ['hostid' => $host['hostid']] + $interface;
+					$changed = true;
 				}
 			}
 			unset($interface);
 
-			$del_interfaceids = array_merge($del_interfaceids, array_keys($db_interfaces));
+			if ($db_interfaces) {
+				$del_interfaceids = array_merge($del_interfaceids, array_keys($db_interfaces));
+				$changed = true;
+			}
+
+			if ($db_hosts) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['interfaces']);
+				}
+			}
 		}
-		unset($host_prototype);
+		unset($host);
 
 		if ($del_interfaceids) {
 			DB::delete('interface_snmp', ['interfaceid' => $del_interfaceids]);
@@ -1291,12 +1394,12 @@ class CHostPrototype extends CHostBase {
 
 		$ins_interfaces_snmp = [];
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('interfaces', $host_prototype)) {
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('interfaces', $host)) {
 				continue;
 			}
 
-			foreach ($host_prototype['interfaces'] as &$interface) {
+			foreach ($host['interfaces'] as &$interface) {
 				if (!array_key_exists('interfaceid', $interface)) {
 					$interface['interfaceid'] = array_shift($interfaceids);
 
@@ -1307,7 +1410,7 @@ class CHostPrototype extends CHostBase {
 			}
 			unset($interface);
 		}
-		unset($host_prototype);
+		unset($host);
 
 		if ($ins_interfaces_snmp) {
 			DB::insert('interface_snmp', $ins_interfaces_snmp, false);
@@ -1339,12 +1442,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($db_interfaces as $db_interface) {
 			$db_details = array_key_exists('details', $db_interface) ? $db_interface['details'] : [];
 
-			if (self::fieldUnchanged($interface, $db_interface, 'type', false)
-					&& self::fieldUnchanged($interface, $db_interface, 'useip', false)
-					&& self::fieldUnchanged($interface, $db_interface, 'ip', true)
-					&& self::fieldUnchanged($interface, $db_interface, 'dns', true)
-					&& self::fieldUnchanged($interface, $db_interface, 'port', true)
-					&& self::fieldUnchanged($interface, $db_interface, 'main', false)) {
+			if (!DB::getUpdatedValues('interface', $interface, $db_interface)) {
 				if (!array_key_exists('details', $interface)) {
 					return $db_interface['interfaceid'];
 				}
@@ -1353,16 +1451,7 @@ class CHostPrototype extends CHostBase {
 					continue;
 				}
 
-				if (self::fieldUnchanged($details, $db_details, 'version', false)
-						&& self::fieldUnchanged($details, $db_details, 'bulk', false)
-						&& self::fieldUnchanged($details, $db_details, 'community', true)
-						&& self::fieldUnchanged($details, $db_details, 'contextname', true)
-						&& self::fieldUnchanged($details, $db_details, 'securityname', true)
-						&& self::fieldUnchanged($details, $db_details, 'securitylevel', false)
-						&& self::fieldUnchanged($details, $db_details, 'authprotocol', false)
-						&& self::fieldUnchanged($details, $db_details, 'authpassphrase', false)
-						&& self::fieldUnchanged($details, $db_details, 'privprotocol', false)
-						&& self::fieldUnchanged($details, $db_details, 'privpassphrase', false)) {
+				if (!DB::getUpdatedValues('interface_snmp', $details, $db_details)) {
 					return $db_interface['interfaceid'];
 				}
 			}
@@ -1372,38 +1461,26 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check if value of the given object field remains unchanged.
-	 *
-	 * @param array  $object
-	 * @param array  $db_object
-	 * @param string $field
-	 * @param bool   $strict
-	 *
-	 * @return bool
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	private static function fieldUnchanged(array $object, array $db_object, string $field, bool $strict): bool {
-		return $strict ? ($object[$field] === $db_object[$field]) : ($object[$field] == $db_object[$field]);
-	}
-
-	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
-	 */
-	private static function updateGroupLinks(array &$host_prototypes, array $db_host_prototypes = null): void {
+	private static function updateGroupLinks(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
 		$ins_group_links = [];
 		$upd_group_links = []; // Used to update templateid value upon inheritance.
 		$del_group_prototypeids = [];
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('groupLinks', $host_prototype)) {
+		foreach ($hosts as $i => &$host) {
+			if (!array_key_exists('groupLinks', $host)) {
 				continue;
 			}
 
-			$db_group_links = ($db_host_prototypes !== null)
-				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupLinks'], null, 'groupid')
+			$changed = false;
+			$db_group_links = $db_hosts !== null
+				? array_column($db_hosts[$host['hostid']]['groupLinks'], null, 'groupid')
 				: [];
 
-			foreach ($host_prototype['groupLinks'] as &$group_link) {
+			foreach ($host['groupLinks'] as &$group_link) {
 				if (array_key_exists($group_link['groupid'], $db_group_links)) {
 					$group_link['group_prototypeid'] = $db_group_links[$group_link['groupid']]['group_prototypeid'];
 					$upd_group_link = DB::getUpdatedValues('group_prototype', $group_link,
@@ -1415,21 +1492,35 @@ class CHostPrototype extends CHostBase {
 							'values' => $upd_group_link,
 							'where' => ['group_prototypeid' => $group_link['group_prototypeid']]
 						];
+						$changed = true;
 					}
 
 					unset($db_group_links[$group_link['groupid']]);
 				}
 				else {
-					$ins_group_links[] = ['hostid' => $host_prototype['hostid']] + $group_link;
+					$ins_group_links[] = ['hostid' => $host['hostid']] + $group_link;
+					$changed = true;
 				}
 			}
 			unset($group_link);
 
-			$del_group_prototypeids = array_merge($del_group_prototypeids,
-				array_column($db_group_links, 'group_prototypeid')
-			);
+			if ($db_group_links) {
+				$del_group_prototypeids = array_merge($del_group_prototypeids,
+					array_column($db_group_links, 'group_prototypeid')
+				);
+				$changed = true;
+			}
+
+			if ($db_hosts !== null) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['groupLinks']);
+				}
+			}
 		}
-		unset($host_prototype);
+		unset($host);
 
 		if ($del_group_prototypeids) {
 			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
@@ -1451,40 +1542,43 @@ class CHostPrototype extends CHostBase {
 			$group_prototypeids = DB::insert('group_prototype', $ins_group_links);
 		}
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('groupLinks', $host_prototype)) {
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('groupLinks', $host)) {
 				continue;
 			}
 
-			foreach ($host_prototype['groupLinks'] as &$group_link) {
+			foreach ($host['groupLinks'] as &$group_link) {
 				if (!array_key_exists('group_prototypeid', $group_link)) {
 					$group_link['group_prototypeid'] = array_shift($group_prototypeids);
 				}
 			}
 			unset($group_link);
 		}
-		unset($host_prototype);
+		unset($host);
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	private static function updateGroupPrototypes(array &$host_prototypes, array $db_host_prototypes = null): void {
+	private static function updateGroupPrototypes(array &$hosts, array $db_hosts = null,
+			array &$upd_hostids = null): void {
 		$ins_group_prototypes = [];
 		$upd_group_prototypes = []; // Used to update templateid value upon inheritance.
 		$del_group_prototypeids = [];
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('groupPrototypes', $host_prototype)) {
+		foreach ($hosts as $i => &$host) {
+			if (!array_key_exists('groupPrototypes', $host)) {
 				continue;
 			}
 
-			$db_group_prototypes = ($db_host_prototypes !== null)
-				? array_column($db_host_prototypes[$host_prototype['hostid']]['groupPrototypes'], null, 'name')
+			$db_group_prototypes = ($db_hosts !== null)
+				? array_column($db_hosts[$host['hostid']]['groupPrototypes'], null, 'name')
 				: [];
+			$changed = false;
 
-			foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+			foreach ($host['groupPrototypes'] as &$group_prototype) {
 				if (array_key_exists($group_prototype['name'], $db_group_prototypes)) {
 					$group_prototype['group_prototypeid'] =
 						$db_group_prototypes[$group_prototype['name']]['group_prototypeid'];
@@ -1497,21 +1591,35 @@ class CHostPrototype extends CHostBase {
 							'values' => $upd_group_prototype,
 							'where' => ['group_prototypeid' => $group_prototype['group_prototypeid']]
 						];
+						$changed = true;
 					}
 
 					unset($db_group_prototypes[$group_prototype['name']]);
 				}
 				else {
-					$ins_group_prototypes[] = ['hostid' => $host_prototype['hostid']] + $group_prototype;
+					$ins_group_prototypes[] = ['hostid' => $host['hostid']] + $group_prototype;
+					$changed = true;
 				}
 			}
 			unset($group_prototype);
 
-			$del_group_prototypeids = array_merge($del_group_prototypeids,
-				array_column($db_group_prototypes, 'group_prototypeid')
-			);
+			if ($db_group_prototypes) {
+				$del_group_prototypeids = array_merge($del_group_prototypeids,
+					array_column($db_group_prototypes, 'group_prototypeid')
+				);
+				$changed = true;
+			}
+
+			if ($db_hosts !== null) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['groupPrototypes']);
+				}
+			}
 		}
-		unset($host_prototype);
+		unset($host);
 
 		if ($del_group_prototypeids) {
 			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
@@ -1535,58 +1643,62 @@ class CHostPrototype extends CHostBase {
 			$group_prototypeids = DB::insert('group_prototype', $ins_group_prototypes);
 		}
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (!array_key_exists('groupPrototypes', $host_prototype)) {
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('groupPrototypes', $host)) {
 				continue;
 			}
 
-			foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+			foreach ($host['groupPrototypes'] as &$group_prototype) {
 				if (!array_key_exists('group_prototypeid', $group_prototype)) {
 					$group_prototype['group_prototypeid'] = array_shift($group_prototypeids);
 				}
 			}
 			unset($group_prototype);
 		}
-		unset($host_prototype);
+		unset($host);
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 * @param array|null $upd_hostids
 	 */
-	private static function updateHostInventories(array $host_prototypes, array $db_host_prototypes = null): void {
+	private static function updateHostInventories(array $hosts, array $db_hosts = null,
+			array &$upd_hostids = null): void {
 		$ins_inventories = [];
 		$upd_inventories = [];
 		$del_hostids = [];
 
-		foreach ($host_prototypes as $host_prototype) {
-			if (!array_key_exists('inventory_mode', $host_prototype)) {
+		foreach ($hosts as $i => $host) {
+			if (!array_key_exists('inventory_mode', $host)) {
 				continue;
 			}
 
-			$db_inventory_mode = ($db_host_prototypes !== null)
-				? $db_host_prototypes[$host_prototype['hostid']]['inventory_mode']
+			$db_inventory_mode = ($db_hosts !== null)
+				? $db_hosts[$host['hostid']]['inventory_mode']
 				: HOST_INVENTORY_DISABLED;
 
-			if ($host_prototype['inventory_mode'] == $db_inventory_mode) {
+			if ($host['inventory_mode'] == $db_inventory_mode) {
 				continue;
 			}
 
-			if ($host_prototype['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				$del_hostids[] = $host_prototype['hostid'];
+			if ($host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+				$del_hostids[] = $host['hostid'];
 			}
 			elseif ($db_inventory_mode != HOST_INVENTORY_DISABLED) {
 				$upd_inventories = [
-					'values' =>['inventory_mode' => $host_prototype['inventory_mode']],
-					'where' => ['hostid' => $host_prototype['hostid']]
+					'values' =>['inventory_mode' => $host['inventory_mode']],
+					'where' => ['hostid' => $host['hostid']]
 				];
 			}
 			else {
 				$ins_inventories[] = [
-					'hostid' => $host_prototype['hostid'],
-					'inventory_mode' => $host_prototype['inventory_mode']
+					'hostid' => $host['hostid'],
+					'inventory_mode' => $host['inventory_mode']
 				];
 			}
+
+			$upd_hostids[$i] = $host['hostid'];
 		}
 
 		if ($del_hostids) {
