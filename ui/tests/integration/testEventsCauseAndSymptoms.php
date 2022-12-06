@@ -45,13 +45,13 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	private function expandMacros($in_str, $event_n, $cause_n = null) {
 		$replacements = [
 			'{EVENT.NAME}' => 'Trigger trap '.$event_n,
-			'{EVENT.ID}' => $event_n
+			'{EVENT.ID}' => $this->eventNumToId($event_n)
 		];
 
 		if (null != $cause_n) {
 			$replacements = array_merge($replacements, [
 				'{EVENT.CAUSE.NAME}' => 'Trigger trap '.$cause_n,
-				'{EVENT.CAUSE.ID}' => $cause_n,
+				'{EVENT.CAUSE.ID}' => $this->eventNumToId($cause_n),
 				'{EVENT.CAUSE.SOURCE}' => EVENT_SOURCE_TRIGGERS,
 				'{EVENT.CAUSE.OBJECT}' => EVENT_OBJECT_TRIGGER,
 				'{EVENT.CAUSE.VALUE}' => self::EVENT_START,
@@ -91,16 +91,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 	private function markAsSymptoms($rank_as_symptom_requests) {
 		foreach ($rank_as_symptom_requests as $request) {
+			$event_ids = $this->eventNumToId($request['event_nums']);
+			$cause_event_ids = $this->eventNumToId($request['cause_event_num']);
+
 			$response = $this->call('event.acknowledge', [
-				'eventids' => $request['eventids'],
+				'eventids' => $event_ids,
 				'action' => ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-				'cause_eventid' => $request['cause_eventid'],
+				'cause_eventid' => $cause_event_ids,
 			]);
 
 			$this->assertArrayHasKey('result', $response);
 			$this->assertArrayHasKey('eventids', $response['result']);
-			if (is_array($request['eventids']))
-				$this->assertCount(count($request['eventids']), $response['result']['eventids']);
+			if (is_array($event_ids))
+				$this->assertCount(count($event_ids), $response['result']['eventids']);
 			else
 				$this->assertArrayHasKey(0, $response['result']['eventids']);
 		}
@@ -147,19 +150,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 			// check if actual cause eventid matches the expected cause eventid
 			foreach ($expected_events as $expected_event) {
-				$expected_event_id = $expected_event['eventid'];
-				$expected_cause_eventid = $expected_event['cause_eventid'];
+				$expected_event_id = $this->eventNumToId($expected_event['event_num']);
+				$expected_cause_eventid = $this->eventNumToId($expected_event['cause_event_num']);
 				$this->assertEquals($expected_cause_eventid,
 						$events[$expected_event_id]['cause_eventid']);
 			}
 		}
 	}
 
-	private function checkMacros($expected_events) {
+	private function checkEventCauseMacros($expected_events) {
 		foreach ($expected_events as $expected_event) {
-			$eventid = $expected_event['eventid'];
-			$expected_cause_eventid = $expected_event['cause_eventid'];
-			$expected_value = $this->expandMacros(self::MACRO_TEMPLATE, $eventid, $expected_cause_eventid);
+			$eventid = $this->eventNumToId($expected_event['event_num']);
+			$expected_value = $this->expandMacros(self::MACRO_TEMPLATE, $expected_event['event_num'],
+					$expected_event['cause_event_num']);
 
 			$response = $this->callUntilDataIsPresent('script.execute', [
 				'scriptid' => self::$scriptid,
@@ -351,20 +354,20 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testRankAsSymptom() {
 		$this->markAsSymptoms([
-			['eventids' => $this->eventNumToId([2, 3]), 'cause_eventid' => $this->eventNumToId(1)],
-			['eventids' => $this->eventNumToId(5), 'cause_eventid' => $this->eventNumToId(4)],
+			['event_nums' => [2, 3], 'cause_event_num' => 1],
+			['event_nums' => 5, 'cause_event_num' => 4],
 		]);
 
 		$expected = [
-			['eventid' => $this->eventNumToId(1), 'cause_eventid' => $this->eventNumToId(0)],
-			['eventid' => $this->eventNumToId(2), 'cause_eventid' => $this->eventNumToId(1)],
-			['eventid' => $this->eventNumToId(3), 'cause_eventid' => $this->eventNumToId(1)],
-			['eventid' => $this->eventNumToId(4), 'cause_eventid' => $this->eventNumToId(0)],
-			['eventid' => $this->eventNumToId(5), 'cause_eventid' => $this->eventNumToId(4)],
+			['event_num' => 1, 'cause_event_num' => 0],
+			['event_num' => 2, 'cause_event_num' => 1],
+			['event_num' => 3, 'cause_event_num' => 1],
+			['event_num' => 4, 'cause_event_num' => 0],
+			['event_num' => 5, 'cause_event_num' => 4],
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
-		$this->checkMacros($expected);
+		$this->checkEventCauseMacros($expected);
 	}
 
 	/**
@@ -393,19 +396,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testSwapCauseAndSymptom() {
 		$this->markAsSymptoms([
-			['eventids' => $this->eventNumToId(1), 'cause_eventid' => $this->eventNumToId(3)],
+			['event_nums' => 1, 'cause_event_num' => 3],
 		]);
 
 		$expected = [
-			['eventid' => $this->eventNumToId(1), 'cause_eventid' => $this->eventNumToId(3)],
-			['eventid' => $this->eventNumToId(2), 'cause_eventid' => $this->eventNumToId(3)],
-			['eventid' => $this->eventNumToId(3), 'cause_eventid' => $this->eventNumToId(0)],
-			['eventid' => $this->eventNumToId(4), 'cause_eventid' => $this->eventNumToId(0)],
-			['eventid' => $this->eventNumToId(5), 'cause_eventid' => $this->eventNumToId(4)],
+			['event_num' => 1, 'cause_event_num' => 3],
+			['event_num' => 2, 'cause_event_num' => 3],
+			['event_num' => 3, 'cause_event_num' => 0],
+			['event_num' => 4, 'cause_event_num' => 0],
+			['event_num' => 5, 'cause_event_num' => 4],
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
-		$this->checkMacros($expected);
+		$this->checkEventCauseMacros($expected);
 	}
 
 	/**
@@ -434,19 +437,19 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testRankCauseAsSymptomOfSymptom() {
 		$this->markAsSymptoms([
-			['eventids' => $this->eventNumToId(4), 'cause_eventid' => $this->eventNumToId(2)],
+			['event_nums' => 4, 'cause_event_num' => 2],
 		]);
 
 		$expected = [
-			['eventid' => $this->eventNumToId(1), 'cause_eventid' => $this->eventNumToId(3)],
-			['eventid' => $this->eventNumToId(2), 'cause_eventid' => $this->eventNumToId(3)],
-			['eventid' => $this->eventNumToId(3), 'cause_eventid' => $this->eventNumToId(0)],
-			['eventid' => $this->eventNumToId(4), 'cause_eventid' => $this->eventNumToId(3)],
-			['eventid' => $this->eventNumToId(5), 'cause_eventid' => $this->eventNumToId(3)],
+			['event_num' => 1, 'cause_event_num' => 3],
+			['event_num' => 2, 'cause_event_num' => 3],
+			['event_num' => 3, 'cause_event_num' => 0],
+			['event_num' => 4, 'cause_event_num' => 3],
+			['event_num' => 5, 'cause_event_num' => 3],
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
-		$this->checkMacros($expected);
+		$this->checkEventCauseMacros($expected);
 	}
 
 	/**
@@ -483,14 +486,14 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		$this->assertCount(4,  $response['result']['eventids']);
 
 		$expected = [
-			['eventid' => $this->eventNumToId(1), 'cause_eventid' => 0],
-			['eventid' => $this->eventNumToId(2), 'cause_eventid' => 0],
-			['eventid' => $this->eventNumToId(3), 'cause_eventid' => 0],
-			['eventid' => $this->eventNumToId(4), 'cause_eventid' => 0],
-			['eventid' => $this->eventNumToId(5), 'cause_eventid' => 0],
+			['event_num' => 1, 'cause_event_num' => 0],
+			['event_num' => 2, 'cause_event_num' => 0],
+			['event_num' => 3, 'cause_event_num' => 0],
+			['event_num' => 4, 'cause_event_num' => 0],
+			['event_num' => 5, 'cause_event_num' => 0],
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
-		$this->checkMacros($expected);
+		$this->checkEventCauseMacros($expected);
 	}
 }
