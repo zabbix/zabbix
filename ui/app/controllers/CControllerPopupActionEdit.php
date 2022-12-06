@@ -147,6 +147,8 @@ class CControllerPopupActionEdit extends CController {
 				));
 			}
 
+			sortOperations($eventsource, $data['action']['operations']);
+
 			foreach ($data['action']['operations'] as &$operation) {
 				$operation['recovery'] = ACTION_OPERATION;
 				$data['descriptions']['operation'] = getActionOperationData($data['action']['operations']);
