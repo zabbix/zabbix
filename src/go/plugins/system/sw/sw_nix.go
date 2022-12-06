@@ -91,16 +91,6 @@ func readOsInfoFile(path string) (contents string, err error) {
 	return strings.TrimSpace(string(bin)), nil
 }
 
-func getVersionFull() (version string, err error) {
-	version, err = readOsInfoFile(swOSFull)
-
-	if err == nil {
-		version = strings.TrimSpace(version)
-	}
-
-	return
-}
-
 func findFirstMatch(src string, reg *regexp.Regexp) (res string) {
 	match := reg.FindStringSubmatch(src)
 	if len(match) > 1 {
@@ -272,7 +262,7 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 
 	switch info {
 	case "full":
-		if result, err = getVersionFull(); err == nil {
+		if result, err = readOsInfoFile(swOSFull); err == nil {
 			return result, nil
 		}
 
@@ -319,7 +309,7 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	info.OSType = "linux"
 
 	info.ProductName, _ = getName()
-	info.VersionFull, _ = getVersionFull()
+	info.VersionFull, _ = readOsInfoFile(swOSFull)
 
 	u := syscall.Utsname{}
 	if syscall.Uname(&u) == nil {

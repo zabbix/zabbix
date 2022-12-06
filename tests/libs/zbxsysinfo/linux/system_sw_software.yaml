@@ -92,7 +92,7 @@ out:
 test case: '#1 get system info json'
 in:
   type: get
-  key: 'system.sw.get[]'
+  key: 'system.sw.get'
   issue_net: ''
   os_release: ''
   proc_version: ''
@@ -106,7 +106,7 @@ out:
 test case: '#2 get system info json'
 in:
   type: get
-  key: 'system.sw.get[]'
+  key: 'system.sw.get'
   issue_net: ''
   os_release: ''
   proc_version: 'version_full filled'
@@ -120,7 +120,7 @@ out:
 test case: '#3 get system info json'
 in:
   type: get
-  key: 'system.sw.get[]'
+  key: 'system.sw.get'
   issue_net: ''
   os_release: ''
   proc_version: 'version_full filled'
@@ -136,7 +136,7 @@ out:
 test case: '#3 get system info json'
 in:
   type: get
-  key: 'system.sw.get[]'
+  key: 'system.sw.get'
   issue_net: ''
   os_release: |
     FIELD1=123

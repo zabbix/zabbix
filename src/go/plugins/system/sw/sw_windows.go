@@ -128,13 +128,13 @@ func getBuildString(handle registry.Key, inclDesc bool) (result string, err erro
 	return "", err
 }
 
-func createWinInfoLineOrErr(data string[]) (res string, err) {
+func createWinInfoLineOrErr(data []string) (res string, err error) {
 	res = joinNonEmptyStrings(" ", data)
 
 	if len(res) > 0 {
 		return strings.TrimSpace(res), nil
 	} else {
-		return "", zbxerr.New("Could not read registry value " + regProductName)
+		return "", errors.New("Could not read registry value " + regProductName)
 	}
 }
 
@@ -179,7 +179,7 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 
 	handle, err = openRegistrySysInfoKey()
 	if err != nil {
-		return nil, zbxerr.New("Could not open registry key " + regVersionKey)
+		return nil, errors.New("Could not open registry key " + regVersionKey)
 	}
 	defer handle.Close()
 
@@ -193,11 +193,11 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	case "name":
 		result, err = getRegistryValue(handle, regProductName, registry.SZ)
 		if err != nil {
-			return nil, zbxerr.New("Invalid first parameter.")
+			return nil, errors.New("Invalid first parameter.")
 		}
 
 	default:
-		return nil, zbxerr.New("Could not read registry value " + regProductName)
+		return nil, errors.New("Could not read registry value " + regProductName)
 	}
 
 	return
