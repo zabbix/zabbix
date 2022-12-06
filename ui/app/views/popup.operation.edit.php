@@ -215,6 +215,7 @@ $form_grid->addItem([
 	(new CLabel(_('Message'), 'operation_opmessage_message'))->setId('operation-message-label'),
 	(new CTextArea('operation[opmessage][message]'))
 		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
+		->setAttribute('maxlength', (DB::getFieldLength('opmessage', 'message')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation_opmessage_message')
 ]);
