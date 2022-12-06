@@ -1879,16 +1879,42 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *
 	cache_put_snmp_index((const DC_ITEM *)arg, snmp_oid, index, value);
 }
 
+typedef struct
+{
+	int	numeric_oids;
+	int	numeric_enum;
+	int	numeric_ts;
+	int	oid_format;
+}
+zbx_snmp_bulkwalk_opts_t;
+
+static void	snmp_bulkwalk_backup_options(zbx_snmp_bulkwalk_opts_t *opts)
+{
+	opts->numeric_oids = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS);
+	opts->numeric_enum = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM);
+	opts->numeric_ts = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS);
+	opts->oid_format = netsnmp_ds_get_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT);
+}
+
+static void	snmp_bulkwalk_set_options(zbx_snmp_bulkwalk_opts_t *opts)
+{
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, opts->numeric_oids);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM, opts->numeric_enum);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS, opts->numeric_ts);
+	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, opts->oid_format);
+}
+
 static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
 		int *errcode, char *error, size_t max_error_len)
 {
 #define ZBX_SNMP_BULKWALK_DEFAULT_MAX_REPETITIONS	10
-	struct snmp_pdu		*pdu = NULL, *response = NULL;
-	int			i, ret = SUCCEED, status, num_vars, pdu_type;
-	AGENT_REQUEST		request;
-	struct variable_list	*var;
-	char			*results = NULL;
-	size_t			results_alloc = 0, results_offset = 0;
+	struct snmp_pdu			*pdu = NULL, *response = NULL;
+	int				i, ret = SUCCEED, status, num_vars, pdu_type;
+	AGENT_REQUEST			request;
+	struct variable_list		*var;
+	char				*results = NULL;
+	size_t				results_alloc = 0, results_offset = 0;
+	zbx_snmp_bulkwalk_opts_t	default_opts, bulk_opts;
 
 	zbx_init_agent_request(&request);
 
@@ -1908,10 +1934,13 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM, 1);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_NUMERIC_TIMETICKS, 1);
-	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
+	snmp_bulkwalk_backup_options(&default_opts);
+
+	bulk_opts.numeric_oids = 1;
+	bulk_opts.numeric_enum = 1;
+	bulk_opts.numeric_ts = 1;
+	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
+	snmp_bulkwalk_set_options(&bulk_opts);
 
 	for (i = 0; i < request.nparam; i++)
 	{
@@ -2030,6 +2059,8 @@ out:
 		zbx_free(results);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 	}
+
+	snmp_bulkwalk_set_options(&default_opts);
 
 	return ret;
 #undef ZBX_SNMP_BULKWALK_DEFAULT_MAX_REPETITIONS
