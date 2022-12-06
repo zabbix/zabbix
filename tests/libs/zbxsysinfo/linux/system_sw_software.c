@@ -56,6 +56,8 @@ int __wrap_uname(struct utsname *buf)
 
 	if (0 == ret) {
 		release = zbx_mock_get_parameter_string("in.uname.release");
+		buf->release[0] = '\0';
+		buf->machine[0] = '\0';
 
 		if (sizeof(buf->release) < strlen(release) * sizeof(char))
 			fail_msg("Uname release string is too large, maximum length is: %s bytes", sizeof(buf->release));
