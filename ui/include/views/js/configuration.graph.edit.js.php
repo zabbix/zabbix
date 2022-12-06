@@ -30,7 +30,7 @@
 		<?php if ($readonly): ?>
 			<td>
 		<?php else: ?>
-			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+			<td style="top: 8px">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
