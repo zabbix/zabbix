@@ -1317,6 +1317,14 @@ form {
 	}
 }
 
+.table-forms-container.readonly {
+	#row_new_group_prototype,
+	#interface-add,
+	.element-table-add {
+		display: none;
+	}
+}
+
 .form-btns {
 	button {
 		margin: 10px 6px 5px;

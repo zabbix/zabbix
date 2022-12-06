@@ -1262,3 +1262,124 @@ function getHostDashboards(string $hostid, array $dashboard_fields = []): array 
 function getMacroConfigValue(array $macro): string {
 	return ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_SECRET_MASK : $macro['value'];
 }
+
+/**
+ * @param array|null $host
+ * @param array      $group_links
+ *
+ * @return array
+ */
+function prepareHostPrototypeGroupLinks(?array $host, array $group_links) {
+	$_group_links =[];
+
+	if ($host !== null) {
+		if ($host['templateid'] == 0) {
+			$host_groupids = zbx_toHash($host['groupLinks'], 'groupid');
+			unset($host_groupids[0]);
+
+			foreach ($group_links as $groupid) {
+				$_group_links[] = [
+					'groupid' => array_key_exists($groupid, $host_groupids)
+						? $host_groupids[$groupid]['groupid']
+						: $groupid
+				];
+			}
+		}
+	}
+	else {
+		foreach ($group_links as $groupid) {
+			$_group_links[] = ['groupid' => $groupid];
+		}
+	}
+
+	return $_group_links;
+}
+
+/**
+ * @param array $group_prototypes
+ *
+ * @return array
+ */
+function prepareGroupPrototypes(array $group_prototypes): array {
+	$_group_prototypes = [];
+
+	foreach ($group_prototypes as $group_prototype) {
+		if ($group_prototype['name'] !== '') {
+			$_group_prototypes[] = $group_prototype;
+		}
+	}
+
+	return $_group_prototypes;
+}
+
+
+/**
+ * @param array $interfaces
+ * @param array $main_interfaces
+ *
+ * @return array
+ */
+function preparePrototypeInterfaces(array $interfaces, array $main_interfaces): array {
+	foreach ($interfaces as &$interface) {
+		// Process SNMP interface fields.
+		if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+			$interface['details']['bulk'] = array_key_exists('bulk', $interface['details'])
+				? SNMP_BULK_ENABLED
+				: SNMP_BULK_DISABLED;
+
+			switch ($interface['details']['version']) {
+				case SNMP_V1:
+				case SNMP_V2C:
+					$interface['details'] = array_intersect_key($interface['details'],
+						array_flip(['version', 'bulk', 'community'])
+					);
+					break;
+
+				case SNMP_V3:
+					$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname', 'securitylevel']);
+
+					if ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+						$field_names += array_flip(['authprotocol', 'authpassphrase']);
+					}
+					elseif ($interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+						$field_names +=
+							array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
+					}
+
+					$interface['details'] = array_intersect_key($interface['details'], $field_names);
+					break;
+			}
+		}
+
+		unset($interface['isNew'], $interface['items'], $interface['interfaceid']);
+		$interface['main'] = 0;
+	}
+	unset($interface);
+
+	foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
+		if (array_key_exists($type, $main_interfaces)
+				&& array_key_exists($main_interfaces[$type], $interfaces)) {
+			$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
+		}
+	}
+
+	return $interfaces;
+}
+
+/**
+ * @param array  $input
+ * @param string $input['templateid']
+ *
+ * @return array
+ */
+function getSanitizedHostPrototypeFields(array $input): array {
+	if ($input['templateid'] == 0) {
+		$field_names = ['host', 'name', 'custom_interfaces', 'status', 'discover', 'interfaces', 'groupLinks',
+			'groupPrototypes', 'templates', 'tags' , 'macros', 'inventory_mode'];
+	}
+	else {
+		$field_names = ['status', 'discover'];
+	}
+
+	return array_intersect_key($input, array_flip($field_names));
+}

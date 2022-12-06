@@ -3471,6 +3471,13 @@ form.is-loading {
   .table-forms-container > .ui-tabs-nav, .browser-warning-container > .ui-tabs-nav {
     margin: -10px -10px 10px; }
 
+.table-forms-container.readonly #row_new_group_prototype, .readonly.browser-warning-container #row_new_group_prototype,
+.table-forms-container.readonly #interface-add,
+.readonly.browser-warning-container #interface-add,
+.table-forms-container.readonly .element-table-add,
+.readonly.browser-warning-container .element-table-add {
+  display: none; }
+
 .form-btns button {
   margin: 10px 6px 5px; }
 
