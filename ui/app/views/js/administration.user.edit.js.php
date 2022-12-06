@@ -27,7 +27,9 @@
 <script type="text/javascript">
 	const view = new class {
 
-		init() {
+		init({userid}) {
+			this.userid = userid;
+
 			document.getElementById('user-form').addEventListener('submit', (e) => {
 				if (!this._userFormSubmit()) {
 					e.preventDefault();
@@ -50,7 +52,7 @@
 			const password1 = document.getElementById('password1').value;
 			const password2 = document.getElementById('password2').value;
 
-			if (password1 !== '' && password2 !== '') {
+			if (this.userid !== null && password1 !== '' && password2 !== '') {
 				const warning_msg = <?= json_encode(
 					_('In case of successful password change user will be logged out of all active sessions. Continue?')
 				) ?>;

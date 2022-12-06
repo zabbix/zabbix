@@ -67,7 +67,8 @@
 
 			if (password1 !== '' && password2 !== '' && current_password !== '') {
 				return confirm(warning_msg);
-			} else {
+			}
+			else {
 				return true;
 			}
 		}

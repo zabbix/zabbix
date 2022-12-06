@@ -470,8 +470,7 @@ class CUser extends CApiService {
 			}
 
 			if (array_key_exists('passwd', $user) && $this->checkPassword($user + $db_user, '/'.($i + 1).'/passwd')) {
-				if ($user['userid'] == self::$userData['userid'] && self::$userData['roleid'] == USER_TYPE_SUPER_ADMIN
-						&& !array_key_exists('current_passwd', $user)) {
+				if ($user['userid'] == self::$userData['userid'] && !array_key_exists('current_passwd', $user)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Current password is mandatory.'));
 				}
 

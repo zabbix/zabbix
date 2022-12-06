@@ -197,7 +197,6 @@ else {
 	if ($data['internal_authentication']) {
 		$change_password_enabled = $data['action'] === 'userprofile.edit'
 				|| $data['db_user']['username'] !== ZBX_GUEST_USER;
-
 	}
 
 	$hint = null;
@@ -873,6 +872,15 @@ $html_page
 	->addItem($user_form)
 	->show();
 
-(new CScriptTag('view.init();'))
-	->setOnDocumentReady()
-	->show();
+if ($data['action'] === 'user.edit') {
+	(new CScriptTag('view.init('.json_encode([
+		'userid' => $data['userid'] ?: null
+	]).');'))
+		->setOnDocumentReady()
+		->show();
+}
+else {
+	(new CScriptTag('view.init();'))
+		->setOnDocumentReady()
+		->show();
+}
