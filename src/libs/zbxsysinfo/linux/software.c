@@ -524,7 +524,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		"dpkg",
 		"dpkg --version 2> /dev/null",
 		"dpkg --get-selections",
-		"dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
+		"LC_ALL=C dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
 		dpkg_list,
 		dpkg_details
 	},
@@ -540,7 +540,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		"rpm",
 		"rpm --version 2> /dev/null",
 		"rpm -qa",
-		"rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
+		"LC_ALL=C rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
 		NULL,
 		rpm_details
 	},
@@ -548,7 +548,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		"pacman",
 		"pacman --version 2> /dev/null",
 		"pacman -Q",
-		"pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)' | cut -f2- -d: | paste -d, - - - - - -",
+		"LC_ALL=C pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)' | cut -f2- -d: | paste -d, - - - - - -",
 		NULL,
 		pacman_details
 	},
