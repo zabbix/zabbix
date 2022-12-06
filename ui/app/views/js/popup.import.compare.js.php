@@ -49,7 +49,7 @@ window.popup_import_compare = new class {
 				const arrow = e.target.querySelector('span');
 				const show = arrow.classList.contains('<?= ZBX_STYLE_ARROW_UP ?>');
 
-				e.target.parentNode.nextSibling.style.display =	show ? '' : 'none';
+				e.target.parentNode.nextSibling.style.display = show ? '' : 'none';
 
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_UP ?>');
 				arrow.classList.toggle('<?= ZBX_STYLE_ARROW_DOWN ?>');
@@ -66,4 +66,3 @@ window.popup_import_compare = new class {
 		popup_import.submitImportPopup();
 	}
 }
-
