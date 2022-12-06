@@ -360,7 +360,7 @@ class CConfiguration extends CApiService {
 		$entities = [
 			'host_groups' => 'name',
 			'template_groups' => 'name',
-			'templates' => 'template',
+			'templates' => 'template'
 		];
 
 		foreach ($entities as $entity => $name_field) {

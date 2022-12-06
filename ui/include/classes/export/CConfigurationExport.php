@@ -1095,7 +1095,7 @@ class CConfigurationExport {
 			$inherit_options = [
 				'output' => array_merge($this->dataFields['httptests'], ['templateid']),
 				'templateids' => $templateids,
-				'inherited' => true,
+				'inherited' => true
 			];
 
 			$inherited_httptests = API::HttpTest()->get($options + $inherit_options);
@@ -1113,7 +1113,7 @@ class CConfigurationExport {
 		$options += [
 			'output' => $this->dataFields['httptests'],
 			'hostids' => array_keys($hosts),
-			'inherited' => false,
+			'inherited' => false
 		];
 
 		$httptests = API::HttpTest()->get($options);
