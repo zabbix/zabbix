@@ -373,6 +373,7 @@ window.action_edit_popup = new class {
 					throw {error: response.error};
 				}
 				overlayDialogueDestroy(this.overlay.dialogueid);
+				uncheckTableRows('action_' + this.eventsource, response.keepids ?? []);
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 			})
