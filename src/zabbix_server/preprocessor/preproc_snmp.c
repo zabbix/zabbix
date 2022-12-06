@@ -68,7 +68,7 @@ static void snmp_value_pair_free(zbx_snmp_value_pair_t	*p)
 	zbx_free(p);
 }
 
-static void snmp_walk_json_output_obj_free(zbx_snmp_walk_json_output_obj_t *obj)
+static void snmp_walk_json_output_obj_clear(zbx_snmp_walk_json_output_obj_t *obj)
 {
 	zbx_free(obj->key);
 	zbx_vector_snmp_value_pair_clear_ext(&obj->values, snmp_value_pair_free);
@@ -517,7 +517,6 @@ static void	snmp_walk_serialize_json(zbx_hashset_t *grouped_prefixes, char **res
 			zbx_json_addstring(&json, vv->oid, vv->value, ZBX_JSON_TYPE_STRING);
 		}
 
-		snmp_walk_json_output_obj_free(outobj);
 		zbx_json_close(&json);
 	}
 
@@ -596,8 +595,9 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
 
-	zbx_hashset_create(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
-			snmp_walk_json_output_obj_compare_func);
+	zbx_hashset_create_ext(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
+			snmp_walk_json_output_obj_compare_func, snmp_walk_json_output_obj_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
 	{
