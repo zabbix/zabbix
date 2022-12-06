@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-11-17T13:08:19Z'
+  date: '2022-12-06T13:37:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1760,7 +1760,7 @@ zabbix_export:
               name: 'RabbitMQ: Host has been restarted'
               event_name: 'RabbitMQ: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -2390,6 +2390,27 @@ zabbix_export:
           description: 'The metrics for an individual queue.'
           item_prototypes:
             -
+              uuid: 158f41423b094efcb90ac273d1e6349c
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Get data'
+              type: DEPENDENT
+              key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'The HTTP API endpoint that returns [{#VHOST}][{#QUEUE}] queue metrics'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].first()'
+              master_item:
+                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: fcbee789f2864010b26ac69894659e77
               name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers'
               type: DEPENDENT
@@ -2401,9 +2422,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].consumers.first()'
+                    - $.consumers
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2427,9 +2448,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].memory.first()'
+                    - $.memory
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2453,11 +2474,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.ack_details.rate.first()'
+                    - $.message_stats.ack_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2480,11 +2501,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.ack.first()'
+                    - $.message_stats.ack
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2508,11 +2529,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_details.rate.first()'
+                    - $.message_stats.deliver_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2535,11 +2556,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver.first()'
+                    - $.message_stats.deliver
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2563,11 +2584,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_get_details.rate.first()'
+                    - $.message_stats.deliver_get_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2590,11 +2611,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.deliver_get.first()'
+                    - $.message_stats.deliver_get
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2618,11 +2639,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish_details.rate.first()'
+                    - $.message_stats.publish_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2645,11 +2666,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish.first()'
+                    - $.message_stats.publish
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2673,9 +2694,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_details.rate.first()'
+                    - $.messages_details.rate
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2699,11 +2720,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver_details.rate.first()'
+                    - $.message_stats.redeliver_details.rate
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2726,11 +2747,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver.first()'
+                    - $.message_stats.redeliver
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2753,9 +2774,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages.first()'
+                    - $.messages
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2791,9 +2812,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready_details.rate.first()'
+                    - $.messages_ready_details.rate
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2816,9 +2837,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_ready.first()'
+                    - $.messages_ready
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2842,9 +2863,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged_details.rate.first()'
+                    - $.messages_unacknowledged_details.rate
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
@@ -2867,9 +2888,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].messages_unacknowledged.first()'
+                    - $.messages_unacknowledged
               master_item:
-                key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
+                key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               tags:
                 -
                   tag: component
