@@ -118,9 +118,9 @@ $form_grid->addItem([
 					'multiselect' => '1',
 					'srctbl' => 'usrgrp',
 					'srcfld1' => 'usrgrpid',
+					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'operation_opmessage_grp__usrgrpid',
-					'editable' => '1',
+					'dstfld1' => 'operation_opmessage_grp__usrgrpid'
 				]
 			]
 		]))
@@ -145,8 +145,7 @@ $form_grid->addItem([
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
 					'dstfrm' => $form->getName(),
-					'dstfld1'=> 'operation_opmessage_usr__userid',
-					'editable' => '1',
+					'dstfld1'=> 'operation_opmessage_usr__userid'
 				]
 			]
 		]))
