@@ -99,9 +99,12 @@ $left_column = (new CFormList())
 			->setId('name_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))

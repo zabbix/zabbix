@@ -50,6 +50,7 @@ OBJS = \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
+	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
 	..\..\..\src\libs\zbxsymbols\symbols.o \
@@ -58,6 +59,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\zabbix_sender\win32\zabbix_sender.o

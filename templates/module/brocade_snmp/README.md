@@ -1,9 +1,9 @@
 
-# Brocade_Foundry Performance SNMP
+# Brocade_Foundry Performance by SNMP
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 
 ## Setup
 
@@ -38,10 +38,10 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|High memory utilization |<p>The system is running out of free memory.</p> |`min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Brocade_Foundry Performance by SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|High memory utilization |<p>The system is running out of free memory.</p> |`min(/Brocade_Foundry Performance by SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

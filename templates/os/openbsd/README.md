@@ -3,8 +3,8 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
-Official OpenBSD template. Requires agent of Zabbix 6.0 and newer.
+For Zabbix version: 6.2 and higher.
+It is an Official OpenBSD template. It requires Zabbix agent 6.0 or newer.
 
 
 ## Setup
@@ -22,7 +22,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AGENT.TIMEOUT} |<p>Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).</p> |`3m` |
+|{$AGENT.TIMEOUT} |<p>The timeout after which the agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).</p> |`3m` |
 
 ## Template links
 
@@ -32,17 +32,17 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of file systems of different types as defined in global regular expression "File systems for discovery".</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p> |
-|Network interface discovery |<p>Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p> <p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p> |
+|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p> |
+|Network interface discovery |<p>The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p> <p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |CPU |Interrupts per second |<p>-</p> |ZABBIX_PASSIVE |system.cpu.intr<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p> |
-|CPU |Processor load (1 min average per core) |<p>The processor load is calculated as system CPU load divided by number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg1] |
-|CPU |Processor load (5 min average per core) |<p>The processor load is calculated as system CPU load divided by number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg5] |
-|CPU |Processor load (15 min average per core) |<p>The processor load is calculated as system CPU load divided by number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg15] |
+|CPU |Processor load (1 min average per core) |<p>The processor load is calculated as the system CPU load divided by the number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg1] |
+|CPU |Processor load (5 min average per core) |<p>The processor load is calculated as the system CPU load divided by the number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg5] |
+|CPU |Processor load (15 min average per core) |<p>The processor load is calculated as the system CPU load divided by the number of CPU cores.</p> |ZABBIX_PASSIVE |system.cpu.load[percpu,avg15] |
 |CPU |Context switches per second |<p>-</p> |ZABBIX_PASSIVE |system.cpu.switches<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p> |
 |CPU |CPU idle time |<p>The time the CPU has spent doing nothing.</p> |ZABBIX_PASSIVE |system.cpu.util[,idle] |
 |CPU |CPU interrupt time |<p>The amount of time the CPU has been servicing hardware interrupts.</p> |ZABBIX_PASSIVE |system.cpu.util[,interrupt] |
@@ -55,27 +55,27 @@ There are no template links in this template.
 |Filesystems |Filesystems: Total disk space on {#FSNAME} |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},total] |
 |Filesystems |Filesystems: Used disk space on {#FSNAME} |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},used] |
 |General |Host boot time |<p>-</p> |ZABBIX_PASSIVE |system.boottime |
-|General |Host name |<p>System host name.</p> |ZABBIX_PASSIVE |system.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|General |Host name |<p>A host name of the system.</p> |ZABBIX_PASSIVE |system.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Host local time |<p>-</p> |ZABBIX_PASSIVE |system.localtime |
-|General |System information |<p>The information as normally returned by 'uname -a'.</p> |ZABBIX_PASSIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|General |System information |<p>The information as normally returned by the 'uname -a'.</p> |ZABBIX_PASSIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |System uptime |<p>-</p> |ZABBIX_PASSIVE |system.uptime |
 |Memory |Free swap space |<p>-</p> |ZABBIX_PASSIVE |system.swap.size[,free] |
 |Memory |Free swap space in % |<p>-</p> |ZABBIX_PASSIVE |system.swap.size[,pfree] |
 |Memory |Total swap space |<p>-</p> |ZABBIX_PASSIVE |system.swap.size[,total] |
-|Memory |Available memory |<p>Available memory is defined as free+cached+buffers memory.</p> |ZABBIX_PASSIVE |vm.memory.size[available] |
+|Memory |Available memory |<p>The available memory is defined as free+cached+buffers memory.</p> |ZABBIX_PASSIVE |vm.memory.size[available] |
 |Memory |Total memory |<p>-</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
 |Monitoring agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Monitoring agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Monitoring agent |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_PASSIVE |agent.ping |
+|Monitoring agent |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.</p> |ZABBIX_PASSIVE |agent.ping |
 |Network interfaces |Network interfaces: Incoming network traffic on {#IFNAME} |<p>-</p> |ZABBIX_PASSIVE |net.if.in[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
 |Network interfaces |Network interfaces: Outgoing network traffic on {#IFNAME} |<p>-</p> |ZABBIX_PASSIVE |net.if.out[{#IFNAME}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND: ``</p><p>- MULTIPLIER: `8`</p> |
-|OS |Maximum number of opened files |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
-|OS |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
-|OS |Number of logged in users |<p>Number of users who are currently logged in.</p> |ZABBIX_PASSIVE |system.users.num |
-|Processes |Number of running processes |<p>Number of processes in running state.</p> |ZABBIX_PASSIVE |proc.num[,,run] |
-|Processes |Number of processes |<p>Total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |
-|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256] |
-|Status |Zabbix agent availability |<p>Monitoring agent availability status</p> |INTERNAL |zabbix[host,agent,available] |
+|OS |Maximum number of opened files |<p>It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxfiles |
+|OS |Maximum number of processes |<p>It could be increased by using the sysctl utility or modifying the file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
+|OS |Number of logged in users |<p>The number of users who are currently logged in.</p> |ZABBIX_PASSIVE |system.users.num |
+|Processes |Number of running processes |<p>The number of processes in a running state.</p> |ZABBIX_PASSIVE |proc.num[,,run] |
+|Processes |Number of processes |<p>The total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |
+|Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Status |Zabbix agent availability |<p>Monitoring the availability status of the agent.</p> |INTERNAL |zabbix[host,agent,available] |
 
 ## Triggers
 
@@ -94,11 +94,11 @@ There are no template links in this template.
 |Too many processes running on {HOST.NAME} |<p>-</p> |`avg(/OpenBSD by Zabbix agent/proc.num[,,run],5m)>30` |WARNING | |
 |Too many processes on {HOST.NAME} |<p>-</p> |`avg(/OpenBSD by Zabbix agent/proc.num[],5m)>300` |WARNING | |
 |/etc/passwd has been changed on {HOST.NAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
-|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/OpenBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.</p> |`max(/OpenBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 

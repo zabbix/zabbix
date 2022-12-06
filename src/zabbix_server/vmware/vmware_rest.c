@@ -508,8 +508,8 @@ static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE *page)
 	zbx_snprintf(tmp, sizeof(tmp),"%s/session", page->url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, tmp)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CUSTOMREQUEST, "DELETE")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 0L)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CUSTOMREQUEST, "DELETE")))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot set cURL option %d: %s.",
 				__func__, (int)opt, curl_easy_strerror(err));
