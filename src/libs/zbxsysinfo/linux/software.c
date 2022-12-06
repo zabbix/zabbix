@@ -352,7 +352,7 @@ static void append_to_pretty_ver(char **pretty, const char *str)
 {
 	size_t	prt_alloc = 0, prt_offset = 0;
 
-	if (*pretty == NULL)
+	if (NULL == *pretty)
 		zbx_strcatnl_alloc(pretty, &prt_alloc, &prt_offset, str);
 	else
 		*pretty = zbx_dsprintf(*pretty, "%s %s", *pretty, str);
@@ -380,8 +380,14 @@ int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		major[sizeof(info.release)], minor[sizeof(info.release)], patch[sizeof(info.release)];
 
 	ZBX_UNUSED(request);
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
+	if (0 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&j, SW_OS_GET_TYPE, "linux", ZBX_JSON_TYPE_STRING);
 
 	if (SUCCEED == get_os_name(&str))
@@ -422,9 +428,10 @@ out:
 		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, str, ZBX_JSON_TYPE_STRING);
 	else
 		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, "", ZBX_JSON_TYPE_STRING);
-	zbx_free(str);
 
-	zbx_json_close(&j);
+	zbx_free(str);
+	zbx_free(prt_version);
+
 	SET_STR_RESULT(result, strdup(j.buffer));
 	zbx_json_free(&j);
 

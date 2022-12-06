@@ -55,6 +55,8 @@ const (
 	regVersion        = "CurrentVersion"
 	regLab            = "BuildLab"
 	regLabEX          = "BuildLabEx"
+
+	regVersionKey     = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 )
 
 type system_info struct {
@@ -104,7 +106,7 @@ func getRegistryValue(handle registry.Key, value string, valueType uint32) (resu
 }
 
 func openRegistrySysInfoKey() (handle registry.Key, err error) {
-	return registry.OpenKey(registry.LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", registry.QUERY_VALUE)
+	return registry.OpenKey(registry.LOCAL_MACHINE, regVersionKey, registry.QUERY_VALUE)
 }
 
 func getBuildString(handle registry.Key, inclDesc bool) (result string, err error) {
@@ -126,61 +128,39 @@ func getBuildString(handle registry.Key, inclDesc bool) (result string, err erro
 	return "", err
 }
 
-func setErrorIfEmpty(eIn error, eOut *error) {
-	if eIn != nil && *eOut == nil {
-		*eOut = eIn
-	}
+func createWinInfoLineOrErr(data string[]) (res string, err) {
+	res = joinNonEmptyStrings(" ", data)
 
-	return
+	if len(res) > 0 {
+		return strings.TrimSpace(res), nil
+	} else {
+		return "", zbxerr.New("Could not read registry value " + regProductName)
+	}
 }
 
 func getFullOSInfoString(handle registry.Key) (result string, err error) {
 	var name, lab, build string
-	var internal_err error
 
-	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
-	setErrorIfEmpty(internal_err, &err)
-
-	lab, internal_err = getRegistryValue(handle, regLabEX, registry.SZ)
-	setErrorIfEmpty(internal_err, &err)
+	name, _ = getRegistryValue(handle, regProductName, registry.SZ)
+	lab, _ = getRegistryValue(handle, regLabEX, registry.SZ)
 
 	if len(lab) == 0 {
-		lab, internal_err = getRegistryValue(handle, regLab, registry.SZ)
-		setErrorIfEmpty(internal_err, &err)
+		lab, _ = getRegistryValue(handle, regLab, registry.SZ)
 	}
 
-	build, internal_err = getBuildString(handle, true)
-	setErrorIfEmpty(internal_err, &err)
-
-	result = joinNonEmptyStrings(" ", []string{name, lab, build})
-
-	if len(result) > 0 {
-		return strings.TrimSpace(result), nil
-	} else {
-		return "", err
-	}
+	build, _ = getBuildString(handle, true)
+	
+	return createWinInfoLineOrErr([]string{name, lab, build})
 }
 
 func getPrettyOSInfoString(handle registry.Key) (result string, err error) {
 	var name, build, spVer string
-	var internal_err error
 
-	name, internal_err = getRegistryValue(handle, regProductName, registry.SZ)
-	setErrorIfEmpty(internal_err, &err)
+	name, _ = getRegistryValue(handle, regProductName, registry.SZ)
+	build, _ = getBuildString(handle, true)
+	spVer, _ = getRegistryValue(handle, regSPVersion, registry.SZ)
 
-	build, internal_err = getBuildString(handle, true)
-	setErrorIfEmpty(internal_err, &err)
-
-	spVer, internal_err = getRegistryValue(handle, regSPVersion, registry.SZ)
-	setErrorIfEmpty(internal_err, &err)
-
-	result = joinNonEmptyStrings(" ",[]string{name, build, spVer})
-
-	if len(result) > 0 {
-		return strings.TrimSpace(result), nil
-	} else {
-		return "", err
-	}
+	return createWinInfoLineOrErr([]string{name, build, spVer})
 }
 
 func (p *Plugin) getPackages(params []string) (result interface{}, err error) {
@@ -199,7 +179,7 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 
 	handle, err = openRegistrySysInfoKey()
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.New("Could not open registry key " + regVersionKey)
 	}
 	defer handle.Close()
 
@@ -211,10 +191,13 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 		return getPrettyOSInfoString(handle)
 
 	case "name":
-		return getRegistryValue(handle, regProductName, registry.SZ)
+		result, err = getRegistryValue(handle, regProductName, registry.SZ)
+		if err != nil {
+			return nil, zbxerr.New("Invalid first parameter.")
+		}
 
 	default:
-		return nil, errors.New("Invalid first parameter.")
+		return nil, zbxerr.New("Could not read registry value " + regProductName)
 	}
 
 	return
@@ -248,27 +231,25 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	info.SPBuild, _ = getRegistryValue(handle, regSPBuild, registry.SZ)
 	info.Version, _ = getRegistryValue(handle, regVersion, registry.SZ)
 
-	sysInfo, err = win32.GetNativeSystemInfo()
-	if err == nil {
-		switch sysInfo.WProcessorArchitecture {
-		case processorArchitectureAmd64:
-			info.Architecture = "x86_64"
+	sysInfo = win32.GetNativeSystemInfo()
+	switch sysInfo.WProcessorArchitecture {
+	case processorArchitectureAmd64:
+		info.Architecture = "x86_64"
 
-		case processorArchitectureArm:
-			info.Architecture = "arm"
+	case processorArchitectureArm:
+		info.Architecture = "arm"
 
-		case processorArchitectureArm64:
-			info.Architecture = "arm64"
+	case processorArchitectureArm64:
+		info.Architecture = "arm64"
 
-		case processorArchitectureIa64:
-			info.Architecture = "Intel Itanium"
+	case processorArchitectureIa64:
+		info.Architecture = "Intel Itanium"
 
-		case processorArchitectureIntel:
-			info.Architecture = "x86"
+	case processorArchitectureIntel:
+		info.Architecture = "x86"
 
-		case processorArchitectureUnknown:
-			info.Architecture = "unknown"
-		}
+	case processorArchitectureUnknown:
+		info.Architecture = "unknown"
 	}
 
 out:

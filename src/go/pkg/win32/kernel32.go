@@ -81,7 +81,7 @@ func init() {
 
 	getNativeSystemInfo, err = hKernel32.getProcAddress("GetNativeSystemInfo")
 	if err != nil {
-		hKernel32.mustGetProcAddress("GetSystemInfo")
+		getNativeSystemInfo = hKernel32.mustGetProcAddress("GetSystemInfo")
 	}
 }
 
@@ -201,13 +201,8 @@ func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
 	return c, nil
 }
 
-func GetNativeSystemInfo() (sysInfo SystemInfo, err error) {
-	var ret uintptr
-	ret, _, err = syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
+func GetNativeSystemInfo() (sysInfo SystemInfo) {
+	syscall.Syscall(getNativeSystemInfo, 1, uintptr(unsafe.Pointer(&sysInfo)), 0, 0)
 
-	if ret == 0 {
-		err = nil
-	}
-
-	return sysInfo, err
+	return sysInfo
 }

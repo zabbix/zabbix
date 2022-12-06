@@ -37,6 +37,8 @@
 #define ZBX_REGVALUE_DISPLAYVERSION	"DisplayVersion"
 #define ZBX_REGVALUE_VERSION		"CurrentVersion"
 
+#define ZBX_REGKEY_VERSION	"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: join strings into one, placing separator in between them,         *
@@ -147,10 +149,11 @@ static char	*get_registry_value(HKEY hKey, LPCTSTR name, DWORD value_type)
 	if (NULL == value)
 		return NULL;
 
-	if (value_type == REG_DWORD)
+	if (REG_DWORD == value_type)
 		ret = zbx_dsprintf(NULL, "%d", (uint32_t)*(DWORD *)value);
 	else
 		ret = zbx_unicode_to_utf8(value);
+
 	zbx_free(value);
 
 	return ret;
@@ -158,7 +161,6 @@ static char	*get_registry_value(HKEY hKey, LPCTSTR name, DWORD value_type)
 
 static HKEY	open_registry_info_key(void)
 {
-#define ZBX_REGKEY_VERSION	"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 	HKEY	handle = NULL;
 
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT(ZBX_REGKEY_VERSION), 0, KEY_READ, &handle))
@@ -168,7 +170,6 @@ static HKEY	open_registry_info_key(void)
 	}
 
 	return handle;
-#undef ZBX_REGKEY_VERSION
 }
 
 static char	*get_build_string(HKEY handle, int include_descriptor)
@@ -209,7 +210,7 @@ static char	*get_full_os_info(HKEY handle)
 static char	*get_pretty_os_info(HKEY handle)
 {
 	char	*res = NULL;
-	char	*name, *build, *sp_version;SW_OS_GET
+	char	*name, *build, *sp_version;
 
 	name = get_registry_value(handle, TEXT(ZBX_REGVALUE_PRODUCTNAME), REG_MULTI_SZ);
 	build = get_build_string(handle, 1);
@@ -236,7 +237,10 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == (handle = open_registry_info_key()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Could not open registry key " ));
 		goto out;
+	}
 
 	type = get_rparam(request, 0);
 
@@ -295,11 +299,17 @@ int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json	j;
 	char		*str;
 	const char	*arch;
-	HKEY	handle = NULL;
+	HKEY		handle = NULL;
 
 	ZBX_UNUSED(request);
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
+	if (0 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&j, SW_OS_GET_TYPE, "windows", ZBX_JSON_TYPE_STRING);
 
 	if (NULL == (handle = open_registry_info_key()))
@@ -403,7 +413,6 @@ out:
 		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, "", ZBX_JSON_TYPE_STRING);
 
 	RegCloseKey(handle);
-	zbx_json_close(&j);
 	SET_STR_RESULT(result, strdup(j.buffer));
 	zbx_json_free(&j);
 

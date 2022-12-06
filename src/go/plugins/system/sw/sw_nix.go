@@ -23,6 +23,7 @@
 package sw
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -87,7 +88,7 @@ func readOsInfoFile(path string) (contents string, err error) {
 		return "", fmt.Errorf("Cannot open "+path+": %s", err)
 	}
 
-	return string(bin), nil
+	return strings.TrimSpace(string(bin)), nil
 }
 
 func getVersionFull() (version string, err error) {
@@ -100,9 +101,8 @@ func getVersionFull() (version string, err error) {
 	return
 }
 
-func findFirstMatch(src string, pattern string) (res string) {
-	regex := regexp.MustCompile(pattern)
-	match := regex.FindStringSubmatch(src)
+func findFirstMatch(src string, reg *regexp.Regexp) (res string) {
+	match := reg.FindStringSubmatch(src)
 	if len(match) > 1 {
 		return match[1]
 	}
@@ -111,21 +111,34 @@ func findFirstMatch(src string, pattern string) (res string) {
 }
 
 func getName() (name string, err error) {
-	name, err = readOsInfoFile(swOSNameRelease)
+	readFile, err := os.Open(swOSNameRelease)
 
 	if err == nil {
-		if name = findFirstMatch(name, swOSOptionPrettyName+"=\"([^\"]+)\""); len(name) > 0 {
-			return name, nil
-		}
+		fileScanner := bufio.NewScanner(readFile)
+		fileScanner.Split(bufio.ScanLines)
 
-		if name = findFirstMatch(name, swOSOptionPrettyName+"=(\\S+)\\s*\\n"); len(name) > 0 {
-			return name, nil
+		regexQuoted := regexp.MustCompile(swOSOptionPrettyName + "=\"([^\"]+)\"")
+		regexUnquoted := regexp.MustCompile(swOSOptionPrettyName + "=(\\S+)\\s*$")
+		var tmpStr string
+
+		for fileScanner.Scan() {
+			tmpStr = fileScanner.Text()
+			fmt.Println(tmpStr)
+			name = findFirstMatch(tmpStr, regexQuoted)
+
+			if len(name) == 0 {
+				name = findFirstMatch(tmpStr, regexUnquoted)
+			}
+
+			if len(name) > 0 {
+				return name, nil
+			}
 		}
 	}
 
-	name, err = readOsInfoFile(swOSName)
+	readFile.Close()
 
-	return
+	return readOsInfoFile(swOSName)
 }
 
 func getManagers() []manager {

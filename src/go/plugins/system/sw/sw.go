@@ -53,6 +53,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	const (
 		maxSwPackagesParams = 3
 		maxSwOSParams       = 1
+		maxSwOSGetParams    = 0
 	)
 
 	switch key {
@@ -71,6 +72,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		result, err = p.getOSVersion(params)
 
 	case "system.sw.os.get":
+		if len(params) > maxSwOSGetParams {
+			return nil, zbxerr.ErrorTooManyParameters
+		}
 		result, err = p.getOSVersionJSON()
 
 	default:
