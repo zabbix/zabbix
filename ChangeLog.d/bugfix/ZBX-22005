@@ -1,1 +1,1 @@
-A......... [ZBX-22005] fixed item prototype inherit process (rdetlavs)
+A......... [ZBX-22005] fixed inability to update the template with dependent item prototypes using the configuration.import when the template is linked to some host prototype (rdetlavs)
