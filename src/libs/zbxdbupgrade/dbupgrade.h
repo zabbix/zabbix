@@ -69,6 +69,13 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 
+int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname);
+int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname);
+
 #endif
 
 #endif

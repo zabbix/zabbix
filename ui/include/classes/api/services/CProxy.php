@@ -131,7 +131,7 @@ class CProxy extends CApiService {
 		 */
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
-				['tls_psk_identity', 'tls_psk']
+				['tls_psk_identity', 'tls_psk', 'name_upper']
 			);
 		}
 		/*
@@ -163,7 +163,7 @@ class CProxy extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'name_upper'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -476,6 +476,12 @@ class CProxy extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
 			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
