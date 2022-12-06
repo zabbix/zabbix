@@ -25,7 +25,25 @@ ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t *)
 
+#ifdef HAVE_NETSNMP
 static char	zbx_snmp_init_done;
+
+static int	preproc_snmp_translate_oid(const char *oid_in, char **oid_out)
+{
+	char			buffer[MAX_OID_LEN];
+	oid			oid_tmp[MAX_OID_LEN];
+	size_t			oid_len = MAX_OID_LEN;
+
+	if (0 != get_node(oid_in, oid_tmp, &oid_len))
+	{
+		snprint_objid(buffer, sizeof(buffer), oid_tmp, oid_len);
+		*oid_out = zbx_strdup(NULL, buffer);
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+#endif
 
 static zbx_hash_t	snmp_value_pair_hash_func(const void *d)
 {
@@ -73,22 +91,6 @@ static int	snmp_walk_json_output_obj_compare_func(const void *d1, const void *d2
 	return strcmp(s1->key, s2->key);
 }
 
-static int	preproc_snmp_translate_oid(const char *oid_in, char **oid_out)
-{
-	char			buffer[MAX_OID_LEN];
-	oid			oid[MAX_OID_LEN];
-	size_t			oid_len = MAX_OID_LEN;
-
-	if (0 != get_node(oid_in, oid, &oid_len))
-	{
-		snprint_objid(buffer, sizeof(buffer), oid, oid_len);
-		*oid_out = zbx_strdup(NULL, buffer);
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
 {
 	char	*token = NULL, *saveptr, *field_name, *params2;
@@ -111,6 +113,8 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 			zbx_snmp_walk_to_json_param_t	parsed_param;
 #ifdef HAVE_NETSNMP
 			char				*oid_tr_tmp = NULL;
+
+			zbx_preproc_init_snmp();
 
 			if (SUCCEED == preproc_snmp_translate_oid(token, &oid_tr_tmp))
 				parsed_param.oid_prefix = oid_tr_tmp;
@@ -378,6 +382,8 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *oid_needle
 #ifdef HAVE_NETSNMP
 	char			*oid_tr_tmp = NULL;
 	const char		*oid_tr;
+
+	zbx_preproc_init_snmp();
 
 	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
 		oid_tr = oid_tr_tmp;
@@ -685,6 +691,7 @@ out:
 	return ret;
 }
 
+#ifdef HAVE_NETSNMP
 /* This function has to be moved to separate SNMP library when such refactoring will be done in future */
 static void	zbx_init_snmp(void)
 {
@@ -730,3 +737,4 @@ void	zbx_preproc_shutdown_snmp(void)
 
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
+#endif
