@@ -60,7 +60,7 @@
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
+int	evaluate_function2(zbx_variant_t *value, DC_EVALUATE_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
 
 int	zbx_is_trigger_function(const char *name, size_t len);
@@ -75,8 +75,10 @@ int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVE
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
+void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
+
 void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const DC_ITEM *history_items, const int *history_errcodes);
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
 void	prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
