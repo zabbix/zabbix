@@ -51,7 +51,6 @@
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
-extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 zbx_config_tls_t	*zbx_config_tls_new(void)
@@ -1435,7 +1434,7 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout)
 {
 	ZBX_SOCKADDR	serv_addr;
 	fd_set		sock_set;
@@ -1491,7 +1490,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		goto out;
 	}
 
-	zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
+	zbx_socket_timeout_set(s, config_timeout);
 
 	if (ZBX_SOCKET_ERROR == (res = recv(s->socket, &buf, 1, MSG_PEEK)))
 	{

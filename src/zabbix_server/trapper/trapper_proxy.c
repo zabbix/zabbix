@@ -22,9 +22,7 @@
 #include "zbxcommshigh.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
 
-extern int		CONFIG_TIMEOUT;
-
-static void	active_passive_misconfig(zbx_socket_t *sock)
+static void	active_passive_misconfig(zbx_socket_t *sock, int config_timeout)
 {
 	char	*msg = NULL;
 
@@ -32,18 +30,18 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 			" sends requests to it as to proxy in passive mode", sock->peer);
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
-	zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+	zbx_send_proxy_response(sock, FAIL, msg, config_timeout);
 	zbx_free(msg);
 }
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb)
+		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb, int config_timeout)
 {
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
-			zbx_recv_proxyconfig(sock, zbx_config_tls);
+			zbx_recv_proxyconfig(sock, zbx_config_tls, config_timeout);
 			return SUCCEED;
 		}
 		else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -53,7 +51,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 			/* prevent logging of this problem for every request we report it     */
 			/* only when the server sends configuration to the proxy and ignore   */
 			/* it for other requests.                                             */
-			active_passive_misconfig(sock);
+			active_passive_misconfig(sock, config_timeout);
 			return SUCCEED;
 		}
 	}
