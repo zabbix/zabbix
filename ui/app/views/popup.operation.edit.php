@@ -44,6 +44,7 @@ if (count($data['operation_types']) > 1) {
 	$select_operationtype = (new CFormField(
 		(new CSelect('operation[operationtype]'))
 			->setFocusableElementId('operationtype')
+			->setAttribute('width', ZBX_TEXTAREA_SMALL_WIDTH)
 			->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
 			->setValue($operationtype_value ?? 0)
 			->setId('operation-type-select')
