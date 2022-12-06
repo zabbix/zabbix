@@ -353,6 +353,7 @@ window.action_edit_popup = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
+		fields.esc_period = fields.esc_period.trim();
 
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
