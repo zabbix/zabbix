@@ -160,7 +160,7 @@ if ($data['change_password']) {
 		])
 		: null;
 
-	$current_password = (new CPassBox('current_password', $data['current_password']))
+	$current_password = (new CPassBox('current_password'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->setAriaRequired();
 
