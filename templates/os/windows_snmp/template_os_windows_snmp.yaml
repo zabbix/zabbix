@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:18:23Z'
+  date: '2022-10-28T15:26:33Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: f9a59315c8944853bb91c0a9ec3056d7
-      template: 'Windows SNMP'
-      name: 'Windows SNMP'
+      template: 'Windows by SNMP'
+      name: 'Windows by SNMP'
       description: |
         Official Windows SNMP template. Requires Zabbix server 4.0.14, 4.2.8, 4.4.0 or newer (JSONPath function avg() used with types autoconversion).
         
@@ -57,7 +57,7 @@ zabbix_export:
           triggers:
             -
               uuid: 08e22bd77606469d9e03183ec70dc89d
-              expression: 'max(/Windows SNMP/icmpping,#3)=0'
+              expression: 'max(/Windows by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -83,14 +83,14 @@ zabbix_export:
           triggers:
             -
               uuid: fa81e50132464ec486ea72929d18d778
-              expression: 'min(/Windows SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Windows SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Windows by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Windows by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Windows SNMP/icmpping,#3)=0'
+                  expression: 'max(/Windows by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -116,17 +116,17 @@ zabbix_export:
           triggers:
             -
               uuid: fba819f734de4b469fb7851501e55b21
-              expression: 'avg(/Windows SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Windows by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Windows SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Windows SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Windows by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Windows by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Windows SNMP/icmpping,#3)=0'
+                  expression: 'max(/Windows by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -196,7 +196,7 @@ zabbix_export:
           triggers:
             -
               uuid: ad2261f1ab77449cb1279725e8cf02f9
-              expression: 'min(/Windows SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Windows by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -307,7 +307,7 @@ zabbix_export:
           triggers:
             -
               uuid: e257b5cf5d9949028c690722e4153612
-              expression: 'last(/Windows SNMP/system.name,#1)<>last(/Windows SNMP/system.name,#2) and length(last(/Windows SNMP/system.name))>0'
+              expression: 'last(/Windows by SNMP/system.name,#1)<>last(/Windows by SNMP/system.name,#2) and length(last(/Windows by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -388,7 +388,7 @@ zabbix_export:
           triggers:
             -
               uuid: a20254c09f7a4d4d9793da7b075121f3
-              expression: 'max(/Windows SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Windows by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -396,7 +396,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Windows SNMP/icmpping,#3)=0'
+                  expression: 'max(/Windows by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -706,9 +706,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 101b888ea92348689bbc499bbe15b212
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -759,21 +759,21 @@ zabbix_export:
             -
               uuid: fe3e2d20c6eb475ba9f0e8f0c5766720
               expression: |
-                change(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Windows SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Windows by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -782,8 +782,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -791,13 +791,13 @@ zabbix_export:
             -
               uuid: 5ab179badc3747438cf988c437b7b735
               expression: |
-                (avg(/Windows SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Windows SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Windows by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Windows by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Windows SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Windows SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Windows by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Windows by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Windows by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -807,8 +807,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -816,12 +816,12 @@ zabbix_export:
             -
               uuid: 8acdf247d86b4b2785c92266291682ac
               expression: |
-                min(/Windows SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Windows SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Windows by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Windows by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Windows SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Windows SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Windows by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Windows by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -831,8 +831,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Windows SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Windows by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -846,42 +846,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: b2c0a897e22d438f8b1bbff44e493b13
@@ -982,8 +982,8 @@ zabbix_export:
             -
               uuid: 597ea2f6059746c0b2e5b7312f764224
               expression: |
-                last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Windows by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1004,8 +1004,8 @@ zabbix_export:
             -
               uuid: 028b24edaf9c4640a2316845f50a4a7e
               expression: |
-                last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Windows by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1020,8 +1020,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low'
                   expression: |
-                    last(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    last(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Windows by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Windows by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1043,14 +1043,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
         -
           uuid: 23bb0567e4194546a09da96ded5182dd
@@ -1141,7 +1141,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ab4b4ad08664454096f5e2cf3b7da1e9
-                  expression: 'min(/Windows SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Windows by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MEMNAME}: High memory utilization'
                   event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -1164,7 +1164,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Windows SNMP'
+                    host: 'Windows by SNMP'
                     key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
       tags:
         -
@@ -1312,7 +1312,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Windows SNMP'
+                        host: 'Windows by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 3b28bdbfdb6d4cf1a69c7466a4f059f3
@@ -1333,7 +1333,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Windows SNMP'
+                        host: 'Windows by SNMP'
                         name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -1357,7 +1357,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Windows SNMP'
+                        host: 'Windows by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -1381,7 +1381,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Windows SNMP'
+                        host: 'Windows by SNMP'
                         name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
@@ -2294,7 +2294,7 @@ zabbix_export:
   triggers:
     -
       uuid: b7a0b390f8844d2aa05ee849d12495f7
-      expression: '(last(/Windows SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Windows SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Windows SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Windows SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Windows by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Windows by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Windows by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Windows by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2303,7 +2303,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Windows SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Windows by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2319,5 +2319,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Windows SNMP'
+            host: 'Windows by SNMP'
             key: system.cpu.util

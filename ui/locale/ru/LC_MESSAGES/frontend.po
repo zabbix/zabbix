@@ -3957,6 +3957,10 @@ msgstr "Закрыть конструктор выражения"
 msgid "Close new event"
 msgstr "Закрыть новое событие"
 
+#: app/views/configuration.correlation.edit.php:156
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:151
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"

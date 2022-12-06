@@ -37,7 +37,7 @@ out:
   return: SUCCEED
 ---
 test case: Query $.filters.price
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.filters.price 
@@ -46,7 +46,7 @@ out:
   value: 10
 ---
 test case: Query $.filters.category
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.filters.category 
@@ -55,7 +55,7 @@ out:
   value: fiction
 ---
 test case: Query $.filters.id
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.filters.id 
@@ -63,7 +63,7 @@ out:
   return: SUCCEED
 ---
 test case: Query $.books[1].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[1].title 
@@ -72,7 +72,7 @@ out:
   value: Sword of Honour
 ---
 test case: Query $['closed message']
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $['closed message'] 
@@ -81,7 +81,7 @@ out:
   value: Store is closed
 ---
 test case: Query $.books[-1].author
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[-1].author 
@@ -90,7 +90,7 @@ out:
   value: J. R. R. Tolkien
 ---
 test case: Query $.filters
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.filters 
@@ -104,7 +104,7 @@ out:
     }
 ---
 test case: Query $.books.length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books.length() 
@@ -113,7 +113,7 @@ out:
   value: 4
 ---
 test case: Query $.tags[:]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[:] 
@@ -122,7 +122,7 @@ out:
   value: '["a", "b", "c", "d", "e" ]'
 ---
 test case: Query $.tags[2:]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[2:] 
@@ -131,7 +131,7 @@ out:
   value: '["c", "d", "e" ]'
 ---
 test case: Query $.tags[:2]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[:2] 
@@ -140,7 +140,7 @@ out:
   value: '["a", "b"]'
 ---
 test case: Query $.tags[1:4]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[1:4] 
@@ -149,7 +149,7 @@ out:
   value: '["b", "c", "d"]'
 ---
 test case: Query $.tags[-2:]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[-2:] 
@@ -158,7 +158,7 @@ out:
   value: '["d", "e"]'
 ---
 test case: Query $.tags[:-3]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[:-3] 
@@ -167,7 +167,7 @@ out:
   value: '["a", "b"]'
 ---
 test case: Query $.tags[:-3].length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.tags[:-3].length() 
@@ -176,25 +176,25 @@ out:
   value: 2
 ---
 test case: Query $.books[0, 2].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[0, 2].title 
 out:
   return: SUCCEED
-  value: '["Sayings of the Century", "Moby Dick"]'
+  value: '["Moby Dick", "Sayings of the Century"]'
 ---
 test case: Query $.books[1]['author', "title"]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[1]['author', "title"] 
 out:
   return: SUCCEED
-  value: '["Evelyn Waugh", "Sword of Honour"]'
+  value: '["Sword of Honour", "Evelyn Waugh"]'
 ---
 test case: Query $..id
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..id 
@@ -203,16 +203,16 @@ out:
   value: '[1, 2, 3, 4]'
 ---
 test case: Query $.services..price
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.services..price
 out:
   return: SUCCEED
-  value: '[5, 154.99, 46, 24.5, 99.49]'
+  value: '[154.99, 5, 46, 24.5, 99.49]'
 ---
 test case: Query $.books[?(@.id == 1 + 1)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 1 + 1)].title
@@ -221,7 +221,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 4 / 2)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 4 / 2)].title
@@ -230,7 +230,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 7 - 5)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 7 - 5)].title
@@ -239,7 +239,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 0.4 * 5)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 0.4 * 5)].title
@@ -248,7 +248,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 4 - 0.4 * 5)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 4 - 0.4 * 5)].title
@@ -257,7 +257,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == -0.4 * 5 + 4)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == -0.4 * 5 + 4)].title
@@ -266,7 +266,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 0.4 * (-5) + 4)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 0.4 * (-5) + 4)].title
@@ -275,7 +275,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 2 || @.id == 4)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 2 || @.id == 4)].title
@@ -284,7 +284,7 @@ out:
   value: '["Sword of Honour", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.id == 2 && 2 * ((1 + 3) / 2 + 3) == 10)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 2 && 2 * ((1 + 3) / 2 + 3) == 10)].title
@@ -293,7 +293,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.id == 2 == 1)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 2 == 1)].title
@@ -302,7 +302,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(!(@.id == 2))].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(!(@.id == 2))].title
@@ -311,7 +311,7 @@ out:
   value: '["Sayings of the Century", "Moby Dick", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.id != 2)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id != 2)].title
@@ -320,7 +320,7 @@ out:
   value: '["Sayings of the Century", "Moby Dick", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.title =~ " of ")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.title =~ " of ")].title
@@ -329,7 +329,7 @@ out:
   value: '["Sayings of the Century", "Sword of Honour", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.price > 12.99)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price > 12.99)].title
@@ -338,7 +338,7 @@ out:
   value: '["The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.price >= 12.99)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price >= 12.99)].title
@@ -347,7 +347,7 @@ out:
   value: '["Sword of Honour", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.price < 12.99)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price < 12.99)].title
@@ -356,7 +356,7 @@ out:
   value: '["Sayings of the Century", "Moby Dick"]'
 ---
 test case: Query $.books[?(@.price <= 12.99)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price <= 12.99)].title
@@ -365,7 +365,7 @@ out:
   value: '["Sayings of the Century", "Sword of Honour", "Moby Dick"]'
 ---
 test case: Query $.books[?(@.author > "Herman Melville")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.author > "Herman Melville")].title
@@ -374,7 +374,7 @@ out:
   value: '["Sayings of the Century", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.author >= "Herman Melville")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.author >= "Herman Melville")].title
@@ -383,7 +383,7 @@ out:
   value: '["Sayings of the Century", "Moby Dick", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.author < "Herman Melville")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.author < "Herman Melville")].title
@@ -392,7 +392,7 @@ out:
   value: '["Sword of Honour"]'
 ---
 test case: Query $.books[?(@.author <= "Herman Melville")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.author <= "Herman Melville")].title
@@ -401,7 +401,7 @@ out:
   value: '["Sword of Honour", "Moby Dick"]'
 ---
 test case: Query $.books[?(@.price > $.filters.price)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price > $.filters.price)].title
@@ -410,7 +410,7 @@ out:
   value: '["Sword of Honour", "The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.category == $.filters.category)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.category == $.filters.category)].title
@@ -419,7 +419,7 @@ out:
   value: '["Sword of Honour","Moby Dick","The Lord of the Rings"]'
 ---
 test case: Query $.books[?(@.category != $.filters.category)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.category != $.filters.category)].title
@@ -428,7 +428,7 @@ out:
   value: '["Sayings of the Century"]'
 ---
 test case: Query $..[?(@.id)]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..[?(@.id)]
@@ -469,7 +469,7 @@ out:
     ]
 ---
 test case: Query $.services..[?(@.price > 50)].description
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.services..[?(@.price > 50)].description
@@ -478,7 +478,7 @@ out:
   value: '["Printing and assembling book in A5 format", "Rebinding torn book"]'
 ---
 test case: Query $..id.length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..id.length()
@@ -487,7 +487,7 @@ out:
   value: 4
 ---
 test case: Query $.books[?(@.price >= 12.99)].length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.price >= 12.99)].length()
@@ -496,7 +496,7 @@ out:
   value: 2
 ---
 test case: Query $.books[?(@.id == 2)].title.first()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.id == 2)].title.first()
@@ -505,7 +505,7 @@ out:
   value: Sword of Honour
 ---
 test case: Query $..tags.first().length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..tags.first().length()
@@ -514,7 +514,7 @@ out:
   value: 5
 ---
 test case: Query $.bad.path.first().length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.bad.path.first().length()
@@ -522,7 +522,7 @@ out:
   return: FAIL
 ---
 test case: Query $.[?(@.ElementName == "test")].values.first().length()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.[?(@.ElementName == "test")].values.first().length()
@@ -562,7 +562,7 @@ out:
   value: a
 ---
 test case: Query $.books[*].price.min()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[*].price.min()
@@ -571,7 +571,7 @@ out:
   value: 8.95
 ---
 test case: Query $..price.max()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..price.max()
@@ -580,7 +580,7 @@ out:
   value: 154.99
 ---
 test case: Query $.books[?(@.category == "fiction")].price.avg()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.category == "fiction")].price.avg()
@@ -589,7 +589,7 @@ out:
   value: 14.99
 ---
 test case: Query $.books[?(@.category == $.filters.xyz)].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.category == $.filters.xyz)].title
@@ -597,7 +597,7 @@ out:
   return: SUCCEED
 ---
 test case: Query $.filters['no filters']
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.filters['no filters']
@@ -606,16 +606,16 @@ out:
   value: no "filters"
 ---
 test case: Query $.services[?(@.active=="true")].servicegroup
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.services[?(@.active=="true")].servicegroup
 out:
   return: SUCCEED
-  value: '[1000,1001]'
+  value: '[1001,1000]'
 ---
 test case: Query $.services[?(@.active=="false")].servicegroup
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.services[?(@.active=="false")].servicegroup
@@ -624,7 +624,7 @@ out:
   value: '[1002]'
 ---
 test case: Query $.books[?(@.title =~ "[a-z")].title
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.title =~ "[a-z")].title
@@ -632,7 +632,7 @@ out:
   return: FAIL
 ---
 test case: $..books[?(!@.isbn)]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..books[?(!@.isbn)]
@@ -657,7 +657,7 @@ out:
     ]
 ---
 test case: $..books[?(@.isbn)]
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $..books[?(@.isbn)]
@@ -684,7 +684,7 @@ out:
     ]
 ---
 test case: Query $.books[*].price.sum()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[*].price.sum()
@@ -725,25 +725,25 @@ out:
   values: '[2]'
 ---
 test case: Query $.*~
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.*~
 out:
   return: SUCCEED
-  value: '["books","services","filters","closed message","tags"]'
+  value: '["filters", "services", "tags", "books", "closed message"]'
 ---
 test case: Query $.*~.first()
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.*~.first()
 out:
   return: SUCCEED
-  value: 'books'
+  value: 'filters'
 ---
 test case: Query $.services[?(@.servicegroup=="1002")]~
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.services[?(@.servicegroup=="1002")]~
@@ -752,11 +752,73 @@ out:
   value: '["restoration"]'
 ---
 test case: Query $.books[?(@.category=="fiction")]~
-include: &include zbx_jsonpath_query.inc.yaml
+include: &include zbx_jsonobj_query.inc.yaml
 in:
   data: *include
   path: $.books[?(@.category=="fiction")]~
 out:
   return: SUCCEED
   value: '["1","2","3"]'
+---
+test case: Query $.books[?(@.category=="reference")].price
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[?(@.category=="reference")].price
+out:
+  return: SUCCEED
+  value: '[8.95]'
+---
+test case: Query $.books[1,1].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1,1].title 
+out:
+  return: SUCCEED
+  value: Sword of Honour
+---
+test case: Query $.books[1:2].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1:2].title 
+out:
+  return: SUCCEED
+  value: '["Sword of Honour"]'
+---
+test case: Query $.books[1]["title","title"]
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1].["title","title"] 
+out:
+  return: SUCCEED
+  value: Sword of Honour
+---
+test case: Query empty array
+in:
+  data: '{"a":[]}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '[]'
+---
+test case: Query empty object
+in:
+  data: '{"a":{}}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '{}'
+---
+test case: Query with json prefixed with whitespace
+in:
+  data: ' {"a":1}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '1'
 ...
+
+

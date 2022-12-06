@@ -1,15 +1,80 @@
+Changes for 6.2.7rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.2.6
+
+6.2.6rc2 was released as 6.2.6 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.2.6rc2
+
+Bug fixes:
+.......PS. [ZBX-22019] fixed item value type change not being updated in preprocessing manager cache (wiper)
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+.......PS. [ZBX-21995] fixed configuration sync compatibility problems between minor versions (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.6rc1
+
+New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
+
+Bug fixes:
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.5
+
+6.2.5rc1 was released as 6.2.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.5rc1
 
 New features:
-.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
-.........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
+.......PS. [ZBXNEXT-8040] added object-based JSON parsing and JSONPath optimizations (wiper)
+.........T [ZBX-21588] optimized the template Kubernetes nodes by HTTP (egordymov)
+.........T [ZBXNEXT-7903] added templates for Azure PostgreSQL servers (vkhaliev)
+.........T [ZBXNEXT-7949] added a preposition "by" to template names (egordymov)
+.........T [ZBX-20478] fixed the script Kubernetes cluster state (egordymov)
+.........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
+.......PS. [ZBXNEXT-8009] added JSONPath optimizations (wiper)
+.........T [ZBXNEXT-7940] added the template OS processes by Zabbix agent (egordymov)
 
 Bug fixes:
-.......PS. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted function parameters (gcalenko)
+..F....... [ZBX-21536] reverted fix for backslash escape in the trigger expression constructor (gcalenko)
+.........T [ZBX-21631] changed UUIDs of active agent availability metrics in Windows and Linux templates (vkhaliev)
+........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
+........S. [ZBX-21830] fixed syntax of a message identifier in the In-Reply-To e-mail header field (askolmeisters)
+..F....... [ZBX-21828] fixed undefined index "suppress_until" in the Problems by severity widget (kkuzmina)
+..F....... [ZBX-21816] fixed the "i" icon alignment in the Info column in Problems section with compact view  (kkuzmina)
+........S. [ZBX-19813] reworked inteface updates in template linking and LLD (wiper)
+..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
+.......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
+.........T [ZBX-21620] changed an update interval for the passwd checksum item in OS templates to 15m (drasihov)
+........S. [ZBX-21825] improved history syncer performance (vso)
+........S. [ZBX-21616] fixed an error due to non-existent macros in custom expressions (dgoloscapov, wiper)
+.......PS. [ZBX-21786] fixed the 'invalid timeout' error occurring after script item parameters removal (asestakovs)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
+..F....... [ZBX-21785] updated Actions checkboxes in the Audit log form filter for User directory and Autoregistration (kkuzmina)
+........S. [ZBX-21765] removed HTTP header "Accept-Encoding" from defaults in a web scenario step request (dimir)
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
+.......PS. [ZBX-21655] updated VMware datastore discovery to prevent returning the same datastore multiple times (asestakovs)
 .......P.. [ZBX-21468] fixed synchronization of the "hstgrp" configuration table (jxl)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
-...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
+...G...... [ZBX-21689] modified proc.num item to prevent agent crash on Windows when 'user' parameter is set (asestakovs)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.4
@@ -448,15 +513,80 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12
+
+6.0.12rc2 was released as 6.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc2
+
+Bug fixes:
+.......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
+........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.12rc1
+
+New features:
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
+
+Bug fixes:
+.......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
+.........T [ZBX-21943] fixed loss and latency checks in Cisco Meraki template (abiba, vkhaliev)
+.........T [ZBX-21601] added optimization for LLD preprocessing by splitting master item to sub metrics (abiba)
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.11
+
+6.0.11rc2 was released as 6.0.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.11rc2
+
+Bug fixes:
+........S. [ZBX-17419] prepared an upgrade patch for backporting the feature to 5.0 (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.11rc1
 
 New features:
-.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+.........T [ZBX-21588] optimized the template Kubernetes nodes by HTTP (egordymov)
+.......PS. [ZBXNEXT-8040] added object-based JSON parsing and JSONPath optimizations (wiper)
+.........T [ZBXNEXT-7949] added a preposition "by" to template names (egordymov)
+.........T [ZBX-20478] fixed the script Kubernetes cluster state (egordymov)
+.........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
+.......PS. [ZBXNEXT-8009] added JSONPath optimizations (wiper)
 
 Bug fixes:
-........S. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted function parameters (gcalenko)
+..F....... [ZBX-21536] reverted fix for backslash escape in trigger expression constructor (gcalenko)
+........S. [ZBX-21818] added escaping of macro values in script item parameters (asitals)
+........S. [ZBX-21830] fixed syntax of a message identifier in the In-Reply-To e-mail header field (askolmeisters)
+..F....... [ZBX-21816] fixed the "i" icon alignment in the Info column in Problems section with compact view (kkuzmina)
+........S. [ZBX-19813] reworked inteface updates in template linking and LLD (wiper)
+..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
+.......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
+.........T [ZBX-21620] changed an update interval for the passwd checksum item in OS templates to 15m (drasihov)
+........S. [ZBX-21616] fixed an error due to non-existent macros in custom expressions (dgoloscapov, wiper)
+........S. [ZBX-21825] improved history syncer performance (vso)
+.......PS. [ZBX-21786] fixed the 'invalid timeout' error occurring after script item parameters removal (asestakovs)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
+........S. [ZBX-21765] removed HTTP header "Accept-Encoding" from defaults in a web scenario step request (dimir)
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
+........S. [ZBX-21655] updated VMware datastore discovery to prevent returning the same datastore multiple times (asestakovs)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10
@@ -2649,13 +2779,32 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.31rc1
+
+New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.30
+
+5.0.30rc1 was released as 5.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.30rc1
 
 New features:
-.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+.......PS. [ZBXNEXT-8009] added JSONPath optimizations (wiper)
 
 Bug fixes:
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-21816] fixed the "i" icon alignment in the Info column in Problems section with compact view (kkuzmina)
+........S. [ZBX-21825] improved history syncer performance (vso)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
@@ -5308,6 +5457,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T20:51:03Z'
+  date: '2022-10-28T15:26:35Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Operating systems'
@@ -655,7 +655,7 @@ zabbix_export:
               tag: component
               value: cpu
         -
-          uuid: 3c1068939adf4d998a942dcb6be23656
+          uuid: 1ac6ebdb5c98415b94cb44da5feeac7f
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -677,7 +677,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: ce4a95a80cc54353ab0e0d2ae6312930
+              uuid: bad86dfaf5274927bce35ad314a2d21a
               expression: 'min(/Windows by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -2089,7 +2089,7 @@ zabbix_export:
               value: '255'
               newvalue: 'No such service'
         -
-          uuid: 6e7949c77d3442849778ff80271211df
+          uuid: 131de6a1016e43019d7cac2ce76901d4
           name: zabbix.host.active_agent.available
           mappings:
             -

@@ -27,11 +27,20 @@ $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'
 	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
-$buttons = [
-	(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
-		->setAttribute('data-url', CMenuHelper::getFirstUrl())
-		->onClick('document.location = this.dataset.url;')
-];
+if (CWebUser::isLoggedIn()) {
+	$buttons = [
+		(new CButton('back', _s('Go to "%1$s"', CMenuHelper::getFirstLabel())))
+			->setAttribute('data-url', CMenuHelper::getFirstUrl())
+			->onClick('document.location = this.dataset.url;')
+	];
+}
+else {
+	$buttons = [
+		(new CButton('login', _s('Go to "%1$s"', _('Login'))))
+			->setAttribute('data-url', 'index.php')
+			->onClick('document.location = this.dataset.url;')
+	];
+}
 
 echo '<body';
 

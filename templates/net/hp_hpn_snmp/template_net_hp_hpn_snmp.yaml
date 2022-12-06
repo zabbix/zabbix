@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:09:25Z'
+  date: '2022-10-27T11:34:37Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: cce20a5d149a48b7ac7f5383c3510883
-      template: 'HP Enterprise Switch SNMP'
-      name: 'HP Enterprise Switch SNMP'
+      template: 'HP Enterprise Switch by SNMP'
+      name: 'HP Enterprise Switch by SNMP'
       description: |
         Template Net HP Enterprise Switch
         
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8fb33a256deb49a096b287493285e300
-              expression: 'max(/HP Enterprise Switch SNMP/icmpping,#3)=0'
+              expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -74,14 +74,14 @@ zabbix_export:
           triggers:
             -
               uuid: 589e13a6ab084dd4b7d1456f7707f44d
-              expression: 'min(/HP Enterprise Switch SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch SNMP/icmppingloss,5m)<100'
+              expression: 'min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Enterprise Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -107,17 +107,17 @@ zabbix_export:
           triggers:
             -
               uuid: 75bdd8a0cd664815aa3e4fa54d4f0b97
-              expression: 'avg(/HP Enterprise Switch SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/HP Enterprise Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/HP Enterprise Switch SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Enterprise Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -182,7 +182,7 @@ zabbix_export:
           triggers:
             -
               uuid: 883e49e933bd4cfda0e7dde774604a0a
-              expression: 'min(/HP Enterprise Switch SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/HP Enterprise Switch by SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -245,7 +245,7 @@ zabbix_export:
           triggers:
             -
               uuid: a9dcdf4129d041eca8dadc8bfbc455ee
-              expression: 'last(/HP Enterprise Switch SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch SNMP/system.hw.firmware))>0'
+              expression: 'last(/HP Enterprise Switch by SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -279,7 +279,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6b9b9b0d1ff24074bb344d04efe53444
-              expression: 'last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -366,7 +366,7 @@ zabbix_export:
           triggers:
             -
               uuid: 63f6f85bfed94821a8339c46544dde0e
-              expression: 'last(/HP Enterprise Switch SNMP/system.name,#1)<>last(/HP Enterprise Switch SNMP/system.name,#2) and length(last(/HP Enterprise Switch SNMP/system.name))>0'
+              expression: 'last(/HP Enterprise Switch by SNMP/system.name,#1)<>last(/HP Enterprise Switch by SNMP/system.name,#2) and length(last(/HP Enterprise Switch by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -447,7 +447,7 @@ zabbix_export:
           triggers:
             -
               uuid: d64df6c48ce44bbcafcdd60a3102b41c
-              expression: 'max(/HP Enterprise Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -455,7 +455,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Enterprise Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -556,7 +556,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4fba6383ed4c4cd89b349a5dfccb7909
-                  expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
+                  expression: 'count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -570,7 +570,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 6cf626561b33468cb1e2c9e590334c4b
-                  expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1'
+                  expression: 'count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -578,7 +578,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ENT_DESCR}: Fan is in critical state'
-                      expression: 'count(/HP Enterprise Switch SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
+                      expression: 'count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -657,7 +657,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4fe0382fdee141adac03788c8810e387
-                  expression: 'min(/HP Enterprise Switch SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/HP Enterprise Switch by SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization'
                   event_name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -679,14 +679,14 @@ zabbix_export:
                   drawtype: BOLD_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'vm.memory.total[hpLocalMemTotalBytes.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'vm.memory.available[hpLocalMemFreeBytes.{#SNMPINDEX}]'
             -
               uuid: 87cafd79e372498a87bd6fa283482256
@@ -698,7 +698,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'vm.memory.util[snmp.{#SNMPINDEX}]'
         -
           uuid: dd018320e4b2466786840efdcd4a9fd9
@@ -1004,9 +1004,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8f16d1db51ce4dceb0ed8753b74e8b7f
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1057,21 +1057,21 @@ zabbix_export:
             -
               uuid: 97e6d8236ec04a7a91269819c89b2622
               expression: |
-                change(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/HP Enterprise Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1080,8 +1080,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1089,13 +1089,13 @@ zabbix_export:
             -
               uuid: 0f14cdc1b43a4325ba256645573a0905
               expression: |
-                (avg(/HP Enterprise Switch SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/HP Enterprise Switch SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/HP Enterprise Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/HP Enterprise Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/HP Enterprise Switch SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/HP Enterprise Switch SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Enterprise Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/HP Enterprise Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/HP Enterprise Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1105,8 +1105,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1114,12 +1114,12 @@ zabbix_export:
             -
               uuid: 61797acc8cb642038b1875a198d0a740
               expression: |
-                min(/HP Enterprise Switch SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/HP Enterprise Switch SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/HP Enterprise Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/HP Enterprise Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/HP Enterprise Switch SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/HP Enterprise Switch SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/HP Enterprise Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/HP Enterprise Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1129,8 +1129,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Enterprise Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1147,42 +1147,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Enterprise Switch SNMP'
+                    host: 'HP Enterprise Switch by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 92a9d50fd9894af486dfcee142db1d61
@@ -1252,7 +1252,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1b117ed66a0c4b098606d1179e21f3f0
-                  expression: 'last(/HP Enterprise Switch SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/HP Enterprise Switch by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1320,7 +1320,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 81553d4157ce4c938c25b9403c5e572a
-                  expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
+                  expression: 'count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1334,7 +1334,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: aeb31d4c3958433c9a0105f79156094a
-                  expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1'
+                  expression: 'count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1'
                   name: '{#ENT_DESCR}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1342,7 +1342,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#ENT_DESCR}: Power supply is in critical state'
-                      expression: 'count(/HP Enterprise Switch SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
+                      expression: 'count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1'
                   tags:
                     -
                       tag: scope
@@ -1391,9 +1391,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5d0d743c7f5449f4a429845ab3894d19
-                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1408,9 +1408,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: b549cc5016884818bf416c415618171f
-                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above warning threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1419,8 +1419,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above critical threshold'
-                      expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
-                      recovery_expression: 'max(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                      expression: 'avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                      recovery_expression: 'max(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1430,9 +1430,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: a4294d3ad024438aaba4234811d65582
-                  expression: 'avg(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/HP Enterprise Switch SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
+                  recovery_expression: 'min(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low'
                   event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1606,7 +1606,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'HP Enterprise Switch SNMP'
+                        host: 'HP Enterprise Switch by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2551,7 +2551,7 @@ zabbix_export:
   triggers:
     -
       uuid: 1395e02bc63e48daa779b8b685e91868
-      expression: '(last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2560,7 +2560,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/HP Enterprise Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2576,5 +2576,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'HP Enterprise Switch SNMP'
+            host: 'HP Enterprise Switch by SNMP'
             key: 'system.cpu.util[hpSwitchCpuStat.0]'

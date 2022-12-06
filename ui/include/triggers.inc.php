@@ -1875,6 +1875,24 @@ function get_item_function_info(string $expr) {
 }
 
 /**
+ * Quoting $param if it contains special characters.
+ *
+ * @param string $param
+ * @param bool   $forced
+ *
+ * @return string
+ */
+function quoteFunctionParam($param, $forced = false) {
+	if (!$forced) {
+		if (!isset($param[0]) || ($param[0] != '"' && false === strpbrk($param, ',)'))) {
+			return $param;
+		}
+	}
+
+	return '"'.str_replace('"', '\\"', $param).'"';
+}
+
+/**
  * Returns the text indicating the trigger's status and state. If the $state parameter is not given, only the status of
  * the trigger will be taken into account.
  *

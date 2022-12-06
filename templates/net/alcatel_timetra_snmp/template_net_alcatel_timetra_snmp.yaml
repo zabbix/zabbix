@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:03:47Z'
+  date: '2022-10-27T11:34:28Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 53044571fb864d87af32473e08c76d0b
-      template: 'Alcatel Timetra TiMOS SNMP'
-      name: 'Alcatel Timetra TiMOS SNMP'
+      template: 'Alcatel Timetra TiMOS by SNMP'
+      name: 'Alcatel Timetra TiMOS by SNMP'
       description: |
         Template Net Alcatel Timetra TiMOS
         
@@ -44,7 +44,7 @@ zabbix_export:
           triggers:
             -
               uuid: 72f8bcb4dfde4d338c31c83b72a36129
-              expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+              expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -70,14 +70,14 @@ zabbix_export:
           triggers:
             -
               uuid: 0c0a32b98df84c07acbe51caabc8c012
-              expression: 'min(/Alcatel Timetra TiMOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -103,17 +103,17 @@ zabbix_export:
           triggers:
             -
               uuid: 06fd317938784236b3e17b2b4080925d
-              expression: 'avg(/Alcatel Timetra TiMOS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Alcatel Timetra TiMOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Alcatel Timetra TiMOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -177,7 +177,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4167b064eb19478da13531f629082ef1
-              expression: 'min(/Alcatel Timetra TiMOS SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Alcatel Timetra TiMOS by SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -314,7 +314,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5f11cacfd4a94cf696897b3f3fa80601
-              expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
+              expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -400,7 +400,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd5dc3541a3d402c98a60b25d9e48dd6
-              expression: 'last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.sw.os[sysDescr.0]))>0'
+              expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -408,7 +408,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Alcatel Timetra TiMOS SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.name))>0'
+                  expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -483,7 +483,7 @@ zabbix_export:
           triggers:
             -
               uuid: a22f13e245b944e991c2c9850a731a3c
-              expression: 'min(/Alcatel Timetra TiMOS SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Alcatel Timetra TiMOS by SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -519,7 +519,7 @@ zabbix_export:
           triggers:
             -
               uuid: 60187191b268499784a70ef1dfe058ae
-              expression: 'max(/Alcatel Timetra TiMOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -527,7 +527,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Alcatel Timetra TiMOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -571,7 +571,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ccdcfdbe1a6243949857c764aed9c9ea
-                  expression: 'last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -616,7 +616,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 10f9f5cd2f1b4d09abba3ae48b482eb8
-                  expression: 'count(/Alcatel Timetra TiMOS SNMP/sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Alcatel Timetra TiMOS by SNMP/sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '#{#SNMPINDEX}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -932,9 +932,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a4bcc6d80080415698d8fd323ff5d484
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -985,21 +985,21 @@ zabbix_export:
             -
               uuid: a9467162f7434b8e97cb6645b6a060ae
               expression: |
-                change(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Alcatel Timetra TiMOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1008,8 +1008,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1017,13 +1017,13 @@ zabbix_export:
             -
               uuid: 27e0b7fcaf664410962dc768e0ef7267
               expression: |
-                (avg(/Alcatel Timetra TiMOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Alcatel Timetra TiMOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Alcatel Timetra TiMOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Alcatel Timetra TiMOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Alcatel Timetra TiMOS SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Alcatel Timetra TiMOS SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Alcatel Timetra TiMOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Alcatel Timetra TiMOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1033,8 +1033,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1042,12 +1042,12 @@ zabbix_export:
             -
               uuid: ee8dccabf5df45b48a503320131b152e
               expression: |
-                min(/Alcatel Timetra TiMOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Alcatel Timetra TiMOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Alcatel Timetra TiMOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Alcatel Timetra TiMOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Alcatel Timetra TiMOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Alcatel Timetra TiMOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Alcatel Timetra TiMOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Alcatel Timetra TiMOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1057,8 +1057,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1075,42 +1075,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Alcatel Timetra TiMOS SNMP'
+                    host: 'Alcatel Timetra TiMOS by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 078d4ad71e014260aa173288492e7f5d
@@ -1180,7 +1180,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e5d6ba20229044b98ee8cb33e00de8b0
-                  expression: 'last(/Alcatel Timetra TiMOS SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Alcatel Timetra TiMOS by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1240,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: afbc2020a9f74d6abe52469ac663e057
-                  expression: 'count(/Alcatel Timetra TiMOS SNMP/sensor.psu.status[tmnxChassisPowerSupply1Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply1Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '#{#SNMPINDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1277,7 +1277,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: fcbc0ef8f55146daaed6be4ccbd324e7
-                  expression: 'count(/Alcatel Timetra TiMOS SNMP/sensor.psu.status[tmnxChassisPowerSupply2Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply2Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '#{#SNMPINDEX}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1322,9 +1322,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8f478386378349e7a4e4586c5ba74c78
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1339,9 +1339,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 90ba726922f74d1d971b3f07781fc035
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1350,8 +1350,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1361,9 +1361,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 6035fc6733614ae1b4ed22c7d73466b0
-                  expression: 'avg(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Alcatel Timetra TiMOS SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
                   event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1493,7 +1493,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Alcatel Timetra TiMOS SNMP'
+                        host: 'Alcatel Timetra TiMOS by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2438,7 +2438,7 @@ zabbix_export:
   triggers:
     -
       uuid: 3b6324116e5940b5aaea72adca4dbbf6
-      expression: '(last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2447,7 +2447,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Alcatel Timetra TiMOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2463,7 +2463,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Alcatel Timetra TiMOS SNMP'
+            host: 'Alcatel Timetra TiMOS by SNMP'
             key: 'system.cpu.util[sgiCpuUsage.0]'
     -
       uuid: e404b522555e4f9092930ce870649828
@@ -2474,14 +2474,14 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'Alcatel Timetra TiMOS SNMP'
+            host: 'Alcatel Timetra TiMOS by SNMP'
             key: 'vm.memory.total[snmp]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Alcatel Timetra TiMOS SNMP'
+            host: 'Alcatel Timetra TiMOS by SNMP'
             key: 'vm.memory.available[sgiKbMemoryAvailable.0]'
     -
       uuid: 111cde007d8342f9b743f08f12380ec3
@@ -2493,5 +2493,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Alcatel Timetra TiMOS SNMP'
+            host: 'Alcatel Timetra TiMOS by SNMP'
             key: 'vm.memory.util[vm.memory.util.0]'

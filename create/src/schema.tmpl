@@ -88,19 +88,22 @@ FIELD		|auto_compress	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|custom_interfaces|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|name_upper	|t_varchar(128)	|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
 INDEX		|4		|name
 INDEX		|5		|maintenanceid
+INDEX		|6		|name_upper
 CHANGELOG	|1
+UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
 TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|type,name
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
@@ -264,6 +267,7 @@ FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|name_upper	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|hostid,key_(764)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -271,7 +275,9 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
+INDEX		|9		|hostid,name_upper
 CHANGELOG	|3
+UPD_TRIG_FUNC	|name		|name_upper	|itemid	|upper
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
@@ -1974,4 +1980,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6020000	|6020003
+ROW		|1		|6020000	|6020013
