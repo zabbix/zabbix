@@ -824,7 +824,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		if ($ruleids) {
 			API::ItemPrototype()->syncTemplates($link_request);
-			API::HostPrototype()->syncTemplates($ruleids, $hostids);
+			API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
 		}
 
 		API::Trigger()->syncTemplates($link_request);
@@ -1057,7 +1057,7 @@ abstract class CHostGeneral extends CHostBase {
 
 			if ($ruleids) {
 				API::ItemPrototype()->syncTemplates($link_request);
-				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
+				API::HostPrototype()->linkTemplateObjects($ruleids, $link_request['hostids']);
 			}
 		}
 

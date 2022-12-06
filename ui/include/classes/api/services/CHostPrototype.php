@@ -27,6 +27,13 @@ class CHostPrototype extends CHostBase {
 	protected $sortColumns = ['hostid', 'host', 'name', 'status', 'discover'];
 
 	/**
+	 * Maximum number of inheritable items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const INHERIT_CHUNK_SIZE = 1000;
+
+	/**
 	 * Get host prototypes.
 	 *
 	 * @param array        $options
@@ -1715,64 +1722,36 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $db_host_prototypes
-	 *
-	 * @param array
-	 */
-	private static function getTemplatedObjects(array $host_prototypes, array $db_host_prototypes = null): array {
-		$templated_ruleids = DBfetchColumn(DBselect(
-			'SELECT DISTINCT i.itemid'.
-			' FROM items i,hosts_templates ht'.
-			' WHERE i.hostid=ht.templateid'.
-				' AND '.dbConditionId('i.itemid', array_unique(array_column($host_prototypes, 'ruleid')))
-		), 'itemid');
-
-		foreach ($host_prototypes as $i => $host_prototype) {
-			if (!in_array($host_prototype['ruleid'], $templated_ruleids)) {
-				unset($host_prototypes[$i]);
-
-				if ($db_host_prototypes !== null && array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
-					unset($db_host_prototypes[$host_prototype['hostid']]);
-				}
-			}
-		}
-
-		$host_prototypes = array_values($host_prototypes);
-
-		return ($db_host_prototypes === null) ? [$host_prototypes] : [$host_prototypes, $db_host_prototypes];
-	}
-
-	/**
-	 * Inherits all host prototypes from the templates given in "templateids" to hosts or templates given in "hostids".
-	 *
 	 * @param array $ruleids
 	 * @param array $hostids
 	 */
-	public function syncTemplates(array $ruleids, array $hostids): void {
-		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
-			'SELECT hd.parent_itemid AS ruleid,h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,'.
+	public function linkTemplateObjects(array $ruleids, array $hostids): void {
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.parent_itemid AS ruleid,h.hostid,h.host,h.name,h.custom_interfaces,h.flags,h.status,h.discover,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM host_discovery hd'.
 			' INNER JOIN hosts h ON hd.hostid=h.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
-			' WHERE '.dbConditionId('hd.parent_itemid', $ruleids)
+			' WHERE '.dbConditionId('hd.parent_itemid', $ruleids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
 		), 'hostid');
 
-		if (!$db_host_prototypes) {
+		if (!$db_hosts) {
 			return;
 		}
 
-		$host_prototypes = [];
+		self::checkRulesAndAddParentDetails($db_hosts);
 
-		foreach ($db_host_prototypes as $db_host_prototype) {
-			$host_prototype = array_intersect_key($db_host_prototype, array_flip(['hostid', 'custom_interfaces']));
+		$hosts = [];
 
-			if ($db_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
-				$host_prototype += ['interfaces' => []];
+		foreach ($db_hosts as $db_host) {
+			$host = $db_host;
+
+			if ($db_host['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+				$host += ['interfaces' => []];
 			}
 
-			$host_prototypes[] = $host_prototype + [
+			$hosts[] = $host + [
 				'groupLinks' => [],
 				'groupPrototypes' => [],
 				'templates' => [],
@@ -1781,310 +1760,581 @@ class CHostPrototype extends CHostBase {
 			];
 		}
 
-		$this->addAffectedObjects($host_prototypes, $db_host_prototypes);
+		$this->addAffectedObjects($hosts, $db_hosts);
 
-		$host_prototypes = array_values($db_host_prototypes);
+		$hosts = array_values($db_hosts);
 
-		foreach ($host_prototypes as &$host_prototype) {
-			if (array_key_exists('interfaces', $host_prototype)) {
-				$host_prototype['interfaces'] = array_values($host_prototype['interfaces']);
+		foreach ($hosts as &$host) {
+			if (array_key_exists('interfaces', $host)) {
+				$host['interfaces'] = array_values($host['interfaces']);
 			}
 
-			$host_prototype['groupLinks'] = array_values($host_prototype['groupLinks']);
-			$host_prototype['groupPrototypes'] = array_values($host_prototype['groupPrototypes']);
-			$host_prototype['templates'] = array_values($host_prototype['templates']);
-			$host_prototype['tags'] = array_values($host_prototype['tags']);
-			$host_prototype['macros'] = array_values($host_prototype['macros']);
+			$host['groupLinks'] = array_values($host['groupLinks']);
+			$host['groupPrototypes'] = array_values($host['groupPrototypes']);
+			$host['templates'] = array_values($host['templates']);
+			$host['tags'] = array_values($host['tags']);
+			$host['macros'] = array_values($host['macros']);
 		}
-		unset($host_prototype);
+		unset($host);
 
-		$this->inherit($host_prototypes, [], $hostids);
+		$this->inherit($hosts, [], $hostids);
 	}
 
 	/**
-	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
-	 *
-	 * @param array      $host_prototypes
-	 * @param array      $db_host_prototypes
-	 * @param array|null $hostids            Array of hosts to inherit to; if set to null, the children will be updated
-	 *                                       on all child hosts.
+	 * @inheritDoc
 	 */
-	protected function inherit(array $host_prototypes, array $db_host_prototypes = [], array $hostids = null): void {
-		$ins_host_prototypes = [];
-		$upd_host_prototypes = [];
-		$upd_db_host_prototypes = [];
+	protected function inherit(array $hosts, array $db_hosts = [], array $hostids = null): void {
+		$tpl_links = self::getTemplateLinks($hosts, $hostids);
 
-		if ($db_host_prototypes) {
-			$_upd_db_host_prototypes = $this->getChildObjectsUsingTemplateid($host_prototypes, $db_host_prototypes);
+		if ($hostids === null) {
+			self::filterObjectsToInherit($hosts, $db_hosts, $tpl_links);
 
-			if ($_upd_db_host_prototypes) {
-				$_upd_host_prototypes = self::getUpdChildObjectsUsingTemplateid($host_prototypes, $db_host_prototypes,
-					$_upd_db_host_prototypes
-				);
-
-				self::checkDuplicates($_upd_host_prototypes, $_upd_db_host_prototypes, true);
-
-				$upd_host_prototypes = array_merge($upd_host_prototypes, $_upd_host_prototypes);
-				$upd_db_host_prototypes += $_upd_db_host_prototypes;
+			if (!$hosts) {
+				return;
 			}
 		}
 
-		if (count($host_prototypes) != count($db_host_prototypes)) {
-			$_upd_db_host_prototypes = $this->getChildObjectsUsingName($host_prototypes, $hostids);
+		self::checkDoubleInheritedNames($hosts, $db_hosts, $tpl_links);
 
-			if ($_upd_db_host_prototypes) {
-				$_upd_host_prototypes = self::getUpdChildObjectsUsingName($host_prototypes, $db_host_prototypes,
-					$_upd_db_host_prototypes
-				);
+		$chunks = self::getInheritChunks($hosts, $tpl_links);
 
-				$upd_host_prototypes = array_merge($upd_host_prototypes, $_upd_host_prototypes);
-				$upd_db_host_prototypes += $_upd_db_host_prototypes;
-			}
+		foreach ($chunks as $chunk) {
+			$_hosts = array_intersect_key($hosts, array_flip($chunk['host_indexes']));
+			$_db_hosts = array_intersect_key($db_hosts, array_flip(array_column($_hosts, 'hostid')));
+			$_hostids = array_keys($chunk['hosts']);
 
-			$ins_host_prototypes = self::getInsChildObjects($host_prototypes, $_upd_db_host_prototypes, $hostids);
-		}
-
-		if ($upd_host_prototypes) {
-			$this->updateForce($upd_host_prototypes, $upd_db_host_prototypes);
-		}
-
-		if ($ins_host_prototypes) {
-			$this->createForce($ins_host_prototypes, true);
-		}
-
-		[$tpl_host_prototypes, $tpl_db_host_prototypes] = $this->getTemplatedObjects(
-			array_merge($upd_host_prototypes, $ins_host_prototypes), $upd_db_host_prototypes
-		);
-
-		if ($tpl_host_prototypes) {
-			$this->inherit($tpl_host_prototypes, $tpl_db_host_prototypes);
+			$this->inheritChunk($_hosts, $_db_hosts, $tpl_links, $_hostids);
 		}
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
+	 * Filter out inheritable host prototypes.
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 * @param array $tpl_links
+	 */
+	protected static function filterObjectsToInherit(array &$hosts, array &$db_hosts, array $tpl_links): void {
+		foreach ($hosts as $i => $host) {
+			if (!array_key_exists($host['parent_hostid'], $tpl_links)) {
+				unset($hosts[$i]);
+
+				if (array_key_exists($host['hostid'], $db_hosts)) {
+					unset($db_hosts[$host['hostid']]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param array      $hosts
+	 * @param array|null $hostids
 	 *
 	 * @return array
 	 */
-	private function getChildObjectsUsingTemplateid(array $host_prototypes, array $db_host_prototypes): array {
-		$upd_db_host_prototypes = DBfetchArrayAssoc(DBselect(
+	protected static function getTemplateLinks(array $hosts, ?array $hostids): array {
+		if ($hostids !== null) {
+			$db_hosts = DB::select('hosts', [
+				'output' => ['hostid', 'status'],
+				'hostids' => $hostids,
+				'preservekeys' => true
+			]);
+
+			$tpl_links = [];
+
+			foreach ($hosts as $host) {
+				$tpl_links[$host['parent_hostid']] = $db_hosts;
+			}
+		}
+		else {
+			$templateids = [];
+
+			foreach ($hosts as $host) {
+				if ($host['parent_status'] == HOST_STATUS_TEMPLATE) {
+					$templateids[$host['parent_hostid']] = true;
+				}
+			}
+
+			if (!$templateids) {
+				return [];
+			}
+
+			$result = DBselect(
+				'SELECT ht.templateid,ht.hostid,h.status'.
+				' FROM hosts_templates ht,hosts h'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND '.dbConditionId('ht.templateid', array_keys($templateids))
+			);
+
+			$tpl_links = [];
+
+			while ($row = DBfetch($result)) {
+				$tpl_links[$row['templateid']][$row['hostid']] = [
+					'hostid' => $row['hostid'],
+					'status' => $row['status']
+				];
+			}
+		}
+
+		return $tpl_links;
+	}
+
+	/**
+	 * Check that no host prototypes with repeating host name would be inherited to a single host or template.
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 * @param array $tpl_links
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkDoubleInheritedNames(array $hosts, array $db_hosts, array $tpl_links): void {
+		$host_indexes = [];
+
+		foreach ($hosts as $i => $host) {
+			if (array_key_exists($host['hostid'], $db_hosts) && $host['host'] === $db_hosts[$host['hostid']]['host']) {
+				continue;
+			}
+
+			$host_indexes[$host['host']][] = $i;
+		}
+
+		foreach ($host_indexes as $name => $indexes) {
+			if (count($indexes) == 1) {
+				continue;
+			}
+
+			$tpl_hosts = array_column(array_intersect_key($hosts, array_flip($indexes)), null, 'parent_hostid');
+			$templateids = array_keys($tpl_hosts);
+			$template_count = count($templateids);
+
+			for ($i = 0; $i < $template_count - 1; $i++) {
+				for ($j = $i + 1; $j < $template_count; $j++) {
+					$same_hosts = array_intersect_key($tpl_links[$templateids[$i]], $tpl_links[$templateids[$j]]);
+
+					if ($same_hosts) {
+						$same_host = reset($same_hosts);
+
+						$hosts = DB::select('hosts', [
+							'output' => ['hostid', 'host'],
+							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
+							'preservekeys' => true
+						]);
+
+						$target_is_host = in_array($same_host['status'],
+							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
+						);
+
+						$error = $target_is_host
+							? _('Cannot inherit host prototypes with host name "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+							: _('Cannot inherit host prototypes with host name "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $name,
+							$hosts[$templateids[$i]]['host'], $hosts[$templateids[$j]]['host'],
+							$hosts[$same_host['hostid']]['host']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get host prototypes in chunks to inherit.
+	 *
+	 * @param array $hosts
+	 * @param array $tpl_links
+	 *
+	 * @return array
+	 */
+	protected static function getInheritChunks(array $hosts, array $tpl_links): array {
+		$chunks = [
+			[
+				'host_indexes' => [],
+				'hosts' => [],
+				'size' => 0
+			]
+		];
+		$last = 0;
+
+		foreach ($hosts as $i => $host) {
+			$hosts_chunks = array_chunk($tpl_links[$host['parent_hostid']], self::INHERIT_CHUNK_SIZE, true);
+
+			foreach ($hosts_chunks as $hosts) {
+				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
+					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
+
+					$can_add_hosts = true;
+
+					foreach ($chunks[$last]['host_indexes'] as $_i) {
+						$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
+
+						if (array_intersect_key($tpl_links[$hosts[$_i]['parent_hostid']], $new_hosts)) {
+							$can_add_hosts = false;
+							break;
+						}
+					}
+
+					if ($can_add_hosts) {
+						$chunks[$last]['host_indexes'][] = $i;
+						$chunks[$last]['hosts'] += $_hosts;
+						$chunks[$last]['size'] += count($_hosts);
+
+						$hosts = array_diff_key($hosts, $_hosts);
+					}
+				}
+
+				if ($hosts) {
+					$chunks[++$last] = [
+						'host_indexes' => [$i],
+						'hosts' => $hosts,
+						'size' => count($hosts)
+					];
+				}
+				else {
+					break 2;
+				}
+			}
+		}
+
+		return $chunks;
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 * @param array $tpl_links
+	 * @param array $hostids
+	 */
+	protected function inheritChunk(array $hosts, array $db_hosts, array $tpl_links, array $hostids): void {
+		$hosts_to_link = [];
+		$hosts_to_update = [];
+
+		foreach ($hosts as $i => $host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
+				$hosts_to_link[] = $host;
+			}
+			else {
+				$hosts_to_update[] = $host;
+			}
+
+			unset($hosts[$i]);
+		}
+
+		$ins_hosts = [];
+		$upd_hosts = [];
+		$upd_db_hosts = [];
+
+		if ($hosts_to_link) {
+			$lld_links = self::getLldLinks($hosts_to_link);
+
+			$upd_db_hosts = $this->getChildObjectsUsingName($hosts_to_link, $hostids, $lld_links);
+
+			if ($upd_db_hosts) {
+				$upd_hosts = self::getUpdChildObjectsUsingName($hosts_to_link, $upd_db_hosts);
+			}
+
+			$ins_hosts = self::getInsChildObjects($hosts_to_link, $upd_db_hosts, $tpl_links, $hostids, $lld_links);
+		}
+
+		if ($hosts_to_update) {
+			$_upd_db_hosts = self::getChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $hostids);
+			$_upd_hosts = self::getUpdChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $_upd_db_hosts);
+
+			self::checkDuplicates($_upd_hosts, $_upd_db_hosts, true);
+
+			$upd_hosts = array_merge($upd_hosts, $_upd_hosts);
+			$upd_db_hosts += $_upd_db_hosts;
+		}
+
+		if ($upd_hosts) {
+			$this->updateForce($upd_hosts, $upd_db_hosts);
+		}
+
+		if ($ins_hosts) {
+			$this->createForce($ins_hosts);
+		}
+
+		$this->inherit(array_merge($upd_hosts, $ins_hosts), $upd_db_hosts);
+	}
+
+	/**
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	private static function getLldLinks(array $hosts): array {
+		$result = DBselect(
+			'SELECT i.itemid AS ruleid,ht.hostid,ht.templateid'.
+			' FROM items i,items ii,hosts h,hosts_templates ht'.
+			' WHERE i.templateid=ii.itemid'.
+				' AND ii.hostid=h.hostid'.
+				' AND h.hostid=ht.templateid'.
+				' AND '.dbConditionId('i.templateid', array_column($hosts, 'ruleid', 'ruleid'))
+		);
+
+		$lld_links = [];
+
+		while ($row = DBfetch($result)) {
+			$lld_links[$row['templateid']][$row['hostid']] = $row['ruleid'];
+		}
+
+		return $lld_links;
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private function getChildObjectsUsingTemplateid(array $hosts, array $db_hosts, array $hostids): array {
+		$upd_db_hosts = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.templateid,'.
-				'hd.parent_itemid AS ruleid,'.
+				'hd.parent_itemid AS ruleid,i.hostid AS parent_hostid,hh.status AS parent_status,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM hosts h'.
 			' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
-			' WHERE '.dbConditionId('h.templateid', array_keys($db_host_prototypes))
+			' INNER JOIN items i'.
+			' INNER JOIN hosts hh'.
+			' WHERE hd.parent_itemid=i.itemid'.
+				' AND hh.hostid=i.hostid'.
+				' AND '.dbConditionId('h.templateid', array_keys($db_hosts)).
+				' AND '.dbConditionId('i.hostid', $hostids)
 		), 'hostid');
 
-		if ($upd_db_host_prototypes) {
-			$host_prototypes = array_column($host_prototypes, null, 'hostid');
-			$upd_host_prototypes = [];
+		if ($upd_db_hosts) {
+			$hosts = array_column($hosts, null, 'hostid');
+			$upd_hosts = [];
 
-			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
-				$host_prototype = $host_prototypes[$upd_db_host_prototype['templateid']];
-				$db_host_prototype = $db_host_prototypes[$upd_db_host_prototype['templateid']];
+			foreach ($upd_db_hosts as $upd_db_host) {
+				$host = $hosts[$upd_db_host['templateid']];
+				$db_host = $db_hosts[$upd_db_host['templateid']];
 
-				$upd_host_prototype = [
-					'hostid' => $upd_db_host_prototype['hostid'],
-					'custom_interfaces' => $host_prototype['custom_interfaces']
-				];
+				$upd_host = [
+					'hostid' => $upd_db_host['hostid'],
+					'custom_interfaces' => $host['custom_interfaces']
+				] + array_intersect_key($upd_db_host, array_flip(['parent_hostid', 'parent_status']));
 
-				if (array_key_exists('interfaces', $host_prototype)) {
-					$upd_host_prototype += ['interfaces' => []];
+				if (array_key_exists('interfaces', $host)) {
+					$upd_host += ['interfaces' => []];
 				}
 
-				$upd_host_prototype += array_intersect_key([
+				$upd_host += array_intersect_key([
 					'groupLinks' => [],
 					'groupPrototypes' => [],
 					'templates' => [],
 					'tags' => [],
 					'macros' => []
-				], $db_host_prototype);
+				], $db_host);
 
-				$upd_host_prototypes[] = $upd_host_prototype;
+				$upd_hosts[] = $upd_host;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			$this->addAffectedObjects($upd_hosts, $upd_db_hosts);
 		}
 
-		return $upd_db_host_prototypes;
+		return $upd_db_hosts;
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
-	 * @param array $upd_db_host_prototypes
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 * @param array $upd_db_hosts
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingTemplateid(array $host_prototypes, array $db_host_prototypes,
-			array $upd_db_host_prototypes): array {
-		$upd_host_prototypes = [];
+	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $db_hosts,
+			array $upd_db_hosts): array {
+		$upd_hosts = [];
 
-		foreach ($host_prototypes as $host_prototype) {
-			if (!array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
+		foreach ($hosts as &$host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				continue;
 			}
 
-			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectIds($host_prototype);
-
-			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
-				if (bccomp($host_prototype['hostid'], $upd_db_host_prototype['templateid']) != 0) {
-					continue;
-				}
-
-				$upd_host_prototype = array_intersect_key($upd_db_host_prototype,
-					array_flip(['hostid', 'templateid', 'ruleid'])
-				) + $host_prototype;
-
-				if (array_key_exists('groupLinks', $upd_host_prototype)) {
-					foreach ($upd_host_prototype['groupLinks'] as &$group_link) {
-						foreach ($upd_db_host_prototype['groupLinks'] as $db_group_link) {
-							if (bccomp($group_link['group_prototypeid'], $db_group_link['templateid']) == 0
-									|| bccomp($group_link['groupid'], $db_group_link['groupid']) == 0) {
-								$group_link['templateid'] = $group_link['group_prototypeid'];
-								$group_link['group_prototypeid'] = $db_group_link['group_prototypeid'];
-								break 2;
-							}
-						}
-
-						$group_link['templateid'] = $group_link['group_prototypeid'];
-						unset($group_link['group_prototypeid']);
-					}
-					unset($group_link);
-				}
-
-				if (array_key_exists('groupPrototypes', $upd_host_prototype)) {
-					foreach ($upd_host_prototype['groupPrototypes'] as &$group_prototype) {
-						foreach ($upd_db_host_prototype['groupPrototypes'] as $db_group_prototype) {
-							if (bccomp($group_prototype['group_prototypeid'], $db_group_prototype['templateid']) == 0
-									|| $group_prototype['name'] === $db_group_prototype['name']) {
-								$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
-								$group_prototype['group_prototypeid'] = $db_group_prototype['group_prototypeid'];
-								break 2;
-							}
-						}
-
-						$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
-						unset($group_prototype['group_prototypeid']);
-					}
-					unset($group_prototype);
-				}
-
-				if (array_key_exists('macros', $upd_host_prototype)) {
-					$db_macros = $db_host_prototypes[$host_prototype['hostid']]['macros'];
-
-					foreach ($upd_host_prototype['macros'] as &$macro) {
-						if (array_key_exists($macro['hostmacroid'], $db_macros)) {
-							$db_macro = $db_macros[$macro['hostmacroid']];
-
-							$macro['hostmacroid'] = key(array_filter($upd_db_host_prototype['macros'],
-								static function (array $upd_db_macro) use ($db_macro): bool {
-									return $upd_db_macro['macro'] === $db_macro['macro']
-										&& $upd_db_macro['type'] == $db_macro['type']
-										&& $upd_db_macro['value'] === $db_macro['value']
-										&& $upd_db_macro['description'] === $db_macro['description'];
-								}
-							));
-						}
-						else {
-							unset($macro['hostmacroid']);
-						}
-					}
-					unset($macro);
-				}
-
-				$upd_host_prototypes[] = $upd_host_prototype;
-			}
+			$host = self::unsetNestedObjectIds($host);
 		}
 
-		return $upd_host_prototypes;
+		$parent_indexes = array_flip(array_column($hosts, 'hostid'));
+		$upd_hosts = [];
+
+		foreach ($upd_db_hosts as $upd_db_host) {
+			$host = $hosts[$parent_indexes[$upd_db_host['templateid']]];
+
+			$upd_host = array_intersect_key($upd_db_host,
+				array_flip(['hostid', 'templateid', 'ruleid', 'parent_hostid', 'parent_status'])
+			) + $host;
+
+			if (array_key_exists('groupLinks', $upd_host)) {
+				foreach ($upd_host['groupLinks'] as &$group_link) {
+					$matched = false;
+
+					foreach ($upd_db_host['groupLinks'] as $db_group_link) {
+						if (bccomp($group_link['group_prototypeid'], $db_group_link['templateid']) == 0
+								|| bccomp($group_link['groupid'], $db_group_link['groupid']) == 0) {
+							$group_link['templateid'] = $group_link['group_prototypeid'];
+							$group_link['group_prototypeid'] = $db_group_link['group_prototypeid'];
+
+							$matched = true;
+							break;
+						}
+					}
+
+					if ($matched) {
+						continue;
+					}
+
+					$group_link['templateid'] = $group_link['group_prototypeid'];
+					unset($group_link['group_prototypeid']);
+				}
+				unset($group_link);
+			}
+
+			if (array_key_exists('groupPrototypes', $upd_host)) {
+				foreach ($upd_host['groupPrototypes'] as &$group_prototype) {
+					$matched = false;
+
+					foreach ($upd_db_host['groupPrototypes'] as $db_group_prototype) {
+						if (bccomp($group_prototype['group_prototypeid'], $db_group_prototype['templateid']) == 0
+								|| $group_prototype['name'] === $db_group_prototype['name']) {
+							$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+							$group_prototype['group_prototypeid'] = $db_group_prototype['group_prototypeid'];
+
+							$matched = true;
+							break;
+						}
+					}
+
+					if ($matched) {
+						continue;
+					}
+
+					$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+					unset($group_prototype['group_prototypeid']);
+				}
+				unset($group_prototype);
+			}
+
+			if (array_key_exists('macros', $upd_host)) {
+				$db_macros = $db_hosts[$host['hostid']]['macros'];
+
+				foreach ($upd_host['macros'] as &$macro) {
+					if (array_key_exists($macro['hostmacroid'], $db_macros)) {
+						$db_macro = $db_macros[$macro['hostmacroid']];
+
+						$macro['hostmacroid'] = key(array_filter($upd_db_host['macros'],
+							static function (array $upd_db_macro) use ($db_macro): bool {
+								return $upd_db_macro['macro'] === $db_macro['macro']
+									&& $upd_db_macro['type'] == $db_macro['type']
+									&& $upd_db_macro['value'] === $db_macro['value']
+									&& $upd_db_macro['description'] === $db_macro['description'];
+							}
+						));
+					}
+					else {
+						unset($macro['hostmacroid']);
+					}
+				}
+				unset($macro);
+			}
+
+			$upd_hosts[] = $upd_host;
+		}
+
+		return $upd_hosts;
 	}
 
 	/**
-	 * @param array $host_prototype
+	 * @param array $host
 	 *
 	 * @return array
 	 */
-	private static function unsetNestedObjectIds(array $host_prototype): array {
-		if (array_key_exists('interfaces', $host_prototype)) {
-			foreach ($host_prototype['interfaces'] as &$interface) {
+	private static function unsetNestedObjectIds(array $host): array {
+		if (array_key_exists('interfaces', $host)) {
+			foreach ($host['interfaces'] as &$interface) {
 				unset($interface['interfaceid']);
 			}
 			unset($interface);
 		}
 
-		if (array_key_exists('templates', $host_prototype)) {
-			foreach ($host_prototype['templates'] as &$template) {
+		if (array_key_exists('templates', $host)) {
+			foreach ($host['templates'] as &$template) {
 				unset($template['hosttemplateid']);
 			}
 			unset($template);
 		}
 
-		if (array_key_exists('tags', $host_prototype)) {
-			foreach ($host_prototype['tags'] as &$tag) {
+		if (array_key_exists('tags', $host)) {
+			foreach ($host['tags'] as &$tag) {
 				unset($tag['hosttagid']);
 			}
 			unset($tag);
 		}
 
-		return $host_prototype;
+		return $host;
 	}
 
 	/**
-	 * @param array      $host_prototypes
-	 * @param array|null $hostids
+	 * @param array $items
+	 * @param array $hostids
+	 * @param array $lld_links
 	 *
 	 * @return array
 	 */
-	private function getChildObjectsUsingName(array $host_prototypes, ?array $hostids): array {
-		$upd_db_host_prototypes = [];
-		$parent_indexes = [];
-
-		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('i.hostid', $hostids) : '';
-
+	private function getChildObjectsUsingName(array $hosts, array $hostids, array $lld_links): array {
 		$result = DBselect(
-			'SELECT i.templateid AS parent_ruleid,i.itemid AS ruleid,hd.hostid,h.uuid,h.host,h.name,'.
-				'h.custom_interfaces,h.status,h.discover,h.templateid,'.
+			'SELECT i.templateid AS parent_ruleid,i.hostid AS parent_hostid,hh.status AS parent_status,'.
+				'i.itemid AS ruleid,'.
+				'hd.hostid,h.uuid,h.host,h.name,h.custom_interfaces,h.status,h.discover,h.flags,h.templateid,'.
 				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode').
 			' FROM items i'.
 			' INNER JOIN host_discovery hd ON i.itemid=hd.parent_itemid'.
 			' INNER JOIN hosts h ON hd.hostid=h.hostid'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
-			' WHERE '.dbConditionId('i.templateid', array_unique(array_column($host_prototypes, 'ruleid'))).
-				' AND '.dbConditionString('h.host', array_unique(array_column($host_prototypes, 'host'))).
-				$hostids_condition
+			' INNER JOIN hosts hh ON i.hostid=hh.hostid'.
+			' WHERE '.dbConditionId('i.templateid', array_column($hosts, 'ruleid', 'ruleid')).
+				' AND '.dbConditionString('h.host', array_column($hosts, 'host', 'host')).
+				' AND '.dbConditionId('i.hostid', $hostids)
 		);
 
+		$upd_db_hosts = [];
+		$host_indexes = [];
+
 		while ($row = DBfetch($result)) {
-			foreach ($host_prototypes as $i => $host_prototype) {
-				if (bccomp($row['parent_ruleid'], $host_prototype['ruleid']) == 0
-						&& $row['host'] === $host_prototype['host']) {
-					$upd_db_host_prototypes[$row['hostid']] = $row;
-					$parent_indexes[$row['hostid']] = $i;
+			foreach ($hosts as $i => $host) {
+				if (bccomp($row['parent_ruleid'], $host['ruleid']) == 0 && $row['host'] === $host['host']) {
+					if ($row['flags'] == $host['flags'] &&
+							($row['templateid'] == 0 || bccomp($row['templateid'], $host['hostid']) == 0)
+							&& bccomp($row['ruleid'], $lld_links[$host['parent_hostid']][$row['parent_hostid']]) == 0) {
+						$upd_db_hosts[$row['hostid']] = $row;
+						$host_indexes[$row['hostid']] = $i;
+					}
+					else {
+						self::showObjectMismatchError($host, $row);
+					}
 				}
 			}
 		}
 
-		if ($upd_db_host_prototypes) {
-			$upd_host_prototypes = [];
+		if ($upd_db_hosts) {
+			$upd_hosts = [];
 
-			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
-				$host_prototype = $host_prototypes[$parent_indexes[$upd_db_host_prototype['hostid']]];
+			foreach ($upd_db_hosts as $upd_db_host) {
+				$host = $hosts[$host_indexes[$upd_db_host['hostid']]];
 
-				$upd_host_prototype = [
-					'hostid' => $upd_db_host_prototype['hostid'],
-					'custom_interfaces' => $host_prototype['custom_interfaces']
+				$upd_host = [
+					'hostid' => $upd_db_host['hostid'],
+					'custom_interfaces' => $host['custom_interfaces']
 				];
 
-				if (array_key_exists('interfaces', $host_prototype)) {
-					$upd_host_prototype += ['interfaces' => []];
+				if (array_key_exists('interfaces', $host)) {
+					$upd_host += ['interfaces' => []];
 				}
 
-				$upd_host_prototype += [
+				$upd_host += [
 					'groupLinks' => [],
 					'groupPrototypes' => [],
 					'templates' => [],
@@ -2092,193 +2342,214 @@ class CHostPrototype extends CHostBase {
 					'macros' => []
 				];
 
-				$upd_host_prototypes[] = $upd_host_prototype;
+				$upd_hosts[] = $upd_host;
 			}
 
-			$this->addAffectedObjects($upd_host_prototypes, $upd_db_host_prototypes);
+			$this->addAffectedObjects($upd_hosts, $upd_db_hosts);
 		}
 
-		return $upd_db_host_prototypes;
+		return $upd_db_hosts;
 	}
 
 	/**
-	 * @param array $host_prototypes
-	 * @param array $db_host_prototypes
-	 * @param array $upd_db_host_prototypes
+	 * @param array $hosts
+	 * @param array $upd_db_hosts
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingName(array $host_prototypes, array $db_host_prototypes,
-			array $upd_db_host_prototypes): array {
-		$upd_host_prototypes = [];
+	private static function getUpdChildObjectsUsingName(array $hosts, array $upd_db_hosts): array {
+		$parent_indexes = [];
 
-		foreach ($host_prototypes as $host_prototype) {
-			if (array_key_exists($host_prototype['hostid'], $db_host_prototypes)) {
-				continue;
+		foreach ($hosts as $i => $host) {
+			$host = self::unsetNestedObjectIds($host);
+			$parent_indexes[$host['ruleid']][$host['host']] = $i;
+		}
+
+		$upd_hosts = [];
+		$nested_objects = array_fill_keys(
+			['interfaces', 'groupPrototypes', 'templates', 'tags', 'groupLinks', 'macros'], []
+		);
+
+		foreach ($upd_db_hosts as $upd_db_host) {
+			$host = $hosts[$parent_indexes[$upd_db_host['parent_ruleid']][$upd_db_host['host']]];
+
+			$upd_host = array_intersect_key($upd_db_host,
+				array_flip(['hostid', 'ruleid', 'parent_hostid', 'parent_status'])
+			);
+			$upd_host += ['templateid' => $host['hostid']] + $host + $nested_objects;
+
+			foreach ($upd_host['groupLinks'] as &$group_link) {
+				foreach ($upd_db_host['groupLinks'] as $db_group_link) {
+					if (bccomp($group_link['groupid'], $db_group_link['groupid']) == 0) {
+						$group_link['templateid'] = $group_link['group_prototypeid'];
+						$group_link['group_prototypeid'] = $db_group_link['group_prototypeid'];
+						break;
+					}
+				}
+
+				$group_link['templateid'] = $group_link['group_prototypeid'];
+				unset($group_link['group_prototypeid']);
 			}
+			unset($group_link);
 
-			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectIds($host_prototype);
+			foreach ($upd_host['groupPrototypes'] as &$group_prototype) {
+				foreach ($upd_db_host['groupPrototypes'] as $db_group_prototype) {
+					if ($group_prototype['name'] === $db_group_prototype['name']) {
+						$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+						$group_prototype['group_prototypeid'] = $db_group_prototype['group_prototypeid'];
+						break;
+					}
+				}
 
-			foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
-				if (bccomp($host_prototype['ruleid'], $upd_db_host_prototype['parent_ruleid']) != 0
-						|| $host_prototype['name'] !== $upd_db_host_prototype['name']) {
+				$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
+				unset($group_prototype['group_prototypeid']);
+			}
+			unset($group_prototype);
+
+			foreach ($upd_host['macros'] as &$macro) {
+				$hostmacroid = key(array_filter($upd_db_host['macros'],
+					static function (array $upd_db_macro) use ($macro): bool {
+						return $upd_db_macro['macro'] === $macro['macro']
+							&& $upd_db_macro['type'] == $macro['type']
+							&& $upd_db_macro['value'] === $macro['value']
+							&& (!array_key_exists('description', $macro)
+								|| $upd_db_macro['description'] === $macro['description']);
+					}
+				));
+
+				if ($hostmacroid !== null) {
+					$macro['hostmacroid'] = $hostmacroid;
+				}
+				else {
+					unset($macro['hostmacroid']);
+				}
+			}
+			unset($macro);
+
+			$upd_hosts[] = $upd_host;
+		}
+
+		return $upd_hosts;
+	}
+
+	/**
+	 * @param array $host
+	 * @param array $upd_db_host
+	 *
+	 * @throws APIException
+	 */
+	protected static function showObjectMismatchError(array $host, array $upd_db_host): void {
+		$target_is_host = in_array($upd_db_host['parent_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+
+		$hosts = DB::select('hosts', [
+			'output' => ['host', 'status'],
+			'hostids' => [$host['hostid'], $upd_db_host['hostid']],
+			'preservekeys' => true
+		]);
+
+		$error = '';
+
+		if ($upd_db_host['templateid'] == 0) {
+			switch ($upd_db_host['flags']) {
+				case ZBX_FLAG_DISCOVERY_NORMAL:
+					$error = $target_is_host
+						? _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to host "%3$s", because a host with the same host name already exists.')
+						: _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to template "%3$s", because a host with the same host name already exists.');
+					break;
+
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = $target_is_host
+						? _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to host "%3$s", because a host prototype with the same host name already exists.')
+						: _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to template "%3$s", because a host prototype host with the same host name already exists.');
+					break;
+
+				case ZBX_FLAG_DISCOVERY_CREATED:
+					$error = $target_is_host
+						? _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to host "%3$s", because a discovered host with the same host name already exists.')
+						: _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to template "%3$s", because a discovered host with the same host name already exists.');
+					break;
+			}
+		}
+
+		if ($error) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $hosts[$host['hostid']]['host'], $upd_db_host['host'],
+				$hosts[$upd_db_host['hostid']]['host']
+			));
+		}
+
+		$template = DBfetch(DBselect(
+			'SELECT h.host'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', [$upd_db_host['parent_ruleid']])
+		));
+
+		$error = $target_is_host
+			? _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to host "%3$s", because a host prototype with the same host name is already inherited from template "%4$s".')
+			: _('Cannot inherit host prototype with host name "%1$s" of template "%2$s" to template "%3$s", because a host prototype with with the same host name is already inherited from template "%4$s".');
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $hosts[$host['hostid']]['host'], $upd_db_host['host'],
+			$hosts[$upd_db_host['hostid']]['host'], $template['host']
+		));
+	}
+
+	/**
+	 * @param array $hosts
+	 * @param array $upd_db_items
+	 * @param array $tpl_links
+	 * @param array $hostids
+	 * @param array $lld_links
+	 *
+	 * @return array
+	 */
+	private static function getInsChildObjects(array $hosts, array $upd_db_hosts, array $tpl_links,
+			array $hostids, array $lld_links): array {
+
+		$ins_hosts = [];
+
+		$upd_host_names = [];
+
+		foreach ($upd_db_hosts as $upd_db_host) {
+			$upd_host_names[$upd_db_host['parent_hostid']][] = $upd_db_host['host'];
+		}
+
+		foreach ($hosts as $host) {
+			$host['uuid'] = '';
+			$host = self::unsetNestedObjectIds($host);
+
+			foreach ($tpl_links[$host['parent_hostid']] as $upd_host) {
+					if (!in_array($upd_host['hostid'], $hostids)
+						|| (array_key_exists($upd_host['hostid'], $upd_host_names)
+								&& in_array($host['host'], $upd_host_names[$upd_host['hostid']]))) {
 					continue;
 				}
 
-				$upd_host_prototype = array_intersect_key($upd_db_host_prototype, array_flip(['hostid', 'ruleid']));
-				$upd_host_prototype += ['templateid' => $host_prototype['hostid']];
-				$upd_host_prototype += $host_prototype;
+				$ins_host = [
+					'ruleid' => $lld_links[$host['parent_hostid']][$upd_host['hostid']],
+					'templateid' => $host['hostid'],
+					'parent_status' => $upd_host['status'],
+					'parent_hostid' => $upd_host['hostid']
+				] + array_diff_key($host, array_flip(['hostid']));
 
-				if (array_key_exists('interfaces', $upd_db_host_prototype)) {
-					$upd_host_prototype += $upd_db_host_prototype['interfaces'] ? ['interfaces' => []] : [];
-				}
-
-				$upd_host_prototype += $upd_db_host_prototype['groupPrototypes'] ? ['groupPrototypes' => []] : [];
-				$upd_host_prototype += $upd_db_host_prototype['templates'] ? ['templates' => []] : [];
-				$upd_host_prototype += $upd_db_host_prototype['tags'] ? ['tags' => []] : [];
-
-				if (array_key_exists('groupLinks', $upd_host_prototype)) {
-					foreach ($upd_host_prototype['groupLinks'] as &$group_link) {
-						foreach ($upd_db_host_prototype['groupLinks'] as $db_group_link) {
-							if (bccomp($group_link['groupid'], $db_group_link['groupid']) == 0) {
-								$group_link['templateid'] = $group_link['group_prototypeid'];
-								$group_link['group_prototypeid'] = $db_group_link['group_prototypeid'];
-								break 2;
-							}
-						}
-
-						$group_link['templateid'] = $group_link['group_prototypeid'];
-						unset($group_link['group_prototypeid']);
-					}
-					unset($group_link);
-				}
-
-				if (array_key_exists('groupPrototypes', $upd_host_prototype)) {
-					foreach ($upd_host_prototype['groupPrototypes'] as &$group_prototype) {
-						foreach ($upd_db_host_prototype['groupPrototypes'] as $db_group_prototype) {
-							if ($group_prototype['name'] === $db_group_prototype['name']) {
-								$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
-								$group_prototype['group_prototypeid'] = $db_group_prototype['group_prototypeid'];
-								break 2;
-							}
-						}
-
-						$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
-						unset($group_prototype['group_prototypeid']);
-					}
-					unset($group_prototype);
-				}
-
-				if (array_key_exists('macros', $upd_host_prototype)) {
-					foreach ($upd_host_prototype['macros'] as &$macro) {
-						$hostmacroid = key(array_filter($upd_db_host_prototype['macros'],
-							static function (array $upd_db_macro) use ($macro): bool {
-								return $upd_db_macro['macro'] === $macro['macro']
-									&& $upd_db_macro['type'] == $macro['type']
-									&& $upd_db_macro['value'] === $macro['value']
-									&& (!array_key_exists('description', $macro)
-										|| $upd_db_macro['description'] === $macro['description']);
-							}
-						));
-
-						if ($hostmacroid !== null) {
-							$macro['hostmacroid'] = $hostmacroid;
-						}
-						else {
-							unset($macro['hostmacroid']);
-						}
-					}
-					unset($macro);
-				}
-				elseif ($upd_db_host_prototype['macros']) {
-					$upd_host_prototype += ['macros' => []];
-				}
-
-				$upd_host_prototypes[] = $upd_host_prototype;
-			}
-		}
-
-		return $upd_host_prototypes;
-	}
-
-	/**
-	 * @param array      $host_prototypes
-	 * @param array      $upd_db_host_prototypes
-	 * @param array|null $hostids
-	 *
-	 * @return array
-	 */
-	private static function getInsChildObjects(array $host_prototypes, array $upd_db_host_prototypes,
-			?array $hostids): array {
-		$ins_host_prototypes = [];
-		$rule_links =[];
-
-		$hostids_condition = ($hostids !== null) ? ['hostid' => $hostids] : [];
-
-		$options = [
-			'output' => ['itemid', 'templateid'],
-			'filter' => [
-				'templateid' => array_unique(array_column($host_prototypes, 'ruleid'))
-			] + $hostids_condition
-		];
-		$result = DBselect(DB::makeSql('items', $options));
-
-		while ($row = DBfetch($result)) {
-			$rule_links[$row['templateid']][] = $row['itemid'];
-		}
-
-		if (!$rule_links) {
-			return $ins_host_prototypes;
-		}
-
-		foreach ($host_prototypes as $host_prototype) {
-			if (!array_key_exists($host_prototype['ruleid'], $rule_links)) {
-				continue;
-			}
-
-			$host_prototype['uuid'] = '';
-			$host_prototype = self::unsetNestedObjectIds($host_prototype);
-
-			if (array_key_exists('macros', $host_prototype)) {
-				foreach ($host_prototype['macros'] as &$macro) {
-					unset($macro['hostmacroid']);
-				}
-				unset($macro);
-			}
-
-			foreach ($rule_links[$host_prototype['ruleid']] as $ruleid) {
-				foreach ($upd_db_host_prototypes as $upd_db_host_prototype) {
-					if (bccomp($ruleid, $upd_db_host_prototype['ruleid']) == 0
-							&& $host_prototype['host'] == $upd_db_host_prototype['host']) {
-						continue 2;
-					}
-				}
-
-				$ins_host_prototype = [
-					'ruleid' => $ruleid,
-					'templateid' => $host_prototype['hostid']
-				] + array_diff_key($host_prototype, array_flip(['hostid']));
-
-				foreach ($ins_host_prototype['groupLinks'] as &$group_link) {
+				foreach ($ins_host['groupLinks'] as &$group_link) {
 					$group_link['templateid'] = $group_link['group_prototypeid'];
 					unset($group_link['group_prototypeid']);
 				}
 				unset($group_link);
 
-				if (array_key_exists('groupPrototypes', $ins_host_prototype)) {
-					foreach ($ins_host_prototype['groupPrototypes'] as &$group_prototype) {
+				if (array_key_exists('groupPrototypes', $ins_host)) {
+					foreach ($ins_host['groupPrototypes'] as &$group_prototype) {
 						$group_prototype['templateid'] = $group_prototype['group_prototypeid'];
 						unset($group_prototype['group_prototypeid']);
 					}
 					unset($group_prototype);
 				}
 
-				$ins_host_prototypes[] = $ins_host_prototype;
+				$ins_hosts[] = $ins_host;
 			}
 		}
 
-		return $ins_host_prototypes;
+		return $ins_hosts;
 	}
 
 	/**
