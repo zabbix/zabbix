@@ -1781,6 +1781,82 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * @param array      $ruleids
+	 * @param array|null $hostids
+	 */
+	public function unlinkTemplateObjects(array $ruleids, array $hostids = null): void {
+		$hostids_condition = $hostids ? ' AND '.dbConditionId('i.hostid', $hostids) : '';
+
+		$result = DBselect(
+			'SELECT i.hostid AS parent_hostid,hh.status AS parent_status,hd.hostid,'.
+				'h.host,h.custom_interfaces,h.uuid,h.templateid'.
+			' FROM items i'.
+			' INNER JOIN host_discovery hd ON i.itemid=hd.parent_itemid'.
+			' INNER JOIN hosts h ON hd.hostid=h.hostid'.
+			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
+			' INNER JOIN hosts hh ON i.hostid=hh.hostid'.
+			' WHERE '.dbConditionId('i.itemid', $ruleids).
+				$hostids_condition
+		);
+
+		$hosts = [];
+		$db_hosts = [];
+		$i = 0;
+		$tpl_hostids = [];
+
+		$nested_objects = [
+			'groupLinks' => [],
+			'groupPrototypes' => []
+		];
+
+		while ($row = DBfetch($result)) {
+			$host = ['templateid' => 0]
+				+ array_intersect_key($row,	array_flip(['hostid', 'host', 'uuid', 'custom_interfaces']))
+				+ $nested_objects;
+
+			if ($row['parent_status'] == HOST_STATUS_TEMPLATE) {
+				$host['uuid'] = generateUuidV4();
+				$host += array_intersect_key($row, array_flip(['parent_hostid', 'parent_status']));
+
+				$tpl_hostids[$i] = $row['hostid'];
+			}
+
+			$hosts[$i++] = $host;
+			$db_hosts[$host['hostid']] = $row;
+		}
+
+		if ($hosts) {
+			$this->addAffectedObjects($hosts, $db_hosts);
+
+			foreach ($hosts as &$host) {
+				$host = array_diff_key($host, $nested_objects)
+					+ array_intersect_key($db_hosts[$host['hostid']], $nested_objects);
+
+				if (array_key_exists('groupPrototypes', $host)) {
+					foreach ($host['groupPrototypes'] as $i => $foo) {
+						$host['groupPrototypes'][$i]['templateid'] = 0;
+					}
+				}
+
+				if (array_key_exists('groupLinks', $host)) {
+					foreach ($host['groupLinks'] as $i => $foo) {
+						$host['groupLinks'][$i]['templateid'] = 0;
+					}
+				}
+			}
+
+			if ($tpl_hostids) {
+				$_hosts = array_intersect_key($hosts, $tpl_hostids);
+				$_db_hosts = array_intersect_key($db_hosts, array_flip($tpl_hostids));
+
+				$this->inherit($_hosts, $_db_hosts);
+			}
+
+			$this->updateForce($hosts, $db_hosts);
+		}
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected function inherit(array $hosts, array $db_hosts = [], array $hostids = null): void {
@@ -2558,39 +2634,39 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	public function delete(array $hostids): array {
-		$this->validateDelete($hostids, $db_host_prototypes);
+		$this->validateDelete($hostids, $db_hosts);
 
-		self::deleteForce($db_host_prototypes);
+		self::deleteForce($db_hosts);
 
 		return ['hostids' => $hostids];
 	}
 
 	/**
 	 * @param array      $hostids
-	 * @param array|null $db_host_prototypes
+	 * @param array|null $db_hosts
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$hostids, array &$db_host_prototypes = null): void {
+	private function validateDelete(array &$hostids, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_host_prototypes = $this->get([
+		$db_hosts = $this->get([
 			'output' => ['hostid', 'host', 'templateid'],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($db_host_prototypes) != count($hostids)) {
+		if (count($db_hosts) != count($hostids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		foreach ($hostids as $i => $hostid) {
-			if ($db_host_prototypes[$hostid]['templateid'] != 0) {
+			if ($db_hosts[$hostid]['templateid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 					_('cannot delete templated host prototype')
 				));
@@ -2599,12 +2675,14 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * @param array $db_host_prototypes
+	 * @param array $db_hosts
 	 */
-	public static function deleteForce(array $db_host_prototypes): void {
-		$hostids = array_keys($db_host_prototypes);
+	public static function deleteForce(array $db_hosts): void {
+		self::addInheritedHostPrototypes($db_hosts);
 
-		// Lock host prototypes before the deletion to prevent server from adding new LLD hosts.
+		$hostids = array_keys($db_hosts);
+
+		// Lock host prototypes before deletion to prevent server from adding new LLD hosts.
 		DBselect(
 			'SELECT NULL'.
 			' FROM hosts h'.
@@ -2612,34 +2690,7 @@ class CHostPrototype extends CHostBase {
 			' FOR UPDATE'
 		);
 
-		$_db_host_prototypes = $db_host_prototypes;
-
-		do {
-			// Lock also inherited host prototypes before the deletion to prevent server from adding new LLD hosts.
-			$_db_host_prototypes = DBfetchArrayAssoc(DBselect(
-				'SELECT hostid,host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionId('h.templateid', array_keys($_db_host_prototypes)).
-				' FOR UPDATE'
-			), 'hostid');
-
-			$db_host_prototypes += $_db_host_prototypes;
-		}
-		while ($_db_host_prototypes);
-
-		$hostids = array_keys($db_host_prototypes);
-
-		$discovered_hosts = DBfetchArrayAssoc(DBselect(
-			'SELECT hd.hostid,h.host'.
-			' FROM host_discovery hd,hosts h'.
-			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.parent_hostid', $hostids)
-		), 'hostid');
-
-		CHost::validateDeleteForce($discovered_hosts);
-		CHost::deleteForce($discovered_hosts);
-
-		// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
+		// Lock group prototypes to prevent server from adding new LLD elements.
 		$db_group_prototypes = DBfetchArray(DBselect(
 			'SELECT gp.group_prototypeid,gp.name'.
 			' FROM group_prototype gp'.
@@ -2659,8 +2710,18 @@ class CHostPrototype extends CHostBase {
 			self::deleteDiscoveredGroups($group_prototypeids);
 		}
 
+		$discovered_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids)
+		), 'hostid');
+
+		CHost::validateDeleteForce($discovered_hosts);
+		CHost::deleteForce($discovered_hosts);
+
 		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('group_prototype', ['group_prototypeid' => array_column($db_host_prototypes, 'group_prototypeid')]);
+		DB::delete('group_prototype', ['hostid' => $hostids]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
@@ -2668,7 +2729,25 @@ class CHostPrototype extends CHostBase {
 
 		DB::delete('hosts', ['hostid' => $hostids]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_hosts);
+	}
+
+	/**
+	 * @param array $db_hosts
+	 */
+	private static function addInheritedHostPrototypes(array &$db_hosts): void {
+		$_db_hosts = $db_hosts;
+
+		do {
+			$options = [
+				'output' => ['hostid', 'host'],
+				'filter' => ['templateid' => array_keys($_db_hosts)],
+				'preservekeys' => true
+			];
+			$_db_hosts = DB::select('hosts', $options);
+
+			$db_hosts += $_db_hosts;
+		} while ($_db_hosts);
 	}
 
 	/**

@@ -1364,14 +1364,20 @@ abstract class CHostBase extends CApiService {
 		return $hostsLinkageInserts;
 	}
 
-	protected function unlink($templateids, $targetids = null) {
-		$cond = ['templateid' => $templateids];
-		if (!is_null($targetids)) {
-			$cond['hostid'] = $targetids;
-		}
-		DB::delete('hosts_templates', $cond);
+	/**
+	 * @param array      $templateids
+	 * @param array|null $targetids
+	 */
+	protected function unlink(array $templateids, array $targetids = null): void {
+		$options = ['templateid' => $templateids];
 
-		if (!is_null($targetids)) {
+		if ($targetids !== null) {
+			$options['hostid'] = $targetids;
+		}
+
+		DB::delete('hosts_templates', $options);
+
+		if ($targetids !== null) {
 			$hosts = API::Host()->get([
 				'hostids' => $targetids,
 				'output' => ['hostid', 'host'],
@@ -1386,15 +1392,15 @@ abstract class CHostBase extends CApiService {
 			]);
 		}
 
-		if (!empty($hosts)) {
+		if ($hosts) {
 			$templates = API::Template()->get([
 				'templateids' => $templateids,
 				'output' => ['hostid', 'host'],
 				'nopermissions' => true
 			]);
 
-			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
-			$templates = implode(', ', zbx_objectValues($templates, 'host'));
+			$hosts = implode(', ', array_column($hosts, 'host'));
+			$templates = implode(', ', array_column($templates, 'host'));
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}

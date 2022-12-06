@@ -721,38 +721,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		// host prototypes
 		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
-			}
+			API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]), $hostids);
 		}
 
 		// http tests
@@ -1084,7 +1053,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param null|array $targetids		the IDs of the hosts to unlink the templates from
 	 * @param bool       $clear			delete all of the inherited objects from the hosts
 	 */
-	protected function unlink($templateids, $targetids = null, $clear = false) {
+	protected function unlink(array $templateids, $targetids = null, $clear = false): void {
 		$flags = ($clear)
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
 			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
@@ -1383,37 +1352,10 @@ abstract class CHostGeneral extends CHostBase {
 		// host prototypes
 		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
 		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
+			if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
+				API::HostPrototype()->unlinkTemplateObjects(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]),
+					$targetids
+				);
 			}
 		}
 
