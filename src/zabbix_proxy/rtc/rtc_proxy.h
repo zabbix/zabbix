@@ -23,5 +23,5 @@
 #include "zbxrtc.h"
 
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
-int	rtc_process(const char *option, char **error);
+int	rtc_process(const char *option, int config_timeout, char **error);
 #endif

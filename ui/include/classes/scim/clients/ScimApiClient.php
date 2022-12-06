@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,15 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CYBERARK_H
-#define ZABBIX_CYBERARK_H
 
-#include "../zbxkvs/kvs.h"
+namespace SCIM\clients;
 
-#define ZBX_CYBERARK_NAME		"CyberArk"
-#define ZBX_CYBERARK_DBUSER_KEY		"UserName"
-#define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
+use CLocalApiClient;
+use Exception;
 
-int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
-#endif
+class ScimApiClient extends CLocalApiClient {
+	/**
+	 * Returns true if the given API is valid.
+	 *
+	 * @param string $api
+	 *
+	 * @return bool
+	 */
+	protected function isValidApi($api) {
+		if (!$this->serviceFactory->hasObject($api)) {
+			throw new Exception('The requested endpoint is not supported.', 501);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns true if calling the given method requires a valid authentication token.
+	 *
+	 * @param $api
+	 * @param $method
+	 *
+	 * @return bool
+	 */
+	protected function requiresAuthentication($api, $method) {
+		return !($api === 'serviceproviderconfig' && $method === 'get');
+	}
+}
