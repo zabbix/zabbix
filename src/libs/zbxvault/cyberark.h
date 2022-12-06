@@ -17,16 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_HASHICORP_H
-#define ZABBIX_HASHICORP_H
+#ifndef ZABBIX_CYBERARK_H
+#define ZABBIX_CYBERARK_H
 
-#include "zbxalgo.h"
+#include "zbxkvs.h"
 
-#define ZBX_HASHICORP_NAME		"HashiCorp"
-#define ZBX_HASHICORP_DBUSER_KEY	"username"
-#define ZBX_HASHICORP_DBPASSWORD_KEY	"password"
-
-int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
-
+int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 #endif

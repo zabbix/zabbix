@@ -396,8 +396,9 @@ out:
  *                                                                            *
  * Purpose: processes preprocessing test request                              *
  *                                                                            *
- * Parameters: sock - [IN] the request source socket (frontend)               *
- *             jp   - [IN] the request                                        *
+ * Parameters: sock           - [IN] the request source socket (frontend)     *
+ *             jp             - [IN] the request                              *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  * Return value: SUCCEED - the request was processed successfully             *
  *               FAIL    - otherwise                                          *
@@ -408,7 +409,7 @@ out:
  *           is counted as successful test and will return success response.  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char		*error = NULL;
 	int		ret;
@@ -418,11 +419,11 @@ int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	if (SUCCEED == (ret = trapper_preproc_test_run(jp, &json, &error)))
 	{
-		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
+		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_timeout);
 	}
 	else
 	{
-		zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, error, config_timeout);
 		zbx_free(error);
 	}
 
