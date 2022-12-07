@@ -229,6 +229,9 @@ $translate_strings = [
 		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
 	],
+	'inputsecret.js' => [
+		'value' => _('value')
+	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
 		'S_JANUARY' => _('January'),
@@ -323,7 +326,8 @@ $translate_strings = [
 	],
 	'hostmacrosmanager.js' => [
 		'Change' => _x('Change', 'verb'),
-		'Remove' => _('Remove')
+		'Remove' => _('Remove'),
+		'value' => _('value')
 	],
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
