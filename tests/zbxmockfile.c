@@ -37,7 +37,7 @@ void	*mock_streams[ZBX_MOCK_MAX_FILES];
 
 static zbx_mock_handle_t	fragments;
 
-static FILE *(*fopen_mock_callback)(const char *, const char *) = NULL;
+static FILE	*(*fopen_mock_callback)(const char *, const char *) = NULL;
 
 struct zbx_mock_IO_FILE
 {

@@ -27,8 +27,8 @@
 
 FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 {
-	const char *str;
-	size_t f_size;
+	const char	*str;
+	size_t		f_size;
 
 	if (0 == strcmp(__filename, "/proc/version"))
 		str = zbx_mock_get_parameter_string("in.proc_version");
@@ -46,11 +46,11 @@ FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 	return fmemopen((void *)str, f_size * sizeof(char), "r");
 }
 
-int __wrap_uname(struct utsname *buf)
+int	__wrap_uname(struct utsname *buf)
 {
-	const char *str;
-	const char *release, *machine;
-	int ret;
+	const char	*str;
+	const char	*release, *machine;
+	int		ret;
 
 	ret = (int)zbx_mock_get_parameter_uint64("in.uname.return");
 
@@ -77,11 +77,11 @@ int __wrap_uname(struct utsname *buf)
 
 void	zbx_mock_test_entry(void **state)
 {
-	AGENT_REQUEST		request;
-	AGENT_RESULT		result;
-	const char		*key, *expected_value, *actual_value, *test, *f_name;
-	int			expected_result, actual_result;
-	int(*f_test)(AGENT_REQUEST *, AGENT_RESULT *) = NULL;
+	AGENT_REQUEST	request;
+	AGENT_RESULT	result;
+	const char	*key, *expected_value, *actual_value, *test, *f_name;
+	int		expected_result, actual_result;
+	int		(*f_test)(AGENT_REQUEST *, AGENT_RESULT *) = NULL;
 
 	ZBX_UNUSED(state);
 	zbx_set_fopen_mock_callback(&custom_fopen_mock);
