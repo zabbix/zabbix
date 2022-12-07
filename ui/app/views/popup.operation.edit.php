@@ -44,7 +44,7 @@ if (count($data['operation_types']) > 1) {
 	$select_operationtype = (new CFormField(
 		(new CSelect('operation[operationtype]'))
 			->setFocusableElementId('operationtype')
-			->setAttribute('width', ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
 			->setValue($operationtype_value ?? 0)
 			->setId('operation-type-select')
@@ -65,8 +65,7 @@ $form_grid->addItem([
 // Operation escalation steps row.
 if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL
 		|| $data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
-	$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
-		->setAttribute('value', $operation['esc_step_from'] ?? 1)
+	$step_from = (new CNumericBox('operation[esc_step_from]', $operation['esc_step_from'] ?? 1, 5))
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		->setId('operation_esc_step_from');
 	$step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
@@ -214,7 +213,7 @@ $form_grid->addItem([
 	(new CLabel(_('Message'), 'operation_opmessage_message'))->setId('operation-message-label'),
 	(new CTextArea('operation[opmessage][message]'))
 		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
-		->setAttribute('maxlength', (DB::getFieldLength('opmessage', 'message')))
+		->setMaxlength(DB::getFieldLength('opmessage', 'message'))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation_opmessage_message')
 ]);
