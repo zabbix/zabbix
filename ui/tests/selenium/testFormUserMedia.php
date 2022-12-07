@@ -304,7 +304,7 @@ class testFormUserMedia extends CWebTest {
 					'error_message' => 'Incorrect value for field "period": a time period is expected'
 				]
 			],
-			// Multiple When active periods separated by coma.
+			// Multiple When active periods separated by comma.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -559,8 +559,7 @@ class testFormUserMedia extends CWebTest {
 	private function getUserMediaTab($user) {
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $user)->waitUntilVisible()->one()->click();
-		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
-		$user_form->selectTab('Media');
+		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one()->selectTab('Media');
 
 		return $user_form;
 	}

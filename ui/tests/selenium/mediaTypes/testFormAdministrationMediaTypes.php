@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
@@ -98,11 +99,22 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->assertEquals('One', $concurrent_sessions->getSelected());
 
 		// Check the maxsessions input element.
+		$session_settings = [
+			'Custom' => true,
+			'One' => false,
+			'Unlimited' => false
+		];
 		$maxsessions = $concurrent_sessions->query('id:maxsessions')->one();
-		$this->assertFalse($maxsessions->isVisible());
-		$concurrent_sessions->fill('Custom');
-		$this->assertTrue($maxsessions->isVisible());
-		$this->assertEquals(0, $concurrent_sessions->query('id:maxsessions')->one()->getValue());
+
+		foreach ($session_settings as $setting => $visible) {
+			$concurrent_sessions->fill($setting);
+			$this->assertTrue($maxsessions->isVisible($visible));
+
+			if ($visible) {
+				$this->assertEquals(0, $maxsessions->getValue());
+				$this->assertEquals(3, $maxsessions->getAttribute('maxlength'));
+			}
+		}
 
 		// Check that Add and Cancel buttons are present in the form and that they are clickable.
 		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
@@ -180,8 +192,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	* @dataProvider getLayoutMediaTypes
-	*/
+	 * @dataProvider getLayoutMediaTypes
+	 */
 	public function testFormAdministrationMediaTypes_MediatypeLayout($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
@@ -195,6 +207,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		switch ($data['type']) {
 			case 'Email':
 				$connection_security = $form->getField('Connection security');
+
 				// Check that SSL verify peer, SSL verify host, Username and Password fields are not visible.
 				$this->assertEquals(0, $this->query('id', ['smtp_verity_peer', 'smtp_verify_host', 'smtp_usename',
 					'smtp_password'])->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->count()
@@ -288,6 +301,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals('65535 characters remaining', $char_count->getText());
 				$script_input->fill('12345');
 				$this->assertEquals('65530 characters remaining', $char_count->getText());
+
 				// Check dialog buttons.
 				$this->assertEquals(2, $script_dialog->query('button', ['Apply', 'Cancel'])->all()
 						->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
@@ -773,7 +787,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				]
 			],
 			// Successfully create media type with different options
-
 			[
 				[
 					'mediatype_tab' => [
@@ -863,10 +876,69 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	* @dataProvider getMediaTypeData
-	*/
+	 * @dataProvider getMediaTypeData
+	 */
 	public function testFormAdministrationMediaTypes_Create($data) {
 		$this->checkAction($data);
+	}
+
+	public function getGeneralMediaTypeData() {
+		return [
+			[
+				[
+					'media_type' => 'Email (HTML)'
+				]
+			],
+			[
+				[
+					'media_type' => 'Test script'
+				]
+			],
+			[
+				[
+					'media_type' => 'SMS'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getGeneralMediaTypeData
+	 */
+	public function testFormAdministrationMediaTypes_SimpleUpdate($data) {
+		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
+
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
+		$this->query('id:media_type_form')->asForm()->waitUntilVisible()->one()->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Media type updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+	}
+
+	/**
+	 * @dataProvider getGeneralMediaTypeData
+	 */
+	public function testFormAdministrationMediaTypes_Clone($data) {
+		$clone_sql = 'SELECT type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd, '.
+				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, exec_params, '.
+				'maxsessions, maxattempts, attempt_interval, content_type, script, timeout, process_tags, show_event_menu, '.
+				'event_menu_url, event_menu_name, description FROM media_type WHERE name=';
+		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr($data['media_type']));
+
+		// Clone the media type.
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', $data['media_type'])->WaitUntilClickable()->one()->click();
+		$this->query('button:Clone')->one()->click();
+		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one();
+		$clone_name = $data['media_type'].' clone';
+		$form->fill(['Name' => $clone_name]);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Media type added');
+		$this->assertEquals($old_hash, CDBHelper::getHash($clone_sql.zbx_dbstr($clone_name)));
 	}
 
 	/**
@@ -890,39 +962,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	public function testFormAdministrationMediaTypes_CancelDelete() {
 		$this->checkActionCancellation('delete');
-	}
-
-	public function testFormAdministrationMediaTypes_SimpleUpdate() {
-		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
-
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->query('link:Email (HTML)')->one()->WaitUntilClickable()->click();
-		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one()->submit();
-		$this->page->waitUntilReady();
-
-		$this->assertMessage(TEST_GOOD, 'Media type updated');
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
-	}
-
-	public function testFormAdministrationMediaTypes_Clone() {
-		$clone_sql = 'SELECT type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd, '.
-				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, exec_params, '.
-				'maxsessions, maxattempts, attempt_interval, content_type, script, timeout, process_tags, show_event_menu, '.
-				'event_menu_url, event_menu_name, description FROM media_type WHERE name=';
-		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr(self::$delete_mediatype));
-
-		// Clone the media type.
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->query('link', self::$delete_mediatype)->WaitUntilClickable()->one()->click();
-		$this->query('button:Clone')->one()->click();
-		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one();
-		$clone_name = self::$delete_mediatype.' clone';
-		$form->fill(['Name' => $clone_name]);
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		$this->assertMessage(TEST_GOOD, 'Media type added');
-		$this->assertEquals($old_hash, CDBHelper::getHash($clone_sql.zbx_dbstr($clone_name)));
 	}
 
 	public function testFormAdministrationMediaTypes_Delete() {
@@ -1029,8 +1068,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			// Add prefix to mediatype new name for update scenarios to avoid issues with duplicate names.
 			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 				$data['mediatype_tab']['Name'] = (array_key_exists('trim', $data))
-						? '   Update: '.ltrim($data['mediatype_tab']['Name'])
-						: 'Update: '.$data['mediatype_tab']['Name'];
+					? '   Update: '.ltrim($data['mediatype_tab']['Name'])
+					: 'Update: '.$data['mediatype_tab']['Name'];
 			}
 		}
 
