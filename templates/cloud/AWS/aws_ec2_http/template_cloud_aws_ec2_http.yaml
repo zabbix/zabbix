@@ -534,8 +534,8 @@ zabbix_export:
                params: {},
             
                setParams: function (params) {
-                   ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
-                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                   ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
+                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                            throw 'Required param is not set: "' + field + '".';
                        }
                    });
@@ -595,7 +595,8 @@ zabbix_export:
             
                    var request = new HttpRequest(),
                        url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                   request.setProxy(AwsEC2.params.proxy);
                    request.addHeader('x-amz-date: ' + amzdate);
                    request.addHeader('Accept: application/json');
                    request.addHeader('Content-Type: application/json');
@@ -743,6 +744,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -762,8 +766,8 @@ zabbix_export:
                   request_period: 600,
             
                   setParams: function (params) {
-                      ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
-                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                      ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
+                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                               throw 'Required param is not set: "' + field + '".';
                           }
                       });
@@ -905,7 +909,8 @@ zabbix_export:
             
                       var request = new HttpRequest(),
                           url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                      request.setProxy(AwsEC2.params.proxy);
                       request.addHeader('x-amz-date: ' + amzdate);
                       request.addHeader('Accept: application/json');
                       request.addHeader('Content-Type: application/json');
@@ -992,6 +997,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1011,8 +1019,8 @@ zabbix_export:
                 request_period: 600,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -1072,7 +1080,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    request.setProxy(AwsEbs.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -1170,6 +1179,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -2202,8 +2214,8 @@ zabbix_export:
                     request_period: 600,
                 
                     setParams: function (params) {
-                        ['access_key', 'secret_key', 'region', 'volume_id'].forEach(function (field) {
-                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                        ['access_key', 'secret_key', 'region', 'volume_id', 'proxy'].forEach(function (field) {
+                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                                 throw 'Required param is not set: "' + field + '".';
                             }
                         });
@@ -2333,7 +2345,8 @@ zabbix_export:
                 
                         var request = new HttpRequest(),
                             url = 'https://' + host + canonical_uri + '?' + params;
-                
+
+                        request.setProxy(AwsEbs.params.proxy);
                         request.addHeader('x-amz-date: ' + amzdate);
                         request.addHeader('Accept: application/json');
                         request.addHeader('Content-Type: application/json');
@@ -2420,6 +2433,9 @@ zabbix_export:
                 -
                   name: volume_id
                   value: '{#VOLUME_ID}'
+                -
+                  name: proxy
+                  value: '{$AWS.PROXY}'
               tags:
                 -
                   tag: component
@@ -2510,6 +2526,9 @@ zabbix_export:
           tag: target
           value: ec2
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'

@@ -320,8 +320,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'bucket_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'bucket_name', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -381,7 +381,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    request.setProxy(AwsS3.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -499,6 +500,9 @@ zabbix_export:
             -
               name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -518,8 +522,8 @@ zabbix_export:
                 request_period: 180,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'bucket_name', 'filter_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'bucket_name', 'filter_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -639,7 +643,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri;
-            
+
+                    request.setProxy(AwsS3.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData')
                     request.addHeader('Accept: application/json');
@@ -723,6 +728,9 @@ zabbix_export:
             -
               name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1207,6 +1215,9 @@ zabbix_export:
           tag: target
           value: s3
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
