@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup profiles, hosts, items, graphs
+ * @backup profiles, hosts
  *
  * @onBefore prepareGraphsData
  */
