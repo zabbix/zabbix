@@ -438,6 +438,8 @@ static int	snmp_prepend_oid_dot(const char *oid_in, zbx_snmp_value_pair_t *p)
 		return 1;
 	}
 
+	p->oid = (char *)oid_in;
+
 	return 0;
 }
 
@@ -605,7 +607,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
 
 	zbx_hashset_create_ext(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
-			snmp_walk_json_output_obj_compare_func, snmp_walk_json_output_obj_clear,
+			snmp_walk_json_output_obj_compare_func, (zbx_clean_func_t)snmp_walk_json_output_obj_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (FAIL == preproc_snmp_walk_to_json_params(params, &parsed_params))
