@@ -296,7 +296,7 @@ reparse_type:
 			{
 				while ('\n' != *data && '\0' != *data)
 					data++;
-				
+
 				goto eol;
 			}
 
