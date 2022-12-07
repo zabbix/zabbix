@@ -347,6 +347,8 @@ db data:
   history_str (3): []
   history_str (4): []
   history_str (5): []
+  history_str (6): []
+  history_str (7): []
 ---
 test case: Test time based request on empty data
 in:
