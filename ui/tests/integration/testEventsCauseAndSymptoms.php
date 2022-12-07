@@ -32,13 +32,16 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	private static $hostid;
 	private static $trigger_ids = [];
 	private static $event_ids = [];
-	private static $scriptid;
+	private static $cause_events_test_scriptid;
+	private static $symptom_events_test_scriptid;
 
-	const HOST_NAME = 'host_cause_and_symptoms';
+	const HOST_NAME = 'host cause and symptoms';
 	const TRAPPER_ITEM_NAME_PREFIX = 'Trapper item ';
 	const TRAPPER_ITEM_KEY_PREFIX = 'trap';
-	const MACRO_TEMPLATE = 'Macros to test: {EVENT.NAME}|{EVENT.ID}|{EVENT.CAUSE.NAME}|{EVENT.CAUSE.ID}|{EVENT.CAUSE.SOURCE}|{EVENT.CAUSE.OBJECT}|{EVENT.CAUSE.VALUE}';
-	const COMMAND_NAME = 'script_cause_and_symptoms';
+	const EVENT_CAUSE_MACRO_TEMPLATE = 'Macros to test: {EVENT.NAME}|{EVENT.ID}|{EVENT.CAUSE.NAME}|{EVENT.CAUSE.ID}|{EVENT.CAUSE.SOURCE}|{EVENT.CAUSE.OBJECT}|{EVENT.CAUSE.VALUE}';
+	const EVENT_SYMPTOMS_MACRO_TEMPLATE = '{EVENT.SYMPTOMS}';
+	const TEST_CAUSE_EVENTS_SCRIPT_NAME = 'script test cause events';
+	const TEST_SYMPTOM_EVENTS_SCRIPT_NAME = 'script test symptom events';
 	const EVENT_COUNT = 5;
 	const EVENT_START = 1;
 
@@ -161,16 +164,55 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	private function checkEventCauseMacros($expected_events) {
 		foreach ($expected_events as $expected_event) {
 			$eventid = $this->eventNumToId($expected_event['event_num']);
-			$expected_value = $this->expandMacros(self::MACRO_TEMPLATE, $expected_event['event_num'],
+			$expected_value = $this->expandMacros(self::EVENT_CAUSE_MACRO_TEMPLATE, $expected_event['event_num'],
 					$expected_event['cause_event_num']);
 
 			$response = $this->callUntilDataIsPresent('script.execute', [
-				'scriptid' => self::$scriptid,
+				'scriptid' => self::$cause_events_test_scriptid,
 				'eventid' => $eventid
 			], 10, 1);
 			$this->assertArrayHasKey('result', $response);
 			$this->assertArrayHasKey('value', $response['result']);
 			$this->assertEquals($expected_value, $response['result']['value']);
+		}
+	}
+
+	private function checkEventSymptomMacros($expected_events) {
+		$expected_symptoms = [];
+
+		foreach ($expected_events as $expected_event) {
+			$cause_event_num = $expected_event['cause_event_num'];
+			if (0 != $cause_event_num) {
+				if (!array_key_exists($cause_event_num, $expected_symptoms))
+					$expected_symptoms[$cause_event_num] = [];
+
+				$symptom_event_num = $expected_event['event_num'];
+				$expected_symptoms[$cause_event_num][] = $symptom_event_num;
+			}
+
+
+		}
+
+		foreach ($expected_symptoms as $cause_event_num => $symptom_events_nums) {
+			$response = $this->callUntilDataIsPresent('script.execute', [
+				'scriptid' => self::$symptom_events_test_scriptid,
+				'eventid' => $this->eventNumToId($cause_event_num)
+			], 10, 1);
+			$this->assertArrayHasKey('result', $response);
+			$this->assertArrayHasKey('value', $response['result']);
+
+			$lines = explode("\n", $response['result']['value']);
+			$this->assertCount(count($symptom_events_nums), $lines);
+
+			for ($i = 0; $i < count($symptom_events_nums); $i++) {
+				$symptom_num = $symptom_events_nums[$i];
+				$needle = sprintf("Host: %s Problem name: %s Severity: Not classified Age:",
+						self::HOST_NAME, 'Trigger trap '.(string)$symptom_num);
+				$cmp_result = substr_compare($lines[$i], $needle, 0, strlen($needle));
+				$error_msg = sprintf("Line is expected to begin with:\n'%s'\nfound:\n'%s'", $needle,
+						$lines[$i]);
+				$this->assertEquals(0, $cmp_result, $error_msg);
+			}
 		}
 	}
 
@@ -246,16 +288,27 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			self::$trigger_ids[$i] = $trigger_id;
 		}
 
-		// create a script for testing macros
+		// create a script for testing cause events
 		$response = $this->call('script.create', [
-			'name' => self::COMMAND_NAME,
-			'command' => sprintf('echo -n "%s"', self::MACRO_TEMPLATE),
+			'name' => self::TEST_CAUSE_EVENTS_SCRIPT_NAME,
+			'command' => sprintf('echo -n "%s"',  self::EVENT_CAUSE_MACRO_TEMPLATE),
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
 			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
-		self::$scriptid = $response['result']['scriptids'][0];
+		self::$cause_events_test_scriptid = $response['result']['scriptids'][0];
+
+		// create a script for testing symptom events
+		$response = $this->call('script.create', [
+			'name' => self::TEST_SYMPTOM_EVENTS_SCRIPT_NAME,
+			'command' => sprintf('echo -n "%s"',  self::EVENT_SYMPTOMS_MACRO_TEMPLATE),
+			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		self::$symptom_events_test_scriptid = $response['result']['scriptids'][0];
 	}
 
 	/**
@@ -368,6 +421,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
 		$this->checkEventCauseMacros($expected);
+		$this->checkEventSymptomMacros($expected);
 	}
 
 	/**
@@ -409,6 +463,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
 		$this->checkEventCauseMacros($expected);
+		$this->checkEventSymptomMacros($expected);
 	}
 
 	/**
@@ -450,6 +505,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
 		$this->checkEventCauseMacros($expected);
+		$this->checkEventSymptomMacros($expected);
 	}
 
 	/**
