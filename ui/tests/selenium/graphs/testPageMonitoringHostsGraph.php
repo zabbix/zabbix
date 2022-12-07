@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup profiles, hosts, items, graphs
@@ -145,9 +145,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		// Check that timeselector set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')
-			->one()->getAttribute('class')
-		);
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
@@ -156,11 +154,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		$form = $this->query('name:zbx_filter')->asform()->one();
 
-		// There is 2 graphs because second appears after you click pattern.
+		// There are 2 graphs because second appears after you click pattern.
 		$this->assertEquals(['Host', 'Search type', 'Graphs', 'Graphs'], $form->getLabels()->asText());
 
 		// Check that Strict search type is selected first.
-		$this->assertEquals('Strict', $this->query('id:filter_search_type')->asSegmentedRadio()->one()->getText());
+		$this->assertEquals('Strict', $form->query('id:filter_search_type')->asSegmentedRadio()->one()->getText());
 
 		// Check placeholders.
 		foreach (['filter_hostids__ms', 'filter_graphids__ms', 'filter_graph_patterns__ms'] as $id) {
@@ -183,7 +181,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// When table result is empty.
 		$this->assertEquals('Specify host to see the graphs.',
-			$this->query("xpath://table[@class='list-table']//td")->one()->getText()
+				$this->query("xpath://table[@class='list-table']//td")->one()->getText()
 		);
 
 		// Check "View as" values.
@@ -243,9 +241,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Item for graph 2',
 						'Item for graph 3'
 					],
-					'view_result' => [
-						"1\n2\n3"
-					]
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #1
@@ -266,9 +262,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Item for graph 2',
 						'Item for graph 3'
 					],
-					'view_result' => [
-						"1\n2\n3"
-					]
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #2
@@ -280,15 +274,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_2'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_2'
-					],
-					'items_names' => [
-						'Item for graph 2'
-					],
-					'view_result' => [
-						"2"
-					]
+					'graph_names' => ['Graph_2'],
+					'items_names' => ['Item for graph 2'],
+					'view_result' => ['2']
 				]
 			],
 			// #3
@@ -300,15 +288,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_2'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_2'
-					],
-					'items_names' => [
-						'Item for graph 2'
-					],
-					'view_result' => [
-						"2"
-					]
+					'graph_names' => ['Graph_2'],
+					'items_names' => ['Item for graph 2'],
+					'view_result' => ['2']
 				]
 			],
 			// #4
@@ -319,15 +301,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph_1'
 					],
 					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_1'
-					],
-					'items_names' => [
-						'Item for graph 1'
-					],
-					'view_result' => [
-						"1"
-					]
+					'graph_names' => ['Graph_1'],
+					'items_names' => ['Item for graph 1'],
+					'view_result' => ['1']
 				]
 			],
 			// #5
@@ -359,9 +335,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Item for graph 2',
 						'Item for graph 3'
 					],
-					'view_result' => [
-						"1\n2\n3"
-					]
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #7
@@ -410,15 +384,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						]
 					],
 					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_1'
-					],
-					'items_names' => [
-						'Item for graph 1'
-					],
-					'view_result' => [
-						"1"
-					]
+					'graph_names' => ['Graph_1'],
+					'items_names' => ['Item for graph 1'],
+					'view_result' => ['1']
 				]
 			]
 		];
@@ -459,7 +427,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 				foreach ($graph_sources as $source) {
 					if (str_contains($source, '='.self::$graphids[$name])) {
-						$graph_sources = array_values(array_diff($graph_sources, [$source]));
+							$graph_sources = array_values(array_diff($graph_sources, [$source])
+						);
 					}
 				}
 
@@ -491,12 +460,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 				if ($data['filter']['Graphs'] === 'lonely_graph') {
 					$this->assertEquals(['No data found.'], $this->query('class:list-table')->asTable()->one()->
-					getRows()->asText()
+							getRows()->asText()
 					);
 				}
 				else {
 					$this->assertEquals('Specify host to see the graphs.',
-						$this->query("xpath://table[@class='list-table']//td")->one()->getText()
+							$this->query("xpath://table[@class='list-table']//td")->one()->getText()
 					);
 				}
 			}

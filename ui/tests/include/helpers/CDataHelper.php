@@ -401,8 +401,8 @@ class CDataHelper extends CAPIHelper {
 
 		foreach (array_values($values) as $key => $value) {
 			$clock = is_array($time) ? $time[$key] : $time;
-			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
-				.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '.
+					zbx_dbstr($clock).', '.zbx_dbstr($value).')');
 		}
 	}
 }
