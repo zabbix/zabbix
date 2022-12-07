@@ -353,7 +353,7 @@ static void append_to_pretty_ver(char **pretty, const char *str)
 	size_t	prt_alloc = 0, prt_offset = 0;
 
 	if (NULL == *pretty)
-		zbx_strcatnl_alloc(pretty, &prt_alloc, &prt_offset, str);
+		zbx_strcpy_alloc(pretty, &prt_alloc, &prt_offset, str);
 	else
 		*pretty = zbx_dsprintf(*pretty, "%s %s", *pretty, str);
 

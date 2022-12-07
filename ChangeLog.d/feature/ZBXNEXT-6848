@@ -1,1 +1,1 @@
-..FG....S. [ZBXNEXT-6848] added support for system.sw.os on Windows OS, and system.sw.os.get key for Zabbix agent items (jfreibergs, kprutkovs)
+..FG...... [ZBXNEXT-6848] added support for system.sw.os on Windows OS, and system.sw.os.get key for Zabbix agent items (jfreibergs, kprutkovs)

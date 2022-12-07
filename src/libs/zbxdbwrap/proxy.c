@@ -2801,6 +2801,19 @@ static void	process_tasks_contents(struct zbx_json_parse *jp_tasks)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: appends text to the string on a new line                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_strcatnl_alloc(char **info, size_t *info_alloc, size_t *info_offset, const char *text)
+{
+	if (0 != *info_offset)
+		zbx_chrcpy_alloc(info, info_alloc, info_offset, '\n');
+
+	zbx_strcpy_alloc(info, info_alloc, info_offset, text);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: detect lost connection with proxy and calculate suppression       *
  *          window if possible                                                *
  *                                                                            *
