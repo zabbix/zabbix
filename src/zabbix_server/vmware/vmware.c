@@ -8495,7 +8495,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
 	CURLoption	opt;
 	CURLcode	err;
 
-	if (0 != vc_version && 6 > vc_version)
+	if (NULL != *headers && 0 != vc_version && 6 > vc_version)
 		return SUCCEED;
 	else if (6 > vc_version)
 		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
