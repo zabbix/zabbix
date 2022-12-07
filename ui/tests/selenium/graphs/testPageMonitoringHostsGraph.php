@@ -135,7 +135,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_Layout() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
-				'=now&filter_search_type=0&filter_set=1');
+				'=now&filter_search_type=0&filter_set=1')->waitUntilReady();
 		$this->page->assertHeader('Graphs');
 		$this->page->assertTitle('Custom graphs');
 
@@ -202,7 +202,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_KioskMode() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
-				'=now&filter_search_type=0&filter_set=1');
+				'=now&filter_search_type=0&filter_set=1')->waitUntilReady();
 
 		// Check Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
@@ -399,7 +399,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-				'now&filter_search_type=0&filter_set=1');
+				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
 
 		// If the filter is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
