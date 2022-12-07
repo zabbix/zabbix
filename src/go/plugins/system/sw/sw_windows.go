@@ -193,11 +193,11 @@ func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
 	case "name":
 		result, err = getRegistryValue(handle, regProductName, registry.SZ)
 		if err != nil {
-			return nil, errors.New("Invalid first parameter.")
+			return nil, errors.New("Could not read registry value " + regProductName)
 		}
 
 	default:
-		return nil, errors.New("Could not read registry value " + regProductName)
+		return nil, errors.New("Invalid first parameter.")
 	}
 
 	return
