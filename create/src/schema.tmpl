@@ -100,10 +100,10 @@ UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
 TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|type,name
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE

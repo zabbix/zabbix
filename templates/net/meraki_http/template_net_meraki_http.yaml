@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-01T21:40:45Z'
+  date: '2022-11-22T19:30:41Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -123,7 +123,7 @@ zabbix_export:
               'devices': devices,
               'error': error_msg.toString()
             });
-          description: 'Item for gathering all the organizations and devices from Meraki API"'
+          description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
           parameters:
             -
@@ -582,6 +582,26 @@ zabbix_export:
           type: DEPENDENT
           key: meraki.device.uplinks.discovery
           delay: '0'
+          filter:
+            conditions:
+              -
+                macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IP}'
+                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IP}'
+                value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             -
               uuid: abf642b1bb944d16bebf90dcf58dbd86
@@ -601,10 +621,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].latencyMs.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value === "" ? -1000 : value'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1000'
                 -
                   type: MULTIPLIER
                   parameters:
@@ -655,10 +673,8 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].lossPercent.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value === "" ? -1 : value'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-1'
               master_item:
                 key: meraki.get.device
               tags:
@@ -749,6 +765,22 @@ zabbix_export:
           macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
           description: 'Devices uplink loss threshold in percents.'
+        -
+          macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
+          value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
+          value: ^$
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
+          value: .+
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
+          value: ^$
+          description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.2/manual/config/items/itemtypes/http'

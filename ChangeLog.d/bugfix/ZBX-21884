@@ -1,0 +1,1 @@
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)

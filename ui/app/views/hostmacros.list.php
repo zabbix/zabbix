@@ -21,9 +21,11 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
+
 $output = [
 	'body' => (new CPartial($tmpl, $data))->getOutput()
 ];

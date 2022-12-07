@@ -929,6 +929,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	DC_ITEM			*item;
 	int			i, ret = FAIL;
 	zbx_expression_query_one_t	*data;
+	DC_EVALUATE_ITEM		evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int )len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
@@ -977,9 +978,15 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		goto out;
 	}
 
+	evaluate_item.itemid = item->itemid;
+	evaluate_item.value_type = item->value_type;
+	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.host = item->host.host;
+	evaluate_item.key_orig = item->key_orig;
+
 	if (0 == args_num)
 	{
-		ret = evaluate_function(value, item, func_name, "", ts, error);
+		ret = evaluate_function(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -1010,7 +1017,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
