@@ -37,7 +37,7 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
-const timeFmt = "Mon Jan 02 15:04:05 2006"
+const timeFmt = "Mon Jan  2 15:04:05 2006"
 
 type manager struct {
 	name          string
@@ -69,7 +69,7 @@ func getManagers() []manager {
 			"dpkg",
 			"dpkg --version 2> /dev/null",
 			"dpkg --get-selections",
-			"dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
+			"LC_ALL=C dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
 			dpkgList,
 			dpkgDetails,
 		},
@@ -77,7 +77,7 @@ func getManagers() []manager {
 			"rpm",
 			"rpm --version 2> /dev/null",
 			"rpm -qa",
-			"rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
+			"LC_ALL=C rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
 			parseRegex,
 			rpmDetails,
 		},
@@ -85,10 +85,10 @@ func getManagers() []manager {
 			"pacman",
 			"pacman --version 2> /dev/null",
 			"pacman -Q",
-			"pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)'" +
+			"LC_ALL=C pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)'" +
 				" | cut -f2- -d: | paste -d, - - - - - -",
 			parseRegex,
-			dpkgDetails,
+			pacmanDetails,
 		},
 		{
 			"pkgtools",
@@ -181,6 +181,7 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 	pd := []PackageDetails{}
 
 	for _, s := range in {
+		// Status, Name, Version, Arch, Size
 		split := strings.Split(s, ",")
 
 		if len(split) != num_fields {
@@ -241,6 +242,7 @@ func rpmDetails(manager string, in []string, regex string) (out string, err erro
 	pd := []PackageDetails{}
 
 	for _, s := range in {
+		// Name, Version, Arch, Size, Build time, Install time
 		split := strings.Split(s, ",")
 
 		if len(split) != num_fields {
@@ -281,6 +283,111 @@ func rpmDetails(manager string, in []string, regex string) (out string, err erro
 
 		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, buildtime_tm.Format(timeFmt),
 			buildtime_timestamp, installtime_tm.Format(timeFmt), installtime_timestamp))
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(pd)
+
+	if err != nil {
+		return
+	}
+
+	out = string(b)
+
+	return
+}
+
+func pacmanDetails(manager string, in []string, regex string) (out string, err error) {
+	const num_fields = 6
+
+	rgx, err := regexp.Compile(regex)
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
+
+		return
+	}
+
+	// initialize empty slice instead of nil slice
+	pd := []PackageDetails{}
+
+	for _, s := range in {
+		s = strings.Trim(s, " ")
+
+		// Name, Version, Arch, Size, Build time, Install time
+		split := strings.Split(s, ", ")
+
+		if len(split) != num_fields {
+			log.Debugf("unexpected number of fields while expected %d in \"%s\", ignoring", num_fields, s)
+
+			continue
+		}
+
+		matched := rgx.MatchString(split[0])
+
+		if !matched {
+			continue
+		}
+
+		size_parts := strings.Split(split[3], " ")
+
+		if len(size_parts) != 2 {
+			log.Debugf("unexpected size field \"%s\" in \"%s\", ignoring", split[3], s)
+
+			continue
+		}
+
+		var size_float float64
+
+		size_float, err = strconv.ParseFloat(size_parts[0], 64)
+
+		if err != nil {
+			log.Debugf("unexpected size \"%s\" in \"%s\", ignoring", size_parts[0], s)
+
+			continue
+		}
+
+		// pacman supports the following labels:
+		// "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"
+		var size uint64
+
+		switch size_parts[1] {
+			case "B":
+				size = uint64(size_float)
+			case "KiB":
+				size = uint64(size_float * 1024)
+			case "MiB":
+				size = uint64(size_float * 1024 * 1024)
+			case "GiB":
+				size = uint64(size_float * 1024 * 1024 * 1024)
+			case "TiB":
+				size = uint64(size_float * 1024 * 1024 * 1024 * 1024)
+			default:
+				log.Debugf("unexpected Install Size suffix \"%s\" in \"%s\", ignoring", size_parts[1], s)
+
+				continue
+		}
+
+		var buildtime, installtime time.Time
+
+		buildtime, err = time.Parse(timeFmt, split[4])
+
+		if err != nil {
+		        log.Debugf("unexpected buildtime \"%s\" in \"%s\", ignoring", split[4], s)
+
+			continue
+		}
+
+		installtime, err = time.Parse(timeFmt, split[5])
+
+		if err != nil {
+		        log.Debugf("unexpected installtime \"%s\" in \"%s\", ignoring", split[5], s)
+
+			continue
+		}
+
+		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, split[4], buildtime.Unix(),
+			split[5], installtime.Unix()))
 	}
 
 	var b []byte
