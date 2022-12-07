@@ -39,8 +39,8 @@ static void	zbx_prof_init(void)
 
 static int	compare_func_profile(const void *d1, const void *d2)
 {
-	const zbx_func_profile_t	*func_profile1 = *((const zbx_func_profile_t **)d1);
-	const zbx_func_profile_t	*func_profile2 = *((const zbx_func_profile_t **)d2);
+	const zbx_func_profile_t	*func_profile1 = *((const zbx_func_profile_t * const *)d1);
+	const zbx_func_profile_t	*func_profile2 = *((const zbx_func_profile_t * const *)d2);
 
 	ZBX_RETURN_IF_NOT_EQUAL(func_profile1->func_name, func_profile2->func_name);
 
@@ -172,20 +172,20 @@ static void	zbx_print_prof(void)
 		{
 			if (0 != (ZBX_PROF_RWLOCK & zbx_prof_scope))
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nrwlocks : locked:%d holding:"
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nrwlocks : locked:%u holding:"
 						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec", total_locked_rwlock,
 						total_busy_lock, total_wait_lock);
 			}
 			if (0 != (ZBX_PROF_MUTEX & zbx_prof_scope))
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nmutexes : locked:%d holding:"
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nmutexes : locked:%u holding:"
 						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec", total_locked_mutex,
 						total_mutex_busy_lock, total_mutex_wait_lock);
 			}
 
 			if (ZBX_PROF_ALL == zbx_prof_scope)
 			{
-				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nlocking total : locked:%d holding:"
+				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "\nlocking total : locked:%u holding:"
 						ZBX_FS_DBL " sec waiting:" ZBX_FS_DBL " sec",
 						total_locked_rwlock + total_locked_mutex,
 						total_busy_lock + total_mutex_busy_lock,
