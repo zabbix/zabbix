@@ -53,7 +53,7 @@ class CTemplateDashboardImporter extends CImporter {
 				$dashboardid = $this->referencer->findTemplateDashboardidByUuid($dashboard['uuid']);
 
 				if ($dashboardid === null) {
-					$dashboardid = $this->referencer->findTemplateDashboardidByName($dashboard['name']);
+					$dashboardid = $this->referencer->findTemplateDashboardidByName($dashboard['name'], $templateid);
 				}
 
 				if ($dashboardid !== null) {
@@ -99,7 +99,9 @@ class CTemplateDashboardImporter extends CImporter {
 					$dashboardid = $this->referencer->findTemplateDashboardidByUuid($dashboard['uuid']);
 
 					if ($dashboardid === null) {
-						$dashboardid = $this->referencer->findTemplateDashboardidByName($dashboard['name']);
+						$dashboardid = $this->referencer->findTemplateDashboardidByName($dashboard['name'],
+							$templateid
+						);
 					}
 
 					if ($dashboardid !== null) {

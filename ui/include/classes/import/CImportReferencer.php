@@ -477,16 +477,17 @@ class CImportReferencer {
 	 * Get template dashboard ID by dashboard name.
 	 *
 	 * @param string $name
+	 * @param int    $templateid
 	 *
 	 * @return string|null
 	 */
-	public function findTemplateDashboardidByName(string $name): ?string {
+	public function findTemplateDashboardidByName(string $name, int $templateid): ?string {
 		if ($this->db_template_dashboards === null) {
 			$this->selectTemplateDashboards();
 		}
 
 		foreach ($this->db_template_dashboards as $dashboardid => $dashboard) {
-			if ($dashboard['name'] === $name) {
+			if ($dashboard['name'] === $name && $dashboard['templateid'] == $templateid) {
 				return $dashboardid;
 			}
 		}
@@ -1302,24 +1303,15 @@ class CImportReferencer {
 			$dashboard_names += [$dashboard['name']];
 		}
 
-		$db_template_dashboards = API::TemplateDashboard()->get([
-			'output' => ['uuid', 'name'],
-			'filter' => ['uuid' => array_keys($this->template_dashboards)],
+		$this->db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => ['uuid', 'name', 'templateid'],
+			'filter' => [
+				'uuid' => array_keys($this->template_dashboards),
+				'name' => $dashboard_names
+			],
+			'searchByAny' => true,
 			'preservekeys' => true
 		]);
-
-		$db_template_dashboards += API::TemplateDashboard()->get([
-			'output' => ['uuid', 'name'],
-			'filter' => ['name' => $dashboard_names],
-			'preservekeys' => true
-		]);
-
-		foreach ($db_template_dashboards as $dashboardid => $dashboard) {
-			$this->db_template_dashboards[$dashboardid] = [
-				'uuid' => $dashboard['uuid'],
-				'name' => $dashboard['name']
-			];
-		}
 
 		$this->template_dashboards = [];
 	}
