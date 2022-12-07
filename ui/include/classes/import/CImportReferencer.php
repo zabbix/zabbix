@@ -1297,17 +1297,11 @@ class CImportReferencer {
 			return;
 		}
 
-		$dashboard_names = [];
-
-		foreach ($this->template_dashboards as $dashboard) {
-			$dashboard_names += [$dashboard['name']];
-		}
-
 		$this->db_template_dashboards = API::TemplateDashboard()->get([
 			'output' => ['uuid', 'name', 'templateid'],
 			'filter' => [
 				'uuid' => array_keys($this->template_dashboards),
-				'name' => $dashboard_names
+				'name' => array_column($this->template_dashboards, 'name')
 			],
 			'searchByAny' => true,
 			'preservekeys' => true
