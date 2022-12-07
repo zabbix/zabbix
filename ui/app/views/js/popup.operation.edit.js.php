@@ -474,7 +474,9 @@ window.operation_popup = new class {
 		curl.setArgument('action', 'action.operation.check');
 
 		const fields = getFormFields(this.form);
-		fields.operation.esc_period = fields.operation.esc_period.trim();
+		if (fields.operation.esc_period != null) {
+			fields.operation.esc_period = fields.operation.esc_period.trim();
+		}
 
 		this._post(curl.getUrl(), fields);
 	}
