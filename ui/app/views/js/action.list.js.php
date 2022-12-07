@@ -99,7 +99,6 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.enable');
-			curl.setArgument('eventsource', this.eventsource);
 
 			this._post(target, actionids, curl.getUrl());
 		}
@@ -115,7 +114,6 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.disable');
-			curl.setArgument('eventsource', this.eventsource);
 
 			this._post(target, actionids, curl.getUrl());
 		}
@@ -131,7 +129,6 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
-			curl.setArgument('eventsource', this.eventsource);
 
 			this._post(target, actionids, curl.getUrl());
 		}

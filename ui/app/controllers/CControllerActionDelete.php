@@ -27,10 +27,6 @@ class CControllerActionDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
-									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-								]),
 			'actionids' =>		'required|array_db actions.actionid'
 		];
 
@@ -50,9 +46,15 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		switch ($this->getInput('eventsource')) {
-			case EVENT_SOURCE_TRIGGERS:
-				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+		$actions = API::Action()->get([
+			'output' => ['eventsource'],
+			'actionids' => $this->getInput('actionids')
+		]);
+
+		foreach ($actions as $action) {
+			switch ($action['eventsource']) {
+				case EVENT_SOURCE_TRIGGERS:
+					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
 			case EVENT_SOURCE_DISCOVERY:
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
@@ -65,6 +67,7 @@ class CControllerActionDelete extends CController {
 
 			case EVENT_SOURCE_SERVICE:
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+			}
 		}
 
 		return false;

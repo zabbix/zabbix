@@ -429,8 +429,6 @@ window.action_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'action.delete');
-		curl.setArgument('eventsource', this.eventsource);
-
 
 		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
