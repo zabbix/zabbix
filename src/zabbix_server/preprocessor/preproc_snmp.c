@@ -659,11 +659,25 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			}
 			else
 			{
+				int	j;
+
 				zbx_free(oobj_local.key);
+
+				for (j = 0; j < oobj_cached->values.values_num; j++)
+				{
+					zbx_snmp_value_pair_t *vp = oobj_cached->values.values[j];
+
+					if (0 == strcmp(vp->oid, output_value->oid))
+					{
+						snmp_value_pair_free(output_value);
+						goto skip;
+					}
+				}
+
 				zbx_vector_snmp_value_pair_append(&oobj_cached->values, output_value);
 			}
 		}
-
+skip:
 		data += len;
 		zbx_free(p.oid);
 		zbx_free(p.value);
