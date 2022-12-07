@@ -27,7 +27,6 @@ static int				zbx_prof_initialized;
 
 static zbx_func_profile_t		*zbx_func_profile[PROF_LEVEL_MAX];
 static int				zbx_func_profile_level;
-static const char			*zbx_info;
 
 static void	zbx_prof_init(void)
 {
@@ -121,7 +120,7 @@ static const char	*get_scope_string(zbx_prof_scope_t scope)
 	}
 }
 
-static void	zbx_print_prof(void)
+static void	zbx_print_prof(const char *info)
 {
 	if (0 != zbx_prof_scope)
 	{
@@ -193,7 +192,7 @@ static void	zbx_print_prof(void)
 						total_wait_lock + total_mutex_wait_lock);
 			}
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "=== Profiling statistics for %s === %s", zbx_info, str);
+			zabbix_log(LOG_LEVEL_INFORMATION, "=== Profiling statistics for %s === %s", info, str);
 		}
 	}
 }
@@ -225,7 +224,6 @@ void	zbx_prof_update(const char *info, double time_now)
 	{
 		zbx_prof_init();
 		zbx_prof_scope = zbx_prof_scope_requested;
-		zbx_info = info;
 	}
 	else
 		zbx_prof_scope = 0;
@@ -235,7 +233,7 @@ void	zbx_prof_update(const char *info, double time_now)
 		last_update = time_now;
 
 		if (0 != zbx_prof_scope)
-			zbx_print_prof();
+			zbx_print_prof(info);
 		else
 			zbx_reset_prof();
 	}
