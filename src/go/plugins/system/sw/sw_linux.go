@@ -345,34 +345,34 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 		var size uint64
 
 		switch size_parts[1] {
-			case "B":
-				size = uint64(size_float)
-			case "KiB":
-				size = uint64(size_float * 1024)
-			case "MiB":
-				size = uint64(size_float * 1024 * 1024)
-			case "GiB":
-				size = uint64(size_float * 1024 * 1024 * 1024)
-			case "TiB":
-				size = uint64(size_float * 1024 * 1024 * 1024 * 1024)
-			default:
-				log.Debugf("unexpected Install Size suffix \"%s\" in \"%s\", ignoring", size_parts[1], s)
+		case "B":
+			size = uint64(size_float)
+		case "KiB":
+			size = uint64(size_float * 1024)
+		case "MiB":
+			size = uint64(size_float * 1024 * 1024)
+		case "GiB":
+			size = uint64(size_float * 1024 * 1024 * 1024)
+		case "TiB":
+			size = uint64(size_float * 1024 * 1024 * 1024 * 1024)
+		default:
+			log.Debugf("unexpected Install Size suffix \"%s\" in \"%s\", ignoring", size_parts[1], s)
 
-				continue
+			continue
 		}
 
 		var buildtime, installtime time.Time
 
 		buildtime, err = time.Parse(timeFmt, split[4])
 		if err != nil {
-		        log.Debugf("unexpected buildtime \"%s\" in \"%s\", ignoring", split[4], s)
+			log.Debugf("unexpected buildtime \"%s\" in \"%s\", ignoring", split[4], s)
 
 			continue
 		}
 
 		installtime, err = time.Parse(timeFmt, split[5])
 		if err != nil {
-		        log.Debugf("unexpected installtime \"%s\" in \"%s\", ignoring", split[5], s)
+			log.Debugf("unexpected installtime \"%s\" in \"%s\", ignoring", split[5], s)
 
 			continue
 		}
@@ -439,7 +439,7 @@ func pkgtoolsDetails(manager string, in []string, regex string) (out string, err
 		size_float, err = strconv.ParseFloat(split[3][:len(split[3])-1], 64)
 		if err != nil {
 			log.Debugf("unexpected size \"%s\" in \"%s\", ignoring", split[3], s)
-fmt.Printf("unexpected size \"%s\" in \"%s\", ignoring\n", split[3], s)
+
 			continue
 		}
 
@@ -460,7 +460,8 @@ fmt.Printf("unexpected size \"%s\" in \"%s\", ignoring\n", split[3], s)
 			if i >= 1 {
 				size = uint64(size_float * 1024 * 1024)
 			} else {
-				log.Debugf("unexpected size suffix in \"%s\", expected 'K' or 'M' in \"%s\", ignoring", split[3], s)
+				log.Debugf("unexpected size suffix in \"%s\", expected 'K' or 'M' in \"%s\", ignoring",
+					split[3], s)
 
 				continue
 			}
