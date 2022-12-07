@@ -26,6 +26,7 @@ package zbxlib
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
+#include "zbx_item_constants.h"
 
 void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
@@ -45,7 +46,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 
 int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, char **error);
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
 
 typedef struct
 {
@@ -211,7 +212,8 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p, &cerrmsg)
+		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p,
+		(C.int)(agent.Options.Timeout), &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char

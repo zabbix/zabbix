@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0beta2');
+define('ZABBIX_VERSION',		'6.4.0rc1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030084);
+define('ZABBIX_DB_VERSION',		6030149);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -98,6 +98,12 @@ define('ZBX_UNITS_ROUNDOFF_UNSUFFIXED',		4);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
+define('IDP_TYPE_LDAP',	1);
+define('IDP_TYPE_SAML',	2);
+
+define('JIT_PROVISIONING_DISABLED',	0);
+define('JIT_PROVISIONING_ENABLED',	1);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
@@ -140,6 +146,7 @@ define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
+define('ZBX_AUTH_NONE',		-1);
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
 define('ZBX_AUTH_HTTP_DISABLED',	0);
@@ -148,6 +155,8 @@ define('ZBX_AUTH_LDAP_DISABLED',	0);
 define('ZBX_AUTH_LDAP_ENABLED',		1);
 define('ZBX_AUTH_SAML_DISABLED',	0);
 define('ZBX_AUTH_SAML_ENABLED',		1);
+define('ZBX_AUTH_SCIM_PROVISIONING_DISABLED',	0);
+define('ZBX_AUTH_SCIM_PROVISIONING_ENABLED',	1);
 define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);

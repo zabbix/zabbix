@@ -25,6 +25,8 @@
 #include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
 
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE

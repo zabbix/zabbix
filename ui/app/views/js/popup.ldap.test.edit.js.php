@@ -52,6 +52,12 @@ window.ldap_test_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if ('provisioning' in response) {
+					this.appendProvisioning(document.getElementById('provisioning_role'), response.provisioning.role);
+					this.appendProvisioning(document.getElementById('provisioning_groups'), response.provisioning.groups);
+					this.appendProvisioning(document.getElementById('provisioning_medias'), response.provisioning.medias);
+				}
+
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -80,6 +86,27 @@ window.ldap_test_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	appendProvisioning(parent, names) {
+		let span;
+		parent.innerHTML = '';
+
+		if (names.length > 0) {
+			for (const name of names) {
+				span = document.createElement('span');
+				span.innerText = name;
+				span.classList.add(<?= json_encode(ZBX_STYLE_TAG) ?>);
+
+				parent.appendChild(span);
+			}
+		}
+		else {
+			span = document.createElement('span');
+			span.innerText = <?= json_encode(_('No value')) ?>;
+			span.classList.add(<?= json_encode(ZBX_STYLE_DISABLED) ?>);
+			parent.appendChild(span);
+		}
 	}
 
 	removePopupMessages() {

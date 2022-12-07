@@ -993,6 +993,12 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
 		int case_sensitive, const char *output_template, char **output)
 {
+/* regular expressions */
+#define EXPRESSION_TYPE_INCLUDED	0
+#define EXPRESSION_TYPE_ANY_INCLUDED	1
+#define EXPRESSION_TYPE_NOT_INCLUDED	2
+#define EXPRESSION_TYPE_TRUE		3
+#define EXPRESSION_TYPE_FALSE		4
 	int	i, ret = FAIL;
 	char	*output_accu;	/* accumulator for 'output' when looping over global regexp subexpressions */
 
@@ -1087,6 +1093,11 @@ out:
 	}
 
 	return ret;
+#undef EXPRESSION_TYPE_INCLUDED
+#undef EXPRESSION_TYPE_ANY_INCLUDED
+#undef EXPRESSION_TYPE_NOT_INCLUDED
+#undef EXPRESSION_TYPE_TRUE
+#undef EXPRESSION_TYPE_FALSE
 }
 
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
