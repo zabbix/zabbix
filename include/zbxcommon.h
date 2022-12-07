@@ -746,7 +746,14 @@ int	zbx_alarm_timed_out(void);
 void	__zbx_update_env(double time_now);
 
 #ifdef _WINDOWS
-#define zbx_update_env(time_now)	__zbx_update_env(time_now);
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	ZBX_UNUSED(info);				\
+}							\
+while (0)
 #else
 #define zbx_update_env(info, time_now)			\
 							\
