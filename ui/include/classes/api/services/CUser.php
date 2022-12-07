@@ -1658,17 +1658,19 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check if authenticated by session id or by token.
+	 * Checks if user is authenticated by session ID or by API token.
 	 *
 	 * @param array  $session
-	 * @param string $session[]['sessionid']  session id to be checked
-	 * @param string $session[]['token']      token to be checked
-	 * @param bool   $session[]['extend']     (optional with sessionid) extend session (update lastaccess time)
+	 * @param string $session[]['sessionid']  Session ID to be checked.
+	 * @param string $session[]['token']      API token to be checked.
+	 * @param bool   $session[]['extend']     Optional. Used with 'sessionid' to extend the user session which updates
+	 *                                        'lastaccess' time.
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session): array
-	{
+	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' => ['type' => API_STRING_UTF8],
 			'extend' => ['type' => API_BOOLEAN, 'default' => true],
@@ -1688,7 +1690,7 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		// access DB only once per page load
+		// Access DB only once per page load.
 		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
 			return self::$userData;
 		}
@@ -1708,11 +1710,6 @@ class CUser extends CApiService {
 			],
 			'userids' => $userid
 		]);
-
-		// If user not exists.
-		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
 
 		$db_user = $db_users[0];
 
@@ -1767,10 +1764,10 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Authenticates user based on token.
+	 * Authenticates user based on API token.
 	 *
-	 * @param string $auth_token
-	 * @param int    $time
+	 * @param string $auth_token API token.
+	 * @param int    $time       Current time unix timestamp.
 	 *
 	 * @throws APIException
 	 *
@@ -1797,9 +1794,9 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Authenticates user based on sessionid.
+	 * Authenticates user based on session ID.
 	 *
-	 * @param string $sessionid
+	 * @param string $sessionid Session ID.
 	 *
 	 * @throws APIException
 	 *

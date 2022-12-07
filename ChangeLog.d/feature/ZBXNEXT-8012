@@ -1,1 +1,1 @@
-A......... [ZBXNEXT-8012] implemented token authentication in CUser->checkAuthentication method (rdetlavs)
+A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuthentication method (rdetlavs)
