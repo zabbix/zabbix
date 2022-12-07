@@ -54,9 +54,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->page->assertHeader('Media types');
 
 		$form = $this->query('id:media_type_form')->asForm()->one();
-		$this->assertEquals(json_encode(['Media type', 'Message templates', 'Options']),
-				json_encode($form->query("xpath:.//li[@role='tab']")->all()->asText())
-		);
+		$this->assertEquals(['Media type', 'Message templates', 'Options'], $form->getTabs());
 
 		// Check available media type types.
 		$this->assertEquals(['Email', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
