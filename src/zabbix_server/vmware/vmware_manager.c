@@ -211,7 +211,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		zbx_vmware_job_t	*job;
 
 		time_now = zbx_time();
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{

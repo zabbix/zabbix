@@ -676,7 +676,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		unsigned char	*rtc_data;
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
 		{

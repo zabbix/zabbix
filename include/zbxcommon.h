@@ -748,13 +748,13 @@ void	__zbx_update_env(double time_now);
 #ifdef _WINDOWS
 #define zbx_update_env(time_now)	__zbx_update_env(time_now);
 #else
-#define zbx_update_env(time_now)	\
-					\
-do					\
-{					\
-	__zbx_update_env(time_now);	\
-	zbx_prof_update(time_now);	\
-}					\
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	zbx_prof_update(info, time_now);		\
+}							\
 while (0)
 #endif
 

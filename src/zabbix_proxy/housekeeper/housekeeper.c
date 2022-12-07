@@ -214,7 +214,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		hk_period = get_housekeeper_period(time_slept);
 
