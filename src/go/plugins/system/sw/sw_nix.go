@@ -101,9 +101,9 @@ func findFirstMatch(src string, reg *regexp.Regexp) (res string) {
 }
 
 func getName() (name string, err error) {
-	readFile, err := os.Open(swOSNameRelease)
+	if readFile, err := os.Open(swOSNameRelease); err == nil {
+		defer readFile.Close()
 
-	if err == nil {
 		fileScanner := bufio.NewScanner(readFile)
 		fileScanner.Split(bufio.ScanLines)
 
@@ -113,7 +113,6 @@ func getName() (name string, err error) {
 
 		for fileScanner.Scan() {
 			tmpStr = fileScanner.Text()
-			fmt.Println(tmpStr)
 			name = findFirstMatch(tmpStr, regexQuoted)
 
 			if len(name) == 0 {
@@ -125,8 +124,6 @@ func getName() (name string, err error) {
 			}
 		}
 	}
-
-	readFile.Close()
 
 	return readOsInfoFile(swOSName)
 }

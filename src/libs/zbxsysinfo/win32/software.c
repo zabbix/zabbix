@@ -89,7 +89,7 @@ static char	*join_nonempty_strs(const char *separator, size_t count, ...)
 	return res;
 }
 
-static WORD	get_processor_architecture()
+static WORD	get_processor_architecture(void)
 {
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 
@@ -209,8 +209,7 @@ static char	*get_full_os_info(HKEY handle)
 
 static char	*get_pretty_os_info(HKEY handle)
 {
-	char	*res = NULL;
-	char	*name, *build, *sp_version;
+	char	*name, *build, *sp_version, *res = NULL;
 
 	name = get_registry_value(handle, TEXT(ZBX_REGVALUE_PRODUCTNAME), REG_MULTI_SZ);
 	build = get_build_string(handle, 1);
@@ -244,7 +243,8 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	type = get_rparam(request, 0);
 
-	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full")) {
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full"))
+	{
 		if (NULL != (str = get_full_os_info(handle)))
 			ret = SYSINFO_RET_OK;
 	}
@@ -264,7 +264,8 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (SYSINFO_RET_OK == ret) {
+	if (SYSINFO_RET_OK == ret)
+	{
 		SET_STR_RESULT(result, zbx_strdup(NULL, str));
 		zbx_free(str);
 	}
@@ -276,6 +277,7 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 out:
 	RegCloseKey(handle);
+
 	return ret;
 }
 
