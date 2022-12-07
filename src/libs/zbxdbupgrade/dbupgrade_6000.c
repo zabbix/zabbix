@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -244,6 +245,137 @@ static int	DBpatch_6000007(void)
 	return DBmodify_field_type("users", &field, NULL);
 }
 
+static int	DBpatch_6000008(void)
+{
+	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding \"name_upper\" column to \"hosts\" table");
+		return SUCCEED;
+	}
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6000009(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding index to \"name_upper\" column");
+		return SUCCEED;
+	}
+
+	return DBcreate_index("hosts", "hosts_6", "name_upper", 0);
+}
+
+static int	DBpatch_6000010(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of updating \"name_upper\" column");
+
+		return SUCCEED;
+	}
+
+	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6000011(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_insert"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_insert trigger for table \"hosts\" already exists,"
+				" skipping patch of adding it to \"hosts\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("hosts", "name", "name_upper", "upper", "hostid");
+}
+
+static int	DBpatch_6000012(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding it to \"hosts\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("hosts", "name", "name_upper", "upper", "hostid");
+}
+
+static int	DBpatch_6000013(void)
+{
+	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding \"name_upper\" column to \"items\" table");
+		return SUCCEED;
+	}
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6000014(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding index to \"name_upper\" column");
+
+		return SUCCEED;
+	}
+
+	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
+}
+
+static int	DBpatch_6000015(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of updating \"name_upper\" column");
+		return SUCCEED;
+	}
+
+	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6000016(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_insert"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_insert trigger for table \"items\" already exists,"
+				" skipping patch of adding it to \"items\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("items", "name", "name_upper", "upper", "itemid");
+}
+
+static int	DBpatch_6000017(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding it to \"items\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
+}
 #endif
 
 DBPATCH_START(6000)
@@ -258,5 +390,15 @@ DBPATCH_ADD(6000004, 0, 0)
 DBPATCH_ADD(6000005, 0, 0)
 DBPATCH_ADD(6000006, 0, 0)
 DBPATCH_ADD(6000007, 0, 0)
+DBPATCH_ADD(6000008, 0, 0)
+DBPATCH_ADD(6000009, 0, 0)
+DBPATCH_ADD(6000010, 0, 0)
+DBPATCH_ADD(6000011, 0, 0)
+DBPATCH_ADD(6000012, 0, 0)
+DBPATCH_ADD(6000013, 0, 0)
+DBPATCH_ADD(6000014, 0, 0)
+DBPATCH_ADD(6000015, 0, 0)
+DBPATCH_ADD(6000016, 0, 0)
+DBPATCH_ADD(6000017, 0, 0)
 
 DBPATCH_END()

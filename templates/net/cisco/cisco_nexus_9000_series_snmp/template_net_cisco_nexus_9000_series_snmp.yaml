@@ -1,0 +1,2802 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-11-25T12:59:18Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 80fc469750f84061924662a98c33580c
+      template: 'Cisco Nexus 9000 Series by SNMP'
+      name: 'Cisco Nexus 9000 Series by SNMP'
+      description: |
+        Template Cisco Nexus 9000 Series
+          
+          MIBs used:
+          CISCO-ENHANCED-MEMPOOL-MIB
+          CISCO-ENTITY-FRU-CONTROL-MIB
+          CISCO-ENTITY-SENSOR-MIB
+          CISCO-PROCESS-MIB
+          ENTITY-MIB
+          EtherLike-MIB
+          IF-MIB
+          SNMPv2-MIB
+          SNMP-FRAMEWORK-MIB
+          CISCO-IMAGE-MIB
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 8eff7e6fc12c45f6b98a4fb89c44f03d
+          name: 'ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 7d
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 2b9b678cb9fc407cb485136ddcf5953c
+              expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
+              name: 'Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'The last three attempts returned a timeout. Check the connectivity of a device.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: cb04f67d7ea04894a9f143a7d27db09a
+          name: 'ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: d32cffe7dcef4873ac8bb4d86119ddaa
+              expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
+              name: 'High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: be862a0f8625484ebccb8a4e5255b683
+          name: 'ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 7d
+          value_type: FLOAT
+          units: s
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: a51dc1f61eec4709b8f52b3df65eae86
+              expression: 'avg(/Cisco Nexus 9000 Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'High ICMP ping loss'
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
+                -
+                  name: 'Unavailable by ICMP ping'
+                  expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 027bb218006e46238392afbb12d96ec6
+          name: 'SNMP traps (fallback)'
+          type: SNMP_TRAP
+          key: snmptrap.fallback
+          history: 7d
+          trends: '0'
+          value_type: LOG
+          description: 'The item is used to collect all the SNMP traps unmatched by the other snmptrap items.'
+          logtimefmt: 'hh:mm:sszyyyy/MM/dd'
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 566c78f548bc4d1c9157b4a3f41f083b
+          name: 'System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: system.contact
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB.
+            The textual identification of the contact person for the managed node (or: this node), together with the contact information of this person. If no contact information is known, the value is a zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: bc245084de0047aaa7bc62234970e827
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: system.descr
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB.
+            The textual description of the entity. This value should include the full name and version identification number of the system's hardware type, software operating-system, and the networking software.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 34022f907faa4a3e8a02c5e5f5c8c43a
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.149
+          key: system.hw.model
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB.'
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 9d42a842c591489bb984faad26cd7e63
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.149
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB.'
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: b813bf6448fe4974911106e36b2d8888
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber))>0'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'The serial number of a device has changed. Acknowledge to close manually.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 5f109dce62c942f794fecaf7038d691e
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: system.location
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB.
+            The physical location of this node (e.g., telephone closet, the third floor).
+            If the location is unknown, the value is a zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 31ff1ef55d69461bbc5b4416c7a040be
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB.
+            The administratively-assigned name for this node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is a zero-length string.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: cf98bf1ffe854a758f0006aaeb5096ab
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'The system name has changed. Acknowledge to close manually.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: a60cce9cf0464d6292d6b7934e9cfcd6
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: system.objectid
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB.
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprise's subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining "what kind of box" is being managed.
+            For example, if the vendor "Flintstones, Inc." was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its "Fred Router".
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: e02a0a8de70547e4895b395b616919dd
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.9.9.25.1.1.1.2.5
+          key: system.sw.os
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: CISCO-IMAGE-MIB'
+          inventory_link: OS
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'CW_VERSION\$(.*?)\$'
+                - \1
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 749b4c4b8f4e49caa6b239b15953ffb9
+              expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.sw.os))>0'
+              recovery_mode: NONE
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close manually.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'System name has changed'
+                  expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 83405503b84d4af292e6846ccbd8a877
+          name: 'Uptime (snmp)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
+          key: system.uptime
+          history: 7d
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMP-FRAMEWORK-MIB::snmpEngineTime.
+            The number of seconds since the value of the `snmpEngineBoots` object has had a last change.
+            When incrementing this object's value would cause it to exceed its maximum, the `snmpEngineBoots` is incremented as if a re-initialization had occurred,
+            and this object's value consequently reverts to zero.
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: fc80a45e361842f09dfe9b047e1c6b5f
+              expression: 'last(/Cisco Nexus 9000 Series by SNMP/system.uptime)<10m'
+              name: 'Device has been restarted or reinitialized'
+              event_name: '{HOST.NAME} has been restarted or reinitialized (uptime < 10m)'
+              priority: WARNING
+              description: 'The record of SNMP Boots has changed in less than 10 minutes. The restart of a device also counts.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: edb1d93d5fda47928dcb62223ada8b16
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: b60bca40b3b14f2384332103af74bd23
+              expression: 'max(/Cisco Nexus 9000 Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Check the connectivity of a device and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: d1d6b8c10e83484e82e37b58c7004d9e
+          name: 'CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.2]'
+          key: cpu.discovery
+          delay: 1h
+          description: |
+            You must use CISCO-PROCESS-MIB and its object `cpmCPUTotal5minRev` from the table called `cpmCPUTotalTable`, and indexed with `cpmCPUTotalPhysicalIndex`.
+            The table `cpmCPUTotalTable` allows CISCO-PROCESS-MIB to keep the CPU statistics for different physical entities in the router, such as different CPU chips, a group of CPUs, or CPUs in different modules/cards.
+            In the case of a single CPU, the `cpmCPUTotalTable` has only one entry.
+          item_prototypes:
+            -
+              uuid: 0196f6b4431b4823860b89c712b2e5a8
+              name: '#{#SNMPINDEX}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'system.cpu.util[{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: CISCO-PROCESS-MIB
+                The object name: `cpmCPUTotal5minRev`
+                
+                The MIB object `cpmCPUTotal5minRev` provides a more accurate view of the performance of the router over time than the MIB objects `cpmCPUTotal1minRev` and `cpmCPUTotal5secRev`. These MIB objects are not accurate because they look at the CPU with an interval of one minute and five seconds, respectively. These MIBs enable to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for the `cpmCPUTotal5minRev` is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500 series can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+              trigger_prototypes:
+                -
+                  uuid: 1ac7652bda474762aa0b0c354728307e
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: '#{#SNMPINDEX}: High CPU utilization'
+                  event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 477691193b1e43b595f421644926d5a7
+              name: '#{#SNMPINDEX}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'system.cpu.util[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: b0c97bd2037f405ba2b183456d01973e
+          name: 'Entity serial numbers discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]'
+          key: entity_sn.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ENT_SN}'
+                value: '{$ENT_SN.MATCHES}'
+                formulaid: B
+              -
+                macro: '{#ENT_CLASS}'
+                value: '{$ENT_CLASS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          description: 'The discovery of serial numbers of the entities from ENTITY-MIB.'
+          item_prototypes:
+            -
+              uuid: 873d648619bf45168d8008ea32596838
+              name: '{#ENT_NAME}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: ENTITY-MIB.
+                The object name: `entPhysicalSerialNum`.
+                The vendor-specific serial number string for the physical entity. The preferred value is the serial number string actually printed on the component itself (if present).
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: component
+                  value: serial-number
+                -
+                  tag: entity
+                  value: '{#ENT_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 18e244c17d6c436f9e3b1d71d7bfd024
+                  expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}])=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'The device serial number has changed. Acknowledge to close manually.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: a323e6f090e043058e2e932ed2456cba
+          name: 'Fan status discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: fan.status.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}'
+                formulaid: A
+          description: 'The discovery of metrics for the fan''s status from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
+          item_prototypes:
+            -
+              uuid: 16047f29242444f284e81f6b87a22c50
+              name: '{#SNMPVALUE}: Fan operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.117.1.4.1.1.1.{#SNMPINDEX}'
+              key: 'sensor.fan.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CISCO-ENTITY-FRU-CONTROL-MIB.
+                The object name: `cefcFanTrayOperStatus`.
+                The operational state of the fan or a fan tray.
+                Possible values:
+                -  unknown (1) - unknown;
+                -  up (2) - powered on;
+                -  down (3) - powered down;
+                -  warning (4) - partial failure; needs replacement as soon as possible.
+              valuemap:
+                name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus'
+              tags:
+                -
+                  tag: component
+                  value: fan
+              trigger_prototypes:
+                -
+                  uuid: c06b2cf2183d40348b3f688a7fbcb479
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                  name: '{#SNMPVALUE}: Fan is down'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  description: 'The fan unit requires immediate attention.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: ec5a4c0aa2b947309d012fcaf1736c7e
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=1'
+                  name: '{#SNMPVALUE}: Fan is in unknown state'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: INFO
+                  description: 'The fan unit requires attention.'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Fan is down'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 83494b0d4ec84709a18f8674c1fa50fd
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
+                  name: '{#SNMPVALUE}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'The fan unit requires attention.'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Fan is down'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: 2714f855584347329b2f175a85198f80
+          name: 'Memory discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.221.1.1.1.1.3]'
+          key: memory.discovery
+          delay: 1h
+          description: |
+            The discovery of `ciscoMemoryPoolTable` - the table that contains monitoring entries of the memory pool.
+            For more details see "How to Get Free and Largest Block of Contiguous Memory Using SNMP":
+            http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+          item_prototypes:
+            -
+              uuid: 566a28e0151f4e54a8dd7fceae39ffab
+              name: '{#SNMPVALUE}: Free memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.221.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'vm.memory.free[{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CISCO-ENHANCED-MEMPOOL-MIB.
+                The object name: `cempMemPoolFree`.
+                It indicates the number of bytes from the memory pool that are currently unused on the physical entity.
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
+            -
+              uuid: e1d336ee79b6448ea9d6a28107314a42
+              name: '{#SNMPVALUE}: Used memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.221.1.1.1.1.7.{#SNMPINDEX}'
+              key: 'vm.memory.used[{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CISCO-ENHANCED-MEMPOOL-MIB.
+                The object name: `cempMemPoolUsed`.
+                It indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity.
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
+            -
+              uuid: a56f71ab5bc64aa8884dc540baefe91a
+              name: '{#SNMPVALUE}: Memory utilization'
+              type: CALCULATED
+              key: 'vm.memory.util[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//vm.memory.used[{#SNMPINDEX}])/(last(//vm.memory.free[{#SNMPINDEX}])+last(//vm.memory.used[{#SNMPINDEX}]))*100'
+              description: 'The memory utilization expressed in %.'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: memory
+                  value: '{#SNMPVALUE}'
+              trigger_prototypes:
+                -
+                  uuid: d7f6de21b2434a81b2b116a98a59b1ed
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  name: '{#SNMPVALUE}: High memory utilization'
+                  event_name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 12fcbac74d9b4874b6065c20bd6b2901
+              name: '{#SNMPVALUE}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'vm.memory.util[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: cd6bc93993e44b61aca57f0486e61756
+          name: 'Network interfaces discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'The discovery of interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: ad58c092ed604092a06ba518779c3294
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'net.if.in.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                The number of inbound packets, which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be the necessity to free up the buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: cbf3ec76d241416caf812eccdf91ec1b
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'net.if.in.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 9d60de695fa243b4b933766b668de946
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate'
+                  event_name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors in: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                      expression: |
+                        {$IFCONTROL:"{#IFNAME}"}=1 
+                        and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                        and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 7bce2682f482489c8c27aafc9ddcb205
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'net.if.in[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB.
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 4751c9b0380d465799b013906e404e14
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.out.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                The number of outbound packets, which were chosen to be discarded, even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 36185d5b8239434ba2c85706cd890148
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'net.if.out.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: d1cc4527260346e59b86577e0ae9cc0c
+                  expression: 'min(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate'
+                  event_name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors out: {ITEM.LASTVALUE2}'
+                  priority: WARNING
+                  description: 'It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                      expression: |
+                        {$IFCONTROL:"{#IFNAME}"}=1 
+                        and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                        and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 669337baef364a46bc8ad34bd4c97494
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'net.if.out[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB.
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of the ifOutOctets.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 2d7507061f1e49debfbbd78e5e666a13
+              name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'net.if.speed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB.
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of "n", then the speed of the interface is somewhere in the range from n-500,000 to n+499,999.
+                For the interfaces, which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
+                For a sub-layer, which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 07cf5068d5584affa0b35aea5f63e17c
+              name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'net.if.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                The current operational state of the interface:
+                -  The testing (3) state indicates that no operational packet scan be passed.
+                -  If ifAdminStatus is down (2), then ifOperStatus should be down (2).
+                -  If ifAdminStatus is changed to up (1), then ifOperStatus should change to up (1), provided the interface is ready to transmit and receive network traffic.
+                -  It should change to dormant (5) if the interface is waiting for external actions, such as a serial line waiting for an incoming connection.
+                -  It should remain in the down (2) state if and only when there is a fault that prevents it from going to the up (1) state.
+                -  It should remain in the notPresent (6) state if the interface has missing components (typically, hardware).
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: d16b8b35258a4c4b8e4338c2577f198b
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. Use $IFCONTROL macro with context "{#IFNAME}" to void trigger firing on specific interfaces. Values:
+                    -  0 : Marks an interface as not important. Trigger does not fire when interface is down.
+                    -  1 : Default value to fire the trigger when interface is down
+                    3. change(//net.if.status[{#IFNAME}]) - condition prevents firing of trigger if status did not change. It helps in cases, when interfaces were initially down.
+                    BEWARE, manual close will ceasefire until at least two status changes happens again!
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: f2353404b957494683ade2d0c0a24e05
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'net.if.type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB.
+                The type of an interface.
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA)
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+          trigger_prototypes:
+            -
+              uuid: 06a31bd057814786aac4f42ccdf57fdf
+              expression: |
+                change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])<0 
+                and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 
+                and find(/Cisco Nexus 9000 Series by SNMP/net.if.type[{#SNMPINDEX}],#1,"regexp","^(6|7|11|62|69|117)$") 
+                and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])<>2
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                (change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0)
+                or last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2
+              name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
+              opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Ack to close manually.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 9dc308a5f30a45689eb2b9b3c2d9d453
+              expression: |
+                (avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 0036e4b0761740aea6f0b5c305861a4d
+              expression: |
+                (avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
+                  expression: |
+                    {$IFCONTROL:"{#IFNAME}"}=1 
+                    and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 
+                    and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 34e5de605fd54d43979c2ed35b0bdc80
+              name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.in[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.out[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.out.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.in.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.out.discards[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'net.if.in.discards[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: 73133517383046b58c8039363a907fe4
+          name: 'EtherLike discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.10.7.2.1.19,{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2]'
+          key: net.if.duplex.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: (2|3)
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '1'
+                formulaid: A
+          description: 'The discovery of interfaces from IF-MIB and EtherLike-MIB. The interfaces that have up (1) operational status are discovered.'
+          item_prototypes:
+            -
+              uuid: 17792bed5be34b21a4c8a4069374d7f7
+              name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.duplex[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: EtherLike-MIB.
+                The object name: dot3StatsDuplexStatus.
+                The current mode of operation of the MAC entity 'unknown' indicates that the current duplex mode could not be determined.
+                The management control of the duplex mode is accomplished through the MAU MIB. 
+                When the interface does not support autonegotiation, or when autonegotiation is not enabled, the duplex mode is controlled using ifMauDefaultType.
+                When autonegotiation is supported and enabled, duplex mode is controlled using ifMauAutoNegAdvertisedBits.
+                In either case, the currently operating duplex mode is reflected in both: in this object and in ifMauType.
+                Note that this object provides redundant information with ifMauType.
+                Normally, redundant objects are discouraged. 
+                However, in this instance, it allows the management application to determine the duplex status of an interface without having to know every possible value of ifMauType.
+                This was felt to be sufficiently valuable to justify the redundancy.
+                For the reference see: [IEEE 802.3 Std.], 30.3.1.1.32, aDuplexStatus.
+              valuemap:
+                name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: c1f6a9e7c53c43a6ae19fa249236157d
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/net.if.duplex[{#SNMPINDEX}])=2'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
+                  priority: WARNING
+                  description: 'Check the autonegotiation settings and cabling.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  try {
+                      var data = JSON.parse(value);
+                  }
+                  catch (error) {
+                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
+                  }
+                  var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
+                  data.forEach(function (element) {
+                      fields.forEach(function (field) {
+                          element[field] = typeof(element[field]) === 'undefined' ? '' : element[field];
+                      });
+                  });
+                  return JSON.stringify(data);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: 8a6f70d8eaa94e1dbd45f199c231d770
+          name: 'PSU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: psu.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#SNMPVALUE}'
+                value: '{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}'
+                formulaid: A
+          description: 'The discovery of power supplies from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
+          item_prototypes:
+            -
+              uuid: 8a083945d7e244099095b022169de86c
+              name: '{#SNMPVALUE}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.117.1.1.2.1.2.{#SNMPINDEX}'
+              key: 'sensor.psu.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CISCO-ENTITY-FRU-CONTROL-MIB.
+                The object name: cefcFRUPowerOperStatus.
+                The Operational field-replaceable unit (FRU) Status types.
+                The valid values are:
+                -  offEnvOther (1): FRU is powered off because of a problem not listed below;
+                -  on (2): FRU is powered on;
+                -  offAdmin (3): administratively off;
+                -  offDenied (4): FRU is powered off because available system power is insufficient;
+                -  offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;
+                -  offEnvTemp (6): FRU is powered off because of temperature problem;
+                -  offEnvFan (7): FRU is powered off because of fan problems;
+                -  failed (8): FRU is in failed state;
+                -  onButFanFail (9): FRU is on but fan has failed;
+                -  offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;
+                -  offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;
+                -  onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.
+              valuemap:
+                name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerOperStatus'
+              tags:
+                -
+                  tag: component
+                  value: power
+              trigger_prototypes:
+                -
+                  uuid: 4bc31f8605ab4899979d2f3385cd7b7a
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
+                  name: '{#SNMPVALUE}: PSU is in failed state'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'The FRU is in a failed state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: a930e2d032804dc880ebe51c4fd0dd07
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=3'
+                  name: '{#SNMPVALUE}: PSU is off: Administratively'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: INFO
+                  description: 'The FRU is administratively off.'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: PSU is in failed state'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 6e2517ce92c949589539edece3cb5eb5
+                  expression: 'find(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}],#1,"regexp",{$PSU.PROBLEM.STATES})'
+                  name: '{#SNMPVALUE}: PSU is off or out of optimal state'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  description: |
+                    The PSU requires attention. Compare the current state from operational data with the table below:
+                    -  offEnvOther (1): FRU is powered off because of a problem not listed below;
+                    -  on (2): FRU is powered on;
+                    -  offAdmin (3): administratively off;
+                    -  offDenied (4): FRU is powered off because available system power is insufficient;
+                    -  offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;
+                    -  offEnvTemp (6): FRU is powered off because of temperature problem;
+                    -  offEnvFan (7): FRU is powered off because of fan problems;
+                    -  failed (8): FRU is in failed state;
+                    -  onButFanFail (9): FRU is on but fan has failed;
+                    -  offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;
+                    -  offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;
+                    -  onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: PSU is in failed state'
+                      expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+        -
+          uuid: bb7d48018f8044ec9bb4fd20d6c52106
+          name: 'Temperature sensors discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.4.1.9.9.91.1.1.1.1.1,{#SENSOR_SCALE},1.3.6.1.4.1.9.9.91.1.1.1.1.2,{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: temperature.discovery
+          delay: 1h
+          description: 'The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) `entSensorType` are discovered. The scale of gathered values is taken from the `entSensorScale` and applied in item preprocessing.'
+          item_prototypes:
+            -
+              uuid: d4e13b5e26164a2ca240bfb93fdd9b77
+              name: '{#SNMPVALUE}: Temperature sensor status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.91.1.1.1.1.5.{#SNMPINDEX}'
+              key: 'sensor.temp.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: CISCO-ENTITY-SENSOR-MIB.
+                The object name: entSensorStatus.
+                This variable indicates the present operational status of the sensor.
+                Possible values:
+                -  ok (1): means the agent can read the sensor value;
+                -  unavailable (2): means that the agent presently can not report the sensor value;
+                -  nonoperational (3) means that the agent believes the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).
+              valuemap:
+                name: 'CISCO-ENTITY-SENSOR-MIB::entSensorStatus'
+              tags:
+                -
+                  tag: component
+                  value: temperature
+                -
+                  tag: sensor
+                  value: '{#SNMPVALUE}'
+              trigger_prototypes:
+                -
+                  uuid: 938eb8e3d3f4486b89316a7b00aa5600
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
+                  name: '{#SNMPVALUE}: Temperature sensor is not available'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'It means that the agent presently can not report the sensor value.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: ec63ba043da64c8abd4c4a9e2dbc297f
+                  expression: 'last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=3'
+                  name: '{#SNMPVALUE}: Temperature sensor is not operational'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'It means that the agent considers that the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 87bb149a7c464318be942011b678a704
+              name: '{#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.91.1.1.1.1.4.{#SNMPINDEX}'
+              key: 'sensor.temp.value[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!°C'
+              description: |
+                MIB: CISCO-ENTITY-SENSOR-MIB.
+                The object name: entSensorValue.
+                This variable reports the most recent measurement seen by the sensor.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '{#SENSOR_SCALE}'
+              tags:
+                -
+                  tag: component
+                  value: temperature
+                -
+                  tag: sensor
+                  value: '{#SNMPVALUE}'
+              trigger_prototypes:
+                -
+                  uuid: ca54affa31654e358ad2be30b8e6dc72
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  name: '{#SNMPVALUE}: Temperature is above critical threshold'
+                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}°C'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'This trigger uses the values of the temperature sensor.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 29f9c6e22d714a18997683ad8979239a
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  name: '{#SNMPVALUE}: Temperature is above warning threshold'
+                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}°C"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'This trigger uses the values of the temperature sensor.'
+                  dependencies:
+                    -
+                      name: '{#SNMPVALUE}: Temperature is above critical threshold'
+                      expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 0ce9b389385f482c9bea0c52822be85d
+                  expression: 'avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'min(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}-3'
+                  name: '{#SNMPVALUE}: Temperature is too low'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}°C"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 821343c6c4614842b05c85ba57e054ae
+              name: '{#SNMPVALUE}: Temperature'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Nexus 9000 Series by SNMP'
+                    key: 'sensor.temp.value[{#SNMPINDEX}]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  try {
+                      var sensors = JSON.parse(value);
+                  } catch (e) {
+                      throw "Failed to parse JSON of temperature discovery.";
+                  }
+                  
+                  var scales = {'9': 1, '8': 0.001, '7': 0.000001};
+                  var result = sensors.filter(function (sensor) {      
+                      if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof(scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
+                          return false;
+                      }
+                      sensor['{#SENSOR_SCALE}'] = scales[sensor['{#SENSOR_SCALE}']];
+                      return true;
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: cisco
+        -
+          tag: target
+          value: cisco-nexus
+        -
+          tag: target
+          value: n9000
+      macros:
+        -
+          macro: '{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}'
+          value: '^(?:Fan Module-\d+|PowerSupply-\d+ Fan-\d+)$'
+          description: 'It leaves only the matching fan names as indicated in the filter string.'
+        -
+          macro: '{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}'
+          value: '^(?:PowerSupply-\d+)$'
+          description: 'It leaves only the matching power supply names as indicated in the filter string.'
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$ENT_CLASS.NOT_MATCHES}'
+          value: '3'
+          description: 'The filter excludes chassis (3) class from Serial discovery. The chassis (3) are polled with a regular item.'
+        -
+          macro: '{$ENT_SN.MATCHES}'
+          value: .+
+          description: 'The filter retrieves only existing serial number strings.'
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'If the administrative status is down (2), then an interface is excluded.'
+        -
+          macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFDESCR.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$NET.IF.IFNAME.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
+          description: 'It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'If the operational status is `notPresent (6)`, then an interface is excluded.'
+        -
+          macro: '{$NET.IF.IFTYPE.MATCHES}'
+          value: '.*'
+        -
+          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+        -
+          macro: '{$PSU.PROBLEM.STATES}'
+          value: ^(1|4|5|6|7|9|10|11|12)$
+          description: 'The PSU states list for average trigger priority.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:regex:"BACK"}'
+          value: '70'
+        -
+          macro: '{$TEMP_CRIT:regex:"CPU"}'
+          value: '90'
+        -
+          macro: '{$TEMP_CRIT:regex:"FRONT"}'
+          value: '80'
+        -
+          macro: '{$TEMP_CRIT:regex:"SUN1"}'
+          value: '110'
+        -
+          macro: '{$TEMP_CRIT:regex:"Transceiver"}'
+          value: '75'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:regex:"BACK"}'
+          value: '42'
+        -
+          macro: '{$TEMP_WARN:regex:"CPU"}'
+          value: '80'
+        -
+          macro: '{$TEMP_WARN:regex:"FRONT"}'
+          value: '70'
+        -
+          macro: '{$TEMP_WARN:regex:"SUN1"}'
+          value: '90'
+        -
+          macro: '{$TEMP_WARN:regex:"Transceiver"}'
+          value: '70'
+      dashboards:
+        -
+          uuid: 370f653fc1eb4600afdc5c37fe7b9d0d
+          name: 'Network interfaces'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '2'
+                    -
+                      type: INTEGER
+                      name: columns
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: rows
+                      value: '1'
+                    -
+                      type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Cisco Nexus 9000 Series by SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+      valuemaps:
+        -
+          uuid: aadba98c69b14fbab88e7c37cab158c6
+          name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: up
+            -
+              value: '3'
+              newvalue: down
+            -
+              value: '4'
+              newvalue: warning
+        -
+          uuid: 166e0ff278184ab7b574833bb0dbaec1
+          name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: offEnvOther
+            -
+              value: '2'
+              newvalue: 'on'
+            -
+              value: '3'
+              newvalue: offAdmin
+            -
+              value: '4'
+              newvalue: offDenied
+            -
+              value: '5'
+              newvalue: offEnvPower
+            -
+              value: '6'
+              newvalue: offEnvTemp
+            -
+              value: '7'
+              newvalue: offEnvFan
+            -
+              value: '8'
+              newvalue: failed
+            -
+              value: '9'
+              newvalue: onButFanFail
+            -
+              value: '10'
+              newvalue: offCooling
+            -
+              value: '11'
+              newvalue: offConnectorRating
+            -
+              value: '12'
+              newvalue: onButInlinePowerFail
+        -
+          uuid: 2c29188a8b70409eb9735be0caab0393
+          name: 'CISCO-ENTITY-SENSOR-MIB::entSensorStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: ok
+            -
+              value: '2'
+              newvalue: unavailable
+            -
+              value: '3'
+              newvalue: nonoperational
+        -
+          uuid: feee58fb80214a779f809b5b5ea098d4
+          name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: unknown
+            -
+              value: '2'
+              newvalue: halfDuplex
+            -
+              value: '3'
+              newvalue: fullDuplex
+        -
+          uuid: 29398bbb22bd4743944d117f17973bcb
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: dc2b653516504e14a19afc2d2d9f6ef1
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: e523e2589daf46be96abf630047538cd
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 7b2dabb391bf41d1ab5084248e77efed
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

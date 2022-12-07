@@ -783,7 +783,8 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 }
 
 static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (*eval_func_cb)(
-		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+		zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *,
+			const zbx_timespec_t *, char **))
 {
 	DC_ITEM		item;
 	DC_FUNCTION	function;
@@ -797,13 +798,20 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 
 		if (SUCCEED == err_item)
 		{
-			char		*error = NULL;
-			zbx_variant_t	var;
-			zbx_timespec_t	ts;
+			char			*error = NULL;
+			zbx_variant_t		var;
+			zbx_timespec_t		ts;
+			DC_EVALUATE_ITEM	evaluate_item;
 
 			zbx_timespec(&ts);
 
-			if (SUCCEED == eval_func_cb(&var, &item, function.function,
+			evaluate_item.itemid = item.itemid;
+			evaluate_item.value_type = item.value_type;
+			evaluate_item.proxy_hostid = item.host.proxy_hostid;
+			evaluate_item.host = item.host.host;
+			evaluate_item.key_orig = item.key_orig;
+
+			if (SUCCEED == eval_func_cb(&var, &evaluate_item, function.function,
 					function.parameter, &ts, &error) && ZBX_VARIANT_NONE != var.type)
 			{
 				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
@@ -823,7 +831,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (
 }
 
 static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression, int (*eval_func_cb)(
-		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+		zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -871,8 +879,8 @@ static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **
 }
 
 static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int index, char **value_ret,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **))
+		int (*eval_func_cb)(zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *,
+				const zbx_timespec_t *, char **))
 {
 	int			i;
 	zbx_eval_context_t	local_ctx;
@@ -914,8 +922,8 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 }
 
 void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery)
+		int (*eval_func_cb)(zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *,
+				const zbx_timespec_t *, char **), int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;
@@ -935,8 +943,8 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 }
 
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
-		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
-		char **), int recovery)
+		int (*eval_func_cb)(zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *,
+		const zbx_timespec_t *, char **), int recovery)
 {
 	zbx_trigger_cache_t		*cache;
 	zbx_trigger_cache_state_t	state;

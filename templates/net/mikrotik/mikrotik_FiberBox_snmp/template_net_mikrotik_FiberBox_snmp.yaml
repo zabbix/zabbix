@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:24:35Z'
+  date: '2022-10-27T12:58:12Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 2bd6f566391d49dab6bee184522ab5fa
-      template: 'MikroTik FiberBox SNMP'
-      name: 'MikroTik FiberBox SNMP'
+      template: 'MikroTik FiberBox by SNMP'
+      name: 'MikroTik FiberBox by SNMP'
       description: |
         The template for monitoring Switch MikroTik FiberBox.
         An outdoor switch with five SFP ports
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6a7f532a2e4a4b4cbe9435e560f8d281
-              expression: 'max(/MikroTik FiberBox SNMP/icmpping,#3)=0'
+              expression: 'max(/MikroTik FiberBox by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: 17c92f554c45423eb5b44bd08f34ad7f
-              expression: 'min(/MikroTik FiberBox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik FiberBox SNMP/icmppingloss,5m)<100'
+              expression: 'min(/MikroTik FiberBox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik FiberBox by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik FiberBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik FiberBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: 3b093888ce154887afaa6f738218d718
-              expression: 'avg(/MikroTik FiberBox SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/MikroTik FiberBox by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/MikroTik FiberBox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik FiberBox SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/MikroTik FiberBox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik FiberBox by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik FiberBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik FiberBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2a00f0a84a274bf98254d1bbb9f1ad93
-              expression: 'last(/MikroTik FiberBox SNMP/system.hw.firmware,#1)<>last(/MikroTik FiberBox SNMP/system.hw.firmware,#2) and length(last(/MikroTik FiberBox SNMP/system.hw.firmware))>0'
+              expression: 'last(/MikroTik FiberBox by SNMP/system.hw.firmware,#1)<>last(/MikroTik FiberBox by SNMP/system.hw.firmware,#2) and length(last(/MikroTik FiberBox by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -262,7 +262,7 @@ zabbix_export:
           triggers:
             -
               uuid: 519f97f0275f4e9caf7e320e932ee911
-              expression: 'last(/MikroTik FiberBox SNMP/system.hw.serialnumber,#1)<>last(/MikroTik FiberBox SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik FiberBox SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/MikroTik FiberBox by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik FiberBox by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik FiberBox by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -349,7 +349,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd116049df75471b8aacbedd082f2634
-              expression: 'last(/MikroTik FiberBox SNMP/system.name,#1)<>last(/MikroTik FiberBox SNMP/system.name,#2) and length(last(/MikroTik FiberBox SNMP/system.name))>0'
+              expression: 'last(/MikroTik FiberBox by SNMP/system.name,#1)<>last(/MikroTik FiberBox by SNMP/system.name,#2) and length(last(/MikroTik FiberBox by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             -
               uuid: 97933a27c0eb4e0cb67fceb9877641d9
-              expression: 'last(/MikroTik FiberBox SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik FiberBox SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik FiberBox SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              expression: 'last(/MikroTik FiberBox by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik FiberBox by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik FiberBox by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -440,7 +440,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/MikroTik FiberBox SNMP/system.name,#1)<>last(/MikroTik FiberBox SNMP/system.name,#2) and length(last(/MikroTik FiberBox SNMP/system.name))>0'
+                  expression: 'last(/MikroTik FiberBox by SNMP/system.name,#1)<>last(/MikroTik FiberBox by SNMP/system.name,#2) and length(last(/MikroTik FiberBox by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -510,7 +510,7 @@ zabbix_export:
           triggers:
             -
               uuid: 72662034829d4d008f19cd3231b18bd1
-              expression: 'min(/MikroTik FiberBox SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/MikroTik FiberBox by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -546,7 +546,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7b8af02b531842e2b7f50037a8b3679a
-              expression: 'max(/MikroTik FiberBox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/MikroTik FiberBox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -554,7 +554,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik FiberBox SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik FiberBox by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -588,7 +588,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c5c743eec5fd430385a3ab3f1b9ccd61
-                  expression: 'min(/MikroTik FiberBox SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/MikroTik FiberBox by SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -609,7 +609,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
         -
           uuid: ba436d334f7648db8a7b792418232fde
@@ -647,9 +647,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 788f637f7c28499cb0b8227bbcfddbf6
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold'
                   event_name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -664,9 +664,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: f2952ccdadf0474a85e626eeae67ee8f
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold'
                   event_name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -675,8 +675,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'CPU: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                      expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   tags:
                     -
                       tag: scope
@@ -686,9 +686,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: fbd7daacdcde41fa9395a3dba62c7365
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low'
                   event_name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -738,9 +738,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 732a162ce6aa424e8660882cccfaf40b
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   name: 'Device: Temperature is above critical threshold'
                   event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -755,9 +755,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 64daf72dc6824976bbc28c0e76b9318c
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
                   name: 'Device: Temperature is above warning threshold'
                   event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -766,8 +766,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: 'max(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                      expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   tags:
                     -
                       tag: scope
@@ -777,9 +777,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 3a6e8742e68d4e4cb77931acec6202f2
-                  expression: 'avg(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  expression: 'avg(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik FiberBox SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  recovery_expression: 'min(/MikroTik FiberBox by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
                   name: 'Device: Temperature is too low'
                   event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -836,7 +836,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 89422cbc4e294e5392352b3daa42a27b
-                  expression: 'max(/MikroTik FiberBox SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  expression: 'max(/MikroTik FiberBox by SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -872,7 +872,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1f5dbc7e06fb4a48a516f21095ad95eb
-                  expression: 'max(/MikroTik FiberBox SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  expression: 'max(/MikroTik FiberBox by SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -908,7 +908,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 13229b29783c42119d9242d4e2d795ef
-                  expression: 'max(/MikroTik FiberBox SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  expression: 'max(/MikroTik FiberBox by SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -944,7 +944,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: acdd956a5d49476a86ced8d9ac561979
-                  expression: 'max(/MikroTik FiberBox SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  expression: 'max(/MikroTik FiberBox by SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -963,25 +963,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
         -
           uuid: 8dccf29262d64d02aa9ec070a113e9c5
@@ -1240,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a6f2bfc1407f4b96ac51aa7ec69b234d
-                  expression: 'last(/MikroTik FiberBox SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  expression: 'last(/MikroTik FiberBox by SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
@@ -1555,9 +1555,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1dec7dd2894f4296963217dc13c78abe
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1608,21 +1608,21 @@ zabbix_export:
             -
               uuid: 9d517af24f104293b6ca6b2b8de70d3b
               expression: |
-                change(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/MikroTik FiberBox SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/MikroTik FiberBox by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1631,8 +1631,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1640,13 +1640,13 @@ zabbix_export:
             -
               uuid: a95105e0711543388452fdb960bd2caf
               expression: |
-                (avg(/MikroTik FiberBox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/MikroTik FiberBox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/MikroTik FiberBox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/MikroTik FiberBox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/MikroTik FiberBox SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/MikroTik FiberBox SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik FiberBox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/MikroTik FiberBox by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/MikroTik FiberBox by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik FiberBox by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1656,8 +1656,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1665,12 +1665,12 @@ zabbix_export:
             -
               uuid: 1881f3af98ec450cb15b88ac749bacf6
               expression: |
-                min(/MikroTik FiberBox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/MikroTik FiberBox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/MikroTik FiberBox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/MikroTik FiberBox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/MikroTik FiberBox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/MikroTik FiberBox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/MikroTik FiberBox by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/MikroTik FiberBox by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1680,8 +1680,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik FiberBox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik FiberBox by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1698,42 +1698,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 4f9aab06d404429095f58719a45169df
@@ -1830,8 +1830,8 @@ zabbix_export:
             -
               uuid: d48fafd1402e4774a5e7c2d854e3ebbc
               expression: |
-                last(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik FiberBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik FiberBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1852,8 +1852,8 @@ zabbix_export:
             -
               uuid: 802aa708fd8e42fdaa61d1aa3394c58b
               expression: |
-                last(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik FiberBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik FiberBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1868,8 +1868,8 @@ zabbix_export:
                 -
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
                   expression: |
-                    last(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/MikroTik FiberBox SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    last(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik FiberBox by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik FiberBox by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik FiberBox by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1891,14 +1891,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'MikroTik FiberBox SNMP'
+                    host: 'MikroTik FiberBox by SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
       tags:
         -
@@ -2048,7 +2048,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'MikroTik FiberBox SNMP'
+                        host: 'MikroTik FiberBox by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2961,7 +2961,7 @@ zabbix_export:
   triggers:
     -
       uuid: 63045c3ca20d4cd390b1247dfd3876c4
-      expression: '(last(/MikroTik FiberBox SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik FiberBox SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik FiberBox SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik FiberBox SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/MikroTik FiberBox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik FiberBox by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik FiberBox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik FiberBox by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2970,7 +2970,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/MikroTik FiberBox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/MikroTik FiberBox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2986,5 +2986,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'MikroTik FiberBox SNMP'
+            host: 'MikroTik FiberBox by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.Memory]'

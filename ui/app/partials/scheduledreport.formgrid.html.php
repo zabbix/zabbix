@@ -121,10 +121,10 @@ $form_grid
 $show_weekdays = ($data['cycle'] == ZBX_REPORT_CYCLE_WEEKLY);
 
 $weekdays = [];
-foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
+foreach (range(1, 7) as $day) {
 	$value = 1 << ($day - 1);
 	$weekdays[] = [
-		'name' => getDayOfWeekCaption($day),
+		'label' => getDayOfWeekCaption($day),
 		'value' => $value,
 		'checked' => (bool) ($value & $data['weekdays'])
 	];
@@ -139,8 +139,8 @@ $form_grid
 		(new CFormField(
 			(new CCheckBoxList('weekdays'))
 				->setOptions($weekdays)
-				->addClass(ZBX_STYLE_COLUMNS)
-				->addClass(ZBX_STYLE_COLUMNS_3)
+				->setColumns(3)
+				->setVertical(true)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['allowed_edit'])
 		))

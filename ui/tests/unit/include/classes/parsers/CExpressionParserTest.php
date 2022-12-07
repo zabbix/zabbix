@@ -1822,8 +1822,6 @@ class CExpressionParserTest extends TestCase {
 
 			['find(/host/key,,"like","\\")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like","\\\\")=0', null, CParser::PARSE_SUCCESS],
-			['find(/host/key,,"like","\\r")=0', null, CParser::PARSE_FAIL],
-			['find(/host/key,,"like","\\\\r")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\\\\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\""")=0', null, CParser::PARSE_FAIL],

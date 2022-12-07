@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:58:59Z'
+  date: '2022-10-27T12:56:03Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 6c235d126c1f4895acfe2156b140a886
-      template: 'Ubiquiti AirOS SNMP'
-      name: 'Ubiquiti AirOS SNMP'
+      template: 'Ubiquiti AirOS by SNMP'
+      name: 'Ubiquiti AirOS by SNMP'
       description: |
         Template Net Ubiquiti AirOS
         
@@ -61,7 +61,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2a6711992f354095b056b628be78022c
-              expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+              expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -87,14 +87,14 @@ zabbix_export:
           triggers:
             -
               uuid: 8e66ba0787b54af2897dd348e5453f10
-              expression: 'min(/Ubiquiti AirOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -120,17 +120,17 @@ zabbix_export:
           triggers:
             -
               uuid: 4ae253aa403a42ad8cd4721e2ffdfbca
-              expression: 'avg(/Ubiquiti AirOS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Ubiquiti AirOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Ubiquiti AirOS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -194,7 +194,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0a779320c2ba4494b8c55aef969e7c9d
-              expression: 'min(/Ubiquiti AirOS SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Ubiquiti AirOS by SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -253,7 +253,7 @@ zabbix_export:
           triggers:
             -
               uuid: ab4a91cf3c2a4305a59727558c00a1f8
-              expression: 'last(/Ubiquiti AirOS SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS SNMP/system.hw.firmware))>0'
+              expression: 'last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -363,7 +363,7 @@ zabbix_export:
           triggers:
             -
               uuid: 15523bce03a24cd6a4818ab655d1d2ad
-              expression: 'last(/Ubiquiti AirOS SNMP/system.name,#1)<>last(/Ubiquiti AirOS SNMP/system.name,#2) and length(last(/Ubiquiti AirOS SNMP/system.name))>0'
+              expression: 'last(/Ubiquiti AirOS by SNMP/system.name,#1)<>last(/Ubiquiti AirOS by SNMP/system.name,#2) and length(last(/Ubiquiti AirOS by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -515,7 +515,7 @@ zabbix_export:
           triggers:
             -
               uuid: 30c0c80ae6df45bb96c434016e394bba
-              expression: 'min(/Ubiquiti AirOS SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Ubiquiti AirOS by SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -551,7 +551,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7735f20ab7fd40b8b34cead6cb306b30
-              expression: 'max(/Ubiquiti AirOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -559,7 +559,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Ubiquiti AirOS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -856,9 +856,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c360a22671ea4dcda48fc49ec7847c2d
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFDESCR}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -909,21 +909,21 @@ zabbix_export:
             -
               uuid: 9ccbb6859cd7422684e1946c1e321b3c
               expression: |
-                change(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                change(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Ubiquiti AirOS SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -932,8 +932,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -941,13 +941,13 @@ zabbix_export:
             -
               uuid: 80e37d44eddf49c89b39dacc8c88ac07
               expression: |
-                (avg(/Ubiquiti AirOS SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/Ubiquiti AirOS SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/Ubiquiti AirOS by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
+                avg(/Ubiquiti AirOS by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
+                last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Ubiquiti AirOS SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/Ubiquiti AirOS SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/Ubiquiti AirOS by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
+                avg(/Ubiquiti AirOS by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFDESCR}: High bandwidth usage'
               event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -957,8 +957,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -966,12 +966,12 @@ zabbix_export:
             -
               uuid: 3d7c8f98d0c447038c630f4e2ad81c06
               expression: |
-                min(/Ubiquiti AirOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Ubiquiti AirOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Ubiquiti AirOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Ubiquiti AirOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Ubiquiti AirOS SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Ubiquiti AirOS SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Ubiquiti AirOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Ubiquiti AirOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFDESCR}: High error rate'
               event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -981,8 +981,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFDESCR}: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Ubiquiti AirOS SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -996,42 +996,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Ubiquiti AirOS SNMP'
+                    host: 'Ubiquiti AirOS by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
       tags:
         -
@@ -1130,7 +1130,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Ubiquiti AirOS SNMP'
+                        host: 'Ubiquiti AirOS by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
@@ -2043,7 +2043,7 @@ zabbix_export:
   triggers:
     -
       uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
-      expression: '(last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2052,7 +2052,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Ubiquiti AirOS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2068,7 +2068,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Ubiquiti AirOS SNMP'
+            host: 'Ubiquiti AirOS by SNMP'
             key: 'system.cpu.util[loadValue.2]'
     -
       uuid: cbce9bb057b14b8eb81f8cbb463442d6
@@ -2080,5 +2080,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Ubiquiti AirOS SNMP'
+            host: 'Ubiquiti AirOS by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage]'
