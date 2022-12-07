@@ -24,6 +24,9 @@
 #define ZBX_REGEXP_NO_MATCH	0
 #define ZBX_REGEXP_MATCH	1
 
+#define ZBX_IGNORE_CASE			0
+#define ZBX_CASE_SENSITIVE		1
+
 typedef struct zbx_regexp zbx_regexp_t;
 
 typedef struct

@@ -55,8 +55,6 @@ static int	get_config_log_file_size(void)
 #	define UNLOCK_LOG	unlock_log()
 #endif
 
-#define ZBX_MESSAGE_BUF_SIZE	1024
-
 #ifdef _WINDOWS
 #	define STDIN_FILENO	_fileno(stdin)
 #	define STDOUT_FILENO	_fileno(stdout)
@@ -618,21 +616,6 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: replace strerror to print also the error number                  *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_strerror(int errnum)
-{
-	/* !!! Attention: static !!! Not thread-safe for Win32 */
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
-
-	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
-
-	return utf8_string;
 }
 
 char	*strerror_from_system(unsigned long error)

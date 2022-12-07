@@ -53,7 +53,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 			],
 			[
 				'name' => 'user-zabbix token',
-				'userid' => 5,
+				'userid' => 50,
 				'description' => 'Token that is generated for user',
 				'status' => '0',
 				'expires_at' => '1798754399'

@@ -26,9 +26,22 @@
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
+
+#define ZBX_LOC_NOWHERE	0
+#define ZBX_LOC_QUEUE	1
+#define ZBX_LOC_POLLER	2
+
+#define ZBX_ITEM_COLLECTED		0x01	/* force item rescheduling after new value collection */
+#define ZBX_HOST_UNREACHABLE		0x02
+#define ZBX_ITEM_KEY_CHANGED		0x04
+#define ZBX_ITEM_TYPE_CHANGED		0x08
+#define ZBX_ITEM_DELAY_CHANGED		0x10
+#define ZBX_ITEM_NEW			0x20
 
 typedef struct
 {
@@ -953,10 +966,17 @@ ZBX_DC_CONFIG;
 extern int	sync_in_progress;
 extern ZBX_DC_CONFIG	*config;
 extern zbx_rwlock_t	config_lock;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define	RDLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_rdlock(config_lock)
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
+
+extern zbx_rwlock_t	config_history_lock;
+
+#define	RDLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_rdlock(config_history_lock)
+#define	WRLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_wrlock(config_history_lock)
+#define	UNLOCK_CACHE_CONFIG_HISTORY	zbx_rwlock_unlock(config_history_lock)
 
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
@@ -992,13 +1012,21 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync);
 
 /* number of slots to store maintenance update flags */
 #define ZBX_MAINTENANCE_UPDATE_FLAGS_NUM()	\
-		((CONFIG_TIMER_FORKS + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
+		((((size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER]) + sizeof(uint64_t) * 8 - 1) / (sizeof(uint64_t) * 8))
 
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
 char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
+
+void		DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface);
+ZBX_DC_HOST	*DCfind_host(const char *host);
+ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key);
+void		DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src_function);
+void		DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
+int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
+			char **error);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001

@@ -25,7 +25,6 @@
 #include "zbxexec.h"
 #include "cfg.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
 

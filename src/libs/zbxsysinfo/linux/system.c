@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
 #endif

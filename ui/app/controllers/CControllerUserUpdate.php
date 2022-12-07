@@ -35,7 +35,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'username' =>		'required|db users.username|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'user_groups' =>	'required|array_id|not_empty',
+			'user_groups' =>	'array_id',
 			'password1' =>		'string',
 			'password2' =>		'string',
 			'medias' =>			'array',
@@ -47,7 +47,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page',
 			'url' =>			'db users.url',
-			'roleid' =>			'required|db users.roleid',
+			'roleid' =>			'id',
 			'form_refresh' =>	'int32'
 		];
 
@@ -90,27 +90,28 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function doAction() {
-		$user = [];
+		$user = ['roleid' => 0];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
-		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 
 		if ($this->getInput('password1', '') !== '' || ($this->hasInput('password1') && !$this->allow_empty_password)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['medias'] = [];
+		[$db_user] = API::User()->get([
+			'output' => ['userdirectoryid'],
+			'userids' => [$user['userid']]
+		]);
 
-		foreach ($this->getInput('medias', []) as $media) {
-			$user['medias'][] = [
-				'mediatypeid' => $media['mediatypeid'],
-				'sendto' => $media['sendto'],
-				'active' => $media['active'],
-				'severity' => $media['severity'],
-				'period' => $media['period']
-			];
+		if ($db_user['userdirectoryid']) {
+			$provisioned_fields = ['username', 'name', 'surname', 'roleid', 'passwd'];
+			$user = array_diff_key($user, array_fill_keys($provisioned_fields, ''));
+		}
+		else {
+			$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
+			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		$result = (bool) API::User()->update($user);

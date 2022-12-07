@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /*

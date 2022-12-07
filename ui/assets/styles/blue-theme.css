@@ -111,6 +111,11 @@ a:active {
 a img {
   border: 0;
   vertical-align: top; }
+a.disabled:active, a.disabled:focus, a.disabled:hover {
+  cursor: default !important;
+  border-bottom: 0;
+  outline: 0;
+  opacity: .35; }
 
 svg a {
   fill: #0275b8;
@@ -3422,14 +3427,12 @@ form.is-loading {
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }
-    .list-table.compact-view td [class*='icon-'] {
-      vertical-align: middle; }
-      .list-table.compact-view td [class*='icon-']::after {
-        margin: 0;
-        line-height: 14px;
-        top: 0; }
-      .list-table.compact-view td [class*='icon-']:last-of-type {
-        margin-right: 0; }
+    .list-table.compact-view td [class*='icon-']::after {
+      margin: 0;
+      line-height: 14px;
+      top: 0; }
+    .list-table.compact-view td [class*='icon-']:last-of-type {
+      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
@@ -4363,11 +4366,21 @@ button {
   font-size: inherit;
   padding: 0;
   min-height: inherit; }
+  .btn-link.red {
+    color: #e33734;
+    border-color: #e33734; }
+  .btn-link.green {
+    color: #429e47;
+    border-color: #429e47; }
   .btn-link:focus {
     outline: none;
     margin-bottom: -2px !important;
     border-bottom: 2px solid rgba(2, 117, 184, 0.5);
     box-shadow: 0 0 0 0 !important; }
+    .btn-link:focus.red {
+      border-color: #e33734; }
+    .btn-link:focus.green {
+      border-color: #429e47; }
   .btn-link[disabled] {
     background-color: transparent; }
     .btn-link[disabled]:hover {
@@ -4729,7 +4742,7 @@ section .section-toggle, .filter-container.tabfilter-container .icon-edit, .btn-
 button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #acbbc2 !important;
   background-color: #ebebeb;
-  border-color: #ccd5d9;
+  border-color: #ccd5d9 !important;
   cursor: default; }
   button.icon-cal[disabled] {
     opacity: .3;
@@ -6498,7 +6511,8 @@ svg {
         box-shadow: none; }
     .navtree .tree .tree-item > .tree-row > .content {
       display: flex;
-      height: 20px; }
+      height: 20px;
+      align-items: center; }
       .navtree .tree .tree-item > .tree-row > .content > .arrow {
         flex: 0 0 15px;
         text-align: center;
@@ -7129,7 +7143,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 26px; }
+  width: 10px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {

@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 static vm_size_t	pagesize = 0;
 
 static struct vm_statistics	vm;

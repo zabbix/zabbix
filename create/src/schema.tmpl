@@ -46,8 +46,11 @@ FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
-FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
+FIELD		|roleid		|t_id			|NULL	|NULL	|0	|1|role
+FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|ZBX_NODATA	|2|userdirectory	|userdirectoryid	|RESTRICT
+FIELD		|ts_provisioned		|t_time	|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|username
+INDEX		|2		|userdirectoryid
 
 TABLE|maintenances|maintenanceid|ZBX_DATA
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
@@ -88,12 +91,15 @@ FIELD		|auto_compress	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|custom_interfaces|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|name_upper	|t_varchar(128)	|''	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
 INDEX		|4		|name
 INDEX		|5		|maintenanceid
+INDEX		|6		|name_upper
 CHANGELOG	|1
+UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
 TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
@@ -266,6 +272,7 @@ FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|name_upper	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|hostid,key_(764)
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -273,7 +280,9 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
+INDEX		|9		|hostid,name_upper
 CHANGELOG	|3
+UPD_TRIG_FUNC	|name		|name_upper	|itemid	|upper
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
@@ -543,7 +552,7 @@ FIELD		|http_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|http_login_form	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|http_strip_domains	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
-FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_auth_enabled		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
@@ -551,19 +560,6 @@ FIELD		|compression_status	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compress_older	|t_varchar(32)	|'7d'	|NOT NULL	|ZBX_NODATA
 FIELD		|instanceid	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_auth_enabled	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_idp_entityid	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sso_url	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_slo_url	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_username_attribute|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sp_entityid	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_nameid_format	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sign_messages	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sign_assertions	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sign_authn_requests	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sign_logout_requests	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_sign_logout_responses	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_encrypt_nameid	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|saml_encrypt_assertions|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_case_sensitive	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|default_lang		|t_varchar(5)	|'en_US'|NOT NULL	|ZBX_NODATA
 FIELD		|default_timezone	|t_varchar(50)	|'system'|NOT NULL	|ZBX_NODATA
@@ -600,9 +596,14 @@ FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirectoryid|RESTRICT
 FIELD		|server_status		|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|jit_provision_interval		|t_varchar(32)	|'1h'	|NOT NULL	|ZBX_NODATA
+FIELD		|saml_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ldap_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|disabled_usrgrpid			|t_id			|NULL	|NULL		|ZBX_NODATA	|4|usrgrp	|usrgrpid|RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
+INDEX		|4		|disabled_usrgrpid
 
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
@@ -1630,6 +1631,9 @@ FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
 FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
 FIELD		|value_serviceid|t_id		|	|NULL		|0			|7|services	|serviceid
 FIELD		|value_slaid	|t_id		|	|NULL		|0			|8|sla		|slaid
+FIELD		|value_userid	|t_id		|	|NULL		|0			|9|users	|userid
+FIELD		|value_actionid	|t_id		|	|NULL		|0			|10|actions	|actionid
+FIELD		|value_mediatypeid|t_id		|	|NULL		|0			|11|media_type	|mediatypeid
 INDEX		|1		|widgetid
 INDEX		|2		|value_groupid
 INDEX		|3		|value_hostid
@@ -1638,6 +1642,9 @@ INDEX		|5		|value_graphid
 INDEX		|6		|value_sysmapid
 INDEX		|7		|value_serviceid
 INDEX		|8		|value_slaid
+INDEX		|9		|value_userid
+INDEX		|10		|value_actionid
+INDEX		|11		|value_mediatypeid
 
 TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
@@ -1961,19 +1968,77 @@ FIELD		|lastaccess		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|version		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|compatibility		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 
-
 TABLE|userdirectory|userdirectoryid|0
 FIELD		|userdirectoryid	|t_id			|		|NOT NULL	|0
 FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
 FIELD		|description		|t_shorttext	|''		|NOT NULL	|0
-FIELD		|host				|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|port				|t_integer		|'389'	|NOT NULL	|0
-FIELD		|base_dn			|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|bind_dn			|t_varchar(255)	|''		|NOT NULL	|0
-FIELD		|bind_password		|t_varchar(128)	|''		|NOT NULL	|0
-FIELD		|search_attribute	|t_varchar(128)	|''		|NOT NULL	|0
-FIELD		|start_tls			|t_integer		|'0'	|NOT NULL	|0
-FIELD		|search_filter		|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|idp_type			|t_integer		|'1'	|NOT NULL	|0
+FIELD		|provision_status	|t_integer		|'0'	|NOT NULL	|0
+INDEX		|1			|idp_type
+
+TABLE|userdirectory_ldap|userdirectoryid|0
+FIELD		|userdirectoryid		|t_id			|		|NOT NULL	|0	|1|userdirectory
+FIELD		|host					|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|port					|t_integer		|'389'	|NOT NULL	|0
+FIELD		|base_dn				|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|search_attribute		|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|bind_dn				|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|bind_password			|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|start_tls				|t_integer		|'0'	|NOT NULL	|0
+FIELD		|search_filter			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|group_basedn			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|group_name				|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|group_member			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|user_ref_attr			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|group_filter			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|group_membership		|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|user_username			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|user_lastname			|t_varchar(255)	|''		|NOT NULL	|0
+
+TABLE|userdirectory_saml|userdirectoryid|0
+FIELD		|userdirectoryid		|t_id			|		|NOT NULL	|0	|1|userdirectory
+FIELD		|idp_entityid			|t_varchar(1024)|''		|NOT NULL	|0
+FIELD		|sso_url				|t_varchar(2048)|''		|NOT NULL	|0
+FIELD		|slo_url				|t_varchar(2048)|''		|NOT NULL	|0
+FIELD		|username_attribute		|t_varchar(128)	|''		|NOT NULL	|0
+FIELD		|sp_entityid			|t_varchar(1024)|''		|NOT NULL	|0
+FIELD		|nameid_format			|t_varchar(2048)|''		|NOT NULL	|0
+FIELD		|sign_messages			|t_integer		|'0'	|NOT NULL	|0
+FIELD		|sign_assertions		|t_integer		|'0'	|NOT NULL	|0
+FIELD		|sign_authn_requests	|t_integer		|'0'	|NOT NULL	|0
+FIELD		|sign_logout_requests	|t_integer		|'0'	|NOT NULL	|0
+FIELD		|sign_logout_responses	|t_integer		|'0'	|NOT NULL	|0
+FIELD		|encrypt_nameid			|t_integer		|'0'	|NOT NULL	|0
+FIELD		|encrypt_assertions		|t_integer		|'0'	|NOT NULL	|0
+FIELD		|group_name				|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|user_username			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|user_lastname			|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|scim_status			|t_integer		|'0'	|NOT NULL	|0
+
+TABLE|userdirectory_media|userdirectory_mediaid|0
+FIELD		|userdirectory_mediaid	|t_id			|	|NOT NULL	|0
+FIELD		|userdirectoryid	|t_id			|	|NOT NULL	|0	|1	|userdirectory
+FIELD		|mediatypeid		|t_id			|	|NOT NULL	|0	|2	|media_type
+FIELD		|name				|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|attribute			|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1	|userdirectoryid
+INDEX		|2	|mediatypeid
+
+TABLE|userdirectory_usrgrp|userdirectory_usrgrpid|0
+FIELD		|userdirectory_usrgrpid		|t_id		|	|NOT NULL	|0
+FIELD		|userdirectory_idpgroupid	|t_id		|	|NOT NULL	|0	|1	|userdirectory_idpgroup
+FIELD		|usrgrpid					|t_id		|	|NOT NULL	|0	|2	|usrgrp
+UNIQUE		|1	|userdirectory_idpgroupid,usrgrpid
+INDEX		|2	|usrgrpid
+INDEX		|3	|userdirectory_idpgroupid
+
+TABLE|userdirectory_idpgroup|userdirectory_idpgroupid|0
+FIELD		|userdirectory_idpgroupid	|t_id			|	|NOT NULL	|0
+FIELD		|userdirectoryid		|t_id			|	|NOT NULL	|0	|1	|userdirectory
+FIELD		|roleid					|t_id			|	|NOT NULL	|0	|2	|role
+FIELD		|name					|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1	|userdirectoryid
+INDEX		|2	|roleid
 
 TABLE|changelog|changelogid|0
 FIELD		|changelogid	|t_serial	|	|NOT NULL	|0
@@ -1983,8 +2048,20 @@ FIELD		|operation	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
+TABLE|scim_group|scim_groupid|0
+FIELD		|scim_groupid	|t_id			|	|NOT NULL	|0
+FIELD		|name			|t_varchar(64)	|''	|NOT NULL	|0
+UNIQUE		|1		|name
+
+TABLE|user_scim_group|user_scim_groupid|0
+FIELD		|user_scim_groupid	|t_id	|	|NOT NULL	|0
+FIELD		|userid				|t_id	|	|NOT NULL	|0	|1|users
+FIELD		|scim_groupid		|t_id	|	|NOT NULL	|0	|2|scim_group
+INDEX		|1	|userid
+INDEX		|2	|scim_groupid
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030063	|6030063
+ROW		|1		|6030148	|6030148
