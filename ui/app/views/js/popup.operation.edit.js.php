@@ -474,6 +474,7 @@ window.operation_popup = new class {
 		curl.setArgument('action', 'action.operation.check');
 
 		const fields = getFormFields(this.form);
+
 		if (fields.operation.esc_period != null) {
 			fields.operation.esc_period = fields.operation.esc_period.trim();
 		}

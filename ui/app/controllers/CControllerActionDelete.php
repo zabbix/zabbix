@@ -56,17 +56,17 @@ class CControllerActionDelete extends CController {
 				case EVENT_SOURCE_TRIGGERS:
 					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
-			case EVENT_SOURCE_DISCOVERY:
-				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
+				case EVENT_SOURCE_DISCOVERY:
+					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
 
-			case EVENT_SOURCE_AUTOREGISTRATION:
-				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
+				case EVENT_SOURCE_AUTOREGISTRATION:
+					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
 
-			case EVENT_SOURCE_INTERNAL:
-				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
+				case EVENT_SOURCE_INTERNAL:
+					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
 
-			case EVENT_SOURCE_SERVICE:
-				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
+				case EVENT_SOURCE_SERVICE:
+					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 			}
 		}
 

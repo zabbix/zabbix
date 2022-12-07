@@ -353,6 +353,7 @@ window.action_edit_popup = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
+
 		if (fields.esc_period != null ) {
 			fields.esc_period = fields.esc_period.trim();
 		}
