@@ -596,8 +596,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'db_instance_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -657,7 +657,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    request.setProxy(AwsRds.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -773,6 +774,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -791,8 +795,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'db_instance_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -852,7 +856,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    request.setProxy(AwsRds.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -956,6 +961,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -975,8 +983,8 @@ zabbix_export:
                 request_period: 600,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'db_instance_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -1036,7 +1044,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    request.setProxy(AwsRds.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -1115,6 +1124,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1134,8 +1146,8 @@ zabbix_export:
                 request_period: 600,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'db_instance_id'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                    ['access_key', 'secret_key', 'region', 'db_instance_id', 'proxy'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -1298,7 +1310,8 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri;
-            
+
+                    request.setProxy(AwsRds.params.proxy);
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData')
                     request.addHeader('Accept: application/json');
@@ -1379,6 +1392,9 @@ zabbix_export:
             -
               name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -3364,6 +3380,9 @@ zabbix_export:
           tag: target
           value: rds
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
