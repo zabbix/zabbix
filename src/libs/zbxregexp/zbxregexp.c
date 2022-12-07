@@ -191,7 +191,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: public wrapper to compiles a regular expression                   *
+ * Purpose: public wrapper to compile a regular expression                    *
  *                                                                            *
  * Parameters:                                                                *
  *     pattern   - [IN] regular expression as a text string. Empty            *

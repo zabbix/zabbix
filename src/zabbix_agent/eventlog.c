@@ -1696,8 +1696,8 @@ out:
 	return ret;
 }
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		const zbx_config_tls_t *zbx_config_tls, int config_timeout, zbx_uint64_t *lastlogsize_sent,
 		char **error)
 {

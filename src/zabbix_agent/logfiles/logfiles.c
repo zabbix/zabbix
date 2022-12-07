@@ -2022,12 +2022,12 @@ static int	zbx_match_log_rec(const zbx_vector_expression_t *regexps, const char 
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
-		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
-		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
-		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
-		char **err_msg)
+		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps,
+		const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2386,7 +2386,7 @@ out:
  *                       encodings.                                           *
  *                       "" (empty string) means a single-byte character set  *
  *                       (e.g. ASCII).                                        *
- *     regexps         - [IN] array of regexps                                *
+ *     regexps         - [IN] vector of regexps                               *
  *     pattern         - [IN] pattern to match                                *
  *     output_template - [IN] output formatting template                      *
  *     p_count         - [IN/OUT] limit of records to be processed            *
@@ -2419,11 +2419,12 @@ out:
  ******************************************************************************/
 static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
-		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
-		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **err_msg)
+		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
+		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
+		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
