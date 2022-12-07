@@ -4089,7 +4089,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC])]
 				]];
 				break;
 

@@ -2041,17 +2041,30 @@ abstract class CItemGeneral extends CApiService {
 				if ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
 					$params = explode("\n", $step['params']);
 
-					if (count($params) % 2 !== 0) {
+					if (count($params) % 3 !== 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
 						);
 					}
 
-					foreach ($params as $param) {
+					for ($n = 1; $n <= count($params); $n++) {
+						$param = $params[$n - 1];
+
 						if ($param === '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('cannot be empty'))
 							);
+						}
+
+						// Field "Treat as" every 3rd value. Check that field is correct.
+						if ($n % 3 === 0) {
+							if (!in_array($param, [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED,
+										ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC
+									])) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1).'/params', _('incorrect value'))
+								);
+							}
 						}
 					}
 				}

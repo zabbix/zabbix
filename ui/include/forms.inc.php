@@ -1297,7 +1297,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			// Create a primary param text box, so it can be hidden if necessary.
 			$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
 			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
-				->setTitle($step_param_0_value)
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
@@ -1305,7 +1304,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				? $step['params'][1]
 				: '';
 			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
-				->setTitle($step_param_1_value)
 				->setReadonly($readonly);
 		}
 
@@ -1445,33 +1443,54 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				break;
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
-				$params = $step_param_0
-					->setAttribute('placeholder', _('OID'))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('OID')),
+					(new CSelect('preprocessing['.$i.'][params][1]'))
+						->setValue($step_param_1_value)
+						->addOptions([
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+						])
+						->setReadonly($readonly)
+				];
 				break;
 
 			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 				$mapping_rows = [];
 				$count = count($step['params']);
 
-				for ($j = 0; $j < $count; $j+=2) {
+				for ($j = 0; $j < $count; $j += 3) {
 					$mapping_rows[] = [
 						(new CRow([
 							new CCol(
 								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+									->setReadonly($readonly)
 									->removeId()
-									->setAttribute('placeholder', _('Output field name')),
+									->setAttribute('placeholder', _('Output field name'))
 							),
 							new CCol(
 								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+									->setReadonly($readonly)
 									->removeId()
-									->setAttribute('placeholder', _('Key value prefix')),
+									->setAttribute('placeholder', _('Key value prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing['.$i.'][params][]'))
+									->setValue($step['params'][$j + 2])
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+									])
+									->setReadonly($readonly)
 							),
 							(new CCol(
 								(new CSimpleButton(_('Remove')))
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->addClass('js-group-json-action-delete')
-									->setEnabled($count > 2)
+									->setEnabled($count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass('group-json-row')
 					];
@@ -1485,6 +1504,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 								(new CRowHeader([
 									new CColHeader(_('Output field name')),
 									new CColHeader(_('Key value prefix')),
+									new CColHeader(_('Treat as')),
 									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
 								]))->addClass(ZBX_STYLE_GREY)
 							)
@@ -1496,7 +1516,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 											(new CSimpleButton(_('Add')))
 												->addClass(ZBX_STYLE_BTN_LINK)
 												->addClass('js-group-json-action-add')
-										))->setColSpan(3)
+										))->setColSpan(4)
 									)
 							)
 							->setAttribute('data-index', $i)

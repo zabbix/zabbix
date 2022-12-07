@@ -130,6 +130,18 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-value-tmpl">
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('OID')).
+		(new CSelect('preprocessing[#{rowNum}][params][1]'))
+			->setValue(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED)
+			->addOptions([
+				new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+				new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+			])
+	?>
+</script>
+
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-walk-to-json-tmpl">
 	<?php
 		echo (new CDiv(
@@ -139,6 +151,7 @@
 						(new CRowHeader([
 							new CColHeader(_('Output field name')),
 							new CColHeader(_('Key value prefix')),
+							new CColHeader(_('Treat as')),
 							(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass(ZBX_STYLE_GREY)
 					)
@@ -147,12 +160,22 @@
 							new CCol(
 								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 									->removeId()
-									->setAttribute('placeholder', _('Output field name')),
+									->setAttribute('placeholder', _('Output field name'))
 							),
 							new CCol(
 								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 									->removeId()
-									->setAttribute('placeholder', _('Key value prefix')),
+									->setAttribute('placeholder', _('Key value prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing[#{rowNum}][params][]'))
+									->setValue(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED)
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+									])
 							),
 							(new CCol(
 								(new CSimpleButton(_('Remove')))
@@ -169,7 +192,7 @@
 									(new CSimpleButton(_('Add')))
 										->addClass(ZBX_STYLE_BTN_LINK)
 										->addClass('js-group-json-action-add')
-								))->setColSpan(3)
+								))->setColSpan(4)
 							)
 					)
 					->setAttribute('data-index', '#{rowNum}')
@@ -183,12 +206,22 @@
 			new CCol(
 				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 					->removeId()
-					->setAttribute('placeholder', _('Output field name')),
+					->setAttribute('placeholder', _('Output field name'))
 			),
 			new CCol(
 				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 					->removeId()
-					->setAttribute('placeholder', _('Key value prefix')),
+					->setAttribute('placeholder', _('Key value prefix'))
+			),
+			new CCol(
+				(new CSelect('preprocessing[#{rowNum}][params][]'))
+					->setValue(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED)
+					->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+					->addOptions([
+						new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+						new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+					])
 			),
 			(new CCol(
 				(new CSimpleButton(_('Remove')))
@@ -211,6 +244,9 @@
 			);
 			const preproc_param_prometheus_pattern_tmpl = new Template(
 				$('#preprocessing-steps-parameters-custom-prometheus-pattern-tmpl').html()
+			);
+			const preproc_param_snmp_walk_value_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-walk-value-tmpl').html()
 			);
 			const preproc_param_snmp_walk_to_json_tmpl = new Template(
 				$('#preprocessing-steps-parameters-snmp-walk-to-json-tmpl').html()
@@ -322,10 +358,9 @@
 					}));
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
-					return $(preproc_param_single_tmpl.evaluate({
+					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
 						rowNum: index,
-						placeholder: <?= json_encode(_('OID')) ?>
-					})).css('width', <?= ZBX_TEXTAREA_SMALL_WIDTH ?>);
+					}));
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
 					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({

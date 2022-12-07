@@ -2104,11 +2104,11 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			case ZBX_PREPROC_SNMP_WALK_VALUE:
 			case ZBX_PREPROC_SCRIPT:
 				$step['params'] = $step['params'][0];
 				break;
 
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
 			case ZBX_PREPROC_VALIDATE_RANGE:
 				foreach ($step['params'] as &$param) {
 					$param = trim($param);
