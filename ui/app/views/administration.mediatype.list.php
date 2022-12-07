@@ -206,7 +206,7 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'eventsource' => $action['eventsource']
+		'eventsource' => $action['eventsource'] ?? 0
 	]).');
 '))
 	->setOnDocumentReady()
