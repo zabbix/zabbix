@@ -133,7 +133,8 @@ out:
 db data:
   history_str: 
   - [1487496600, 0, 'value 02-19 11:30:00']
-  history_str (2):
+  history_str (2): []
+  history_str (3):
   - [1487410200, 0, 'value 02-18 11:30:00']
 ---
 test case: Test count based request over short period

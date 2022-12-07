@@ -412,7 +412,7 @@ out:
  * Parameters:  itemid        - [IN] the itemid                                     *
  *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs)    *
  *              values        - [OUT] the item history data values                  *
- *              count         - [IN] the number of values to read                   *
+ *              count         - [IN] the number of values to read + 1               *
  *              end_timestamp - [IN] the value timestamp to start reading with      *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
