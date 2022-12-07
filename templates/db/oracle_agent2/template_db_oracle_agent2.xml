@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-11-16T11:34:21Z</date>
+   <date>2022-12-07T09:47:34Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -656,7 +656,7 @@
                <history>0</history>
                <trends>0</trends>
                <value_type>TEXT</value_type>
-               <description>he item gets its state of the current instance.</description>
+               <description>The item gets its state of the current instance.</description>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
@@ -2141,7 +2141,7 @@
                      <history>7d</history>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <description>sage of the ASM disk group expressed in %.</description>
+                     <description>Usage of the ASM disk group expressed in %.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Oracle ASM</name>
@@ -2259,7 +2259,7 @@
                            <expression>{diff()}=1</expression>
                            <name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</name>
                            <priority>INFO</priority>
-                           <description>he Oracle DB open status has changed. Ack to close manually.</description>
+                           <description>The Oracle DB open status has changed. Ack to close manually.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                         <trigger_prototype>

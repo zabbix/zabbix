@@ -1,0 +1,4181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+   <version>6.0</version>
+   <date>2022-12-05T13:26:17Z</date>
+   <groups>
+      <group>
+         <uuid>748ad4d098d447d492bb935c907f652f</uuid>
+         <name>Templates/Databases</name>
+      </group>
+   </groups>
+   <templates>
+      <template>
+         <uuid>00ade9277d7c41e8b57d638b22d54372</uuid>
+         <template>Oracle by ODBC</template>
+         <name>Oracle by ODBC</name>
+         <description>1. Create an Oracle user for monitoring.
+
+2. Set the user name and password in host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).
+  Do not forget to install the Microsoft ODBC driver on the Zabbix server or the Zabbix proxy.
+  See Oracle documentation for instructions: https://www.oracle.com/database/technologies/releasenote-odbc-ic.html.
+
+  Note! Credentials in the odbc.ini do not work for Oracle.
+  Note! Be sure that ODBC connects to Oracle with session parameter NLS_NUMERIC_CHARACTERS= '.,' It is important for correct display float numbers in Zabbix.
+The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
+
+
+Template tooling version used: 0.41</description>
+         <groups>
+            <group>
+               <name>Templates/Databases</name>
+            </group>
+         </groups>
+         <items>
+            <item>
+               <uuid>1a6e01f90dca47459975632c14ce5a39</uuid>
+               <name>Oracle: Get archive log info</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>5m</delay>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
+d.log_sequence,
+d.error
+FROM v$archive_dest d , v$database db
+WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>archive-log</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>63fad55a2ced487aa30017b33bf1692e</uuid>
+               <name>Oracle: Get ASM stats</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+name AS dgname,
+ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
+ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
+ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
+FROM v$asm_diskgroup ;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>It gets the ASM disk groups statistics.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>asm</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>5de7c786988d49d0b50f28d2d622db62</uuid>
+               <name>Oracle: Get CDB and No-CDB info</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT name as DBNAME,
+DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode,
+DECODE(database_role, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0) AS ROLE,
+DECODE(force_logging, 'YES',1,'NO',0,0) AS force_logging,
+DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode
+FROM v$database</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>It gets the information about the container database (CDB) and non-CDB databases on an instance.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cdb</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>dde19b79507648bd80a82a0575bf8671</uuid>
+               <name>Oracle: Get instance state</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+INSTANCE_NAME,
+HOST_NAME,
+VERSION || '-' || EDITION AS VERSION,
+floor((SYSDATE - startup_time)*60*60*24) AS UPTIME,
+decode(status,'STARTED',1,'MOUNTED',2,'OPEN',3,'OPEN MIGRATE',4, 0) AS STATUS,
+decode(archiver,'STOPPED',1,'STARTED',2,'FAILED',3, 0) AS  ARCHIVER,
+decode(instance_role,'PRIMARY_INSTANCE',1,'SECONDARY_INSTANCE',2, 0) AS  INSTANCE_ROLE
+FROM v$instance;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The item gets its state of the current instance.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>cedcebd0b7ce474c9681022fcc75df1c</uuid>
+               <name>Oracle: Get PDB info</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+name as DBNAME,
+DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode
+FROM v$pdbs;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>It gets the information about the PDB databases on an instance.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pdb</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>3839683749974cdeafd9178bdccb38d6</uuid>
+               <name>Oracle: Get system metrics</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>0;m0-59</delay>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) as VALUE
+ FROM V$SYSMETRIC WHERE GROUP_ID = 2
+UNION
+  SELECT 'SYSPARAM::' || INITCAP(NAME) AS METRIC, to_number(VALUE)
+  FROM V$SYSTEM_PARAMETER WHERE NAME IN ('sessions', 'processes', 'db_files')
+UNION
+ SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
+UNION
+SELECT 'SESSION::Lock rate' ,(cnt_block / cnt_all)* 100 pct
+FROM ( SELECT COUNT(*) cnt_block FROM v$session WHERE blocking_session IS NOT NULL), ( SELECT COUNT(*) cnt_all FROM v$session)
+UNION
+  SELECT 'SESSION::Long time locked' ,count(*) FROM V$SESSION s WHERE s.BLOCKING_SESSION IS NOT NULL AND s.BLOCKING_SESSION_STATUS='VALID' AND s.SECONDS_IN_WAIT &gt; {$ORACLE.SESSION.LOCK.MAX.TIME}
+UNION
+ SELECT 'SESSION::Total', COUNT(*) AS VALUE FROM V$SESSION
+UNION
+SELECT 'SESSION::Concurrency rate', NVL(ROUND(SUM(duty_act.cnt*100 / num_cores.val)), 0)
+FROM
+( SELECT DECODE(session_state, 'ON CPU', 'CPU', wait_class) wait_class, ROUND(COUNT(*)/(60 * 15), 1) cnt
+FROM v$active_session_history sh
+WHERE sh.sample_time &gt;= SYSDATE - 15 / 1440 AND DECODE(session_state, 'ON CPU', 'CPU', wait_class) IN('Concurrency')
+GROUP BY DECODE(session_state, 'ON CPU', 'CPU', wait_class)) duty_act,
+( SELECT SUM(value) val FROM v$osstat WHERE stat_name = 'NUM_CPU_CORES') num_cores
+UNION
+ SELECT 'PGA::' || INITCAP(NAME), VALUE FROM V$PGASTAT
+UNION
+ SELECT 'FRA::Space Limit' AS METRIC, space_limit AS VALUE FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Space Used', space_used AS VALUE FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Space Reclaimable', space_reclaimable AS VALUE FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Number Of Files', number_of_files AS VALUE FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Usable Pct', DECODE(space_limit, 0, 0,(100-(100 *(space_used-space_reclaimable)/ space_limit))) AS VALUE FROM V$RECOVERY_FILE_DEST
+UNION
+ SELECT 'FRA::Restore Point', COUNT(*) AS VALUE FROM V$RESTORE_POINT
+UNION
+ SELECT 'PROC::Procnum', COUNT(*) FROM v$process
+UNION
+ SELECT 'DATAFILE::Count', COUNT(*) FROM v$datafile
+UNION
+ SELECT 'SGA::' || INITCAP(pool), SUM(bytes) FROM V$SGASTAT
+ WHERE pool IN ( 'java pool', 'large pool' ) GROUP BY pool
+UNION
+ SELECT 'SGA::Shared Pool', SUM(bytes) FROM V$SGASTAT
+ WHERE pool = 'shared pool' AND name NOT IN ('library cache', 'dictionary cache', 'free memory', 'sql area')
+UNION
+ SELECT 'SGA::' || INITCAP(name), bytes FROM V$SGASTAT
+ WHERE pool IS NULL AND name IN ('log_buffer', 'fixed_sga')
+UNION
+ SELECT 'SGA::Buffer_Cache', SUM(bytes) FROM V$SGASTAT
+ WHERE pool IS NULL AND name IN ('buffer_cache', 'db_block_buffers')
+UNION
+ SELECT 'REDO::Available', count(*) from v$log t where t.status in ('INACTIVE', 'UNUSED')
+UNION
+ SELECT 'USER::Expire password', ROUND(DECODE(SIGN(NVL(u.expiry_date, SYSDATE + 999) - SYSDATE),-1, 0, NVL(u.expiry_date, SYSDATE + 999) - SYSDATE)) exp_passwd_days_before
+FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The item gets the values of the system metrics.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>972be2e777e44c539d0ddd7918b79e88</uuid>
+               <name>Oracle: Get tablespaces stats</name>
+               <type>ODBC</type>
+               <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <history>0</history>
+               <trends>0</trends>
+               <value_type>TEXT</value_type>
+               <params>SELECT
+  df.tablespace_name AS TABLESPACE,
+  df.type AS TYPE,
+  NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
+  NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
+  NVL(SUM(f.FREE), 0) AS FREE_BYTES,
+  SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
+  ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
+  ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
+  DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
+FROM ( SELECT
+   ddf.file_id,
+   dt.contents AS TYPE,
+   dt.STATUS ,
+   ddf.file_name,
+   ddf.tablespace_name,
+   TRUNC(ddf.bytes) AS bytes,
+   TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes
+   FROM
+    dba_data_files ddf,
+    dba_tablespaces dt
+  WHERE
+   ddf.tablespace_name = dt.tablespace_name ) df,
+   ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f
+   WHERE df.file_id = f.file_id (+)
+   GROUP BY df.tablespace_name, df.TYPE, df.status
+UNION ALL
+SELECT
+  Y.name AS TABLESPACE,
+  Y.type AS TYPE,
+  NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
+  NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
+  NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
+  SUM(Y.BYTES)-MAX(Y.FREE_BYTES) AS USED_BYTES,
+  ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
+  ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-MAX(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
+  DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
+   FROM ( SELECT
+     dtf.tablespace_name AS name,
+     dt.contents AS TYPE,
+     dt.STATUS AS tbs_status,
+     dtf.status AS status,
+     dtf.bytes AS bytes,
+     (SELECT
+       ((f.total_blocks - s.tot_used_blocks)* vp.value)
+       FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment
+          WHERE tablespace_name != 'DUMMY'
+          GROUP BY tablespace_name) s,
+     ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files
+       WHERE tablespace_name != 'DUMMY'
+       GROUP BY tablespace_name) f,
+     ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp
+   WHERE
+     f.tablespace_name = s.tablespace_name
+     AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes,
+     CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes
+     ELSE dtf.maxbytes END AS max_bytes
+   FROM
+    sys.dba_temp_files dtf,
+    sys.dba_tablespaces dt
+   WHERE
+   dtf.tablespace_name = dt.tablespace_name ) Y
+   GROUP BY Y.name, Y.TYPE, Y.tbs_status;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>It gets the statistics of the tablespaces.</description>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>raw</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>tablespaces</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>7ee99dfbd8dd4048bc2867aaa2fc335e</uuid>
+               <name>Oracle: Service's TCP port state</name>
+               <key>net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}]</key>
+               <delay>30s</delay>
+               <history>7d</history>
+               <description>It checks the availability of Oracle on the TCP port.</description>
+               <valuemap>
+                  <name>Service state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>health</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>network</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>7b0bde98c6c54e67b0aa8b3339fe464d</uuid>
+                     <expression>max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)&gt;0</expression>
+                     <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
+                     <priority>DISASTER</priority>
+                     <description>The TCP port of the Oracle Server service is currently unavailable.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>availability</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>6b6ce717919e45df93015a8f65337055</uuid>
+               <name>Oracle: Active parallel sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_parallel_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active parallel sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Active Parallel Sessions')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>928b095ffe57404eb6863b06b466524d</uuid>
+               <name>Oracle: Active serial sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_serial_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active serial sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Active Serial Sessions')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>70633c6c4e27410dabcf035dd583f820</uuid>
+               <name>Oracle: Average active sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.active_sessions</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The average active sessions at a point in time. The number of sessions that are either working or waiting.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Average Active Sessions')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>eb9f4179a87249fc9df9989f58502a12</uuid>
+               <name>Oracle: Archiver state</name>
+               <type>DEPENDENT</type>
+               <key>oracle.archiver_state</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The status of automatic archiving.</description>
+               <valuemap>
+                  <name>Oracle archiver state</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..ARCHIVER.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>836e01f5247a468dbf1866a744979376</uuid>
+               <name>Oracle: Buffer cache hit ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.buffer_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Buffer Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>dedafce88267427a8f0b51d74de28c58</uuid>
+               <name>Oracle: Global cache blocks corrupted</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cache_blocks_corrupt</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>Rps</units>
+               <description>The number of blocks that encountered corruption or checksum failure during the interconnect.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Global Cache Blocks Corrupted')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>d0d0dbbf1869487d957e60d03e8e3512</uuid>
+               <name>Oracle: Global cache blocks lost</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cache_blocks_lost</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>Rps</units>
+               <description>The number of lost global cache blocks.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Global Cache Blocks Lost')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>50ea6f52e01c44e5b9039add026faaa2</uuid>
+               <name>Oracle: Cursor cache hit ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.cursor_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The ratio of cursor cache hits (CursorCacheHit/SoftParse).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Cursor Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>82228fbb70bf4660aa64bdde2f57686d</uuid>
+               <name>Oracle: Database CPU time ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.database_cpu_time_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>It is calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Database CPU Time Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cpu</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>877272b0b9424d279b1efaa6536eb19b</uuid>
+               <name>Oracle: Database wait time ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.database_wait_time_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes, such as latches, locks, data buffers, etc.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Database Wait Time Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>751fe010337e40a5a12fc24d327ffcee</uuid>
+               <name>Oracle: Datafiles count</name>
+               <type>DEPENDENT</type>
+               <key>oracle.db_files_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The current number of datafiles.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='DATAFILE::Count')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>datafiles</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>5752d92063f84aaa818bc85b135cd4fd</uuid>
+                     <event_name>Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.db_files_count,5m) * 100 / last(/Oracle by ODBC/oracle.db_files_limit) &gt; {$ORACLE.DB.FILE.MAX.WARN}</expression>
+                     <name>Oracle: Too many database files</name>
+                     <priority>WARNING</priority>
+                     <description>The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>a0e263bf207042058b5d9d2e735e05eb</uuid>
+               <name>Oracle: Datafiles limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.db_files_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The maximum allowable number of datafiles.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Db_Files')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>datafiles</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>22d9cccf44924f99aaf444c80b3beab9</uuid>
+               <name>Oracle: Disk sort per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.disk_sorts</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of sorts going to disk per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Disk Sort Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>46e0598b703a412e96a3b18e2248e754</uuid>
+               <name>Oracle: Enqueue timeouts per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.enqueue_timeouts_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Enqueue timeouts per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Enqueue Timeouts Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>beca246cadb44e48a20bc8809624a6f4</uuid>
+               <name>Oracle: FRA, Number of files</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_number_of_files</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of files in the FRA.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Number Of Files')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>61eb041ea3b349df88cb3495b383fbe4</uuid>
+               <name>Oracle: FRA, Number of restore points</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_restore_point</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Restore Point')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>375e094a1a024a19b8e69e4f362c0163</uuid>
+               <name>Oracle: FRA, Space limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The maximum amount of disk space (in bytes) that the database can use for the Fast Recovery Area (FRA).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Limit')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>4028e389cc9e4b24946657f1ded1ba47</uuid>
+               <name>Oracle: FRA, Space reclaimable</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_reclaimable</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the FRA.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Reclaimable')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>40b03e917c3c4c0385536336e48affcb</uuid>
+               <name>Oracle: FRA, Used space</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_space_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The amount of disk space (in bytes) used by FRA files created in the current and all the previous FRAs.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Space Used')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>b29c93eecf9d4d1b8c5de1ce9721801f</uuid>
+               <name>Oracle: FRA, Usable space in %</name>
+               <type>DEPENDENT</type>
+               <key>oracle.fra_usable_pct</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='FRA::Usable Pct')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>fra</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>3243beb0fe70425f8d71938a52f765ae</uuid>
+               <name>Oracle: GC CR block received per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.gc_cr_block_received_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The global cache (GC) and the consistent read (CR) block received per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::GC CR Block Received Per Second')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>3da27d558e034236a42b3b94bfa13159</uuid>
+               <name>Oracle: Instance hostname</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_hostname</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The name of the host machine.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..HOST_NAME.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>618a3e3c82dc4ccba82477afdd100a98</uuid>
+                     <event_name>Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})</event_name>
+                     <expression>last(/Oracle by ODBC/oracle.instance_hostname,#1)&lt;&gt;last(/Oracle by ODBC/oracle.instance_hostname,#2) and length(last(/Oracle by ODBC/oracle.instance_hostname))&gt;0</expression>
+                     <name>Oracle: Instance hostname has changed</name>
+                     <priority>INFO</priority>
+                     <description>Oracle DB Instance hostname has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>notice</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>4e5df3339a2940c6b3cdad6f5b65234b</uuid>
+               <name>Oracle: Instance name</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_name</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The name of an instance.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..INSTANCE_NAME.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>2fe53d1d931e4eb38fef10a3171c1665</uuid>
+                     <event_name>Oracle: Instance name has changed (new name received: {ITEM.VALUE})</event_name>
+                     <expression>last(/Oracle by ODBC/oracle.instance_name,#1)&lt;&gt;last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))&gt;0</expression>
+                     <name>Oracle: Instance name has changed</name>
+                     <priority>INFO</priority>
+                     <description>The Oracle DB instance has changed. Ack to close manually.</description>
+                     <manual_close>YES</manual_close>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>notice</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>632a953eead74114bdaf640bbf5929a5</uuid>
+               <name>Oracle: Instance status</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance_status</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The status of the instance.</description>
+               <valuemap>
+                  <name>Oracle instance status</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..STATUS.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>cc3c9200deed42e5a8e187e82c123009</uuid>
+               <name>Oracle: Instance role</name>
+               <type>DEPENDENT</type>
+               <key>oracle.instance.role</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>It indicates whether the instance is an active instance or an inactive secondary instance.</description>
+               <valuemap>
+                  <name>Oracle instance role</name>
+               </valuemap>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..INSTANCE_ROLE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>9a3084287a354fb0b0eb5de377a6de92</uuid>
+               <name>Oracle: Library cache hit ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.library_cache_hit_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The ratio of library cache hits (Hits/Pins).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Library Cache Hit Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>ac44884b2518485eae4bc7caf46799a8</uuid>
+               <name>Oracle: Logons per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.logons_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of logon attempts.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Logons Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>f7691a5d7ef74a4d99cac61835052fba</uuid>
+               <name>Oracle: Long table scans per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.long_table_scans_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than five blocks.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Long Table Scans Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>49445baea18640ea844f869c51aee565</uuid>
+               <name>Oracle: Memory sorts ratio</name>
+               <type>DEPENDENT</type>
+               <key>oracle.memory_sorts_ratio</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The percentage of sorts (from ORDER BY clauses or index building) that are done to disk vs in-memory.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Memory Sorts Ratio')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>786188c7719048cb863450f98ab921ac</uuid>
+               <name>Oracle: PGA, Global memory bound</name>
+               <type>DEPENDENT</type>
+               <key>oracle.pga_global_bound</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The maximum size of work area executed in automatic mode.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Global Memory Bound')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>1f532b6599f34db285b60a8879638d75</uuid>
+               <name>Oracle: PGA, Aggregate target parameter</name>
+               <type>DEPENDENT</type>
+               <key>oracle.pga_target</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of the PGA memory is disabled.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Aggregate Pga Target Parameter')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>2f305e09eafd4f7a9360f138be20a631</uuid>
+               <name>Oracle: Physical reads bytes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_read_bytes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Read bytes per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Read Bytes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>disk</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>001bf0d526cb455386f5a63e6bb8f410</uuid>
+               <name>Oracle: Physical reads per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_reads_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Reads per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Reads Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>disk</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>e2e21384fbae431a88f1eef610b0307b</uuid>
+               <name>Oracle: Physical writes bytes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_write_bytes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Write bytes per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Write Bytes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>disk</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>d20f81d99e6647479abcc9ffcbc208fc</uuid>
+               <name>Oracle: Physical writes per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.physical_writes_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>Writes per second.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Physical Writes Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>disk</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>533ae91bb94e4077870aa362a8cea7e5</uuid>
+               <name>Oracle: Number of processes</name>
+               <type>DEPENDENT</type>
+               <key>oracle.processes_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PROC::Procnum')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>system</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>38471058988c46f4b81af9f77637914a</uuid>
+                     <event_name>Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.processes_count,5m) * 100 / last(/Oracle by ODBC/oracle.processes_limit) &gt; {$ORACLE.PROCESSES.MAX.WARN}</expression>
+                     <name>Oracle: Too many active processes</name>
+                     <priority>WARNING</priority>
+                     <description>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>721c04b5f3ba42d0ae7acceb5876c360</uuid>
+               <name>Oracle: Processes limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.processes_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The maximum number of user processes.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Processes')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>system</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>65064008eef54657b7b7f2beeba70b0a</uuid>
+               <name>Oracle: Redo logs available to switch</name>
+               <type>DEPENDENT</type>
+               <key>oracle.redo_logs_available</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The number of inactive/unused redo logs available for log switching.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='REDO::Available')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>1348b1e854e64d34b6b00be118f045c3</uuid>
+                     <event_name>Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)</event_name>
+                     <expression>max(/Oracle by ODBC/oracle.redo_logs_available,5m) &lt; {$ORACLE.REDO.MIN.WARN}</expression>
+                     <name>Oracle: Number of REDO logs available for switching is too low</name>
+                     <priority>WARNING</priority>
+                     <description>The number of inactive/unused REDOs available for log switching is low (database down risk).</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>ab298981f26a4ec6849e1155ce35ee76</uuid>
+               <name>Oracle: Rows per sort</name>
+               <type>DEPENDENT</type>
+               <key>oracle.rows_per_sort</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The average number of rows per sort for all types of sorts performed.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Rows Per Sort')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>ddbdd3d7d40d42b9b9711470516a5aec</uuid>
+               <name>Oracle: SQL service response time</name>
+               <type>DEPENDENT</type>
+               <key>oracle.service_response_time</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <description>The Structured Query Language (SQL) service response time expressed in seconds.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::SQL Service Response Time')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <parameters>
+                        <parameter>0.01</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>e269a27f3c3f47ae86fef231da2a6fce</uuid>
+               <name>Oracle: Active background sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_active_background</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active background sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Active Background')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>6e8defc1e3e2485784d8bef6e2b988c7</uuid>
+               <name>Oracle: Active user sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_active_user</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of active user sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Active User')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>a3f2b314a6354d238d6604afa2333ae6</uuid>
+               <name>Oracle: Sessions concurrency</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_concurrency_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, the rest of the transactions are waiting for the access. In the case when the access for the resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on the performance. A high contention value does not indicate the root cause of the problem but is a signal to search for it.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Concurrency rate')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>7099e4a160c1446395b9e5b721db7b38</uuid>
+                     <event_name>Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.session_concurrency_rate,5m) &gt; {$ORACLE.CONCURRENCY.MAX.WARN}</expression>
+                     <name>Oracle: Too high database concurrency</name>
+                     <priority>WARNING</priority>
+                     <description>The concurrency rate exceeds {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but it is a signal to search for it. In the case of high competition, the analysis of resource consumption should be carried out. Which are the most "heavy" queries made in the database? Possibly, also session tracing. All this will help to determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>performance</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>3459ae7c82454882a9655db8a83120fd</uuid>
+               <name>Oracle: Session count</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_count</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The count of sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Total')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>4a055da31f09489ea0f03e4582ee4333</uuid>
+                     <event_name>Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.session_count,5m) * 100 / last(/Oracle by ODBC/oracle.session_limit) &gt; {$ORACLE.SESSIONS.MAX.WARN}</expression>
+                     <name>Oracle: Too many active sessions</name>
+                     <priority>WARNING</priority>
+                     <description>Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>5abf01d0bad442e7817752ae01dfc2d2</uuid>
+               <name>Oracle: Inactive user sessions</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_inactive_user</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The number of inactive user sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Inactive User')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>ebc142a0784041d2bbe982c4d766b98f</uuid>
+               <name>Oracle: Sessions limit</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_limit</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>The user and system sessions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYSPARAM::Sessions')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>64361f8862e8482d86a8bdd71c709142</uuid>
+               <name>Oracle: Sessions lock rate</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_lock_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource — either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Lock rate')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>9a75f3a039094ca89c2ba7e3fa93b1a8</uuid>
+                     <event_name>Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.session_lock_rate,5m) &gt; {$ORACLE.SESSIONS.LOCK.MAX.WARN}</expression>
+                     <name>Oracle: Too many locked sessions</name>
+                     <priority>WARNING</priority>
+                     <description>The number of locked sessions exceeds {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>performance</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>a9669cb6290b4a158e7f02c1f079b6f9</uuid>
+               <name>Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s</name>
+               <type>DEPENDENT</type>
+               <key>oracle.session_long_time_locked</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The count of the prolongedly locked sessions. (You can change the duration of maximum session lock in seconds for a query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default is 600 sec).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SESSION::Long time locked')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sessions</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>a8f5ec966f5e4c72baad1380eda4d0a2</uuid>
+                     <event_name>Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.session_long_time_locked,5m) &gt; {$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</expression>
+                     <name>Oracle: Too many sessions locked</name>
+                     <priority>WARNING</priority>
+                     <description>The number of locked sessions exceeding {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect the database performance. Therefore, if they are detected, you should first find the most difficult queries from the database point of view and then analyze possible resource leaks.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>performance</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>94fe3a129f08415bb7e02a862bd9e8a8</uuid>
+               <name>Oracle: SGA, buffer cache</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_buffer_cache</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The size of standard block cache.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Buffer_Cache')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>cache</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>062fbd601d6f41208e364c80f1d08b1e</uuid>
+               <name>Oracle: SGA, fixed</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_fixed</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The fixed System Global Area (SGA) is an internal housekeeping area.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Fixed_Sga')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>614066ff91e144dbae58b4920c1db932</uuid>
+               <name>Oracle: SGA, java pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_java_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The memory is allocated from the Java pool.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Java Pool')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>0f726310d4a8426188658f7c093c3989</uuid>
+               <name>Oracle: SGA, large pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_large_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The memory is allocated from a large pool.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Large Pool')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>03e9cea3887447349c9116b89b1be026</uuid>
+               <name>Oracle: SGA, log buffer</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_log_buffer</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The number of bytes allocated for the redo log buffer.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Log_Buffer')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>eb4c2f63ef8449d99794e5fdb7fed7bf</uuid>
+               <name>Oracle: SGA, shared pool</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sga_shared_pool</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The memory is allocated from a shared pool.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SGA::Shared Pool')].VALUE.first()</parameter>
+                     </parameters>
+                     <error_handler>CUSTOM_VALUE</error_handler>
+                     <error_handler_params>0</error_handler_params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>sga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>b14b0126cf64436ea206ec151984cd95</uuid>
+               <name>Oracle: Shared pool free %</name>
+               <type>DEPENDENT</type>
+               <key>oracle.shared_pool_free</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>%</units>
+               <description>Free memory of a shared pool expressed in %.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Shared Pool Free %')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>8facfa98bcd3447ea53d0a3d09ada933</uuid>
+                     <event_name>Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)</event_name>
+                     <expression>max(/Oracle by ODBC/oracle.shared_pool_free,5m)&lt;{$ORACLE.SHARED.FREE.MIN.WARN}</expression>
+                     <name>Oracle: Shared pool free is too low</name>
+                     <priority>WARNING</priority>
+                     <description>The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>8b3e958d76d14ef7a6869634106f1277</uuid>
+               <name>Oracle: Total sorts per user call</name>
+               <type>DEPENDENT</type>
+               <key>oracle.sorts_per_user_call</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>The total sorts per user call.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Total Sorts Per User Call')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>fc2cff59b0804989989179e1dbc338b5</uuid>
+               <name>Oracle: Temp space used</name>
+               <type>DEPENDENT</type>
+               <key>oracle.temp_space_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Used temporary space.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::Temp Space Used')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>085c097ab3b34f07b262caf80703b469</uuid>
+               <name>Oracle: PGA, Total allocated</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_allocated</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Pga Allocated')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>c2c18a0a502d4fbe91db25d29ae57d45</uuid>
+               <name>Oracle: PGA, Total freeable</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_freeable</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>The number of bytes of the PGA memory in all processes that could be freed back to the operating system.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Freeable Pga Memory')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>e0e88ce92ece4ca0b776f09dc4ec5039</uuid>
+               <name>Oracle: PGA, Total inuse</name>
+               <type>DEPENDENT</type>
+               <key>oracle.total_pga_used</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>B</units>
+               <description>It indicates how much the Program Global Area (PGA) memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='PGA::Total Pga Inuse')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>pga</value>
+                  </tag>
+                  <tag>
+                     <tag>component</tag>
+                     <value>memory</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>476001f0f52a45f59942d73c643371c1</uuid>
+                     <event_name>Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)</event_name>
+                     <expression>min(/Oracle by ODBC/oracle.total_pga_used,5m) * 100 / last(/Oracle by ODBC/oracle.pga_target) &gt; {$ORACLE.PGA.USE.MAX.WARN}</expression>
+                     <name>Oracle: Total PGA inuse is too high</name>
+                     <priority>WARNING</priority>
+                     <description>The total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>capacity</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>3c817d2b45fc471aa86771ce1739de6f</uuid>
+               <name>Oracle: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>oracle.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0d</trends>
+               <units>s</units>
+               <description>The Oracle instance uptime expressed in seconds.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..UPTIME.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>03a4fb1d6e684c9b82c1317699c71468</uuid>
+                     <event_name>Oracle: Failed to fetch info data (or no data for 5m)</event_name>
+                     <expression>nodata(/Oracle by ODBC/oracle.uptime,5m)=1</expression>
+                     <name>Oracle: Failed to fetch info data</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</description>
+                     <dependencies>
+                        <dependency>
+                           <name>Oracle: Port {$ORACLE.PORT} is unavailable</name>
+                           <expression>max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)&gt;0</expression>
+                        </dependency>
+                     </dependencies>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>availability</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+                  <trigger>
+                     <uuid>431201a1ce0d47948751c7e4e6bbeb92</uuid>
+                     <event_name>Oracle: {HOST.NAME} has been restarted (uptime &lt; 10m)</event_name>
+                     <expression>last(/Oracle by ODBC/oracle.uptime)&lt;10m</expression>
+                     <name>Oracle: Host has been restarted</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes.</description>
+                     <manual_close>YES</manual_close>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>notice</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>ad275dbbe8af483b93d37e416c3f1fd2</uuid>
+               <name>Oracle: User '{$ORACLE.USER}' expire password</name>
+               <type>DEPENDENT</type>
+               <key>oracle.user_expire_password</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>days</units>
+               <description>The number of days before the password of Zabbix account expires.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='USER::Expire password')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>a909d8cccacf4470a3e2da88b4e5c3d5</uuid>
+                     <event_name>Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)</event_name>
+                     <expression>last(/Oracle by ODBC/oracle.user_expire_password)  &lt; {$ORACLE.EXPIRE.PASSWORD.MIN.WARN}</expression>
+                     <name>Oracle: Zabbix account will expire soon</name>
+                     <priority>WARNING</priority>
+                     <description>The password for Zabbix user in the database expires soon.</description>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>notice</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>3455378f6ecf4ecb93a69d2387e4a57d</uuid>
+               <name>Oracle: User rollbacks per second</name>
+               <type>DEPENDENT</type>
+               <key>oracle.user_rollbacks_rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Rps</units>
+               <description>The number of times that users manually issue the ROLLBACK statement or an error occurred during the users' transactions.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$[?(@.METRIC=='SYS::User Rollbacks Per Sec')].VALUE.first()</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+            </item>
+            <item>
+               <uuid>45143cb0d0284608bf48897885a91bbb</uuid>
+               <name>Oracle: Version</name>
+               <type>DEPENDENT</type>
+               <key>oracle.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>The Oracle Server version.</description>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <parameters>
+                        <parameter>$..VERSION.first()</parameter>
+                     </parameters>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <parameters>
+                        <parameter>1d</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               </master_item>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>a5dd4fe627c44afebdfe7beeefc4ec3d</uuid>
+                     <event_name>Oracle: Version has changed (new version value received: {ITEM.VALUE})</event_name>
+                     <expression>last(/Oracle by ODBC/oracle.version,#1)&lt;&gt;last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))&gt;0</expression>
+                     <name>Oracle: Version has changed</name>
+                     <priority>INFO</priority>
+                     <description>The Oracle DB version has changed. Acknowledge to close manually.</description>
+                     <manual_close>YES</manual_close>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>notice</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <uuid>bf89a6ced768432a9cc3c27e1e3159d0</uuid>
+               <name>Oracle: Number of LISTENER processes</name>
+               <key>proc.num[,,,"tnslsnr LISTENER"]</key>
+               <delay>30s</delay>
+               <history>7d</history>
+               <description>The number of running LISTENER processes.</description>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <parameters>
+                        <parameter>10m</parameter>
+                     </parameters>
+                  </step>
+               </preprocessing>
+               <tags>
+                  <tag>
+                     <tag>component</tag>
+                     <value>application</value>
+                  </tag>
+               </tags>
+               <triggers>
+                  <trigger>
+                     <uuid>eb5e531eb3f142569775349a126d1ab0</uuid>
+                     <expression>max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)=0</expression>
+                     <name>Oracle: LISTENER process is not running</name>
+                     <priority>DISASTER</priority>
+                     <tags>
+                        <tag>
+                           <tag>scope</tag>
+                           <value>availability</value>
+                        </tag>
+                     </tags>
+                  </trigger>
+               </triggers>
+            </item>
+         </items>
+         <discovery_rules>
+            <discovery_rule>
+               <uuid>a527b14b1cee4115be5c5e9387af821b</uuid>
+               <name>Archive log discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>1h</delay>
+               <params>SELECT d.dest_name
+FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>Destinations of the log archive.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <uuid>06e47a56685e4dd784628c40d5038c88</uuid>
+                     <name>Archivelog '{#DEST_NAME}': Error</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_error["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It displays the error message.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>archive-log</value>
+                        </tag>
+                        <tag>
+                           <tag>destination</tag>
+                           <value>{#DEST_NAME}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>1948e6bfaa48451cac6ee83a16b07826</uuid>
+                     <name>Archivelog '{#DEST_NAME}': Last sequence</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_log_sequence["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>It identifies the sequence number of the last archived redo log to be archived.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].LOG_SEQUENCE.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>archive-log</value>
+                        </tag>
+                        <tag>
+                           <tag>destination</tag>
+                           <value>{#DEST_NAME}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>0d561969fc2942fea854541a03b6a490</uuid>
+                     <name>Archivelog '{#DEST_NAME}': Status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.archivelog_log_status["{#DEST_NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>It identifies the current status of the destination where:
+1 - 'VALID';
+2 - 'DEFERRED';
+3 - 'ERROR';
+0 - 'UNKNOWN'.</description>
+                     <valuemap>
+                        <name>Oracle Archivelog status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>1h</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>archive-log</value>
+                        </tag>
+                        <tag>
+                           <tag>destination</tag>
+                           <value>{#DEST_NAME}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>1202e75015304115a4ccdab027617816</uuid>
+                           <expression>last(/Oracle by ODBC/oracle.archivelog_log_status["{#DEST_NAME}"])&lt;2</expression>
+                           <name>Archivelog '{#DEST_NAME}': Log Archive is not valid</name>
+                           <priority>HIGH</priority>
+                           <description>The trigger will launch if the archive log destination is not in one of these states:
+2 - 'DEFERRED';
+3 - 'VALID'."</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>availability</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <uuid>c40708b755c7464bb064b7bffc584381</uuid>
+               <name>ASM disk groups discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>1h</delay>
+               <params>SELECT name AS dgname FROM v$asm_diskgroup;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <description>The ASM disk groups.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <uuid>da6116af9f54452ab1694af8eef9f38d</uuid>
+                     <name>ASM '{#DGNAME}': Free size</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.asm_free_size["{#DGNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The free size of the ASM disk group.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DGNAME=='{#DGNAME}')].FREE_SIZE_BYTE.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>asm</value>
+                        </tag>
+                        <tag>
+                           <tag>disk-group</tag>
+                           <value>{#DGNAME}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>7f2a51d7eeb64c5b8929dcb0e3a49273</uuid>
+                     <name>ASM '{#DGNAME}': Total size</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.asm_total_size["{#DGNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The total size of the ASM disk group.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DGNAME=='{#DGNAME}')].SIZE_BYTE.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>asm</value>
+                        </tag>
+                        <tag>
+                           <tag>disk-group</tag>
+                           <value>{#DGNAME}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>9c87a9089a19468f85eb1d3c28893092</uuid>
+                     <name>ASM '{#DGNAME}': Free size</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.asm_used_pct["{#DGNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Usage of the ASM disk group expressed in %.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DGNAME=='{#DGNAME}')].USED_PERCENT.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>asm</value>
+                        </tag>
+                        <tag>
+                           <tag>disk-group</tag>
+                           <value>{#DGNAME}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>d65971e0f3994dfcbcbde145c9866678</uuid>
+                           <event_name>ASM '{#DGNAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)&gt;{$ORACLE.ASM.USED.PCT.MAX.WARN}</expression>
+                           <name>ASM '{#DGNAME}': Disk group usage is too high</name>
+                           <priority>WARNING</priority>
+                           <description>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>ASM '{#DGNAME}': Disk group usage is too high</name>
+                                 <expression>min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>756a8b4b04bc4aadab6b4b4cc856ad32</uuid>
+                           <event_name>ASM '{#DGNAME}': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)&gt;{$ORACLE.ASM.USED.PCT.MAX.HIGH}</expression>
+                           <name>ASM '{#DGNAME}': Disk group usage is too high</name>
+                           <priority>HIGH</priority>
+                           <description>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <uuid>75f9f07dbae84443900aad10095e37f9</uuid>
+                     <name>ASM '{#DGNAME}': ASM disk group '{#DGNAME}'</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Oracle by ODBC</host>
+                              <key>oracle.asm_free_size["{#DGNAME}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Oracle by ODBC</host>
+                              <key>oracle.asm_total_size["{#DGNAME}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <uuid>0f65936b86314c269b7720a9ff3f1c14</uuid>
+               <name>Database discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[db_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>1h</delay>
+               <params>SELECT name as DBNAME, DECODE(CDB, 'YES', 'CDB', 'No-CDB') AS TYPE  FROM V$DATABASE;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning databases in the database management system (DBMS).</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <uuid>075885bfd41d43aba7861ae49e9abbee</uuid>
+                     <name>Oracle Database '{#DBNAME}': Force logging</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_force_logging["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>It indicates whether the database is under force logging mode 'YES' or 'NO'.</description>
+                     <valuemap>
+                        <name>Oracle force log status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].FORCE_LOGGING.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>database</value>
+                        </tag>
+                        <tag>
+                           <tag>database</tag>
+                           <value>{#DBNAME}</value>
+                        </tag>
+                        <tag>
+                           <tag>type</tag>
+                           <value>{#TYPE}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>9c17e0fdd6fe409e8f298433e58b7445</uuid>
+                           <expression>last(/Oracle by ODBC/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by ODBC/oracle.db_log_mode["{#DBNAME}"]) = 1</expression>
+                           <name>Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog</name>
+                           <priority>WARNING</priority>
+                           <description>Force Logging mode - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all the transactions to the REDO.</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>performance</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>9b88e24d523e4111b2ff65ae26650e04</uuid>
+                     <name>Oracle Database '{#DBNAME}': Log mode</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_log_mode["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The archive log mode where:
+0 - 'NOARCHIVELOG';
+1 - 'ARCHIVELOG';
+2 - 'MANUAL'.</description>
+                     <valuemap>
+                        <name>Oracle log mode</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].LOG_MODE.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>database</value>
+                        </tag>
+                        <tag>
+                           <tag>database</tag>
+                           <value>{#DBNAME}</value>
+                        </tag>
+                        <tag>
+                           <tag>type</tag>
+                           <value>{#TYPE}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>f1971909355f4ef48c32695b5d204d56</uuid>
+                     <name>Oracle Database '{#DBNAME}': Open status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_open_mode["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>1 - 'MOUNTED';
+2 - 'READ WRITE';
+3 - 'READ ONLY';
+4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</description>
+                     <valuemap>
+                        <name>Oracle DB open status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>database</value>
+                        </tag>
+                        <tag>
+                           <tag>database</tag>
+                           <value>{#DBNAME}</value>
+                        </tag>
+                        <tag>
+                           <tag>type</tag>
+                           <value>{#TYPE}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>9bf80a9372ef4b3898fd5a4f0c3cec7c</uuid>
+                           <event_name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</event_name>
+                           <expression>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#1)&lt;&gt;last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"],#2)</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status has changed</name>
+                           <priority>INFO</priority>
+                           <description>The Oracle DB open status has changed. Ack to close manually.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                                 <expression>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1</expression>
+                              </dependency>
+                           </dependencies>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>notice</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>3620ac4e75644789a2f0245dbb948771</uuid>
+                           <expression>last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                           <priority>WARNING</priority>
+                           <description>The Oracle DB is in a mounted state.</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>notice</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>949d1e5fc4424b2bb0ffd220f00f6a79</uuid>
+                     <name>Oracle Database '{#DBNAME}': Role</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.db_role["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The current role of the database where:
+1 - 'SNAPSHOT STANDBY';
+2 - 'LOGICAL STANDBY';
+3 - 'PHYSICAL STANDBY';
+4 - 'PRIMARY ';
+5 - 'FAR SYNC'.</description>
+                     <valuemap>
+                        <name>Oracle DB role</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].ROLE.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>database</value>
+                        </tag>
+                        <tag>
+                           <tag>database</tag>
+                           <value>{#DBNAME}</value>
+                        </tag>
+                        <tag>
+                           <tag>type</tag>
+                           <value>{#TYPE}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>fb5ccc917a8344d7945b8867a1982d6b</uuid>
+                           <event_name>Oracle Database '{#DBNAME}': Role has changed (new value received: {ITEM.VALUE})</event_name>
+                           <expression>last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#1)&lt;&gt;last(/Oracle by ODBC/oracle.db_role["{#DBNAME}"],#2)</expression>
+                           <name>Oracle Database '{#DBNAME}': Role has changed</name>
+                           <priority>INFO</priority>
+                           <description>The Oracle DB role has changed. Ack to close manually.</description>
+                           <manual_close>YES</manual_close>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>notice</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <uuid>2611e69f735a42b190852589658dd591</uuid>
+               <name>PDB discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[pdb_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>1h</delay>
+               <params>SELECT name as DBNAME FROM V$PDBS;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#DBNAME}</macro>
+                        <value>{$ORACLE.DBNAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning a pluggable database (PDB) in DBMS.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <uuid>975d302e3e9a4316b6d63256b88b5006</uuid>
+                     <name>Oracle Database '{#DBNAME}': Open status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.pdb_open_mode["{#DBNAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>1 - 'MOUNTED';
+2 - 'READ WRITE';
+3 - 'READ ONLY';
+4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</description>
+                     <valuemap>
+                        <name>Oracle DB open status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()</parameter>
+                           </parameters>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <parameters>
+                              <parameter>15m</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>database</value>
+                        </tag>
+                        <tag>
+                           <tag>database</tag>
+                           <value>{#DBNAME}</value>
+                        </tag>
+                        <tag>
+                           <tag>type</tag>
+                           <value>pdb</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>3dbb9379f8024924b197037acfbbdac4</uuid>
+                           <event_name>Oracle Database '{#DBNAME}': Open status has changed (new value received: {ITEM.VALUE})</event_name>
+                           <expression>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#1)&lt;&gt;last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"],#2)</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status has changed</name>
+                           <priority>INFO</priority>
+                           <description>The Oracle DB open status has changed. Ack to close manually.</description>
+                           <manual_close>YES</manual_close>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>notice</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>5f8ed69b2c074a29b9975baf10a2a2f8</uuid>
+                           <expression>last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1</expression>
+                           <name>Oracle Database '{#DBNAME}': Open status in mount mode</name>
+                           <priority>WARNING</priority>
+                           <description>The Oracle DB is in a mounted state.</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>notice</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+            </discovery_rule>
+            <discovery_rule>
+               <uuid>c8de553c98f64e59b40bf927f6447ad1</uuid>
+               <name>Tablespace discovery</name>
+               <type>ODBC</type>
+               <key>db.odbc.discovery[tbsname,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+               <delay>1h</delay>
+               <params>SELECT
+tablespace_name AS tablespace,
+contents  FROM DBA_TABLESPACES;</params>
+               <username>{$ORACLE.USER}</username>
+               <password>{$ORACLE.PASSWORD}</password>
+               <filter>
+                  <evaltype>AND</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#TABLESPACE}</macro>
+                        <value>{$ORACLE.TABLESPACE.NAME.MATCHES}</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#TABLESPACE}</macro>
+                        <value>{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning tablespaces in DBMS.</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <uuid>46956fd7e5d8462798b85cd7b425a794</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].FILE_BYTES.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>8c3284a21872423499ee15fd7b0038f1</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace free, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_free_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Free bytes of the allocated space.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].FREE_BYTES.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>afd8c1a01b64408fbc6f8f95fbb13593</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>The maximum size of the tablespace.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].MAX_BYTES.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>42c7812a75d5433ab8a275498635c81c</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Open status</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_status["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>The tablespace status where:
+1 - 'ONLINE';
+2 - 'OFFLINE';
+3 - 'READ ONLY'.</description>
+                     <valuemap>
+                        <name>Oracle tablespace status</name>
+                     </valuemap>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].STATUS.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>3c5f54f41f95440aa18ca5316aeb50f6</uuid>
+                           <expression>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</name>
+                           <priority>WARNING</priority>
+                           <description>The tablespace is in the offline state.</description>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>availability</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>05c2af5a765842a1a70f2f67355db1b3</uuid>
+                           <event_name>Oracle TBS '{#TABLESPACE}': Tablespace status has changed (new value received: {ITEM.VALUE})</event_name>
+                           <expression>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#1)&lt;&gt;last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"],#2)</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace status has changed</name>
+                           <priority>INFO</priority>
+                           <description>Oracle tablespace status has changed. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</name>
+                                 <expression>last(/Oracle by ODBC/oracle.tbs_status["{#TABLESPACE}"])=2</expression>
+                              </dependency>
+                           </dependencies>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>b9cc0eabdcbc404fb0df2a2a082411f1</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace used, bytes</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <units>B</units>
+                     <description>Currently used bytes for the tablespace (current size of datafiles - the free space).</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>877961c286e448238f58cff9c51088c8</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace usage, percent</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_file_pct["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Used bytes/allocated bytes*100.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_FILE_PCT.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>e6f2cb4ade52464b97f5e0f5e05ab61b</uuid>
+                           <event_name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high</name>
+                                 <expression>min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>78c293ae7ded42b0b05d50af99762017</uuid>
+                           <event_name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.USED.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace usage is too high</name>
+                           <priority>HIGH</priority>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <uuid>c3a904455ff244e1a30bf32f0b4ea0d7</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent</name>
+                     <type>DEPENDENT</type>
+                     <key>oracle.tbs_used_pct["{#TABLESPACE}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <description>Allocated bytes/max bytes*100.</description>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <parameters>
+                              <parameter>$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT_MAX.first()</parameter>
+                           </parameters>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]</key>
+                     </master_item>
+                     <tags>
+                        <tag>
+                           <tag>component</tag>
+                           <value>tablespaces</value>
+                        </tag>
+                        <tag>
+                           <tag>tablespace</tag>
+                           <value>{#TABLESPACE}</value>
+                        </tag>
+                        <tag>
+                           <tag>contents</tag>
+                           <value>{#CONTENTS}</value>
+                        </tag>
+                     </tags>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <uuid>9469e51bd69e4baba82de4fd4e5eb14c</uuid>
+                           <event_name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.USED.PCT.MAX.WARN}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high</name>
+                           <priority>WARNING</priority>
+                           <dependencies>
+                              <dependency>
+                                 <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high</name>
+                                 <expression>min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
+                              </dependency>
+                           </dependencies>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <uuid>a8aa7255866d4a5ba71d2f89a1d234fe</uuid>
+                           <event_name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).</event_name>
+                           <expression>min(/Oracle by ODBC/oracle.tbs_used_pct["{#TABLESPACE}"],5m)&gt;{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</expression>
+                           <name>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high</name>
+                           <priority>HIGH</priority>
+                           <tags>
+                              <tag>
+                                 <tag>scope</tag>
+                                 <value>capacity</value>
+                              </tag>
+                           </tags>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
+               <graph_prototypes>
+                  <graph_prototype>
+                     <uuid>a9f3bc52aa0340feb35600ad249e82d3</uuid>
+                     <name>Oracle TBS '{#TABLESPACE}': Tablespace '{#TABLESPACE}'</name>
+                     <graph_items>
+                        <graph_item>
+                           <color>1A7C11</color>
+                           <item>
+                              <host>Oracle by ODBC</host>
+                              <key>oracle.tbs_alloc_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <color>2774A4</color>
+                           <item>
+                              <host>Oracle by ODBC</host>
+                              <key>oracle.tbs_max_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>2</sortorder>
+                           <color>F63100</color>
+                           <item>
+                              <host>Oracle by ODBC</host>
+                              <key>oracle.tbs_used_bytes["{#TABLESPACE}"]</key>
+                           </item>
+                        </graph_item>
+                     </graph_items>
+                  </graph_prototype>
+               </graph_prototypes>
+            </discovery_rule>
+         </discovery_rules>
+         <tags>
+            <tag>
+               <tag>class</tag>
+               <value>database</value>
+            </tag>
+            <tag>
+               <tag>target</tag>
+               <value>oracle</value>
+            </tag>
+         </tags>
+         <macros>
+            <macro>
+               <macro>{$ORACLE.ASM.USED.PCT.MAX.HIGH}</macro>
+               <value>95</value>
+               <description>The maximum percentage of used Automatic Storage Management (ASM) disk group for a high trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.ASM.USED.PCT.MAX.WARN}</macro>
+               <value>90</value>
+               <description>The maximum percentage of used ASM disk group for a warning trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.CONCURRENCY.MAX.WARN}</macro>
+               <value>80</value>
+               <description>The maximum percentage of sessions concurrency usage for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DB.FILE.MAX.WARN}</macro>
+               <value>80</value>
+               <description>The maximum percentage of used database files for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DBNAME.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in database discovery. It can be overridden on host level or its linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DBNAME.NOT_MATCHES}</macro>
+               <value>PDB\$SEED</value>
+               <description>This macro is used in database discovery. It can be overridden on host level or its linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.DRIVER}</macro>
+               <value>&lt;Put path to oracle driver here&gt;</value>
+               <description>The Oracle driver path. For example: `/usr/lib/oracle/21/client64/lib/libsqora.so.21.1`</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.EXPIRE.PASSWORD.MIN.WARN}</macro>
+               <value>7</value>
+               <description>The number of warning days before the password expires for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PASSWORD}</macro>
+               <value>&lt;Put your password here&gt;</value>
+               <description>The Oracle user's password.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PGA.USE.MAX.WARN}</macro>
+               <value>90</value>
+               <description>Alert threshold for the maximum percentage of the Program Global Area (PGA) usage for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PORT}</macro>
+               <value>1521</value>
+               <description>Oracle DB TCP port.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.PROCESSES.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Alert threshold for the maximum percentage of active processes for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.REDO.MIN.WARN}</macro>
+               <value>3</value>
+               <description>Alert threshold for the minimum number of REDO logs for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SERVICE}</macro>
+               <value>&lt;Put oracle service name here&gt;</value>
+               <description>Oracle Service Name.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSION.LOCK.MAX.TIME}</macro>
+               <value>600</value>
+               <description>The maximum duration of the session lock in seconds to count the session as a prolongedly locked query.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}</macro>
+               <value>3</value>
+               <description>Alert threshold for the maximum number of the prolongedly locked sessions for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSIONS.LOCK.MAX.WARN}</macro>
+               <value>20</value>
+               <description>Alert threshold for the maximum percentage of locked sessions for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SESSIONS.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Alert threshold for the maximum percentage of active sessions for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.SHARED.FREE.MIN.WARN}</macro>
+               <value>5</value>
+               <description>Alert threshold for the minimum percentage of free shared pool for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TABLESPACE.NAME.MATCHES}</macro>
+               <value>.*</value>
+               <description>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+               <description>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.USED.PCT.MAX.HIGH}</macro>
+               <value>95</value>
+               <description>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.USED.PCT.MAX.WARN}</macro>
+               <value>90</value>
+               <description>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}</macro>
+               <value>90</value>
+               <description>High severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}</macro>
+               <value>80</value>
+               <description>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</description>
+            </macro>
+            <macro>
+               <macro>{$ORACLE.USER}</macro>
+               <value>&lt;Put your username here&gt;</value>
+               <description>Oracle username.</description>
+            </macro>
+         </macros>
+         <valuemaps>
+            <valuemap>
+               <uuid>79af6c068ba141ba9806f4341edd9266</uuid>
+               <name>Oracle Archivelog status</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Error</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Deferred</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Valid</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>3afaab75342c4be186fb4f595ed62a31</uuid>
+               <name>Oracle archiver state</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Stopped</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Started</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Failed</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>d0912db18fe54941b9345ebf869fd1a6</uuid>
+               <name>Oracle DB open status</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Mounted</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Read Only</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Read-Write</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>4</value>
+                     <newvalue>Read Only with Apply</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>df05d594141f42ebb294cf6adca5fd6b</uuid>
+               <name>Oracle DB role</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Snapshot standby</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Logical standby</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Physical standby</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>4</value>
+                     <newvalue>Primary</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>5</value>
+                     <newvalue>Far sync</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>f00ca5c45ab84df788820af2642e4784</uuid>
+               <name>Oracle force log status</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>No</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Yes</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>97b689d7ddc04bcd9b9f92af6ba783bd</uuid>
+               <name>Oracle instance role</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Primary</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Secondary</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>41e105c52bf045899c3c4a1cb4e16865</uuid>
+               <name>Oracle instance status</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Started</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Mounted</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Open</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>4</value>
+                     <newvalue>Open migrate</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>809554f521d645ea8e8850c3b1f41579</uuid>
+               <name>Oracle log mode</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>NOARCHIVELOG</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>ARCHIVELOG</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>MANUAL</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>c6633e4ef9a84fa7b843529479a06158</uuid>
+               <name>Oracle tablespace status</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Unknown</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Online</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>2</value>
+                     <newvalue>Offline</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>3</value>
+                     <newvalue>Read-Only</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+            <valuemap>
+               <uuid>45ad479873b84113a98fa21b21081c65</uuid>
+               <name>Service state</name>
+               <mappings>
+                  <mapping>
+                     <value>0</value>
+                     <newvalue>Down</newvalue>
+                  </mapping>
+                  <mapping>
+                     <value>1</value>
+                     <newvalue>Up</newvalue>
+                  </mapping>
+               </mappings>
+            </valuemap>
+         </valuemaps>
+      </template>
+   </templates>
+   <graphs>
+      <graph>
+         <uuid>72ad9e81bb5147e6827499143d256068</uuid>
+         <name>Oracle: Datafiles</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.db_files_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.db_files_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>dba3f3b856114d50b826a15cacd1d896</uuid>
+         <name>Oracle: PGA</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.total_pga_used</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.pga_target</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.total_pga_allocated</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>3d1c6ffe69f34695b30d132d99d41dbb</uuid>
+         <name>Oracle: Physical Read\Write Rate</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.physical_writes_rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.physical_reads_rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>5002e9a128524991b16dbea89e0f4b07</uuid>
+         <name>Oracle: Physical Read\Write Rate, Bytes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.physical_write_bytes_rate</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.physical_read_bytes_rate</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>044e0b3a485547b7b41939a78be80784</uuid>
+         <name>Oracle: Processes</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.processes_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.processes_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>eef29b959d334e4b9ba3a4d83a571f1f</uuid>
+         <name>Oracle: Sessions</name>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.session_count</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.session_active_background</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.session_inactive_user</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.session_active_user</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.session_limit</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+      <graph>
+         <uuid>dd6a3c604ba446e793526564527c5c2f</uuid>
+         <name>Oracle: SGA Memory Usage</name>
+         <type>STACKED</type>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_java_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_large_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>2</sortorder>
+               <color>F63100</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_shared_pool</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>3</sortorder>
+               <color>A54F10</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_log_buffer</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>4</sortorder>
+               <color>FC6EA3</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_fixed</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>5</sortorder>
+               <color>6C59DC</color>
+               <item>
+                  <host>Oracle by ODBC</host>
+                  <key>oracle.sga_buffer_cache</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+</zabbix_export>
