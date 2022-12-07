@@ -2759,4 +2759,52 @@ in:
 out:
   return: SUCCEED
   value: '[{"{#SNMPINDEX}":"2","IFDESCR":"30"},{"{#SNMPINDEX}":"1","IFDESCR":"20"}]'
+---
+test case: SNMP walk to JSON - No more variables 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+      .1.3.6.1.2 = 456
+      .1.3.6.2.1 = STRING: "TEST"
+      .1.3.6.2.2 = Counter64: 64
+      .1.3.6.3.1 = No more variables left in this MIB View (It is past the end of the MIB tree)
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      MACRO2
+      .1.3.6.2
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":"TEST"}]'
+---
+test case: SNMP walk to JSON - No more variables 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+      .1.3.6.1.2 = 456
+      .1.3.6.2.1 = STRING: "TEST"
+      .1.3.6.2.2 = Counter64: 64
+      .1.3.6.3.1 = No more variables left in this MIB View (It is past the end of the MIB tree)
+      .1.3.7.1.1 = 123
+      .1.3.7.1.2 = 456
+      .1.3.7.2.1 = STRING: "TEST"
+      .1.3.7.2.2 = Counter64: 64
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      MACRO2
+      .1.3.6.2
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":"TEST"}]'
 ...

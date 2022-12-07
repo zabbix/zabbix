@@ -291,6 +291,15 @@ reparse_type:
 
 		if (':' != *data)
 		{
+			if (0 == strcmp(type, "No") &&
+					0 == strncmp(data, " more variables", ZBX_CONST_STRLEN(" more variables")))
+			{
+				while ('\n' != *data && '\0' != *data)
+					data++;
+				
+				goto eol;
+			}
+
 			*error = strdup("invalid value type format");
 			goto out;
 		}
@@ -308,7 +317,7 @@ reparse_type:
 
 	len = preproc_snmp_parse_value(data, type, json, &p->value);
 	data += len;
-
+eol:
 	if ('\0' == *data)
 	{
 		*line_len = data - start;
