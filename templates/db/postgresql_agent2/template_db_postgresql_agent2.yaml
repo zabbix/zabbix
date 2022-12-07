@@ -2694,7 +2694,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '12'
                   height: '5'
                   fields:
@@ -2717,7 +2717,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: pg_stat_database metrics'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2741,7 +2741,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Locks'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2765,7 +2765,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Size'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2790,7 +2790,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Number of bloating tables'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -2814,7 +2814,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent 2'
                         name: 'DB {#DBNAME}: Queries'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '10'
                   width: '12'

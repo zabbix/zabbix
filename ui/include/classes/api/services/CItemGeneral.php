@@ -701,8 +701,8 @@ abstract class CItemGeneral extends CApiService {
 				switch ($upd_db_item['flags']) {
 					case ZBX_FLAG_DISCOVERY_NORMAL:
 						$error = $target_is_host
-							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
-							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
+							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
 						break 2;
 
 					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
@@ -722,8 +722,8 @@ abstract class CItemGeneral extends CApiService {
 				switch ($upd_db_item['flags']) {
 					case ZBX_FLAG_DISCOVERY_NORMAL:
 						$error = $target_is_host
-							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
-							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key already exists.');
 						break 2;
 
 					case ZBX_FLAG_DISCOVERY_RULE:

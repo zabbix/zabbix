@@ -24,6 +24,9 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /*
  * 2.2 development database patches

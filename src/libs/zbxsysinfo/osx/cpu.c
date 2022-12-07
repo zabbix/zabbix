@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 #include "stats.h"
 
 static int	get_cpu_num(int online)

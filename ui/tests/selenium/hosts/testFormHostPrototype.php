@@ -850,7 +850,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
-					'template' => 'Alcatel Timetra TiMOS SNMP'
+					'template' => 'Alcatel Timetra TiMOS by SNMP'
 				]
 			],
 			[

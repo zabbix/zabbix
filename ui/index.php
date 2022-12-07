@@ -41,10 +41,13 @@ $fields = [
 check_fields($fields);
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
-	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED
-			&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_SLO_URL) !== ''
-			&& CSessionHelper::has('saml_data')) {
-		redirect('index_sso.php?slo');
+	if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED) {
+		$provisioning = CProvisioning::forUserDirectoryId(CAuthenticationHelper::getSamlUserdirectoryid());
+		$saml_config = $provisioning->getIdpConfig();
+
+		if ($saml_config['slo_url'] !== '' && CSessionHelper::has('saml_data')) {
+			redirect('index_sso.php?slo');
+		}
 	}
 
 	CWebUser::logout();

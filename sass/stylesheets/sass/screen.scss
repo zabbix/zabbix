@@ -29,6 +29,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
@@ -457,8 +458,6 @@ form {
 			white-space: nowrap;
 
 			[class*='icon-'] {
-				vertical-align: middle;
-
 				&::after {
 					margin: 0;
 					line-height: 14px;
@@ -1991,6 +1990,16 @@ button {
 	padding: 0;
 	min-height: inherit;
 
+	&.red {
+		color: $red;
+		border-color: $red
+	}
+
+	&.green {
+		color: $green;
+		border-color: $green
+	}
+
 	&:hover {
 		@extend .btn-link;
 	}
@@ -2001,6 +2010,14 @@ button {
 		margin-bottom: -2px !important;
 		border-bottom: 2px solid rgba($link-hover-color, .5);
 		box-shadow: 0 0 0 0 !important;
+
+		&.red {
+			border-color: $red
+		}
+
+		&.green {
+			border-color: $green
+		}
 	}
 
 	&:active {
@@ -2525,7 +2542,7 @@ $icon-widget-btn: (
 %btn-disabled {
 	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
-	border-color: $btn-disabled-border-color;
+	border-color: $btn-disabled-border-color !important;
 	cursor: default;
 
 	&.icon-cal {
@@ -4786,14 +4803,6 @@ svg {
 	visibility: hidden;
 }
 
-.checkbox-list {
-	li {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 24px;
-	}
-}
-
 .preprocessing-list {
 	$name-width: 295px;
 	$on-fail-width: 100px;
@@ -5031,6 +5040,7 @@ svg {
 				> .content {
 					display: flex;
 					height: 20px;
+					align-items: center;
 
 					> .arrow {
 						flex: 0 0 15px;
@@ -6071,7 +6081,7 @@ button {
 
 // Table column styles
 #itemsTable {
-	.table-col-handle { width: 26px; }
+	.table-col-handle { width: 10px; }
 	.table-col-no { width: 20px; }
 	.table-col-name-normal { width: 285px; }
 	.table-col-name { width: 365px; }

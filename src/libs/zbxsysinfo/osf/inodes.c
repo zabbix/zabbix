@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 static int	vfs_fs_inode_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H

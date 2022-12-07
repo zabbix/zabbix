@@ -795,6 +795,30 @@ in:
 out:
   return: SUCCEED
   value: Sword of Honour
+---
+test case: Query empty array
+in:
+  data: '{"a":[]}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '[]'
+---
+test case: Query empty object
+in:
+  data: '{"a":{}}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '{}'
+---
+test case: Query with json prefixed with whitespace
+in:
+  data: ' {"a":1}'
+  path: $.a
+out:
+  return: SUCCEED
+  value: '1'
 ...
 
 

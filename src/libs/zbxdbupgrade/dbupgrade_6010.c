@@ -22,6 +22,8 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxavailability.h"
+#include "zbx_host_constants.h"
 
 extern unsigned char	program_type;
 

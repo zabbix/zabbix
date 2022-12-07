@@ -84,7 +84,13 @@ class CInputSecret extends CInput {
 			]);
 		}
 		else {
-			$node->addItem(new CPassBox($name, $value, $maxlength));
+			$pass_box = new CPassBox($name, $value, $maxlength);
+
+			if ($this->getAttribute('placeholder')) {
+				$pass_box->setAttribute('placeholder', $this->getAttribute('placeholder'));
+			}
+
+			$node->addItem($pass_box);
 		}
 
 		if ($this->add_post_js) {

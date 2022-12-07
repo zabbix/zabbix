@@ -20,8 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 static u_int	pagesize = 0;
 
 #define ZBX_SYSCTLBYNAME(name, value)									\

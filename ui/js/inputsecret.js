@@ -33,6 +33,7 @@
 
 		$input
 			.prop('disabled', false)
+			.attr('placeholder', t('value'))
 			.val('')
 			.focus();
 

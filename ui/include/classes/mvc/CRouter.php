@@ -47,6 +47,8 @@ class CRouter {
 		// action									controller												layout					view
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
+		'actionlog.csv'								=> ['CControllerActionLogList',							'layout.csv',			'reports.actionlog.list.csv'],
+		'actionlog.list'							=> ['CControllerActionLogList',							'layout.htmlpage',		'reports.actionlog.list'],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> ['CControllerAuditSettingsUpdate',					null,					null],
 		'auditlog.list'								=> ['CControllerAuditLogList',							'layout.htmlpage',		'reports.auditlog.list'],
@@ -185,9 +187,13 @@ class CRouter {
 		'popup.massupdate.triggerprototype'			=> ['CControllerPopupMassupdateTrigger',				'layout.json',			'popup.massupdate.trigger'],
 		'popup.media'								=> ['CControllerPopupMedia',							'layout.json',			'popup.media'],
 		'popup.mediatype.message'					=> ['CControllerPopupMediatypeMessage',					'layout.json',			'popup.mediatype.message'],
+		'popup.mediatypemapping.check'				=> ['CControllerPopupMediaTypeMappingCheck',			'layout.json',			null],
+		'popup.mediatypemapping.edit'				=> ['CControllerPopupMediaTypeMappingEdit',				'layout.json',			'popup.mediatypemapping.edit'],
 		'popup.mediatypetest.edit'					=> ['CControllerPopupMediatypeTestEdit',				'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'					=> ['CControllerPopupMediatypeTestSend',				'layout.json',			null],
 		'popup.proxy.edit'							=> ['CControllerPopupProxyEdit',						'layout.json',			'popup.proxy.edit'],
+		'popup.usergroupmapping.check'				=> ['CControllerPopupUserGroupMappingCheck',			'layout.json',			null],
+		'popup.usergroupmapping.edit'				=> ['CControllerPopupUserGroupMappingEdit',				'layout.json',			'popup.usergroupmapping.edit'],
 		'popup.scheduledreport.create'				=> ['CControllerPopupScheduledReportCreate',			'layout.json',			null],
 		'popup.scheduledreport.edit'				=> ['CControllerPopupScheduledReportEdit',				'layout.json',			'popup.scheduledreport.edit'],
 		'popup.scheduledreport.list'				=> ['CControllerPopupScheduledReportList',				'layout.json',			'popup.scheduledreport.list'],
@@ -286,6 +292,7 @@ class CRouter {
 		'user.token.list'							=> ['CControllerUserTokenList',							'layout.htmlpage',		'administration.user.token.list'],
 		'user.unblock'								=> ['CControllerUserUnblock',							null,					null],
 		'user.update'								=> ['CControllerUserUpdate',							null,					null],
+		'user.provision'							=> ['CControllerUserProvision',							null,					null],
 		'usergroup.create'							=> ['CControllerUsergroupCreate',						null,					null],
 		'usergroup.delete'							=> ['CControllerUsergroupDelete',						null,					null],
 		'usergroup.edit'							=> ['CControllerUsergroupEdit',							'layout.htmlpage',		'administration.usergroup.edit'],
@@ -306,7 +313,6 @@ class CRouter {
 
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
-		'auditacts.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
 		'chart2.php'					=> ['CLegacyAction', null, null],

@@ -99,6 +99,22 @@ class CHttpRequest {
 	}
 
 	/**
+	 * Get authentication header bearer value, return null when no authentication header exists or
+	 * authentication method is not bearer type.
+	 *
+	 * @return string|null
+	 */
+	public function getAuthBearerValue() {
+		$auth = $this->header('AUTHORIZATION');
+
+		if (is_string($auth) && substr($auth, 0, 7) === 'Bearer ') {
+			return substr($auth, 7);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Return Raw HTTP Request (note: This is incomplete)
 	 * @param bool ReBuild the Raw HTTP Request
 	 */
