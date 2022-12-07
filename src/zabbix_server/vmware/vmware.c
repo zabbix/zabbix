@@ -255,6 +255,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
 /*
  * SOAP support
  */
+#define	ZBX_XML_HEADER1_VERSION	21
 #define	ZBX_XML_HEADER1_V4	"Soapaction:urn:vim25/4.1"
 #define	ZBX_XML_HEADER1_V6	"Soapaction:urn:vim25/6.0"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
@@ -8491,16 +8492,17 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
  ******************************************************************************/
 static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error)
 {
-	char		soapver[MAX_STRING_LEN / 32];
+	const char	*soapver;
 	CURLoption	opt;
 	CURLcode	err;
 
-	if (NULL != *headers && 0 != vc_version && 6 > vc_version)
-		return SUCCEED;
-	else if (6 > vc_version)
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
+	if (6 > vc_version)
+		soapver = ZBX_XML_HEADER1_V4;
 	else
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V6, sizeof(soapver));
+		soapver = ZBX_XML_HEADER1_V6;
+
+	if (NULL != *headers && (*headers)->data[ZBX_XML_HEADER1_VERSION] == soapver[ZBX_XML_HEADER1_VERSION])
+		return SUCCEED;
 
 	curl_slist_free_all(*headers);
 	*headers = NULL;
