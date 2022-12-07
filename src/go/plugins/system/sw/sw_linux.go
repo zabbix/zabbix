@@ -96,7 +96,7 @@ func getManagers() []manager {
 			"ls /var/log/packages",
 			"grep -r '^UNCOMPRESSED PACKAGE SIZE' /var/log/packages",
 			parseRegex,
-			dpkgDetails,
+			pkgtoolsDetails,
 		},
 	}
 }
@@ -203,7 +203,6 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 		var size uint64
 
 		size, err = strconv.ParseUint(split[4], 10, 64)
-
 		if err != nil {
 			return
 		}
@@ -218,7 +217,6 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 	var b []byte
 
 	b, err = json.Marshal(pd)
-
 	if err != nil {
 		return
 	}
@@ -261,19 +259,16 @@ func rpmDetails(manager string, in []string, regex string) (out string, err erro
 		var buildtime_timestamp, installtime_timestamp int64
 
 		size, err = strconv.ParseUint(split[3], 10, 64)
-
 		if err != nil {
 			return
 		}
 
 		buildtime_timestamp, err = strconv.ParseInt(split[4], 10, 64)
-
 		if err != nil {
 			return
 		}
 
 		installtime_timestamp, err = strconv.ParseInt(split[5], 10, 64)
-
 		if err != nil {
 			return
 		}
@@ -288,7 +283,6 @@ func rpmDetails(manager string, in []string, regex string) (out string, err erro
 	var b []byte
 
 	b, err = json.Marshal(pd)
-
 	if err != nil {
 		return
 	}
@@ -340,7 +334,6 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 		var size_float float64
 
 		size_float, err = strconv.ParseFloat(size_parts[0], 64)
-
 		if err != nil {
 			log.Debugf("unexpected size \"%s\" in \"%s\", ignoring", size_parts[0], s)
 
@@ -371,7 +364,6 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 		var buildtime, installtime time.Time
 
 		buildtime, err = time.Parse(timeFmt, split[4])
-
 		if err != nil {
 		        log.Debugf("unexpected buildtime \"%s\" in \"%s\", ignoring", split[4], s)
 
@@ -379,7 +371,6 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 		}
 
 		installtime, err = time.Parse(timeFmt, split[5])
-
 		if err != nil {
 		        log.Debugf("unexpected installtime \"%s\" in \"%s\", ignoring", split[5], s)
 
@@ -393,7 +384,95 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 	var b []byte
 
 	b, err = json.Marshal(pd)
+	if err != nil {
+		return
+	}
 
+	out = string(b)
+
+	return
+}
+
+func pkgtoolsDetails(manager string, in []string, regex string) (out string, err error) {
+	const num_fields = 4
+
+	pkg_rgx, err := regexp.Compile(regex)
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex \"%s\"", regex)
+
+		return
+	}
+
+	line_rgx, err := regexp.Compile(`^/var/log/packages/(.*)-([^-]+)-([^-]+)-([^:]+):UNCOMPRESSED PACKAGE SIZE:\s+(.*)$`)
+	if err != nil {
+		log.Debugf("internal error: cannot compile regex for parsing package details")
+
+		return
+	}
+
+	// initialize empty slice instead of nil slice
+	pd := []PackageDetails{}
+
+	for _, s := range in {
+		// ...Name-Version-Arch-Release:...: Size
+		// e. g.: /var/log/packages/util-linux-2.27.1-x86_64-1:UNCOMPRESSED PACKAGE SIZE:     1.9M
+		// note the possible dash in the package name, this is why we are forced to use regex
+		s_ := line_rgx.ReplaceAllString(s, `$1,$2-$4,$3,$5`)
+
+		// Name, Version, Arch, Size
+		split := strings.Split(s_, ",")
+
+		if len(split) != num_fields {
+			log.Debugf("unexpected number of fields while expected %d in \"%s\", ignoring", num_fields, s)
+
+			continue
+		}
+
+		matched := pkg_rgx.MatchString(split[0])
+
+		if !matched {
+			continue
+		}
+
+		var size_float float64
+
+		size_float, err = strconv.ParseFloat(split[3][:len(split[3])-1], 64)
+		if err != nil {
+			log.Debugf("unexpected size \"%s\" in \"%s\", ignoring", split[3], s)
+fmt.Printf("unexpected size \"%s\" in \"%s\", ignoring\n", split[3], s)
+			continue
+		}
+
+		// according to pkgtools source code the size suffix is
+		// either 'K' or 'M' and it may be specified in 3 formats:
+		//   <n>K
+		//   <n>.<n>M
+		//   <n>M
+		var size uint64
+
+		i := strings.Index(split[3], "K")
+
+		if i >= 1 {
+			size = uint64(size_float * 1024)
+		} else {
+			i := strings.Index(split[3], "M")
+
+			if i >= 1 {
+				size = uint64(size_float * 1024 * 1024)
+			} else {
+				log.Debugf("unexpected size suffix in \"%s\", expected 'K' or 'M' in \"%s\", ignoring", split[3], s)
+
+				continue
+			}
+		}
+
+		// pkgtools has no build/install time information
+		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, "", 0, "", 0))
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(pd)
 	if err != nil {
 		return
 	}
@@ -444,7 +523,6 @@ func (p *Plugin) systemSwPackages(params []string) (result string, err error) {
 	var short bool
 
 	regex, manager, short, err = getParams(params, 3)
-
 	if err != nil {
 		return
 	}
@@ -513,7 +591,6 @@ func (p *Plugin) systemSwPackagesGet(params []string) (result string, err error)
 	var regex, manager string
 
 	regex, manager, _, err = getParams(params, 2)
-
 	if err != nil {
 		return
 	}
