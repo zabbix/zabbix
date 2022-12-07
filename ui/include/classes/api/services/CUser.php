@@ -1683,7 +1683,7 @@ class CUser extends CApiService {
 		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
 		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Sessionid or token is expected.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session ID or token is expected.'));
 		}
 
 		$time = time();
