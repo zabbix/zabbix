@@ -23,10 +23,10 @@
 
 #include "zbxsysinfo.h"
 
-int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
+int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error, const char *options)
 {
 	AGENT_RESULT	result;
 	int		ret;
@@ -46,11 +46,12 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 }
 #endif /*POLLER_GET_VALUE_SSH_TEST_H*/
 
-int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	ZBX_UNUSED(item);
 	ZBX_UNUSED(result);
 	ZBX_UNUSED(encoding);
+	ZBX_UNUSED(options);
 
 	return SYSINFO_RET_OK;
 }

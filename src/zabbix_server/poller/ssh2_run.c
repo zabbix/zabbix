@@ -33,6 +33,114 @@ extern char	*CONFIG_SSH_KEY_LOCATION;
 
 static const char	*password;
 
+static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
+		char **err_msg)
+{
+	if (0 > libssh2_session_method_pref(session, type, value))
+	{
+		char	*err;
+		const char **algs;
+		int i, rc;
+
+		*err_msg = zbx_dsprintf(NULL, "Error while setting %s SSH option", key_str);
+
+		if (0 > libssh2_session_last_error(session, &err, NULL, 0))
+		{
+			*err_msg = zbx_strdcatf(*err_msg, ": %s.", err);
+		}
+		else
+		{
+			*err_msg = zbx_strdcat(*err_msg, ".");
+		}
+
+		if (0 < (rc = libssh2_session_supported_algs(session, type, &algs)))
+		{
+			*err_msg = zbx_strdcat(*err_msg, " Supported values are: ");
+
+			for (i = 0; i < rc; i++)
+			{
+				*err_msg = zbx_strdcat(*err_msg, algs[i]);
+				if (i < rc - 1)
+					*err_msg = zbx_strdcat(*err_msg, ", ");
+			}
+			*err_msg = zbx_strdcat(*err_msg, ".");
+		}
+
+		return -1;
+	}
+
+	return 0;
+}
+
+static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
+{
+	int ret = SUCCEED;
+	char opt_copy[1024] = {0};
+	char	*line, *rest = opt_copy;
+
+	zbx_strscpy(opt_copy, options);
+
+	while ((line = strtok_r(opt_copy, ";", &rest)))
+	{
+		char *eq_str = strchr(line, '=');
+
+		*eq_str = '\0';
+
+#ifdef HAVE_LIBSSH2_METHOD_KEX
+		if(ZBX_CONST_STRLEN(KEY_EXCHANGE_STR) == (eq_str - line) &&
+				0 == strncmp(line, KEY_EXCHANGE_STR, ZBX_CONST_STRLEN(KEY_EXCHANGE_STR)))
+		{
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_KEX, KEY_EXCHANGE_STR, eq_str + 1,
+					err_msg)))
+				break;
+			continue;
+		}
+#endif
+#ifdef HAVE_LIBSSH2_METHOD_HOSTKEY
+		if(ZBX_CONST_STRLEN(KEY_HOSTKEY_STR) == (eq_str - line) &&
+				0 == strncmp(line, KEY_HOSTKEY_STR, ZBX_CONST_STRLEN(KEY_HOSTKEY_STR)))
+		{
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_HOSTKEY, KEY_HOSTKEY_STR, eq_str + 1,
+					err_msg)))
+				break;
+			continue;
+		}
+#endif
+#if defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && defined(HAVE_LIBSSH2_METHOD_CRYPT_SC)
+		if(ZBX_CONST_STRLEN(KEY_CIPHERS_STR) == (eq_str - line) &&
+				0 == strncmp(line, KEY_CIPHERS_STR, ZBX_CONST_STRLEN(KEY_CIPHERS_STR)))
+		{
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_CS, KEY_CIPHERS_STR, eq_str + 1,
+					err_msg)))
+				break;
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_CRYPT_SC, KEY_CIPHERS_STR, eq_str + 1,
+					err_msg)))
+				break;
+			continue;
+		}
+#endif
+#if defined(HAVE_LIBSSH2_METHOD_MAC_CS) && defined(HAVE_LIBSSH2_METHOD_MAC_SC)
+		if(ZBX_CONST_STRLEN(KEY_MACS_STR) == (eq_str - line) &&
+				0 == strncmp(line, KEY_MACS_STR, ZBX_CONST_STRLEN(KEY_MACS_STR)))
+		{
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_CS, KEY_MACS_STR, eq_str + 1,
+					err_msg)))
+				break;
+			if (0 != (ret = ssh_set_options(session, LIBSSH2_METHOD_MAC_SC, KEY_MACS_STR, eq_str + 1,
+					err_msg)))
+				break;
+			continue;
+		}
+#endif
+
+		*err_msg = zbx_dsprintf(NULL, "SSH option %s is not supported", line);
+		ret = FAIL;
+		break;
+	}
+
+	return ret;
+}
+
 static void	kbd_callback(const char *name, int name_len, const char *instruction,
 		int instruction_len, int num_prompts,
 		const LIBSSH2_USERAUTH_KBDINT_PROMPT *prompts,
@@ -80,14 +188,14 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 }
 
 /* example ssh.run["ls /"] */
-int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const char *options)
 {
 	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED, exitcode;
 	char		tmp_buf[DATA_BUFFER_SIZE], *userauthlist, *publickey = NULL, *privatekey = NULL, *ssherr,
-			*output, *buffer = NULL;
+			*output, *buffer = NULL, *err_msg = NULL;
 	size_t		offset = 0, buf_size = DATA_BUFFER_SIZE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -104,6 +212,14 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
 		goto tcp_close;
+	}
+
+	if (0 != ssh_parse_options(session, options, &err_msg))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set additional SSH session options: %s",
+				err_msg));
+		zbx_free(err_msg);
+		goto session_free;
 	}
 
 	/* set blocking mode on session */
