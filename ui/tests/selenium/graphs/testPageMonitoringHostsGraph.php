@@ -19,11 +19,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @backup profiles, hosts, items, graphs
+ * @backup profiles, hosts
  *
  * @onBefore prepareGraphsData
  */
@@ -32,12 +32,16 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	use TableTrait;
 
 	/**
-	 * Item id.
+	 * ID of the item used for graph creation and check.
+	 *
+	 * @var integer
 	 */
 	private static $itemids;
 
 	/**
-	 * Graph id.
+	 * ID of the graph used for result check.
+	 *
+	 * @var integer
 	 */
 	private static $graphids;
 
@@ -177,19 +181,17 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 * Check graph page layout.
 	 */
 	public function testPageMonitoringHostsGraph_Layout() {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_set=1');
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_set=1')->waitUntilReady();
 		$this->page->assertHeader('Graphs');
 		$this->page->assertTitle('Custom graphs');
 
 		// If the time selector is not visible - enable it.
 		if ($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-1')->one()->click();
+				$this->query('id:ui-id-1')->one()->click();
 		}
 
 		// Check that time selector set to display Last hour data.
-		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')
-				->one()->getAttribute('class')
-		);
+		$this->assertEquals('selected', $this->query('xpath://a[@data-label="Last 1 hour"]')->one()->getAttribute('class'));
 
 		// Enable filter and check filter labels.
 		$this->query('id:ui-id-2')->one()->click();
@@ -202,7 +204,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertEquals('All graphs', $radio->getSelected());
 
 		// Check placeholder for Hosts.
-		$this->assertEquals('type here to search', $form->query('id:filter_hostids__ms')->one()->getAttribute('placeholder'));
+		$this->assertEquals('type here to search', $form->getField('id:filter_hostids__ms')->getAttribute('placeholder'));
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
@@ -211,7 +213,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			);
 		}
 
-		// When table result is empty.
+		// Check that the table is empty by default.
 		$this->assertEquals('Specify host to see the graphs.', $this->query('class:nothing-to-show')->one()->getText());
 	}
 
@@ -536,7 +538,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_TagFilter($data) {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-				'now&filter_search_type=0&filter_set=1');
+				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->query('button:Reset')->one()->click();
 		$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
@@ -564,12 +566,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				$graph_sources[] = $source->getAttribute('src');
 			}
 
-			// Check that displayed graphs has correct ids.
+			// Check that displayed graphs have correct ids.
 			if (array_key_exists('graph_name', $data)) {
 				$this->checkGraphsIds($data['graph_names'], $graph_sources);
 			}
 
-			// Check that displayed item graphs has correct ids.
+			// Check that displayed item graphs hav correct ids.
 			if (array_key_exists('item_names', $data)) {
 				$this->checkGraphsIds($data['item_names'], $graph_sources, false);
 			}
@@ -894,7 +896,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-				'now&filter_search_type=0&filter_set=1');
+				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->query('button:Reset')->one()->click();
 		$form->fill($data['filter'])->submit();
@@ -931,7 +933,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 */
 	public function testPageMonitoringHostsGraph_KioskMode() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
-				'=now&filter_search_type=0&filter_set=1');
+				'=now&filter_search_type=0&filter_set=1')->waitUntilReady();
 
 		// Check Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
