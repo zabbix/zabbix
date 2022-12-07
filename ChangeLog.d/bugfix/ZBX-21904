@@ -1,1 +1,1 @@
-..F....... [ZBX-21904] fixed broken adding value mappings via template mass update (agriscenko)
+..F....... [ZBX-21904] fixed possibility to add value mappings from templates in mass update form (agriscenko)
