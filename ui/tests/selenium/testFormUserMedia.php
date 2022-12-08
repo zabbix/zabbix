@@ -363,7 +363,7 @@ class testFormUserMedia extends CWebTest {
 	public function testFormUserMedia_Edit($data) {
 		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
 
-		// Edit selected media
+		// Edit selected media.
 		$edit_row = $this->getUserMediaTab('Admin')->asTable()->query('xpath:.//tr[@id="user_medias_0"]')->one()->asTableRow();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
@@ -673,20 +673,20 @@ class testFormUserMedia extends CWebTest {
 		];
 
 		if (array_key_exists('Use if severity', $data['fields'])) {
-			// Check that the passed severities are turned on
+			// Check that the passed severities are turned on.
 			foreach ($data['fields']['Use if severity'] as $used_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/div['.$reference_severities[$used_severity].']')->one()->getText();
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
-			// Check that other severities are turned off
+			// Check that other severities are turned off.
 			foreach ($reference_severities as $name => $unused_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/div['.$unused_severity.']')->one()->getText();
 				$this->assertEquals($name.' (off)', $actual_severity);
 			}
 		}
 		else {
-			// Check that when no severities are passed - they all are turned on by default
+			// Check that when no severities are passed - they all are turned on by default.
 			for ($i = 1; $i < 7; $i++) {
 				$severity =  $row->query('xpath:./td[4]/div/div['.$i.']')->one()->getText();
 				$this->assertStringContainsString('(on)', $severity);

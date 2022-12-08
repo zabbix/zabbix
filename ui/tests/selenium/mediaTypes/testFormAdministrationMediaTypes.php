@@ -265,7 +265,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				break;
 
 			case 'Webhook':
-				// Check parameters table
+				// Check parameters table.
 				$webhook_params = [
 					['Name' => 'URL', 'Value' => ''],
 					['Name' => 'HTTPProxy', 'Value' => ''],
@@ -566,7 +566,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
-			// Options validation - Attempt interval
+			// Options validation - Attempt interval.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -784,7 +784,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'substitute_maxsessions' => true
 				]
 			],
-			// Successfully create media type with different options
+			// Successfully create media type with different options.
 			[
 				[
 					'mediatype_tab' => [
