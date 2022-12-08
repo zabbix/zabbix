@@ -615,7 +615,7 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 
 	if (1 == transformed)
 		zbx_free(pair_local.oid);
-	
+
 	zbx_free(oid_needle);
 
 	return ret;
