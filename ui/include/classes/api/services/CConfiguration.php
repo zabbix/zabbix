@@ -62,9 +62,9 @@ class CConfiguration extends CApiService {
 	 */
 	private function validateExport(array $params, bool $with_unlinked_parent_templates = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
-			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
-			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
+			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
+			'options' =>		['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 				'hosts' =>				['type' => API_IDS],
 				'images' =>				['type' => API_IDS],
 				'maps' =>				['type' => API_IDS],
@@ -282,9 +282,6 @@ class CConfiguration extends CApiService {
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
 
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
-
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
@@ -346,9 +343,6 @@ class CConfiguration extends CApiService {
 
 		// Normalize array keys and strings.
 		$data = (new CImportDataNormalizer($schema))->normalize($data);
-
-		// Transform converter.
-		$data = (new CTransformImportConverter($schema))->convert($data);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);

@@ -613,7 +613,6 @@ class CConfigurationImport {
 		$groups_to_update = [];
 
 		foreach ($this->getFormattedTemplateGroups() as $group) {
-
 			$groupid = $this->referencer->findTemplateGroupidByUuid($group['uuid']);
 
 			if ($groupid === null) {
