@@ -33,6 +33,7 @@ typedef struct
 {
 	char	*field_name;
 	char	*oid_prefix;
+	int	hex_conv_flag;
 }
 zbx_snmp_walk_to_json_param_t;
 
@@ -51,6 +52,7 @@ typedef struct
 {
 	char	*oid;
 	char	*value;
+	int	is_hex;
 }
 zbx_snmp_value_pair_t;
 
