@@ -1128,7 +1128,7 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Check and add UUID to all host prototypes on templates, if it doesn't exist.
+	 * Check that only templated host prototypes have UUIDs. Generate a UUID for such prototypes, if empty.
 	 *
 	 * @param array $hosts
 	 *
@@ -1137,14 +1137,14 @@ class CHostPrototype extends CHostBase {
 	private static function checkAndAddUuid(array &$hosts): void {
 		foreach ($hosts as $i => &$host) {
 			if ($host['parent_status'] == HOST_STATUS_TEMPLATE) {
-				if (array_key_exists('uuid', $host)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/' . ($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-					);
-				}
-				else {
+				if (!array_key_exists('uuid', $host)) {
 					$host['uuid'] = generateUuidV4();
 				}
+			}
+			elseif (array_key_exists('uuid', $host)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('zInvalid parameter "%1$s": %2$s.', '/' . ($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+				);
 			}
 		}
 		unset($host);
