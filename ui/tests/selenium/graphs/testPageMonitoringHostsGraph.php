@@ -217,370 +217,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertEquals('Specify host to see the graphs.', $this->query('class:nothing-to-show')->one()->getText());
 	}
 
-	public static function getCheckTagFilterData() {
-		return [
-			// #0 All graphs - filter by Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'All graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						]
-					],
-					'graphs_amount' => 3,
-					'graph_names' => [
-						'Graph_2',
-						'Graph_3'
-					],
-					'item_names' => [
-						'Item_for_graph_2'
-					]
-				]
-			],
-			// #1 Host graphs - filter by Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'Host graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						]
-					],
-					'graphs_amount' => 2,
-					'graph_names' => [
-						'Graph_2',
-						'Graph_3'
-					]
-				]
-			],
-			// #2 Simple graphs - filter by Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						]
-					],
-					'graphs_amount' => 1,
-					'item_names' => [
-						'Item_for_graph_2'
-					]
-				]
-			],
-			// #3 All graphs - filter by 2 Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'All graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2',
-							'tag_name_1'
-						]
-					],
-					'graphs_amount' => 5,
-					'graph_names' => [
-						'Graph_1',
-						'Graph_2',
-						'Graph_3'
-					],
-					'item_names' => [
-						'Item_for_graph_1',
-						'Item_for_graph_2'
-					]
-				]
-			],
-			// #4 Host graphs - filter by 2 Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'Host graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2',
-							'tag_name_1'
-						]
-					],
-					'graphs_amount' => 3,
-					'graph_names' => [
-						'Graph_1',
-						'Graph_2',
-						'Graph_3'
-					]
-				]
-			],
-			// #5 Simple graphs - filter by 2 Tags.
-			[
-				[
-					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2',
-							'tag_name_1'
-						]
-					],
-					'graphs_amount' => 2,
-					'item_names' => [
-						'Item_for_graph_1',
-						'Item_for_graph_2'
-					]
-				]
-			],
-			// #6 All graphs - filter by Tags and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'All graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					],
-					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_3'
-					]
-				]
-			],
-			// #7 Host graphs - filter by Tag and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Host graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					],
-					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_2'
-					]
-				]
-			],
-			// #8 Simple graphs - filter by Tag and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					]
-				]
-			],
-			// #9 All graphs - filter by 2 Tags and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'All graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					],
-					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_3'
-					]
-				]
-			],
-			// #10 Host graphs - filter by 2 Tags and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Host graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					],
-					'graphs_amount' => 1,
-					'graph_names' => [
-						'Graph_3'
-					]
-				]
-			],
-			// #11 Simple graphs - filter by 2 Tags and Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					]
-				]
-			],
-			// #12 All graphs - filter by 2 Tags and 2 Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'All graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_2',
-							'tag_value_1'
-						]
-					],
-					'graphs_amount' => 5,
-					'graph_names' => [
-						'Graph_1',
-						'Graph_2',
-						'Graph_3'
-					],
-					'item_names' => [
-						'Item_for_graph_1',
-						'Item_for_graph_2'
-					]
-				]
-			],
-			// #13 Host graphs - filter by 2 Tags and 2 Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Host graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_2',
-							'tag_value_1'
-						]
-					],
-					'graphs_amount' => 3,
-					'graph_names' => [
-						'Graph_1',
-						'Graph_2',
-						'Graph_3'
-					]
-				]
-			],
-			// #14 Simple graphs - filter by 2 Tags and 2 Tag value.
-			[
-				[
-					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_2',
-							'tag_value_1'
-						]
-					],
-					'graphs_amount' => 2,
-					'item_names' => [
-						'Item_for_graph_1',
-						'Item_for_graph_2'
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * Check tags filtering.
-	 *
-	 * @dataProvider getCheckTagFilterData
-	 */
-	public function testPageMonitoringHostsGraph_TagFilter($data) {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->query('button:Reset')->one()->click();
-		$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
-		$this->page->waitUntilReady();
-
-		// Click on subfilter.
-		foreach ($data['subfilter'] as $header => $values) {
-			foreach ($values as $value) {
-				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
-				$this->page->waitUntilReady();
-			}
-		}
-
-		$form->fill($data['filter'])->submit();
-		$this->page->waitUntilReady();
-
-		// Check result amount.
-		if (array_key_exists('graphs_amount', $data)) {
-			$this->checkGraphs($data['graphs_amount']);
-
-			// Find links with graphs and items ids.
-			$graph_sources = [];
-			foreach ($this->query("xpath://tbody//img")->all() as $source) {
-				$graph_sources[] = $source->getAttribute('src');
-			}
-
-			// Check that displayed graphs have correct ids.
-			if (array_key_exists('graph_name', $data)) {
-				$this->checkGraphsIds($data['graph_names'], $graph_sources);
-			}
-
-			// Check that displayed item graphs hav correct ids.
-			if (array_key_exists('item_names', $data)) {
-				$this->checkGraphsIds($data['item_names'], $graph_sources, false);
-			}
-		}
-		else {
-			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
-		}
-	}
-
 	public static function getCheckFilterData() {
 		return [
 			// #0 One host with several items and graphs. Show all graphs.
@@ -885,6 +521,315 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Name' => 'Graph_4'
 					]
 				]
+			],
+			// #22 All graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						]
+					],
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_2'
+					]
+				]
+			],
+			// #23 Host graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						]
+					],
+					'graphs_amount' => 2,
+					'graph_names' => [
+						'Graph_2',
+						'Graph_3'
+					]
+				]
+			],
+			// #24 Simple graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						]
+					],
+					'graphs_amount' => 1,
+					'item_names' => [
+						'Item_for_graph_2'
+					]
+				]
+			],
+			// #25 All graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 5,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
+				]
+			],
+			// #26 Host graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					]
+				]
+			],
+			// #27 Simple graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 2,
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
+				]
+			],
+			// #28 All graphs - filter by Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
+				]
+			],
+			// #29 Host graphs - filter by Tag and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_2'
+					]
+				]
+			],
+			// #30 Simple graphs - filter by Tag and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					]
+				]
+			],
+			// #31 All graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
+				]
+			],
+			// #32 Host graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 1,
+					'graph_names' => [
+						'Graph_3'
+					]
+				]
+			],
+			// #33 Simple graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_3'
+						]
+					]
+				]
+			],
+			// #34 All graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_1'
+						]
+					],
+					'graphs_amount' => 5,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					],
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
+				]
+			],
+			// #35 Host graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_1'
+						]
+					],
+					'graphs_amount' => 3,
+					'graph_names' => [
+						'Graph_1',
+						'Graph_2',
+						'Graph_3'
+					]
+				]
+			],
+			// #36 Simple graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_1'
+						]
+					],
+					'graphs_amount' => 2,
+					'item_names' => [
+						'Item_for_graph_1',
+						'Item_for_graph_2'
+					]
+				]
 			]
 		];
 	}
@@ -899,6 +844,22 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->query('button:Reset')->one()->click();
+
+		// Filter using tags.
+		if (array_key_exists('subfilter', $data)) {
+			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
+			$this->page->waitUntilReady();
+
+			// Click on subfilter.
+			foreach ($data['subfilter'] as $header => $values) {
+				foreach ($values as $value) {
+					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
+						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+					$this->page->waitUntilReady();
+				}
+			}
+		}
+
 		$form->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 
@@ -923,7 +884,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 		else {
-			$message = (array_key_exists('Hosts', $data['filter'])) ? 'No data found.' : 'Specify host to see the graphs.';
+			$message = (array_key_exists('Hosts', $data['filter']) || array_key_exists('subfilter', $data))
+					? 'No data found.' : 'Specify host to see the graphs.';
 			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
