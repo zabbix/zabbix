@@ -59,7 +59,7 @@ window.popup_import = new class {
 		}
 
 		advanced_configuration.addEventListener('change', () => {
-			this.form.querySelectorAll('.js-advanced-configuration').forEach(function (e) {
+			this.form.querySelectorAll('.js-advanced-configuration').forEach((e) => {
 				return e.classList.toggle("display-none");
 			});
 		});
@@ -90,7 +90,7 @@ window.popup_import = new class {
 	}
 
 	submitPopup() {
-		if (document.getElementById('rules_preset').value === "template") {
+		if (document.getElementById('rules_preset').value === 'template') {
 			return this.openImportComparePopup();
 		}
 
@@ -99,7 +99,6 @@ window.popup_import = new class {
 		}
 
 		return this.submitImportPopup();
-
 	}
 
 	isDeleteMissingChecked() {
@@ -281,7 +280,7 @@ window.popup_import = new class {
 			if (checkbox.checked !== check) {
 				checkbox.checked = check;
 			}
-		})
+		});
 	}
 }
 

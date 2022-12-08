@@ -836,10 +836,10 @@ class CConfigurationExport {
 
 		// gather graph prototypes
 		$graphs = API::GraphPrototype()->get([
+			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -871,8 +871,8 @@ class CConfigurationExport {
 
 		// gather host prototypes
 		$host_prototypes = API::HostPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,

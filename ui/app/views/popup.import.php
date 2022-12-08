@@ -80,19 +80,19 @@ if ($data['advanced_config']) {
 	$rules_table->addRow([
 		(new CCol('All'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		$col_update
-			? (new CCol(
-				(new CCheckBox('update_all'))->setChecked(true)
-			))->addClass(ZBX_STYLE_CENTER)
+			? 	(new CCol(
+					(new CCheckBox('update_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
 			: null,
 		$col_create
-			? (new CCol(
-				(new CCheckBox('create_all'))->setChecked(true)
-			))->addClass(ZBX_STYLE_CENTER)
+			? 	(new CCol(
+					(new CCheckBox('create_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
 			: null,
 		$col_delete
-			? (new CCol(
-				(new CCheckBox('delete_all'))->setChecked(true)
-			))->addClass(ZBX_STYLE_CENTER)
+			? 	(new CCol(
+					(new CCheckBox('delete_all'))->setChecked(true)
+				))->addClass(ZBX_STYLE_CENTER)
 			: null
 	]);
 }
@@ -167,7 +167,7 @@ foreach ($titles as $key => $title) {
 $rules_table->setHeader([
 	'',
 	$col_update ? (new CColHeader(_('Update existing')))->addClass(ZBX_STYLE_CENTER) : null,
-	$col_create ? (new CColHeader( _('Create new') ))->addClass(ZBX_STYLE_CENTER) : null,
+	$col_create ? (new CColHeader( _('Create new')))->addClass(ZBX_STYLE_CENTER) : null,
 	$col_delete ? (new CColHeader(_('Delete missing')))->addClass(ZBX_STYLE_CENTER) : null
 ]);
 
@@ -179,12 +179,14 @@ $advanced_config_checkbox = $data['advanced_config']
 	: null;
 
 $form_grid = (new CFormGrid())
-	->addItem([(new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
+	->addItem([
+		(new CLabel(_('Import file'), 'import_file'))->setAsteriskMark(),
 		new CFormField(
 			(new CFile('import_file'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
-				->setAttribute('autofocus', 'autofocus'))
+				->setAttribute('autofocus', 'autofocus')
+		)
 	])
 	->addItem($advanced_config_checkbox)
 	->addItem([new CLabel(_('Rules')), new CFormField($rules_table)]);

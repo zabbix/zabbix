@@ -227,7 +227,6 @@ class CConfigurationImportcompare {
 
 		$removed_entities = $before;
 		$added_entities = $after;
-
 		foreach ($added_entities as $entity) {
 			unset($entity['uniqueness']);
 

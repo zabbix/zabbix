@@ -177,7 +177,8 @@ else {
 				->addItem(drawToc($data['diff_toc']))
 				->addItem(drawDiff($data['diff']))
 				->addItem(
-					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady())
+					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady()
+				)
 				->toString(),
 		'buttons' => $buttons,
 		'no_changes' => !$data['diff']

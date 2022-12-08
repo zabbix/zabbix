@@ -63,6 +63,6 @@ window.popup_import_compare = new class {
 		}
 
 		overlayDialogueDestroy(this.overlay.dialogueid);
-		popup_import.submitImportPopup();
+		return popup_import.submitImportPopup();
 	}
 }
