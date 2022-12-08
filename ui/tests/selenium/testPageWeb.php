@@ -140,7 +140,7 @@ class testPageWeb extends CWebTest {
 	 */
 	public function testPageWeb_CheckLayout() {
 		// Logins directly into required page.
-		$this->page->login()->open('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -176,7 +176,7 @@ class testPageWeb extends CWebTest {
 	 * Function which checks Hosts context menu.
 	 */
 	public function testPageWeb_CheckHostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
 
 		$titles = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration', 'Detect operating system',
@@ -204,7 +204,7 @@ class testPageWeb extends CWebTest {
 	 * Function which checks if button "Reset" works properly.
 	 */
 	public function testPageWeb_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -235,16 +235,16 @@ class testPageWeb extends CWebTest {
 	 * Function which checks if disabled web services aren't displayed.
 	 */
 	public function testPageWeb_CheckDisabledWebServices() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$values = $this->getTableResult('Name');
 
 		// Turn off/on web services and check table results.
 		foreach (['Disable', 'Enable'] as $status) {
-			$this->page->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host']);
+			$this->page->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])->waitUntilReady();
 			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 			$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
-			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 			$changed = ($status === 'Disable') ? array_diff($values, ['Web scenario 1 step', 'Web scenario 2 step',
 					'Web scenario 3 step']) : $values;
 			$this->assertTableDataColumn($changed);
@@ -282,7 +282,7 @@ class testPageWeb extends CWebTest {
 	 * Function which checks sorting by Name/Host column.
 	 */
 	public function testPageWeb_CheckSorting() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC');
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach (['Host', 'Name'] as $column_name) {
@@ -303,7 +303,7 @@ class testPageWeb extends CWebTest {
 	 * Function which checks that title field disappears while Kioskmode is active.
 	 */
 	public function testPageWeb_CheckKioskMode() {
-		$this->page->login()->open('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
@@ -316,7 +316,7 @@ class testPageWeb extends CWebTest {
 	 * Function which checks links to "Details of Web scenario".
 	 */
 	public function testPageWeb_CheckLinks() {
-		$this->page->login()->open('zabbix.php?action=web.view');
+		$this->page->login()->open('zabbix.php?action=web.view')->waitUntilReady();
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1')
 				->query('link', 'testFormWeb1')->one()->click();
 		$this->page->waitUntilReady();
