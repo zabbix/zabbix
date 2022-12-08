@@ -4,28 +4,28 @@
 ## Overview
 
 For Zabbix version: 6.4 and higher.
-The template is developed for monitoring DBMS PostgreSQL and its forks.
+The template is developed to monitore DBMS PostgreSQL and its forks.
 
 
 
-This template was tested on:
+This template has been tested on:
 
-- PostgreSQL, version 10, 11, 12
+- PostgreSQL, version 10-15
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-1\. Deploy Zabbix agent2 with Postgres plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 postgres metrics moved to the loadable plugin and requires separate package installation or [compilation of the plugin from sources](https://www.zabbix.com/documentation/6.4/manual/config/items/plugins/build).
+1. Deploy Zabbix agent2 with Postgres plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 postgres metrics moved to a loadable plugin and requires separate package installation or [compilation of a plugin from sources](https://www.zabbix.com/documentation/6.4/manual/config/items/plugins/build).
 
-2\. Create PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role "pg_monitor":
+2. Create PostgreSQL user to monitor (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 
 ```bash
 CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT pg_monitor TO zbx_monitor;
 ```
 
-3\. Edit `pg_hba.conf` to allow connections from Zabbix agent:
+3. Edit `pg_hba.conf` to allow connections from Zabbix agent:
   
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -34,9 +34,9 @@ GRANT pg_monitor TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation https://www.postgresql.org/docs/current/auth-pg-hba-conf.html.
 
-4\. Set in the `{$PG.URI}` macro the system data source name of the PostgreSQL instance such as `<protocol(host:port)>`.
+4. Set in the `{$PG.URI}` macro the system data source name of the PostgreSQL instance such as `<protocol(host:port)>`.
 
-5\. Set the user name and password in host macros (`{$PG.USER}` and `{$PG.PASSWORD}`) if you want to override parameters from the Zabbix agent configuration file.
+5. Set the user name and password in host macros (`{$PG.USER}` and `{$PG.PASSWORD}`) if you want to override parameters from the Zabbix agent configuration file.
 
 
 
