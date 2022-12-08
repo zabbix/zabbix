@@ -48,7 +48,7 @@ void	zbx_mock_test_entry(void **state)
 		item.interface.addr = (char *)zbx_mock_get_parameter_string("in.item.interface");
 		item.key = (char *)zbx_mock_get_parameter_string("in.item.key");
 
-		returned_code = zbx_get_value_ssh_test_run(&item, &error, NULL);
+		returned_code = zbx_get_value_ssh_test_run(&item, &error);
 		if (SUCCEED != returned_code && NULL != error)
 			printf("zbx_get_value_ssh_test_run error: %s\n", error);
 
