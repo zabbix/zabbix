@@ -842,7 +842,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 				" from items"
 				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
-				/* items with interfaces INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
+				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
 				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT);
