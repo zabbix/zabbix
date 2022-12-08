@@ -44,7 +44,7 @@ A.......S. [ZBX-17419] optimized API queries when searching through names in hos
 ........S. [ZBX-21616] fixed error due to non-existent macros in custom expressions (dgoloscapov, wiper)
 .......PS. [ZBX-21786] fixed "invalid timeout" error occurring after removal of script item parameters (asestakovs)
 ...G...... [ZBX-21823] fixed "vfs.fs.inode" and "vfs.fs.get" to handle the file systems with zero total inodes count (asestakovs)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header so that it allows to access the frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header so that it allows to access the frontend in maintenace mode (agriscenko)
 .........T [ZBX-21588] optimized template k8s nodes by HTTP (egordymov)
 .........T [ZBX-20478] fixed script for k8s cluster state (egordymov)
 .........T [ZBX-20296] fixed swap trigger function for windows os and modules by Zabbix agent templates (atocko)
@@ -232,7 +232,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
 ...G...... [ZBX-21689] modified proc.num item to prevent agent crash on Windows when 'user' parameter is set (asestakovs)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.4
@@ -744,7 +744,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ........S. [ZBX-21655] updated VMware datastore discovery to prevent returning the same datastore multiple times (asestakovs)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10
@@ -2962,7 +2962,7 @@ A.F....... [ZBX-16432] removed the ability to import a graph with an empty name 
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
@@ -5615,7 +5615,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44
