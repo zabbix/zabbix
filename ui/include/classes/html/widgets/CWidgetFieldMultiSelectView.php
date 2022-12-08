@@ -68,9 +68,9 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 			else {
 				$options['popup'] = [
 					'parameters' => [
-							'dstfrm' => $this->form_name,
-							'dstfld1' => zbx_formatDomId($multiselect_name)
-						] + $this->getPopupParameters() + $this->field->getFilterParameters()
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($multiselect_name)
+					] + $this->getPopupParameters() + $this->field->getFilterParameters()
 				];
 
 				if ($this->filter_preselect) {

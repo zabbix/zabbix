@@ -34,11 +34,13 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectHost,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectMap,
 	CWidgetFieldMultiSelectMediaType,
 	CWidgetFieldMultiSelectService,
 	CWidgetFieldMultiSelectSla,
 	CWidgetFieldMultiSelectUser,
-	CWidgetFieldSelectResource};
+	CWidgetFieldSelectResource
+};
 
 class CControllerDashboardWidgetEdit extends CController {
 
@@ -184,17 +186,18 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		// Prepare data for CMultiSelect controls.
 		$ids = [
+			'action' => [],
+			'graph' => [],
 			'group' => [],
 			'host' => [],
 			'item' => [],
-			'graph' => [],
-			'prototype_item' => [],
+			'media_type' => [],
 			'prototype_graph' => [],
+			'prototype_item' => [],
 			'service' => [],
 			'sla' => [],
-			'user' => [],
-			'action' => [],
-			'media_type' => []
+			'sysmap' => [],
+			'user' => []
 		];
 
 		foreach ($form->getFields() as $field) {
@@ -241,6 +244,10 @@ class CControllerDashboardWidgetEdit extends CController {
 			elseif ($field instanceof CWidgetFieldMultiSelectMediaType) {
 				$key = 'media_types';
 				$var = 'media_type';
+			}
+			elseif ($field instanceof CWidgetFieldMultiSelectMap) {
+				$key = 'sysmaps';
+				$var = 'sysmap';
 			}
 			else {
 				continue;
@@ -439,18 +446,35 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
+		if ($ids['sysmap']) {
+			$db_sysmaps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($ids['sysmap']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_sysmaps as $sysmapid => $sysmap) {
+				foreach ($ids['sysmap'][$sysmapid] as $field_name) {
+					$captions['ms']['sysmaps'][$field_name][$sysmapid] += [
+						'name' => $sysmap['name']
+					];
+				}
+			}
+		}
+
 		$inaccessible_resources = [
+			'actions' => _('Inaccessible action'),
+			'graphs' => _('Inaccessible graph'),
+			'graph_prototypes' => _('Inaccessible graph prototype'),
 			'groups' => _('Inaccessible group'),
 			'hosts' => _('Inaccessible host'),
 			'items' => _('Inaccessible item'),
-			'graphs' => _('Inaccessible graph'),
 			'item_prototypes' => _('Inaccessible item prototype'),
-			'graph_prototypes' => _('Inaccessible graph prototype'),
+			'media_types' => _('Inaccessible media type'),
+			'maps' => _('Inaccessible map'),
 			'services' => _('Inaccessible service'),
 			'slas' => _('Inaccessible SLA'),
-			'users' => _('Inaccessible user'),
-			'actions' => _('Inaccessible action'),
-			'media_types' => _('Inaccessible media type')
+			'users' => _('Inaccessible user')
 		];
 
 		foreach ($captions['ms'] as $resource_type => &$fields_captions) {

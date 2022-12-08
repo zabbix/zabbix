@@ -27,6 +27,7 @@ use Zabbix\Widgets\{
 };
 
 use Zabbix\Widgets\Fields\{
+	CWidgetFieldMultiSelectMap,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelectResource,
 	CWidgetFieldWidgetSelect
@@ -53,8 +54,8 @@ class WidgetForm extends CWidgetForm {
 
 		if (!array_key_exists('source_type', $this->values) || $this->values['source_type'] == Widget::SOURCETYPE_MAP) {
 			$this->addField(
-				(new CWidgetFieldSelectResource('sysmapid', _('Map')))
-					->setResourceType(CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP)
+				(new CWidgetFieldMultiSelectMap('sysmapid', _('Map')))
+					->setMultiple(false)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}
