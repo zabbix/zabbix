@@ -40,7 +40,7 @@ in:
   type: ZBX_TEST_GET_VALUE_SSH
   item:
     interface: ""
-    key: ssh.run[clear,127.0.0.1,,,KexAlgorithms=ecdh-sha2-nistp256]
+    key: ssh.run[clear,127.0.0.1,,,KexAlgorithms=diffie-hellman-group1-sha1]
 out:
   return: SUCCEED
 ---
@@ -49,7 +49,7 @@ in:
   type: ZBX_TEST_GET_VALUE_SSH
   item:
     interface: ""
-    key: ssh.run[clear,127.0.0.1,,,"KexAlgorithms=eecdh-sha2-nistp256,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1"]
+    key: ssh.run[clear,127.0.0.1,,,"KexAlgorithms=diffie-hellman-group14-sha1,diffie-hellman-group1-sha1"]
 out:
   return: SUCCEED
 ---

@@ -38,6 +38,8 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 {
 	int ret = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
+
 	if (0 > ssh_options_set(session, type, value))
 	{
 		*err_msg = zbx_dsprintf(NULL, "Error while setting %s SSH option: %s.", key_str,
@@ -45,6 +47,8 @@ static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const c
 
 		ret = -1;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
 
 	return ret;
 }

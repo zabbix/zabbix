@@ -36,6 +36,10 @@ static const char	*password;
 static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_str, const char *value,
 		char **err_msg)
 {
+	int ret = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(\"%s\", \"%s\")", __func__, key_str, value);
+
 	if (0 > libssh2_session_method_pref(session, type, value))
 	{
 		char	*err;
@@ -64,12 +68,16 @@ static int	ssh_set_options(LIBSSH2_SESSION *session, int type, const char *key_s
 					*err_msg = zbx_strdcat(*err_msg, ", ");
 			}
 			*err_msg = zbx_strdcat(*err_msg, ".");
+
+			libssh2_free(session, algs);
 		}
 
-		return -1;
+		ret = -1;
 	}
 
-	return 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, ret);
+
+	return ret;
 }
 
 static int	ssh_parse_options(LIBSSH2_SESSION *session, const char *options, char **err_msg)
