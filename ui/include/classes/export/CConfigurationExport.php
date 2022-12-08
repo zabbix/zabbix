@@ -956,10 +956,10 @@ class CConfigurationExport {
 
 		// gather graph prototypes
 		$options = [
+			'output' => API_OUTPUT_EXTEND,
 			'discoveryids' => array_column($items, 'itemid'),
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		];
 
