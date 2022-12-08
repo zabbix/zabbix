@@ -1626,13 +1626,12 @@ class CControllerPopupGeneric extends CController {
 				if ($hostids) {
 					$options = [
 						'output' => ['name'],
-						'hostids' => $hostids,
 						'preservekeys' => true
 					];
 
 					$hosts = $context === 'host'
-						? API::Host()->get($options)
-						: API::Template()->get($options);
+						? API::Host()->get($options + ['hostids' => $hostids])
+						: API::Template()->get($options + ['templateids' => $hostids]);
 				}
 				else {
 					$options = [
