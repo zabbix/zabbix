@@ -34,6 +34,8 @@ class CWidgetNavTree extends CWidget {
 		this._maps_accessible = null;
 		this._show_unavailable = false;
 		this._problems = null;
+
+		// this._max_depth must be synced with WIDGET_NAVIGATION_TREE_MAX_DEPTH in defines.inc.php.
 		this._max_depth = 10;
 		this._last_id = null;
 
@@ -878,7 +880,7 @@ class CWidgetNavTree extends CWidget {
 											name: form_inputs.name.value.trim(),
 											sysmapid: form_inputs.sysmapid.value,
 											add_submaps: () => {
-												if (form_inputs.add_submaps) {
+												if (typeof form_inputs.add_submaps !== 'undefined') {
 													return form_inputs.add_submaps.checked ? 1 : 0
 												}
 												else {
@@ -937,7 +939,9 @@ class CWidgetNavTree extends CWidget {
 													if (typeof resp.hierarchy[sysmapid] !== 'undefined'
 														&& depth <= this._max_depth) {
 														const root = this._target
-															.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+															.querySelector(
+																`.tree-item[data-id="${itemid}"]>ul.tree-list`
+															);
 
 														$.each(resp.hierarchy[sysmapid], (i, submapid) => {
 															if (typeof resp.submaps[submapid] !== 'undefined') {
