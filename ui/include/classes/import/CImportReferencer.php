@@ -520,14 +520,14 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get template dashboard ID by dashboard name.
+	 * Get template dashboard ID by dashboard name and template ID.
 	 *
 	 * @param string $name
 	 * @param int    $templateid
 	 *
 	 * @return string|null
 	 */
-	public function findTemplateDashboardidByName(string $name, int $templateid): ?string {
+	public function findTemplateDashboardidByNameAndId(string $name, int $templateid): ?string {
 		if ($this->db_template_dashboards === null) {
 			$this->selectTemplateDashboards();
 		}
@@ -1394,7 +1394,7 @@ class CImportReferencer {
 			'output' => ['uuid', 'name', 'templateid'],
 			'filter' => [
 				'uuid' => array_keys($this->template_dashboards),
-				'name' => array_column($this->template_dashboards, 'name')
+				'name' => array_unique(array_column($this->template_dashboards, 'name'))
 			],
 			'searchByAny' => true,
 			'preservekeys' => true
