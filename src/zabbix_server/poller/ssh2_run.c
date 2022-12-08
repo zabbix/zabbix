@@ -206,24 +206,23 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
-		goto close;
-	}
-
 	/* initializes an SSH session object */
 	if (NULL == (session = libssh2_session_init()))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
-		goto tcp_close;
+		goto ret;
 	}
 
 	if (0 != ssh_parse_options(session, options, &err_msg))
 	{
 		SET_MSG_RESULT(result, err_msg);
-		zbx_free(err_msg);
+		goto session_free;
+	}
+
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
 		goto session_free;
 	}
 
@@ -236,7 +235,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	{
 		libssh2_session_last_error(session, &ssherr, NULL, 0);
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssherr));
-		goto session_free;
+		goto tcp_close;
 	}
 
 	/* check what authentication methods are available */
@@ -409,6 +408,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding, const cha
 	output = NULL;
 
 	ret = SYSINFO_RET_OK;
+
 channel_close:
 	/* close an active data channel */
 	exitcode = 127;
@@ -433,13 +433,13 @@ channel_close:
 session_close:
 	libssh2_session_disconnect(session, "Normal Shutdown");
 
-session_free:
-	libssh2_session_free(session);
-
 tcp_close:
 	zbx_tcp_close(&s);
 
-close:
+session_free:
+	libssh2_session_free(session);
+
+ret:
 	zbx_free(publickey);
 	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
