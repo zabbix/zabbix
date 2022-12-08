@@ -192,19 +192,13 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = false;
+	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
+		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
 
-	if ($data['internal_authentication']) {
-		$change_password_enabled = $data['action'] === 'userprofile.edit'
-				|| $data['db_user']['username'] !== ZBX_GUEST_USER;
-	}
-
-	$hint = null;
-
-	if (!$data['internal_authentication']) {
-		$hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
-			->addStyle('margin-left: 5px; margin-top: 4px');
-	}
+	$hint = !$data['internal_authentication']
+		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
+			->addStyle('margin-left: 5px; margin-top: 4px')
+		: null;
 
 	$user_form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
