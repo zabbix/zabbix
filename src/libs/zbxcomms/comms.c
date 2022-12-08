@@ -775,7 +775,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 			written += bytes_sent;
 		}
 
-		written -= offset;
+		written -= (ssize_t)offset;
 	}
 
 	while (written < (ssize_t)send_len)
@@ -1021,14 +1021,14 @@ int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout)
  * Purpose: inspect data in socket buffer without reading it                  *
  *                                                                            *
  ******************************************************************************/
-static int	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
+static ssize_t	tcp_peek(ZBX_SOCKET s, char *buffer, size_t size, int timeout)
 {
 	ssize_t		n;
 	zbx_pollfd_t	pd;
 	zbx_timespec_t	deadline;
 	int		poll_timeout;
 
-	if (0 <= (n = recv(s, buffer, size, MSG_PEEK)))
+	if (0 <= (n = ZBX_TCP_RECV(s, buffer, size, MSG_PEEK)))
 		return n;
 
 	if (SUCCEED != socket_had_nonblocking_error())

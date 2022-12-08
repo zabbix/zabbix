@@ -3639,16 +3639,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, int timeout, char *
 	{
 		int	result_code;
 
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
-		if (SUCCEED == zbx_alarm_timed_out())
-		{
-			*error = zbx_strdup(*error, "SSL_accept() timed out");
-			goto out;
-		}
-
 		/* In case of certificate error SSL_get_verify_result() provides more helpful diagnostics */
 		/* than other methods. Include it as first but continue with other diagnostics. Should be */
 		/* harmless in case of PSK. */

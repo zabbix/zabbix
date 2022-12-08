@@ -29,11 +29,37 @@
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
+#	define ZBX_TCP_RECV(s, b, bl, f)		((ssize_t)recv((s), (b), (int)(bl), f))
 #	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
 #	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
 #	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 #	define ZBX_PROTO_AGAIN			WSAEINTR
 #	define ZBX_SOCKET_ERROR			INVALID_SOCKET
+
+#	if !defined(POLLIN)
+#		define POLLIN	0x001
+#	endif
+#	if !defined(POLLPRI)
+#		define POLLPRI	0x002
+#	endif
+#	if !defined(POLLOUT)
+#		define POLLOUT	0x004
+#	endif
+#	if !defined(POLLERR)
+#		define POLLERR	0x008
+#	endif
+#	if !defined(POLLHUP)
+#		define POLLHUP	0x010
+#	endif
+#	if !defined(POLLNVAL)
+#		define POLLNVAL	0x020
+#	endif
+#	if !defined(POLLRDNORM)
+#		define POLLRDNORM	0x040
+#	endif
+#	if !defined(POLLWRNORM)
+#		define POLLWRNORM	0x100
+#	endif
 
 typedef struct
 {
@@ -48,6 +74,7 @@ int	socket_poll(zbx_pollfd_t* fds, int fds_num, int timeout);
 #else
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
+#	define ZBX_TCP_RECV(s, b, bl, f)	((ssize_t)recv((s), (b), (bl), f))
 #	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
 #	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
