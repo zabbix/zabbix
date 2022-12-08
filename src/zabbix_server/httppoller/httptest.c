@@ -28,6 +28,15 @@
 #include "httpmacro.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
+
+/* HTTP item types */
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
 typedef struct
 {
@@ -662,7 +671,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;

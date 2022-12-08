@@ -115,16 +115,17 @@ exit:
 	return ret;
 }
 
-int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result, int config_timeout)
 {
 	int	errcode = SUCCEED;
 
-	get_values_java(request, item, result, &errcode, 1);
+	get_values_java(request, item, result, &errcode, 1, config_timeout);
 
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
+		int config_timeout)
 {
 	zbx_socket_t	s;
 	struct zbx_json	json;
@@ -203,7 +204,7 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 	zbx_json_close(&json);
 
 	if (SUCCEED == (err = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, CONFIG_JAVA_GATEWAY, CONFIG_JAVA_GATEWAY_PORT,
-			CONFIG_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			config_timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 
