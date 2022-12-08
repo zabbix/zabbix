@@ -4,6 +4,11 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21206] reverted postgresql connection to be per database for Zabbix agent 2 postgresql plugin (esneiders)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin and ORACLE agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.30
