@@ -321,7 +321,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				break;
 
 			case 'Webhook':
-				// Check parameters table
+				// Check parameters table.
 				$webhook_params = [
 					['Name' => 'URL', 'Value' => ''],
 					['Name' => 'HTTPProxy', 'Value' => ''],
@@ -650,7 +650,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
-			// Options validation - Attempt interval
+			// Options validation - Attempt interval.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -781,7 +781,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// SMTP generic email with all possible parameters defined
+			// SMTP generic email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [
@@ -808,7 +808,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// Gmail relay email with all possible parameters defined
+			// Gmail relay email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [
@@ -830,7 +830,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				]
 			],
 			// TODO: uncomment the below case when ZBX-21915 is fixed.
-//			// Offise365 relay email with all possible parameters defined
+//			// Offise365 relay email with all possible parameters defined.
 //			[
 //				[
 //					'mediatype_tab' => [
@@ -913,7 +913,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'substitute_maxsessions' => true
 				]
 			],
-			// Successfully create media type with different options
+			// Successfully create media type with different options.
 			[
 				[
 					'mediatype_tab' => [
