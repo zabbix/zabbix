@@ -250,7 +250,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphDataSet('ds'))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
