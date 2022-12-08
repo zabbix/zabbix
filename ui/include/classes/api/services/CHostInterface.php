@@ -1099,7 +1099,8 @@ class CHostInterface extends CApiService {
 		if (($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3)
 				&& (!array_key_exists('max_repetitions', $interface['details'])
 					|| !is_numeric($interface['details']['max_repetitions'])
-					|| $interface['details']['max_repetitions'] < 1)) {
+					|| $interface['details']['max_repetitions'] < 1
+					|| $interface['details']['max_repetitions'] > ZBX_MAX_INT32)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 		}
 	}
