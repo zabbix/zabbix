@@ -520,16 +520,14 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get template dashboard ID by dashboard name
+	 * Get template dashboard ID by dashboard name and template ID.
 	 *
 	 * @param string $name
 	 * @param int    $templateid
 	 *
 	 * @return string|null
-	 *
-	 * @throws APIException
 	 */
-	public function findTemplateDashboardidByName(string $name, int $templateid): ?string {
+	public function findTemplateDashboardidByNameAndId(string $name, int $templateid): ?string {
 		if ($this->db_template_dashboards === null) {
 			$this->selectTemplateDashboards();
 		}
