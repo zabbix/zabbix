@@ -1623,22 +1623,18 @@ class CControllerPopupGeneric extends CController {
 
 				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
-				if ($hostids) {
-					$options = [
-						'output' => ['name'],
-						'preservekeys' => true
-					];
+				$options = [
+					'output' => ['name'],
+					'preservekeys' => true
+				];
 
+				if ($hostids) {
 					$hosts = $context === 'host'
 						? API::Host()->get($options + ['hostids' => $hostids])
 						: API::Template()->get($options + ['templateids' => $hostids]);
 				}
 				else {
-					$options = [
-						'output' => ['name'],
-						'preservekeys' => true,
-						'limit' => $limit
-					];
+					$options['limit'] = $limit;
 
 					$hosts = $context === 'host'
 						? API::Host()->get($options + ['groupids' => $this->groupids])
