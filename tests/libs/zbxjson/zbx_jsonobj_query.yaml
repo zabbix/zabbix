@@ -778,6 +778,23 @@ out:
   return: SUCCEED
   value: Sword of Honour
 ---
+test case: Query $.books[1:10000].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1:10000].title 
+out:
+  return: SUCCEED
+  value: '["Sword of Honour","Moby Dick","The Lord of the Rings"]'
+---
+test case: Query $.books[10000:1].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[10000:1].title 
+out:
+  return: SUCCEED
+---
 test case: Query $.books[1:2].title
 include: &include zbx_jsonobj_query.inc.yaml
 in:

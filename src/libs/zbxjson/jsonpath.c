@@ -2401,7 +2401,7 @@ static int	jsonpath_match_range(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *pare
 	const zbx_jsonpath_segment_t	*segment = &ctx->path->segments[path_depth];
 
 	values_num = parent->data.array.values_num;
-	start_index = (0 != (segment->data.range.flags & 0x01) ? MIN(segment->data.range.start, values_num) : 0);
+	start_index = (0 != (segment->data.range.flags & 0x01) ? segment->data.range.start : 0);
 	end_index = (0 != (segment->data.range.flags & 0x02) ? MIN(segment->data.range.end, values_num) : values_num);
 
 	if (0 > start_index)
