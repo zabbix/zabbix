@@ -175,6 +175,31 @@ out:
   return: SUCCEED
   value: 2
 ---
+test case: $.tags[-10:-9] 
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.tags[-10:-9] 
+out:
+  return: SUCCEED
+---
+test case: $.tags[1:-10] 
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.tags[1:-10] 
+out:
+  return: SUCCEED
+---
+test case: $.tags[-10:1]
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.tags[-10:1] 
+out:
+  return: SUCCEED
+  value: '["a"]'
+---
 test case: Query $.books[0, 2].title
 include: &include zbx_jsonobj_query.inc.yaml
 in:
