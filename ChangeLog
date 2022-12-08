@@ -516,8 +516,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.13rc1
 
 New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin, ORACLE ODBC and agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+.........T [ZBX-21595] optimized rabbitmq node templates (egordymov)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
+.........T [ZBX-21594] optimized rabbitmq cluster templates (egordymov)
+..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
+..F....... [ZBX-21864] fixed fatal error in system warning page (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12
