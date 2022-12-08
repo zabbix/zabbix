@@ -40,6 +40,8 @@ class CWidgetNavTree extends CWidget {
 		this._maps_accessible = null;
 		this._show_unavailable = false;
 		this._problems = null;
+
+		// this._max_depth must be synced with WIDGET_NAVIGATION_TREE_MAX_DEPTH in defines.inc.php.
 		this._max_depth = 10;
 		this._last_id = null;
 
@@ -547,6 +549,7 @@ class CWidgetNavTree extends CWidget {
 			button_add_child.title = t('Add child element');
 			button_add_child.classList.add('btn-add', 'js-button-add-child');
 			button_add_child.setAttribute('data-id', item.id);
+			button_add_child.disabled = depth === this._max_depth;
 			tools.appendChild(button_add_child);
 
 			const button_add_maps = document.createElement('input');
@@ -721,6 +724,14 @@ class CWidgetNavTree extends CWidget {
 				$arrow.removeClass('arrow-down a1').addClass('arrow-right');
 			}
 		});
+
+		for (const tree_element of document.querySelectorAll('.tree-list')) {
+			const button = tree_element.querySelector('.js-button-add-child');
+
+			if (button !== null) {
+				button.disabled = tree_element.dataset.depth >= this._max_depth;
+			}
+		}
 	}
 
 	_markTreeItemSelected(itemid) {
@@ -836,156 +847,157 @@ class CWidgetNavTree extends CWidget {
 
 		url.setArgument('action', 'widget.navtree.item.edit');
 
-		jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: {
-				name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
-				sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
-				depth: depth
-			},
-			dataType: 'json',
-			success: (resp) => {
-				if ('error' in resp) {
-					clearMessages();
+		if (depth <= this._max_depth) {
+			jQuery.ajax({
+				url: url.getUrl(),
+				method: 'POST',
+				data: {
+					name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
+					sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
+					depth: depth
+				},
+				dataType: 'json',
+				success: (resp) => {
+					if (resp.debug !== undefined) {
+						resp.body += resp.debug;
+					}
 
-					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+					overlayDialogue({
+						'title': t('Edit tree element'),
+						'class': 'modal-popup',
+						'content': resp.body,
+						'buttons': [
+							{
+								'title': item_edit ? t('Apply') : t('Add'),
+								'class': 'dialogue-widget-save',
+								'action': (overlay) => {
+									const form = document.getElementById('widget-dialogue-form');
+									const form_inputs = form.elements;
+									const url = new Curl('zabbix.php');
 
-					addMessage(message_box);
+									url.setArgument('action', 'widget.navtree.item.update');
 
-					return;
-				}
+									overlay.setLoading();
 
-				if (resp.debug !== undefined) {
-					resp.body += resp.debug;
-				}
+									overlay.xhr = $.ajax({
+										url: url.getUrl(),
+										method: 'POST',
+										data: {
+											name: form_inputs.name.value.trim(),
+											sysmapid: form_inputs.sysmapid.value,
+											add_submaps: () => {
+												if (typeof form_inputs.add_submaps !== 'undefined') {
+													return form_inputs.add_submaps.checked ? 1 : 0
+												}
+												else {
+													return 0;
+												}
+											},
+											depth: depth
+										},
+										dataType: 'json',
+										complete: () => {
+											overlay.unsetLoading();
+										},
+										success: (resp) => {
+											form.querySelectorAll('.msg-bad').forEach((msg) => {
+												msg.remove();
+											})
 
-				overlayDialogue({
-					'title': t('Edit tree element'),
-					'class': 'modal-popup',
-					'content': resp.body,
-					'buttons': [
-						{
-							'title': item_edit ? t('Apply') : t('Add'),
-							'class': 'dialogue-widget-save',
-							'action': (overlay) => {
-								const form = document.getElementById('widget-dialogue-form');
-								const form_inputs = form.elements;
-								const url = new Curl('zabbix.php');
+											if ('error' in resp) {
+												const message_box = makeMessageBox('bad', resp.error.messages,
+													resp.error.title
+												)[0];
 
-								url.setArgument('action', 'widget.navtree.item.update');
+												form.insertAdjacentElement('afterbegin', message_box);
 
-								overlay.setLoading();
-
-								overlay.xhr = $.ajax({
-									url: url.getUrl(),
-									method: 'POST',
-									data: {
-										name: form_inputs.name.value.trim(),
-										sysmapid: form_inputs.sysmapid.value,
-										add_submaps: form_inputs.add_submaps.checked ? 1 : 0,
-										depth: depth
-									},
-									dataType: 'json',
-									complete: () => {
-										overlay.unsetLoading();
-									},
-									success: (resp) => {
-										form.querySelectorAll('.msg-bad').forEach((msg) => {
-											msg.remove();
-										})
-
-										if ('error' in resp) {
-											const message_box = makeMessageBox('bad', resp.error.messages,
-												resp.error.title
-											)[0];
-
-											form.insertAdjacentElement('afterbegin', message_box);
-
-											return false;
-										}
-										else {
-											this._deactivateContentsEvents();
-											if (item_edit) {
-												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
-
-												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
-												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
-													.val(resp['sysmapid']);
-												jQuery('> .tree-row > .content > .item-name', $row)
-													.empty()
-													.attr('title', resp['name'])
-													.append(jQuery('<span>').text(resp.name));
-												$row.toggleClass('no-map', resp.sysmapid == 0);
+												return false;
 											}
 											else {
-												const root = this._target
-													.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
+												this._deactivateContentsEvents();
 
-												id = this._getNextId();
+												if (item_edit) {
+													const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
-												root.append(this._makeTreeItem({
-													id: id,
-													name: resp['name'],
-													sysmapid: resp['sysmapid'],
-													parent: parent
-												}));
-
-												root.closest('.tree-item').classList.remove('closed');
-												root.closest('.tree-item').classList.add('opened', 'is-parent');
-											}
-
-											const add_child_level = (sysmapid, itemid, depth) => {
-												if (typeof resp.hierarchy[sysmapid] !== 'undefined'
-													&& depth <= this._max_depth) {
+													jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
+													jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
+														.val(resp['sysmapid']);
+													jQuery('> .tree-row > .content > .item-name', $row)
+														.empty()
+														.attr('title', resp['name'])
+														.append(jQuery('<span>').text(resp.name));
+													$row.toggleClass('no-map', resp.sysmapid == 0);
+												}
+												else {
 													const root = this._target
-														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+														.querySelector(`.tree-item[data-id="${parent}"]>ul.tree-list`);
 
-													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
-														if (typeof resp.submaps[submapid] !== 'undefined') {
-															const submap_item = resp.submaps[submapid];
-															const submap_itemid = this._getNextId();
+													id = this._getNextId();
 
-															root.append(this._makeTreeItem({
-																id: submap_itemid,
-																name: submap_item['name'],
-																sysmapid: submap_item['sysmapid'],
-																parent: itemid
-															}));
-															add_child_level(submapid, submap_itemid, depth + 1);
-														}
-													});
+													root.append(this._makeTreeItem({
+														id: id,
+														name: resp['name'],
+														sysmapid: resp['sysmapid'],
+														parent: parent
+													}, depth));
 
 													root.closest('.tree-item').classList.remove('closed');
 													root.closest('.tree-item').classList.add('opened', 'is-parent');
 												}
-											};
 
-											add_child_level(resp['sysmapid'], id, depth + 1);
+												const add_child_level = (sysmapid, itemid, depth) => {
+													if (typeof resp.hierarchy[sysmapid] !== 'undefined'
+														&& depth <= this._max_depth) {
+														const root = this._target
+															.querySelector(
+																`.tree-item[data-id="${itemid}"]>ul.tree-list`
+															);
 
-											overlayDialogueDestroy(overlay.dialogueid);
-											this._updateWidgetFields();
-											this._setTreeHandlers();
-											this._activateContentsEvents();
+														$.each(resp.hierarchy[sysmapid], (i, submapid) => {
+															if (typeof resp.submaps[submapid] !== 'undefined') {
+																const submap_item = resp.submaps[submapid];
+																const submap_itemid = this._getNextId();
+
+																root.append(this._makeTreeItem({
+																	id: submap_itemid,
+																	name: submap_item['name'],
+																	sysmapid: submap_item['sysmapid'],
+																	parent: itemid
+																}));
+																add_child_level(submapid, submap_itemid, depth + 1);
+															}
+														});
+
+														root.closest('.tree-item').classList.remove('closed');
+														root.closest('.tree-item').classList.add('opened', 'is-parent');
+													}
+												};
+
+												add_child_level(resp['sysmapid'], id, depth + 1);
+
+												overlayDialogueDestroy(overlay.dialogueid);
+												this._updateWidgetFields();
+												this._setTreeHandlers();
+												this._activateContentsEvents();
+											}
 										}
-									}
-								});
-
-								return false;
+									});
+									return false;
+								},
+								'isSubmit': true
 							},
-							'isSubmit': true
-						},
-						{
-							'title': t('Cancel'),
-							'class': 'btn-alt',
-							'action': () => {}
-						}
-					],
-					'dialogueid': 'navtreeitem',
-					'script_inline': resp.script_inline
-				}, trigger_elmnt);
-			}
-		});
+							{
+								'title': t('Cancel'),
+								'class': 'btn-alt',
+								'action': () => {}
+							}
+						],
+						'dialogueid': 'navtreeitem',
+						'script_inline': resp.script_inline
+					}, trigger_elmnt);
+				}
+			});
+		}
 	}
 
 	_updateWidgetFields() {
@@ -1007,12 +1019,16 @@ class CWidgetNavTree extends CWidget {
 			if (id) {
 				const parent = document.getElementById(`${prefix}navtree.parent.${id}`).value;
 				const sysmapid = document.getElementById(`${prefix}navtree.sysmapid.${id}`).value;
-				const sibling = document.getElementById(`${prefix}children-of-${parent}`).childNodes;
+				const element = document.getElementById(`${prefix}children-of-${parent}`);
 
 				let order = 0;
 
-				while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
-					order++;
+				if (element !== null) {
+					const sibling = element.childNodes;
+
+					while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
+						order++;
+					}
 				}
 
 				this._fields[`navtree.name.${id}`] = field.value;
