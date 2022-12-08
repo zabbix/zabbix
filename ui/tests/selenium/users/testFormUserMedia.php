@@ -428,7 +428,7 @@ class testFormUserMedia extends CWebTest {
 		}
 
 		// Check that status of disabled user media is cickable.
-		$this->assertTrue($email_row->getColumn('Status')->query('xpath:.//a')->one()->isValid());
+		$this->assertTrue($email_row->getColumn('Status')->query('button:Disabled')->one()->isValid());
 
 		// Check that disabled media types are not shown if user media with enabled media type is edited.
 		$email_row->query('button:Edit')->one()->click();
