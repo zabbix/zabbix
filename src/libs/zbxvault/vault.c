@@ -91,7 +91,7 @@ int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t
 			config_vault->tls_key_file, path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
-int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, const zbx_config_vault_t *config_vault,
+int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
 		char **error)
 {
 	int		ret = FAIL;

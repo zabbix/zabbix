@@ -56,8 +56,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 			return SUCCEED;
 		}
 	}
-	ZBX_UNUSED(request);
-	ZBX_UNUSED(sock);
+
 	ZBX_UNUSED(jp);
 
 	return FAIL;

@@ -220,7 +220,6 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 		zbx_get_program_type_f get_program_type_cb, int config_timeout)
 {
 	ZBX_UNUSED(config_tls);
-	ZBX_UNUSED(config_vault);
 	ZBX_UNUSED(get_program_type_cb);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))

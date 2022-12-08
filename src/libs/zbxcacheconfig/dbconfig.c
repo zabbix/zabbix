@@ -113,8 +113,6 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint64_t revision);
 static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision);
 
-extern char		*CONFIG_VAULTTOKEN;
-extern char		*CONFIG_VAULT;
 /******************************************************************************
  *                                                                            *
  * Purpose: copies string into configuration cache shared memory              *

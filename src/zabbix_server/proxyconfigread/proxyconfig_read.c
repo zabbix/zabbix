@@ -29,7 +29,6 @@
 #include "zbxcrypto.h"
 #include "zbx_item_constants.h"
 
-extern char	*CONFIG_VAULTDBPATH;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
@@ -210,23 +209,24 @@ static void	proxyconfig_get_fields(char **sql, size_t *sql_alloc, size_t *sql_of
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get global/host macro data of the specified hosts from database   *
- *                                                                            *
- * Parameters: table_name - [IN] table name - globalmacro/hostmacro           *
- *             hostids    - [IN] the target hostids for hostmacro table and   *
- *                               NULL for globalmacro table                   *
- *             keys_paths - [OUT] the vault macro path/key                    *
- *             j          - [OUT] the output json                             *
- *             error      - [OUT] the error message                           *
- *                                                                            *
- * Return value: SUCCEED - the data was read successfully                     *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: get global/host macro data of the specified hosts from database           *
+ *                                                                                    *
+ * Parameters: table_name           - [IN] table name - globalmacro/hostmacro         *
+ *             hostids              - [IN] the target hostids for hostmacro table and *
+ *                                         NULL for globalmacro table                 *
+ *             config_vault_db_path - [IN]                                            *
+ *             keys_paths           - [OUT] the vault macro path/key                  *
+ *             j                    - [OUT] the output json                           *
+ *             error                - [OUT] the error message                         *
+ *                                                                                    *
+ * Return value: SUCCEED - the data was read successfully                             *
+ *               FAIL    - otherwise                                                  *
+ *                                                                                    *
+ **************************************************************************************/
 static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vector_uint64_t *hostids,
-		zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
+		const char *config_vault_db_path, zbx_vector_ptr_t *keys_paths, struct zbx_json *j, char **error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -295,7 +295,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			goto next;
 		}
 
-		if (NULL != CONFIG_VAULTDBPATH && 0 == strcasecmp(CONFIG_VAULTDBPATH, path) &&
+		if (NULL != config_vault_db_path && 0 == strcasecmp(config_vault_db_path, path) &&
 				(0 == strcasecmp(key, ZBX_PROTO_TAG_PASSWORD)
 						|| 0 == strcasecmp(key, ZBX_PROTO_TAG_USERNAME)))
 		{
@@ -922,8 +922,9 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 			goto out;
 		}
 
-		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_GMACROS) &&
-				SUCCEED != proxyconfig_get_macro_updates("globalmacro", NULL, &keys_paths, j, error))
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_GMACROS) && SUCCEED !=
+				proxyconfig_get_macro_updates("globalmacro", NULL, config_vault->db_path, &keys_paths,
+				j, error))
 		{
 			goto out;
 		}
@@ -936,8 +937,11 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 				goto out;
 			}
 
-			if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, &keys_paths, j, error))
+			if (SUCCEED != proxyconfig_get_macro_updates("hostmacro", &macro_hostids, config_vault->db_path,
+					&keys_paths, j, error))
+			{
 				goto out;
+			}
 		}
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_DRULES) &&
