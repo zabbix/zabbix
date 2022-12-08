@@ -97,9 +97,7 @@ class CControllerHostMacrosList extends CController {
 		}
 
 		if ($show_inherited_macros) {
-			$macros = mergeInheritedMacros($macros,
-				getInheritedMacros($this->getInput('templateids', []), $parent_hostid)
-			);
+			addInheritedMacros($macros, $this->getInput('templateids', []), $parent_hostid);
 		}
 
 		$macros = array_values(order_macros($macros, 'macro'));

@@ -530,7 +530,7 @@ if (hasRequest('form')) {
 	$macros = $data['host_prototype']['macros'];
 
 	if ($data['show_inherited_macros']) {
-		$macros = mergeInheritedMacros($macros, getInheritedMacros(array_keys($templates), $data['parent_hostid']));
+		addInheritedMacros($macros, array_keys($templates), $data['parent_hostid']);
 	}
 
 	// Sort only after inherited macros are added. Otherwise the list will look chaotic.

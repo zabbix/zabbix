@@ -518,7 +518,7 @@ if (hasRequest('form')) {
 
 	// Add global macros to template macros.
 	if ($data['show_inherited_macros']) {
-		$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros([]));
+		addInheritedMacros($data['macros']);
 	}
 
 	// Sort only after inherited macros are added. Otherwise the list will look chaotic.
