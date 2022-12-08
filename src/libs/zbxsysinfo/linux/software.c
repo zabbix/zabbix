@@ -34,7 +34,7 @@
 #       include <sys/utsname.h>
 #endif
 
-#define TIME_FMT	"%a %b %d %H:%M:%S %Y"
+#define TIME_FMT	"%a %b %e %H:%M:%S %Y"
 
 #define DETAIL_BUF	128
 
