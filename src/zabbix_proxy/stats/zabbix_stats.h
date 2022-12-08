@@ -23,6 +23,6 @@
 #include "zbxjson.h"
 #include "zbxstats.h"
 
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms);
 
 #endif /* ZABBIX_ZABBIX_STATS_H_ */

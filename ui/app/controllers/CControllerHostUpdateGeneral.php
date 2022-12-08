@@ -149,7 +149,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 			else {
 				unset($macro['discovery_state'], $macro['original_value'], $macro['original_description'],
-					$macro['original_macro_type']
+					$macro['original_macro_type'], $macro['allow_revert']
 				);
 			}
 		}

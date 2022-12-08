@@ -17,28 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_KVS_H
-#define ZABBIX_KVS_H
+#ifndef ZABBIX_ZBXVAULT_H
+#define ZABBIX_ZBXVAULT_H
 
-#include "zbxalgo.h"
-#include "zbxjson.h"
+#include "zbxkvs.h"
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_kv_t;
+int	zbx_vault_init(char **error);
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
+int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
 
-typedef zbx_hashset_t zbx_kvs_t;
-
-void		zbx_kvs_create(zbx_kvs_t *kvs, size_t init_size);
-void		zbx_kvs_clear(zbx_kvs_t *kvs);
-void		zbx_kvs_destroy(zbx_kvs_t *kvs);
-zbx_kv_t	*zbx_kvs_search(zbx_kvs_t *kvs, const zbx_kv_t *data);
-
-int	zbx_kvs_from_json_by_path_get(const char *path, const struct zbx_json_parse *jp_kvs_paths, zbx_kvs_t *kvs,
-		char **error);
-void	zbx_kvs_from_json_get(const struct zbx_json_parse *jp_kvs, zbx_kvs_t *kvs);
+int	zbx_vault_token_from_env_get(char **token, char **error);
 
 #endif

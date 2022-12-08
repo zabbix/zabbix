@@ -29,7 +29,8 @@ extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_JAVA_GATEWAY;
 extern int	CONFIG_JAVA_GATEWAY_PORT;
 
-int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
+int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result, int config_timeout);
+void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
+		int config_timeout);
 
 #endif
