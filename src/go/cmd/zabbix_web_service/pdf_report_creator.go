@@ -29,6 +29,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
@@ -63,33 +64,39 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Cannot remove port from host for incoming ip %s.", err.Error()), http.StatusInternalServerError)
+
 		return
 	}
 
 	if !h.allowedPeers.CheckPeer(net.ParseIP(host)) {
 		logAndWriteError(w, fmt.Sprintf("Cannot accept incoming connection for peer: %s.", r.RemoteAddr), http.StatusInternalServerError)
+
 		return
 	}
 
 	if r.Method != http.MethodPost {
 		logAndWriteError(w, "Method is not supported.", http.StatusMethodNotAllowed)
+
 		return
 	}
 
 	if r.Header.Get("Content-Type") != "application/json" {
 		logAndWriteError(w, "Content Type is not application/json.", http.StatusMethodNotAllowed)
+
 		return
 	}
 
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logAndWriteError(w, "Can not read body data.", http.StatusInternalServerError)
+
 		return
 	}
 
 	req := newRequestBody()
 	if err = json.Unmarshal(b, &req); err != nil {
 		logAndWriteError(w, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err).Error(), http.StatusInternalServerError)
+
 		return
 	}
 
@@ -108,18 +115,41 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Incorrect parameter width: %s", err.Error()), http.StatusBadRequest)
+
 		return
 	}
 
 	height, err := strconv.ParseInt(req.Parameters["height"], 10, 64)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Incorrect parameter height: %s", err.Error()), http.StatusBadRequest)
+
 		return
 	}
 
 	u, err := parseUrl(req.URL)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Incorrect request url: %s", err.Error()), http.StatusBadRequest)
+
+		return
+	}
+
+	if u.Scheme != "http" && u.Scheme != "https" {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL scheme: \"%s\"", u.Scheme), http.StatusBadRequest)
+
+		return
+	}
+
+	if !strings.HasSuffix(u.Path, "/zabbix.php") {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL path: \"%s\"", u.Path), http.StatusBadRequest)
+
+		return
+	}
+
+	queryParams := u.Query()
+
+	if queryParams.Get("action") != "dashboard.print" {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL action: \"%s\"", queryParams.Get("action")), http.StatusBadRequest)
+
 		return
 	}
 
@@ -143,10 +173,12 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 				WithPaperWidth(pixels2inches(width)).
 				WithPaperHeight(pixels2inches(height)).
 				Do(timeoutContext)
+
 			return err
 		}),
 	}); err != nil {
 		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
+
 		return
 	}
 

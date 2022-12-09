@@ -152,25 +152,31 @@ class HostMacrosManager {
 						.val(macro_type)
 						.trigger('change');
 					$('#macros_'+macro_num+'_value')
-						.prop('readonly', true)
 						.val($('#macros_'+macro_num+'_inherited_value').val())
 						.trigger('input');
 					if (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET) {
-						jQuery('#macros_'+macro_num+'_value').prop('disabled', true);
+						$('#macros_' +macro_num+ '_value').attr('disabled', true);
+						$('#macros_'+macro_num+'_value_btn').prop('disabled', true);
+					}
+					else {
+						$('#macros_' +macro_num+ '_value').prop('readonly', true);
 					}
 					$('#macros_'+macro_num+'_value')
 						.closest('.macro-input-group')
 						.find('.btn-undo')
-						.hide();
-					$('#macros_'+macro_num+'_value_btn').prop('disabled', true);
+						.remove();
+					$('#macros_' +macro_num+ '_allow_revert').remove();
+					$('#macros_' +macro_num+ '_hostmacroid').remove();
 					$('#macros_'+macro_num+'_change').text(t('Change'));
 				}
 				else {
 					$('#macros_'+macro_num+'_inherited_type').val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_'+macro_num+'_value')
+						.prop('disabled', false)
 						.prop('readonly', false)
+						.attr({'placeholder': t('value')})
+						.val('')
 						.focus();
-					$('#macros_'+macro_num+'_value_btn').prop('disabled', false);
 					$('#macros_'+macro_num+'_description').prop('readonly', false);
 					$('#macros_'+macro_num+'_type_button')
 						.prop('disabled', false)

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T13:30:53Z'
+  date: '2022-10-31T08:16:07Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 44c2c2d94a4447c6a924386640e4854a
-      template: 'F5 Big-IP SNMP'
-      name: 'F5 Big-IP SNMP'
+      template: 'F5 Big-IP by SNMP'
+      name: 'F5 Big-IP by SNMP'
       description: |
         MIBs used:
         RFC1213-MIB
@@ -70,7 +70,7 @@ zabbix_export:
           triggers:
             -
               uuid: f93a7ff7cc614c0b84789f325ebb662b
-              expression: 'count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","4")>6'
+              expression: 'count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","4")>6'
               name: 'F5 BIG-IP: Cluster not in sync'
               event_name: 'F5 BIG-IP: Cluster not in sync: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
@@ -293,7 +293,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8a55167ddebb43f2ac8f6d028aef87c2
-              expression: 'last(/F5 Big-IP SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP SNMP/bigip.serialnumber))>0'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0'
               name: 'F5 BIG-IP: Chassis has been replaced'
               event_name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
               priority: INFO
@@ -332,7 +332,7 @@ zabbix_export:
           triggers:
             -
               uuid: 098fe258e8cc4216b0c1800913ba8e18
-              expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=2'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.syncstatus)=2'
               name: 'F5 BIG-IP: Changes have been made on the device not sync'
               event_name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
@@ -345,7 +345,7 @@ zabbix_export:
                   value: notice
             -
               uuid: eb3517626c6d425f9b88a2bc35641ab6
-              expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=4'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.syncstatus)=4'
               name: 'F5 BIG-IP: The device is inconsistent with the device group'
               event_name: 'F5 BIG-IP: The device is inconsistent with the device group: {ITEM.VALUE}'
               opdata: '{ITEM.LASTVALUE}'
@@ -465,7 +465,7 @@ zabbix_export:
           triggers:
             -
               uuid: 551fd3b77d144ed58f138865e4862901
-              expression: 'last(/F5 Big-IP SNMP/bigip.uptime)<10m'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.uptime)<10m'
               name: 'F5 BIG-IP: Host has been restarted'
               event_name: 'F5 BIG-IP: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
@@ -495,7 +495,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9ec4425af8dd4cf59dcb3146e6a8263c
-              expression: 'max(/F5 Big-IP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/F5 Big-IP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'F5 BIG-IP: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -549,7 +549,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.blade.temp.value[{#SLOT.INDEX},{#TEMP.INDEX}]'
           preprocessing:
             -
@@ -625,7 +625,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.blade.voltage.value[{#VOLT.INDEX}]'
           preprocessing:
             -
@@ -664,7 +664,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 015ce3f5d10749aca1d871a1d26c51c5
-                  expression: 'last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()'
                   name: 'F5 BIG-IP: Certificate expires ({#CERT.NAME})'
                   event_name: 'F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})'
                   opdata: 'Expires: {ITEM.VALUE}'
@@ -741,7 +741,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 546745f6edf7470896d5bf251d760dfe
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=0'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=0'
                   name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is in critical state'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
@@ -751,7 +751,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: d20c56720aa54efba37f5fcdfdde0225
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2'
                   name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is not present'
                   priority: INFO
                   description: 'Please check the fan unit'
@@ -767,7 +767,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.chassis.fan.speed[{#FAN.INDEX}]'
           preprocessing:
             -
@@ -811,7 +811,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1e85cee65875477b85f74aedba6e86c9
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=0'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=0'
                   name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is in critical state'
                   priority: HIGH
                   description: 'Please check the power supply unit'
@@ -821,7 +821,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 84469f28c4bf47f790a85b9f1f37cff0
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2'
                   name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present'
                   priority: INFO
                   description: 'Please check the power supply unit'
@@ -873,7 +873,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 452167aafe594e3faa3748e6dc470fb1
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
                   name: 'F5 BIG-IP: Chassis temperature'
                   event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
                   opdata: '{ITEM.LASTVALUE}'
@@ -884,7 +884,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 00c0212fcb8049309bf0b3de2b2363b4
-                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
                   name: 'F5 BIG-IP: Chassis temperature'
                   event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
                   opdata: '{ITEM.LASTVALUE}'
@@ -892,7 +892,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'F5 BIG-IP: Chassis temperature'
-                      expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
+                      expression: 'last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
                   tags:
                     -
                       tag: scope
@@ -905,7 +905,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.chassis.temp.value[{#TEMP.INDEX}]'
           preprocessing:
             -
@@ -1448,9 +1448,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1163080e05d3433f884773fe1ee0271a
-                  expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}'
+                  expression: 'last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])<{$BIGIP.CPU.UTIL.WARN.MIN}'
+                  recovery_expression: 'last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])<{$BIGIP.CPU.UTIL.WARN.MIN}'
                   name: 'F5 BIG-IP: High CPU utilization'
                   event_name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
                   priority: WARNING
@@ -1564,43 +1564,43 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.user.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.nice.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.system.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.idle.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.irq.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.iowait.1m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.stolen.1m[{#HOST.ID},{#CPU.ID}]'
             -
               uuid: 3fd0ca58d8f14e06afa2c58f9d1b46f3
@@ -1609,43 +1609,43 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.user.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.nice.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.system.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.idle.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.irq.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.iowait.5m[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.stolen.5m[{#HOST.ID},{#CPU.ID}]'
             -
               uuid: dba5e4f4c3714f438eacba4b213ce640
@@ -1654,43 +1654,43 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.user.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.nice.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.system.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.idle.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.irq.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.iowait.5s[{#HOST.ID},{#CPU.ID}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.stolen.1s[{#HOST.ID},{#CPU.ID}]'
           preprocessing:
             -
@@ -1793,7 +1793,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.sensor.fan[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
             -
               uuid: be756734cec74d9fb427fb1d515c7888
@@ -1802,7 +1802,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.cpu.sensor.temperature[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
           preprocessing:
             -
@@ -1924,9 +1924,9 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: 32b87997dc0b4967bdb158f1dc0baad2
-              expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP by SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100>{$BIGIP.FS.FREE.WARN.MAX:"{#PART.NAME}"}'
+              recovery_expression: 'last(/F5 Big-IP by SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP by SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100>{$BIGIP.FS.FREE.WARN.MAX:"{#PART.NAME}"}'
               name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}]'
               event_name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}] (less than {$BIGIP.FS.FREE.WARN.MIN}% for 5m)'
               priority: WARNING
@@ -1944,13 +1944,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.disktable.freeblocks[{#PART.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.disktable.totalblocks[{#PART.NAME}]'
           preprocessing:
             -
@@ -2101,9 +2101,9 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: e72f446075214129ab1d6269fcd87051
-              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
+              recovery_expression: 'last(/F5 Big-IP by SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total[{#HOST.ID}])*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
               name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}]'
               event_name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
               priority: WARNING
@@ -2114,9 +2114,9 @@ zabbix_export:
                   value: performance
             -
               uuid: 5cf3e1f819ee46f49ba89156c53274ec
-              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
+              recovery_expression: 'last(/F5 Big-IP by SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
               name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}]'
               event_name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
               priority: WARNING
@@ -2133,13 +2133,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.memory.used[{#HOST.ID}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.memory.total[{#HOST.ID}]'
             -
               uuid: 4b7815c72f264209b288c019541a09e6
@@ -2148,13 +2148,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.memory.used.swap[{#HOST.ID}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.memory.total.swap[{#HOST.ID}]'
           preprocessing:
             -
@@ -2270,19 +2270,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.module.memory.ratio[{#MODULE.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.module.cpu.ratio[{#MODULE.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.module.disk.ratio[{#MODULE.NAME}]'
           preprocessing:
             -
@@ -2702,7 +2702,7 @@ zabbix_export:
           trigger_prototypes:
             -
               uuid: 2d9214768b684ba880703d738ac52099
-              expression: 'last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
+              expression: 'last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
               name: 'F5 BIG-IP: There are errors on the network interface'
               event_name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
               priority: AVERAGE
@@ -2718,39 +2718,39 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.in.pkts.rate[{#IF.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.in.bytes.rate[{#IF.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.out.pkts.rate[{#IF.NAME}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.out.bytes.rate[{#IF.NAME}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.in.multicast.rate[{#IF.NAME}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.net.out.multicast.rate[{#IF.NAME}]'
           preprocessing:
             -
@@ -3005,27 +3005,27 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.node.net.in.pkts.rate[{#NODE.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.node.net.in.bytes.rate[{#NODE.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.node.net.out.pkts.rate[{#NODE.NAME}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.node.net.out.bytes.rate[{#NODE.NAME}]'
           preprocessing:
             -
@@ -3077,14 +3077,14 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0b6e708075684cbab0d8c598f3467e0c
-                  expression: 'count(/F5 Big-IP SNMP/bigip.pool.available[{#POOL.NAME}],120m,"ne","1")>20'
+                  expression: 'count(/F5 Big-IP by SNMP/bigip.pool.available[{#POOL.NAME}],120m,"ne","1")>20'
                   name: 'F5 BIG-IP: Pool {#POOL.NAME} is not available in some capacity: {ITEM.VALUE1}'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: AVERAGE
                   dependencies:
                     -
                       name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
-                      expression: 'count(/F5 Big-IP SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
+                      expression: 'count(/F5 Big-IP by SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
                   tags:
                     -
                       tag: scope
@@ -3124,7 +3124,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4d0431e2c4934f37be7302ffedd69e8a
-                  expression: 'count(/F5 Big-IP SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
+                  expression: 'count(/F5 Big-IP by SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
                   name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
                   opdata: '{ITEM.LASTVALUE}'
                   priority: AVERAGE
@@ -3373,27 +3373,27 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.pool.net.in.pkts.rate[{#POOL.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.pool.net.in.bytes.rate[{#POOL.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.pool.net.out.pkts.rate[{#POOL.NAME}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.pool.net.out.bytes.rate[{#POOL.NAME}]'
           preprocessing:
             -
@@ -3702,27 +3702,27 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
             -
               uuid: 17d18d4117f943d18873972584f3374e
@@ -3731,19 +3731,19 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.usage.5s[{#VSERVER.NAME}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.usage.1m[{#VSERVER.NAME}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'F5 Big-IP SNMP'
+                    host: 'F5 Big-IP by SNMP'
                     key: 'bigip.vserver.usage.5m[{#VSERVER.NAME}]'
           preprocessing:
             -
@@ -3982,35 +3982,35 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.tcp.open
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.udp.open
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.tcp.close_wait
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.tcp.fin1_wait
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.tcp.fin2_wait
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'F5 Big-IP SNMP'
+            host: 'F5 Big-IP by SNMP'
             key: bigip.tcp.time_wait

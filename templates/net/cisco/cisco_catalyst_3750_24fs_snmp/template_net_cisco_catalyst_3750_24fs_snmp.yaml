@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-15T17:45:36Z'
+  date: '2022-10-27T12:56:08Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 6ff896f545e043cc98de6d98698d41df
-      template: 'Cisco Catalyst 3750V2-24FS SNMP'
-      name: 'Cisco Catalyst 3750V2-24FS SNMP'
+      template: 'Cisco Catalyst 3750V2-24FS by SNMP'
+      name: 'Cisco Catalyst 3750V2-24FS by SNMP'
       description: |
         Template Cisco Catalyst 3750V2-24FS
           
@@ -47,7 +47,7 @@ zabbix_export:
           triggers:
             -
               uuid: b0507a7333384bd5bf251fe238a538ad
-              expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/icmpping,#3)=0'
+              expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -73,14 +73,14 @@ zabbix_export:
           triggers:
             -
               uuid: 089e23bcb4bb41f992947a6970555394
-              expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -106,17 +106,17 @@ zabbix_export:
           triggers:
             -
               uuid: d5449d68d76e49ad9b7c052abff255e2
-              expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/icmpping,#3)=0'
+                  expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -230,7 +230,7 @@ zabbix_export:
           triggers:
             -
               uuid: ef94f8295a2946b9a266afc6c9a5c5c9
-              expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -316,7 +316,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0d48c5e2b30f4f08b3cec8c89c05d52d
-              expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS SNMP/system.name))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -397,7 +397,7 @@ zabbix_export:
           triggers:
             -
               uuid: 77433856d157408d98c72d964fdbf045
-              expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24FS SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-24FS SNMP/system.sw.os))>0'
+              expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os))>0'
               recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
@@ -406,7 +406,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS SNMP/system.name))>0'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -426,7 +426,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4ebd3dd755dd4b1dae2509842d0b7117
-              expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -475,7 +475,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a825aa92b31c4460bef20469afead397
-                  expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -499,7 +499,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'system.cpu.util[{#SNMPINDEX}]'
         -
           uuid: bee10a232bfb498286a73963b6fe1f2a
@@ -548,7 +548,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b715f039d7874915aacd687e87661588
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -588,7 +588,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 03a372d275194f8cae61786a38a7fb96
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
                   name: '{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -602,7 +602,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 65bc040110534b6ab0544cb1866288ab
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.fan.status[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=2'
                   name: '{#SNMPVALUE}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -610,7 +610,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Fan is in critical state'
-                      expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
+                      expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=4'
                   tags:
                     -
                       tag: scope
@@ -689,7 +689,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: fc434ae6fdff4ec0b20400750571b786
-                  expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#SNMPVALUE}: High memory utilization'
                   event_name: '{#SNMPVALUE}: High memory utilization ( >{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -712,7 +712,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'vm.memory.util[{#SNMPINDEX}]'
         -
           uuid: 2d0c3668e56c4511b6625d6dc7b72015
@@ -837,9 +837,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ac2ed3537a1744bd91abb32acb45181c
-                  expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
@@ -848,7 +848,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -940,9 +940,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4e96fef6da19403eb125c67947ceadee
-                  expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
@@ -951,7 +951,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -1052,7 +1052,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1086cb4f3a6a46c399fe221ffd538037
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1097,21 +1097,21 @@ zabbix_export:
             -
               uuid: 6c5a9334ff7d437c91c0f76da988cade
               expression: |
-                change(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])>0
+                change(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0
                 and (
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=6 or
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=7 or
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=11 or
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=62 or
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=69 or
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.type[{#SNMPINDEX}])=117
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=6 or
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=7 or
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=11 or
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=62 or
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=69 or
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])<>2)
+                (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
-                (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)
+                (change(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
+                (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1119,7 +1119,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1127,10 +1127,10 @@ zabbix_export:
             -
               uuid: 5f4de3462234401d826a4a7bab16402f
               expression: |
-                (avg(/Cisco Catalyst 3750V2-24FS SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1139,7 +1139,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1147,10 +1147,10 @@ zabbix_export:
             -
               uuid: 13ac4bfd49a749b7ba49cdbf531939b1
               expression: |
-                (avg(/Cisco Catalyst 3750V2-24FS SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1159,7 +1159,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1173,42 +1173,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.in[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.out[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.out.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.in.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.out.discards[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco Catalyst 3750V2-24FS SNMP'
+                    host: 'Cisco Catalyst 3750V2-24FS by SNMP'
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
         -
           uuid: 836c2d80023941e6a9c66d7129d0caf2
@@ -1279,7 +1279,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 75341985cb654533b4ef67cbdd9333a9
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/net.if.duplex[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.duplex[{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1318,7 +1318,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d64945a4f2f74909a10f9cc448f26a02
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
                   name: '{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1329,7 +1329,7 @@ zabbix_export:
                       value: availability
                 -
                   uuid: aaf5b05767f24a9bb87753a519140673
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.psu.status[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=2'
                   name: '{#SNMPVALUE}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1337,7 +1337,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Power supply is in critical state'
-                      expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
+                      expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=4'
                   tags:
                     -
                       tag: scope
@@ -1376,7 +1376,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3d307edd9bc54aa2890bebe3ded250c2
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=4'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=4'
                   name: '{#SNMPVALUE}: Temperature is in critical state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1390,7 +1390,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 24000d852b014ae7828eab26451257c1
-                  expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
+                  expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=2'
                   name: '{#SNMPVALUE}: Temperature is in warning state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1398,7 +1398,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is in critical state'
-                      expression: 'last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=4'
+                      expression: 'last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=4'
                   tags:
                     -
                       tag: scope
@@ -1429,9 +1429,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8c7c804c7b274cf4a17090086ee0f8a0
-                  expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1446,9 +1446,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 0cdb1f1c7e7848bfba2368395d2c03e5
-                  expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1457,8 +1457,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1468,9 +1468,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: eac4504f0d45457fa325f40e6ab585a2
-                  expression: 'avg(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
                   event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -2517,7 +2517,7 @@ zabbix_export:
   triggers:
     -
       uuid: 6e105d2b8a2c43cc8841abb6995941ba
-      expression: '(last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24FS SNMP/system.net.uptime)<10m)'
+      expression: '(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.net.uptime)<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING

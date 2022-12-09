@@ -31,9 +31,7 @@ class CMacrosResolverTest extends TestCase {
 				'hostids' => [10084],
 				'macros' => [
 					'{$TMG.PROXY.CHECK.URL1}' => 'http://zabbix.com',
-					'{$CITY}' => 'Tokyo',
-					'{$REGEX_OK}' => '^OK\\s+',
-					'{$QUOTED_STRING}' => '"string"'
+					'{$CITY}' => 'Tokyo'
 				]
 			]
 		];
@@ -83,91 +81,6 @@ class CMacrosResolverTest extends TestCase {
 		];
 	}
 
-	public function dataProviderFunctionsInput() {
-		return [
-			'query and period should be not quoted' => [
-				'functions' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1y',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				],
-				'expected' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1y',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				]
-			],
-			'backslash is escaped in macro value' => [
-				'functions' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 10h, "string", {$REGEX_OK}',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				],
-				'expected' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 10h, "string", "^OK\\\\s+"',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				]
-			],
-			'no double quotes for quoted macro' => [
-				'functions' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1d, "string", "{$CITY}"',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				],
-				'expected' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1d, "string", "Tokyo"',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				]
-			],
-			'double quotes escaped when in macro value' => [
-				'functions' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1w, {$QUOTED_STRING}',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				],
-				'expected' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 1w, "\\"string\\""',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				]
-			],
-			'only quoted parameters stay quoted' => [
-				'functions' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 100h:now/h-10h, 100h, 2h, 2.1, "mad"',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				],
-				'expected' => [
-					30896 => [
-						'parameter'	=> TRIGGER_QUERY_PLACEHOLDER.', 100h:now/h-10h, 100h, 2h, 2.1, "mad"',
-						'function'	=> 'func',
-						'hostid'	=> 10084
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider dataProviderInput
 	 */
@@ -175,14 +88,5 @@ class CMacrosResolverTest extends TestCase {
 		$resolved_item = $this->stub->resolveItemDescriptions($item);
 
 		$this->assertEquals($resolved_item, $expected_item);
-	}
-
-	/**
-	 * @dataProvider dataProviderFunctionsInput
-	 */
-	public function testResolveFunctionParameters($functions, $expected) {
-		$resolved = $this->stub->resolveFunctionParameters($functions);
-
-		$this->assertEquals($expected, $resolved);
 	}
 }
