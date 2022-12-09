@@ -188,7 +188,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 $data['esc_period'] = $data['action']['esc_period'];
 
 $operations_tab->addItem([
-	new CLabel('Operations'),
+	new CLabel(_('Operations')),
 	(new CFormField(new CPartial('action.operations', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('operations-container')
