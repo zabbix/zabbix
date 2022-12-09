@@ -21,11 +21,11 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-void zbx_vmware_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
+void zbx_vmware_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
 {
 	zbx_vmware_stats_t	vmware_stats;
 
-	ZBX_UNUSED(zbx_config);
+	ZBX_UNUSED(config_comms);
 
 	/* zabbix[vmware,buffer,<mode>] */
 	if (SUCCEED == zbx_vmware_get_statistics(&vmware_stats))

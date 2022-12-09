@@ -96,6 +96,7 @@ typedef struct
 	const char		*hostname;
 	const int		proxymode;
 	const int		config_timeout;
+	const int		config_server_startup_time;
 }
 zbx_config_comms_args_t;
 

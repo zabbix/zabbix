@@ -285,10 +285,10 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-int	CONFIG_SERVER_STARTUP_TIME	= 0;
+int	config_server_startup_time	= 0;
 static int		get_server_startup_time(void)
 {
-	return CONFIG_SERVER_STARTUP_TIME;
+	return config_server_startup_time;
 }
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -588,7 +588,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	CONFIG_SERVER_STARTUP_TIME = time(NULL);
+	config_server_startup_time = time(NULL);
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
@@ -1236,7 +1236,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_icmpping(&config_icmpping);
-	zbx_init_library_stats(get_program_type, get_server_startup_time);
+	zbx_init_library_stats(get_program_type);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1360,7 +1360,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0, CONFIG_TIMEOUT};
+	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0, CONFIG_TIMEOUT,
+			config_server_startup_time};
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};

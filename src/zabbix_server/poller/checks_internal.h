@@ -23,7 +23,7 @@
 #include "zbxcachehistory.h"
 #include "zbxcomms.h"
 
-extern int	CONFIG_SERVER_STARTUP_TIME;
+extern int	config_server_startup_time;
 
 int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms);
 

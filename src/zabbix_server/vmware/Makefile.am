@@ -3,7 +3,7 @@
 noinst_LIBRARIES = libzbxvmware.a
 
 libzbxvmware_a_SOURCES = \
-	stats.c \
+	vmware_stats.c \
 	vmware.c \
 	vmware_rest.c \
 	vmware_manager.c \

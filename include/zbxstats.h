@@ -34,7 +34,7 @@ zbx_stats_ext_func_entry_t;
 
 ZBX_PTR_VECTOR_DECL(stats_ext_func, zbx_stats_ext_func_entry_t *)
 
-void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_config_int_f get_server_startup_time);
+void	zbx_init_library_stats(zbx_get_program_type_f get_program_type);
 
 void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb);
 void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb);

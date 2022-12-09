@@ -26,18 +26,15 @@
 #include "zbxjson.h"
 #include "zbxself.h"
 
-static zbx_get_config_int_f		get_server_startup_time_cb;
 static zbx_get_program_type_f		get_program_type_cb;
 static zbx_vector_stats_ext_func_t	stats_ext_funcs;
-
 static zbx_vector_stats_ext_func_t	stats_data_funcs;
 
 ZBX_PTR_VECTOR_IMPL(stats_ext_func, zbx_stats_ext_func_entry_t *)
 
-void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_config_int_f get_server_startup_time)
+void	zbx_init_library_stats(zbx_get_program_type_f get_program_type)
 {
 	get_program_type_cb = get_program_type;
-	get_server_startup_time_cb = get_server_startup_time;
 
 	zbx_vector_stats_ext_func_create(&stats_data_funcs);
 	zbx_vector_stats_ext_func_create(&stats_ext_funcs);
@@ -47,7 +44,7 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type, zbx_get_con
  *                                                                            *
  * Purpose: register callback to add information                              *
  *                                                                            *
- * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
+ * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
@@ -64,7 +61,7 @@ void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_c
  *                                                                            *
  * Purpose: register callback to add information to data subelement           *
  *                                                                            *
- * Parameters: stats_ext_get_cb - [IN] statistics extention callback          *
+ * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
@@ -85,9 +82,9 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
  *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms)
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
 {
-	int i;
+	int			i;
 	zbx_config_cache_info_t	count_stats;
 	zbx_wcache_info_t	wcache_info;
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
@@ -96,10 +93,10 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 	DCget_count_stats_all(&count_stats);
 
 	/* zabbix[boottime] */
-	zbx_json_addint64(json, "boottime", get_server_startup_time_cb());
+	zbx_json_addint64(json, "boottime", config_comms->config_server_startup_time);
 
 	/* zabbix[uptime] */
-	zbx_json_addint64(json, "uptime", time(NULL) - get_server_startup_time_cb());
+	zbx_json_addint64(json, "uptime", time(NULL) - config_comms->config_server_startup_time);
 
 	/* zabbix[hosts] */
 	zbx_json_adduint64(json, "hosts", count_stats.hosts);
@@ -115,7 +112,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_data_funcs.values_num; i++)
 	{
-		stats_data_funcs.values[i]->stats_ext_get_cb(json, zbx_config_comms);
+		stats_data_funcs.values[i]->stats_ext_get_cb(json, config_comms);
 	}
 
 	/* zabbix[rcache,<cache>,<mode>] */
@@ -178,7 +175,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_ext_funcs.values_num; i++)
 	{
-		stats_ext_funcs.values[i]->stats_ext_get_cb(json, zbx_config_comms);
+		stats_ext_funcs.values[i]->stats_ext_get_cb(json, config_comms);
 	}
 
 	/* zabbix[process,<type>,<mode>,<state>] */

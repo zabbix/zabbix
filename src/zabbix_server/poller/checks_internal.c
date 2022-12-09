@@ -307,7 +307,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, time(NULL) - config_server_startup_time);
 	}
 	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
@@ -317,7 +317,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, config_server_startup_time);
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{

@@ -232,10 +232,10 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-int	CONFIG_SERVER_STARTUP_TIME	= 0;
+int	config_server_startup_time	= 0;
 static int		get_server_startup_time(void)
 {
-	return CONFIG_SERVER_STARTUP_TIME;
+	return config_server_startup_time;
 }
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -475,7 +475,7 @@ static void	zbx_set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	CONFIG_SERVER_STARTUP_TIME = time(NULL);
+	config_server_startup_time = time(NULL);
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -1151,7 +1151,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_icmpping(&config_icmpping);
-	zbx_init_library_stats(get_program_type, get_server_startup_time);
+	zbx_init_library_stats(get_program_type);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1257,7 +1257,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
 	zbx_config_comms_args_t			zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
-								CONFIG_TIMEOUT};
+								CONFIG_TIMEOUT, config_server_startup_time};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
