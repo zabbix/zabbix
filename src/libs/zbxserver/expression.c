@@ -577,6 +577,18 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 		case ZBX_REQUEST_HOST_HOST:
 		case ZBX_REQUEST_HOST_NAME:
 			return get_host_value(itemid, replace_to, request);
+		case ZBX_REQUEST_ITEM_KEY:
+			DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+
+			if (SUCCEED == errcode)
+			{
+				zbx_substitute_macros_in_item_key(&dc_item, replace_to);
+				ret = SUCCEED;
+			}
+
+			DCconfig_clean_items(&dc_item, &errcode, 1);
+
+			return ret;
 	}
 
 	result = DBselect(
@@ -601,17 +613,6 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 			case ZBX_REQUEST_ITEM_NAME:
 				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
-				break;
-			case ZBX_REQUEST_ITEM_KEY:
-				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
-
-				if (SUCCEED == errcode)
-				{
-					zbx_substitute_macros_in_item_key(&dc_item, replace_to);
-					ret = SUCCEED;
-				}
-
-				DCconfig_clean_items(&dc_item, &errcode, 1);
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
 				DCconfig_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
@@ -1658,8 +1659,8 @@ static const char	*ex_macros[] =
 	NULL
 };
 
-/* macros that are supported as host macro */
-static const char	*host_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, NULL};
+/* macros that are supported in expression macro */
+static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
 
 typedef struct
 {
@@ -6796,12 +6797,13 @@ int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITE
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extract index from valid indexed host macro                       *
+ * Purpose: extract index from valid indexed host or item key macro           *
  *                                                                            *
- * Return value: The index or -1 if it was not valid indexed host macro       *
+ * Return value: The index or -1 if it was not valid indexed host or item key *
+ *               macro                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_host_macro_index(const char *macro)
+int	zbx_expr_macro_index(const char *macro)
 {
 	zbx_strloc_t	loc;
 	int		func_num;
@@ -6809,7 +6811,7 @@ int	zbx_host_macro_index(const char *macro)
 	loc.l = 0;
 	loc.r = strlen(macro) - 1;
 
-	if (NULL != macro_in_list(macro, loc, host_macros, &func_num))
+	if (NULL != macro_in_list(macro, loc, expr_macros, &func_num))
 		return func_num;
 
 	return -1;
