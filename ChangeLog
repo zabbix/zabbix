@@ -1,12 +1,20 @@
 Changes for 6.4.0rc1
 
 New features:
+...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 A......... [ZBXNEXT-8085] removed deprecated property "alias" in user.get, user.create, user.update methods and "user" in user.login (kkuzmina)
 .........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.........T [ZBX-21039] fixed readme in PostgreSQL by Zabbix agent 2 template (atocko)
+........S. [ZBX-21922] fixed expression macros to use corresponding item keys (asestakovs)
+..F....... [ZBX-21806] fixed fatal PHP error in case incorrect variable type for controller action is given (Ivo)
+..F....... [ZBX-21753] fixed graphs not loading in kiosk mode (rdetlavs)
+..F....... [ZBX-21789] fixed not being able to save SVG graph with override missing data value "Last known" (Ivo)
+..F....... [ZBX-21472] fixed incorrect problem period visualisation in graph widget (rdetlavs)
+..F....... [ZBX-20413] fixed behaviour of paging when filter or sub-filter is applied (rdetlavs)
 ...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
 A......... [ZBX-22014] fixed fatal error in SCIM authentication (gcalenko)
 ..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
