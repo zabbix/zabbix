@@ -46,36 +46,25 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$actions = API::Action()->get([
-			'output' => ['eventsource'],
-			'actionids' => $this->getInput('actionids'),
-			'editable' => true
+		$permissions = array_filter([
+			EVENT_SOURCE_TRIGGERS => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS),
+			EVENT_SOURCE_DISCOVERY => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS),
+			EVENT_SOURCE_AUTOREGISTRATION => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS),
+			EVENT_SOURCE_INTERNAL => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS),
+			EVENT_SOURCE_SERVICE => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)
 		]);
 
-		if (count($actions) !== count($this->getInput('actionids'))) {
+		if (!$permissions) {
 			return false;
 		}
 
-		foreach ($actions as $action) {
-			switch ($action['eventsource']) {
-				case EVENT_SOURCE_TRIGGERS:
-					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+		$actionids = $this->getInput('actionids');
 
-				case EVENT_SOURCE_DISCOVERY:
-					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-
-				case EVENT_SOURCE_AUTOREGISTRATION:
-					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-
-				case EVENT_SOURCE_INTERNAL:
-					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-
-				case EVENT_SOURCE_SERVICE:
-					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-			}
-		}
-
-		return false;
+		return count($actionids) == API::Action()->get([
+				'countOutput' => true,
+				'actionids' => $actionids,
+				'filter' => ['eventsource' => array_keys($permissions)]
+			]);
 	}
 
 	protected function doAction(): void {
