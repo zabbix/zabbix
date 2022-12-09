@@ -130,6 +130,7 @@ foreach ($data['scripts'] as $script) {
 						$actions[] = (new CLink($action['name']))
 							->addClass('js-action-edit')
 							->setAttribute('data-actionid', $action['actionid'])
+							->setAttribute('data-eventsource', $action['eventsource'])
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}
@@ -226,10 +227,6 @@ $html_page
 	->addItem($scriptsForm)
 	->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
-		'eventsource' => $action['eventsource'] ?? 0
-	]).');
-'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

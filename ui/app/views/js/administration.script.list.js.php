@@ -27,15 +27,10 @@
 <script>
 	const view = new class {
 
-		init({eventsource}) {
-			this.eventsource = eventsource;
-			this._initActions();
-		}
-
-		_initActions() {
+		init() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.dataset.actionid, eventsource: this.eventsource});
+					this._edit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
 				}
 			})
 		}
