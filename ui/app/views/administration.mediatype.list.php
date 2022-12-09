@@ -125,7 +125,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 		foreach ($mediaType['listOfActions'] as $action) {
 			$actionLinks[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
-				->setAttribute('data-actionid', $action['actionid']);
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-eventsource', $action['eventsource']);
 
 			$actionLinks[] = ', ';
 		}
@@ -204,10 +205,6 @@ $html_page
 	->addItem($mediaTypeForm)
 	->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
-		'eventsource' => $action['eventsource'] ?? 0
-	]).');
-'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();
