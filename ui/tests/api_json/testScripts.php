@@ -3599,15 +3599,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful parameter reset when scope changes to action' => [
-				'script' => [
-					[
-						'scriptid' => 58,
-						'scope' => ZBX_SCRIPT_SCOPE_ACTION
-					]
-				],
-				'expected_error' => null
-			],
 			'Test successful same name and delete menu_path' => [
 				'script' => [
 					[
@@ -3680,6 +3671,15 @@ class testScripts extends CAPITest {
 						'scriptid' => 58,
 						'name' => 'API scope reset to action',
 						'menu_path' => '/home'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful parameter reset when scope changes to action' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'scope' => ZBX_SCRIPT_SCOPE_ACTION
 					]
 				],
 				'expected_error' => null
