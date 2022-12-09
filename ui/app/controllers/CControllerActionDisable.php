@@ -48,8 +48,13 @@ class CControllerActionDisable extends CController {
 	protected function checkPermissions(): bool {
 		$actions = API::Action()->get([
 			'output' => ['eventsource'],
-			'actionids' => $this->getInput('actionids')
+			'actionids' => $this->getInput('actionids'),
+			'editable' => true
 		]);
+
+		if (count($actions) !== count($this->getInput('actionids'))) {
+			return false;
+		}
 
 		foreach ($actions as $action) {
 			switch ($action['eventsource']) {
@@ -69,6 +74,7 @@ class CControllerActionDisable extends CController {
 					return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 			}
 		}
+
 
 		return false;
 	}
