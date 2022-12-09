@@ -107,6 +107,12 @@ class CControllerLatestView extends CControllerLatest {
 			$ret = (count($data) === count($valid));
 		}
 
+		if ($ret && $this->hasInput('filter_set') && !$this->hasInput('filter_name')) {
+			error(_s('the parameter "%1$s" is missing', 'filter_name'));
+
+			$ret = false;
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}

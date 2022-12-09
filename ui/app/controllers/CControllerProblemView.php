@@ -69,6 +69,12 @@ class CControllerProblemView extends CControllerProblem {
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
 			&& $this->validateTags();
 
+		if ($this->hasInput('filter_set') && !$this->hasInput('filter_name')) {
+			error(_s('the parameter "%1$s" is missing', 'filter_name'));
+
+			$ret = false;
+		}
+
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
