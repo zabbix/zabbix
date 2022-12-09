@@ -274,8 +274,7 @@ class CWidgetNavTree extends CWidget {
 			this._parseProblems();
 
 			if (this._navtree_item_selected === null
-				|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
-			) {
+					|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')) {
 				this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
 					.not('[data-sysmapid="0"]')
 					.first()
@@ -458,6 +457,7 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		const ul = this._makeTreeBranch(item.id);
+
 		if (item.children !== undefined && this._max_depth > depth) {
 			let child_items_visible = 0;
 
@@ -708,8 +708,10 @@ class CWidgetNavTree extends CWidget {
 			jQuery('.tree-list', jQuery(this._target)).filter(function() {
 				return this._max_depth > jQuery(this).attr('data-depth');
 			}).each(function() {
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this)).css('visibility', 'visible');
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this)).css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this))
+					.css('visibility', 'visible');
+				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this))
+					.css('visibility', 'visible');
 			});
 		});
 
@@ -736,7 +738,6 @@ class CWidgetNavTree extends CWidget {
 
 	_markTreeItemSelected(itemid) {
 		const selected_item = document.getElementById(`${this._unique_id}_tree-item-${itemid}`);
-
 		const item = this._navtree[itemid];
 
 		if (item === undefined || selected_item === null || item === this._navtree_item_selected) {
@@ -982,6 +983,7 @@ class CWidgetNavTree extends CWidget {
 											}
 										}
 									});
+
 									return false;
 								},
 								'isSubmit': true
