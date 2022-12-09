@@ -93,6 +93,8 @@
 				url.setArgument('action', 'problem.view.csv');
 				$('#export_csv').attr('data-url', url.getUrl());
 
+				this.refresh_url.setArgument('page', '1');
+
 				this.refreshResults();
 				this.refreshCounters();
 				chkbxRange.clearSelectedOnFilterChange();
