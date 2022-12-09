@@ -20,8 +20,8 @@
 #ifndef ZABBIX_PREPROC_SNMP_H
 #define ZABBIX_PREPROC_SNMP_H
 
-#include "zbxalgo.h"
 #include "item_preproc.h"
+#include "zbxalgo.h"
 
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */

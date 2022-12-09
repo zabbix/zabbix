@@ -128,6 +128,17 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
 }
 
+static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+		const char *fieldname, int *num)
+{
+	char	tmp[ZBX_MAX_UINT64_LEN + 1];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
+		*num = atoi(tmp);
+	else
+		*num = atoi(DBget_field(table, fieldname)->default_value);
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
 		const zbx_config_comms_args_t *zbx_config)
 {
@@ -253,6 +264,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			table_interface_snmp, "authpassphrase");
 	item.snmpv3_privpassphrase = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_PRIVPASSPHRASE,
 			table_interface_snmp, "privpassphrase");
+
+	db_int_from_json(&jp_details, ZBX_PROTO_TAG_MAX_REPS, table_interface_snmp, "max_repetitions",
+			&item.snmp_max_repetitions);
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_AUTHPROTOCOL, table_interface_snmp, "authprotocol",
 			&item.snmpv3_authprotocol);
