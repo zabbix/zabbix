@@ -1313,9 +1313,22 @@ class CScript extends CApiService {
 			$scripts[0]['name'] =  $db_script[0]['name'];
 		}
 
-		if (!array_key_exists('menu_path', $scripts[0])) {
-			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
-			$scripts[0]['menu_path'] =  $db_script[0]['menu_path'];
+		if (array_key_exists('scope', $scripts[0])) {
+			if ($scripts[0]['scope'] != 1) {
+				if (!array_key_exists('scriptid', $scripts[0])) {
+					$scripts[0]['menu_path'] =  '';
+				}
+				else if (!array_key_exists('menu_path', $scripts[0])) {
+					$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+
+					if ($db_script === null) {
+						$scripts[0]['menu_path'] =  '';
+					}
+					else {
+						$scripts[0]['menu_path'] =  $db_script[0]['menu_path'];
+					}
+				}
+			}
 		}
 
 		foreach ($scripts as $script) {
@@ -1324,10 +1337,10 @@ class CScript extends CApiService {
 			}
 
 			$menu_path = array_key_exists('menu_path', $script) ? $script['menu_path'] : '';
-			$script_id = array_key_exists('scriptid', $script) ? $script['scriptid'] : '';
+			$scriptid = array_key_exists('scriptid', $script) ? $script['scriptid'] : '';
 			$path_name = $menu_path.'/'.$script['name'];
 
-			if ($db_scripts === null || $path_name !== $db_scripts[$script_id]['menu_path'].'/'.
+			if ($db_scripts === null || $path_name !== $db_scripts[$scriptid]['menu_path'].'/'.
 				$db_scripts[$script['scriptid']]['name']) {
 				$names[] = $script['name'];
 				$menu_paths[] = $menu_path;
