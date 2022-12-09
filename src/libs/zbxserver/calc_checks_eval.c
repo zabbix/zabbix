@@ -1956,7 +1956,7 @@ static void	macro_index_free(zbx_macro_index_t *index)
 	zbx_free(index);
 }
 
-static int	resolve_expression_query_macro(const DB_TRIGGER *trigger, int request, int func_num,
+static int	resolve_expression_query_macro(const ZBX_DB_TRIGGER *trigger, int request, int func_num,
 		zbx_expression_query_t *query, char **entity, zbx_vector_ptr_t *indices)
 {
 	int			id;
