@@ -171,11 +171,19 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
+...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 .........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.........T [ZBX-21039] fixed readme in PostgreSQL by Zabbix agent 2 template (atocko)
+........S. [ZBX-21922] fixed expression macros to use corresponding item keys (asestakovs)
+..F....... [ZBX-21806] fixed fatal PHP error in case incorrect variable type for controller action is given (Ivo)
+..F....... [ZBX-21753] fixed graphs not loading in kiosk mode (rdetlavs)
+..F....... [ZBX-21789] fixed not being able to save SVG graph with override missing data value "Last known" (Ivo)
+..F....... [ZBX-21472] fixed incorrect problem period visualisation in graph widget (rdetlavs)
+..F....... [ZBX-20413] fixed behaviour of paging when filter or sub-filter is applied (rdetlavs)
 ...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
 ...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
 ...G.....T [ZBX-21296] updated ORACLE plugin, ORACLE ODBC and agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
