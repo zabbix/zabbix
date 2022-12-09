@@ -2111,6 +2111,7 @@ class CApiInputValidator {
 		if ($data === null) {
 			return true;
 		}
+
 		if (array_key_exists('uniq', $rule)) {
 			foreach ($rule['uniq'] as $field_names) {
 				$uniq = [];
@@ -2119,7 +2120,6 @@ class CApiInputValidator {
 					$_uniq = &$uniq;
 					$values = [];
 					$level = 1;
-
 					$field_names_count = count($field_names);
 
 					if ($field_names_count > 1) {
@@ -2143,7 +2143,7 @@ class CApiInputValidator {
 							$_uniq = &$_uniq[$value];
 						}
 						else if (array_key_exists($value, $_uniq)) {
-							if ($level > 1) {
+							if (($level > 1) && (array_key_exists('menu_path', $_uniq))) {
 								$menu_path = [];
 								$_menu_path = &$menu_path;
 
