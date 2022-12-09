@@ -165,6 +165,7 @@ foreach ($data['mediatype_options'] as $mediatype) {
 $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions($mediatypes)
 	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 $form_grid->addItem([
@@ -179,6 +180,7 @@ $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions($mediatypes)
 	->setFocusableElementId('operation-mediatypeid')
 	->setName('operation[opmessage][mediatypeid]')
+	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 $form_grid->addItem([
