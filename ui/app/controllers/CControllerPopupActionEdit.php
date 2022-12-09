@@ -21,6 +21,11 @@
 
 class CControllerPopupActionEdit extends CController {
 
+	/**
+	 * @var array
+	*/
+	private array $action;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
@@ -67,12 +72,12 @@ class CControllerPopupActionEdit extends CController {
 		}
 
 		if ($this->hasInput('actionid')) {
-			$operation_output = [
+			$operation_options = [
 				'operationtype', 'opcommand', 'opcommand_grp', 'opcommand_hst', 'opmessage', 'opmessage_usr',
 				'opmessage_grp'
 			];
 
-			$this->action = API::Action()->get([
+			$db_actions = API::Action()->get([
 				'output' => ['actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed',
 					'notify_if_canceled'
 				],
@@ -81,25 +86,22 @@ class CControllerPopupActionEdit extends CController {
 					'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 					'opconditions', 'opmessage_usr', 'opmessage_grp'
 				],
-				'selectRecoveryOperations' => $operation_output,
-				'selectUpdateOperations' => $operation_output,
+				'selectRecoveryOperations' => $operation_options,
+				'selectUpdateOperations' => $operation_options,
 				'selectFilter' => ['conditions', 'formula', 'evaltype']
 			]);
 
-			foreach ($this->action as $action) {
-				if ($action['eventsource'] !== $this->getInput('eventsource')) {
-					return false;
-				}
-			}
-
-			if (!$this->action) {
+			if (!$db_actions) {
 				return false;
 			}
 
-			$this->action = $this->action[0];
-		}
-		else {
-			$this->action = null;
+			$db_action = reset($db_actions);
+
+			if ($db_action['eventsource'] != $this->getInput('eventsource')) {
+				return false;
+			}
+
+			$this->action = $db_action;
 		}
 
 		return true;
