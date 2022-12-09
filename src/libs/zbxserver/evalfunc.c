@@ -382,7 +382,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 	{
 		char			*pattern;
 		int			match;
-		zbx_vector_ptr_t	regexps;
+		zbx_vector_expression_t	regexps;
 
 		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
 
@@ -405,14 +405,14 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 		if (ITEM_VALUE_TYPE_STR == value_type && ZBX_VALUEMAP_TYPE_REGEX == valuemap->type)
 		{
-			zbx_vector_ptr_create(&regexps);
+			zbx_vector_expression_create(&regexps);
 
 			pattern = valuemap->value;
 
-			match = regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
+			match = zbx_regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE);
 
 			zbx_regexp_clean_expressions(&regexps);
-			zbx_vector_ptr_destroy(&regexps);
+			zbx_vector_expression_destroy(&regexps);
 
 			if (ZBX_REGEXP_MATCH == match)
 				goto map_value;
@@ -757,12 +757,12 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, const DC_EVALUATE_ITEM *ite
 {
 	char			*pattern = NULL;
 	int			ret = FAIL, nparams;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
@@ -806,7 +806,7 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, const DC_EVALUATE_ITEM *ite
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
 
-		if (FAIL == (regexp_ret = regexp_match_ex(&regexps, logeventid, pattern, ZBX_CASE_SENSITIVE)))
+		if (FAIL == (regexp_ret = zbx_regexp_match_ex(&regexps, logeventid, pattern, ZBX_CASE_SENSITIVE)))
 		{
 			*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		}
@@ -828,7 +828,7 @@ out:
 	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -855,12 +855,12 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const DC_EVALUATE_ITEM *item
 {
 	char			*pattern = NULL;
 	int			ret = FAIL, nparams;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
@@ -899,7 +899,7 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const DC_EVALUATE_ITEM *item
 
 	if (SUCCEED == get_last_n_value(item, parameters, ts, &vc_value, error))
 	{
-		switch (regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
+		switch (zbx_regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
 		{
 			case ZBX_REGEXP_MATCH:
 				zbx_variant_set_dbl(value, 1);
@@ -921,7 +921,7 @@ out:
 	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1140,7 +1140,8 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	}
 }
 
-static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
+static void	count_one_str(int *count, int op, const char *value, const char *pattern,
+		zbx_vector_expression_t *regexps)
 {
 	int	res;
 
@@ -1159,13 +1160,15 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 				(*count)++;
 			break;
 		case OP_REGEXP:
-			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+			if (ZBX_REGEXP_MATCH ==
+					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;
 			break;
 		case OP_IREGEXP:
-			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+			if (ZBX_REGEXP_MATCH ==
+					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;
@@ -1212,13 +1215,13 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_EVALUATE_ITEM *item, co
 	double				arg3_dbl;
 	zbx_uint64_t			pattern_ui64, pattern2_ui64;
 	zbx_value_type_t		arg1_type;
-	zbx_vector_ptr_t		regexps;
+	zbx_vector_expression_t		regexps;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() params:%s", __func__, ZBX_NULL2EMPTY_STR(parameters));
 
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
@@ -1500,7 +1503,7 @@ out:
 	zbx_free(pattern);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 

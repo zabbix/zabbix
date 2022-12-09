@@ -21,8 +21,8 @@
 
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
-#include "libs/zbxkvs/kvs.h"
-#include "libs/zbxvault/vault.h"
+#include "zbxkvs.h"
+#include "zbxvault.h"
 #include "log.h"
 #include "zbxcommshigh.h"
 #include "zbxcompress.h"
@@ -1102,7 +1102,7 @@ out:
  *          (for active proxies)                                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1139,7 +1139,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
 	{
 		error = zbx_strdup(error, "proxy and server major versions do not match");
-		(void)zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
+		(void)zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "configuration update is disabled for this version of proxy \"%s\" at"
 				" \"%s\": %s", proxy.host, sock->peer, error);
 		goto out;
@@ -1149,7 +1149,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, &error))
 	{
-		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
 		goto clean;
