@@ -1087,6 +1087,25 @@ class testScripts extends CAPITest {
 					]]
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "parameters".'
+			],
+			'Test unsuccessful same name with same menu paths' => [
+				'script' => [
+					[
+						'name' => 'API create script same name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name)=(menu_path1/API create script same name1) already exists.'
 			]
 		];
 	}
@@ -1304,6 +1323,63 @@ class testScripts extends CAPITest {
 								'value' => 'Значение'
 							]
 						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful same menu_path' => [
+				'script' => [
+					[
+						'name' => 'API create script same path (test1)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same path (test2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful same name with different menu paths' => [
+				'script' => [
+					[
+						'name' => 'API create script same name (tes2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same name (test2)',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful different name with different menu paths' => [
+				'script' => [
+					[
+						'name' => 'API create script name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script name2',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path2'
 					]
 				],
 				'expected_error' => null
@@ -2849,6 +2925,28 @@ class testScripts extends CAPITest {
 					'type' => ZBX_SCRIPT_TYPE_TELNET
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "username" is missing.'
+			],
+			'Test unsuccessful same name and existing menu_path' => [
+				'script' => [
+					'scriptid' => 61,
+					'menu_path' => 'menu_path1'
+				],
+				'expected_error' => 'Script "menu_path1/API scope update (event scope)" already exists.'
+			],
+			'Test unsuccessful existing name and same menu_path' => [
+				'script' => [
+					'scriptid' => 61,
+					'name' => 'API scope reset to action'
+				],
+				'expected_error' => 'Script "/home/API scope reset to action" already exists.'
+			],
+			'Test unsuccessful existing name and delete menu_path' => [
+				'script' => [
+					'scriptid' => 61,
+					'name' => 'API scope update (host scope)',
+					'menu_path' => ''
+				],
+				'expected_error' => 'Script "API scope update (host scope)" already exists.'
 			]
 		];
 	}
@@ -3506,6 +3604,82 @@ class testScripts extends CAPITest {
 					[
 						'scriptid' => 58,
 						'scope' => ZBX_SCRIPT_SCOPE_ACTION
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful same name and delete menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful same name and new menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'menu_path' => 'menu_path_new'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful existing name and same menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope update (host scope)'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful existing name and new menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope update (event scope)',
+						'menu_path' => 'menu_path_new2'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful existing name and existing menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope update (host scope)',
+						'menu_path' => '/home'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful new name and same menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope update new (test1)'
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful new name and delete menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope update new (test2)',
+						'menu_path' => ''
+					]
+				],
+				'expected_error' => null
+			],
+			'Test successful new name and new menu_path' => [
+				'script' => [
+					[
+						'scriptid' => 58,
+						'name' => 'API scope reset to action',
+						'menu_path' => '/home'
 					]
 				],
 				'expected_error' => null

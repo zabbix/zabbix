@@ -102,10 +102,10 @@ class CControllerScriptList extends CController {
 
 		foreach ($data['scripts'] as $script) {
 			if ($script['menu_path'] != null) {
-				$script['name_path'] = ($script['menu_path'].'/'.$script['name']);
+				$script['name_path'] = ('~'.$script['menu_path'].'/'.$script['name']);
 			}
 			else {
-				$script['name_path'] = (' /'.$script['name']);
+				$script['name_path'] = ($script['name']);
 			}
 			$name_path[] = $script;
 		}

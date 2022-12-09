@@ -1308,6 +1308,16 @@ class CScript extends CApiService {
 		$names = [];
 		$menu_paths = [];
 
+		if (!array_key_exists('name', $scripts[0])) {
+			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+			$scripts[0]['name'] =  $db_script[0]['name'];
+		}
+
+		if (!array_key_exists('menu_path', $scripts[0])) {
+			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+			$scripts[0]['menu_path'] =  $db_script[0]['menu_path'];
+		}
+
 		foreach ($scripts as $script) {
 			if (!array_key_exists('name', $script)) {
 				continue;
@@ -1334,7 +1344,24 @@ class CScript extends CApiService {
 			'limit' => 1
 		]);
 
+		$dbScripts = DB::select('scripts', [
+			'output' => ['name', 'menu_path'],
+		]);
+
+		$duplicateScripts = false;
 		if ($duplicates) {
+			foreach ($names as $key => $name) {
+				foreach ($dbScripts as $dbScript) {
+					if ($dbScript['menu_path'] === $menu_paths[$key] && $dbScript['name'] === $name) {
+						$duplicates[0]['menu_path'] = $dbScript['menu_path'];
+						$duplicates[0]['name'] = $dbScript['name'];
+						$duplicateScripts = true;
+					}
+				}
+			}
+		}
+
+		if ($duplicateScripts) {
 			if ($duplicates[0]['menu_path'] == null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
 					$duplicates[0]['name']));

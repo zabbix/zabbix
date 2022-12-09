@@ -2120,10 +2120,10 @@ class CApiInputValidator {
 					$values = [];
 					$level = 1;
 
-					$field_names_sum = count($field_names);
+					$field_names_count = count($field_names);
 
-					if ($field_names_sum > 1) {
-						$level = $field_names_sum;
+					if ($field_names_count > 1) {
+						$level = $field_names_count;
 					}
 
 					foreach ($field_names as $field_name) {
@@ -2132,7 +2132,6 @@ class CApiInputValidator {
 						}
 
 						$values[] = $object[$field_name];
-
 						$value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
 							? self::trimMacro($object[$field_name])
 							: $object[$field_name];
@@ -2143,25 +2142,25 @@ class CApiInputValidator {
 							}
 							$_uniq = &$_uniq[$value];
 						}
-
-						if ($level > 1) {
-							if (array_key_exists($value, $_uniq)) {
+						else if (array_key_exists($value, $_uniq)) {
+							if ($level > 1) {
 								$menu_path = [];
 								$_menu_path = &$menu_path;
 
-								foreach ($data as $duplicate) {
-									$path_name = (array_key_exists('menu_path', $duplicate))
-										? $duplicate['menu_path']
+								foreach ($data as $data_field) {
+									$path_name = (array_key_exists('menu_path', $data_field))
+										? $data_field['menu_path']
 										: '';
 
-									if ($duplicate['name'] == $value) {
+									if ($data_field['name'] == $value) {
 										if (array_key_exists($path_name, $menu_path)) {
-											$path = (($path_name != null) ? $path_name.'/'.$value : $value);
+											$duplicate_field[] = $field_names[0];
+											$duplicate = (($path_name != null) ? $path_name.'/'.$value : $value);
 											$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 											$error = _s('Invalid parameter "%1$s": %2$s.',
 													$subpath,
 													_s('value %1$s already exists',
-													'('.implode(', ', $field_names).')=('.$path.')'
+													'('.implode(', ', $duplicate_field).')=('.$duplicate.')'
 											));
 											return false;
 										}
@@ -2169,24 +2168,17 @@ class CApiInputValidator {
 										$_menu_path[$path_name] = true;
 									}
 								}
-
-								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-								$error = _s('Invalid parameter "%1$s": %2$s.',
-										$subpath,
-										_s('value %1$s already exists',
-										'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
-								));
-								return false;
 							}
-						}
-						else if (array_key_exists($value, $_uniq)) {
-							$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-							$error = _s('Invalid parameter "%1$s": %2$s.',
+							else {
+								$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+								$duplicate_field[] = $field_names[0];
+								$error = _s('Invalid parameter "%1$s": %2$s.',
 									$subpath,
 									_s('value %1$s already exists',
-									'('.implode(', ', $field_names).')=('.implode(', ', $values).')'
-							));
-							return false;
+										'('.implode(', ', $duplicate_field).')=('.implode(', ', $values).')'
+									));
+								return false;
+							}
 						}
 
 						$_uniq[$value] = true;
