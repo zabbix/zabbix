@@ -134,6 +134,7 @@
 	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))->setAttribute('placeholder', _('OID')).
 		(new CSelect('preprocessing[#{rowNum}][params][1]'))
 			->setValue(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED)
+			->setAdaptiveWidth(202)
 			->addOptions([
 				new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
 				new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
@@ -149,9 +150,9 @@
 					->addClass('group-json-mapping')
 					->setHeader(
 						(new CRowHeader([
-							new CColHeader(_('Output field name')),
-							new CColHeader(_('Key value prefix')),
-							new CColHeader(_('Treat as')),
+							new CColHeader(_('Field name')),
+							new CColHeader(_('OID prefix')),
+							new CColHeader(_('Format')),
 							(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass(ZBX_STYLE_GREY)
 					)
@@ -160,12 +161,12 @@
 							new CCol(
 								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 									->removeId()
-									->setAttribute('placeholder', _('Output field name'))
+									->setAttribute('placeholder', _('Field name'))
 							),
 							new CCol(
 								(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 									->removeId()
-									->setAttribute('placeholder', _('Key value prefix'))
+									->setAttribute('placeholder', _('OID prefix'))
 							),
 							new CCol(
 								(new CSelect('preprocessing[#{rowNum}][params][]'))
@@ -206,12 +207,12 @@
 			new CCol(
 				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 					->removeId()
-					->setAttribute('placeholder', _('Output field name'))
+					->setAttribute('placeholder', _('Field name'))
 			),
 			new CCol(
 				(new CTextBox('preprocessing[#{rowNum}][params][]', ''))
 					->removeId()
-					->setAttribute('placeholder', _('Key value prefix'))
+					->setAttribute('placeholder', _('OID prefix'))
 			),
 			new CCol(
 				(new CSelect('preprocessing[#{rowNum}][params][]'))

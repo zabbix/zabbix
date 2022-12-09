@@ -1447,6 +1447,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					$step_param_0->setAttribute('placeholder', _('OID')),
 					(new CSelect('preprocessing['.$i.'][params][1]'))
 						->setValue($step_param_1_value)
+						->setAdaptiveWidth(202)
 						->addOptions([
 							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
 							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
@@ -1467,13 +1468,13 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
 									->setReadonly($readonly)
 									->removeId()
-									->setAttribute('placeholder', _('Output field name'))
+									->setAttribute('placeholder', _('Field name'))
 							),
 							new CCol(
 								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
 									->setReadonly($readonly)
 									->removeId()
-									->setAttribute('placeholder', _('Key value prefix'))
+									->setAttribute('placeholder', _('OID prefix'))
 							),
 							new CCol(
 								(new CSelect('preprocessing['.$i.'][params][]'))
@@ -1502,9 +1503,9 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 							->addClass('group-json-mapping')
 							->setHeader(
 								(new CRowHeader([
-									new CColHeader(_('Output field name')),
-									new CColHeader(_('Key value prefix')),
-									new CColHeader(_('Treat as')),
+									new CColHeader(_('Field name')),
+									new CColHeader(_('OID prefix')),
+									new CColHeader(_('Format')),
 									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
 								]))->addClass(ZBX_STYLE_GREY)
 							)
