@@ -534,24 +534,18 @@ out:
 	return ret;
 }
 
-static int	snmp_prepend_oid_dot(const char *oid_in, zbx_snmp_value_pair_t *p)
+static void	snmp_prepend_oid_dot(const char *oid_in, zbx_snmp_value_pair_t *p)
 {
 	if ('.' != oid_in[0])
-	{
 		p->oid = zbx_dsprintf(p->oid, ".%s", oid_in);
-		return 1;
-	}
-
-	p->oid = (char *)oid_in;
-
-	return 0;
+	else
+		p->oid = zbx_strdup(NULL, oid_in);
 }
 
 static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *params, char **output, char **error)
 {
 	int			ret;
-	zbx_snmp_value_pair_t	*pair_cached, pair_local;
-	int			transformed = 0;
+	zbx_snmp_value_pair_t	*pair_cached, pair_local = {0};
 	char			*oid_needle = NULL;
 	int			hex_conv_flag = 0;
 #ifdef HAVE_NETSNMP
@@ -565,14 +559,11 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 
 #ifdef HAVE_NETSNMP
 	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
-	{
 		pair_local.oid = oid_tr_tmp;
-		transformed = 1;
-	}
 	else
-		transformed = snmp_prepend_oid_dot(oid_needle, &pair_local);
+		snmp_prepend_oid_dot(oid_needle, &pair_local);
 #else
-	transformed = snmp_prepend_oid_dot(oid_needle, &pair_local);
+	snmp_prepend_oid_dot(oid_needle, &pair_local);
 #endif
 
 	if (NULL == (pair_cached = (zbx_snmp_value_pair_t *)zbx_hashset_search(&cache->pairs, &pair_local)))
@@ -616,8 +607,7 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 		ret = SUCCEED;
 	}
 out:
-	if (1 == transformed)
-		zbx_free(pair_local.oid);
+	zbx_free(pair_local.oid);
 	zbx_free(oid_needle);
 
 	return ret;
