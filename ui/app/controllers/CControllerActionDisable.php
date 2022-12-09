@@ -75,7 +75,6 @@ class CControllerActionDisable extends CController {
 			}
 		}
 
-
 		return false;
 	}
 
