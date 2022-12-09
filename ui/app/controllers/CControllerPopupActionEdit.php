@@ -86,6 +86,12 @@ class CControllerPopupActionEdit extends CController {
 				'selectFilter' => ['conditions', 'formula', 'evaltype']
 			]);
 
+			foreach ($this->action as $action) {
+				if ($action['eventsource'] !== $this->getInput('eventsource')) {
+					return false;
+				}
+			}
+
 			if (!$this->action) {
 				return false;
 			}
