@@ -308,7 +308,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -328,7 +328,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -364,7 +364,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -399,7 +399,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -435,7 +435,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -471,7 +471,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]
@@ -510,7 +510,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('alert.get', [
 			'output' => 'extend',
-			'actionsids' => self::$actionid,
+			'actionids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'userids' => [self::$userid]

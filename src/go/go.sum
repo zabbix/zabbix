@@ -1,5 +1,9 @@
 git.zabbix.com/ap/plugin-support v1.1.1-0.20221021133846-49ba2b4b6cb5 h1:2r/hEHm1xE7tcnP1jPKY0aEimj/Y64RZijaWigJSSFw=
 git.zabbix.com/ap/plugin-support v1.1.1-0.20221021133846-49ba2b4b6cb5/go.mod h1:R3QzQWgpxlA+ddJNkOhsPTcGOVtrR69WS0hXIsnBurY=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20221124103809-5328eadd3213 h1:T0egZ+iYpWw6+38vbQgtVETn46SIHKmkDH4iAfdnROs=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20221124103809-5328eadd3213/go.mod h1:R3QzQWgpxlA+ddJNkOhsPTcGOVtrR69WS0hXIsnBurY=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20221208095623-2412f1a5c1c0 h1:rqwzy7hZEHvh5poAnQLvLbkNtJwGzBfad2sWxRvv8Ig=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20221208095623-2412f1a5c1c0/go.mod h1:R3QzQWgpxlA+ddJNkOhsPTcGOVtrR69WS0hXIsnBurY=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
 github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5 h1:BjkPE3785EwPhhyuFkbINB+2a1xATwk8SNDWnJiD41g=
