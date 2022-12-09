@@ -381,11 +381,6 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
  *                                                                            *
  * Purpose: updates additional webhook media type fields                      *
  *                                                                            *
- * Parameters: manager   - [IN] the alert manager                             *
- *             mediatype - [IN/OUT] the media type                            *
- *             script    - [IN] the script source                             *
- *             timeout   - [IN] the timeout as string                         *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediatype, const char *script,
 		const char *timeout)
@@ -1274,7 +1269,7 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_am_alert_t *alert, int sta
  * Purpose: send response to external alert request                           *
  *                                                                            *
  * Parameters: alerter_service - [IN] the alerter service                     *
- *             alert           - [IN] the alert obejct                        *
+ *             alert           - [IN] the alert object                        *
  *             value           - [IN] the value of response                   *
  *             errcode         - [IN] the error code                          *
  *             error           - [IN] the error message                       *

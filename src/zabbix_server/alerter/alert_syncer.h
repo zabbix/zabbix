@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ALERT_SYNCER_H
 #define ZABBIX_ALERT_SYNCER_H
 
-#include "zbxcommon.h"
 #include "zbxthreads.h"
 
 typedef struct
