@@ -174,6 +174,7 @@ static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 
+
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
@@ -346,6 +347,12 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+
+#if defined(HAVE_POSTGRESQL)
+extern int	ZBX_TSDB_VERSION;
+#endif
+
+struct zbx_db_version_info_t	db_version_info;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1088,11 +1095,18 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
+static void	zbx_db_version_info_clear(void)
+{
+	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
+}
+
 static void	zbx_check_db(void)
 {
-	struct zbx_db_version_info_t	db_version_info;
-	struct zbx_json			db_version_json;
-	int				result = SUCCEED;
+	struct zbx_json	db_version_json;
+	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
@@ -1127,6 +1141,11 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_TSDB_VERSION > 0)
+			zbx_tsdb_update_dbversion_info(&db_version_info);
+#endif
+
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1137,13 +1156,10 @@ static void	zbx_check_db(void)
 	}
 
 	DBclose();
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
 
-	if(SUCCEED != result)
+	if (SUCCEED != result)
 	{
+		zbx_db_version_info_clear();
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1495,6 +1511,49 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: restart HA manager when working in standby mode                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_restart_ha(zbx_rtc_t *rtc)
+{
+	char	*error = NULL;
+
+	zbx_unset_child_signal_handler();
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	/* Disable locks so main process doesn't hang on logging if a process was              */
+	/* killed during logging. The locks will be re-enabled after logger is reinitialized   */
+	zbx_locks_disable();
+#endif
+	zbx_ha_kill();
+
+	zbx_set_child_signal_handler();
+
+	/* restart logger because it could have been stuck in lock */
+	if (SUCCEED != server_restart_logger(&error))
+	{
+		zbx_error("cannot restart logger: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_enable();
+#endif
+
+	if (SUCCEED != zbx_ha_start(rtc, ZBX_NODE_STATUS_STANDBY, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	ha_status = ZBX_NODE_STATUS_STANDBY;
+}
+
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL;
@@ -1777,6 +1836,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (ZBX_NODE_STATUS_ERROR == ha_status)
 			break;
 
+		if (ZBX_NODE_STATUS_HATIMEOUT == ha_status)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "HA manager is not responding in standby mode, "
+					"restarting it.");
+			server_restart_ha(&rtc);
+			continue;
+		}
+
 		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
@@ -1837,6 +1904,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+
+	zbx_db_version_info_clear();
 
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);

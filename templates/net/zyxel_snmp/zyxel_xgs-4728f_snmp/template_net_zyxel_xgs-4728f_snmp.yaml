@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T04:05:49Z'
+  date: '2022-10-27T12:58:52Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: ab18a5665b7d4bed876881b5c4e8ce51
-      template: 'ZYXEL XGS-4728F SNMP'
-      name: 'ZYXEL XGS-4728F SNMP'
+      template: 'ZYXEL XGS-4728F by SNMP'
+      name: 'ZYXEL XGS-4728F by SNMP'
       description: |
         ZYXEL XGS-4728F
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: fd9a321842544253896e5a4c1a58ced3
-              expression: 'max(/ZYXEL XGS-4728F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL XGS-4728F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL XGS-4728F: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -107,7 +107,7 @@ zabbix_export:
           triggers:
             -
               uuid: 20f368f955f74fc9b8380b1bbff7e057
-              expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
               name: 'ZYXEL XGS-4728F: High CPU utilization'
               event_name: 'ZYXEL XGS-4728F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -154,7 +154,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5da304609e8c45d980c46579f6848f0a
-              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion))>0'
+              expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion))>0'
               name: 'ZYXEL XGS-4728F: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -277,7 +277,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0329f3f5aa6a4315a4f3611ad662103e
-              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.model)<>"XGS-4728F"'
+              expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.model)<>"XGS-4728F"'
               name: 'ZYXEL XGS-4728F: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}'
@@ -360,7 +360,7 @@ zabbix_export:
           triggers:
             -
               uuid: 4df7c31c3079411baabd4ae66e580652
-              expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0'
+              expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber))>0'
               name: 'ZYXEL XGS-4728F: Device has been replaced'
               event_name: 'ZYXEL XGS-4728F: Device has been replaced (new serial number received)'
               priority: INFO
@@ -406,7 +406,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 012219b8b16941b59d1f9a3f685e9f38
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
                   name: 'ZYXEL XGS-4728F: FAN{#SNMPINDEX} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -423,7 +423,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.fan[{#SNMPINDEX}]'
         -
           uuid: 06f0e151e2a146028f80e60031d49b48
@@ -456,7 +456,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 90b328c3b56c417eb938091338bd07fc
-                  expression: 'min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
                   event_name: 'ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -813,9 +813,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3f3ce5111d47490382cb0c18e2d36f77
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1016,37 +1016,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: a8c07b7801d64c24bfedf10ea193f697
@@ -1055,13 +1055,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.out.traffic[{#SNMPINDEX}]'
             -
               uuid: 37e8454c3fa04f88be36d875638110c6
@@ -1072,13 +1072,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
@@ -1096,7 +1096,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 6e0b5b991865448780e042d98168d72c
@@ -1154,7 +1153,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 409c52cfed074352810bacfd52aa89f0
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
                   name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1165,7 +1164,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: a2c40df40a334f6da00a438eb70f8374
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1182,7 +1181,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.sfp.ddm[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1342,7 +1341,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 632be557ffed439e98425eaa59361e50
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced'
                   event_name: 'ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
@@ -1473,7 +1472,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6181f094ae4c4cf4ae4b2e198e2f9b6e
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL XGS-4728F: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1490,7 +1489,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.temp[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1545,7 +1544,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 631202a132dc44afa90b0537f9957ee1
-                  expression: 'last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  expression: 'last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL XGS-4728F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1562,7 +1561,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL XGS-4728F SNMP'
+                    host: 'ZYXEL XGS-4728F by SNMP'
                     key: 'zyxel.4728f.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1758,7 +1757,7 @@ zabbix_export:
   triggers:
     -
       uuid: 36b9a7d3d3fb45f782a5ea05de6816f9
-      expression: '(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.uptime)<10m)'
+      expression: '(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<10m)'
       name: 'ZYXEL XGS-4728F: Host has been restarted'
       event_name: 'ZYXEL XGS-4728F: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
@@ -1779,5 +1778,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'ZYXEL XGS-4728F SNMP'
+            host: 'ZYXEL XGS-4728F by SNMP'
             key: zyxel.4728f.cpuusage

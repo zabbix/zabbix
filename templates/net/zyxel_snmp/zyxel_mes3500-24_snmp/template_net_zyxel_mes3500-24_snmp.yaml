@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T04:05:46Z'
+  date: '2022-10-27T12:58:55Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 292970ad91204722b5e5cb3233fc0026
-      template: 'ZYXEL MES3500-24 SNMP'
-      name: 'ZYXEL MES3500-24 SNMP'
+      template: 'ZYXEL MES3500-24 by SNMP'
+      name: 'ZYXEL MES3500-24 by SNMP'
       description: |
         ZYXEL MES3500-24
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 96435fde17384c6bb4f9811ad9ca184a
-              expression: 'max(/ZYXEL MES3500-24 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL MES3500-24 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL MES3500-24: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -107,7 +107,7 @@ zabbix_export:
           triggers:
             -
               uuid: 911d1c7e921f43af8ab3c0035be57a27
-              expression: 'min(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.cpuusage,5m)>{$CPU.UTIL.CRIT}'
               name: 'ZYXEL MES3500-24: High CPU utilization'
               event_name: 'ZYXEL MES3500-24: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -154,7 +154,7 @@ zabbix_export:
           triggers:
             -
               uuid: f3daea29a34b4cf992d3c23ba8a64d2e
-              expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion,#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.fwversion))>0'
+              expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.fwversion,#1)<>last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.fwversion,#2) and length(last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.fwversion))>0'
               name: 'ZYXEL MES3500-24: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -277,7 +277,7 @@ zabbix_export:
           triggers:
             -
               uuid: ab363c150ecd447ea4d3a3a9c311b992
-              expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.model)<>"MES3500-24"'
+              expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.model)<>"MES3500-24"'
               name: 'ZYXEL MES3500-24: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MES3500-24, but connected to {ITEM.VALUE}'
@@ -360,7 +360,7 @@ zabbix_export:
           triggers:
             -
               uuid: a475d29129664eec82fc7ed85cb74df9
-              expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber,#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.serialnumber))>0'
+              expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.serialnumber,#1)<>last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.serialnumber,#2) and length(last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.serialnumber))>0'
               name: 'ZYXEL MES3500-24: Device has been replaced'
               event_name: 'ZYXEL MES3500-24: Device has been replaced (new serial number received)'
               priority: INFO
@@ -402,7 +402,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 66802198e0764ee29cdf557378b5566b
-                  expression: 'min(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
                   event_name: 'ZYXEL MES3500-24: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -759,9 +759,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5a9faa35f7d547a987e78075832cf38e
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL MES3500-24: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -962,37 +962,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: b4c385f72ca243c8a7681c8220229d8d
@@ -1001,13 +1001,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.out.traffic[{#SNMPINDEX}]'
             -
               uuid: ae845a9a10204c40a1a044002f5b1a72
@@ -1018,13 +1018,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
@@ -1042,7 +1042,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 302fdabe174e425d9f32d36694453331
@@ -1100,7 +1099,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ef830e34f83347bebba87a72208d805b
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
                   name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1111,7 +1110,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 229f44666e6043a1a8e34437ad24e3ae
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL MES3500-24: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1128,7 +1127,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.sfp.ddm[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1288,7 +1287,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f84b378d79b74174842cc49af29c2a0c
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced'
                   event_name: 'ZYXEL MES3500-24: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
@@ -1419,7 +1418,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9963d3848c774563881689da1bcddefc
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL MES3500-24: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1436,7 +1435,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.temp[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1491,7 +1490,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2eef8cabb2e141dd8b6d1868ebc79db4
-                  expression: 'last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  expression: 'last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL MES3500-24: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1508,7 +1507,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MES3500-24 SNMP'
+                    host: 'ZYXEL MES3500-24 by SNMP'
                     key: 'zyxel.3500_24.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1698,7 +1697,7 @@ zabbix_export:
   triggers:
     -
       uuid: c389b0db83bc404e8cb84ce65db79700
-      expression: '(last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.hw.uptime)>0 and last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.hw.uptime)<10m) or (last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.hw.uptime)=0 and last(/ZYXEL MES3500-24 SNMP/zyxel.3500_24.net.uptime)<10m)'
+      expression: '(last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.hw.uptime)>0 and last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.hw.uptime)<10m) or (last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.hw.uptime)=0 and last(/ZYXEL MES3500-24 by SNMP/zyxel.3500_24.net.uptime)<10m)'
       name: 'ZYXEL MES3500-24: Host has been restarted'
       event_name: 'ZYXEL MES3500-24: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
@@ -1719,5 +1718,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'ZYXEL MES3500-24 SNMP'
+            host: 'ZYXEL MES3500-24 by SNMP'
             key: zyxel.3500_24.cpuusage
