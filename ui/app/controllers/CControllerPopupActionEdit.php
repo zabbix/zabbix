@@ -21,11 +21,6 @@
 
 class CControllerPopupActionEdit extends CController {
 
-	/**
-	 * @var array
-	*/
-	private array $action;
-
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
@@ -70,6 +65,8 @@ class CControllerPopupActionEdit extends CController {
 		if (!$has_permission) {
 			return false;
 		}
+
+		$this->action = null;
 
 		if ($this->hasInput('actionid')) {
 			$operation_options = [
