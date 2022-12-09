@@ -48,11 +48,18 @@ zbx_snmp_walk_json_output_value_t;
 
 ZBX_PTR_VECTOR_DECL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 
+typedef enum
+{
+	ZBX_SNMP_TYPE_UNDEFINED,
+	ZBX_SNMP_TYPE_HEX
+}
+zbx_snmp_type_t;
+
 typedef struct
 {
-	char	*oid;
-	char	*value;
-	int	is_hex;
+	char		*oid;
+	char		*value;
+	zbx_snmp_type_t	type;
 }
 zbx_snmp_value_pair_t;
 

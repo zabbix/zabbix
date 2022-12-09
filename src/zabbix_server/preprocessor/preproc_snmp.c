@@ -19,7 +19,8 @@
 
 #include "item_preproc.h"
 #include "preproc_snmp.h"
-#include <zbxjson.h>
+#include "zbxjson.h"
+#include "zbxcrypto.h"
 
 #define ZBX_PREPROC_SNMPWALK_UNDEFINED		0
 #define ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX	1
@@ -95,54 +96,81 @@ static int	snmp_walk_json_output_obj_compare_func(const void *d1, const void *d2
 	return strcmp(s1->key, s2->key);
 }
 
-static unsigned char	*snmp_hex_from_utf8(char *value)
+static int	snmp_hex_to_utf8(unsigned char *value, unsigned char *out, size_t size)
 {
-	char		*data = value;
-	unsigned char	*bin_data;
-	size_t		len;
-	int		i;
+	int	len;
 
-	if ('\0' == *value)
-		return NULL;
+	zbx_remove_chars((char *)value, " ");
 
-	zbx_remove_chars(value, " ");
+	if (FAIL == (len = zbx_hex2bin(value, out, size)))
+		return FAIL;
 
-	len = strlen(value) / 2;
+	out[len] = '\0';
+	zbx_replace_invalid_utf8((char *)out);
 
-	bin_data = (char*)malloc(len + 1);
-	bin_data[len] = '\0';
-
-	for (i = 0; i < len; i++)
-	{
-		sscanf(data, "%2hhx", &bin_data[i]);
-		data += 2;
-	}
-
-	zbx_replace_invalid_utf8(bin_data);
-
-	return bin_data;
+	return SUCCEED;
 }
 
-static int	snmp_mac_from_utf8(char *value, char **errmsg)
+static int	snmp_hex_to_utf8_dyn(const char *value, char **out)
 {
-#define MAC_LEN	17
-	size_t	i, len;
+	unsigned char	*ptr;
+	size_t		len;
 
-	len = strlen(value);
+	if ('\0' == *value)
+		return FAIL;
 
-	if (MAC_LEN != len)
+	len = strlen(value) / 3 + 2;
+	*out = (char *)(ptr = (unsigned char *)malloc(len));
+
+	if (FAIL == snmp_hex_to_utf8((unsigned char *)value, (unsigned char *)*out, len))
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "failed to parse Hex-STRING as a MAC address: %s", value);
+		zbx_free(*out);
 		return FAIL;
 	}
 
-	for (i = 2; i < len; i += 3)
+	return SUCCEED;
+}
+
+static int	snmp_hex_to_mac(char *out)
+{
+#define MAC_LEN	6
+	int	hex_num = 0;
+
+	while ('\0' != *out)
 	{
-		value[i] = ':';
+		if (0 == isxdigit((unsigned char)out[0]) || 0 == isxdigit((unsigned char)out[1]))
+			return FAIL;
+
+		hex_num++;
+
+		if ('\0' == out[2])
+			break;
+
+		if (' ' != out[2])
+			return FAIL;
+
+		out[2] = ':';
+		out += 3;
 	}
+
+	if (MAC_LEN != hex_num)
+		return FAIL;
 
 	return SUCCEED;
 #undef MAC_LEN
+}
+
+static int	snmp_hex_to_mac_dyn(const char *value, char **out)
+{
+	*out = zbx_strdup(NULL, value);
+
+	if (SUCCEED != snmp_hex_to_mac(*out))
+	{
+		zbx_free(*out);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
@@ -202,7 +230,6 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 	return SUCCEED;
 }
 
-
 static size_t	preproc_snmp_pair_parse_oid(const char *ptr, zbx_snmp_value_pair_t *p)
 {
 	const char	*start = ptr;
@@ -243,7 +270,7 @@ static size_t	preproc_snmp_parse_type(const char *ptr, char **type)
 	return len;
 }
 
-static size_t	preproc_snmp_parse_value(const char *ptr, const char *type, zbx_snmp_value_pair_t *p, int json)
+static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p)
 {
 	const char	*start = ptr;
 	size_t 		len;
@@ -261,11 +288,6 @@ static size_t	preproc_snmp_parse_value(const char *ptr, const char *type, zbx_sn
 		p->value = malloc(len + 1);
 		memcpy(p->value, start, len);
 		(p->value)[len] = '\0';
-
-		if (NULL != type && 0 == strcmp(type, "Hex-STRING"))
-		{
-			p->is_hex = 1;
-		}
 
 		return len;
 	}
@@ -304,8 +326,7 @@ static size_t	preproc_snmp_parse_value(const char *ptr, const char *type, zbx_sn
 	}
 }
 
-static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, size_t *line_len, int json,
-		char **error)
+static int	preproc_snmp_parse_line(const char *data, zbx_snmp_value_pair_t *p, size_t *line_len, char **error)
 {
 	int		ret = FAIL;
 	size_t		len;
@@ -367,7 +388,9 @@ reparse_type:
 		}
 	}
 
-	len = preproc_snmp_parse_value(data, type, p, json);
+	p->type = (NULL != type && 0 == strcmp(type, "Hex-STRING") ? ZBX_SNMP_TYPE_HEX : ZBX_SNMP_TYPE_UNDEFINED);
+
+	len = preproc_snmp_parse_value(data, p);
 	data += len;
 eol:
 	if ('\0' == *data)
@@ -395,14 +418,14 @@ out:
 	return ret;
 }
 
-static int	preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, int json, char **error)
+static int	preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, char **error)
 {
 	size_t			len;
 	zbx_snmp_value_pair_t	p;
 
 	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, json, error))
+	while (FAIL != preproc_snmp_parse_line(data, &p, &len, error))
 	{
 		if (NULL == zbx_hashset_insert(pairs, &p, sizeof(zbx_snmp_value_pair_t)))
 		{
@@ -452,6 +475,39 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 	return SUCCEED;
 }
 
+static int	preproc_snmp_convert_hex_value(char **value, int format, char **error)
+{
+	char	*out = NULL;
+
+	switch (format)
+	{
+		case ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX:
+			if (SUCCEED != snmp_hex_to_utf8_dyn(*value, &out))
+			{
+				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to utf-8 string",
+						*value);
+				return FAIL;
+			}
+
+			break;
+		case ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC:
+			if (SUCCEED != snmp_hex_to_mac_dyn(*value, &out))
+			{
+				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to mac address",
+						*value);
+				return FAIL;
+			}
+			break;
+		default:
+			return SUCCEED;
+	}
+
+	zbx_free(*value);
+	*value = out;
+
+	return SUCCEED;
+}
+
 static int	preproc_snmp_value_from_walk(const char *data, const char *params, char **output, char **error)
 {
 	int			ret = FAIL;
@@ -483,7 +539,7 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 #endif
 	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, 0, error))
+	while (FAIL != preproc_snmp_parse_line(data, &p, &len, error))
 	{
 #ifdef HAVE_NETSNMP
 		if (0 == strcmp(oid_tr, p.oid + offset))
@@ -491,26 +547,13 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 		if (0 == strcmp(oid_needle, p.oid + offset))
 #endif
 		{
-			if (1 == p.is_hex)
+			if (ZBX_SNMP_TYPE_HEX == p.type)
 			{
-				if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX == hex_conv_flag)
+				if (SUCCEED != preproc_snmp_convert_hex_value(&p.value, hex_conv_flag, error))
 				{
-					unsigned char	*utf_str;
-
-					if (NULL != (utf_str = snmp_hex_from_utf8(p.value)))
-					{
-						zbx_free(p.value);
-						p.value = utf_str;
-					}
-				}
-				else if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC == hex_conv_flag)
-				{
-					if (FAIL == (ret = snmp_mac_from_utf8(p.value, error)))
-					{
-						zbx_free(p.oid);
-						zbx_free(p.value);
-						goto out;
-					}
+					zbx_free(p.oid);
+					zbx_free(p.value);
+					goto out;
 				}
 			}
 			zbx_free(p.oid);
@@ -522,10 +565,10 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 		data += len;
 		zbx_free(p.oid);
 		zbx_free(p.value);
-		p.is_hex = 0;
 	}
 
-	*error = zbx_strdup(NULL, "no data was found");
+	if (NULL == *error)
+		*error = zbx_strdup(NULL, "no data was found");
 out:
 	zbx_free(oid_needle);
 #ifdef HAVE_NETSNMP
@@ -542,9 +585,10 @@ static void	snmp_prepend_oid_dot(const char *oid_in, zbx_snmp_value_pair_t *p)
 		p->oid = zbx_strdup(NULL, oid_in);
 }
 
-static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *params, char **output, char **error)
+static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char *params, char **output,
+		char **error)
 {
-	int			ret;
+	int			ret = FAIL;
 	zbx_snmp_value_pair_t	*pair_cached, pair_local = {0};
 	char			*oid_needle = NULL;
 	int			hex_conv_flag = 0;
@@ -569,43 +613,21 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 	if (NULL == (pair_cached = (zbx_snmp_value_pair_t *)zbx_hashset_search(&cache->pairs, &pair_local)))
 	{
 		*error = zbx_strdup(NULL, "no data was found");
-		ret = FAIL;
+		goto out;
 	}
-	else
+
+	*output = zbx_strdup(NULL, pair_cached->value);
+
+	if (ZBX_SNMP_TYPE_HEX == pair_cached->type)
 	{
-		if (1 == pair_cached->is_hex)
+		if (SUCCEED != preproc_snmp_convert_hex_value(output, hex_conv_flag, error))
 		{
-			if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX == hex_conv_flag)
-			{
-				unsigned char	*utf_str;
-
-				if (NULL != (utf_str = snmp_hex_from_utf8(pair_cached->value)))
-				{
-					*output = utf_str;
-				}
-			}
-			else if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC == hex_conv_flag)
-			{
-				char	*mac_value;
-
-				mac_value = zbx_strdup(NULL, pair_cached->value);
-
-				if (FAIL == (ret = snmp_mac_from_utf8(mac_value, error)))
-				{
-					zbx_free(mac_value);
-					ret = FAIL;
-					goto out;
-				}
-				else
-					*output = mac_value;
-			}
-			else
-				*output = zbx_strdup(NULL, pair_cached->value);
+			zbx_free(*output);
+			goto out;
 		}
-		else
-			*output = zbx_strdup(NULL, pair_cached->value);
-		ret = SUCCEED;
 	}
+
+	ret = SUCCEED;
 out:
 	zbx_free(pair_local.oid);
 	zbx_free(oid_needle);
@@ -634,7 +656,7 @@ int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, c
 	zbx_hashset_create(&cache->pairs, 100, snmp_value_pair_hash_func,
 			snmp_value_pair_compare_func);
 
-	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, 0, error))
+	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -754,7 +776,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	data = value->data.str;
 	memset(&p, 0, sizeof(zbx_snmp_value_pair_t));
 
-	while (FAIL != preproc_snmp_parse_line(data, &p, &len, 1, errmsg))
+	while (FAIL != preproc_snmp_parse_line(data, &p, &len, errmsg))
 	{
 		int				i;
 		zbx_snmp_walk_to_json_param_t	param_field;
@@ -778,24 +800,15 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
 				continue;
 
-			if (1 == p.is_hex)
+			if (ZBX_SNMP_TYPE_HEX == p.type)
 			{
-				if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX == param_field.hex_conv_flag)
+				if (SUCCEED != preproc_snmp_convert_hex_value(&p.value, param_field.hex_conv_flag,
+						errmsg))
 				{
-					unsigned char	*utf_str;
-
-					if (NULL != (utf_str = snmp_hex_from_utf8(p.value)))
-					{
-						zbx_free(p.value);
-						p.value = utf_str;
-					}
-				}
-				else if (ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC == param_field.hex_conv_flag)
-				{
-					if (FAIL == (ret = snmp_mac_from_utf8(p.value, errmsg)))
-					{
-						goto error;
-					}
+					zbx_free(p.oid);
+					zbx_free(p.value);
+					ret = FAIL;
+					goto out;
 				}
 			}
 
@@ -840,14 +853,9 @@ skip:
 		zbx_free(p.oid);
 		zbx_free(p.value);
 	}
-error:
+
 	if (NULL != *errmsg)
-	{
-		zbx_free(p.oid);
-		zbx_free(p.value);
 		ret = FAIL;
-		goto out;
-	}
 
 	if (0 < grouped_prefixes.num_data)
 	{
