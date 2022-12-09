@@ -53,6 +53,7 @@ typedef struct
 {
 	zbx_hashset_t	index;
 	zbx_tfc_slot_t	*slots;
+	size_t		slots_size;
 	zbx_uint32_t	slots_num;
 	zbx_uint32_t	free_slot;
 	zbx_uint32_t	free_head;
@@ -172,7 +173,7 @@ static void	*tfc_realloc_func(void *old, size_t size)
 
 static void	tfc_free_func(void *ptr)
 {
-	if (ptr >= (void *)cache->slots && ptr < (void *)(cache->slots + cache->slots_num))
+	if (ptr >= (void *)cache->slots && (char *)ptr < (char *)cache->slots + cache->slots_size)
 	{
 		tfc_free_slot(ptr);
 		return;
@@ -308,10 +309,10 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
 					"too large, setting it to %d", cache->slots_num, CONFIG_TREND_FUNC_CACHE_SIZE,
 					cache->index.num_data);
 
+			/* force slot limit to current hashset size and remove all free slots */
 			cache->slots_num = cache->index.num_data;
-
-			if (cache->slots_num < cache->free_slot)
-				cache->free_slot = cache->slots_num;
+			cache->free_slot = cache->slots_num;
+			cache->free_head = UINT32_MAX;
 		}
 
 		tfc_reserve_slot();
@@ -427,7 +428,8 @@ int	zbx_tfc_init(char **error)
 	cache->lru_tail = UINT32_MAX;
 
 	/* reserve the rest of memory for hashset entries */
-	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, tfc_mem->free_size - (2 * 8));
+	cache->slots_size = tfc_mem->free_size - (2 * 8);
+	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, cache->slots_size);
 
 	cache->free_head = UINT32_MAX;
 	cache->free_slot = 0;
