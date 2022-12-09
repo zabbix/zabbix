@@ -620,14 +620,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			buttonUpdateAction: () => {
-				var params = this._active_item.getFilterParams();
+				var params = this._active_item.getFilterParams(false);
 
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				})
 				.then(() => {
-					this._active_item.updateApplyUrl();
+					this._active_item.updateApplyUrl(false);
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -650,8 +650,8 @@ class CTabFilter extends CBaseComponent {
 			buttonApplyAction: () => {
 				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
+				this._active_item.updateUnsavedState(false);
+				this._active_item.updateApplyUrl(false);
 				this._active_item.setBrowserLocationToApplyUrl();
 			},
 
