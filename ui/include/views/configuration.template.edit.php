@@ -99,8 +99,6 @@ $tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 	]), TAB_INDICATOR_TAGS
 );
 
-// macros
-$tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 $tabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
@@ -108,10 +106,18 @@ $tabs->addTab('macroTab', _('Macros'),
 			->addValue(_('Global and template macros'), 1)
 			->setModern(true)
 		)
-		->addRow(null, new CPartial($tmpl, [
-			'macros' => $data['macros'],
-			'readonly' => $data['readonly']
-		]), 'macros_container'),
+		->addRow(
+			null,
+			new CPartial($data['show_inherited_macros']
+				? 'hostmacros.inherited.list.html'
+				: 'hostmacros.list.html',
+			[
+				'macros' => $data['macros'],
+				'source' => 'template',
+				'readonly' => $data['readonly']
+			]),
+			'macros_container'
+		),
 	TAB_INDICATOR_MACROS
 );
 

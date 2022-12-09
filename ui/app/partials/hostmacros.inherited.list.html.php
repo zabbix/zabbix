@@ -44,17 +44,23 @@ else {
 		$link = [' (', $link, ')'];
 	}
 
-	$table->setColumns([
+	$headers = [
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
 		!$data['readonly'] ? (new CTableColumn())->addClass('table-col-action') : null,
 		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
-		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null,
-		(new CTableColumn())->addClass('table-col-arrow'),
-		(new CTableColumn(_('Template value')))->addClass('table-col-template-value'),
-		(new CTableColumn())->addClass('table-col-arrow'),
-		(new CTableColumn([_('Global value'), $link]))->addClass('table-col-global-value')
-	]);
+		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null
+	];
+
+	if ($data['source'] !== 'template') {
+		$headers[] = (new CTableColumn())->addClass('table-col-arrow');
+		$headers[] = (new CTableColumn(_('Template value')))->addClass('table-col-template-value');
+	}
+
+	$headers[] = (new CTableColumn())->addClass('table-col-arrow');
+	$headers[] = (new CTableColumn([_('Global value'), $link]))->addClass('table-col-global-value');
+
+	$table->setColumns($headers);
 
 	foreach ($data['macros'] as $i => $macro) {
 		$macro_cell = [
@@ -155,28 +161,29 @@ else {
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 		}
 
-		// Template macro value.
-		$template_macro = null;
+		if ($data['source'] !== 'template') {
+			$template_macro = null;
 
-		if (array_key_exists('template', $macro)) {
-			if ($macro['template']['rights'] == PERM_READ_WRITE) {
-				$link = (new CLink(CHtml::encode($macro['template']['name']),
-					'templates.php?form=update&templateid='.$macro['template']['templateid'])
-				)
-					->addClass('unknown')
-					->setTarget('_blank');
-			}
-			else {
-				$link = new CSpan(CHtml::encode($macro['template']['name']));
+			if (array_key_exists('template', $macro)) {
+				if ($macro['template']['rights'] == PERM_READ_WRITE) {
+					$link = (new CLink(CHtml::encode($macro['template']['name']),
+						'templates.php?form=update&templateid='.$macro['template']['templateid'])
+					)
+						->addClass('unknown')
+						->setTarget('_blank');
+				}
+				else {
+					$link = new CSpan(CHtml::encode($macro['template']['name']));
+				}
+
+				$template_macro = [$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'];
 			}
 
-			$template_macro = [$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"'];
+			$row[] = array_key_exists('template', $macro) ? '&lArr;' : '';
+			$row[] = (new CDiv(array_key_exists('template', $macro) ? $template_macro : null))
+				->setAdaptiveWidth($inherited_width)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 		}
-
-		$row[] = array_key_exists('template', $macro) ? '&lArr;' : '';
-		$row[] = (new CDiv(array_key_exists('template', $macro) ? $template_macro : null))
-			->setAdaptiveWidth($inherited_width)
-			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
 		// Global macro value.
 		$row[] = array_key_exists('global', $macro) ? '&lArr;' : '';

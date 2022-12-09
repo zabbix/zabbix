@@ -36,6 +36,7 @@ class CControllerHostMacrosList extends CController {
 		$fields = [
 			'macros'				=> 'array',
 			'show_inherited_macros' => 'required|in 0,1',
+			'source'				=> 'string|in template,host,host_prototype',
 			'templateids'			=> 'array_db hosts.hostid',
 			'readonly'				=> 'required|in 0,1',
 			'parent_hostid'			=> 'id'
@@ -122,6 +123,7 @@ class CControllerHostMacrosList extends CController {
 		$data = [
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
+			'source' => $this->getInput('source', ''),
 			'readonly' => $readonly,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

@@ -188,6 +188,7 @@ class CControllerHostEdit extends CController {
 			'host' => $this->host,
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
+			'source' => 'host',
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'warning' => null,
 			'user' => [

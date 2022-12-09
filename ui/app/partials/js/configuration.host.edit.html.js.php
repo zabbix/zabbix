@@ -252,7 +252,7 @@
 		initMacrosTab() {
 			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
-			this.macros_manager = new HostMacrosManager({});
+			this.macros_manager = new HostMacrosManager({source: 'host'});
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;

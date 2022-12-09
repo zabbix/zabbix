@@ -335,9 +335,9 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 
 $tabs->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
-		'source' => 'host_prototype',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
+		'source' => 'host_prototype',
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'
 	]),
@@ -360,6 +360,7 @@ $tabs->addTab('macroTab', _('Macros'),
 				[
 					'macros' => $data['macros'],
 					'parent_hostid' => $data['parent_host']['hostid'],
+					'source' => 'host_protototype',
 					'readonly' => $data['templates']
 				]
 			),

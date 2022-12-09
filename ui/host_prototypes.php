@@ -398,6 +398,7 @@ if (hasRequest('form')) {
 			'main_interfaces' => getRequest('mainInterfaces', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
+		'source' => 'host_prototype',
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,

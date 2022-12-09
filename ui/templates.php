@@ -34,6 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'templates'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
 	'groupids'			=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
@@ -47,8 +48,6 @@ $fields = [
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
 								null
 							],
-	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
@@ -477,6 +476,7 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form'),
 		'templateid' => getRequest('templateid', 0),
+		'source' => 'template',
 		'tags' => $tags,
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 		'readonly' => false,

@@ -34,8 +34,9 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid}) {
+	constructor({readonly, parent_hostid, source}) {
 		this.readonly = readonly;
+		this.source = source;
 		this.parent_hostid = parent_hostid ?? null;
 		this.$container = $('#macros_container .table-forms-td-right');
 	}
@@ -48,7 +49,8 @@ class HostMacrosManager {
 			macros: this.getMacros(),
 			show_inherited_macros: show_inherited_macros ? 1 : 0,
 			templateids: templateids,
-			readonly: this.readonly ? 1 : 0
+			readonly: this.readonly ? 1 : 0,
+			source: this.source
 		};
 
 		if (this.parent_hostid !== null) {
