@@ -58,8 +58,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('action_' + this.eventsource);
-
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -86,8 +84,6 @@
 						}
 
 						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows('action_' + this.eventsource, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -95,8 +91,6 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
-
-						uncheckTableRows('action_' + this.eventsource);
 					}
 
 					location.href = location.href;
