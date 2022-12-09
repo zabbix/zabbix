@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.4 and higher.
-The template is developed to monitore DBMS PostgreSQL and its forks.
+The template is developed to monitor DBMS PostgreSQL and its forks.
 
 
 
