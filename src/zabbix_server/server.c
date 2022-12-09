@@ -1353,7 +1353,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
+							listen_sock};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							CONFIG_TIMEOUT};

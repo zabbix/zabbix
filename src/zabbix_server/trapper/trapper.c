@@ -1255,7 +1255,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 }
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *config_comms, zbx_config_vault_t *config_vault)
+		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault)
 {
 	ssize_t	bytes_received;
 
