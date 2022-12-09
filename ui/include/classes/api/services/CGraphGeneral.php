@@ -439,7 +439,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph name and graph items including Y axis item ID's and graph item fields on Create method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 *
@@ -589,7 +589,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph items including valid Y axis item ID's on Update method
-	 * and return valid item ID's on success or trow an error on failure.
+	 * and return valid item ID's on success or throw an error on failure.
 	 *
 	 * @param array $graphs
 	 * @param array $db_graphs
@@ -649,7 +649,7 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Validate graph general data on Update method.
-	 * When updating graph check to what host graph belongs to and trow an error if new items added from other hosts.
+	 * When updating graph check to what host graph belongs to and throw an error if new items added from other hosts.
 	 * Includes Y axis validation and if graph already exists somewhere in DB.
 	 *
 	 * @param array $graphs
