@@ -24,9 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for testing changing rank of trigger-based events/problems
  *
  * @required-components server
- * @configurationDataProvider serverConfigurationProvider
- * @backup items,triggers,task,task_data,acknowledges,event_symptom,events,problem
- * @hosts host_cause_and_symptoms
+ * @backup hosts,items,triggers,task,task_data,acknowledges,event_symptom,events,problem
  */
 class testEventsCauseAndSymptoms extends CIntegrationTest {
 	private static $hostid;
@@ -161,6 +159,55 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		}
 	}
 
+	private function checkEventsStartUntilSuccessOrTimeout() {
+		$max_attempts = 5;
+		$sleep_time = 1;
+
+		for ($i = 0; $i < $max_attempts - 1; $i++) {
+			try {
+				return $this->checkEventsStart();
+			} catch (Exception $e) {
+				sleep($sleep_time);
+			}
+		}
+
+		return $this->checkEventsStart();
+	}
+
+	private function checkEventsStart() {
+		foreach (['problem.get', 'event.get'] as $request_type) {
+			// get events/problems
+			$response = $this->callUntilDataIsPresent($request_type, [
+				'output' => [
+					'eventid',
+					'objectid',
+					'cause_eventid',
+				],
+				'objectids' => self::$trigger_ids,
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER
+			]);
+
+			$this->assertArrayHasKey('result', $response);
+			$this->assertCount(self::EVENT_COUNT, $response['result']);
+
+			$events = [];
+			foreach ($response['result'] as $event) {
+				$this->assertArrayHasKey('eventid', $event);
+				$this->assertArrayHasKey('objectid', $event);
+				$this->assertArrayHasKey('cause_eventid', $event);
+				$this->assertEquals(0, $event['cause_eventid']);
+				$events[$event['objectid']] = $event;
+			}
+
+			// make sure an event is started for each trigger and it is cause with no symptoms
+			foreach (self::$trigger_ids as $trigger_id) {
+				$this->assertArrayHasKey($trigger_id, $events);
+			}
+		}
+		return $events;
+	}
+
 	private function checkEventCauseMacros($expected_events) {
 		foreach ($expected_events as $expected_event) {
 			$eventid = $this->eventNumToId($expected_event['event_num']);
@@ -189,8 +236,6 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 				$symptom_event_num = $expected_event['event_num'];
 				$expected_symptoms[$cause_event_num][] = $symptom_event_num;
 			}
-
-
 		}
 
 		foreach ($expected_symptoms as $cause_event_num => $symptom_events_nums) {
@@ -244,18 +289,6 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
-
-		// get host interface ids
-		$response = $this->call('host.get', [
-			'output' => ['host'],
-			'hostids' => [self::$hostid],
-			'selectInterfaces' => ['interfaceid']
-		]);
-
-		$this->assertArrayHasKey('result', $response);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
 		for ($i = 1; $i <= self::EVENT_COUNT; $i++) {
 			$item_name = self::TRAPPER_ITEM_NAME_PREFIX . (string) $i;
@@ -312,21 +345,6 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function serverConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'AllowUnsupportedDBVersions' => 1
-			]
-		];
-	}
-
-	/**
 	 * Start 5 events/problems. All events/problems are expected to be causes with no symptoms.
 	 *
 	 * Expected result:
@@ -337,44 +355,15 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * [C] (5)
 	 */
-	public function testStartEvents()
+	public function testEventsCauseAndSymptoms_startEvents()
 	{
 		// start events/problems
-		for ($i = 1; $i <= self::EVENT_COUNT; $i++) {
+		for ($i = 1; $i <= self::EVENT_COUNT ; $i++) {
 			$item_key = self::TRAPPER_ITEM_KEY_PREFIX . (string) $i;
 			$this->sendSenderValue(self::HOST_NAME, $item_key, self::EVENT_START);
 		}
 
-		foreach (['problem.get', 'event.get'] as $request_type) {
-			// get events/problems
-			$response = $this->callUntilDataIsPresent($request_type, [
-				'output' => [
-					'eventid',
-					'objectid',
-					'cause_eventid',
-				],
-				'objectids' => self::$trigger_ids,
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER
-			]);
-
-			$this->assertArrayHasKey('result', $response);
-			$this->assertCount(self::EVENT_COUNT, $response['result']);
-
-			$events = [];
-			foreach ($response['result'] as $event) {
-				$this->assertArrayHasKey('eventid', $event);
-				$this->assertArrayHasKey('objectid', $event);
-				$this->assertArrayHasKey('cause_eventid', $event);
-				$this->assertEquals(0, $event['cause_eventid']);
-				$events[$event['objectid']] = $event;
-			}
-
-			// make sure an event is started for each trigger and it is cause with no symptoms
-			foreach (self::$trigger_ids as $trigger_id) {
-				$this->assertArrayHasKey($trigger_id, $events);
-			}
-		}
+		$events = $this->checkEventsStartUntilSuccessOrTimeout();
 
 		// save event ids
 		for ($i = 1; $i <= self::EVENT_COUNT; $i++) {
@@ -403,9 +392,9 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * |----[S] (5)
 	 *
-	 * @depends testStartEvents
+	 * @depends testEventsCauseAndSymptoms_startEvents
 	 */
-	public function testRankAsSymptom() {
+	public function testEventsCauseAndSymptoms_rankAsSymptom() {
 		$this->markAsSymptoms([
 			['event_nums' => [2, 3], 'cause_event_num' => 1],
 			['event_nums' => 5, 'cause_event_num' => 4],
@@ -445,10 +434,10 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)          <-- no change is expected here
 	 * |----[S] (5)
 	 *
-	 * @depends testRankAsSymptom
+	 * @depends testEventsCauseAndSymptoms_rankAsSymptom
 	 *
 	 */
-	public function testSwapCauseAndSymptom() {
+	public function testEventsCauseAndSymptoms_swapCauseAndSymptom() {
 		$this->markAsSymptoms([
 			['event_nums' => 1, 'cause_event_num' => 3],
 		]);
@@ -487,10 +476,10 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
-	 * @depends testSwapCauseAndSymptom
+	 * @depends testEventsCauseAndSymptoms_swapCauseAndSymptom
 	 *
 	 */
-	public function testRankCauseAsSymptomOfSymptom() {
+	public function testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom() {
 		$this->markAsSymptoms([
 			['event_nums' => 4, 'cause_event_num' => 2],
 		]);
@@ -523,23 +512,71 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *
 	 * [C] (1)
 	 * [C] (2)
-	 * [C] (3)
-	 * [C] (4)
-	 * [C] (5)
 	 *
-	 * @depends testRankCauseAsSymptomOfSymptom
+	 * [C] (3)
+	 *  |----[S] (4)
+	 *  |----[S] (5)
+	 *
+	 * @depends testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom
 	 *
 	 */
-	public function testRankAsCause() {
+	public function testEventsCauseAndSymptoms_rankAsCause1() {
 		// request event/problem ranking
 		$response = $this->call('event.acknowledge', [
-			'eventids' => $this->eventNumToId([1, 2, 4, 5]),
+			'eventids' => $this->eventNumToId([1, 2]),
 			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 		]);
 
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('eventids', $response['result']);
-		$this->assertCount(4,  $response['result']['eventids']);
+		$this->assertCount(2,  $response['result']['eventids']);
+
+		$expected = [
+			['event_num' => 1, 'cause_event_num' => 0],
+			['event_num' => 2, 'cause_event_num' => 0],
+			['event_num' => 3, 'cause_event_num' => 0],
+			['event_num' => 4, 'cause_event_num' => 3],
+			['event_num' => 5, 'cause_event_num' => 3],
+		];
+
+		$this->checkSymptomsUntilSuccessOrTimeout($expected);
+		$this->checkEventCauseMacros($expected);
+		$this->checkEventSymptomMacros($expected);
+	}
+
+	/**
+	 * Rank symptom events as causes.
+	 *
+	 * Initial position:
+	 *
+	 * [C] (1)
+	 * [C] (2)
+	 *
+	 * [C] (3)
+	 *  |----[S] (4)
+	 *  |----[S] (5)
+	 *
+	 * Expected result:
+	 *
+	 * [C] (1)
+	 * [C] (2)
+	 * [C] (3)
+	 * [C] (4)
+	 * [C] (5)
+	 *
+	 * @depends testEventsCauseAndSymptoms_rankAsCause1
+	 *
+	 */
+	public function testEventsCauseAndSymptoms_rankAsCause2() {
+		// request event/problem ranking
+		$response = $this->call('event.acknowledge', [
+			'eventids' => $this->eventNumToId([4, 5]),
+			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+		]);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey('eventids', $response['result']);
+		$this->assertCount(2,  $response['result']['eventids']);
 
 		$expected = [
 			['event_num' => 1, 'cause_event_num' => 0],
