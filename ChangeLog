@@ -1,10 +1,22 @@
 Changes for 6.4.0rc1
 
 New features:
+A......... [ZBXNEXT-8085] removed deprecated property "alias" in user.get, user.create, user.update methods and "user" in user.login (kkuzmina)
+.........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
+A......... [ZBX-22014] fixed fatal error in SCIM authentication (gcalenko)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin, ORACLE ODBC and agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+.........T [ZBX-21595] optimized rabbitmq node templates (egordymov)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
+.........T [ZBX-21594] optimized rabbitmq cluster templates (egordymov)
+..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
+..F....... [ZBX-21864] fixed fatal error in system warning page (Ivo)
 .......PS. [ZBX-22001] re-enabled response decompression support (HTTP header "Accept-Encoding") in web monitoring (reversion of ZBX-21765) (dimir)
 ........S. [ZBX-22000] fixed and/or evaluation in LLD filters/overrides (wiper)
 .......PS. [ZBX-21997] fixed parsing JSON starting with whitespace and empty array/object jsonpath output (wiper)
@@ -44,7 +56,7 @@ A.......S. [ZBX-17419] optimized API queries when searching through names in hos
 ........S. [ZBX-21616] fixed error due to non-existent macros in custom expressions (dgoloscapov, wiper)
 .......PS. [ZBX-21786] fixed "invalid timeout" error occurring after removal of script item parameters (asestakovs)
 ...G...... [ZBX-21823] fixed "vfs.fs.inode" and "vfs.fs.get" to handle the file systems with zero total inodes count (asestakovs)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header so that it allows to access the frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header so that it allows to access the frontend in maintenace mode (agriscenko)
 .........T [ZBX-21588] optimized template k8s nodes by HTTP (egordymov)
 .........T [ZBX-20478] fixed script for k8s cluster state (egordymov)
 .........T [ZBX-20296] fixed swap trigger function for windows os and modules by Zabbix agent templates (atocko)
@@ -159,8 +171,19 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.7rc1
 
 New features:
+.........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
+.........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin, ORACLE ODBC and agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+.........T [ZBX-21595] optimized rabbitmq node templates (egordymov)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
+..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
+.........T [ZBX-21594] optimized rabbitmq cluster templates (egordymov)
+..F....... [ZBX-21864] fixed fatal error in system warning page (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.6
@@ -232,7 +255,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
 ...G...... [ZBX-21689] modified proc.num item to prevent agent crash on Windows when 'user' parameter is set (asestakovs)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.4
@@ -674,8 +697,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.13rc1
 
 New features:
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21206] updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin, ORACLE ODBC and agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+.........T [ZBX-21595] optimized rabbitmq node templates (egordymov)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
+.........T [ZBX-21594] optimized rabbitmq cluster templates (egordymov)
+..F....... [ZBX-20050] fixed broken macro value and type input when changing to/from inherited macros (epulke, rdetlavs)
+..F....... [ZBX-21864] fixed fatal error in system warning page (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.12
@@ -744,7 +776,7 @@ A......... [ZBX-21534] reverted fix for parsing of backslashes in quoted functio
 ........S. [ZBX-21655] updated VMware datastore discovery to prevent returning the same datastore multiple times (asestakovs)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10
@@ -2943,6 +2975,11 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21206] reverted postgresql connection to be per database for Zabbix agent 2 postgresql plugin (esneiders)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin and ORACLE agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.30
@@ -2962,7 +2999,7 @@ A.F....... [ZBX-16432] removed the ability to import a graph with an empty name 
 ...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
@@ -5615,7 +5652,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-21986] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44

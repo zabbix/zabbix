@@ -21,6 +21,7 @@
 
 #ifdef _WINDOWS
 #	include "zbxsysinfo.h"
+#	include "log.h"
 #else
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef struct
