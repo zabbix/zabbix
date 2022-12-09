@@ -1996,7 +1996,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 				goto out;
 			}
 
-			if (response->errstat == SNMP_ERR_NOSUCHNAME)
+			if (SNMP_ERR_NOSUCHNAME == response->errstat)
 				break;
 
 			for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
