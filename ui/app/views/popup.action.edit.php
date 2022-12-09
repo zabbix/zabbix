@@ -198,7 +198,7 @@ $operations_tab->addItem([
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_tab->addItem([
-		new CLabel('Recovery operations'),
+		new CLabel(_('Recovery operations')),
 		(new CFormField(new CPartial('action.recovery.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('recovery-operations-container')
@@ -209,7 +209,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 // Update operations table.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_SERVICE) {
 	$operations_tab->addItem([
-		new CLabel('Update operations'),
+		new CLabel(_('Update operations')),
 		(new CFormField(new CPartial('action.update.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('update-operations-container')
