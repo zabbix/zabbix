@@ -2370,6 +2370,22 @@ out:
   return: SUCCEED
   value: 'test ё'
 ---
+test case: SNMP walk to value - Hex-STRING - to UTF8 (null terminated)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 91 00
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: SUCCEED
+  value: 'test ё'
+---
 test case: SNMP walk to value - Hex-STRING - to UTF8 - invalid hex string
 in:
   value:
@@ -2377,6 +2393,21 @@ in:
     time: 2017-10-29 03:15:00 +03:00
     data: |
       .1.3.6.1.1 = Hex-STRING: 74 65 X3 74 20 D1 91
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8 - invalid hex string (2)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 74 20 D1 9
   step:
     type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
     params: |-
