@@ -134,18 +134,17 @@ $hostid = (count($filter['hosts']) == 1) ? reset($filter['hosts'])['id'] : getRe
  * Do uncheck.
  */
 if (hasRequest('action')) {
-	if (!hasRequest('applications') || !is_array(getRequest('applications'))) {
+	if (!hasRequest('applications')) {
 		access_deny();
 	}
-	else {
-		$applications = API::Application()->get([
-			'output' => [],
-			'applicationids' => getRequest('applications'),
-			'editable' => true
-		]);
-		if (count($applications) != count(getRequest('applications'))) {
-			uncheckTableRows($hostid, zbx_objectValues($applications, 'applicationid'));
-		}
+
+	$applications = API::Application()->get([
+		'output' => [],
+		'applicationids' => getRequest('applications'),
+		'editable' => true
+	]);
+	if (count($applications) != count(getRequest('applications'))) {
+		uncheckTableRows($hostid, zbx_objectValues($applications, 'applicationid'));
 	}
 }
 
@@ -188,7 +187,7 @@ elseif (hasRequest('delete') && hasRequest('applicationid')) {
 	}
 	show_messages($result, _('Application deleted'), _('Cannot delete application'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'application.massdelete' && hasRequest('applications')) {
+elseif (hasRequest('action') && getRequest('action') == 'application.massdelete') {
 	$applicationids = getRequest('applications');
 
 	$result = (bool) API::Application()->delete($applicationids);
@@ -201,13 +200,12 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 		_n('Cannot delete application', 'Cannot delete applications', count($applicationids))
 	);
 }
-elseif (hasRequest('applications')
-		&& str_in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
+elseif (hasRequest('action') && in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
 	$status = (getRequest('action') === 'application.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 	$db_items = API::Item()->get([
 		'output' => ['itemid'],
-		'applicationids' => getRequest('applications', [])
+		'applicationids' => getRequest('applications')
 	]);
 
 	$items = [];
