@@ -96,7 +96,7 @@ static int	snmp_walk_json_output_obj_compare_func(const void *d1, const void *d2
 	return strcmp(s1->key, s2->key);
 }
 
-static int	snmp_hex_to_utf8(unsigned char *value, unsigned char *out, size_t size)
+static int	snmp_hex_to_utf8(unsigned char *value, unsigned char *out, int size)
 {
 	int	len;
 
@@ -111,7 +111,7 @@ static int	snmp_hex_to_utf8(unsigned char *value, unsigned char *out, size_t siz
 	return SUCCEED;
 }
 
-static int	snmp_hex_to_utf8_dyn(const char *value, char **out)
+static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 {
 	unsigned char	*ptr;
 	size_t		len;
@@ -120,9 +120,9 @@ static int	snmp_hex_to_utf8_dyn(const char *value, char **out)
 		return FAIL;
 
 	len = strlen(value) / 3 + 2;
-	*out = (char *)(ptr = (unsigned char *)malloc(len));
+	*out = (char *)(ptr = (unsigned char *)zbx_malloc(NULL, len));
 
-	if (FAIL == snmp_hex_to_utf8((unsigned char *)value, (unsigned char *)*out, len))
+	if (FAIL == snmp_hex_to_utf8((unsigned char *)value, (unsigned char *)*out, (int)len))
 	{
 		zbx_free(*out);
 		return FAIL;
@@ -242,9 +242,9 @@ static size_t	preproc_snmp_pair_parse_oid(const char *ptr, zbx_snmp_value_pair_t
 		ptr++;
 	}
 
-	if (0 != (len = ptr - start))
+	if (0 != (len = (size_t)(ptr - start)))
 	{
-		p->oid = malloc(len + 1);
+		p->oid = zbx_malloc(NULL, len + 1);
 		memcpy(p->oid, start, len);
 		p->oid[len] = '\0';
 	}
@@ -262,8 +262,8 @@ static size_t	preproc_snmp_parse_type(const char *ptr, char **type)
 		ptr++;
 	}
 
-	len = ptr - start;
-	*type = malloc(len + 1);
+	len = (size_t)(ptr - start);
+	*type = zbx_malloc(NULL, len + 1);
 	memcpy(*type, start, len);
 	(*type)[len] = '\0';
 
@@ -283,9 +283,9 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 			len = strlen(start);
 		}
 		else
-			len = ptr - start;
+			len = (size_t)(ptr - start);
 
-		p->value = malloc(len + 1);
+		p->value = zbx_malloc(NULL, len + 1);
 		memcpy(p->value, start, len);
 		(p->value)[len] = '\0';
 
@@ -308,8 +308,8 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 			ptr++;
 		}
 
-		len = ++ptr - start;
-		out = p->value = malloc(len - 1);
+		len = (size_t)(++ptr - start);
+		out = p->value = zbx_malloc(NULL, len - 1);
 		ptr = start + 1;
 
 		while ('"' != *ptr)
@@ -395,7 +395,7 @@ reparse_type:
 eol:
 	if ('\0' == *data)
 	{
-		*line_len = data - start;
+		*line_len = (size_t)(data - start);
 		ret = SUCCEED;
 		goto out;
 	}
@@ -407,7 +407,7 @@ eol:
 		goto out;
 	}
 
-	*line_len = data + 1 - start;
+	*line_len = (size_t)(data + 1 - start);
 	ret = 0;
 out:
 	zbx_free(type);
@@ -466,7 +466,7 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 	if (NULL == (delim_ptr = strchr(params, '\n')))
 		return FAIL;
 
-	if (0 == (delim_offset = delim_ptr - params))
+	if (0 == (delim_offset = (size_t)(delim_ptr - params)))
 		return FAIL;
 
 	zbx_strncpy_alloc(oid_needle, &alloc_offset, &alloc_len, params, delim_offset);
