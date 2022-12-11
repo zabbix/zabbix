@@ -141,25 +141,19 @@ zabbix_export:
                             || item.instancesSet.item.hasOwnProperty('instanceId') === false)
                             throw 'Failed response parse. Check debug log for more information.';
                         var instanceName = item.instancesSet.item.instanceId
-                        if (typeof item.instancesSet.item.tagSet !== 'object'
-                            || typeof item.instancesSet.item.tagSet.item !== 'object') {
-                            instance_array[index]['instanceName'] = instanceName;
-                        }
-                        else {
-                            if (Array.isArray(item.instancesSet.item.tagSet.item)) {
-                                item.instancesSet.item.tagSet.item.forEach(
-                                    function (tag) {
-                                        if (tag.hasOwnProperty('key') && tag.key === 'Name') {
-                                            instanceName = tag.value;
-                                        }
+                        if (typeof item.instancesSet.item.tagSet === 'object'
+                            && typeof item.instancesSet.item.tagSet.item === 'object') {
+                            if (!Array.isArray(item.instancesSet.item.tagSet.item))
+                              item.instancesSet.item.tagSet.item = [item.instancesSet.item.tagSet.item];
+                            item.instancesSet.item.tagSet.item.forEach(
+                                function (tag) {
+                                    if (tag.hasOwnProperty('key') && tag.key === 'Name') {
+                                        instanceName = tag.value;
                                     }
-                                )
-                            } else {
-                                if (item.instancesSet.item.tagSet.item.hasOwnProperty('key') && item.instancesSet.item.tagSet.item.key === 'Name')
-                                    instanceName = item.instancesSet.item.tagSet.item.value
-                            }
-                            instance_array[index]['instanceName'] = instanceName;
+                                }
+                            );
                         }
+                        instance_array[index]['instanceName'] = instanceName;
                     });
             
                     return instance;
@@ -180,7 +174,7 @@ zabbix_export:
                     }
             
                     if (result.DescribeInstancesResponse.reservationSet === null)
-                        return []
+                        return [];
             
                     if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
                         throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
