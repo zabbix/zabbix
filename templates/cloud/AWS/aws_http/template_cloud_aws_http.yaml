@@ -40,8 +40,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -102,7 +102,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
 
-                    request.setProxy(AwsEC2.params.proxy);
+                    if (typeof AwsEC2.params.proxy !== 'undefined' && AwsEC2.params.proxy !== '') {
+                        request.setProxy(AwsEC2.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -141,25 +143,19 @@ zabbix_export:
                             || item.instancesSet.item.hasOwnProperty('instanceId') === false)
                             throw 'Failed response parse. Check debug log for more information.';
                         var instanceName = item.instancesSet.item.instanceId
-                        if (typeof item.instancesSet.item.tagSet !== 'object'
-                            || typeof item.instancesSet.item.tagSet.item !== 'object') {
-                            instance_array[index]['instanceName'] = instanceName;
-                        }
-                        else {
-                            if (Array.isArray(item.instancesSet.item.tagSet.item)) {
-                                item.instancesSet.item.tagSet.item.forEach(
-                                    function (tag) {
-                                        if (tag.hasOwnProperty('key') && tag.key === 'Name') {
-                                            instanceName = tag.value;
-                                        }
+                        if (typeof item.instancesSet.item.tagSet === 'object'
+                            && typeof item.instancesSet.item.tagSet.item === 'object') {
+                            if (!Array.isArray(item.instancesSet.item.tagSet.item))
+                              item.instancesSet.item.tagSet.item = [item.instancesSet.item.tagSet.item];
+                            item.instancesSet.item.tagSet.item.forEach(
+                                function (tag) {
+                                    if (tag.hasOwnProperty('key') && tag.key === 'Name') {
+                                        instanceName = tag.value;
                                     }
-                                )
-                            } else {
-                                if (item.instancesSet.item.tagSet.item.hasOwnProperty('key') && item.instancesSet.item.tagSet.item.key === 'Name')
-                                    instanceName = item.instancesSet.item.tagSet.item.value
-                            }
-                            instance_array[index]['instanceName'] = instanceName;
+                                }
+                            );
                         }
+                        instance_array[index]['instanceName'] = instanceName;
                     });
             
                     return instance;
@@ -180,7 +176,7 @@ zabbix_export:
                     }
             
                     if (result.DescribeInstancesResponse.reservationSet === null)
-                        return []
+                        return [];
             
                     if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
                         throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
@@ -265,8 +261,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -327,7 +323,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
 
-                    request.setProxy(AwsRDS.params.proxy);
+                    if (typeof AwsRDS.params.proxy !== 'undefined' && AwsRDS.params.proxy !== '') {
+                        request.setProxy(AwsRDS.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -450,8 +448,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'secret_key'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -512,7 +510,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
 
-                    request.setProxy(AwsS3.params.proxy);
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');

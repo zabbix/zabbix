@@ -534,8 +534,8 @@ zabbix_export:
                params: {},
             
                setParams: function (params) {
-                   ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
-                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                   ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
+                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                            throw 'Required param is not set: "' + field + '".';
                        }
                    });
@@ -596,7 +596,9 @@ zabbix_export:
                    var request = new HttpRequest(),
                        url = 'https://' + host + canonical_uri + '?' + params;
 
-                   request.setProxy(AwsEC2.params.proxy);
+                   if (typeof AwsEc2.params.proxy !== 'undefined' && AwsEc2.params.proxy !== '') {
+                       request.setProxy(AwsEc2.params.proxy);
+                   }
                    request.addHeader('x-amz-date: ' + amzdate);
                    request.addHeader('Accept: application/json');
                    request.addHeader('Content-Type: application/json');
@@ -766,8 +768,8 @@ zabbix_export:
                   request_period: 600,
             
                   setParams: function (params) {
-                      ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
-                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                      ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
+                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                               throw 'Required param is not set: "' + field + '".';
                           }
                       });
@@ -910,7 +912,9 @@ zabbix_export:
                       var request = new HttpRequest(),
                           url = 'https://' + host + canonical_uri + '?' + params;
 
-                      request.setProxy(AwsEC2.params.proxy);
+                      if (typeof AwsEc2.params.proxy !== 'undefined' && AwsEc2.params.proxy !== '') {
+                          request.setProxy(AwsEc2.params.proxy);
+                      }
                       request.addHeader('x-amz-date: ' + amzdate);
                       request.addHeader('Accept: application/json');
                       request.addHeader('Content-Type: application/json');
@@ -1019,8 +1023,8 @@ zabbix_export:
                 request_period: 600,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'instance_id', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -1081,7 +1085,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
 
-                    request.setProxy(AwsEbs.params.proxy);
+                    if (typeof AwsEbs.params.proxy !== 'undefined' && AwsEbs.params.proxy !== '') {
+                        request.setProxy(AwsEbs.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -2214,8 +2220,8 @@ zabbix_export:
                     request_period: 600,
                 
                     setParams: function (params) {
-                        ['access_key', 'secret_key', 'region', 'volume_id', 'proxy'].forEach(function (field) {
-                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                        ['access_key', 'secret_key', 'region', 'volume_id'].forEach(function (field) {
+                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                                 throw 'Required param is not set: "' + field + '".';
                             }
                         });
@@ -2346,7 +2352,9 @@ zabbix_export:
                         var request = new HttpRequest(),
                             url = 'https://' + host + canonical_uri + '?' + params;
 
-                        request.setProxy(AwsEbs.params.proxy);
+                        if (typeof AwsEbs.params.proxy !== 'undefined' && AwsEbs.params.proxy !== '') {
+                            request.setProxy(AwsEbs.params.proxy);
+                        }
                         request.addHeader('x-amz-date: ' + amzdate);
                         request.addHeader('Accept: application/json');
                         request.addHeader('Content-Type: application/json');
