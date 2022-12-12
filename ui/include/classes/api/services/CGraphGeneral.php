@@ -63,6 +63,12 @@ abstract class CGraphGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
+			// Cannot update templated graph.
+			if ($dbGraphs[$graph['graphid']]['templateid'] != 0
+					&& $dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update a templated graph.'));
+			}
+
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $dbGraphs[$graph['graphid']]);
 
