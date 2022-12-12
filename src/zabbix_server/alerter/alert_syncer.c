@@ -108,7 +108,7 @@ static void	am_db_clear(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: reads the new alerts from database                                *
  *                                                                            *
- * Parameters: alerts - [OUT] the new alerts                                  *
+ * Parameters: alerts - [OUT] new alerts                                      *
  *                                                                            *
  * Comments: On the first call this function will return new and not sent     *
  *           alerts. After that only new alerts are returned.                 *
@@ -238,8 +238,8 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
  *                                                                            *
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
- * Parameters: amdb - [IN] the alert manager cache                            *
- *             ...  - [IN] the mediatype data                                 *
+ * Parameters: amdb - [IN] alert manager cache                                *
+ *             ...  - [IN] mediatype data                                     *
  *                                                                            *
  * Return value: Updated mediatype or NULL, if the cached media was up to     *
  *               date.                                                        *
@@ -300,10 +300,10 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
  *                                                                            *
  * Purpose: updates alert manager media types                                 *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
- *             mediatypeids    - [IN] the media type identifiers              *
- *             medatypeids_num - [IN] the number of media type identifiers    *
- *             mediatypes      - [OUT] the updated mediatypes                 *
+ * Parameters: amdb            - [IN] alert manager cache                     *
+ *             mediatypeids    - [IN] media type identifiers                  *
+ *             medatypeids_num - [IN] number of media type identifiers        *
+ *             mediatypes      - [OUT] updated mediatypes                     *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
@@ -372,7 +372,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
  * Purpose: reads alerts/mediatypes from database and queues them in alert    *
  *          manager                                                           *
  *                                                                            *
- * Parameters: amdb - [IN] the alert manager cache                            *
+ * Parameters: amdb - [IN] alert manager cache                                *
  *                                                                            *
  * Return value: count of alerts                                              *
  *                                                                            *
@@ -672,7 +672,7 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
  * Purpose: retrieves alert updates from alert manager and flushes them into  *
  *          database                                                          *
  *                                                                            *
- * Parameters: amdb - [IN] the alert manager cache                            *
+ * Parameters: amdb - [IN]                                                    *
  *                                                                            *
  * Return value: count of results                                             *
  *                                                                            *
@@ -796,7 +796,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: removes cached media types used more than a day ago               *
  *                                                                            *
- * Parameters: amdb - [IN] the alert manager cache                            *
+ * Parameters: amdb - [IN]                                                    *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
@@ -842,7 +842,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
  *                                                                            *
- * Parameters: amdb - [IN] the alert manager cache                            *
+ * Parameters: amdb - [IN]                                                    *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_watchdog(zbx_am_db_t *amdb)

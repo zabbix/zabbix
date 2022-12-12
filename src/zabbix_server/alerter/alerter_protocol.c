@@ -44,7 +44,7 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
  *                                                                            *
  * Purpose: frees the alert object                                            *
  *                                                                            *
- * Parameters: alert - [IN] the alert object                                  *
+ * Parameters: alert - [IN]                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert)
@@ -911,8 +911,8 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
  *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
- * Parameters: alerts_num - [IN] the alert count                              *
- *             error      - [OUT] the error message                           *
+ * Parameters: alerts_num - [IN] alert count                                  *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the statistics were returned successfully          *
  *               FAIL    - otherwise                                          *
@@ -938,9 +938,9 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  *                                                                            *
  * Purpose: get the top N mediatypes by the number of queued alerts           *
  *                                                                            *
- * Parameters limit      - [IN] the number of top records to retrieve         *
+ * Parameters limit      - [IN] number of top records to retrieve             *
  *            mediatypes - [OUT] a vector of top mediatypeid,alerts_num pairs *
- *            error      - [OUT] the error message                            *
+ *            error      - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the top n mediatypes were returned successfully    *
  *               FAIL    - otherwise                                          *
@@ -972,10 +972,10 @@ out:
  *                                                                            *
  * Purpose: get the top N sources by the number of queued alerts              *
  *                                                                            *
- * Parameters limit   - [IN] the number of top records to retrieve            *
+ * Parameters limit   - [IN] number of top records to retrieve                *
  *            sources - [OUT] a vector of top zbx_alerter_source_stats_t      *
  *                             structure                                      *
- *            error   - [OUT] the error message                               *
+ *            error   - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - the top n sources were returned successfully       *
  *               FAIL    - otherwise                                          *
@@ -1131,14 +1131,14 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MED
  *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
- * Parameters: dispatch     - [IN] the dispatcher                             *
- *             subject      - [IN] the subject                                *
- *             message      - [IN] the message                                *
- *             content_name - [IN] the content name                           *
- *             content_type - [IN] the content type                           *
- *             content      - [IN] the additional content to dispatch         *
- *             content_size - [IN] the content size                           *
- *             error          [OUT] the error message                         *
+ * Parameters: dispatch     - [IN] dispatcher                                 *
+ *             subject      - [IN] subject                                    *
+ *             message      - [IN] message                                    *
+ *             content_name - [IN] content name                               *
+ *             content_type - [IN] content type                               *
+ *             content      - [IN] additional content to dispatch             *
+ *             content_size - [IN] content size                               *
+ *             error          [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was started successfully              *
  *               FAIL    - otherwise                                          *
@@ -1192,10 +1192,10 @@ out:
  *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
- * Parameters: dispatch   - [IN] the dispatcher                               *
- *             mediatype  - [IN] the media type to use for sending            *
- *             recipients - [IN] the dispatch recipients                      *
- *             error      - [OUT] the error message                           *
+ * Parameters: dispatch   - [IN] dispatcher                                   *
+ *             mediatype  - [IN] media type to use for sending                *
+ *             recipients - [IN] dispatch recipients                          *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the dispatch sent successfully                     *
  *               FAIL    - otherwise                                          *
@@ -1234,8 +1234,8 @@ out:
  *                                                                            *
  * Purpose: finish data dispatch                                              *
  *                                                                            *
- * Parameters: dispatch  - [IN] the dispatcher                                *
- *             error     - [OUT] the error message                            *
+ * Parameters: dispatch  - [IN] dispatcher                                    *
+ *             error     - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was finished successfully             *
  *               FAIL    - otherwise                                          *
