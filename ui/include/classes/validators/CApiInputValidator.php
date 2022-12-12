@@ -2122,7 +2122,7 @@ class CApiInputValidator {
 					$level = 1;
 					$field_names_count = count($field_names);
 
-					if ($field_names_count > 1) {
+					if (($field_names_count > 1) && ($field_names[1] === 'menu_path')) {
 						$level = $field_names_count;
 					}
 
@@ -2142,46 +2142,49 @@ class CApiInputValidator {
 							}
 							$_uniq = &$_uniq[$value];
 						}
-						else if (array_key_exists($value, $_uniq)) {
-							if (($level > 1) && (array_key_exists('menu_path', $_uniq))) {
-								$menu_path = [];
-								$_menu_path = &$menu_path;
+						else {
+							if (array_key_exists($value, $_uniq)) {
+								if ($field_names[1] == 'menu_path') {
+									$menu_path = [];
+									$_menu_path = &$menu_path;
 
-								foreach ($data as $data_field) {
-									$path_name = (array_key_exists('menu_path', $data_field))
-										? $data_field['menu_path']
-										: '';
+									foreach ($data as $data_field) {
+										$path_name = (array_key_exists('menu_path', $data_field))
+											? $data_field['menu_path']
+											: '';
 
-									if ($data_field['name'] == $value) {
-										if (array_key_exists($path_name, $menu_path)) {
-											$duplicate_field[] = $field_names[0];
-											$duplicate = (($path_name != null) ? $path_name.'/'.$value : $value);
-											$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-											$error = _s('Invalid parameter "%1$s": %2$s.',
+										if ($data_field['name'] == $value) {
+											if (array_key_exists($path_name, $menu_path)) {
+												$duplicate_field[] = $field_names[0];
+												$duplicate = (($path_name != null) ? $path_name . '/' . $value : $value);
+												$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+												$error = _s('Invalid parameter "%1$s": %2$s.',
 													$subpath,
 													_s('value %1$s already exists',
-													'('.implode(', ', $duplicate_field).')=('.$duplicate.')'
-											));
-											return false;
-										}
+														'(' . implode(', ', $duplicate_field) . ')=(' . $duplicate . ')'
+													));
+												return false;
+											}
 
-										$_menu_path[$path_name] = true;
+											$_menu_path[$path_name] = true;
+										}
 									}
 								}
+								else {
+									$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+									$error = _s('Invalid parameter "%1$s": %2$s.',
+										$subpath,
+										_s('value %1$s already exists',
+											'(' . implode(', ', $field_names) . ')=(' . implode(', ', $values) . ')'
+										));
+									return false;
+								}
 							}
-							else {
-								$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
-								$duplicate_field[] = $field_names[0];
-								$error = _s('Invalid parameter "%1$s": %2$s.',
-									$subpath,
-									_s('value %1$s already exists',
-										'('.implode(', ', $duplicate_field).')=('.implode(', ', $values).')'
-									));
-								return false;
-							}
+
+							$_uniq[$value] = true;
 						}
 
-						$_uniq[$value] = true;
+						$level++;
 					}
 				}
 			}

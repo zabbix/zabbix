@@ -1349,7 +1349,7 @@ class testScripts extends CAPITest {
 			'Test successful same name with different menu paths' => [
 				'script' => [
 					[
-						'name' => 'API create script same name (tes2)',
+						'name' => 'API create script same name (test2)',
 						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 						'command' => 'reboot server',
 						'scope' => ZBX_SCRIPT_SCOPE_HOST,

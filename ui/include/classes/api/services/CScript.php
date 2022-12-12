@@ -1308,9 +1308,16 @@ class CScript extends CApiService {
 		$names = [];
 		$menu_paths = [];
 
-		if (!array_key_exists('name', $scripts[0])) {
+		if (array_key_exists('scriptid', $scripts[0])) {
 			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+		}
+
+		if (!array_key_exists('name', $scripts[0])) {
 			$scripts[0]['name'] =  $db_script[0]['name'];
+		}
+
+		if (!array_key_exists('scope', $scripts[0])) {
+			$scripts[0]['scope'] = $db_scripts[$scripts[0]['scriptid']]['scope'];
 		}
 
 		if (array_key_exists('scope', $scripts[0])) {
@@ -1340,8 +1347,8 @@ class CScript extends CApiService {
 			$scriptid = array_key_exists('scriptid', $script) ? $script['scriptid'] : '';
 			$path_name = $menu_path.'/'.$script['name'];
 
-			if ($db_scripts === null || $path_name !== $db_scripts[$scriptid]['menu_path'].'/'.
-				$db_scripts[$script['scriptid']]['name']) {
+			if ($db_scripts === null
+					|| $path_name !== $db_scripts[$scriptid]['menu_path'].'/'.$db_scripts[$script['scriptid']]['name']) {
 				$names[] = $script['name'];
 				$menu_paths[] = $menu_path;
 			}
