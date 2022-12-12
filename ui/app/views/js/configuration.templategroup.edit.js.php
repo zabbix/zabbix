@@ -147,6 +147,7 @@
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
 
+					clearMessages();
 					addMessage(message_box);
 				})
 				.finally(() => {
