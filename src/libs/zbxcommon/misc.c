@@ -93,6 +93,10 @@ double	ZBX_DOUBLE_EPSILON = 2.22e-16;
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
+#endif
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
 	int	ret, fd;
