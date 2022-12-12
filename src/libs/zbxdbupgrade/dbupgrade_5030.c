@@ -5763,50 +5763,6 @@ static int	DBpatch_5030189(void)
 	return DBadd_field("valuemap", &field);
 }
 
-static char	*update_template_name(char *old)
-{
-	char	*ptr, new[MAX_STRING_LEN + 1], *ptr_snmp;
-
-#define MIN_TEMPLATE_NAME_LEN	3
-
-	ptr = old;
-
-	if (NULL != zbx_regexp_match(old, "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) ", NULL) &&
-			1 == sscanf(old, "Template %*[^ ] %" ZBX_STR(MAX_STRING_LEN) "[^\n]s", new) &&
-			MIN_TEMPLATE_NAME_LEN <= strlen(new))
-	{
-		ptr = zbx_strdup(ptr, new);
-	}
-
-	ptr_snmp = zbx_string_replace(ptr, "SNMPv2", "SNMP");
-	zbx_free(ptr);
-
-	return ptr_snmp;
-}
-
-static char	*DBpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
-{
-	char	*template_name, *func = NULL;
-	size_t	func_alloc = 0, func_offset = 0;
-
-	template_name = zbx_strdup(NULL, tpl);
-	template_name = update_template_name(template_name);
-
-	zbx_snprintf_alloc(&func, &func_alloc, &func_offset, "%s(/%s/%s", name, template_name, key);
-
-	if ('$' == *param && ',' == *++param)
-		param++;
-
-	if ('\0' != *param)
-		zbx_snprintf_alloc(&func, &func_alloc, &func_offset, ",%s", param);
-
-	zbx_chrcpy_alloc(&func, &func_alloc, &func_offset, ')');
-
-	zbx_free(template_name);
-
-	return func;
-}
-
 static int	DBpatch_5030190(void)
 {
 	int		ret = SUCCEED;
@@ -5829,7 +5785,7 @@ static int	DBpatch_5030190(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		name = zbx_strdup(NULL, row[1]);
-		name = update_template_name(name);
+		name = zbx_update_template_name(name);
 		uuid = zbx_gen_uuid4(name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",
 				uuid, row[0]);
@@ -5874,7 +5830,7 @@ static int	DBpatch_5030191(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		name = zbx_strdup(NULL, row[2]);
-		name = update_template_name(name);
+		name = zbx_update_template_name(name);
 		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
@@ -5986,7 +5942,7 @@ static int	DBpatch_5030192(void)
 				{
 					char	*func;
 
-					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					func = zbx_dbpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
 					zbx_variant_clear(&token->value);
 					zbx_variant_set_str(&token->value, func);
 				}
@@ -6067,7 +6023,7 @@ static int	DBpatch_5030193(void)
 		while (NULL != (row2 = DBfetch(result2)))
 		{
 			host_name = zbx_strdup(NULL, row2[0]);
-			host_name = update_template_name(host_name);
+			host_name = zbx_update_template_name(host_name);
 
 			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
 			zbx_free(host_name);
@@ -6119,7 +6075,7 @@ static int	DBpatch_5030194(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = update_template_name(template_name);
+		template_name = zbx_update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6166,7 +6122,7 @@ static int	DBpatch_5030195(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = update_template_name(template_name);
+		template_name = zbx_update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6213,7 +6169,7 @@ static int	DBpatch_5030196(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = update_template_name(template_name);
+		template_name = zbx_update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -6299,7 +6255,7 @@ static int	DBpatch_5030198(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		template_name = zbx_strdup(NULL, row[2]);
-		template_name = update_template_name(template_name);
+		template_name = zbx_update_template_name(template_name);
 		seed = zbx_dsprintf(seed, "%s/%s/%s", template_name, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set uuid='%s' where itemid=%s;\n",
@@ -6430,7 +6386,7 @@ static int	DBpatch_5030199(void)
 				{
 					char	*func;
 
-					func = DBpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					func = zbx_dbpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
 					zbx_variant_clear(&token->value);
 					zbx_variant_set_str(&token->value, func);
 				}
@@ -6497,7 +6453,7 @@ static int	DBpatch_5030200(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		templ_name = zbx_strdup(NULL, row[2]);
-		templ_name = update_template_name(templ_name);
+		templ_name = zbx_update_template_name(templ_name);
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/%s/%s", templ_name, row[3], row[1]);
 
 		uuid = zbx_gen_uuid4(seed);
@@ -6547,7 +6503,7 @@ static int	DBpatch_5030201(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		name_tmpl = zbx_strdup(NULL, row[2]);
-		name_tmpl = update_template_name(name_tmpl);
+		name_tmpl = zbx_update_template_name(name_tmpl);
 		seed = zbx_dsprintf(seed, "%s/%s/%s", name_tmpl, row[3], row[1]);
 		uuid = zbx_gen_uuid4(seed);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set uuid='%s' where hostid=%s;\n",

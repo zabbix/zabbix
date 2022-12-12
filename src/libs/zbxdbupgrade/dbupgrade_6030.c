@@ -21,6 +21,8 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "zbxcrypto.h"
+#include "zbxeval.h"
 
 extern unsigned char	program_type;
 
@@ -1398,7 +1400,1441 @@ static int	DBpatch_6030148(void)
 	return DBdrop_field("userdirectory", "search_filter");
 }
 /* end of ZBXNEXT-276 patches */
+
+typedef struct zbx_db_valuemap_mapping zbx_db_valuemap_mapping_t;
+typedef struct zbx_db_valuemap zbx_db_valuemap_t;
+typedef struct zbx_child_valuemap zbx_child_valuemap_t;
+
+ZBX_PTR_VECTOR_DECL(valuemap_mapping_ptr, zbx_db_valuemap_mapping_t *)
+ZBX_PTR_VECTOR_IMPL(valuemap_mapping_ptr, zbx_db_valuemap_mapping_t *)
+
+ZBX_PTR_VECTOR_DECL(valuemap_ptr, zbx_db_valuemap_t *)
+ZBX_PTR_VECTOR_IMPL(valuemap_ptr, zbx_db_valuemap_t *)
+
+ZBX_PTR_VECTOR_DECL(child_valuemap_ptr, zbx_child_valuemap_t *)
+ZBX_PTR_VECTOR_IMPL(child_valuemap_ptr, zbx_child_valuemap_t *)
+
+struct zbx_db_valuemap_mapping
+{
+	char	*value;
+	char	*newvalue;
+	int	type;
+	int	sortorder;
+};
+
+struct zbx_db_valuemap
+{
+	uint64_t				child_templateid;
+	char					*uuid;
+	char					*name;
+
+	zbx_vector_uint64_t			itemids;
+	zbx_vector_valuemap_mapping_ptr_t	mappings;
+};
+
+struct zbx_child_valuemap
+{
+	uint64_t				templateid;
+	char					*name;
+};
+
+static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valuemapid)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	uint64_t		itemid, child_templateid;
+
+	child_templateid = valuemap->child_templateid;
+
+	result = DBselect("select i.itemid from items i"
+			" where i.valuemapid=" ZBX_FS_UI64" and i.hostid in "
+			"(" ZBX_FS_UI64", (select h.hostid from hosts h,hosts_templates ht"
+			" where ht.hostid=h.hostid and h.status <>3 and ht.templateid=" ZBX_FS_UI64"))",
+			valuemapid, child_templateid, child_templateid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		zbx_vector_uint64_append(&valuemap->itemids, itemid);
+	}
+
+	DBfree_result(result);
+
+	result = DBselect("select value,newvalue,type,sortorder from valuemap_mapping where valuemapid=" ZBX_FS_UI64,
+			valuemapid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_valuemap_mapping_t	*mapping;
+
+		mapping = zbx_malloc(NULL, sizeof(zbx_db_valuemap_mapping_t));
+
+		mapping->value = zbx_strdup(NULL, row[0]);
+		mapping->newvalue = zbx_strdup(NULL, row[1]);
+		mapping->type = atoi(row[2]);
+		mapping->sortorder = atoi(row[3]);
+
+		zbx_vector_valuemap_mapping_ptr_append(&valuemap->mappings, mapping);
+	}
+
+	DBfree_result(result);
+
+	return valuemap->mappings.values_num;
+}
+
+static void	mapping_clear(zbx_db_valuemap_mapping_t *mapping)
+{
+	zbx_free(mapping->value);
+	zbx_free(mapping->newvalue);
+}
+
+static void	mapping_free(zbx_db_valuemap_mapping_t *mapping)
+{
+	mapping_clear(mapping);
+	zbx_free(mapping);
+}
+
+static void	valuemap_clear(zbx_db_valuemap_t *valuemap)
+{
+	zbx_free(valuemap->uuid);
+	zbx_free(valuemap->name);
+	zbx_vector_uint64_destroy(&valuemap->itemids);
+	zbx_vector_valuemap_mapping_ptr_clear_ext(&valuemap->mappings, mapping_free);
+	zbx_vector_valuemap_mapping_ptr_destroy(&valuemap->mappings);
+}
+
+static void	valuemap_free(zbx_db_valuemap_t *valuemap)
+{
+	valuemap_clear(valuemap);
+	zbx_free(valuemap);
+}
+
+static void	child_valuemap_free(zbx_child_valuemap_t *valuemap)
+{
+	zbx_free(valuemap->name);
+	zbx_free(valuemap);
+}
+
+static int	DBpatch_6030149(void)
+{
+	zbx_vector_valuemap_ptr_t		valuemaps;
+	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
+	zbx_vector_uint64_t			child_templateids;
+	DB_RESULT				result;
+	DB_ROW					row;
+	int					changed, i, j, mappings_num = 0;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t				db_insert_valuemap, db_insert_valuemap_mapping;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_valuemap_ptr_create(&valuemaps);
+	zbx_vector_child_valuemap_ptr_create(&child_valuemaps);
+	zbx_vector_uint64_create(&child_templateids);
+
+	result = DBselect("select v.valuemapid,v.name,h1.hostid,h1.host from valuemap v,hosts h,hosts h1,hosts_templates ht "
+			"where v.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and "
+			"h1.hostid=ht.hostid and h1.status=3");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*template_name, *seed = NULL;
+		zbx_db_valuemap_t 	*valuemap;
+		zbx_uint64_t		valuemapid, child_templateid;
+
+		ZBX_DBROW2UINT64(valuemapid, row[0]);
+		ZBX_DBROW2UINT64(child_templateid, row[2]);
+
+		valuemap = zbx_malloc(NULL, sizeof(zbx_db_valuemap_t));
+		valuemap->child_templateid = child_templateid;
+		valuemap->name = zbx_strdup(NULL, row[1]);
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = zbx_update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		valuemap->uuid = zbx_gen_uuid4(seed);
+		zbx_free(template_name);
+		zbx_free(seed);
+		zbx_vector_uint64_create(&valuemap->itemids);
+		zbx_vector_valuemap_mapping_ptr_create(&valuemap->mappings);
+
+		mappings_num += DBpatch_propogate_valuemap(valuemap, valuemapid);
+		zbx_vector_valuemap_ptr_append(&valuemaps, valuemap);
+		zbx_vector_uint64_append(&child_templateids, child_templateid);
+	}
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBfree_result(result);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,hostid from valuemap where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
+			child_templateids.values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_child_valuemap_t 	*valuemap;
+		uint64_t		templateid;
+
+		ZBX_DBROW2UINT64(templateid, row[1]);
+
+		valuemap = zbx_malloc(NULL, sizeof(zbx_child_valuemap_t));
+		valuemap->templateid = templateid;
+		valuemap->name = zbx_strdup(NULL, row[0]);
+
+		zbx_vector_child_valuemap_ptr_append(&child_valuemaps, valuemap);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+	sql_alloc = 0;
+	sql_offset = 0;
+
+	do
+	{
+		changed = 0;
+
+		for (i = 0; i < child_valuemaps.values_num; i++)
+		{
+			zbx_child_valuemap_t 	*child_valuemap;
+			int			uniq = 0;
+
+			child_valuemap = child_valuemaps.values[i];
+
+			for (j = 0; j < valuemaps.values_num; j++)
+			{
+				zbx_db_valuemap_t 	*valuemap;
+
+				valuemap = valuemaps.values[j];
+
+				if (valuemap->child_templateid == child_valuemap->templateid &&
+						0 == strcmp(valuemap->name, child_valuemap->name))
+				{
+					uniq++;
+					changed++;
+					valuemap->name = zbx_dsprintf(valuemap->name, "%s %d", child_valuemap->name,
+							uniq);
+				}
+			}
+		}
+	}while (0 != changed);
+
+	if (0 != valuemaps.values_num)
+	{
+		zbx_uint64_t	valuemapid, valuemap_mappingid;
+
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		valuemapid = DBget_maxid_num("valuemap", valuemaps.values_num);
+		valuemap_mappingid = DBget_maxid_num("valuemap_mapping", mappings_num);
+
+		zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", "uuid", NULL);
+		zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
+				"valuemapid", "value", "newvalue", "type", "sortorder", NULL);
+
+		for (i = 0; i < valuemaps.values_num; i++)
+		{
+			zbx_db_valuemap_t 	*valuemap;
+
+			valuemap = valuemaps.values[i];
+			zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, valuemap->child_templateid,
+					valuemap->name, valuemap->uuid);
+
+			for (j = 0; j < valuemap->itemids.values_num; j++)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "valuemapid=%s",
+						DBsql_id_ins(valuemapid));
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
+						valuemap->itemids.values[j]);
+			}
+
+			for (j = 0; j < valuemap->mappings.values_num; j++)
+			{
+				zbx_db_valuemap_mapping_t 	*valuemap_mapping;
+
+				valuemap_mapping = valuemap->mappings.values[j];
+				zbx_db_insert_add_values(&db_insert_valuemap_mapping, valuemap_mappingid, valuemapid,
+						valuemap_mapping->value, valuemap_mapping->newvalue,
+						valuemap_mapping->type, valuemap_mapping->sortorder);
+				valuemap_mappingid++;
+			}
+
+			valuemapid++;
+		}
+
+		zbx_db_insert_execute(&db_insert_valuemap);
+		zbx_db_insert_clean(&db_insert_valuemap);
+
+		zbx_db_insert_execute(&db_insert_valuemap_mapping);
+		zbx_db_insert_clean(&db_insert_valuemap_mapping);
+
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&child_templateids);
+	zbx_vector_child_valuemap_ptr_clear_ext(&child_valuemaps, child_valuemap_free);
+	zbx_vector_child_valuemap_ptr_destroy(&child_valuemaps);
+	zbx_vector_valuemap_ptr_clear_ext(&valuemaps, valuemap_free);
+	zbx_vector_valuemap_ptr_destroy(&valuemaps);
+
+	return SUCCEED;
+}
+
+typedef struct zbx_db_hostmacro zbx_db_hostmacro_t;
+typedef struct zbx_child_hostmacro zbx_child_hostmacro_t;
+
+ZBX_PTR_VECTOR_DECL(hostmacro_ptr, zbx_db_hostmacro_t *)
+ZBX_PTR_VECTOR_IMPL(hostmacro_ptr, zbx_db_hostmacro_t *)
+
+ZBX_PTR_VECTOR_DECL(child_hostmacro_ptr, zbx_child_hostmacro_t *)
+ZBX_PTR_VECTOR_IMPL(child_hostmacro_ptr, zbx_child_hostmacro_t *)
+
+struct zbx_db_hostmacro
+{
+	uint64_t	child_templateid;
+	char		*macro;
+	char		*value;
+	char		*description;
+	int		type;
+	int		automatic;
+};
+
+struct zbx_child_hostmacro
+{
+	uint64_t	templateid;
+	char		*macro;
+};
+
+static void	hostmacro_clear(zbx_db_hostmacro_t *hostmacro)
+{
+	zbx_free(hostmacro->macro);
+	zbx_free(hostmacro->value);
+	zbx_free(hostmacro->description);
+}
+
+static void	hostmacro_free(zbx_db_hostmacro_t *hostmacro)
+{
+	hostmacro_clear(hostmacro);
+	zbx_free(hostmacro);
+}
+
+static void	child_hostmacro_free(zbx_child_hostmacro_t *hostmacro)
+{
+	zbx_free(hostmacro->macro);
+	zbx_free(hostmacro);
+}
+
+static int	hostmacro_compare(const zbx_db_hostmacro_t **hm1, const zbx_db_hostmacro_t **hm2)
+{
+	const zbx_db_hostmacro_t *m1, *m2;
+
+	m1 = *hm1;
+	m2 = *hm2;
+
+	if (m1->child_templateid == m2->child_templateid && 0 == strcmp(m1->macro, m2->macro))
+		return 0;
+
+	return 1;
+}
+
+static void	zbx_vector_hostmacro_ptr_uniq2(zbx_vector_hostmacro_ptr_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i;
+
+		for (i = 1; i < vector->values_num; i++)
+		{
+			if (0 == compare_func(&vector->values[i - 1], &vector->values[i]))
+			{
+				hostmacro_free(vector->values[i]);
+				zbx_vector_hostmacro_ptr_remove_noorder(vector, i);
+			}
+		}
+	}
+}
+
+static int	DBpatch_6030150(void)
+{
+	zbx_vector_hostmacro_ptr_t		hostmacros;
+	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
+	zbx_vector_uint64_t			child_templateids;
+	DB_RESULT				result;
+	DB_ROW					row;
+	int					i, j;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t				db_insert_hostmacro;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_hostmacro_ptr_create(&hostmacros);
+	zbx_vector_child_hostmacro_ptr_create(&child_hostmacros);
+	zbx_vector_uint64_create(&child_templateids);
+
+	result = DBselect("select hm.macro,hm.value,hm.description,hm.type,hm.automatic,h1.hostid"
+			" from hostmacro hm,hosts h,hosts h1,hosts_templates ht"
+			" where hm.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
+			" and h1.status=3 order by hm.hostid desc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_hostmacro_t 	*hostmacro;
+		zbx_uint64_t		child_templateid;
+
+		ZBX_DBROW2UINT64(child_templateid, row[5]);
+
+		hostmacro = zbx_malloc(NULL, sizeof(zbx_db_hostmacro_t));
+		hostmacro->child_templateid = child_templateid;
+		hostmacro->macro = zbx_strdup(NULL, row[0]);
+		hostmacro->value = zbx_strdup(NULL, row[1]);
+		hostmacro->description = zbx_strdup(NULL, row[2]);
+		hostmacro->type = atoi(row[3]);
+		hostmacro->automatic = atoi(row[4]);
+
+		zbx_vector_hostmacro_ptr_append(&hostmacros, hostmacro);
+		zbx_vector_uint64_append(&child_templateids, child_templateid);
+	}
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBfree_result(result);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select macro,hostid from hostmacro where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
+			child_templateids.values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_child_hostmacro_t 	*hostmacro;
+		uint64_t		templateid;
+
+		ZBX_DBROW2UINT64(templateid, row[1]);
+
+		hostmacro = zbx_malloc(NULL, sizeof(zbx_child_hostmacro_t));
+		hostmacro->templateid = templateid;
+		hostmacro->macro = zbx_strdup(NULL, row[0]);
+
+		zbx_vector_child_hostmacro_ptr_append(&child_hostmacros, hostmacro);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	zbx_vector_hostmacro_ptr_uniq2(&hostmacros, (zbx_compare_func_t)hostmacro_compare);
+
+	for (i = 0; i < child_hostmacros.values_num; i++)
+	{
+		zbx_child_hostmacro_t 	*child_hostmacro;
+
+		child_hostmacro = child_hostmacros.values[i];
+
+		for (j = 0; j < hostmacros.values_num; j++)
+		{
+			zbx_db_hostmacro_t 	*hostmacro;
+
+			hostmacro = hostmacros.values[j];
+
+			if (hostmacro->child_templateid == child_hostmacro->templateid &&
+					0 == strcmp(hostmacro->macro, child_hostmacro->macro))
+			{
+				hostmacro_free(hostmacro);
+				zbx_vector_hostmacro_ptr_remove_noorder(&hostmacros, j);
+			}
+		}
+	}
+
+	if (0 != hostmacros.values_num)
+	{
+		zbx_uint64_t	hostmacroid;
+
+		hostmacroid = DBget_maxid_num("hostmacro", hostmacros.values_num);
+		zbx_db_insert_prepare(&db_insert_hostmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
+				"description", "type", "automatic", NULL);
+
+		for (i = 0; i < hostmacros.values_num; i++)
+		{
+			zbx_db_hostmacro_t 	*hostmacro;
+
+			hostmacro = hostmacros.values[i];
+			zbx_db_insert_add_values(&db_insert_hostmacro, hostmacroid, hostmacro->child_templateid,
+					hostmacro->macro, hostmacro->value, hostmacro->description, hostmacro->type,
+					hostmacro->automatic);
+			hostmacroid++;
+		}
+
+		zbx_db_insert_execute(&db_insert_hostmacro);
+		zbx_db_insert_clean(&db_insert_hostmacro);
+	}
+
+	zbx_vector_uint64_destroy(&child_templateids);
+	zbx_vector_child_hostmacro_ptr_clear_ext(&child_hostmacros, child_hostmacro_free);
+	zbx_vector_child_hostmacro_ptr_destroy(&child_hostmacros);
+	zbx_vector_hostmacro_ptr_clear_ext(&hostmacros, hostmacro_free);
+	zbx_vector_hostmacro_ptr_destroy(&hostmacros);
+
+	return SUCCEED;
+}
+
+typedef struct zbx_db_hosttag zbx_db_hosttag_t;
+typedef struct zbx_child_hosttag zbx_child_hosttag_t;
+
+ZBX_PTR_VECTOR_DECL(hosttag_ptr, zbx_db_hosttag_t *)
+ZBX_PTR_VECTOR_IMPL(hosttag_ptr, zbx_db_hosttag_t *)
+
+ZBX_PTR_VECTOR_DECL(child_hosttag_ptr, zbx_child_hosttag_t *)
+ZBX_PTR_VECTOR_IMPL(child_hosttag_ptr, zbx_child_hosttag_t *)
+
+struct zbx_db_hosttag
+{
+	uint64_t	child_templateid;
+	char		*tag;
+	char		*value;
+	int		automatic;
+};
+
+struct zbx_child_hosttag
+{
+	uint64_t	templateid;
+	char		*tag;
+};
+
+static void	hosttag_clear(zbx_db_hosttag_t *hosttag)
+{
+	zbx_free(hosttag->tag);
+	zbx_free(hosttag->value);
+}
+
+static void	hosttag_free(zbx_db_hosttag_t *hosttag)
+{
+	hosttag_clear(hosttag);
+	zbx_free(hosttag);
+}
+
+static void	child_hosttag_free(zbx_child_hosttag_t *hosttag)
+{
+	zbx_free(hosttag->tag);
+	zbx_free(hosttag);
+}
+
+static int	hosttag_compare(const zbx_db_hosttag_t **ht1, const zbx_db_hosttag_t **ht2)
+{
+	const zbx_db_hosttag_t *t1, *t2;
+
+	t1 = *ht1;
+	t2 = *ht2;
+
+	if (t1->child_templateid == t2->child_templateid && 0 == strcmp(t1->tag, t2->tag))
+		return 0;
+
+	return 1;
+}
+
+static void	zbx_vector_hosttag_ptr_uniq2(zbx_vector_hosttag_ptr_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i;
+
+		for (i = 1; i < vector->values_num; i++)
+		{
+			if (0 == compare_func(&vector->values[i - 1], &vector->values[i]))
+			{
+				hostmacro_free(vector->values[i]);
+				zbx_vector_hosttag_ptr_remove_noorder(vector, i);
+			}
+		}
+	}
+}
+
+static int	DBpatch_6030151(void)
+{
+	zbx_vector_hosttag_ptr_t		hosttags;
+	zbx_vector_child_hosttag_ptr_t		child_hosttags;
+	zbx_vector_uint64_t			child_templateids;
+	DB_RESULT				result;
+	DB_ROW					row;
+	int					i, j;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t				db_insert_hosttag;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_hosttag_ptr_create(&hosttags);
+	zbx_vector_child_hosttag_ptr_create(&child_hosttags);
+	zbx_vector_uint64_create(&child_templateids);
+
+	result = DBselect("select t.tag,t.value,t.automatic,h1.hostid"
+			" from host_tag t,hosts h,hosts h1,hosts_templates ht"
+			" where t.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
+			" and h1.status=3 order by t.hostid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_hosttag_t 	*hosttag;
+		zbx_uint64_t		child_templateid;
+
+		ZBX_DBROW2UINT64(child_templateid, row[3]);
+
+		hosttag = zbx_malloc(NULL, sizeof(zbx_db_hosttag_t));
+		hosttag->child_templateid = child_templateid;
+		hosttag->tag = zbx_strdup(NULL, row[0]);
+		hosttag->value = zbx_strdup(NULL, row[1]);
+		hosttag->automatic = atoi(row[2]);
+
+		zbx_vector_hosttag_ptr_append(&hosttags, hosttag);
+		zbx_vector_uint64_append(&child_templateids, child_templateid);
+	}
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBfree_result(result);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select tag,hostid from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
+			child_templateids.values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_child_hosttag_t 	*hosttag;
+		uint64_t		templateid;
+
+		ZBX_DBROW2UINT64(templateid, row[1]);
+
+		hosttag = zbx_malloc(NULL, sizeof(zbx_child_hosttag_t));
+		hosttag->templateid = templateid;
+		hosttag->tag = zbx_strdup(NULL, row[0]);
+
+		zbx_vector_child_hosttag_ptr_append(&child_hosttags, hosttag);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	zbx_vector_hosttag_ptr_uniq2(&hosttags, (zbx_compare_func_t)hosttag_compare);
+
+	for (i = 0; i < child_hosttags.values_num; i++)
+	{
+		zbx_child_hosttag_t 	*child_hosttag;
+
+		child_hosttag = child_hosttags.values[i];
+
+		for (j = 0; j < hosttags.values_num; j++)
+		{
+			zbx_db_hosttag_t 	*hosttag;
+
+			hosttag = hosttags.values[j];
+
+			if (hosttag->child_templateid == child_hosttag->templateid &&
+					0 == strcmp(hosttag->tag, child_hosttag->tag))
+			{
+				hosttag_free(hosttag);
+				zbx_vector_hosttag_ptr_remove_noorder(&hosttags, j);
+			}
+		}
+	}
+
+	if (0 != hosttags.values_num)
+	{
+		zbx_uint64_t	hosttagid;
+
+		hosttagid = DBget_maxid_num("host_tag", hosttags.values_num);
+		zbx_db_insert_prepare(&db_insert_hosttag, "host_tag", "hosttagid", "hostid", "tag", "value",
+				"automatic", NULL);
+
+		for (i = 0; i < hosttags.values_num; i++)
+		{
+			zbx_db_hosttag_t 	*hosttag;
+
+			hosttag = hosttags.values[i];
+			zbx_db_insert_add_values(&db_insert_hosttag, hosttagid, hosttag->child_templateid, hosttag->tag,
+					hosttag->value, hosttag->automatic);
+			hosttagid++;
+		}
+
+		zbx_db_insert_execute(&db_insert_hosttag);
+		zbx_db_insert_clean(&db_insert_hosttag);
+	}
+
+	zbx_vector_uint64_destroy(&child_templateids);
+	zbx_vector_child_hosttag_ptr_clear_ext(&child_hosttags, child_hosttag_free);
+	zbx_vector_child_hosttag_ptr_destroy(&child_hosttags);
+	zbx_vector_hosttag_ptr_clear_ext(&hosttags, hosttag_free);
+	zbx_vector_hosttag_ptr_destroy(&hosttags);
+
+	return SUCCEED;
+}
+
+typedef struct zbx_db_widget_field zbx_db_widget_field_t;
+typedef struct zbx_db_widget zbx_db_widget_t;
+typedef struct zbx_db_dashboard_page zbx_db_dashboard_page_t;
+typedef struct zbx_db_dashboard zbx_db_dashboard_t;
+typedef struct zbx_child_dashboard zbx_child_dashboard_t;
+
+ZBX_PTR_VECTOR_DECL(widget_field_ptr, zbx_db_widget_field_t *)
+ZBX_PTR_VECTOR_IMPL(widget_field_ptr, zbx_db_widget_field_t *)
+
+ZBX_PTR_VECTOR_DECL(widget_ptr, zbx_db_widget_t *)
+ZBX_PTR_VECTOR_IMPL(widget_ptr, zbx_db_widget_t *)
+
+ZBX_PTR_VECTOR_DECL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
+ZBX_PTR_VECTOR_IMPL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
+
+ZBX_PTR_VECTOR_DECL(dashboard_ptr, zbx_db_dashboard_t *)
+ZBX_PTR_VECTOR_IMPL(dashboard_ptr, zbx_db_dashboard_t *)
+
+ZBX_PTR_VECTOR_DECL(child_dashboard_ptr, zbx_child_dashboard_t *)
+ZBX_PTR_VECTOR_IMPL(child_dashboard_ptr, zbx_child_dashboard_t *)
+
+struct zbx_db_widget_field
+{
+	int		type;
+	char		*name;
+	int		value_int;
+	char		*value_str;
+	zbx_uint64_t	value_groupid;
+	zbx_uint64_t	value_hostid;
+	zbx_uint64_t	value_itemid;
+	zbx_uint64_t	value_graphid;
+	zbx_uint64_t	value_sysmapid;
+	zbx_uint64_t	value_serviceid;
+	zbx_uint64_t	value_slaid;
+	zbx_uint64_t	value_userid;
+	zbx_uint64_t	value_actionid;
+	zbx_uint64_t	value_mediatypeid;
+};
+
+struct zbx_db_widget
+{
+	char				*type;
+	char				*name;
+	int				x;
+	int				y;
+	int				width;
+	int				height;
+	int				view_mode;
+
+	zbx_vector_widget_field_ptr_t	fields;
+};
+
+struct zbx_db_dashboard_page
+{
+	char			*name;
+	int			display_period;
+	int			sortorder;
+
+	zbx_vector_widget_ptr_t	widgets;
+};
+
+struct zbx_db_dashboard
+{
+	uint64_t			child_templateid;
+	char				*uuid;
+	char				*name;
+	int				display_period;
+	int				auto_start;
+
+	zbx_vector_dashboard_page_ptr_t	pages;
+};
+
+struct zbx_child_dashboard
+{
+	uint64_t				templateid;
+	char					*name;
+};
+
+static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	result = DBselect("select widget_fieldid,type,name,value_int,value_str,value_groupid,value_hostid,value_itemid,"
+			"value_graphid,value_sysmapid,value_serviceid,value_slaid,value_userid,value_actionid,"
+			"value_mediatypeid where widgetid=" ZBX_FS_UI64, widgetid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_widget_field_t	*field;
+		zbx_uint64_t		fieldid;
+
+		field = zbx_malloc(NULL, sizeof(zbx_db_widget_field_t));
+		ZBX_DBROW2UINT64(fieldid, row[0]);
+		field->type = atoi(row[1]);
+		field->name = zbx_strdup(NULL, row[2]);
+		field->value_int = atoi(row[3]);
+		field->value_str = zbx_strdup(NULL, row[4]);
+		ZBX_DBROW2UINT64(field->value_groupid, row[5]);
+		ZBX_DBROW2UINT64(field->value_hostid, row[6]);
+
+		ZBX_DBROW2UINT64(field->value_itemid, row[7]);
+		ZBX_DBROW2UINT64(field->value_graphid, row[8]);
+		ZBX_DBROW2UINT64(field->value_sysmapid, row[9]);
+		ZBX_DBROW2UINT64(field->value_serviceid, row[10]);
+		ZBX_DBROW2UINT64(field->value_slaid, row[11]);
+		ZBX_DBROW2UINT64(field->value_userid, row[12]);
+		ZBX_DBROW2UINT64(field->value_actionid, row[13]);
+		ZBX_DBROW2UINT64(field->value_mediatypeid, row[14]);
+
+		zbx_vector_widget_field_ptr_append(&widget->fields, field);
+	}
+
+	DBfree_result(result);
+
+	return widget->fields.values_num;
+}
+
+static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid, int *fields_num)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	result = DBselect("select widgetid,type,name,x,y,width,height,view_mode from widget"
+			" where dashboard_pageid=" ZBX_FS_UI64, pageid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_widget_t	*widget;
+		zbx_uint64_t	widgetid;
+
+		widget = zbx_malloc(NULL, sizeof(zbx_db_widget_t));
+		ZBX_DBROW2UINT64(widgetid, row[0]);
+		widget->type = zbx_strdup(NULL, row[1]);
+		widget->name = zbx_strdup(NULL, row[2]);
+		widget->x = atoi(row[3]);
+		widget->y = atoi(row[4]);
+		widget->width = atoi(row[5]);
+		widget->height = atoi(row[6]);
+		widget->view_mode = atoi(row[7]);
+		zbx_vector_widget_field_ptr_create(&widget->fields);
+		*fields_num += DBpatch_propogate_widget(widget, widgetid);
+		zbx_vector_widget_ptr_append(&page->widgets, widget);
+	}
+
+	DBfree_result(result);
+
+	return page->widgets.values_num;
+}
+
+static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t dashboardid, int *widgets_num,
+		int *fields_num)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+
+	result = DBselect("select dashboard_pageid,name,display_period,sortorder from dashboard_page"
+			" where dashboardid=" ZBX_FS_UI64, dashboardid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_dashboard_page_t	*page;
+		zbx_uint64_t		pageid;
+
+		page = zbx_malloc(NULL, sizeof(zbx_db_dashboard_page_t));
+		ZBX_DBROW2UINT64(pageid, row[0]);
+		page->name = zbx_strdup(NULL, row[1]);
+		page->display_period = atoi(row[2]);
+		page->sortorder = atoi(row[3]);
+		zbx_vector_widget_ptr_create(&page->widgets);
+		*widgets_num += DBpatch_propogate_page(page, pageid, fields_num);
+		zbx_vector_dashboard_page_ptr_append(&dashboard->pages, page);
+	}
+
+	DBfree_result(result);
+
+	return dashboard->pages.values_num;
+}
+
+static void	fields_free(zbx_db_widget_field_t *field)
+{
+	zbx_free(field->name);
+	zbx_free(field->value_str);
+	zbx_free(field);
+}
+
+static void	widgets_free(zbx_db_widget_t *widget)
+{
+	zbx_free(widget->type);
+	zbx_free(widget->name);
+	zbx_vector_widget_field_ptr_clear_ext(&widget->fields, fields_free);
+	zbx_vector_widget_field_ptr_destroy(&widget->fields);
+	zbx_free(widget);
+}
+
+static void	dashboard_page_free(zbx_db_dashboard_page_t *page)
+{
+	zbx_free(page->name);
+	zbx_vector_widget_ptr_clear_ext(&page->widgets, widgets_free);
+	zbx_vector_widget_ptr_destroy(&page->widgets);
+	zbx_free(page);
+}
+
+static void	dashboard_clear(zbx_db_dashboard_t *dashboard)
+{
+	zbx_free(dashboard->uuid);
+	zbx_free(dashboard->name);
+	zbx_vector_dashboard_page_ptr_clear_ext(&dashboard->pages, dashboard_page_free);
+	zbx_vector_dashboard_page_ptr_destroy(&dashboard->pages);
+}
+
+static void	dashboard_free(zbx_db_dashboard_t *dashboard)
+{
+	dashboard_clear(dashboard);
+	zbx_free(dashboard);
+}
+
+static void	child_dashboard_free(zbx_child_dashboard_t *dashboard)
+{
+	zbx_free(dashboard->name);
+	zbx_free(dashboard);
+}
+
+static int	DBpatch_6030152(void)
+{
+	zbx_vector_dashboard_ptr_t		dashboards;
+	zbx_vector_child_dashboard_ptr_t	child_dashboards;
+	zbx_vector_uint64_t			child_templateids;
+	DB_RESULT				result;
+	DB_ROW					row;
+	int					changed, i, j, k, l, pages_num = 0, widgets_num = 0, fields_num = 0;
+	char					*sql = NULL;
+	size_t					sql_alloc = 0, sql_offset = 0;
+	zbx_db_insert_t				db_insert_dashboard, db_insert_dashboard_page, db_insert_widget,
+						db_insert_widget_field;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_dashboard_ptr_create(&dashboards);
+	zbx_vector_child_dashboard_ptr_create(&child_dashboards);
+	zbx_vector_uint64_create(&child_templateids);
+
+	result = DBselect("select d.dashboardid,d.name,d.display_period,d.auto_start,h1.hostid,h1.host"
+			" from dashboard d,hosts h,hosts h1,hosts_templates ht"
+			" where d.templateid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
+			" and h1.status=3 order by d.templateid asc");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*template_name, *seed = NULL;
+		zbx_db_dashboard_t 	*dashboard;
+		zbx_uint64_t		dashboardid, child_templateid;
+
+		ZBX_DBROW2UINT64(dashboardid, row[0]);
+		ZBX_DBROW2UINT64(child_templateid, row[4]);
+
+		dashboard = zbx_malloc(NULL, sizeof(zbx_db_dashboard_t));
+		dashboard->child_templateid = child_templateid;
+		dashboard->name = zbx_strdup(NULL, row[1]);
+		dashboard->display_period = atoi(row[2]);
+		dashboard->auto_start = atoi(row[3]);
+
+		template_name = zbx_strdup(NULL, row[5]);
+		template_name = zbx_update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		dashboard->uuid = zbx_gen_uuid4(seed);
+		zbx_free(template_name);
+		zbx_free(seed);
+
+		zbx_vector_dashboard_page_ptr_create(&dashboard->pages);
+		pages_num += DBpatch_propogate_dashboard(dashboard, dashboardid, &widgets_num, &fields_num);
+		zbx_vector_dashboard_ptr_append(&dashboards, dashboard);
+		zbx_vector_uint64_append(&child_templateids, child_templateid);
+	}
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBfree_result(result);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,templateid from dashboard where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", child_templateids.values,
+			child_templateids.values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_child_dashboard_t 	*dashboard;
+		uint64_t		templateid;
+
+		ZBX_DBROW2UINT64(templateid, row[1]);
+
+		dashboard = zbx_malloc(NULL, sizeof(zbx_child_dashboard_t));
+		dashboard->templateid = templateid;
+		dashboard->name = zbx_strdup(NULL, row[0]);
+
+		zbx_vector_child_dashboard_ptr_append(&child_dashboards, dashboard);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	do
+	{
+		changed = 0;
+
+		for (i = 0; i < child_dashboards.values_num; i++)
+		{
+			zbx_child_dashboard_t 	*child_dashboard;
+			int			uniq = 0;
+
+			child_dashboard = child_dashboards.values[i];
+
+			for (j = 0; j < dashboards.values_num; j++)
+			{
+				zbx_db_dashboard_t 	*dashboard;
+
+				dashboard = dashboards.values[j];
+
+				if (dashboard->child_templateid == child_dashboard->templateid &&
+						0 == strcmp(dashboard->name, child_dashboard->name))
+				{
+					uniq++;
+					changed++;
+					dashboard->name = zbx_dsprintf(dashboard->name, "%s %d", child_dashboard->name,
+							uniq);
+				}
+			}
+		}
+	}while (0 != changed);
+
+	if (0 != dashboards.values_num)
+	{
+		zbx_uint64_t	dashboardid, dashboard_pageid, widgetid, widget_fieldid ;
+
+		dashboardid = DBget_maxid_num("dashboard", dashboards.values_num);
+		dashboard_pageid = DBget_maxid_num("dashboard_page", pages_num);
+		widgetid = DBget_maxid_num("widget", widgets_num);
+		widget_fieldid = DBget_maxid_num("widget_field", fields_num);
+
+		zbx_db_insert_prepare(&db_insert_dashboard, "dashboard", "dashboardid", "templateid", "name",
+				"display_period","auto_start", "uuid", NULL);
+		zbx_db_insert_prepare(&db_insert_dashboard_page, "dashboard_page", "dashboard_pageid", "dashboardid",
+				"name", "display_period", "sortorder", NULL);
+		zbx_db_insert_prepare(&db_insert_widget, "widget", "widgetid", "dashboard_pageid", "type", "name", "x",
+				"y", "width", "height", "view_mode", NULL);
+		zbx_db_insert_prepare(&db_insert_widget_field, "widget_field", "widget_fieldid", "widgetid", "type",
+				"name", "value_int", "value_str", "value_groupid", "value_hostid", "value_itemid",
+				"value_graphid", "value_sysmapid", "value_serviceid", "value_slaid", "value_userid",
+				"value_actionid", "value_mediatypeid",NULL);
+
+		for (i = 0; i < dashboards.values_num; i++)
+		{
+			zbx_db_dashboard_t 	*dashboard;
+
+			dashboard = dashboards.values[i];
+			zbx_db_insert_add_values(&db_insert_dashboard, dashboardid, dashboard->child_templateid,
+					dashboard->name, dashboard->display_period, dashboard->auto_start,
+					dashboard->uuid);
+
+			for (j = 0; j < dashboard->pages.values_num; j++)
+			{
+				zbx_db_dashboard_page_t 	*dashboard_page;
+
+				dashboard_page = dashboard->pages.values[j];
+				zbx_db_insert_add_values(&db_insert_dashboard_page, dashboard_pageid, dashboardid,
+						dashboard_page->name, dashboard_page->display_period,
+						dashboard_page->sortorder);
+
+				for (k = 0; k < dashboard_page->widgets.values_num; k++)
+				{
+					zbx_db_widget_t 	*widget;
+
+					widget = dashboard_page->widgets.values[j];
+					zbx_db_insert_add_values(&db_insert_widget, widgetid, dashboard_pageid,
+							widget->type, widget->name, widget->x, widget->y, widget->width,
+							widget->height, widget->view_mode);
+
+					for (l = 0; l < dashboard_page->widgets.values_num; l++)
+					{
+						zbx_db_widget_field_t 	*field;
+
+						field = widget->fields.values[j];
+						zbx_db_insert_add_values(&db_insert_widget_field, widget_fieldid,
+								widgetid, field->type, field->name, field->value_int,
+								field->value_str, field->value_groupid,
+								field->value_hostid, field->value_itemid,
+								field->value_graphid, field->value_sysmapid,
+								field->value_serviceid, field->value_slaid,
+								field->value_userid, field->value_actionid,
+								field->value_mediatypeid);
+						widget_fieldid++;
+					}
+
+					widgetid++;
+				}
+
+				dashboard_pageid++;
+			}
+
+			dashboardid++;
+		}
+
+		zbx_db_insert_execute(&db_insert_dashboard);
+		zbx_db_insert_clean(&db_insert_dashboard);
+
+		zbx_db_insert_execute(&db_insert_dashboard_page);
+		zbx_db_insert_clean(&db_insert_dashboard_page);
+
+		zbx_db_insert_execute(&db_insert_widget);
+		zbx_db_insert_clean(&db_insert_widget);
+
+		zbx_db_insert_execute(&db_insert_widget_field);
+		zbx_db_insert_clean(&db_insert_widget_field);
+	}
+
+	zbx_vector_uint64_destroy(&child_templateids);
+	zbx_vector_child_dashboard_ptr_clear_ext(&child_dashboards, child_dashboard_free);
+	zbx_vector_child_dashboard_ptr_destroy(&child_dashboards);
+	zbx_vector_dashboard_ptr_clear_ext(&dashboards, dashboard_free);
+	zbx_vector_dashboard_ptr_destroy(&dashboards);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030153(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.templates.filter_templates'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030154(void)
+{
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_str_t	uuids;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_str_create(&uuids);
+
+	result = DBselect("select i.itemid,i.key_,h.host from items i left join hosts h on h.hostid=i.hostid"
+			" where h.status=3 and i.templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t		itemid;
+		char			*name, *seed = NULL;
+
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		zbx_vector_uint64_append(&itemids, itemid);
+
+		name = zbx_strdup(NULL, row[2]);
+		name = zbx_update_template_name(name);
+		seed = zbx_dsprintf(seed, "%s/%s", name, row[1]);
+		zbx_vector_str_append(&uuids, zbx_gen_uuid4(seed));
+		zbx_free(name);
+		zbx_free(seed);
+	}
+
+	DBfree_result(result);
+
+	if (0 != itemids.values_num)
+	{
+		int	i;
+
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		for (i = 0; i < itemids.values_num; i++)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set templateid=null,uuid='%s'"
+					" where itemid=" ZBX_FS_UI64 ";\n", uuids.values[i], itemids.values[i]);
+
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto out;
+		}
+
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+out:
+		zbx_free(sql);
+	}
+
+	zbx_vector_str_clear_ext(&uuids, zbx_str_free);
+	zbx_vector_str_destroy(&uuids);
+	zbx_vector_uint64_destroy(&itemids);
+
+	return ret;
+}
+
+static int	DBpatch_6030155(void)
+{
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
+			" from triggers t"
+			" join functions f on f.triggerid=t.triggerid"
+			" join items i on i.itemid=f.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=3"
+			" where t.templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char		*trigger_expr, *uuid, *seed = NULL;
+		char		*composed_expr[] = { NULL, NULL };
+		int		i;
+		size_t		seed_alloc = 0, seed_offset = 0;
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		for (i = 0; i < 2; i++)
+		{
+			int			j;
+			char			*error = NULL;
+			zbx_eval_context_t	ctx;
+
+			trigger_expr = row[i + 2];
+
+			if ('\0' == *trigger_expr)
+			{
+				if (0 == i)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+							__func__, row[0]);
+				}
+				continue;
+			}
+
+			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION,
+					&error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+						__func__, row[0], error);
+				zbx_free(error);
+				DBfree_result(result);
+				return FAIL;
+			}
+
+			for (j = 0; j < ctx.stack.values_num; j++)
+			{
+				zbx_eval_token_t	*token = &ctx.stack.values[j];
+				zbx_uint64_t		functionid;
+
+				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+					continue;
+
+				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+							" zbx_is_uint64_n error", __func__, row[0]);
+					DBfree_result(result);
+					return FAIL;
+				}
+
+				result2 = DBselect(
+						"select h.host,i.key_,f.name,f.parameter"
+						" from functions f"
+						" join items i on i.itemid=f.itemid"
+						" join hosts h on h.hostid=i.hostid"
+						" where f.functionid=" ZBX_FS_UI64,
+						functionid);
+
+				if (NULL != (row2 = DBfetch(result2)))
+				{
+					char	*func;
+
+					func = zbx_dbpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+					zbx_variant_clear(&token->value);
+					zbx_variant_set_str(&token->value, func);
+				}
+
+				DBfree_result(result2);
+			}
+
+			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+			zbx_eval_clear(&ctx);
+		}
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", composed_expr[0]);
+		if (NULL != composed_expr[1])
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", composed_expr[1]);
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update triggers set templateid=null,uuid='%s'"
+				" where triggerid=%s;\n", uuid, row[0]);
+
+		zbx_free(composed_expr[0]);
+		zbx_free(composed_expr[1]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6030156(void)
+{
+	int		ret = SUCCEED;
+	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, seed_alloc = 0, seed_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	result = DBselect(
+			"select distinct g.graphid,g.name"
+			" from graphs g"
+			" join graphs_items gi on gi.graphid=g.graphid"
+			" join items i on i.itemid=gi.itemid"
+			" join hosts h on h.hostid=i.hostid and h.status=3"
+			" where g.templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DB_ROW		row2;
+		DB_RESULT	result2;
+
+		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s", row[1]);
+
+		result2 = DBselect(
+				"select h.host"
+				" from graphs_items gi"
+				" join items i on i.itemid=gi.itemid"
+				" join hosts h on h.hostid=i.hostid"
+				" where gi.graphid=%s"
+				" order by h.host",
+				row[0]);
+
+		while (NULL != (row2 = DBfetch(result2)))
+		{
+			host_name = zbx_strdup(NULL, row2[0]);
+			host_name = zbx_update_template_name(host_name);
+
+			zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "/%s", host_name);
+			zbx_free(host_name);
+		}
+
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update graphs set templateid=null,uuid='%s'"
+				" where graphid=%s;\n", uuid, row[0]);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		DBfree_result(result2);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6030157(void)
+{
+	int		ret = SUCCEED;
+	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select ht.httptestid,ht.name,h.host"
+			" from httptest ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=3"
+			" where ht.templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		template_name = zbx_strdup(NULL, row[2]);
+		template_name = zbx_update_template_name(template_name);
+		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+		uuid = zbx_gen_uuid4(seed);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update httptest set templateid=null,uuid='%s' where httptestid=%s;\n", uuid, row[0]);
+		zbx_free(template_name);
+		zbx_free(uuid);
+		zbx_free(seed);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
 #endif
+
+static int	DBpatch_6030158(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			return SUCCEED;
+
+		if (ZBX_DB_OK > DBexecute("delete from hosts_templates where hostid in (select hostid from hosts"
+				" where status=3)"))
+			return FAIL;
+
+		return SUCCEED;
+
+}
 
 DBPATCH_START(6030)
 
@@ -1553,5 +2989,15 @@ DBPATCH_ADD(6030145, 0, 1)
 DBPATCH_ADD(6030146, 0, 1)
 DBPATCH_ADD(6030147, 0, 1)
 DBPATCH_ADD(6030148, 0, 1)
+DBPATCH_ADD(6030149, 0, 1)
+DBPATCH_ADD(6030150, 0, 1)
+DBPATCH_ADD(6030151, 0, 1)
+DBPATCH_ADD(6030152, 0, 1)
+DBPATCH_ADD(6030153, 0, 1)
+DBPATCH_ADD(6030154, 0, 1)
+DBPATCH_ADD(6030155, 0, 1)
+DBPATCH_ADD(6030156, 0, 1)
+DBPATCH_ADD(6030157, 0, 1)
+DBPATCH_ADD(6030158, 0, 1)
 
 DBPATCH_END()

@@ -87,5 +87,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+
+char	*zbx_update_template_name(char *old);
+char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param);
+
 #endif
 #endif
