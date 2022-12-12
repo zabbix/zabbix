@@ -842,6 +842,12 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	public function testPageMonitoringHostsGraph_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
 				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
+
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->query('button:Reset')->one()->click();
 
@@ -865,7 +871,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
-			$this->checkGraphs($data['graphs_amount']);
+			$this->assertEquals($data['graphs_amount'],
+					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
+			$this->assertTableStats($data['graphs_amount']);
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
@@ -873,19 +881,20 @@ class testPageMonitoringHostsGraph extends CWebTest {
 				$graph_sources[] = $source->getAttribute('src');
 			}
 
-			// Check that displayed graphs has correct ids.
+			// Check that displayed graphs have correct ids.
 			if (array_key_exists('graph_name', $data)) {
 				$this->checkGraphsIds($data['graph_names'], $graph_sources);
 			}
 
-			// Check that displayed item graphs has correct ids.
+			// Check that displayed item graphs have correct ids.
 			if (array_key_exists('item_names', $data)) {
 				$this->checkGraphsIds($data['item_names'], $graph_sources, false);
 			}
 		}
 		else {
 			$message = (array_key_exists('Hosts', $data['filter']) || array_key_exists('subfilter', $data))
-					? 'No data found.' : 'Specify host to see the graphs.';
+				? 'No data found.'
+				: 'Specify host to see the graphs.';
 			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
@@ -912,17 +921,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
-	}
-
-	/**
-	 * Check that correct amount of graphs displayed in table result and in table stats.
-	 *
-	 * @param integer $graphs_amount	how many graphs should be displayed after filtering.
-	 */
-	private function checkGraphs($graphs_amount) {
-		$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-		$this->assertEquals($graphs_amount, $graphs_count);
-		$this->assertTableStats($graphs_amount);
 	}
 
 	/**
