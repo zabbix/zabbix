@@ -1,1 +1,0 @@
-...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and readd performance counters on failed collection and to keep query always open (vso)

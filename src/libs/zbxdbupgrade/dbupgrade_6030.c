@@ -1401,6 +1401,14 @@ static int	DBpatch_6030148(void)
 }
 /* end of ZBXNEXT-276 patches */
 
+static int	DBpatch_6030149(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
 typedef struct zbx_db_valuemap_mapping zbx_db_valuemap_mapping_t;
 typedef struct zbx_db_valuemap zbx_db_valuemap_t;
 typedef struct zbx_child_valuemap zbx_child_valuemap_t;
@@ -1515,7 +1523,7 @@ static void	child_valuemap_free(zbx_child_valuemap_t *valuemap)
 	zbx_free(valuemap);
 }
 
-static int	DBpatch_6030149(void)
+static int	DBpatch_6030150(void)
 {
 	zbx_vector_valuemap_ptr_t		valuemaps;
 	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
@@ -1762,7 +1770,7 @@ static void	zbx_vector_hostmacro_ptr_uniq2(zbx_vector_hostmacro_ptr_t *vector, z
 	}
 }
 
-static int	DBpatch_6030150(void)
+static int	DBpatch_6030151(void)
 {
 	zbx_vector_hostmacro_ptr_t		hostmacros;
 	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
@@ -1957,7 +1965,7 @@ static void	zbx_vector_hosttag_ptr_uniq2(zbx_vector_hosttag_ptr_t *vector, zbx_c
 	}
 }
 
-static int	DBpatch_6030151(void)
+static int	DBpatch_6030152(void)
 {
 	zbx_vector_hosttag_ptr_t		hosttags;
 	zbx_vector_child_hosttag_ptr_t		child_hosttags;
@@ -2301,7 +2309,7 @@ static void	child_dashboard_free(zbx_child_dashboard_t *dashboard)
 	zbx_free(dashboard);
 }
 
-static int	DBpatch_6030152(void)
+static int	DBpatch_6030153(void)
 {
 	zbx_vector_dashboard_ptr_t		dashboards;
 	zbx_vector_child_dashboard_ptr_t	child_dashboards;
@@ -2503,7 +2511,7 @@ static int	DBpatch_6030152(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6030153(void)
+static int	DBpatch_6030154(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -2514,7 +2522,7 @@ static int	DBpatch_6030153(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6030154(void)
+static int	DBpatch_6030155(void)
 {
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_str_t	uuids;
@@ -2580,7 +2588,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030155(void)
+static int	DBpatch_6030156(void)
 {
 	int		ret = SUCCEED;
 	char		*sql = NULL;
@@ -2708,7 +2716,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030156(void)
+static int	DBpatch_6030157(void)
 {
 	int		ret = SUCCEED;
 	char		*host_name, *uuid, *sql = NULL, *seed = NULL;
@@ -2776,7 +2784,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6030157(void)
+static int	DBpatch_6030158(void)
 {
 	int		ret = SUCCEED;
 	char		*template_name, *uuid, *sql = NULL, *seed = NULL;
@@ -2821,9 +2829,8 @@ out:
 
 	return ret;
 }
-#endif
 
-static int	DBpatch_6030158(void)
+static int	DBpatch_6030159(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			return SUCCEED;
@@ -2835,6 +2842,8 @@ static int	DBpatch_6030158(void)
 		return SUCCEED;
 
 }
+
+#endif
 
 DBPATCH_START(6030)
 
@@ -2999,5 +3008,6 @@ DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
+DBPATCH_ADD(6030159, 0, 1)
 
 DBPATCH_END()
