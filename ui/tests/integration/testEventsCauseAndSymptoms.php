@@ -246,17 +246,27 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			$this->assertArrayHasKey('result', $response);
 			$this->assertArrayHasKey('value', $response['result']);
 
-			$lines = explode("\n", $response['result']['value']);
+			$expanded_macro = $response['result']['value'];
+			$lines = explode("\n", $expanded_macro);
 			$this->assertCount(count($symptom_events_nums), $lines);
 
+			// for all expected symptoms
 			for ($i = 0; $i < count($symptom_events_nums); $i++) {
-				$symptom_num = $symptom_events_nums[$i];
+				$match_found = false;
 				$needle = sprintf("Host: %s Problem name: %s Severity: Not classified Age:",
-						self::HOST_NAME, 'Trigger trap '.(string)$symptom_num);
-				$cmp_result = substr_compare($lines[$i], $needle, 0, strlen($needle));
-				$error_msg = sprintf("Line is expected to begin with:\n'%s'\nfound:\n'%s'", $needle,
-						$lines[$i]);
-				$this->assertEquals(0, $cmp_result, $error_msg);
+						self::HOST_NAME, 'Trigger trap '.(string)$symptom_events_nums[$i]);
+
+				// search for the expected symptom in the expanded macro line by line
+				foreach ($lines as $haystack) {
+					$cmp_result = substr_compare($haystack, $needle, 0, strlen($needle));
+					if (0 == $cmp_result) {
+						$match_found = true;
+						break;
+					}
+				}
+
+				$this->assertTrue($match_found, sprintf("A symptom which starts with:\n'%s'\nis not found in the expanded macro '%s':\n\n%s\n",
+						$needle, self::EVENT_SYMPTOMS_MACRO_TEMPLATE, $expanded_macro));
 			}
 		}
 	}
