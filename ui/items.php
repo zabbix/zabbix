@@ -479,7 +479,7 @@ $ms_groups = [];
 $filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
 	getRequest('context')
 );
-$filter_hostids = getRequest('filter_hostids');
+$filter_hostids = getRequest('filter_hostids', []);
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
@@ -1019,7 +1019,11 @@ else {
 		$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
 	}
 	if (array_key_exists('hostids', $options) && $_REQUEST['filter_valuemapids']) {
-		$hostids = CTemplateHelper::getParentTemplatesRecursive($filter_hostids, $data['context']);
+		$hostids = $options['hostids'];
+
+		if ($data['context'] === 'host') {
+			addParentTemplateIds($hostids);
+		}
 
 		$valuemap_names = array_unique(array_column(API::ValueMap()->get([
 			'output' => ['name'],

@@ -1014,13 +1014,11 @@ function getMacroConfigValue(array $macro): string {
 }
 
 /**
- * Add host parent template IDs to input host ID array.
+ * Add to the given array of host IDs their parent template IDs.
  *
- * @param array $hostids An array of host IDs.
- *
- * @return array
+ * @param array $hostids
  */
-function addHostParentTemplateIds(array $hostids): array {
+function addParentTemplateIds(array &$hostids): void {
 	$hosts = API::Host()->get([
 		'output' => [],
 		'selectParentTemplates' => ['templateid'],
@@ -1030,8 +1028,8 @@ function addHostParentTemplateIds(array $hostids): array {
 	$hostids = array_flip($hostids);
 
 	foreach ($hosts as $host) {
-		$hostids += array_column($host['parentTemplates'], 'templateid', 'templateid');
+		$hostids += array_flip(array_column($host['parentTemplates'], 'templateid'));
 	}
 
-	return array_keys($hostids);
+	$hostids = array_keys($hostids);
 }

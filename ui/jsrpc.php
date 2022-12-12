@@ -534,7 +534,7 @@ switch ($data['method']) {
 				$hostids = $data['hostids'];
 
 				if ($data['context'] === 'host' && array_key_exists('with_inherited', $data)) {
-					$hostids = addHostParentTemplateIds($hostids);
+					addParentTemplateIds($hostids);
 				}
 
 				$result = API::ValueMap()->get([
