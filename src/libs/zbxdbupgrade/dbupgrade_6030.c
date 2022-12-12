@@ -1534,6 +1534,7 @@ static int	DBpatch_6030150(void)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_valuemap, db_insert_valuemap_mapping;
+	zbx_uint64_t				valuemapid, valuemap_mappingid;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1572,10 +1573,13 @@ static int	DBpatch_6030150(void)
 		zbx_vector_uint64_append(&child_templateids, child_templateid);
 	}
 
-	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBfree_result(result);
 
+	if (0 == valuemaps.values_num)
+		goto out;
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,hostid from valuemap where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
 			child_templateids.values_num);
@@ -1629,64 +1633,59 @@ static int	DBpatch_6030150(void)
 		}
 	}while (0 != changed);
 
-	if (0 != valuemaps.values_num)
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	valuemapid = DBget_maxid_num("valuemap", valuemaps.values_num);
+	valuemap_mappingid = DBget_maxid_num("valuemap_mapping", mappings_num);
+
+	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", "uuid", NULL);
+	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
+			"valuemapid", "value", "newvalue", "type", "sortorder", NULL);
+
+	for (i = 0; i < valuemaps.values_num; i++)
 	{
-		zbx_uint64_t	valuemapid, valuemap_mappingid;
+		zbx_db_valuemap_t 	*valuemap;
 
-		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		valuemap = valuemaps.values[i];
+		zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, valuemap->child_templateid,
+				valuemap->name, valuemap->uuid);
 
-		valuemapid = DBget_maxid_num("valuemap", valuemaps.values_num);
-		valuemap_mappingid = DBget_maxid_num("valuemap_mapping", mappings_num);
-
-		zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", "uuid", NULL);
-		zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
-				"valuemapid", "value", "newvalue", "type", "sortorder", NULL);
-
-		for (i = 0; i < valuemaps.values_num; i++)
+		for (j = 0; j < valuemap->itemids.values_num; j++)
 		{
-			zbx_db_valuemap_t 	*valuemap;
-
-			valuemap = valuemaps.values[i];
-			zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, valuemap->child_templateid,
-					valuemap->name, valuemap->uuid);
-
-			for (j = 0; j < valuemap->itemids.values_num; j++)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "valuemapid=%s",
-						DBsql_id_ins(valuemapid));
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
-						valuemap->itemids.values[j]);
-			}
-
-			for (j = 0; j < valuemap->mappings.values_num; j++)
-			{
-				zbx_db_valuemap_mapping_t 	*valuemap_mapping;
-
-				valuemap_mapping = valuemap->mappings.values[j];
-				zbx_db_insert_add_values(&db_insert_valuemap_mapping, valuemap_mappingid, valuemapid,
-						valuemap_mapping->value, valuemap_mapping->newvalue,
-						valuemap_mapping->type, valuemap_mapping->sortorder);
-				valuemap_mappingid++;
-			}
-
-			valuemapid++;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set ");
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "valuemapid=%s",
+					DBsql_id_ins(valuemapid));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
+					valuemap->itemids.values[j]);
 		}
 
-		zbx_db_insert_execute(&db_insert_valuemap);
-		zbx_db_insert_clean(&db_insert_valuemap);
+		for (j = 0; j < valuemap->mappings.values_num; j++)
+		{
+			zbx_db_valuemap_mapping_t 	*valuemap_mapping;
 
-		zbx_db_insert_execute(&db_insert_valuemap_mapping);
-		zbx_db_insert_clean(&db_insert_valuemap_mapping);
+			valuemap_mapping = valuemap->mappings.values[j];
+			zbx_db_insert_add_values(&db_insert_valuemap_mapping, valuemap_mappingid, valuemapid,
+					valuemap_mapping->value, valuemap_mapping->newvalue,
+					valuemap_mapping->type, valuemap_mapping->sortorder);
+			valuemap_mappingid++;
+		}
 
-		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		zbx_free(sql);
+		valuemapid++;
 	}
 
+	zbx_db_insert_execute(&db_insert_valuemap);
+	zbx_db_insert_clean(&db_insert_valuemap);
+
+	zbx_db_insert_execute(&db_insert_valuemap_mapping);
+	zbx_db_insert_clean(&db_insert_valuemap_mapping);
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+out:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_valuemap_ptr_clear_ext(&child_valuemaps, child_valuemap_free);
 	zbx_vector_child_valuemap_ptr_destroy(&child_valuemaps);
@@ -1813,10 +1812,12 @@ static int	DBpatch_6030151(void)
 		zbx_vector_uint64_append(&child_templateids, child_templateid);
 	}
 
-	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	DBfree_result(result);
 
+	if (0 == hostmacros.values_num)
+		goto out;
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select macro,hostid from hostmacro where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
 			child_templateids.values_num);
@@ -1884,7 +1885,7 @@ static int	DBpatch_6030151(void)
 		zbx_db_insert_execute(&db_insert_hostmacro);
 		zbx_db_insert_clean(&db_insert_hostmacro);
 	}
-
+out:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_hostmacro_ptr_clear_ext(&child_hostmacros, child_hostmacro_free);
 	zbx_vector_child_hostmacro_ptr_destroy(&child_hostmacros);
@@ -2006,10 +2007,12 @@ static int	DBpatch_6030152(void)
 		zbx_vector_uint64_append(&child_templateids, child_templateid);
 	}
 
-	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	DBfree_result(result);
 
+	if (0 == hosttags.values_num)
+		goto out;
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select tag,hostid from host_tag where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
 			child_templateids.values_num);
@@ -2076,7 +2079,7 @@ static int	DBpatch_6030152(void)
 		zbx_db_insert_execute(&db_insert_hosttag);
 		zbx_db_insert_clean(&db_insert_hosttag);
 	}
-
+out:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_hosttag_ptr_clear_ext(&child_hosttags, child_hosttag_free);
 	zbx_vector_child_hosttag_ptr_destroy(&child_hosttags);
@@ -2321,6 +2324,7 @@ static int	DBpatch_6030153(void)
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_dashboard, db_insert_dashboard_page, db_insert_widget,
 						db_insert_widget_field;
+	zbx_uint64_t				dashboardid, dashboard_pageid, widgetid, widget_fieldid ;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -2362,10 +2366,12 @@ static int	DBpatch_6030153(void)
 		zbx_vector_uint64_append(&child_templateids, child_templateid);
 	}
 
-	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	DBfree_result(result);
 
+	if (0 == dashboards.values_num)
+		goto out;
+
+	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,templateid from dashboard where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", child_templateids.values,
 			child_templateids.values_num);
@@ -2417,91 +2423,86 @@ static int	DBpatch_6030153(void)
 		}
 	}while (0 != changed);
 
-	if (0 != dashboards.values_num)
+	dashboardid = DBget_maxid_num("dashboard", dashboards.values_num);
+	dashboard_pageid = DBget_maxid_num("dashboard_page", pages_num);
+	widgetid = DBget_maxid_num("widget", widgets_num);
+	widget_fieldid = DBget_maxid_num("widget_field", fields_num);
+
+	zbx_db_insert_prepare(&db_insert_dashboard, "dashboard", "dashboardid", "templateid", "name",
+			"display_period","auto_start", "uuid", NULL);
+	zbx_db_insert_prepare(&db_insert_dashboard_page, "dashboard_page", "dashboard_pageid", "dashboardid",
+			"name", "display_period", "sortorder", NULL);
+	zbx_db_insert_prepare(&db_insert_widget, "widget", "widgetid", "dashboard_pageid", "type", "name", "x",
+			"y", "width", "height", "view_mode", NULL);
+	zbx_db_insert_prepare(&db_insert_widget_field, "widget_field", "widget_fieldid", "widgetid", "type",
+			"name", "value_int", "value_str", "value_groupid", "value_hostid", "value_itemid",
+			"value_graphid", "value_sysmapid", "value_serviceid", "value_slaid", "value_userid",
+			"value_actionid", "value_mediatypeid",NULL);
+
+	for (i = 0; i < dashboards.values_num; i++)
 	{
-		zbx_uint64_t	dashboardid, dashboard_pageid, widgetid, widget_fieldid ;
+		zbx_db_dashboard_t 	*dashboard;
 
-		dashboardid = DBget_maxid_num("dashboard", dashboards.values_num);
-		dashboard_pageid = DBget_maxid_num("dashboard_page", pages_num);
-		widgetid = DBget_maxid_num("widget", widgets_num);
-		widget_fieldid = DBget_maxid_num("widget_field", fields_num);
+		dashboard = dashboards.values[i];
+		zbx_db_insert_add_values(&db_insert_dashboard, dashboardid, dashboard->child_templateid,
+				dashboard->name, dashboard->display_period, dashboard->auto_start,
+				dashboard->uuid);
 
-		zbx_db_insert_prepare(&db_insert_dashboard, "dashboard", "dashboardid", "templateid", "name",
-				"display_period","auto_start", "uuid", NULL);
-		zbx_db_insert_prepare(&db_insert_dashboard_page, "dashboard_page", "dashboard_pageid", "dashboardid",
-				"name", "display_period", "sortorder", NULL);
-		zbx_db_insert_prepare(&db_insert_widget, "widget", "widgetid", "dashboard_pageid", "type", "name", "x",
-				"y", "width", "height", "view_mode", NULL);
-		zbx_db_insert_prepare(&db_insert_widget_field, "widget_field", "widget_fieldid", "widgetid", "type",
-				"name", "value_int", "value_str", "value_groupid", "value_hostid", "value_itemid",
-				"value_graphid", "value_sysmapid", "value_serviceid", "value_slaid", "value_userid",
-				"value_actionid", "value_mediatypeid",NULL);
-
-		for (i = 0; i < dashboards.values_num; i++)
+		for (j = 0; j < dashboard->pages.values_num; j++)
 		{
-			zbx_db_dashboard_t 	*dashboard;
+			zbx_db_dashboard_page_t 	*dashboard_page;
 
-			dashboard = dashboards.values[i];
-			zbx_db_insert_add_values(&db_insert_dashboard, dashboardid, dashboard->child_templateid,
-					dashboard->name, dashboard->display_period, dashboard->auto_start,
-					dashboard->uuid);
+			dashboard_page = dashboard->pages.values[j];
+			zbx_db_insert_add_values(&db_insert_dashboard_page, dashboard_pageid, dashboardid,
+					dashboard_page->name, dashboard_page->display_period,
+					dashboard_page->sortorder);
 
-			for (j = 0; j < dashboard->pages.values_num; j++)
+			for (k = 0; k < dashboard_page->widgets.values_num; k++)
 			{
-				zbx_db_dashboard_page_t 	*dashboard_page;
+				zbx_db_widget_t 	*widget;
 
-				dashboard_page = dashboard->pages.values[j];
-				zbx_db_insert_add_values(&db_insert_dashboard_page, dashboard_pageid, dashboardid,
-						dashboard_page->name, dashboard_page->display_period,
-						dashboard_page->sortorder);
+				widget = dashboard_page->widgets.values[j];
+				zbx_db_insert_add_values(&db_insert_widget, widgetid, dashboard_pageid,
+						widget->type, widget->name, widget->x, widget->y, widget->width,
+						widget->height, widget->view_mode);
 
-				for (k = 0; k < dashboard_page->widgets.values_num; k++)
+				for (l = 0; l < dashboard_page->widgets.values_num; l++)
 				{
-					zbx_db_widget_t 	*widget;
+					zbx_db_widget_field_t 	*field;
 
-					widget = dashboard_page->widgets.values[j];
-					zbx_db_insert_add_values(&db_insert_widget, widgetid, dashboard_pageid,
-							widget->type, widget->name, widget->x, widget->y, widget->width,
-							widget->height, widget->view_mode);
-
-					for (l = 0; l < dashboard_page->widgets.values_num; l++)
-					{
-						zbx_db_widget_field_t 	*field;
-
-						field = widget->fields.values[j];
-						zbx_db_insert_add_values(&db_insert_widget_field, widget_fieldid,
-								widgetid, field->type, field->name, field->value_int,
-								field->value_str, field->value_groupid,
-								field->value_hostid, field->value_itemid,
-								field->value_graphid, field->value_sysmapid,
-								field->value_serviceid, field->value_slaid,
-								field->value_userid, field->value_actionid,
-								field->value_mediatypeid);
-						widget_fieldid++;
-					}
-
-					widgetid++;
+					field = widget->fields.values[j];
+					zbx_db_insert_add_values(&db_insert_widget_field, widget_fieldid,
+							widgetid, field->type, field->name, field->value_int,
+							field->value_str, field->value_groupid,
+							field->value_hostid, field->value_itemid,
+							field->value_graphid, field->value_sysmapid,
+							field->value_serviceid, field->value_slaid,
+							field->value_userid, field->value_actionid,
+							field->value_mediatypeid);
+					widget_fieldid++;
 				}
 
-				dashboard_pageid++;
+				widgetid++;
 			}
 
-			dashboardid++;
+			dashboard_pageid++;
 		}
 
-		zbx_db_insert_execute(&db_insert_dashboard);
-		zbx_db_insert_clean(&db_insert_dashboard);
-
-		zbx_db_insert_execute(&db_insert_dashboard_page);
-		zbx_db_insert_clean(&db_insert_dashboard_page);
-
-		zbx_db_insert_execute(&db_insert_widget);
-		zbx_db_insert_clean(&db_insert_widget);
-
-		zbx_db_insert_execute(&db_insert_widget_field);
-		zbx_db_insert_clean(&db_insert_widget_field);
+		dashboardid++;
 	}
 
+	zbx_db_insert_execute(&db_insert_dashboard);
+	zbx_db_insert_clean(&db_insert_dashboard);
+
+	zbx_db_insert_execute(&db_insert_dashboard_page);
+	zbx_db_insert_clean(&db_insert_dashboard_page);
+
+	zbx_db_insert_execute(&db_insert_widget);
+	zbx_db_insert_clean(&db_insert_widget);
+
+	zbx_db_insert_execute(&db_insert_widget_field);
+	zbx_db_insert_clean(&db_insert_widget_field);
+out:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_dashboard_ptr_clear_ext(&child_dashboards, child_dashboard_free);
 	zbx_vector_child_dashboard_ptr_destroy(&child_dashboards);
