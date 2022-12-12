@@ -71,7 +71,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($db_graph);
 
-		foreach ($graphs as &$graph) {
+		foreach ($graphs as $key => &$graph) {
 			// check permissions
 			if (!array_key_exists($graph['graphid'], $db_graphs)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -84,6 +84,23 @@ abstract class CGraphGeneral extends CApiService {
 
 			// cannot update discovered graphs
 			$this->checkPartialValidator($graph, $updateDiscoveredValidator, $db_graphs[$graph['graphid']]);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
+				if ($db_graphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('discover', $graph)) {
+					$graph = [
+						'graphid' => $graph['graphid'],
+						'discover' => $graph['discover'],
+						'name' => $db_graphs[$graph['graphid']]['name'],
+						'gitems' => $db_graphs[$graph['graphid']]['gitems']
+					];
+				}
+				else {
+					unset($graphs[$key]);
+				}
+				continue;
+			}
 
 			// validate items on set or pass existing items from DB
 			if (array_key_exists('gitems', $graph)) {
@@ -108,20 +125,8 @@ abstract class CGraphGeneral extends CApiService {
 
 		$this->validateUpdate($graphs, $db_graphs);
 
-		foreach ($graphs as $key => &$graph) {
+		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
-
-			// Allow for template inherited graphs to update discover parameter.
-			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
-				if (array_key_exists('discover', $graph)) {
-					$graph = ['graphid' => $graph['graphid'], 'discover' => $graph['discover']];
-				}
-				else {
-					unset($graphs[$key]);
-
-					continue;
-				}
-			}
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $db_graphs[$graph['graphid']]['gitems'];
 
