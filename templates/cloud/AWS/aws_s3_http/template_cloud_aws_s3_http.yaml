@@ -320,8 +320,8 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'bucket_name', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'secret_key', 'region', 'bucket_name'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -382,7 +382,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
 
-                    request.setProxy(AwsS3.params.proxy);
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -522,8 +524,8 @@ zabbix_export:
                 request_period: 180,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'bucket_name', 'filter_id', 'proxy'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || (params[field] === '' && field !== 'proxy')) {
+                    ['access_key', 'secret_key', 'region', 'bucket_name', 'filter_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -644,7 +646,9 @@ zabbix_export:
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri;
 
-                    request.setProxy(AwsS3.params.proxy);
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('X-Amz-Target: GraniteServiceVersion20100801.GetMetricData')
                     request.addHeader('Accept: application/json');
