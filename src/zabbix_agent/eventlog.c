@@ -1390,7 +1390,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *             rate             - [IN] threshold of records count at a time   *
  *             process_value_cb - [IN] callback function for sending data to  *
  *                                     the server                             *
- *             config_tls   - [IN]                                            *
+ *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *

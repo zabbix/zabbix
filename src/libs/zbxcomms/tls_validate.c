@@ -181,10 +181,10 @@ static void	zbx_tls_parameter_not_empty(char * const *param, const zbx_config_tl
  *     Helper function: log error message depending on program type and exit.         *
  *                                                                                    *
  * Parameters:                                                                        *
- *     type           - [IN] type of TLS validation error                             *
- *     param1         - [IN] first configuration parameter                            *
- *     param2         - [IN] second configuration parameter (if there is any)         *
- *     zbx_config_tls - [IN]                                                          *
+ *     type       - [IN] type of TLS validation error                                 *
+ *     param1     - [IN] first configuration parameter                                *
+ *     param2     - [IN] second configuration parameter (if there is any)             *
+ *     config_tls - [IN]                                                              *
  *                                                                                    *
  **************************************************************************************/
 #define ZBX_TLS_VALIDATION_INVALID	0
