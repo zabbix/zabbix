@@ -533,7 +533,7 @@ switch ($data['method']) {
 
 				$hostids = $data['hostids'];
 
-				if ($data['context'] === 'host' && array_key_exists('with_inherited', $data)) {
+				if ($data['context'] === 'host') {
 					addParentTemplateIds($hostids);
 				}
 

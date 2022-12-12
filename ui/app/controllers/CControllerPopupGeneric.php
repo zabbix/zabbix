@@ -543,7 +543,6 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
-			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
@@ -1622,8 +1621,7 @@ class CControllerPopupGeneric extends CController {
 				 * Show list of value maps with unique names for defined hosts or templates.
 				 *
 				 * hostids           (required) Array of host or template ids to get value maps from.
-				 * context           (required) Define context for inherited value maps: host, template
-				 * with_inherited    Include value maps from inherited templates.
+				 * context           (required) Define context for inherited value maps: host, template.
 				 */
 				$records = [];
 				$hostids = $this->getInput('hostids', []);
@@ -1633,7 +1631,7 @@ class CControllerPopupGeneric extends CController {
 					break;
 				}
 
-				if ($context === 'host' && $this->hasInput('with_inherited')) {
+				if ($context === 'host') {
 					addParentTemplateIds($hostids);
 				}
 
