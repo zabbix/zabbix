@@ -1551,7 +1551,7 @@ static int	DBpatch_6030150(void)
 	{
 		char			*template_name, *seed = NULL;
 		zbx_db_valuemap_t 	*valuemap;
-		zbx_uint64_t		valuemapid, child_templateid;
+		zbx_uint64_t		child_templateid;
 
 		ZBX_DBROW2UINT64(valuemapid, row[0]);
 		ZBX_DBROW2UINT64(child_templateid, row[2]);
@@ -1959,7 +1959,7 @@ static void	zbx_vector_hosttag_ptr_uniq2(zbx_vector_hosttag_ptr_t *vector, zbx_c
 		{
 			if (0 == compare_func(&vector->values[i - 1], &vector->values[i]))
 			{
-				hostmacro_free(vector->values[i]);
+				hosttag_free(vector->values[i]);
 				zbx_vector_hosttag_ptr_remove_noorder(vector, i);
 			}
 		}
@@ -2342,7 +2342,7 @@ static int	DBpatch_6030153(void)
 	{
 		char			*template_name, *seed = NULL;
 		zbx_db_dashboard_t 	*dashboard;
-		zbx_uint64_t		dashboardid, child_templateid;
+		zbx_uint64_t		child_templateid;
 
 		ZBX_DBROW2UINT64(dashboardid, row[0]);
 		ZBX_DBROW2UINT64(child_templateid, row[4]);

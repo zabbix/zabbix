@@ -23,6 +23,7 @@
 
 #include "zbxdbhigh.h"
 #include "log.h"
+#include "zbxregexp.h"
 
 typedef struct
 {
