@@ -2174,7 +2174,7 @@ static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid)
 
 	result = DBselect("select widget_fieldid,type,name,value_int,value_str,value_groupid,value_hostid,value_itemid,"
 			"value_graphid,value_sysmapid,value_serviceid,value_slaid,value_userid,value_actionid,"
-			"value_mediatypeid where widgetid=" ZBX_FS_UI64, widgetid);
+			"value_mediatypeid from widget_field where widgetid=" ZBX_FS_UI64, widgetid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
