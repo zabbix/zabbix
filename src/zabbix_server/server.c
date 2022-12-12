@@ -152,7 +152,7 @@ const char	*help_message[] = {
 	"      Profiling control targets:",
 	"        process-type              All processes of specified type",
 	"                                  (alerter, alert manager, configuration syncer,",
-	"                                  discoverer, escalator, ha manager, history syncer,",
+	"                                  discoverer, escalator, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger,",
 	"                                  ipmi manager, ipmi poller, java poller,",
 	"                                  poller, preprocessing manager,",
