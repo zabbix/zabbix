@@ -561,7 +561,7 @@ zabbix_export:
                         throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
                     }
             
-                    var buckets = []
+                    var buckets = [];
                     if (!Array.isArray(result.ListAllMyBucketsResult.Buckets.Bucket))
                         buckets = [result.ListAllMyBucketsResult.Buckets.Bucket]
                     else
