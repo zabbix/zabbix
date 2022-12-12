@@ -285,7 +285,7 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-int	config_server_startup_time	= 0;
+static int	config_server_startup_time	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
