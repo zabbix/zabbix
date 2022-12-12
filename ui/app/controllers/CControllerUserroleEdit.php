@@ -139,36 +139,58 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('role');
 
-		if ($this->hasInput('form_refresh') && $this->role === null) {
-			$data = $this->getFormData([
-				'roleid' => null,
-				'readonly' => (bool) $db_defaults['readonly'],
-				'is_own_role' => $this->getInput('roleid', 0) == CWebUser::$data['roleid'],
-				'rules' => $this->getRulesDefaults((int) $this->getInput('type'))
-			]);
-		}
-		elseif ($this->role !== null) {
-			$data = [
-				'roleid' => $this->role['roleid'],
-				'name' => $this->role['name'],
-				'type' => $this->role['type'],
-				'readonly' => (bool) $this->role['readonly'],
-				'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid'],
-				'rules' => array_merge(
-					$this->getRulesDefaults((int) $this->role['type']),
-					$this->getRules($this->role['roleid'])
-				)
-			];
+		if (!$this->hasInput('form_refresh')) {
+			if ($this->role !== null) {
+				$data = [
+					'roleid' => $this->role['roleid'],
+					'name' => $this->role['name'],
+					'type' => $this->role['type'],
+					'readonly' => (bool) $this->role['readonly'],
+					'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid'],
+					'rules' => array_merge(
+						$this->getRulesDefaults((int) $this->role['type']),
+						$this->getRulesByRoleid($this->role['roleid'])
+					)
+				];
+			}
+			else {
+				$data = [
+					'roleid' => null,
+					'name' => $db_defaults['name'],
+					'type' => $db_defaults['type'],
+					'readonly' => (bool) $db_defaults['readonly'],
+					'is_own_role' => false,
+					'rules' => $this->getRulesDefaults((int) $db_defaults['type'])
+				];
+			}
 		}
 		else {
-			$data = [
-				'roleid' => null,
-				'name' => $db_defaults['name'],
-				'type' => $db_defaults['type'],
-				'readonly' => (bool) $db_defaults['readonly'],
-				'is_own_role' => false,
-				'rules' => $this->getRulesDefaults((int) $db_defaults['type'])
-			];
+			if ($this->role !== null) {
+				$data = [
+					'roleid' => $this->role['roleid'],
+					'name' => $this->getInput('name') === '' ? $this->role['name'] : $this->getInput('name'),
+					'type' => $this->getInput('type'),
+					'readonly' => (bool) $this->role['readonly'],
+					'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid'],
+					'rules' => array_merge(
+						$this->getRulesDefaults((int) $this->getInput('type')),
+						$this->getRules($this->getRulesInput($this->getInput('type')))
+					)
+				];
+			}
+			else {
+				$data = [
+					'roleid' => null,
+					'name' => $this->getInput('name') === '' ? $db_defaults['name'] : $this->getInput('name'),
+					'type' => $this->getInput('type'),
+					'readonly' => (bool) $db_defaults['readonly'],
+					'is_own_role' => false,
+					'rules' => array_merge(
+						$this->getRulesDefaults((int) $this->getInput('type')),
+						$this->getRules($this->getRulesInput($this->getInput('type')))
+					)
+				];
+			}
 		}
 
 		$data['labels'] = $this->getLabels();
@@ -339,7 +361,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	/**
 	 * @throws APIException
 	 */
-	private function getRules(string $roleid): array {
+	private function getRulesByRoleid(string $roleid): array {
 		$roles = API::Role()->get([
 			'output' => ['roleid'],
 			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api', 'api.access',
@@ -349,45 +371,47 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'roleids' => $roleid
 		]);
 
-		$role = $roles[0];
+		return $this->getRules($roles[0]['rules']);
+	}
 
+	private function getRules(array $input): array {
 		$rules = [];
 
-		foreach ($role['rules']['ui'] as $rule) {
+		foreach ($input['ui'] as $rule) {
 			$rules['ui']['ui.'.$rule['name']] = $rule['status'];
 		}
 
-		if ($role['rules']['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
+		if ($input['services.read.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
 			$rules['service_read_access'] = CRoleHelper::SERVICES_ACCESS_ALL;
 		}
-		elseif ($role['rules']['services.read.list'] || $role['rules']['services.read.tag']['tag'] !== '') {
+		elseif ($input['services.read.list'] || $input['services.read.tag']['tag'] !== '') {
 			$rules['service_read_access'] = CRoleHelper::SERVICES_ACCESS_LIST;
 		}
 		else {
 			$rules['service_read_access'] = CRoleHelper::SERVICES_ACCESS_NONE;
 		}
 
-		$rules['service_read_list'] = $role['rules']['services.read.list'];
-		$rules['service_read_tag'] = $role['rules']['services.read.tag'];
+		$rules['service_read_list'] = $input['services.read.list'];
+		$rules['service_read_tag'] = $input['services.read.tag'];
 
-		if ($role['rules']['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
+		if ($input['services.write.mode'] == ZBX_ROLE_RULE_SERVICES_ACCESS_ALL) {
 			$rules['service_write_access'] = CRoleHelper::SERVICES_ACCESS_ALL;
 		}
-		elseif ($role['rules']['services.write.list'] || $role['rules']['services.write.tag']['tag'] !== '') {
+		elseif ($input['services.write.list'] || $input['services.write.tag']['tag'] !== '') {
 			$rules['service_write_access'] = CRoleHelper::SERVICES_ACCESS_LIST;
 		}
 		else {
 			$rules['service_write_access'] = CRoleHelper::SERVICES_ACCESS_NONE;
 		}
 
-		$rules['service_write_list'] = $role['rules']['services.write.list'];
-		$rules['service_write_tag'] = $role['rules']['services.write.tag'];
+		$rules['service_write_list'] = $input['services.write.list'];
+		$rules['service_write_tag'] = $input['services.write.tag'];
 
-		foreach ($role['rules']['modules'] as $rule) {
+		foreach ($input['modules'] as $rule) {
 			$rules['modules'][$rule['moduleid']] = $rule['status'];
 		}
 
-		if ($role['rules']['api']) {
+		if ($input['api']) {
 			$rules['api'] = array_map(
 				static function (string $method): array {
 					return [
@@ -395,19 +419,19 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 						'name' => $method
 					];
 				},
-				$role['rules']['api']
+				$input['api']
 			);
 		}
 
-		foreach ($role['rules']['actions'] as $rule) {
+		foreach ($input['actions'] as $rule) {
 			$rules['actions']['actions.'.$rule['name']] = $rule['status'];
 		}
 
-		$rules['ui.default_access'] = $role['rules']['ui.default_access'];
-		$rules['modules.default_access'] = $role['rules']['modules.default_access'];
-		$rules['api.access'] = $role['rules']['api.access'];
-		$rules['api.mode'] = $role['rules']['api.mode'];
-		$rules['actions.default_access'] = $role['rules']['actions.default_access'];
+		$rules['ui.default_access'] = $input['ui.default_access'];
+		$rules['modules.default_access'] = $input['modules.default_access'];
+		$rules['api.access'] = $input['api.access'];
+		$rules['api.mode'] = $input['api.mode'];
+		$rules['actions.default_access'] = $input['actions.default_access'];
 
 		return $rules;
 	}
