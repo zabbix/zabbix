@@ -412,8 +412,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check that correct graphs displayed.
 		if (array_key_exists('graphs_amount', $data)) {
-			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-			$this->assertEquals($data['graphs_amount'], $graphs_count);
+			$this->assertEquals($data['graphs_amount'],
+					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
