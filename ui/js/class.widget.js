@@ -724,7 +724,7 @@ class CWidget extends CBaseComponent {
 					}
 				})
 				.catch((exception) => {
-					console.log('Could not update widget refresh rate:', exception);
+					console.warn('Could not update widget refresh rate:', exception);
 				});
 		}
 	}
@@ -951,7 +951,7 @@ class CWidget extends CBaseComponent {
 		new Promise((resolve) => resolve(this._promiseUpdate()))
 			.then(() => this._hidePreloader())
 			.catch((exception) => {
-				console.log('Could not update widget:', exception);
+				console.warn('Could not update widget:', exception);
 
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();

@@ -364,7 +364,7 @@ class CDashboard extends CBaseComponent {
 		Promise.resolve()
 			.then(() => this._promiseCheckConfiguration())
 			.catch((exception) => {
-				console.log('Could not check the dashboard configuration', exception);
+				console.warn('Could not check the dashboard configuration', exception);
 			})
 			.finally(() => {
 				this._configuration_check_time = Math.max(Date.now() + this._configuration_check_steady_period,
