@@ -43,7 +43,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxstats.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
