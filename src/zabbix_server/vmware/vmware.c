@@ -255,6 +255,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
 /*
  * SOAP support
  */
+#define	ZBX_XML_HEADER1_VERSION	21
 #define	ZBX_XML_HEADER1_V4	"Soapaction:urn:vim25/4.1"
 #define	ZBX_XML_HEADER1_V6	"Soapaction:urn:vim25/6.0"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
@@ -350,9 +351,8 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 #define ZBX_XPATH_HV_SCSI_TOPOLOGY									\
-		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name']"				\
-		"[text()='config.storageDevice.scsiTopology']][1]"					\
-		"/*[local-name()='val']/*[local-name()='adapter']/*[local-name()='target']"		\
+		ZBX_XPATH_PROP_NAME("config.storageDevice.scsiTopology")				\
+		"/*[local-name()='adapter']/*[local-name()='target']"					\
 		"/*[local-name()='lun']/*[local-name()='scsiLun']"
 
 #define ZBX_XPATH_HV_MULTIPATH(state)									\
@@ -4825,7 +4825,6 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             hv_data      - [IN] the hv data with scsi topology info        *
  *             hvid         - [IN] the vmware hypervisor id                   *
  *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
@@ -4835,7 +4834,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		xmlDoc *hv_data, const char *hvid, xmlDoc **xdoc, char **error)
+		const char *hvid, xmlDoc **xdoc, char **error)
 {
 #	define ZBX_POST_HV_MP_DETAILS									\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -4845,7 +4844,6 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 				"<ns0:propSet>"								\
 					"<ns0:type>HostSystem</ns0:type>"				\
 					"<ns0:pathSet>config.storageDevice.multipathInfo</ns0:pathSet>"	\
-					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
@@ -4856,47 +4854,22 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-#	define ZBX_POST_SCSI_INFO									\
-		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].canonicalName</ns0:pathSet>"
-
-	zbx_vector_str_t	scsi_luns;
-	char			*scsi_req = NULL;
-	int			i, ret;
+	char	tmp[MAX_STRING_LEN], *hvid_esc;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
 
-	zbx_vector_str_create(&scsi_luns);
-	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() count of scsiLun:%d", __func__, scsi_luns.values_num);
+	hvid_esc = zbx_xml_escape_dyn(hvid);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_MP_DETAILS,
+			vmware_service_objects[service->type].property_collector, hvid_esc);
+	zbx_free(hvid_esc);
 
-	for (i = 0; i < scsi_luns.values_num; i++)
-	{
-		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i]);
-	}
+	ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error);
 
-	if (0 != scsi_luns.values_num)
-	{
-		char	*tmp, *hvid_esc;
-
-		zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
-		hvid_esc = zbx_xml_escape_dyn(hvid);
-		tmp = zbx_dsprintf(NULL, ZBX_POST_HV_MP_DETAILS,
-				vmware_service_objects[service->type].property_collector, scsi_req, hvid_esc);
-		zbx_free(hvid_esc);
-		zbx_free(scsi_req);
-
-		ret = zbx_soap_post(__func__, easyhandle, tmp, xdoc, NULL, error);
-		zbx_free(tmp);
-	}
-	else
-		ret = SUCCEED;
-
-	zbx_vector_str_destroy(&scsi_luns);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 
-#	undef	ZBX_POST_SCSI_INFO
 #	undef	ZBX_POST_HV_MP_DETAILS
 }
 
@@ -4989,18 +4962,18 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmw
 		pr.first = lun_key;
 
 		if ((FAIL == j || 0 != strcmp(disks_info->values[j].first, lun_key)) &&
-				FAIL == (j = zbx_vector_ptr_pair_search(disks_info, pr,
-				ZBX_DEFAULT_STR_COMPARE_FUNC)))
+				FAIL == (j = zbx_vector_ptr_pair_bsearch(disks_info, pr, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
 			lun_key = NULL;
 			pr.second = zbx_malloc(NULL, sizeof(zbx_vmware_diskinfo_t));
 			memset(pr.second, 0, sizeof(zbx_vmware_diskinfo_t));
 			zbx_vector_ptr_pair_append(disks_info, pr);
-			j = disks_info->values_num - 1;
+			zbx_vector_ptr_pair_sort(disks_info, ZBX_DEFAULT_STR_COMPARE_FUNC);
+			di = (zbx_vmware_diskinfo_t *)pr.second;
 			created++;
 		}
-
-		di = (zbx_vmware_diskinfo_t *)disks_info->values[j].second;
+		else
+			di = (zbx_vmware_diskinfo_t *)disks_info->values[j].second;
 
 		if (0 == strcmp(name, "canonicalName"))
 		{
@@ -5238,12 +5211,13 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
 	}
 
+	zbx_vector_ptr_pair_sort(disks_info, vmware_diskinfo_diskname_compare);
+
 	if (NULL == vsan_uuid)
 		goto out;
 
 	zbx_property_collection_free(iter);
 	iter = NULL;
-	zbx_vector_ptr_pair_sort(disks_info, vmware_diskinfo_diskname_compare);
 	hvid_esc = zbx_xml_escape_dyn(hvid);
 	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter ,
 			"<ns0:pathSet>config.vsanHostConfig.storageInfo.diskMapping</ns0:pathSet>", hvid_esc);
@@ -6041,11 +6015,14 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastores are connected to hypervisor \"%s\"", __func__,
 			datastores.values_num, hv->id);
 
-	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, details, id, &multipath_data, error))
-		goto out;
-
 	if (SUCCEED != vmware_service_hv_disks_get_info(service, easyhandle, details, id, dss,
 			vmware_hv_vsan_uuid(dss, &datastores), &disks_info, error))
+	{
+		goto out;
+	}
+
+	if (0 != disks_info.values_num && SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, id,
+			&multipath_data, error))
 	{
 		goto out;
 	}
@@ -8515,16 +8492,17 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
  ******************************************************************************/
 static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error)
 {
-	char		soapver[MAX_STRING_LEN / 32];
+	const char	*soapver;
 	CURLoption	opt;
 	CURLcode	err;
 
-	if (0 != vc_version && 6 > vc_version)
-		return SUCCEED;
-	else if (6 > vc_version)
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
+	if (6 > vc_version)
+		soapver = ZBX_XML_HEADER1_V4;
 	else
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V6, sizeof(soapver));
+		soapver = ZBX_XML_HEADER1_V6;
+
+	if (NULL != *headers && (*headers)->data[ZBX_XML_HEADER1_VERSION] == soapver[ZBX_XML_HEADER1_VERSION])
+		return SUCCEED;
 
 	curl_slist_free_all(*headers);
 	*headers = NULL;
