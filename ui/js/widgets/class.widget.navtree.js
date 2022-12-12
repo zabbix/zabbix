@@ -712,20 +712,15 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
-			const buttons_add_child = tree_element.querySelectorAll('.js-button-add-child');
-			const buttons_add_maps = tree_element.querySelectorAll('.js-button-add-maps');
+			const tools_buttons = tree_element.querySelectorAll('.js-button-add-child, .js-button-add-maps');
 
 			if (tree_element.dataset.depth > this._max_depth) {
 				tree_element.remove();
 				continue;
 			}
 
-			if (buttons_add_child.length > 0 && buttons_add_maps.length > 0) {
-				for (const button of buttons_add_child) {
-					button.disabled = tree_element.dataset.depth >= this._max_depth;
-				}
-
-				for (const button of buttons_add_maps) {
+			if (tools_buttons.length > 0) {
+				for (const button of tools_buttons) {
 					button.disabled = tree_element.dataset.depth >= this._max_depth;
 				}
 			}
