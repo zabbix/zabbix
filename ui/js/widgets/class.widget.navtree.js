@@ -164,19 +164,21 @@ class CWidgetNavTree extends CWidget {
 
 						const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
 
-						for (const item of data.values) {
-							root.appendChild(this._makeTreeItem({
-								id: this._getNextId(),
-								name: item.name,
-								sysmapid: item.sysmapid,
-								parent: id
-							}));
+						if (root != null) {
+							for (const item of data.values) {
+								root.appendChild(this._makeTreeItem({
+									id: this._getNextId(),
+									name: item.name,
+									sysmapid: item.sysmapid,
+									parent: id
+								}, depth + 1));
+							}
+
+							const tree_item = root.closest('.tree-item');
+
+							tree_item.classList.remove('closed');
+							tree_item.classList.add('opened');
 						}
-
-						const tree_item = root.closest('.tree-item');
-
-						tree_item.classList.remove('closed');
-						tree_item.classList.add('opened');
 
 						this._setTreeHandlers();
 						this._updateWidgetFields();
@@ -205,7 +207,9 @@ class CWidgetNavTree extends CWidget {
 				const parent = this._target.querySelector(`input[name="navtree.parent.${id}"]`).value;
 				const depth = parseInt(button.closest('[data-depth]').getAttribute('data-depth'));
 
-				this._itemEditDialog(id, parent, depth, button);
+				if (depth <= this._max_depth) {
+					this._itemEditDialog(id, parent, depth, button);
+				}
 			},
 
 			removeItem: (e) => {
@@ -554,6 +558,7 @@ class CWidgetNavTree extends CWidget {
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
 			button_add_maps.classList.add('btn-import', 'js-button-add-maps');
+			button_add_maps.disabled = depth === this._max_depth;
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -692,24 +697,6 @@ class CWidgetNavTree extends CWidget {
 		// Set [data-depth] for list and each sublist.
 		jQuery('.tree-list', jQuery(this._target)).each(function() {
 			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length);
-		}).not('.root').promise().done(function() {
-			// Show/hide 'add new items' buttons.
-			jQuery('.tree-list', jQuery(this._target)).filter(function() {
-				return jQuery(this).attr('data-depth') >= this._max_depth;
-			}).each(function() {
-				jQuery('.js-button-add-maps', jQuery(this)).css('visibility', 'hidden');
-				jQuery('.js-button-add-child', jQuery(this)).css('visibility', 'hidden');
-			});
-
-			// Show/hide buttons in deepest levels.
-			jQuery('.tree-list', jQuery(this._target)).filter(function() {
-				return this._max_depth > jQuery(this).attr('data-depth');
-			}).each(function() {
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this))
-					.css('visibility', 'visible');
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this))
-					.css('visibility', 'visible');
-			});
 		});
 
 		// Change arrow style.
@@ -725,12 +712,22 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
-			const button_add_child = tree_element.querySelector('.js-button-add-child');
-			const button_add_maps = tree_element.querySelector('.js-button-add-maps');
+			const buttons_add_child = tree_element.querySelectorAll('.js-button-add-child');
+			const buttons_add_maps = tree_element.querySelectorAll('.js-button-add-maps');
 
-			if (button_add_child !== null && button_add_maps !== null) {
-				button_add_child.disabled = tree_element.dataset.depth >= this._max_depth;
-				button_add_maps.disabled = tree_element.dataset.depth >= this._max_depth;
+			if (tree_element.dataset.depth > this._max_depth) {
+				tree_element.remove();
+				continue;
+			}
+
+			if (buttons_add_child.length > 0 && buttons_add_maps.length > 0) {
+				for (const button of buttons_add_child) {
+					button.disabled = tree_element.dataset.depth >= this._max_depth;
+				}
+
+				for (const button of buttons_add_maps) {
+					button.disabled = tree_element.dataset.depth >= this._max_depth;
+				}
 			}
 		}
 	}
@@ -883,7 +880,9 @@ class CWidgetNavTree extends CWidget {
 									method: 'POST',
 									data: {
 										name: form_inputs.name.value.trim(),
-										sysmapid: form_inputs.sysmapid.value,
+										sysmapid: typeof form_inputs.sysmapid !== 'undefined'
+											? form_inputs.sysmapid.value
+											: null,
 										add_submaps: () => {
 											if (typeof form_inputs.add_submaps !== 'undefined') {
 												return form_inputs.add_submaps.checked ? 1 : 0
@@ -929,15 +928,17 @@ class CWidgetNavTree extends CWidget {
 
 												id = this._getNextId();
 
-												root.append(this._makeTreeItem({
-													id: id,
-													name: resp['name'],
-													sysmapid: resp['sysmapid'],
-													parent: parent
-												}, depth));
+												if (root != null) {
+													root.append(this._makeTreeItem({
+														id: id,
+														name: resp['name'],
+														sysmapid: resp['sysmapid'],
+														parent: parent
+													}, depth + 1));
 
-												root.closest('.tree-item').classList.remove('closed');
-												root.closest('.tree-item').classList.add('opened', 'is-parent');
+													root.closest('.tree-item').classList.remove('closed');
+													root.closest('.tree-item').classList.add('opened', 'is-parent');
+												}
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
