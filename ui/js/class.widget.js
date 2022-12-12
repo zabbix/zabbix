@@ -18,34 +18,141 @@
 **/
 
 
+/*
+ * Widget view modes: whether to display the header statically or on mouse hovering (configurable on the widget form).
+ */
+
 const ZBX_WIDGET_VIEW_MODE_NORMAL = 0;
 const ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER = 1;
 
+/*
+ * Widget states, managed by the dashboard page.
+ */
+
+// Initial state of widget: the widget has never yet been displayed on the dashboard page.
 const WIDGET_STATE_INITIAL = 'initial';
+
+// Active state of widget: the widget is being displayed on the active dashboard page and is updating periodically.
 const WIDGET_STATE_ACTIVE = 'active';
+
+// Inactive state of widget: the widget has been active recently, but is currently hidden on an inactive dashboard page.
 const WIDGET_STATE_INACTIVE = 'inactive';
+
+// Destroyed state of widget: the widget has been deleted from the dashboard page.
 const WIDGET_STATE_DESTROYED = 'destroyed';
 
+/*
+ * Events thrown by widgets to inform the dashboard page about user interaction with the widget, which may impact the
+ * dashboard page and other widgets.
+ */
+
+// Widget edit event: informs the dashboard page to enter the editing mode.
 const WIDGET_EVENT_EDIT = 'widget-edit';
+
+// Widget actions event: informs the dashboard page to display the widget actions popup menu.
 const WIDGET_EVENT_ACTIONS = 'widget-actions';
+
+// Widget enter event: informs the dashboard page to focus the widget and un-focus other widgets.
 const WIDGET_EVENT_ENTER = 'widget-enter';
+
+// Widget leave event: informs the dashboard page to un-focus the widget.
 const WIDGET_EVENT_LEAVE = 'widget-leave';
+
+// Widget before-update event: thrown by a widget immediately before the update cycle has started.
 const WIDGET_EVENT_BEFORE_UPDATE = 'widget-before-update';
+
+// Widget after-update event: thrown by a widget immediately after the update cycle has finished.
 const WIDGET_EVENT_AFTER_UPDATE = 'widget-after-update';
+
+// Widget copy event: informs the dashboard page to copy the widget to the local storage.
 const WIDGET_EVENT_COPY = 'widget-copy';
+
+// Widget paste event: informs the dashboard page to paste the stored widget over the current one.
 const WIDGET_EVENT_PASTE = 'widget-paste';
+
+// Widget delete event: informs the dashboard page to delete the widget.
 const WIDGET_EVENT_DELETE = 'widget-delete';
 
+/*
+ * The base class of all dashboard widgets. Depending on widget needs, it can be instantiated directly or be extended.
+ */
 class CWidget extends CBaseComponent {
 
+	/**
+	 * Check if widgets of this type implement communication with other widgets. The reference field represents the
+	 * unique ID of the widget. Its name is "reference". The value is generated and regenerated automatically when
+	 * copying widgets or dashboard pages.
+	 *
+	 * @returns {boolean}
+	 */
 	static hasReferenceField() {
 		return false;
 	}
 
+	/**
+	 * Get field names by which widgets of this type refer and store connections to other widgets. These fields have a
+	 * role of foreign keys, referring to the corresponding "reference" fields of target widgets. The widget is
+	 * responsible for setting field values. The values are regenerated automatically when copying widgets or dashboard
+	 * pages.
+	 *
+	 * @returns {string[]}
+	 */
 	static getForeignReferenceFields() {
 		return [];
 	}
 
+	/**
+	 * Widget constructor. Executed by the dashboard page.
+	 *
+	 * @param {string}		type				Widget type ("id" field of the manifest.json).
+	 * @param {string}		name				Widget name to display in the header.
+	 * @param {number}		view_mode			One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object}		fields				Widget field values (widget configuration data).
+	 *
+	 * @param {Object}		defaults			Widget type defaults.
+	 * @param {string}		defaults.name			Default name to display in the header, if no custom name given.
+	 * @param {Object}		defaults.size			Default size to use when creating new widgets.
+	 * @param {number}		defaults.size.width		Default width.
+	 * @param {number}		defaults.size.height	Default height
+	 * @param {string}		defaults.js_class		JavaScript class name.
+	 *
+	 * @param {string|null}	widgetid			Widget ID stored in the database, or null for new widgets.
+	 *
+	 * @param {Object|null}	pos					Position and size of the widget (in dashboard coordinates).
+	 * @param {number}		pos.x				Horizontal position.
+	 * @param {number}		pos.y				Vertical position.
+	 * @param {number}		pos.width			Widget width.
+	 * @param {number}		pos.height			Widget height.
+	 *
+	 * @param {boolean}		is_new				Create a visual zoom effect when adding new widgets.
+	 * @param {number}		rf_rate				Update cycle rate (refresh rate) in seconds. Supported values: 0 (no
+	 * 											refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 * @param {Object}		dashboard			Essential data of the dashboard object.
+	 * @param {string|null}	dashboard.dashboardid	Dashboard ID.
+	 * @param {string|null}	dashboard.templateid	Template ID (used for template and host dashboards).
+	 *
+	 * @param {Object}		dashboard_page		Essential data of the dashboard page object.
+	 * @param {string}		dashboard_page.unique_id	Run-time, unique ID of the dashboard page.
+	 *
+	 * @param {number}		cell_width			Dashboard page cell width in percentage.
+	 * @param {number}		cell_height			Dashboard page cell height in pixels.
+	 * @param {number}		min_rows			Minimum number of dashboard cell rows per single widget.
+	 * @param {boolean}		is_editable			Whether to display the "Edit" button.
+	 * @param {boolean}		is_edit_mode		Whether the widget is being created in the editing mode.
+	 * @param {boolean}		can_edit_dashboards	Whether the user has access to creating and editing dashboards.
+	 *
+	 * @param {Object|null}	time_period			Selected time period (if widget.use_time_selector in manifest.json is
+	 * 											set to true in any of the loaded widgets), or null.
+	 * @param {string}		time_period.from	Relative time of period start (like "now-1h").
+	 * @param {number}		time_period.from_ts	Timestamp of period start.
+	 * @param {string}		time_period.to		Relative time of period end (like "now").
+	 * @param {number}		time_period.to_ts	Timestamp of period end.
+	 *
+	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
+	 * 											widgets has the "dynamic" checkbox field configured and checked in the
+	 * 											widget configuration), or null.
+	 * @param {string}		unique_id			Run-time, unique ID of the widget.
+	 */
 	constructor({
 		type,
 		name,
@@ -103,6 +210,9 @@ class CWidget extends CBaseComponent {
 		this._registerEvents();
 	}
 
+	/**
+	 * Define initial data. Executed once, upon instance creation.
+	 */
 	_init() {
 		this._css_classes = {
 			actions: 'dashboard-grid-widget-actions',
@@ -132,10 +242,22 @@ class CWidget extends CBaseComponent {
 
 	// Logical state control methods.
 
+	/**
+	 * Get current state.
+	 *
+	 * Do not override.
+	 *
+	 * @returns {string}	WIDGET_STATE_INITIAL | WIDGET_STATE_INACTIVE | WIDGET_STATE_ACTIVE | WIDGET_STATE_DESTROYED.
+	 */
 	getState() {
 		return this._state;
 	}
 
+	/**
+	 * Prepare widget for the first activation. Executed once, before the first activation of the dashboard page.
+	 *
+	 * Do not override. Override "_doStart" instead.
+	 */
 	start() {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			throw new Error('Unsupported state change.');
@@ -146,6 +268,9 @@ class CWidget extends CBaseComponent {
 		this._doStart();
 	}
 
+	/**
+	 * Create widget view (HTML objects). Executed once, before the first activation of the dashboard page.
+	 */
 	_doStart() {
 		this._makeView();
 
@@ -154,6 +279,11 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Activate the inactive widget and start updating immediately. Executed on each activation of the dashboard page.
+	 *
+	 * Do not override. Override "_doActivate" instead.
+	 */
 	activate() {
 		if (this._state !== WIDGET_STATE_INACTIVE) {
 			throw new Error('Unsupported state change.');
@@ -164,11 +294,19 @@ class CWidget extends CBaseComponent {
 		this._doActivate();
 	}
 
+	/**
+	 * Start processing DOM events and start updating immediately. Executed on each activation of the dashboard page.
+	 */
 	_doActivate() {
 		this._activateEvents();
 		this._startUpdating();
 	}
 
+	/**
+	 * Deactivate the active widget and stop updating immediately. Executed on each deactivation of the dashboard page.
+	 *
+	 * Do not override. Override "_doDeactivate" instead.
+	 */
 	deactivate() {
 		if (this._state !== WIDGET_STATE_ACTIVE) {
 			throw new Error('Unsupported state change.');
@@ -179,6 +317,9 @@ class CWidget extends CBaseComponent {
 		this._doDeactivate();
 	}
 
+	/**
+	 * Stop processing DOM events and stop updating immediately. Executed on each deactivation of the dashboard page.
+	 */
 	_doDeactivate() {
 		if (this._is_new) {
 			this._is_new = false;
@@ -189,6 +330,12 @@ class CWidget extends CBaseComponent {
 		this._stopUpdating();
 	}
 
+	/**
+	 * Destroy the widget which has already been started. Executed once, when the widget or the dashboard page gets
+	 * deleted.
+	 *
+	 * Do not override. Override "_doDestroy" instead.
+	 */
 	destroy() {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this.deactivate();
@@ -203,15 +350,27 @@ class CWidget extends CBaseComponent {
 		this._doDestroy();
 	}
 
+	/**
+	 * Clean-up whatever has been set up when widget was started. Executed once, when the widget or the dashboard page
+	 * gets deleted.
+	 */
 	_doDestroy() {
 	}
 
 	// External events management methods.
 
+	/**
+	 * Check whether the widget is in editing mode.
+	 *
+	 * @returns {boolean}
+	 */
 	isEditMode() {
 		return this._is_edit_mode;
 	}
 
+	/**
+	 * Set widget to editing mode. This is one-way action.
+	 */
 	setEditMode() {
 		this._is_edit_mode = true;
 
@@ -222,14 +381,30 @@ class CWidget extends CBaseComponent {
 		this._target.classList.add('ui-draggable', 'ui-resizable');
 	}
 
+	/**
+	 * Check whether the widget supports dynamic hosts (overriding the host selected in the configuration). The host
+	 * selection control will be displayed on the dashboard, if any of the loaded widgets has such support.
+	 *
+	 * @returns {boolean}
+	 */
 	supportsDynamicHosts() {
-		return this._fields.dynamic == 1;
+		return this._fields.dynamic === '1';
 	}
 
+	/**
+	 * Get the dynamic host currently in use. Executed if the widget supports dynamic hosts.
+	 *
+	 * @returns {string|null}
+	 */
 	getDynamicHost() {
 		return this._dynamic_hostid;
 	}
 
+	/**
+	 * Set the dynamic host. Executed if the widget supports dynamic hosts.
+	 *
+	 * @param {string|null}	dynamic_hostid
+	 */
 	setDynamicHost(dynamic_hostid) {
 		this._dynamic_hostid = dynamic_hostid;
 
@@ -238,14 +413,34 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Set the time period selected in the time selector of the dashboard.
+	 *
+	 * @param {Object|null}	time_period	Selected time period (if widget.use_time_selector in manifest.json is set to
+	 * 									true in any of the loaded widgets), or null.
+	 * @param {string}		time_period.from	Relative time of period start (like "now-1h").
+	 * @param {number}		time_period.from_ts	Timestamp of period start.
+	 * @param {string}		time_period.to		Relative time of period end (like "now").
+	 * @param {number}		time_period.to_ts	Timestamp of period end.
+	 */
 	setTimePeriod(time_period) {
 		this._time_period = time_period;
 	}
 
+	/**
+	 * Find whether the widget is currently entered (focused) my mouse or keyboard. Only one widget can be entered at a
+	 * time.
+	 *
+	 * @returns {boolean}
+	 */
 	isEntered() {
 		return this._target.classList.contains(this._css_classes.focus);
 	}
 
+	/**
+	 * Enter (focus) the widget. Caused by mouse hovering or keyboard navigation. Only one widget can be entered at a
+	 * time.
+	 */
 	enter() {
 		if (this._is_edit_mode) {
 			this._addResizeHandles();
@@ -254,6 +449,9 @@ class CWidget extends CBaseComponent {
 		this._target.classList.add(this._css_classes.focus);
 	}
 
+	/**
+	 * Remove focus from the widget. Caused by mouse hovering or keyboard navigation.
+	 */
 	leave() {
 		if (this._is_edit_mode) {
 			this._removeResizeHandles();
@@ -266,100 +464,210 @@ class CWidget extends CBaseComponent {
 		this._target.classList.remove(this._css_classes.focus);
 	}
 
+	/**
+	 * Get number of header lines the widget displays when focused.
+	 *
+	 * @returns {number}
+	 */
 	getNumHeaderLines() {
-		return this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 1 : 0;
+		return this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER ? 1 : 0;
 	}
 
+	/**
+	 * Is widget currently being resized?
+	 *
+	 * @returns {boolean}
+	 */
 	_isResizing() {
 		return this._target.classList.contains('ui-resizable-resizing');
 	}
 
+	/**
+	 * Set widget resizing state.
+	 *
+	 * @param {boolean}	is_resizing
+	 */
 	setResizing(is_resizing) {
 		this._target.classList.toggle('ui-resizable-resizing', is_resizing);
 	}
 
+	/**
+	 * Is widget currently being dragged?
+	 *
+	 * @returns {boolean}
+	 */
 	_isDragging() {
 		return this._target.classList.contains('ui-draggable-dragging');
 	}
 
+	/**
+	 * Set widget dragging state.
+	 *
+	 * @param {boolean}	is_dragging
+	 */
 	setDragging(is_dragging) {
 		this._target.classList.toggle('ui-draggable-dragging', is_dragging);
 	}
 
+	/**
+	 * Are there context menus open or hints displayed for the widget?
+	 *
+	 * @returns {boolean}
+	 */
 	isUserInteracting() {
-		return this._target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"]').length > 0;
+		return this._target
+			.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
 	}
 
+	/**
+	 * Make the acquaintance of other widgets on all dashboard pages so that related widgets can establish connections.
+	 * Executed each time when the configuration of widgets is updated.
+	 *
+	 * @param {CWidget[]}	widgets
+	 */
 	announceWidgets(widgets) {
 	}
 
+	/**
+	 * Take whatever action is required on each resize event of the widget contents' container.
+	 */
 	resize() {
 	}
 
 	// Data interface methods.
 
+	/**
+	 * Get the unique ID of the widget (runtime, dynamically generated).
+	 *
+	 * @returns {string}
+	 */
 	getUniqueId() {
 		return this._unique_id;
 	}
 
+	/**
+	 * Get the widget type ("id" field of the manifest.json).
+	 *
+	 * @returns {string}
+	 */
 	getType() {
 		return this._type;
 	}
 
+	/**
+	 * Get custom widget name (can be empty).
+	 *
+	 * @returns {string}
+	 */
 	getName() {
 		return this._name;
 	}
 
+	/**
+	 * Set custom widget name and, if not empty, display it in the header. Otherwise, display the default name.
+	 *
+	 * @param {string}	name
+	 */
 	_setName(name) {
 		this._name = name;
 		this._setHeaderName(this._name !== '' ? this._name : this._defaults.name);
 	}
 
+	/**
+	 * Get widget name to be displayed in the header (either custom, if not empty, or the default one).
+	 *
+	 * @returns {string}
+	 */
 	getHeaderName() {
 		return this._name !== '' ? this._name : this._defaults.name;
 	}
 
+	/**
+	 * Display the specified widget name in the header.
+	 *
+	 * @param {string}	name
+	 */
 	_setHeaderName(name) {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			this._content_header.querySelector('h4').textContent = name;
 		}
 	}
 
+	/**
+	 * Check if widget header is set to be always displayed or displayed only when the widget is entered (focused).
+	 *
+	 * @returns {number}	One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
+	 */
 	getViewMode() {
 		return this._view_mode;
 	}
 
+	/**
+	 * Set widget header to be either always displayed or displayed only when the widget is entered (focused).
+	 *
+	 * @param {number}	view_mode	One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
+	 */
 	_setViewMode(view_mode) {
 		if (this._view_mode !== view_mode) {
 			this._view_mode = view_mode;
 			this._target.classList.toggle(this._css_classes.hidden_header,
-				this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+				this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 			);
 		}
 	}
 
+	/**
+	 * Get widget field values (widget configuration data).
+	 *
+	 * @returns {Object}
+	 */
 	getFields() {
 		return this._fields;
 	}
 
+	/**
+	 * Set widget field values (widget configuration data).
+	 *
+	 * @param {Object}	fields
+	 */
 	_setFields(fields) {
 		this._fields = fields;
 	}
 
+	/**
+	 * Get widget ID.
+	 *
+	 * @returns {string|null}	Widget ID stored in the database, or null for new widgets.
+	 */
 	getWidgetId() {
 		return this._widgetid;
 	}
 
+	/**
+	 * Check whether to display vertical padding for the widget contents' container.
+	 *
+	 * @returns {boolean}
+	 */
 	_hasPadding() {
-		return this._view_mode != ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+		return this._view_mode !== ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 	}
 
+	/**
+	 * Update padding of the widget contents' container. Executed when widget properties have changed.
+	 */
 	_updatePadding() {
 		if (this._state !== WIDGET_STATE_INITIAL) {
 			this._content_body.classList.toggle('no-padding', !this._hasPadding());
 		}
 	}
 
+	/**
+	 * Update widget properties and start updating immediately.
+	 *
+	 * @param {string|undefined}	name		Widget name to display in the header.
+	 * @param {number|undefined}	view_mode	One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object|undefined}	fields		Widget field values (widget configuration data).
+	 */
 	updateProperties({name, view_mode, fields}) {
 		if (name !== undefined) {
 			this._setName(name);
@@ -382,10 +690,20 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Get update cycle rate (refresh rate) in seconds.
+	 *
+	 * @returns {number}	Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 */
 	getRfRate() {
 		return this._rf_rate;
 	}
 
+	/**
+	 * Set update cycle rate (refresh rate) in seconds.
+	 *
+	 * @param {number}	rf_rate	Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
+	 */
 	_setRfRate(rf_rate) {
 		this._rf_rate = rf_rate;
 
@@ -411,6 +729,13 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Get widget data for purpose of copying the widget.
+	 *
+	 * @param {boolean} is_single_copy	Whether copying a single widget or copying a whole dashboard page.
+	 *
+	 * @returns {Object}
+	 */
 	getDataCopy({is_single_copy}) {
 		const data = {
 			type: this._type,
@@ -435,6 +760,11 @@ class CWidget extends CBaseComponent {
 		return data;
 	}
 
+	/**
+	 * Get widget data for storing it in the database.
+	 *
+	 * @returns {Object}
+	 */
 	save() {
 		return {
 			widgetid: this._widgetid ?? undefined,
@@ -446,6 +776,13 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
+	/**
+	 * Get context menu to display when actions button is clicked.
+	 *
+	 * @param {boolean}	can_paste_widget	Whether a copied widget is ready to be pasted over the current one.
+	 *
+	 * @returns {Object[]}
+	 */
 	getActionsContextMenu({can_paste_widget}) {
 		let menu = [];
 		let menu_actions = [];
@@ -483,20 +820,20 @@ class CWidget extends CBaseComponent {
 				items: []
 			};
 
-			const rf_rates = {
-				0: t('No refresh'),
-				10: t('10 seconds'),
-				30: t('30 seconds'),
-				60: t('1 minute'),
-				120: t('2 minutes'),
-				600: t('10 minutes'),
-				900: t('15 minutes')
-			};
+			const rf_rates = new Map([
+				[0, t('No refresh')],
+				[10, t('10 seconds')],
+				[30, t('30 seconds')],
+				[60, t('1 minute')],
+				[120, t('2 minutes')],
+				[600, t('10 minutes')],
+				[900, t('15 minutes')]
+			]);
 
-			for (const [rf_rate, label] of Object.entries(rf_rates)) {
+			for (const [rf_rate, label] of rf_rates.entries()) {
 				refresh_interval_section.items.push({
 					label: label,
-					selected: rf_rate == this._rf_rate,
+					selected: rf_rate === this._rf_rate,
 					clickCallback: () => {
 						this._setRfRate(rf_rate);
 
@@ -520,6 +857,12 @@ class CWidget extends CBaseComponent {
 
 	// Content updating methods.
 
+	/**
+	 * Start updating the widget. Executed on activation of the widget or when the update is required immediately.
+	 *
+	 * @param {number}			delay_sec		Delay seconds before the update.
+	 * @param {boolean|null}	do_update_once	Whether the widget is required to update once.
+	 */
 	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
 		if (do_update_once === null) {
 			do_update_once = this._is_edit_mode;
@@ -544,6 +887,11 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Stop updating the widget. Executed on deactivation of the widget or when the update is required to restart.
+	 *
+	 * @param {boolean}	do_abort	Whether to abort the active update request.
+	 */
 	_stopUpdating({do_abort = true} = {}) {
 		if (this._update_timeout_id !== null) {
 			clearTimeout(this._update_timeout_id);
@@ -560,14 +908,25 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Pause updating the widget whether the widget is active.
+	 */
 	_pauseUpdating() {
 		this._is_updating_paused = true;
 	}
 
+	/**
+	 * Resume updating the widget whether the widget is active.
+	 */
 	_resumeUpdating() {
 		this._is_updating_paused = false;
 	}
 
+	/**
+	 * Organize the update cycle of the widget.
+	 *
+	 * @param {boolean}	do_update_once	Whether the widget is required to update once.
+	 */
 	_update(do_update_once) {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
 			this._startUpdating(1, {do_update_once});
@@ -608,6 +967,11 @@ class CWidget extends CBaseComponent {
 			});
 	}
 
+	/**
+	 * Promise to update the widget contents.
+	 *
+	 * @returns {Promise<any>}
+	 */
 	_promiseUpdate() {
 		const curl = new Curl('zabbix.php');
 
@@ -631,6 +995,11 @@ class CWidget extends CBaseComponent {
 			});
 	}
 
+	/**
+	 * Prepare server request data for updating the widget.
+	 *
+	 * @returns {Object}
+	 */
 	_getUpdateRequestData() {
 		return {
 			templateid: this._dashboard.templateid ?? undefined,
@@ -647,6 +1016,20 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
+	/**
+	 * Update widget contents if the update cycle ran smoothly.
+	 *
+	 * @param {Object}				response
+	 * @param {string}				response.name			Widget name to display in the header.
+	 * @param {string}				response.body			Widget body (HTML contents).
+	 * @param {string[]|undefined}	response.messages		Error messages.
+	 *
+	 * @param {Object[]}			response.info			Custom buttons to display in the widget header.
+	 * @param {string}				response.info[].icon
+	 * @param {string}				response.info[].hint
+	 *
+	 * @param {string|undefined}	response.debug			Debug information.
+	 */
 	_processUpdateResponse(response) {
 		this._setContents({
 			name: response.name,
@@ -657,24 +1040,59 @@ class CWidget extends CBaseComponent {
 		});
 	}
 
+	/**
+	 * Display error message if the update cycle did not run smoothly.
+	 *
+	 * @param {Object}				error
+	 * @param {string|undefined}	error.title
+	 * @param {string[]|undefined}	error.messages
+	 */
 	_processUpdateErrorResponse(error) {
 		this._setErrorContents({error});
 	}
 
 	// Widget view methods.
 
+	/**
+	 * Get main HTML container of the widget.
+	 *
+	 * @returns {HTMLDivElement}
+	 */
 	getView() {
 		return this._target;
 	}
 
+	/**
+	 * Get CSS class name for the specified container or state.
+	 *
+	 * @param {string}	name	Container or state name.
+	 *
+	 * @returns {string}
+	 */
 	getCssClass(name) {
 		return this._css_classes[name];
 	}
 
+	/**
+	 * Get position and size of the widget (in dashboard coordinates).
+	 *
+	 * @returns {{x: number, y: number, width: number, height: number}|null}
+	 */
 	getPos() {
 		return this._pos;
 	}
 
+	/**
+	 * Set size and position the widget on the dashboard page.
+	 *
+	 * @param {Object}	pos			Position and size of the widget (in dashboard coordinates).
+	 * @param {number}	pos.x		Horizontal position.
+	 * @param {number}	pos.y		Vertical position.
+	 * @param {number}	pos.width	Widget width.
+	 * @param {number}	pos.height	Widget height.
+	 *
+	 * @param {boolean}	is_managed	Whether physically setting the position and size is managed from the outside.
+	 */
 	setPos(pos, {is_managed = false} = {}) {
 		this._pos = pos;
 
@@ -686,6 +1104,13 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Calculate which of the four sides are affected by the resize handle.
+	 *
+	 * @param {HTMLElement}	resize_handle	One of eight dots by which the widget can be resized in editing mode.
+	 *
+	 * @returns {{top: boolean, left: boolean, bottom: boolean, right: boolean}}
+	 */
 	getResizeHandleSides(resize_handle) {
 		return {
 			top: resize_handle.classList.contains('ui-resizable-nw')
@@ -703,6 +1128,10 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
+	/**
+	 * Add eight resize handles to the widget by which the widget can be resized in editing mode. Executed when the
+	 * widget is entered (focused).
+	 */
 	_addResizeHandles() {
 		this._resizable_handles = {};
 
@@ -728,6 +1157,10 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Remove eight resize handles from the widget by which the widget can be resized in editing mode. Executed when the
+	 * widget is left (unfocused).
+	 */
 	_removeResizeHandles() {
 		for (const resizable_handle of Object.values(this._resizable_handles)) {
 			resizable_handle.remove();
@@ -736,16 +1169,21 @@ class CWidget extends CBaseComponent {
 		this._resizable_handles = {};
 	}
 
+	/**
+	 * Calculate viewport dimensions of the contents' container.
+	 *
+	 * @returns {{content_height: number, content_width: number}}
+	 */
 	_getContentSize() {
 		const computed_style = getComputedStyle(this._content_body);
 
-		const content_width = parseInt(
+		const content_width = Math.floor(
 			parseFloat(computed_style.width)
 				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
 				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
 		);
 
-		const content_height = parseInt(
+		const content_height = Math.floor(
 			parseFloat(computed_style.height)
 				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
 				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
@@ -754,6 +1192,19 @@ class CWidget extends CBaseComponent {
 		return {content_width, content_height};
 	}
 
+	/**
+	 * Update widget contents. Executed on successful update cycle of the widget.
+	 *
+	 * @param {string}				name		Widget name to display in the header.
+	 * @param {string|undefined}	body		Widget body (HTML contents).
+	 * @param {string[]|undefined}	messages	Error messages.
+	 *
+	 * @param {Object[]|undefined}	info		Custom buttons to display in the widget header.
+	 * @param {string}				info[].icon
+	 * @param {string}				info[].hint
+	 *
+	 * @param {string|undefined}	debug		Debug information.
+	 */
 	_setContents({name, body, messages, info, debug}) {
 		this._setHeaderName(name);
 
@@ -780,6 +1231,13 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Display error message if the update cycle did not run smoothly.
+	 *
+	 * @param {Object}				error
+	 * @param {string|undefined}	error.title
+	 * @param {string[]|undefined}	error.messages
+	 */
 	_setErrorContents({error}) {
 		this._setHeaderName(this._defaults.name);
 
@@ -791,6 +1249,13 @@ class CWidget extends CBaseComponent {
 		this._removeInfoButtons();
 	}
 
+	/**
+	 * Add custom buttons to the widget header. Executed when setting widget contents.
+	 *
+	 * @param {Object[]}	buttons
+	 * @param {string}		buttons[].icon
+	 * @param {string}		buttons[].hint
+	 */
 	_addInfoButtons(buttons) {
 		buttons.reverse();
 
@@ -818,12 +1283,18 @@ class CWidget extends CBaseComponent {
 		}
 	}
 
+	/**
+	 * Remove custom buttons from the widget header.
+	 */
 	_removeInfoButtons() {
 		for (const li of this._actions.querySelectorAll('.widget-info-button')) {
 			li.remove();
 		}
 	}
 
+	/**
+	 * Show data preloader immediately. Executed before the first update cycle of the widget.
+	 */
 	_showPreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
 
@@ -836,6 +1307,9 @@ class CWidget extends CBaseComponent {
 		this._content_body.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
+	/**
+	 * Hide data preloader.
+	 */
 	_hidePreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
 
@@ -849,6 +1323,9 @@ class CWidget extends CBaseComponent {
 		});
 	}
 
+	/**
+	 * Schedule showing data preloader after 15 seconds. Executed before regular update cycle of the widget.
+	 */
 	_schedulePreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
 
@@ -860,6 +1337,9 @@ class CWidget extends CBaseComponent {
 		this._content_body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
+	/**
+	 * Create DOM structure for the widget. Executed once, on widget start.
+	 */
 	_makeView() {
 		this._container = document.createElement('div');
 		this._container.classList.add(this._css_classes.container);
@@ -915,7 +1395,7 @@ class CWidget extends CBaseComponent {
 		this._target.classList.toggle('ui-draggable', this._is_edit_mode);
 		this._target.classList.toggle('ui-resizable', this._is_edit_mode);
 		this._target.classList.toggle(this._css_classes.hidden_header,
-			this._view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 		);
 		this._target.classList.toggle('new-widget', this._is_new);
 
@@ -925,6 +1405,9 @@ class CWidget extends CBaseComponent {
 
 	// Internal events management methods.
 
+	/**
+	 * Create event listener functions. Executed once, upon instance initialization.
+	 */
 	_registerEvents() {
 		this._events = {
 			actions: (e) => {
@@ -955,6 +1438,9 @@ class CWidget extends CBaseComponent {
 		};
 	}
 
+	/**
+	 * Activate event listeners. Executed on each activation of the dashboard page.
+	 */
 	_activateEvents() {
 		this._button_actions.addEventListener('click', this._events.actions);
 
@@ -968,6 +1454,9 @@ class CWidget extends CBaseComponent {
 		this._content_header.addEventListener('focusout', this._events.focusout);
 	}
 
+	/**
+	 * Deactivate event listeners. Executed on each deactivation of the dashboard page.
+	 */
 	_deactivateEvents() {
 		this._button_actions.removeEventListener('click', this._events.actions);
 
