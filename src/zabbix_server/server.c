@@ -284,10 +284,10 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
+static char	*config_alert_scripts_path	= NULL;
 static const char	*get_alert_scripts_path(void)
 {
-	return CONFIG_ALERT_SCRIPTS_PATH;
+	return config_alert_scripts_path;
 }
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -599,8 +599,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
 
-	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
-		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DEFAULT_ALERT_SCRIPTS_PATH);
+	if (NULL == config_alert_scripts_path)
+		config_alert_scripts_path = zbx_strdup(config_alert_scripts_path, DEFAULT_ALERT_SCRIPTS_PATH);
 
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
@@ -882,7 +882,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"AlertScriptsPath",		&CONFIG_ALERT_SCRIPTS_PATH,		TYPE_STRING,
+		{"AlertScriptsPath",		&config_alert_scripts_path,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1382,7 +1382,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type, CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type, get_config_forks,
 							get_alert_scripts_path};
-	zbx_thread_alert_args		alert_args = {get_program_type};
+	zbx_thread_alert_args		alert_args = {get_program_type, get_alert_scripts_path};
 
 	if (SUCCEED != init_database_cache(&error))
 	{

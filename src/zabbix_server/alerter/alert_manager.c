@@ -381,11 +381,6 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
  *                                                                            *
  * Purpose: updates additional webhook media type fields                      *
  *                                                                            *
- * Parameters: manager   - [IN]                                               *
- *             mediatype - [IN/OUT]                                           *
- *             script    - [IN] script source                                 *
- *             timeout   - [IN] timeout as string                             *
- *                                                                            *
  ******************************************************************************/
 static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediatype, const char *script,
 		const char *timeout)

@@ -20,7 +20,6 @@
 #include "alert.h"
 
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 
 ZBX_PTR_VECTOR_IMPL(alerter_dispatch_result, zbx_alerter_dispatch_result_t *)
 
