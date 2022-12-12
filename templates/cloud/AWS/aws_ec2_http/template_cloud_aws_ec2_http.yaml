@@ -769,7 +769,7 @@ zabbix_export:
             
                   setParams: function (params) {
                       ['access_key', 'secret_key', 'region', 'instance_id'].forEach(function (field) {
-                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '')) {
+                          if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                               throw 'Required param is not set: "' + field + '".';
                           }
                       });
