@@ -176,7 +176,7 @@ static int	snmp_hex_to_mac_dyn(const char *value, char **out)
 static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
 {
 	char	*token = NULL, *saveptr, *field_name, *params2, *oid_prefix;
-	int	hex_conv_flag , idx = 0;
+	int	format_flag , idx = 0;
 
 	if (NULL == params || '\0' == *params)
 		return FAIL;
@@ -192,12 +192,12 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 		}
 		else if (2 == idx % 3)
 		{
-			hex_conv_flag = atoi(token);
+			format_flag = atoi(token);
 
 			zbx_snmp_walk_to_json_param_t	parsed_param;
 
 			parsed_param.field_name = zbx_strdup(NULL, field_name);
-			parsed_param.hex_conv_flag = hex_conv_flag;
+			parsed_param.format_flag = format_flag;
 			parsed_param.oid_prefix = oid_prefix;
 
 			zbx_vector_snmp_walk_to_json_param_append(parsed_params, parsed_param);
@@ -458,7 +458,7 @@ static void	zbx_vector_snmp_walk_to_json_param_clear_ext(zbx_vector_snmp_walk_to
 	zbx_vector_snmp_walk_to_json_param_clear(v);
 }
 
-static int	preproc_parse_value_from_walk_params(const char *params, char **oid_needle, int *hex_conv_flag)
+static int	preproc_parse_value_from_walk_params(const char *params, char **oid_needle, int *format_flag)
 {
 	char	*delim_ptr;
 	size_t	delim_offset, alloc_offset = 0, alloc_len = 0;
@@ -470,7 +470,7 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 		return FAIL;
 
 	zbx_strncpy_alloc(oid_needle, &alloc_offset, &alloc_len, params, delim_offset);
-	*hex_conv_flag = atoi(params + delim_offset + 1);
+	*format_flag = atoi(params + delim_offset + 1);
 
 	return SUCCEED;
 }
@@ -508,18 +508,44 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: format SNMP value according to its type and specified format      *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to convert. If conversion succeeds *
+ *                               the old value is freed and a new one is      *
+ *                               allocated                                    *
+ *             type   - [IN] the value type returned by SNMP                  *
+ *             format - [IN] the value format specified by configuration      *
+ *             error  - [OUT] the error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the value was converted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	preproc_snmp_convert_value(char **value, zbx_snmp_type_t type, int format, char **error)
+{
+	switch (type)
+	{
+		case ZBX_SNMP_TYPE_HEX:
+			return preproc_snmp_convert_hex_value(value, format, error);
+		default:
+			return SUCCEED;
+	}
+}
+
 static int	preproc_snmp_value_from_walk(const char *data, const char *params, char **output, char **error)
 {
 	int			ret = FAIL;
 	size_t			len, offset;
 	zbx_snmp_value_pair_t	p;
 	char			*oid_needle = NULL;
-	int			hex_conv_flag = 0;
+	int			format_flag = 0;
 #ifdef HAVE_NETSNMP
 	char			*oid_tr_tmp = NULL;
 	const char		*oid_tr;
 #endif
-	if (FAIL == preproc_parse_value_from_walk_params(params, &oid_needle, &hex_conv_flag))
+	if (FAIL == preproc_parse_value_from_walk_params(params, &oid_needle, &format_flag))
 	{
 		*error = zbx_strdup(NULL, "failed to parse params");
 		return FAIL;
@@ -547,15 +573,14 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 		if (0 == strcmp(oid_needle, p.oid + offset))
 #endif
 		{
-			if (ZBX_SNMP_TYPE_HEX == p.type)
+
+			if (SUCCEED != preproc_snmp_convert_value(&p.value, p.type, format_flag, error))
 			{
-				if (SUCCEED != preproc_snmp_convert_hex_value(&p.value, hex_conv_flag, error))
-				{
-					zbx_free(p.oid);
-					zbx_free(p.value);
-					goto out;
-				}
+				zbx_free(p.oid);
+				zbx_free(p.value);
+				goto out;
 			}
+
 			zbx_free(p.oid);
 			*output = p.value;
 			ret = SUCCEED;
@@ -591,11 +616,11 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 	int			ret = FAIL;
 	zbx_snmp_value_pair_t	*pair_cached, pair_local = {0};
 	char			*oid_needle = NULL;
-	int			hex_conv_flag = 0;
+	int			format_flag = 0;
 #ifdef HAVE_NETSNMP
 	char			*oid_tr_tmp = NULL;
 #endif
-	if (FAIL == preproc_parse_value_from_walk_params(params, &oid_needle, &hex_conv_flag))
+	if (FAIL == preproc_parse_value_from_walk_params(params, &oid_needle, &format_flag))
 	{
 		*error = zbx_strdup(NULL, "failed to parse params");
 		return FAIL;
@@ -618,13 +643,10 @@ static int	snmp_value_from_cached_walk(zbx_snmp_value_cache_t *cache, const char
 
 	*output = zbx_strdup(NULL, pair_cached->value);
 
-	if (ZBX_SNMP_TYPE_HEX == pair_cached->type)
+	if (SUCCEED != preproc_snmp_convert_value(output, pair_cached->type, format_flag, error))
 	{
-		if (SUCCEED != preproc_snmp_convert_hex_value(output, hex_conv_flag, error))
-		{
-			zbx_free(*output);
-			goto out;
-		}
+		zbx_free(*output);
+		goto out;
 	}
 
 	ret = SUCCEED;
@@ -800,16 +822,12 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			else if (0 != strncmp(param_field.oid_prefix, p.oid, prefix_len))
 				continue;
 
-			if (ZBX_SNMP_TYPE_HEX == p.type)
+			if (SUCCEED != preproc_snmp_convert_value(&p.value, p.type, param_field.format_flag, errmsg))
 			{
-				if (SUCCEED != preproc_snmp_convert_hex_value(&p.value, param_field.hex_conv_flag,
-						errmsg))
-				{
-					zbx_free(p.oid);
-					zbx_free(p.value);
-					ret = FAIL;
-					goto out;
-				}
+				zbx_free(p.oid);
+				zbx_free(p.value);
+				ret = FAIL;
+				goto out;
 			}
 
 			oobj_local.key = zbx_strdup(NULL, prefix_len + p.oid + 1);
