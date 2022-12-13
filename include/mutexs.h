@@ -21,6 +21,7 @@
 #define ZABBIX_MUTEXS_H
 
 #include "common.h"
+#include "zbxprof.h"
 
 #ifdef _WINDOWS
 #	define ZBX_MUTEX_NULL		NULL
@@ -30,6 +31,9 @@
 
 typedef wchar_t * zbx_mutex_name_t;
 typedef HANDLE zbx_mutex_t;
+
+#	define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
+#	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 #else	/* not _WINDOWS */
 typedef enum
 {
@@ -68,9 +72,34 @@ zbx_rwlock_name_t;
 #	define ZBX_MUTEX_NULL			NULL
 #	define ZBX_RWLOCK_NULL			NULL
 
-#	define zbx_rwlock_wrlock(rwlock)	__zbx_rwlock_wrlock(__FILE__, __LINE__, rwlock)
-#	define zbx_rwlock_rdlock(rwlock)	__zbx_rwlock_rdlock(__FILE__, __LINE__, rwlock)
-#	define zbx_rwlock_unlock(rwlock)	__zbx_rwlock_unlock(__FILE__, __LINE__, rwlock)
+#	define zbx_rwlock_wrlock(rwlock)				\
+									\
+	do								\
+	{								\
+		zbx_prof_start(__func__, ZBX_PROF_RWLOCK);		\
+		__zbx_rwlock_wrlock(__FILE__, __LINE__, rwlock);	\
+		zbx_prof_end_wait();					\
+	}								\
+	while (0)
+
+#	define zbx_rwlock_rdlock(rwlock)				\
+									\
+	do								\
+	{								\
+		zbx_prof_start(__func__, ZBX_PROF_RWLOCK);		\
+		__zbx_rwlock_rdlock(__FILE__, __LINE__, rwlock);	\
+		zbx_prof_end_wait();					\
+	}								\
+	while(0)
+
+#	define zbx_rwlock_unlock(rwlock)				\
+									\
+	do								\
+	{								\
+		__zbx_rwlock_unlock(__FILE__, __LINE__, rwlock);	\
+		zbx_prof_end();						\
+	}								\
+	while(0)
 
 typedef pthread_mutex_t * zbx_mutex_t;
 typedef pthread_rwlock_t * zbx_rwlock_t;
@@ -85,9 +114,35 @@ void	zbx_locks_enable(void);
 #	define ZBX_RWLOCK_NULL				-1
 #	define ZBX_MUTEX_NULL				-1
 
-#	define zbx_rwlock_wrlock(rwlock)		__zbx_mutex_lock(__FILE__, __LINE__, rwlock)
-#	define zbx_rwlock_rdlock(rwlock)		__zbx_mutex_lock(__FILE__, __LINE__, rwlock)
-#	define zbx_rwlock_unlock(rwlock)		__zbx_mutex_unlock(__FILE__, __LINE__, rwlock)
+#	define zbx_rwlock_wrlock(mutex)					\
+									\
+	do								\
+	{								\
+		zbx_prof_start(__func__, ZBX_PROF_MUTEX);		\
+		__zbx_mutex_lock(__FILE__, __LINE__, mutex);		\
+		zbx_prof_end_wait();					\
+	}								\
+	while(0)
+
+#	define zbx_rwlock_rdlock(mutex)					\
+									\
+	do								\
+	{								\
+		zbx_prof_start(__func__, ZBX_PROF_MUTEX);		\
+		__zbx_mutex_lock(__FILE__, __LINE__, mutex);		\
+		zbx_prof_end_wait();					\
+	}								\
+	while(0)
+
+#	define zbx_rwlock_unlock(mutex)					\
+									\
+	do								\
+	{								\
+		__zbx_mutex_unlock(__FILE__, __LINE__, mutex);		\
+		zbx_prof_end();						\
+	}								\
+	while(0)
+
 #	define zbx_rwlock_destroy(rwlock)		zbx_mutex_destroy(rwlock)
 
 typedef int zbx_mutex_t;
@@ -98,9 +153,26 @@ void		zbx_locks_destroy(void);
 int		zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
 zbx_mutex_t	zbx_mutex_addr_get(zbx_mutex_name_t mutex_name);
 zbx_rwlock_t	zbx_rwlock_addr_get(zbx_rwlock_name_t rwlock_name);
+
+#	define zbx_mutex_lock(mutex)					\
+									\
+	do								\
+	{								\
+		zbx_prof_start(__func__, ZBX_PROF_MUTEX);		\
+		__zbx_mutex_lock(__FILE__, __LINE__, mutex);		\
+		zbx_prof_end_wait();					\
+	}								\
+	while(0)
+
+#	define zbx_mutex_unlock(mutex)					\
+									\
+	do								\
+	{								\
+		__zbx_mutex_unlock(__FILE__, __LINE__, mutex);		\
+		zbx_prof_end();						\
+	}								\
+	while(0)
 #endif	/* _WINDOWS */
-#	define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
-#	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 
 int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
 void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex);
