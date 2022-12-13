@@ -1987,6 +1987,17 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	zbx_init_agent_request(&request);
 
+	snmp_bulkwalk_get_options(&default_opts);
+
+	bulk_opts.numeric_oids = 1;
+	bulk_opts.numeric_enum = 1;
+	bulk_opts.numeric_ts = 1;
+	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
+	snmp_bulkwalk_set_options(&bulk_opts);
+
+	zbx_vector_snmp_oid_create_ext(&param_oids, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			(zbx_mem_free_func_t)vector_snmp_oid_free);
+
 	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
 	{
 		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse parameter.", max_error_len);
@@ -2003,19 +2014,11 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
-	snmp_bulkwalk_get_options(&default_opts);
-
-	bulk_opts.numeric_oids = 1;
-	bulk_opts.numeric_enum = 1;
-	bulk_opts.numeric_ts = 1;
-	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
-	snmp_bulkwalk_set_options(&bulk_opts);
-
-	zbx_vector_snmp_oid_create_ext(&param_oids, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
-			(zbx_mem_free_func_t)vector_snmp_oid_free);
-
 	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &param_oids, max_error_len, error))
-		return FAIL;
+	{
+		ret = CONFIG_ERROR;
+		goto out;
+	}
 
 	for (i = 0; i < param_oids.values_num; i++)
 	{
