@@ -2013,6 +2013,13 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
+	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
+	{
+		zbx_strlcpy(error, "Invalid max repetition count: it should be at least 1.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
 	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &param_oids, max_error_len, error))
 	{
 		ret = CONFIG_ERROR;
