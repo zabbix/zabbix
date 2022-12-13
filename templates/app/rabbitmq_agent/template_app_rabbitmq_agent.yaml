@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-12-06T12:50:59Z'
+  date: '2022-12-12T11:04:12Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1834,7 +1834,7 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]'
               history: 7h
-              description: 'It checks whether the the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
+              description: 'It checks whether the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-12-06T12:51:05Z'
+  date: '2022-12-12T11:04:17Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1886,7 +1886,7 @@ zabbix_export:
               authtype: BASIC
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
-              description: 'It checks whether the the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
+              description: 'It checks whether the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
               preprocessing:
