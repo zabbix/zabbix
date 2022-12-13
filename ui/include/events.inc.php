@@ -326,7 +326,7 @@ function isEventUpdating(bool $in_closing, array $event): bool {
  */
 function getEventStatusString(bool $in_closing, array $event): string {
 	if ($event['r_eventid'] != 0) {
-		$value_str = _('RESOLVED');
+		$value_str = isEventUpdating($in_closing, $event) ? _('UPDATING') : _('RESOLVED');
 	}
 	else {
 		if ($in_closing) {
