@@ -1542,7 +1542,9 @@ class CApiInputValidator {
 		if (array_key_exists('length', $rule) && count($data) > $rule['length']) {
 			$error = ($rule['length'] == 0)
 				? _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'))
-				: _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+				: _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('maximum number of array elements is %1$s', $rule['length'])
+				);
 
 			return false;
 		}

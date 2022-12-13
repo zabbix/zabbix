@@ -1830,7 +1830,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
 				[[], [], []],
 				'/',
-				'Invalid parameter "/": value is too long.'
+				'Invalid parameter "/": maximum number of array elements is 2.'
 			],
 			[
 				['type' => API_OBJECTS, 'length' => 3, 'fields' => []],
