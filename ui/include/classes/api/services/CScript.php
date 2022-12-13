@@ -1307,9 +1307,11 @@ class CScript extends CApiService {
 	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
 		$names = [];
 		$menu_paths = [];
+		$script_update = false;
 
 		if (array_key_exists('scriptid', $scripts[0])) {
 			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+			$script_update = true;
 		}
 
 		if (!array_key_exists('name', $scripts[0])) {
@@ -1320,7 +1322,7 @@ class CScript extends CApiService {
 			$scripts[0]['scope'] = $db_scripts[$scripts[0]['scriptid']]['scope'];
 		}
 
-		if (array_key_exists('scope', $scripts[0])) {
+		if (array_key_exists('scope', $scripts[0]) && $script_update) {
 			if ($scripts[0]['scope'] != 1) {
 				if (!array_key_exists('scriptid', $scripts[0])) {
 					$scripts[0]['menu_path'] =  '';
@@ -1369,6 +1371,7 @@ class CScript extends CApiService {
 		]);
 
 		$duplicateScripts = false;
+
 		if ($duplicates) {
 			foreach ($names as $key => $name) {
 				foreach ($dbScripts as $dbScript) {
