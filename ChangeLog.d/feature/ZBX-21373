@@ -1,1 +1,1 @@
-...G...... [ZBX-21373] fixed agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
