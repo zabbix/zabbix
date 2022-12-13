@@ -378,7 +378,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionId('gp.groupid', [0], true)
+				' AND gp.groupid IS NOT NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -420,7 +420,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionString('gp.name', [''], true)
+				' AND gp.groupid IS NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
