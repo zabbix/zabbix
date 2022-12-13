@@ -468,7 +468,6 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 
 static int	preproc_snmp_convert_hex_value(char **value, int format, char **error)
 {
-#define ZBX_PREPROC_SNMP_UNDEFINED	0
 #define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
 #define ZBX_PREPROC_SNMP_UTF8_FROM_MAC	2
 	char	*out = NULL;
@@ -500,7 +499,6 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 	*value = out;
 
 	return SUCCEED;
-#undef ZBX_PREPROC_SNMP_UNDEFINED
 #undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
 #undef ZBX_PREPROC_SNMP_UTF8_FROM_MAC
 }
