@@ -3421,6 +3421,7 @@ form.is-loading {
       margin-right: 0; }
   .list-table .third-col {
     padding-top: 0;
+    padding-bottom: 0;
     padding-left: 2px; }
     .list-table .third-col .icon-action-symptom {
       margin-top: 6px;

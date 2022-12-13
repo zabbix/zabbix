@@ -389,6 +389,8 @@ form {
 	.third-col {
 		// Padding top removed because it pushes the collapse and expand icon too far down.
 		padding-top: 0;
+		// Padding bottom removed because Chrom and Safari expands the row.
+		padding-bottom: 0;
 		padding-left: 2px;
 
 		.icon-action-symptom {
