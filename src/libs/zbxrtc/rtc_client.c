@@ -128,7 +128,6 @@ static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, c
 		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE), data, error);
 	}
 
-
 	if (0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		*code = ZBX_RTC_CONFIG_CACHE_RELOAD;

@@ -27,6 +27,7 @@ static zbx_prof_scope_t			zbx_prof_scope;
 static int				zbx_prof_initialized;
 
 static zbx_func_profile_t		*zbx_func_profile[PROF_LEVEL_MAX];
+#undef PROF_LEVEL_MAX
 static int				zbx_func_profile_level;
 
 static void	zbx_prof_init(void)
@@ -130,8 +131,8 @@ static void	zbx_print_prof(const char *info)
 		static char		*str = NULL;
 		static size_t		str_alloc;
 		size_t			str_offset = 0;
-		double			total_wait_lock = 0, total_busy_lock = 0;
-		double			total_mutex_wait_lock = 0, total_mutex_busy_lock = 0;
+		double			total_wait_lock = 0, total_busy_lock = 0, total_mutex_wait_lock = 0,
+					total_mutex_busy_lock = 0;
 		unsigned int		total_locked_mutex = 0, total_locked_rwlock = 0;
 
 		for (i = 0; i < zbx_func_profiles.values_num; i++)
@@ -219,6 +220,7 @@ static void	zbx_reset_prof(void)
 
 void	zbx_prof_update(const char *info, double time_now)
 {
+#define PROF_UPDATE_INTERVAL	30
 	static double	last_update;
 
 	if (0 != zbx_prof_scope_requested)
@@ -238,4 +240,5 @@ void	zbx_prof_update(const char *info, double time_now)
 		else
 			zbx_reset_prof();
 	}
+#undef PROF_UPDATE_INTERVAL
 }

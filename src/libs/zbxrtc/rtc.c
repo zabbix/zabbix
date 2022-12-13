@@ -44,16 +44,16 @@ static int	rtc_parse_scope(const char *str, int *scope)
  *                                                                            *
  * Purpose: parse runtime control option                                      *
  *                                                                            *
- * Parameters: opt       - [IN] the runtime control option                    *
- *             len       - [IN] the runtime control option length without     *
+ * Parameters: opt       - [IN] runtime control option                        *
+ *             len       - [IN] runtime control option length without         *
  *                              parameter                                     *
- *             pid       - [OUT] the target pid (if specified)                *
- *             proc_type - [OUT] the target process type (if specified)       *
- *             proc_num  - [OUT] the target process num (if specified)        *
- *             scope     - [OUT] the scope (if specified)                     *
- *             error     - [OUT] the error message                            *
+ *             pid       - [OUT] target pid (if specified)                    *
+ *             proc_type - [OUT] target process type (if specified)           *
+ *             proc_num  - [OUT] target process num (if specified)            *
+ *             scope     - [OUT] scope (if specified)                         *
+ *             error     - [OUT] error message                                *
  *                                                                            *
- * Return value: SUCCEED - the runtime control option was processed           *
+ * Return value: SUCCEED - runtime control option was processed               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
