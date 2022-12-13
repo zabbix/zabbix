@@ -49,7 +49,7 @@ Media testing can be done manually, from `Media types` page. Press `Test` button
 
 2. after request is successfully sent from zabbix, check if it is received in OPSGenie alert panel(could require refresh);
 3. Now to close this problem from zabbix: on the test page change `event.value` to `0` (which is a recovery event) and press `Test` button again to send problem close request.
-4. Confrim that problem is closed in OPSGenie panel.
+4. Confirm that problem is closed in OPSGenie panel.
 
 Send cheers to support if anything happens!!!
 ## Internal alerts
