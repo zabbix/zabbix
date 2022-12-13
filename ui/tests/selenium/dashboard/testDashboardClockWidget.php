@@ -24,8 +24,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup widget
- * @backup profiles
+ * @backup widget, profiles
  * @dataSource ClockWidgets
  */
 
@@ -83,13 +82,12 @@ class testDashboardClockWidget extends CWebTest {
 		);
 
 		// Check fields "Time type" values.
-		$timetype_values = ['Local time', 'Server time', 'Host time'];
-		$tt_dropdown = $form->query('name', 'time_type')->asDropdown()->one();
-		$this->assertEquals($timetype_values, $tt_dropdown->getOptions()->asText());
+		$this->assertEquals(['Local time', 'Server time', 'Host time'],
+				$form->query('name', 'time_type')->asDropdown()->one()->getOptions()->asText());
 
 		// Check that it's possible to select host items, when time type is "Host Time".
-		$form->fill(['Time type' => 'Host time']);
 		$fields = ['Type', 'Name', 'Refresh interval', 'Time type'];
+
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
 			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
 			$fields = ($type === 'Host time') ? array_merge($fields, ['Item']) : $fields;
@@ -105,21 +103,19 @@ class testDashboardClockWidget extends CWebTest {
 		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$dashboard->save();
-		$hostname = $dashboard->getWidget('Host for clock widget')->getText();
-		$this->assertEquals("Host for clock widget", $hostname);
+		$this->assertEquals('Host for clock widget', $dashboard->getWidget('Host for clock widget')->getHeaderText());
 
-		// Update widget back to it's original name.
+		// Update widget back to it's original name and check if Apply and Cancel button are clickable.
 		$form = $dashboard->getWidget('Host for clock widget')->edit();
+
+		foreach (['Apply', 'Cancel'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isClickable());
+		}
+
 		$form->fill(['Name' => 'LayoutClock']);
 		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$dashboard->save();
-
-		// Check if Apply and Cancel button are clickable.
-		$dashboard->getWidget('LayoutClock')->edit();
-		foreach (['Apply', 'Cancel'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isClickable());
-		}
 	}
 
 	public static function getCreateData() {
@@ -235,24 +231,17 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill($data['Fields']);
+		$this->query('button', 'Add')->waitUntilClickable()->one()->click();
 
 		if ($data['Expected'] === TEST_GOOD) {
-			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-			// Get fields from saved widgets.
-			$fields = $dashboard->getWidget($data['Fields']['Name'])->edit()->getFields();
-			$original_widget = $fields->asValues();
-
-			// Check if added widgets are truly added and fields are filled as expected.
-			$fields = $dashboard->getWidget($data['Fields']['Name'])->edit()->getFields();
-			$created_widget = $fields->asValues();
-			$this->assertEquals($original_widget, $created_widget);
+			// Check that created widget has correct values fom dataprovider.
+			$dashboard->getWidget($data['Fields']['Name'])->edit()->checkValue($data['Fields']);
 		}
 		else {
-			$this->query('button', 'Add')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
 			$form->getOverlayMessage()->close();
 			$this->query('button', 'Cancel')->waitUntilClickable()->one()->click();
@@ -393,9 +382,9 @@ class testDashboardClockWidget extends CWebTest {
 		$form = $dashboard->getWidget(self::$name)->edit();
 		$form->waitUntilReady();
 		$form->fill($data['Fields']);
+		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 
 		if ($data['Expected'] === TEST_GOOD) {
-			$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
@@ -415,27 +404,22 @@ class testDashboardClockWidget extends CWebTest {
 			$this->assertNotEquals($original_widget, $updated_widget);
 		}
 		else {
-			$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_BAD, null, 'Invalid parameter "Item": cannot be empty.');
 			$form->getOverlayMessage()->close();
 		}
 	}
 
 	/**
-	 * Check clock widgets deletion.
+	 * Check clock widget deletion.
 	 */
 	public function testDashboardClockWidget_Delete() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->edit()->getWidget('DeleteClock');
-		$this->assertTrue($widget->isEditable());
-		$dashboard->deleteWidget('DeleteClock');
-		$dashboard->save();
+		$this->assertTrue($dashboard->edit()->getWidget('DeleteClock')->isEditable());
+		$dashboard->deleteWidget('DeleteClock')->save();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->waitUntilPresent()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Dashboard updated', $message->getTitle());
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget('DeleteClock', false)->isValid());
