@@ -37,7 +37,6 @@
 
 extern zbx_es_t	es_engine;
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: returns numeric type hint based on item value type                *
@@ -2132,7 +2131,6 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 
 	return SUCCEED;
 }
-
 
 /******************************************************************************
  *                                                                            *

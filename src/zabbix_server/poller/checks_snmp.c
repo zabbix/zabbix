@@ -1908,9 +1908,9 @@ typedef struct
 	int	numeric_ts;
 	int	oid_format;
 }
-zbx_snmp_bulkwalk_opts_t;
+zbx_snmp_format_opts_t;
 
-static void	snmp_bulkwalk_backup_options(zbx_snmp_bulkwalk_opts_t *opts)
+static void	snmp_bulkwalk_get_options(zbx_snmp_format_opts_t *opts)
 {
 	opts->numeric_oids = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS);
 	opts->numeric_enum = netsnmp_ds_get_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM);
@@ -1918,7 +1918,7 @@ static void	snmp_bulkwalk_backup_options(zbx_snmp_bulkwalk_opts_t *opts)
 	opts->oid_format = netsnmp_ds_get_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT);
 }
 
-static void	snmp_bulkwalk_set_options(zbx_snmp_bulkwalk_opts_t *opts)
+static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 {
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, opts->numeric_oids);
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_ENUM, opts->numeric_enum);
@@ -1982,7 +1982,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 	struct variable_list		*var;
 	char				*results = NULL;
 	size_t				results_alloc = 0, results_offset = 0;
-	zbx_snmp_bulkwalk_opts_t	default_opts, bulk_opts;
+	zbx_snmp_format_opts_t	default_opts, bulk_opts;
 	zbx_vector_snmp_oid_t		param_oids;
 
 	zbx_init_agent_request(&request);
@@ -2003,7 +2003,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
-	snmp_bulkwalk_backup_options(&default_opts);
+	snmp_bulkwalk_get_options(&default_opts);
 
 	bulk_opts.numeric_oids = 1;
 	bulk_opts.numeric_enum = 1;
