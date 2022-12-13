@@ -871,10 +871,15 @@ class CEvent extends CApiService {
 				$upd_acknowledges = [];
 
 				foreach ($acknowledgeids as $k => $id) {
-					$upd_acknowledges[] = [
-						'values' => ['taskid' => $taskids[$k]],
-						'where' => ['acknowledgeid' => $id]
-					];
+					$acknowledgement = $acknowledges[$k];
+
+					if (($acknowledgement['action']
+							& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
+						$upd_acknowledges[] = [
+							'values' => ['taskid' => $taskids[$k]],
+							'where' => ['acknowledgeid' => $id]
+						];
+					}
 				}
 
 				DB::update('acknowledges', $upd_acknowledges);
@@ -922,10 +927,15 @@ class CEvent extends CApiService {
 				$upd_acknowledges = [];
 
 				foreach ($acknowledgeids as $k => $id) {
-					$upd_acknowledges[] = [
-						'values' => ['taskid' => $taskids[$k]],
-						'where' => ['acknowledgeid' => $id]
-					];
+					$acknowledgement = $acknowledges[$k];
+
+					if (($acknowledgement['action']
+							& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+						$upd_acknowledges[] = [
+							'values' => ['taskid' => $taskids[$k]],
+							'where' => ['acknowledgeid' => $id]
+						];
+					}
 				}
 
 				DB::update('acknowledges', $upd_acknowledges);
