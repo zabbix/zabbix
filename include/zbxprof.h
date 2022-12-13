@@ -17,12 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_RTC_H
-#define ZABBIX_RTC_H
+#ifndef ZABBIX_PROF_H
+#define ZABBIX_PROF_H
 
-#include "zbxtypes.h"
+#define ZBX_PROF_PROCESSING	0x01
+#define ZBX_PROF_RWLOCK		0x02
+#define ZBX_PROF_MUTEX		0x04
+#define ZBX_PROF_ALL		0xff
 
-int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		int *scope, char **error);
+typedef int zbx_prof_scope_t;
+
+void	zbx_prof_enable(zbx_prof_scope_t scope);
+void	zbx_prof_disable(void);
+void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);
+void	zbx_prof_end_wait(void);
+void	zbx_prof_end(void);
+void	zbx_prof_update(const char *info, double time_now);
 
 #endif
