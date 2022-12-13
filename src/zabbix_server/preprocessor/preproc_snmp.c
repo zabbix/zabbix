@@ -22,10 +22,6 @@
 #include "zbxjson.h"
 #include "zbxcrypto.h"
 
-#define ZBX_PREPROC_SNMPWALK_UNDEFINED		0
-#define ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX	1
-#define ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC	2
-
 ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t *)
@@ -472,11 +468,14 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 
 static int	preproc_snmp_convert_hex_value(char **value, int format, char **error)
 {
+#define ZBX_PREPROC_SNMP_UNDEFINED	0
+#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
+#define ZBX_PREPROC_SNMP_UTF8_FROM_MAC	2
 	char	*out = NULL;
 
 	switch (format)
 	{
-		case ZBX_PREPROC_SNMPWALK_UTF8_FROM_HEX:
+		case ZBX_PREPROC_SNMP_UTF8_FROM_HEX:
 			if (SUCCEED != snmp_hex_to_utf8_dyn(*value, &out))
 			{
 				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to utf-8 string",
@@ -485,7 +484,7 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 			}
 
 			break;
-		case ZBX_PREPROC_SNMPWALK_UTF8_FROM_MAC:
+		case ZBX_PREPROC_SNMP_UTF8_FROM_MAC:
 			if (SUCCEED != snmp_hex_to_mac_dyn(*value, &out))
 			{
 				*error = zbx_dsprintf(NULL, "Cannot convert hex value '%s' to mac address",
@@ -501,6 +500,9 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 	*value = out;
 
 	return SUCCEED;
+#undef ZBX_PREPROC_SNMP_UNDEFINED
+#undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
+#undef ZBX_PREPROC_SNMP_UTF8_FROM_MAC
 }
 
 /******************************************************************************
