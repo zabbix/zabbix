@@ -81,6 +81,41 @@
 						field.disabled = !e.target.checked;
 					}
 				});
+
+				if (e.target.checked) {
+					let form_fields = this.form.querySelectorAll('[name^=http_]');
+
+					const http_auth_enabled = document.getElementById('http_auth_enabled');
+					overlayDialogue({
+						'title': <?= json_encode(_('Confirm changes')) ?>,
+						'class': 'position-middle',
+						'content': document.createElement('span').innerText = <?= json_encode(
+							_('Enable HTTP authentication for all users.')
+						) ?>,
+						'buttons': [
+							{
+								'title': <?= json_encode(_('Cancel')) ?>,
+								'cancel': true,
+								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+								'action': function () {
+									for (const form_field of form_fields) {
+										if (form_field !== http_auth_enabled) {
+											form_field.disabled = true;
+										}
+									}
+
+									http_auth_enabled.checked = false;
+									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+								}
+							},
+							{
+								'title': <?= json_encode(_('Ok')) ?>,
+								'focused': true,
+								'action': function () {}
+							}
+						]
+					}, e.target);
+				}
 			});
 
 			if (document.getElementById('saml_auth_enabled') !== null) {
