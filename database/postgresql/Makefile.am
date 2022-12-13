@@ -55,6 +55,9 @@ $(tsdb_nocompr_dir)/history_pk_uint.sql:
 	mkdir -p $(tsdb_nocompr_dir) && \
 	$(gen_history_pk) timescaledb history_uint > $(tsdb_nocompr_dir)/history_pk_uint.sql
 
+clean:
+	rm -f schema.sql data.sql timescaledb.sql history_pk_prepare.sql
+	rm -rf tsdb_history_pk_upgrade_with_compression tsdb_history_pk_upgrade_no_compression
 endif
 
 EXTRA_DIST = \
@@ -74,7 +77,3 @@ EXTRA_DIST = \
 	$(tsdb_nocompr_dir)/history_pk_str.sql \
 	$(tsdb_nocompr_dir)/history_pk_text.sql \
 	$(tsdb_nocompr_dir)/history_pk_uint.sql
-
-clean:
-	rm -f schema.sql data.sql timescaledb.sql history_pk_prepare.sql
-	rm -rf tsdb_history_pk_upgrade_with_compression tsdb_history_pk_upgrade_no_compression
