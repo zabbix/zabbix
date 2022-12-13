@@ -518,14 +518,15 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
  *                                                                            *
  * Purpose: process runtime control option and print result                   *
  *                                                                            *
- * Parameters: option   - [IN] runtime control option                         *
- *             error    - [OUT] error message                                 *
+ * Parameters: option            - [IN] runtime control option                *
+ *             config_timeout    - [IN]                                       *
+ *             error             - [OUT] error message                        *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process(const char *option, char **error)
+int	rtc_process(const char *option, int config_timeout, char **error)
 {
 	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
 	char		*data = NULL;
@@ -545,7 +546,7 @@ int	rtc_process(const char *option, char **error)
 		}
 	}
 
-	return zbx_rtc_async_exchange(&data, code, error);
+	return zbx_rtc_async_exchange(&data, code, config_timeout, error);
 }
 
 /******************************************************************************

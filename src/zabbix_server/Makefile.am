@@ -127,8 +127,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
-	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \

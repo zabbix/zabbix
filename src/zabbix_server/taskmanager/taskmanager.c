@@ -50,6 +50,12 @@
 
 extern unsigned char			program_type;
 
+zbx_export_file_t		*problems_export = NULL;
+static zbx_export_file_t	*get_problems_export(void)
+{
+	return problems_export;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: close the specified problem event and remove task                 *
@@ -1389,6 +1395,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
+	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
+			((((zbx_thread_args_t *)args))->args);
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
@@ -1398,7 +1407,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("task-manager", process_num);
+		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
 	sec1 = zbx_time();
 
@@ -1406,7 +1415,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, taskmanager_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1446,6 +1455,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_export_deinit(problems_export);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
