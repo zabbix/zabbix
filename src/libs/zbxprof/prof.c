@@ -231,7 +231,7 @@ void	zbx_prof_update(const char *info, double time_now)
 	else
 		zbx_prof_scope = 0;
 
-	if (30 < time_now - last_update)
+	if (PROF_UPDATE_INTERVAL < time_now - last_update)
 	{
 		last_update = time_now;
 
