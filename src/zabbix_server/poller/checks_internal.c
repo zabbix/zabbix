@@ -30,7 +30,6 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
-#include "zbxstats.h"
 
 extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];

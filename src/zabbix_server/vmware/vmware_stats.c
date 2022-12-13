@@ -21,7 +21,7 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-void zbx_vmware_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
+void	zbx_vmware_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
 {
 	zbx_vmware_stats_t	vmware_stats;
 

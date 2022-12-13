@@ -42,7 +42,7 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register callback to add information                              *
+ * Purpose: register callback to add information to main element              *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
  *                                                                            *
@@ -79,7 +79,7 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
  * Parameters: json             - [OUT] the json data                         *
- *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
+ *             config_comms     - [IN] Zabbix server/proxy comms config       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms,
