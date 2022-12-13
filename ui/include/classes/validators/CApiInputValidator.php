@@ -2144,7 +2144,7 @@ class CApiInputValidator {
 						}
 						else {
 							if (array_key_exists($value, $_uniq)) {
-								if ($field_names[1] == 'menu_path') {
+								if (array_search('menu_path', $field_names)) {
 									$menu_path = [];
 									$_menu_path = &$menu_path;
 
