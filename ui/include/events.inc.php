@@ -264,16 +264,23 @@ function make_event_details(array $event, array $allowed) {
 		if ($cause_event) {
 			$cause_event = reset($cause_event);
 
+			$has_trigger = (bool) API::Trigger()->get([
+				'output' => [],
+				'triggerids' => [$cause_event['objectid']]
+			]);
+
 			$table->addRow([_('Rank'),
 				[
 					_('Symptom'),
 					' (',
-					new CLink(
-						$cause_event['name'],
-						(new CUrl('tr_events.php'))
-							->setArgument('triggerid', $cause_event['objectid'])
-							->setArgument('eventid', $event['cause_eventid'])
-					),
+					$has_trigger
+						? new CLink(
+							$cause_event['name'],
+							(new CUrl('tr_events.php'))
+								->setArgument('triggerid', $cause_event['objectid'])
+								->setArgument('eventid', $event['cause_eventid'])
+						)
+						: $cause_event['name'],
 					')'
 				]
 			]);
