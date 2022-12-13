@@ -33,10 +33,7 @@
 
 		_initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-hostgroup')) {
-					this._submit(e.target);
-				}
-				else if (e.target.classList.contains('js-update-hostgroup')) {
+				if (e.target.classList.contains('js-update-hostgroup')) {
 					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-clone-hostgroup')) {

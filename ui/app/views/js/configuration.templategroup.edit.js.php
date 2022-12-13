@@ -33,10 +33,7 @@
 
 		_initActionButtons() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-templategroup')) {
-					this._submit(e.target);
-				}
-				else if (e.target.classList.contains('js-update-templategroup')) {
+				if (e.target.classList.contains('js-update-templategroup')) {
 					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-clone-templategroup')) {
