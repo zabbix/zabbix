@@ -70,14 +70,14 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 		$alert_options = [];
 		$alerts = [];
 
-		foreach (eventSourceObjects() as $eventSource) {
+		foreach (eventSourceObjects() as $eventsource) {
 			$alert_options[] = API::Alert()->get([
 				'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid',
 					'actionid', 'mediatypeid', 'alerttype'
 				],
 				'selectMediatypes' => ['name', 'maxattempts'],
-				'eventsource' => $eventSource['source'],
-				'eventobject' => $eventSource['object'],
+				'eventsource' => $eventsource['source'],
+				'eventobject' => $eventsource['object'],
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => $show_lines
