@@ -133,7 +133,6 @@ static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 
 static int	snmp_hex_to_mac(char *out)
 {
-#define MAC_LEN	6
 	int	hex_num = 0;
 
 	while ('\0' != *out)
@@ -153,11 +152,7 @@ static int	snmp_hex_to_mac(char *out)
 		out += 3;
 	}
 
-	if (MAC_LEN != hex_num)
-		return FAIL;
-
 	return SUCCEED;
-#undef MAC_LEN
 }
 
 static int	snmp_hex_to_mac_dyn(const char *value, char **out)

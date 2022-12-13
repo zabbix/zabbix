@@ -2448,36 +2448,6 @@ out:
   return: SUCCEED
   value: '74:65:73:74:20:D1'
 ---
-test case: SNMP walk to value - Hex-STRING - to MAC - invalid MAC, too long
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 FF
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
-    params: |-
-      .1.3.6.1.1
-      2
-out:
-  return: FAIL
----
-test case: SNMP walk to value - Hex-STRING - to MAC - invalid MAC, too short
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
-    params: |-
-      .1.3.6.1.1
-      2
-out:
-  return: FAIL
----
 test case: SNMP walk to value - Hex-STRING - to MAC - invalid hex string
 in:
   value:
@@ -3110,38 +3080,6 @@ in:
 out:
   return: SUCCEED
   value: '[{"{#SNMPINDEX}":"2","MACRO1":"FF:FF:FF:FF:FF:FF","MACRO2":"EA:9A:85:11:22:33"},{"{#SNMPINDEX}":"1","MACRO1":"74:65:73:74:20:D1","MACRO2":"00:00:00:00:00:00"}]'
----
-test case: SNMP walk to JSON - Hex-STRING type - to MAC - invalid MAC, too long
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 FF FF
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
-    params: |-
-      MACRO1
-      .1.3.6.1
-      2
-out:
-  return: FAIL
----
-test case: SNMP walk to JSON - Hex-STRING type - to MAC - invalid MAC, too short
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
-    params: |-
-      MACRO1
-      .1.3.6.1
-      2
-out:
-  return: FAIL
 ---
 test case: SNMP walk to JSON - Hex-STRING type - to MAC - invalid MAC, invalid hex string
 in:
