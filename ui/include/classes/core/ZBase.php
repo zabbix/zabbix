@@ -199,6 +199,18 @@ class ZBase {
 
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
+
+				$validator = new CNewValidator(['action' => $action_name], ['action' => 'fatal|required|string']);
+				$errors = $validator->getAllErrors();
+
+				if ($errors) {
+					CCookieHelper::set('system-message-details', base64_encode(json_encode(
+						['type' => 'error', 'messages' => $errors]
+					)));
+
+					redirect('zabbix.php?action=system.warning');
+				}
+
 				$router->setAction($action_name);
 
 				$this->component_registry->get('menu.main')

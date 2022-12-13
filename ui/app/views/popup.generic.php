@@ -659,6 +659,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'valuemaps':
+	case 'template_valuemaps':
 		foreach ($data['table_records'] as $valuemap) {
 			$name = [];
 			$check_box = $data['multiselect']
@@ -803,7 +804,8 @@ $types = [
 	'users',
 	'usrgrp',
 	'sla',
-	'valuemaps'
+	'valuemaps',
+	'template_valuemaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {

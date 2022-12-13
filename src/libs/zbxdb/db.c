@@ -103,7 +103,7 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_TSDB_VERSION = -1;
+int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
@@ -2563,6 +2563,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
+
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2594,6 +2595,9 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 			{
 				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
 			}
+
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY, info->history_compressed_chunks);
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS, info->trends_compressed_chunks);
 		}
 #endif
 		zbx_json_close(json);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:55Z'
+  date: '2022-10-28T15:26:30Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 296cb27ad93b4063b77aaf1a8339d40c
       template: 'Windows CPU by Zabbix agent active'
       name: 'Windows CPU by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -212,7 +212,7 @@ zabbix_export:
       uuid: 1b04ac025fcf474cb97e6c8c95855eeb
       template: 'Windows filesystems by Zabbix agent active'
       name: 'Windows filesystems by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -414,7 +414,7 @@ zabbix_export:
       uuid: 6dd37a415f4c40aa960d7ba91b6b5143
       template: 'Windows generic by Zabbix agent active'
       name: 'Windows generic by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -573,7 +573,7 @@ zabbix_export:
       uuid: e6535f54a0554463889fb8c65db11250
       template: 'Windows memory by Zabbix agent active'
       name: 'Windows memory by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -831,7 +831,7 @@ zabbix_export:
       uuid: 792cb76a1a6340d8acb36d8802d22c00
       template: 'Windows network by Zabbix agent active'
       name: 'Windows network by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -1457,7 +1457,7 @@ zabbix_export:
       uuid: 222cf73cb40941f6be62db0540524e5e
       template: 'Windows physical disks by Zabbix agent active'
       name: 'Windows physical disks by Zabbix agent active'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Modules
@@ -1757,7 +1757,7 @@ zabbix_export:
       description: |
         Template Services OS Windows
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Modules

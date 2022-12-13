@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:06:27Z'
+  date: '2022-10-27T11:31:40Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d3176749a5274264938f487cd89d17eb
-      template: 'D-Link DES_DGS Switch SNMP'
-      name: 'D-Link DES_DGS Switch SNMP'
+      template: 'D-Link DES_DGS Switch by SNMP'
+      name: 'D-Link DES_DGS Switch by SNMP'
       description: |
         Template D-Link DES_DGS Switch
         
@@ -51,7 +51,7 @@ zabbix_export:
           triggers:
             -
               uuid: 5d134da7ad044ab591e1b96e1dca1641
-              expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+              expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -77,14 +77,14 @@ zabbix_export:
           triggers:
             -
               uuid: 9c48d97b5d4a4668ad382e1d0d9c8e87
-              expression: 'min(/D-Link DES_DGS Switch SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch SNMP/icmppingloss,5m)<100'
+              expression: 'min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -110,17 +110,17 @@ zabbix_export:
           triggers:
             -
               uuid: 3959884457a7420a9a9007c550d9b886
-              expression: 'avg(/D-Link DES_DGS Switch SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/D-Link DES_DGS Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/D-Link DES_DGS Switch SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -184,7 +184,7 @@ zabbix_export:
           triggers:
             -
               uuid: 621c4933fd9c4b78aae1eedada7ffedf
-              expression: 'min(/D-Link DES_DGS Switch SNMP/system.cpu.util[agentCPUutilizationIn1min.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/D-Link DES_DGS Switch by SNMP/system.cpu.util[agentCPUutilizationIn1min.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -241,7 +241,7 @@ zabbix_export:
           triggers:
             -
               uuid: 40a2ad291ded4bf9bc72adc2b8653b98
-              expression: 'last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.firmware,#2) and length(last(/D-Link DES_DGS Switch SNMP/system.hw.firmware))>0'
+              expression: 'last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -302,7 +302,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3aa2e47f4b8145b8a5e4f67b0987ca2b
-              expression: 'last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber,#2) and length(last(/D-Link DES_DGS Switch SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -409,7 +409,7 @@ zabbix_export:
           triggers:
             -
               uuid: 91e1a9f579c64954a89b6efbf6b523dd
-              expression: 'last(/D-Link DES_DGS Switch SNMP/system.name,#1)<>last(/D-Link DES_DGS Switch SNMP/system.name,#2) and length(last(/D-Link DES_DGS Switch SNMP/system.name))>0'
+              expression: 'last(/D-Link DES_DGS Switch by SNMP/system.name,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.name,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -490,7 +490,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2b56c7cfef454441863d2f7cc01a330f
-              expression: 'max(/D-Link DES_DGS Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/D-Link DES_DGS Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -498,7 +498,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/D-Link DES_DGS Switch SNMP/icmpping,#3)=0'
+                  expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -544,7 +544,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e8cb2d8bc3ee44c58c5111d3ead41d1b
-                  expression: 'count(/D-Link DES_DGS Switch SNMP/sensor.fan.status[swFanStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/D-Link DES_DGS Switch by SNMP/sensor.fan.status[swFanStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -583,7 +583,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 29352d2cb80f47d98ca6c6d6d366a29f
-                  expression: 'min(/D-Link DES_DGS Switch SNMP/vm.memory.util[agentDRAMutilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/D-Link DES_DGS Switch by SNMP/vm.memory.util[agentDRAMutilization.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '#{#SNMPVALUE}: High memory utilization'
                   event_name: '#{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -606,7 +606,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'vm.memory.util[agentDRAMutilization.{#SNMPINDEX}]'
         -
           uuid: 86c7d09fe6bc4a93b634230290bcf851
@@ -912,9 +912,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6a8f2b5cd5ec4b8a9e5d35f551a756e0
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -965,21 +965,21 @@ zabbix_export:
             -
               uuid: e645a0cf5e4f47a5af03f0108070d4e4
               expression: |
-                change(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/D-Link DES_DGS Switch SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/D-Link DES_DGS Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -988,8 +988,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -997,13 +997,13 @@ zabbix_export:
             -
               uuid: 8afaa3fc79404673880795d7d7dbabd8
               expression: |
-                (avg(/D-Link DES_DGS Switch SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/D-Link DES_DGS Switch SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/D-Link DES_DGS Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/D-Link DES_DGS Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/D-Link DES_DGS Switch SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/D-Link DES_DGS Switch SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/D-Link DES_DGS Switch SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/D-Link DES_DGS Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/D-Link DES_DGS Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/D-Link DES_DGS Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1013,8 +1013,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1022,12 +1022,12 @@ zabbix_export:
             -
               uuid: 28ae5085f4ab432ea281658f1439ada1
               expression: |
-                min(/D-Link DES_DGS Switch SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/D-Link DES_DGS Switch SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/D-Link DES_DGS Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/D-Link DES_DGS Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/D-Link DES_DGS Switch SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/D-Link DES_DGS Switch SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/D-Link DES_DGS Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/D-Link DES_DGS Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1037,8 +1037,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1055,42 +1055,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'D-Link DES_DGS Switch SNMP'
+                    host: 'D-Link DES_DGS Switch by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: eb78fe16041440cb95d98ae01d53007d
@@ -1160,7 +1160,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d68607dce04f429ab8cd7e8adb5b60f1
-                  expression: 'last(/D-Link DES_DGS Switch SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1229,7 +1229,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: aabaa197e62649cd929353f131c3fa00
-                  expression: 'count(/D-Link DES_DGS Switch SNMP/sensor.psu.status[swPowerStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/D-Link DES_DGS Switch by SNMP/sensor.psu.status[swPowerStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '#{#SNMPVALUE}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1268,9 +1268,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0cbd0c61e07245af863a19f296f38195
-                  expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '#{#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: '#{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1285,9 +1285,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: bc0c87dbf83e49dab264e9f2bf1bb418
-                  expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '#{#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: '#{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1296,8 +1296,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '#{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1307,9 +1307,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 8d93aea3774d4a3bbd98127273c648d1
-                  expression: 'avg(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/D-Link DES_DGS Switch SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/D-Link DES_DGS Switch by SNMP/sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '#{#SNMPVALUE}: Temperature is too low'
                   event_name: '#{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1439,7 +1439,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'D-Link DES_DGS Switch SNMP'
+                        host: 'D-Link DES_DGS Switch by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2415,7 +2415,7 @@ zabbix_export:
   triggers:
     -
       uuid: 7a51877b860a479da9bc9f02ee36e01f
-      expression: '(last(/D-Link DES_DGS Switch SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/D-Link DES_DGS Switch SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/D-Link DES_DGS Switch SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/D-Link DES_DGS Switch SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/D-Link DES_DGS Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2424,7 +2424,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/D-Link DES_DGS Switch SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/D-Link DES_DGS Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2440,5 +2440,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'D-Link DES_DGS Switch SNMP'
+            host: 'D-Link DES_DGS Switch by SNMP'
             key: 'system.cpu.util[agentCPUutilizationIn1min.0]'

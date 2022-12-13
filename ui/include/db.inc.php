@@ -604,7 +604,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$pattern = zbx_dbstr($pattern);
 			}
 
-			$fieldSearch[] = 'UPPER('.$tableShort.'.'.$field.')'.$exclude.' LIKE '.$pattern." ESCAPE '!'";
+			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).' LIKE '.$pattern." ESCAPE '!'";
 		}
 
 		$search[$field] = '('.implode($glue, $fieldSearch).')';

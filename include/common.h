@@ -1315,6 +1315,7 @@ zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
+int	zbx_iso8601_utc(const char *str, time_t *time);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
@@ -1366,12 +1367,10 @@ double	str2double(const char *str);
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#elif defined(__MINGW32__)
-typedef struct _stat64	zbx_stat_t;
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */

@@ -102,6 +102,11 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 int	zbx_tsdb_get_version(void);
 char	*zbx_tsdb_get_license(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names);
+#define ZBX_TSDB1_HISTORY_TABLES "'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass,'history_text'::regclass,'history'::regclass"
+#define ZBX_TSDB2_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB1_TRENDS_TABLES "'trends'::regclass,'trends_uint'::regclass"
+#define ZBX_TSDB2_TRENDS_TABLES "'trends','trends_uint'"
 #endif
 
 #ifdef HAVE_ORACLE
@@ -198,6 +203,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
+#define ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY			"compressed_chunks_history"
+#define ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS			"compressed_chunks_trends"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -281,7 +288,14 @@ struct zbx_db_version_info_t
 
 	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
+
+	int				history_compressed_chunks;
+	int				trends_compressed_chunks;
 };
+
+#if defined(HAVE_POSTGRESQL)
+void	zbx_tsdb_update_dbversion_info(struct zbx_db_version_info_t *db_version_info);
+#endif
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 #ifdef HAVE_POSTGRESQL

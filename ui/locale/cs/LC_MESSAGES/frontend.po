@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-22 08:07+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-04 19:54+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +20,14 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "\"%1$s\" datum musí být menší než datum \"%2$s\"."
+msgstr "zadané datum \"%1$s\" musí být menší než datum \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr "\"%1$s\" namísto \"%2$s\""
+msgstr "\"%1$s\" místo \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -45,13 +45,13 @@ msgstr "\"%1$s\" namísto \"%2$s\""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" je očekávána"
+msgstr "očekáváná hodnota je \"%1$s\" "
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr "\"%1$s\" musí být prázdný text nebo vyšší než \"%2$s\"."
+msgstr "\"%1$s\" musí být prázdný řetězec nebo hodnota větší než \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
@@ -62,15 +62,15 @@ msgstr "hodota \"%1$s\" musí být menší nebo rovná hodnotě \"%2$s\" "
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr "\"host:key\" dvojice je očekávaná"
+msgstr "Očekává se hodnota „host: key“."
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr "\"hostid\" závislé položky a master položky by měly být shodné"
+msgstr "\"host id\" nadřazené položky(master) by mělo být shodné s \"host id\" závislé položky(item)"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr "\"ruleid\" závislé položky a hlavní položky musí ladit"
+msgstr "\"ruleid\" závislé položky(item) a hlavní položky(master) musí být shodné"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
@@ -144,7 +144,7 @@ msgstr "%1$s znaků"
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr "%1$s zbývá znaků"
+msgstr "zbývá ještě %1$s znaků"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -213,7 +213,7 @@ msgstr[2] "%1$s z %2$s prvků v hlásí problém"
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "%1$s. percentil: %2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -1872,7 +1872,7 @@ msgstr "CERT"
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:376
 msgid "CLOSING"
-msgstr ""
+msgstr "ZAVÍRÁNÍ"
 
 #: include/classes/data/CItemData.php:1066
 msgid "CPU information. Returns string or integer"
@@ -2409,9 +2409,9 @@ msgstr[2] "Nelze odstranit skupinu hostitelů"
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze odstranit skupinu hostů, protože údržba \"%1$s\" musí obsahovat minimálně jednoho hosta nebo skupinu hostů. "
+msgstr[1] "Skupiny hostitelů %1$s nelze smazat, protože údržba „%2$s“ musí obsahovat alespoň jednoho hostitele nebo skupinu hostitelů."
+msgstr[2] "Skupinu hostitelů %1$s nelze smazat, protože údržba „%2$s“ musí obsahovat alespoň jednoho hostitele nebo skupinu hostitelů."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
@@ -2470,9 +2470,9 @@ msgstr[2] "Není možné smazat typy médií"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze smazat modul: %1$s."
+msgstr[1] "Nelze odstranit moduly: %1$s"
+msgstr[2] "Nelze odstranit moduly: %1$s"
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2492,7 +2492,7 @@ msgstr[2] "Nelze smazat proxy"
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Uživatelskou roli „%1$s“ pouze pro čtení nelze smazat."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2535,7 +2535,7 @@ msgstr[2] "Nelze smazat služby"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nelze smazat službu „%1$s“: %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2836,7 +2836,7 @@ msgstr "Obrázek pozadí \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezen."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:170
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Graf \"%1$s\" použitý v obrazovce \"%2$s\" nebyl nalezen."
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
@@ -2846,7 +2846,7 @@ msgstr "Skupina \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:140
 #, c-format
 msgid "Cannot find host \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nelze najít hostitele „%1$s“ použitého v panelu „%2$s“."
 
 #: include/classes/import/importers/CMapImporter.php:164
 #, c-format
@@ -2949,7 +2949,7 @@ msgstr "Spouštěč \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
-msgstr ""
+msgstr "Uživatelský adresář pro LDAP nenalezen."
 
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
@@ -3100,9 +3100,9 @@ msgstr ""
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze načíst modul v: %1$s."
+msgstr[1] "Nelze načíst moduly v: %1$s."
+msgstr[2] "Nelze načíst moduly v: %1$s."
 
 #: include/classes/api/services/CUser.php:1449
 msgid "Cannot log out."
@@ -3562,7 +3562,7 @@ msgstr "Nelze aktualizovat službu"
 #: include/classes/api/services/CService.php:2430
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nelze aktualizovat službu \"%1$s\": %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:157
 msgid "Cannot update services"
@@ -3957,6 +3957,10 @@ msgstr "Zavřít kunstruktéra výrazu"
 msgid "Close new event"
 msgstr "Zavřít novou událost"
 
+#: app/views/configuration.correlation.edit.php:156
+msgid "Close new events"
+msgstr "Zavřít nové události"
+
 #: app/views/configuration.correlation.edit.php:151
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"
@@ -3996,7 +4000,7 @@ msgstr "Barva"
 #: include/classes/validators/CColorValidator.php:32 jsLoader.php:289
 #, c-format
 msgid "Color \"%1$s\" is not correct: expecting hexadecimal color code (6 symbols)."
-msgstr ""
+msgstr "Barva \"%1$s\" není správná: očekává se hexadecimální kód barvy (6 znaků)."
 
 #: include/views/js/monitoring.sysmaps.js.php:809
 msgid "Color (OK)"
@@ -4013,7 +4017,7 @@ msgstr "Kombinovaný výsledek"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "Středové souřadnice oddělené čárkami a úroveň přiblížení, které se zobrazí při prvním načtení widgetu."
 
 #: app/views/administration.script.edit.php:175 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:105
@@ -4061,7 +4065,7 @@ msgstr "Komprimace"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "Komprese není podporována."
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4081,7 +4085,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro pravidlo nálezu  \
 #: include/classes/api/services/CDiscoveryRule.php:1605
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr ""
+msgstr "Podmínka \"%2$s\" není použita ve vzorci \"%3$s\" pro přepsání \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1812
 #, c-format
@@ -4091,7 +4095,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro  pravidlo nálezu \
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr ""
+msgstr "Podmínka \"%2$s\" použitá ve vzorci \"%3$s\" pro přepsání \"%1$s\" není definována."
 
 #: app/partials/popup.operations.php:254
 #: app/views/configuration.correlation.edit.php:131
@@ -4127,7 +4131,7 @@ msgstr "Nastavení akcí"
 
 #: app/controllers/CControllerAuditSettingsEdit.php:60
 msgid "Configuration of audit log"
-msgstr ""
+msgstr "Konfigurace protokolu auditu."
 
 #: app/controllers/CControllerAuthenticationEdit.php:196
 msgid "Configuration of authentication"
@@ -4227,7 +4231,7 @@ msgstr "Nastavení skriptů"
 
 #: app/controllers/CControllerTemplateGroupEdit.php:88
 msgid "Configuration of template group"
-msgstr ""
+msgstr "Konfigurace skupiny šablony."
 
 #: app/controllers/CControllerTemplateGroupList.php:123
 msgid "Configuration of template groups"
@@ -4293,7 +4297,7 @@ msgstr "Potvrzující text"
 
 #: app/views/popup.acknowledge.edit.php:114
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
-msgstr ""
+msgstr "Potvrzení, že problém byl zaznamenán (uživatel provádějící potvrzení bude zaznamenán). Změna stavu spustí aktualizační operace."
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -4325,6 +4329,17 @@ msgstr "Vypršel časový limit připojení"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Časový limit připojení %1$s sekund vypršel při připojení k Zabbix serveru \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+"Připojení k Zabbix serveru \"%1$s\" se nezdařilo. Možné důvody:\n"
+"1. Nesprávné \"NodeAddress\" nebo \"ListenPort\" v \"zabbix_server.conf\" nebo přepsání IP/DNS serveru v \"zabbix.conf.php\";\n"
+"2. Nesprávná konfigurace DNS serverů.\n"
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4335,6 +4350,21 @@ msgstr ""
 "Připojení k Zabbix serveru \"%s\" selhalo. Možné důvody:\n"
 "1. Špatné nastavení IP/DNS v souboru \"zabbix.conf.php\";\n"
 "2. Špatné nastavení DNS serveru.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Připojení k serveru Zabbix \"%1$s\" bylo odmítnuto. Možné důvody:\n"
+"1. Nesprávné \"NodeAddress\" nebo \"ListenPort\" v \"zabbix_server.conf\" nebo přepsání IP/DNS serveru v \"zabbix.conf.php\";\n"
+"2. Bezpečnostní prostředí (například SELinux) blokuje spojení;\n"
+"3. Neběží démon serveru Zabbix;\n"
+"4. Firewall blokuje TCP spojení.\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4350,6 +4380,17 @@ msgstr ""
 "2. Bezpečnostní prostředí (například SELinux) blokuje připojení;\n"
 "3. Neběží démon serveru Zabbix;\n"
 "4. Firewall blokuje připojení TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Časový limit připojení k Zabbix serveru \"%1$s\" vypršel. Možné důvody:\n"
+"1. Nesprávné \"NodeAddress\" nebo \"ListenPort\" v \"zabbix_server.conf\" nebo přepsání IP/DNS serveru v \"zabbix.conf.php\";\n"
+"2. Firewall blokuje TCP spojení.\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -4581,7 +4622,7 @@ msgstr "Počet spárovaných řádků v monitorovaném log souboru. Vrací celé
 
 #: include/classes/data/CItemData.php:1638
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "Počet hodnot zařazených do fronty pro zpracování low-level zjišťování."
 
 #: include/classes/data/CItemData.php:1642
 msgid "Count of values enqueued in the preprocessing queue."
@@ -4650,7 +4691,7 @@ msgstr "Vytvořit pravidlo objevování (nejprve vyberte hostitele)"
 
 #: include/views/configuration.host.discovery.list.php:48
 msgid "Create discovery rule (select template first)"
-msgstr ""
+msgstr "Vytvořit pravidlo zjišťování (nejprve vyberte šablonu)"
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:324
 #: include/views/configuration.host.prototype.edit.php:289
@@ -4721,7 +4762,7 @@ msgstr "Vytvořit položku (nejdříve vyberte hosta)"
 
 #: include/views/configuration.item.list.php:47
 msgid "Create item (select template first)"
-msgstr ""
+msgstr "Vytvořit objekt (nejprve vyber šablonu)"
 
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
@@ -4822,7 +4863,7 @@ msgstr "Vytvořit web scénář (vyber nejprve hosta)"
 
 #: include/views/configuration.httpconf.list.php:108
 msgid "Create web scenario (select template first)"
-msgstr ""
+msgstr "Vytvořit webový scénář (nejprve vyber šablonu)"
 
 #: app/partials/service.list.edit.php:57 app/partials/service.list.php:54
 #: app/views/administration.token.list.php:137
@@ -4997,7 +5038,7 @@ msgstr "Dashbord \"%1$s\" již existuje."
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr ""
+msgstr "Dashboard \"%1$s\" je použit v reportu \"%2$s\"."
 
 #: app/controllers/CControllerDashboardUpdate.php:145
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -5225,7 +5266,7 @@ msgstr "Den v měsíci"
 
 #: include/classes/api/services/CMaintenance.php:689
 msgid "Day of the week and day of the month cannot be specified simultaneously."
-msgstr ""
+msgstr "Den v týdnu a den v měsíci nelze zadat současně."
 
 #: app/views/popup.maintenance.period.php:96
 #: app/views/popup.maintenance.period.php:115
@@ -5240,7 +5281,7 @@ msgstr "Dní"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Deactivates manual suppression."
-msgstr ""
+msgstr "Deaktivuje ruční potlačení."
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5283,15 +5324,15 @@ msgstr "Výchozí"
 #: app/views/dashboard.page.properties.edit.php:48
 #, c-format
 msgid "Default (%1$s)"
-msgstr ""
+msgstr "Výchozí (%1$s)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:134
 msgid "Default LDAP server must be specified."
-msgstr ""
+msgstr "Výchozí LDAP server musí být definován."
 
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
-msgstr ""
+msgstr "Výchozí přístup k novým prvkům uživatelského rozhraní"
 
 #: app/views/administration.userrole.edit.php:343
 msgid "Default access to new actions"
@@ -5403,7 +5444,7 @@ msgstr "Smazat"
 
 #: app/views/js/popup.import.js.php:48
 msgid "Delete all elements that are not present in the import file?"
-msgstr ""
+msgstr "Smazat všechny prvky, které nejsou přítomny v importovaném souboru?"
 
 #: include/views/configuration.template.edit.php:226
 #: include/views/configuration.template.list.php:293
@@ -5508,7 +5549,7 @@ msgstr "Smazat vybranou smlouvu SLA?"
 
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
-msgstr ""
+msgstr "Smazat vybraná SLAs?"
 
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
@@ -5637,11 +5678,11 @@ msgstr "Smazat vybrané skripty?"
 
 #: app/views/js/service.list.js.php:152 app/views/popup.service.edit.php:391
 msgid "Delete selected service?"
-msgstr ""
+msgstr "Smazat vybranou službu?"
 
 #: app/views/js/service.list.js.php:151
 msgid "Delete selected services?"
-msgstr ""
+msgstr "Smazat vybrané služby?"
 
 #: jsLoader.php:274
 msgid "Delete selected shapes?"
@@ -5651,7 +5692,7 @@ msgstr "Smazat vybrané tvary?"
 #: app/views/js/configuration.templategroup.list.js.php:70
 #: app/views/popup.templategroup.edit.php:50
 msgid "Delete selected template group?"
-msgstr ""
+msgstr "Smazat vybranou skupinu šablon?"
 
 #: app/views/js/configuration.templategroup.list.js.php:69
 msgid "Delete selected template groups?"
@@ -5762,7 +5803,7 @@ msgstr "Zastaralé"
 #: include/classes/validators/CApiInputValidator.php:1302
 #, c-format
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
-msgstr ""
+msgstr "Zastaralý parametr \"%1$s\" nelze použít s \"%2$s\"."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5815,7 +5856,7 @@ msgstr "Detaily web scénáře"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Detekovaná licence TimescaleDB nepodporuje kompresi. Komprese je podporována v TimescaleDB Komunitní edici."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6096,27 +6137,27 @@ msgstr "Objekt objevování"
 
 #: include/classes/data/CItemData.php:1222
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Zjištění clusterů VMware, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1230
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Zjištění datových úložišť VMware, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Zjištění datových úložišť hypervisoru VMware, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
-msgstr ""
+msgstr "Zjištění síťových rozhraní hypervisoru VMware, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Zjištění hypervizorů VMware, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1550
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Zjištění diskových zařízení virtuálního stroje VMware, <url> - URL služby VMware, <uuid> - název hostitele virtuálního stroje VMware. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1562
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -6279,7 +6320,7 @@ msgstr "Zobrazení možností"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:812
 msgid "Division denominator"
-msgstr ""
+msgstr "Jmenovatel divize"
 
 #: app/views/popup.lldoperation.php:190 app/views/popup.massupdate.item.php:293
 #: include/views/configuration.item.edit.php:850
@@ -6522,7 +6563,7 @@ msgstr "Efektivní hodnota"
 #: include/classes/api/managers/CHistoryManager.php:1385
 #, c-format
 msgid "Elasticsearch URL is not set for type: %1$s."
-msgstr ""
+msgstr "Elasticsearch URL není nastaven pro typ: %1$s."
 
 #: include/classes/helpers/CElasticsearchHelper.php:86
 #: include/classes/helpers/CElasticsearchHelper.php:185
@@ -6662,7 +6703,7 @@ msgstr "Povolit hostitele sledované přes vybrané proxy?"
 
 #: app/views/js/proxy.list.js.php:122
 msgid "Enable hosts monitored by selected proxy?"
-msgstr ""
+msgstr "Povolit hosty monitorované vybranými proxy?"
 
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
@@ -6875,7 +6916,7 @@ msgstr "Rozpočet chyb"
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "Chyba rozpočtu"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6896,7 +6937,7 @@ msgstr "Chyba! Nelze spustit server Zabbix kvůli nepodporované verzi databázo
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "Chyba! Nelze spustit server Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -10002,6 +10043,10 @@ msgstr "Info"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
+
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -18467,6 +18512,16 @@ msgstr "Prozatím tento měsíc"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20200,6 +20255,10 @@ msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procen
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
@@ -21397,6 +21456,14 @@ msgstr "Přihlašovací formulář Zabbixu"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Zabbix server"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

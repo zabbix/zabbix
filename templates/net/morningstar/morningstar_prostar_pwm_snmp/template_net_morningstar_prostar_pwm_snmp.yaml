@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:54:44Z'
+  date: '2022-10-27T11:34:18Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 24bed6339f0a492fab86fe757394b937
-      template: 'Morningstar ProStar PWM SNMP'
-      name: 'Morningstar ProStar PWM SNMP'
+      template: 'Morningstar ProStar PWM by SNMP'
+      name: 'Morningstar ProStar PWM by SNMP'
       description: |
         MIBs used:
         PROSTAR-PWM
@@ -116,7 +116,7 @@ zabbix_export:
           triggers:
             -
               uuid: f12fc2c1a7a142a287304c18bafa1181
-              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+              expression: 'last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               name: 'Battery: Device charge in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -126,14 +126,14 @@ zabbix_export:
                   value: notice
             -
               uuid: adf8cf02aa1e42fa84e1f11ddae4df01
-              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
+              expression: 'last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
               name: 'Battery: Device charge in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Battery: Device charge in critical state'
-                  expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+                  expression: 'last(/Morningstar ProStar PWM by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               tags:
                 -
                   tag: scope
@@ -264,7 +264,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7a8bf4420b6b48ab8a5bc999eecae760
-              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              expression: 'last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
               name: 'Load: Device load in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -274,14 +274,14 @@ zabbix_export:
                   value: notice
             -
               uuid: 5152f9cd4ee34be485f3cb0a0f60afd5
-              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
+              expression: 'last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
               name: 'Load: Device load in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Load: Device load in critical state'
-                  expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+                  expression: 'last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
               tags:
                 -
                   tag: scope
@@ -371,7 +371,7 @@ zabbix_export:
           triggers:
             -
               uuid: 67fd46f034c3486e9af3cabfc5dc8056
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
               name: 'Status: Device has "arrayCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -381,7 +381,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 31cc0b05b83045de80a7d07f26545010
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
               name: 'Status: Device has "batterySenseDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -391,7 +391,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 9e498d21bc7f4ca1937f1628f4b1ea55
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
               name: 'Status: Device has "batterySenseOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -401,7 +401,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 8a09c7609f9a45cea5b217757a7d2e5e
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2'
               name: 'Status: Device has "batteryTempOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -411,7 +411,7 @@ zabbix_export:
                   value: notice
             -
               uuid: b173b8ca12f8464aae6476009b4c89e8
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
               name: 'Status: Device has "controllerReset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -421,7 +421,7 @@ zabbix_export:
                   value: notice
             -
               uuid: cdbac88810ff49caa35771e661d8b312
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -431,7 +431,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 7758388df28d4540ba393f4423fef00a
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
               name: 'Status: Device has "currentMeasurementError" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -441,7 +441,7 @@ zabbix_export:
                   value: notice
             -
               uuid: a56fef1f61c44ba884ec448b0d306c1d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
               name: 'Status: Device has "eepromAccessFailure" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -451,7 +451,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fefea5daa03d453c8c5148ddb39997f9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
               name: 'Status: Device has "fp10SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -461,7 +461,7 @@ zabbix_export:
                   value: notice
             -
               uuid: c252c82aff2a4ac680965115cb2fab64
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
               name: 'Status: Device has "heatsinkTempLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -471,7 +471,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 5b93a0a09a62481d8096ec743c2ceaff
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -481,7 +481,7 @@ zabbix_export:
                   value: notice
             -
               uuid: f28e5143a238470ba93c1345c814f87d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -491,7 +491,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 75c84ef378984fca854b34a8ef79668c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
               name: 'Status: Device has "hightInputVoltageLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -501,7 +501,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 5c1551f7e2be40e0b8b50ed263f8e293
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
               name: 'Status: Device has "loadCurrentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -511,7 +511,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 665117c5b9b64ea09a1d661e9c40fc43
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
               name: 'Status: Device has "loadLvd" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -521,7 +521,7 @@ zabbix_export:
                   value: notice
             -
               uuid: b89c002c859c419ea748b43d575e9e27
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
               name: 'Status: Device has "logTimeout" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -531,7 +531,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 17f51e7b248b4e63934e8b529b85b2ef
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
               name: 'Status: Device has "mosfetOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -541,7 +541,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 75e23772250741d0b1fc1ddff2a72ef6
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
               name: 'Status: Device has "p12SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -551,7 +551,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fc374c9ac9fa4f979fbff9f7c7d83565
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
               name: 'Status: Device has "p33SupplyOutOfRange" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -561,7 +561,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fbec2a1fdbe54d8da352471acf67bad1
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -571,7 +571,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 915da6e7b1cd410da9a6c68e3b4abd85
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -581,7 +581,7 @@ zabbix_export:
                   value: notice
             -
               uuid: e8bf2213a5444e2c9923b6f093d43f75
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -644,7 +644,7 @@ zabbix_export:
           triggers:
             -
               uuid: b2ff69793e124031a79a668b03678fac
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -654,7 +654,7 @@ zabbix_export:
                   value: notice
             -
               uuid: a4ca36ccaa9d45ceb79303afef1c49f0
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -664,7 +664,7 @@ zabbix_export:
                   value: notice
             -
               uuid: f4d1120afb13456b9d45f8795dbc30b7
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
               name: 'Status: Device has "batteryLowVoltageDisconnect" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -674,7 +674,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 9e5f2c575945458ea8a39f33cb23b833
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -684,7 +684,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fd904f4469324784ac2c469e64069f94
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -694,7 +694,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 62076ce0967049c8bde39f71afcb85d9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
               name: 'Status: Device has "localTempSensorDamaged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -704,7 +704,7 @@ zabbix_export:
                   value: notice
             -
               uuid: ea8487afe1c14bc08f3d9fd7f75d208f
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
               name: 'Status: Device has "mosfetSShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -714,7 +714,7 @@ zabbix_export:
                   value: notice
             -
               uuid: b0bb139541ae493bafc40dac9074d898
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -724,7 +724,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 8af94d7ff1a84e18b10122b0e3743d45
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2'
               name: 'Status: Device has "p3Fault" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -734,7 +734,7 @@ zabbix_export:
                   value: notice
             -
               uuid: b41cb2e05acb40f59efa50a25f66cd62
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
               name: 'Status: Device has "rtsNoLongerValid" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -744,7 +744,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d99c3f126c7e480cb4fcc705349eb61d
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -754,7 +754,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 711b28f19cb74c0faeef73263ca1fb8f
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
               name: 'Status: Device has "slaveTimeout" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -764,7 +764,7 @@ zabbix_export:
                   value: notice
             -
               uuid: e4a261d750d546c7b5d5067dd9a0ec25
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -847,7 +847,7 @@ zabbix_export:
           triggers:
             -
               uuid: 99ab5f0d3014459a8cd7d137d3a1f688
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -857,7 +857,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 77752192092f4f1caceef19c3c164b72
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
               name: 'Status: Device has "dipSwitchChanged" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -867,7 +867,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d2e55501d89844aeb47f7887a11754a9
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
               name: 'Status: Device has "externalShortCircuit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -877,7 +877,7 @@ zabbix_export:
                   value: notice
             -
               uuid: a6548502cfc4406098ba3129af8efcb5
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
               name: 'Status: Device has "highTempDisconnect" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -887,7 +887,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 6e8f0127bc7b42dea9d867ab174f458c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
               name: 'Status: Device has "loadHvd" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -897,7 +897,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 2a303d4712e244a9b051fb1b0247fac5
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
               name: 'Status: Device has "mosfetShorted" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -907,7 +907,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 5720e2e15e5f42099fd7de361f62c99a
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -917,7 +917,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 2f522d50a8124ed2a8af4d7b6417c31c
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2'
               name: 'Status: Device has "p3Fault" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -927,7 +927,7 @@ zabbix_export:
                   value: notice
             -
               uuid: e75abe852b9c4e1d91a1f8f83622ef64
-              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
+              expression: 'count(/Morningstar ProStar PWM by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -956,7 +956,7 @@ zabbix_export:
           triggers:
             -
               uuid: 16c1444a745a47e59fd22bd1a64baef3
-              expression: 'nodata(/Morningstar ProStar PWM SNMP/status.net.uptime,5m)=1'
+              expression: 'nodata(/Morningstar ProStar PWM by SNMP/status.net.uptime,5m)=1'
               name: 'Status: Failed to fetch data'
               event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
@@ -1034,7 +1034,7 @@ zabbix_export:
           triggers:
             -
               uuid: 46eb3a0e80294a4db8324d56337ed712
-              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              expression: 'min(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature'
               event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1045,7 +1045,7 @@ zabbix_export:
                   value: notice
             -
               uuid: c3f3ba5b2cab4481bb62fa8527554e96
-              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              expression: 'max(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature'
               event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1056,7 +1056,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 80aaf1de029b4d6eadce9f2a946f6dde
-              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
+              expression: 'min(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature'
               event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1064,14 +1064,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Temperature: Critically high battery temperature'
-                  expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+                  expression: 'min(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               tags:
                 -
                   tag: scope
                   value: notice
             -
               uuid: cf1db336ea124f9a9fd6eb367f93f0e8
-              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
+              expression: 'max(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature'
               event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1079,7 +1079,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Temperature: Critically low battery temperature'
-                  expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+                  expression: 'max(/Morningstar ProStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               tags:
                 -
                   tag: scope
@@ -1133,7 +1133,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e89cf2b8066840c2876642f0d8db1edd
-                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  expression: 'min(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage'
                   event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1144,7 +1144,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 8356aba9afb242b09902873a5f0e1d47
-                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  expression: 'max(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage'
                   event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1155,7 +1155,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 77f130af976c43edb8c823de5cbd57b2
-                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  expression: 'min(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage'
                   event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1163,14 +1163,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery: Critically high battery voltage'
-                      expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                      expression: 'min(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   tags:
                     -
                       tag: scope
                       value: capacity
                 -
                   uuid: 6c288c8b28db4f8e95c8ad2aa8b838ef
-                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  expression: 'max(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage'
                   event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1178,7 +1178,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery: Critically low battery voltage'
-                      expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                      expression: 'max(/Morningstar ProStar PWM by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1192,14 +1192,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Morningstar ProStar PWM SNMP'
+                    host: 'Morningstar ProStar PWM by SNMP'
                     key: 'battery.voltage[batteryTerminalVoltage.0{#SINGLETON}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Morningstar ProStar PWM SNMP'
+                    host: 'Morningstar ProStar PWM by SNMP'
                     key: 'load.voltage[loadVoltage.0]'
           master_item:
             key: 'battery.voltage.discovery[batteryTerminalVoltage.0]'
@@ -1355,7 +1355,7 @@ zabbix_export:
   triggers:
     -
       uuid: dea364bf454746bca6be38d7e0759d06
-      expression: '(last(/Morningstar ProStar PWM SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar PWM SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar PWM SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar PWM SNMP/status.net.uptime)<10m)'
+      expression: '(last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar PWM by SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar PWM by SNMP/status.net.uptime)<10m)'
       name: 'Status: Device has been restarted'
       event_name: 'Status: Device has been restarted (uptime < 10m)'
       priority: INFO
@@ -1374,7 +1374,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'array.voltage[arrayVoltage.0]'
     -
       uuid: 252a40cfba4242deac69f8ed77a04b84
@@ -1384,14 +1384,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'charge.current[chargeCurrent.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'load.current[loadCurrent.0]'
     -
       uuid: 94e4d2db752b4c54a8b497516b515fe0
@@ -1401,19 +1401,19 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'temp.ambient[ambientTemperature.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'temp.battery[batteryTemperature.0]'
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Morningstar ProStar PWM SNMP'
+            host: 'Morningstar ProStar PWM by SNMP'
             key: 'temp.heatsink[heatsinkTemperature.0]'
