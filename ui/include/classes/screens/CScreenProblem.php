@@ -1515,7 +1515,9 @@ class CScreenProblem extends CScreenBase {
 						$collapse_expand_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
 					}
 
-					$row->addItem([$symptom_count_col, $collapse_expand_col]);
+					$row
+						->addClass('problem-row')
+						->addItem([$symptom_count_col, $collapse_expand_col]);
 				}
 				else {
 					if ($data['show_three_columns']) {
@@ -1525,10 +1527,12 @@ class CScreenProblem extends CScreenBase {
 						 * from both sides. Retain zero the paddings even if columns are empty, they too cause extra
 						 * width.
 						 */
-						$row->addItem([
-							$empty_col->addClass(ZBX_STYLE_SECOND_COL),
-							$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-						]);
+						$row
+							->addClass('problem-row')
+							->addItem([
+								$empty_col->addClass(ZBX_STYLE_SECOND_COL),
+								$empty_col->addClass(ZBX_STYLE_THIRD_COL)
+							]);
 					}
 					elseif ($data['show_two_columns']) {
 						/*
@@ -1536,9 +1540,9 @@ class CScreenProblem extends CScreenBase {
 						 * "Show symptoms" filter enabled, so stand-alone events are shown. So only one empty column is
 						 * required which has no padding from both sides.
 						 */
-						$row->addItem(
-							$empty_col->addClass(ZBX_STYLE_SECOND_COL)
-						);
+						$row
+							->addClass('problem-row')
+							->addItem($empty_col->addClass(ZBX_STYLE_SECOND_COL));
 					}
 					// Otherwise page has only cause events with no symptoms at all.
 				}

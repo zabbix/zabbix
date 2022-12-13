@@ -183,23 +183,31 @@
 
 				// Check if cause events were opened. If so, after (not full) refresh open them again.
 				if (this.opened_eventids.includes(btn.dataset.eventid)) {
-					const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+					let rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
 
 					[...rows].forEach(row => row.classList.remove('hidden'));
 
 					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 					btn.title = '<?= _('Collapse') ?>';
 				}
+			});
 
-				// Fix last row border depending if it is opened or closed.
+			// Fix last row border depending if it is opened or closed.
+			rows = table.querySelectorAll('.problem-row');
+
+			rows.forEach((row, idx, array) => {
 				if (idx === array.length - 1) {
-					const tr = btn.closest('tr');
-					const tds = [...tr.children];
+					const tds = [...row.children];
+					let is_collapsed = false;
 
 					tds.forEach((td) => {
-						td.style.borderBottomStyle = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'))
-							? 'hidden'
-							: 'solid';
+						const btn = td.querySelector("button[data-action='show_symptoms']");
+
+						if (btn !== null) {
+							is_collapsed = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
+						}
+
+						td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
 					});
 				}
 			});
@@ -210,7 +218,7 @@
 			btn.disabled = true;
 
 			const table = this.getCurrentResultsTable();
-			const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+			let rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
 
 			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
 			if (rows[0].classList.contains('hidden')) {
@@ -231,16 +239,19 @@
 			}
 
 			// Fix last row border depending if it is opened or closed.
-			if (idx === array.length - 1) {
-				const tr = btn.closest('tr');
-				const tds = [...tr.children];
+			rows = table.querySelectorAll('.problem-row');
 
-				tds.forEach((td) => {
-					td.style.borderBottomStyle = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'))
-						? 'hidden'
-						: 'solid';
-				});
-			}
+			rows.forEach((row, idx, array) => {
+				if (idx === array.length - 1) {
+					const tds = [...row.children];
+
+					tds.forEach((td) => {
+						td.style.borderBottomStyle = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'))
+							? 'hidden'
+							: 'solid';
+					});
+				}
+			});
 
 			// When complete enable button again.
 			btn.disabled = false;
