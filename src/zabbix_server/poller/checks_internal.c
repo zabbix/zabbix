@@ -185,7 +185,8 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms,
+		int config_server_startup_time)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -307,7 +308,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, time(NULL) - zbx_config_comms->config_server_startup_time);
+		SET_UI64_RESULT(result, time(NULL) - config_server_startup_time);
 	}
 	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
@@ -317,7 +318,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, zbx_config_comms->config_server_startup_time);
+		SET_UI64_RESULT(result, config_server_startup_time);
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{
@@ -770,7 +771,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_zabbix_stats_get(&json, zbx_config_comms);
+				zbx_zabbix_stats_get(&json, zbx_config_comms, config_server_startup_time);
 
 				zbx_json_close(&json);
 

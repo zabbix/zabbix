@@ -31,6 +31,7 @@ typedef struct
 {
 	zbx_get_program_type_f  zbx_get_program_type_cb_arg;
 	int                     config_timeout;
+	int			config_server_startup_time;
 }
 zbx_thread_taskmanager_args;
 
