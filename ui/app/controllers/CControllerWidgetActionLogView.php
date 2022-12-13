@@ -66,19 +66,35 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getAlerts($sortfield, $sortorder, $show_lines)	{
-		$alerts = API::Alert()->get([
-			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
-				'mediatypeid', 'alerttype'
-			],
-			'selectMediatypes' => ['name', 'maxattempts'],
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $show_lines
-		]);
+	private function getAlerts($sortfield, $sortorder, $show_lines) {
+		$alert_options = [];
+		$alerts = [];
+
+		foreach (eventSourceObjects() as $eventSource) {
+			$alert_options[] = API::Alert()->get([
+				'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid',
+					'actionid', 'mediatypeid', 'alerttype'
+				],
+				'selectMediatypes' => ['name', 'maxattempts'],
+				'eventsource' => $eventSource['source'],
+				'eventobject' => $eventSource['object'],
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => $show_lines
+			]);
+		}
+
+		foreach ($alert_options as $alert_option) {
+			if (count($alert_option) !== 0) {
+				foreach ($alert_option as $alert) {
+					$alerts[] = $alert;
+				}
+			}
+		}
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
+
 			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
 				$alert['description'] = $alert['mediatypes'][0]['name'];
 				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
