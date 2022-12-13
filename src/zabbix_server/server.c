@@ -285,7 +285,7 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static int	config_server_startup_time	= 0;
+static int	config_startup_time	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -584,7 +584,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	config_server_startup_time = time(NULL);
+	config_startup_time = time(NULL);
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
@@ -1360,9 +1360,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER,
-							config_server_startup_time};
+							config_startup_time};
 	zbx_thread_trapper_args		trapper_args = {&zbx_config_comms, get_program_type, listen_sock,
-							config_server_startup_time};
+							config_startup_time};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
@@ -1373,7 +1373,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type,
 							CONFIG_TIMEOUT};
 	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, CONFIG_TIMEOUT,
-							config_server_startup_time};
+							config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_pinger_args		pinger_args = {get_program_type, CONFIG_TIMEOUT};
 #ifdef HAVE_OPENIPMI

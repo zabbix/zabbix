@@ -39,7 +39,6 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type);
 void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb);
 void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb);
 
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config,
-		int config_server_startup_time);
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config, int config_startup_time);
 
 #endif

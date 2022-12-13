@@ -78,12 +78,13 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
- * Parameters: json             - [OUT] the json data                         *
- *             config_comms     - [IN] Zabbix server/proxy comms config       *
+ * Parameters: json                - [OUT] resulting json structure           *
+ *             config_comms        - [IN] Zabbix server/proxy comms config    *
+ *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms,
-		int config_server_startup_time)
+		int config_startup_time)
 {
 	int			i;
 	zbx_config_cache_info_t	count_stats;
@@ -94,10 +95,10 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 	DCget_count_stats_all(&count_stats);
 
 	/* zabbix[boottime] */
-	zbx_json_addint64(json, "boottime", config_server_startup_time);
+	zbx_json_addint64(json, "boottime", config_startup_time);
 
 	/* zabbix[uptime] */
-	zbx_json_addint64(json, "uptime", time(NULL) - config_server_startup_time);
+	zbx_json_addint64(json, "uptime", time(NULL) - config_startup_time);
 
 	/* zabbix[hosts] */
 	zbx_json_adduint64(json, "hosts", count_stats.hosts);

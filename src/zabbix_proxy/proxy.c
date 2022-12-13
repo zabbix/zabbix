@@ -232,7 +232,7 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-static int	config_server_startup_time	= 0;
+static int	config_startup_time	= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -471,7 +471,7 @@ static void	zbx_set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	config_server_startup_time = time(NULL);
+	config_startup_time = time(NULL);
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -1256,14 +1256,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								CONFIG_TIMEOUT};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER,
-								config_server_startup_time};
+								config_startup_time};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_taskmanager_args		taskmanager_args = {&zbx_config_comms, get_program_type,
-								config_server_startup_time};
+								config_startup_time};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_trapper_args			trapper_args = {&zbx_config_comms, get_program_type, &listen_sock,
-								config_server_startup_time};
+								config_startup_time};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_pinger_args			pinger_args = {get_program_type, CONFIG_TIMEOUT};
 

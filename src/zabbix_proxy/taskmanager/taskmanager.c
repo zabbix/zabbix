@@ -224,7 +224,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  *                                                                            *
  ******************************************************************************/
 static int	tm_execute_data_json(int type, const char *data, char **info,
-		const zbx_config_comms_args_t *zbx_config_comms, int config_server_startup_time)
+		const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -238,7 +238,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			return zbx_trapper_item_test_run(&jp_data, 0, info, zbx_config_comms,
-					config_server_startup_time);
+					config_startup_time);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
@@ -258,7 +258,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
  *                                                                            *
  ******************************************************************************/
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
-		const zbx_config_comms_args_t *zbx_config_comms, int config_server_startup_time)
+		const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -288,8 +288,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
-			ret = tm_execute_data_json(data_type, row[1], &info, zbx_config_comms,
-					config_server_startup_time);
+			ret = tm_execute_data_json(data_type, row[1], &info, zbx_config_comms, config_startup_time);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -329,7 +328,7 @@ finish:
  *                                                                            *
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *zbx_config_comms,
-		int config_server_startup_time)
+		int config_startup_time)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -368,7 +367,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 				break;
 			case ZBX_TM_TASK_DATA:
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, zbx_config_comms,
-						config_server_startup_time))
+						config_startup_time))
 					processed_num++;
 				break;
 			default:
@@ -492,7 +491,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
 		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->zbx_config_comms,
-				taskmanager_args_in->config_server_startup_time);
+				taskmanager_args_in->config_startup_time);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);
