@@ -6,8 +6,6 @@ git.zabbix.com/ap/plugin-support v1.2.2-0.20221208095623-2412f1a5c1c0 h1:rqwzy7h
 git.zabbix.com/ap/plugin-support v1.2.2-0.20221208095623-2412f1a5c1c0/go.mod h1:R3QzQWgpxlA+ddJNkOhsPTcGOVtrR69WS0hXIsnBurY=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
-github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5 h1:BjkPE3785EwPhhyuFkbINB+2a1xATwk8SNDWnJiD41g=
-github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5/go.mod h1:jtAfVaU/2cu1+wdSRPWE2c1N2qeAA3K4RH9pYgqwets=
 github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3 h1:XeGYLuu3Yu3/2/FLDXyObe6lBYtUFDTJgjjNPcfcU40=
 github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3/go.mod h1:55pim6Ht4LJKdVLlyFJV/g++HsEA1hQxPbB5JyNdZC0=
 github.com/chromedp/chromedp v0.6.0 h1:jjzHzXW5pNdKt1D9cEDAKZM/yZ2EwL/hLyGbCUFldBI=
@@ -64,6 +62,8 @@ github.com/omeid/go-yarn v0.0.1 h1:mUQExNwUrYn7tZRwQdsUuoQWHIujtjjpjb/PAtUj9dk=
 github.com/omeid/go-yarn v0.0.1/go.mod h1:JYxmAvShSw7YmX/9vFsccpJE4o/KW111eUh3n/TQ5h8=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/sokurenko/go-netstat v1.0.0 h1:av3W8+xRE99RBLdOf3pUgvbIAZQoDd3VpP6nKj5wM78=
+github.com/sokurenko/go-netstat v1.0.0/go.mod h1:Pfqo84HSDubPYm1MI2TTDDlmf+TwN6W2cbyngD63x18=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 h1:qWPm9rbaAMKs8Bq/9LRpbMqxWRVUAQwMI9fVrssnTfw=
