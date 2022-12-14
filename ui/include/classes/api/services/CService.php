@@ -885,7 +885,7 @@ class CService extends CApiService {
 			$output = ['serviceid', 'eventid', 'severity', 'name'];
 		}
 		else {
-			$output = array_unique(array_merge(['serviceid', 'eventid'], $options['selectProblemEvents']));
+			$output = array_unique(array_merge(['serviceid', 'eventid', 'severity'], $options['selectProblemEvents']));
 		}
 
 		$do_output_name = in_array('name', $output);
