@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hosts' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,		null],
-	'groups' =>					[T_ZBX_STR, O_OPT, P_AS_IS,				NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'groups' =>					[null,      O_OPT, P_ONLY_ARRAY,		NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'mass_update_groups' =>		[T_ZBX_INT, O_OPT, null,
 									IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 									null
