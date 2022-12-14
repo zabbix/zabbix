@@ -25,14 +25,6 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 
-/* media type statuses */
-#define MEDIA_TYPE_STATUS_ACTIVE	0
-#define MEDIA_TYPE_STATUS_DISABLED	1
-
-/* media statuses */
-#define MEDIA_STATUS_ACTIVE		0
-#define MEDIA_STATUS_DISABLED		1
-
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
 
 /* alerter -> manager */
