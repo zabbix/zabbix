@@ -768,7 +768,8 @@ static int	DBpatch_6030082(void)
 
 static int	DBpatch_6030083(void)
 {
-	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("widget_field", 11, &field);
 }
@@ -1400,6 +1401,14 @@ static int	DBpatch_6030148(void)
 
 static int	DBpatch_6030149(void)
 {
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_6030150(void)
+{
 	const ZBX_TABLE table =
 		{"event_symptom", "eventid", 0,
 			{
@@ -1413,49 +1422,49 @@ static int	DBpatch_6030149(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6030150(void)
+static int	DBpatch_6030151(void)
 {
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_symptom", 1, &field);
 }
 
-static int	DBpatch_6030151(void)
+static int	DBpatch_6030152(void)
 {
 	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("event_symptom", 2, &field);
 }
 
-static int	DBpatch_6030152(void)
+static int	DBpatch_6030153(void)
 {
 	const ZBX_FIELD field = {"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("problem", &field);
 }
 
-static int	DBpatch_6030153(void)
+static int	DBpatch_6030154(void)
 {
 	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("problem", 3, &field);
 }
 
-static int	DBpatch_6030154(void)
+static int	DBpatch_6030155(void)
 {
 	const ZBX_FIELD field = {"pause_symptoms", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("actions", &field);
 }
 
-static int	DBpatch_6030155(void)
+static int	DBpatch_6030156(void)
 {
 	const ZBX_FIELD field = {"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_6030156(void)
+static int	DBpatch_6030157(void)
 {
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
@@ -1622,5 +1631,6 @@ DBPATCH_ADD(6030153, 0, 1)
 DBPATCH_ADD(6030154, 0, 1)
 DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
+DBPATCH_ADD(6030157, 0, 1)
 
 DBPATCH_END()

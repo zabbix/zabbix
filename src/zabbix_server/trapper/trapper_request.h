@@ -24,6 +24,6 @@
 #include "zbxjson.h"
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb);
+		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb, int config_timeout);
 
 #endif

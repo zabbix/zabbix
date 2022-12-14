@@ -195,7 +195,7 @@ static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data
  *                         default loglevel command handler                   *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_process_loglevel(int direction, const char *data, char **result)
+static int	rtc_process_option(int direction, const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
@@ -248,32 +248,49 @@ static int	rtc_process_loglevel(int direction, const char *data, char **result)
  * Parameters: data   - [IN] the runtime control parameter (optional)         *
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
+ * Return value: SUCCEED - the rtc command was processed                      *
+ *               FAIL    - the rtc command must be processed by the default   *
+ *                         rtc command handler                                *
+ *                                                                            *
  ******************************************************************************/
-static void	rtc_process_diaginfo(const char *data, char **result)
+static int	rtc_process_diaginfo(const char *data, char **result)
 {
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
-	unsigned int		scope;
+	unsigned int		scope = 0;
+	int			ret = FAIL;
 
 	if (FAIL == zbx_json_open(data, &jp) ||
 			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SECTION, buf, sizeof(buf), NULL))
 	{
 		*result = zbx_dsprintf(NULL, "Invalid parameter \"%s\"\n", data);
-		return;
+		return FAIL;
 	}
 
 	if (0 == strcmp(buf, "all"))
+	{
 		scope = (1 << ZBX_DIAGINFO_VALUECACHE) | (1 << ZBX_DIAGINFO_LLD) | (1 << ZBX_DIAGINFO_ALERTING);
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_VALUECACHE))
+	{
 		scope = 1 << ZBX_DIAGINFO_VALUECACHE;
+		ret = SUCCEED;
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_LLD))
+	{
 		scope = 1 << ZBX_DIAGINFO_LLD;
+		ret = SUCCEED;
+	}
 	else if (0 == strcmp(buf, ZBX_DIAG_ALERTING))
+	{
 		scope = 1 << ZBX_DIAGINFO_ALERTING;
-	else
-		return;
+		ret = SUCCEED;
+	}
 
-	zbx_diag_log_info(scope, result);
+	if (0 != scope)
+		zbx_diag_log_info(scope, result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -467,15 +484,13 @@ static void	rtc_ha_failover_delay(const char *data, char **out)
  ******************************************************************************/
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
-	ZBX_UNUSED(data);
-
 	switch (code)
 	{
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			return rtc_process_loglevel(1, (const char *)data, result);
+			return rtc_process_option(1, (const char *)data, result);
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			return rtc_process_loglevel(-1, (const char *)data, result);
+			return rtc_process_option(-1, (const char *)data, result);
 #endif
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
 			zbx_service_reload_cache();
@@ -491,8 +506,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 					NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_DIAGINFO:
-			rtc_process_diaginfo((const char *)data, result);
-			return FAIL;
+			return rtc_process_diaginfo((const char *)data, result);
 		case ZBX_RTC_HA_STATUS:
 			rtc_ha_status(result);
 			return SUCCEED;
@@ -518,14 +532,15 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
  *                                                                            *
  * Purpose: process runtime control option and print result                   *
  *                                                                            *
- * Parameters: option   - [IN] runtime control option                         *
- *             error    - [OUT] error message                                 *
+ * Parameters: option            - [IN] runtime control option                *
+ *             config_timeout    - [IN]                                       *
+ *             error             - [OUT] error message                        *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	rtc_process(const char *option, char **error)
+int	rtc_process(const char *option, int config_timeout, char **error)
 {
 	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
 	char		*data = NULL;
@@ -545,7 +560,7 @@ int	rtc_process(const char *option, char **error)
 		}
 	}
 
-	return zbx_rtc_async_exchange(&data, code, error);
+	return zbx_rtc_async_exchange(&data, code, config_timeout, error);
 }
 
 /******************************************************************************

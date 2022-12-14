@@ -17,15 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXVAULT_H
-#define ZABBIX_ZBXVAULT_H
+#ifndef ZABBIX_PROF_H
+#define ZABBIX_PROF_H
 
-#include "../zbxkvs/kvs.h"
+#define ZBX_PROF_PROCESSING	0x01
+#define ZBX_PROF_RWLOCK		0x02
+#define ZBX_PROF_MUTEX		0x04
+#define ZBX_PROF_ALL		0xff
 
-int	zbx_vault_init(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
-int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
+typedef int zbx_prof_scope_t;
 
-int	zbx_vault_token_from_env_get(char **token, char **error);
+void	zbx_prof_enable(zbx_prof_scope_t scope);
+void	zbx_prof_disable(void);
+void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);
+void	zbx_prof_end_wait(void);
+void	zbx_prof_end(void);
+void	zbx_prof_update(const char *info, double time_now);
 
 #endif

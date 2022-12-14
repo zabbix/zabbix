@@ -23,9 +23,9 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
+typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms);
 
 void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb);
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms);
 
 #endif
