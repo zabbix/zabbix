@@ -189,7 +189,6 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		return ZBX_VALID_ERROR;
 	}
 
-
 	if ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
