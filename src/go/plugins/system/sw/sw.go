@@ -20,8 +20,6 @@
 package sw
 
 import (
-	"regexp"
-
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -58,11 +56,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	switch key {
 	case "system.sw.packages":
-		if len(params) > maxSwPackagesParams {
-			return nil, zbxerr.ErrorTooManyParameters
-		}
+		result, err = p.systemSwPackages(params)
 
-		result, err = p.getPackages(params)
+	case "system.sw.packages.get":
+		result, err = p.systemSwPackagesGet(params)
 
 	case "system.sw.os":
 		if len(params) > maxSwOSParams {
@@ -84,31 +81,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return
 }
 
-func parseRegex(in []string, regex string) (out []string, err error) {
-	if regex == "" {
-		return in, nil
-	}
-
-	rgx, err := regexp.Compile(regex)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, s := range in {
-		matched := rgx.MatchString(s)
-		if !matched {
-			continue
-		}
-
-		out = append(out, s)
-	}
-
-	return
-}
-
 func init() {
 	plugin.RegisterMetrics(&impl, "Sw",
 		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
+		"system.sw.packages.get", "Lists matching installed packages with details in JSON format.",
 		"system.sw.os", "Operating system information.",
 		"system.sw.os.get", "Operating system information in JSON format.",
 	)

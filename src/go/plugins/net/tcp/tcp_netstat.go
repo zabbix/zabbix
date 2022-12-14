@@ -28,7 +28,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cakturk/go-netstat/netstat"
+	"github.com/sokurenko/go-netstat/netstat"
 )
 
 // exportNetTcpSocketCount - returns number of TCP sockets that match parameters.
