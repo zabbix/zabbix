@@ -1274,13 +1274,15 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Zabbix,Server',
 							'item' => 'Agent, Ping',
 							'Aggregation function' => 'min',
-							'Aggregate' => 'Data set'
+							'Aggregate' => 'Data set',
+							'Legend label' => '祝你今天過得愉快'
 						],
 						[
 							'host' => ',Zabbix Server',
 							'item' => ',Agentp ping',
 							'Draw' => 'Bar',
-							'Aggregation function' => 'max'
+							'Aggregation function' => 'max',
+							'Legend label' => 'Bar ping'
 						],
 						[
 							'host' => ',Zabbix, Server,',
@@ -1440,7 +1442,8 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation function' => 'last',
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688'
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
+							'Legend label' => 'Staicase graph'
 						],
 						[
 							'host' => 'Two host',
@@ -2413,6 +2416,69 @@ class testDashboardGraphWidget extends CWebTest {
 				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
+		}
+	}
+
+	/**
+	 * Check data set naming in legend and in configuration form.
+	 */
+	public function testDashboardGraphWidget_CheckDataSetNaming() {
+		$input_data = [
+			'main_fields' => [
+				'Name' => 'Graph widget for Data set naming check'
+			],
+			'Data set' => [
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'Available memory*',
+					'Aggregation function' => 'avg',
+					'Aggregate' => 'Data set',
+					'Legend label' => '祝你今天過得愉快'
+				],
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'CPU guest*',
+					'Aggregation function' => 'max',
+					'Legend label' => 'Data set only'
+				],
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'item' => 'CPU utilization',
+					'Aggregation function' => 'count',
+					'Aggregation interval' => '24h',
+					'Aggregate' => 'Data set'
+				]
+			]
+		];
+		$displayed_data = [
+			'Data sets' => [
+				'ds_0_dataset_label' => '祝你今天過得愉快',
+				'ds_1_dataset_label' =>  'Data set only',
+				'ds_2_dataset_label' => 'Data set #3'
+			],
+			'Legend labels' => [
+				'avg(祝你今天過得愉快)', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'count(Data set #3)'
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
+		$form = $this->openGraphWidgetConfiguration();
+
+		$this->fillForm($input_data, $form);
+		$form->submit();
+		$this->saveGraphWidget($input_data['main_fields']['Name']);
+
+		// Check legend labels.
+		$widget = CDashboardElement::find()->one()->getWidget($input_data['main_fields']['Name']);
+		$legend_labels = $widget->query('class:svg-graph-legend')->one()->getText();
+		$this->assertEquals($displayed_data['Legend labels'], explode("\n", $legend_labels));
+
+		// Check Data set names in created widget.
+		$form = $widget->edit();
+
+		foreach($displayed_data['Data sets'] as $id => $dataset_name) {
+			$this->assertEquals($dataset_name, $form->query('id', $id)->one()->getText());
 		}
 	}
 
