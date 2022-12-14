@@ -22,7 +22,7 @@
 class CControllerPopupServices extends CController {
 
 	protected function init(): void {
-		$this->disableSIDvalidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput(): bool {

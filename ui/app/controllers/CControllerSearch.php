@@ -43,7 +43,7 @@ class CControllerSearch extends CController {
 	private $limit;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->validate_csrf_token = false;
 
 		$this->admin = in_array($this->getUserType(), [
 			USER_TYPE_ZABBIX_ADMIN,

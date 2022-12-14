@@ -45,7 +45,7 @@ class CControllerPopupTriggerExpr extends CController {
 	private $period_seasons = [];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->validate_csrf_token = false;
 
 		$this->metrics = [
 			PARAM_TYPE_TIME => _('Time'),

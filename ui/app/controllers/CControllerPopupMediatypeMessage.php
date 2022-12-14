@@ -30,7 +30,7 @@ class CControllerPopupMediatypeMessage extends CController {
 	protected $message_types = [];
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->validate_csrf_token = false;
 
 		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}

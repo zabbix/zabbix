@@ -22,7 +22,7 @@
 class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput(): bool {

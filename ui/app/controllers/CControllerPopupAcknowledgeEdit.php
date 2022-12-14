@@ -22,7 +22,7 @@
 class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput() {

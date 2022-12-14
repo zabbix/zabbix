@@ -22,8 +22,6 @@
 class CControllerPopupLdapCheck extends CController {
 
 	protected function init(): void {
-		$this->disableSIDValidation();
-
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 

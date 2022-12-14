@@ -27,7 +27,7 @@ class CLegacyAction extends CAction {
 	 * Disable SID validation for legacy actions.
 	 */
 	protected function init(): void {
-		$this->disableSIDvalidation();
+		$this->validate_csrf_token = false;
 	}
 
 	public function doAction(): void {

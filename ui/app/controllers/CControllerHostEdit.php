@@ -34,7 +34,7 @@ class CControllerHostEdit extends CController {
 	protected $host;
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput(): bool {

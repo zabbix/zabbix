@@ -24,7 +24,7 @@ class CControllerRegExEdit extends CController {
 	protected $db_regex = [];
 
 	protected function init() {
-		$this->disableSIDValidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput() {

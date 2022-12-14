@@ -25,7 +25,7 @@
 abstract class CControllerPopupConditionCommon extends CController {
 
 	protected function init() {
-		$this->disableSIDvalidation();
+		$this->validate_csrf_token = false;
 	}
 
 	protected function checkInput() {
