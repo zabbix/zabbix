@@ -1530,15 +1530,7 @@ class CHostPrototype extends CHostBase {
 		unset($host);
 
 		if ($del_group_prototypeids) {
-			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
-			DBselect(
-				'SELECT NULL'.
-				' FROM group_prototype gp'.
-				' WHERE '.dbConditionId('gp.group_prototypeid', $del_group_prototypeids).
-				' FOR UPDATE'
-			);
-
-			DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
+			self::deleteGroupPrototypes($del_group_prototypeids);
 		}
 
 		if ($upd_group_links) {
@@ -1629,17 +1621,7 @@ class CHostPrototype extends CHostBase {
 		unset($host);
 
 		if ($del_group_prototypeids) {
-			// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
-			DBselect(
-				'SELECT NULL'.
-				' FROM group_prototype gp'.
-				' WHERE '.dbConditionId('gp.group_prototypeid', $del_group_prototypeids).
-				' FOR UPDATE'
-			);
-
-			self::deleteDiscoveredGroups($del_group_prototypeids);
-
-			DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
+			self::deleteGroupPrototypes($del_group_prototypeids);
 		}
 
 		if ($upd_group_prototypes) {
@@ -2691,24 +2673,14 @@ class CHostPrototype extends CHostBase {
 			' FOR UPDATE'
 		);
 
-		// Lock group prototypes to prevent server from adding new LLD elements.
 		$db_group_prototypes = DBfetchArray(DBselect(
 			'SELECT gp.group_prototypeid,gp.name'.
 			' FROM group_prototype gp'.
-			' WHERE '.dbConditionId('gp.hostid', $hostids).
-			' FOR UPDATE'
+			' WHERE '.dbConditionId('gp.hostid', $hostids)
 		));
 
-		$group_prototypeids = [];
-
-		foreach ($db_group_prototypes as $db_group_prototype) {
-			if ($db_group_prototype['name'] !== '') {
-				$group_prototypeids[] = $db_group_prototype['group_prototypeid'];
-			}
-		}
-
-		if ($group_prototypeids) {
-			self::deleteDiscoveredGroups($group_prototypeids);
+		if ($db_group_prototypes) {
+			self::deleteGroupPrototypes(array_column($db_group_prototypes, 'group_prototypeid'));
 		}
 
 		$discovered_hosts = DBfetchArrayAssoc(DBselect(
@@ -2722,7 +2694,6 @@ class CHostPrototype extends CHostBase {
 		CHost::deleteForce($discovered_hosts);
 
 		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('group_prototype', ['hostid' => $hostids]);
 		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
@@ -2749,6 +2720,50 @@ class CHostPrototype extends CHostBase {
 
 			$db_hosts += $_db_hosts;
 		} while ($_db_hosts);
+	}
+
+	/**
+	 *@param array $del_group_prototypeids
+	 */
+	private static function deleteGroupPrototypes(array $del_group_prototypeids): void {
+		if (!$del_group_prototypeids) {
+			return;
+		}
+
+		$_del_group_prototypeids = $del_group_prototypeids;
+
+		do {
+			$options = [
+				'output' => ['group_prototypeid'],
+				'filter' => [
+					'templateid' => $_del_group_prototypeids
+				]
+			];
+			$result = DBselect(DB::makeSql('group_prototype', $options));
+			$_del_group_prototypeids = [];
+
+			while ($row = DBfetch($result)) {
+				$_del_group_prototypeids[] = $row['group_prototypeid'];
+				$del_group_prototypeids[] = $row['group_prototypeid'];
+			}
+		}
+		while ($_del_group_prototypeids);
+
+		// Lock group prototypes before the deletion to prevent server from adding new LLD elements.
+		DBselect(
+			'SELECT NULL'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.group_prototypeid', $del_group_prototypeids).
+			' FOR UPDATE'
+		);
+
+		self::deleteDiscoveredGroups($del_group_prototypeids);
+
+		DB::update('group_prototype', [
+			'values' => ['templateid' => 0],
+			'where' => ['group_prototypeid' => $del_group_prototypeids]
+		]);
+		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
 	}
 
 	/**
