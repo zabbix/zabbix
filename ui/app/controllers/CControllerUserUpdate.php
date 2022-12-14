@@ -105,8 +105,8 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 
-		if ($this->getInput('current_password', '') !== ''
-				|| ($this->hasInput('current_password') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
+		if ($this->getInput('current_password', '') !== '' || ($this->hasInput('current_password')
+				&& CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
 			$user['current_passwd'] = $this->getInput('current_password');
 		}
 

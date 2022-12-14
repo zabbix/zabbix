@@ -149,7 +149,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'preservekeys' => true
 		]);
 
-		$data['internal_authentication'] = CWebUser::$data['auth_type'] === 0;
+		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('User profile'));

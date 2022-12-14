@@ -27,7 +27,6 @@
 <script type="text/javascript">
 
 	const view = new class {
-
 		init() {
 			document.getElementById('user-form').addEventListener('submit', (e) => {
 				if (!this._userFormSubmit()) {
@@ -37,7 +36,7 @@
 
 			document.getElementById('messages_enabled').addEventListener('click', () => {
 				this._updateForm();
-			})
+			});
 
 			this._updateForm();
 		}
@@ -46,14 +45,13 @@
 			document
 				.getElementById('messagingTab')
 				.querySelectorAll('input:not([name="messages[enabled]"]),button')
-				.forEach(node => {
-					node.toggleAttribute('disabled', !document.getElementById('messages_enabled').checked);
+				.forEach(elem => {
+					elem.toggleAttribute('disabled', !document.getElementById('messages_enabled').checked);
 				});
 		}
 
 		_userFormSubmit() {
-			const fields_to_trim = ['#autologout', '#refresh', '#url'];
-			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
+			document.querySelectorAll('#autologout, #refresh, #url').forEach((elem) => {
 				elem.value = elem.value.trim();
 			});
 
@@ -61,16 +59,15 @@
 			const password1 = document.getElementById('password1').value;
 			const password2 = document.getElementById('password2').value;
 
-			const warning_msg = <?= json_encode(
-				_('In case of successful password change user will be logged out of all active sessions. Continue?')
-			) ?>;
-
 			if (password1 !== '' && password2 !== '' && current_password !== '') {
+				const warning_msg = <?= json_encode(
+					_('In case of successful password change user will be logged out of all active sessions. Continue?')
+				) ?>;
+
 				return confirm(warning_msg);
 			}
-			else {
-				return true;
-			}
+
+			return true;
 		}
 	}
 </script>

@@ -76,10 +76,10 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 *
 	 * @return bool
 	 */
-	protected function validateCurrentPassword() {
+	protected function validateCurrentPassword(): bool {
 		$this->allow_empty_password = !self::hasInternalAuth($this->getUserGroups());
 
-		$current_password = $this->hasInput('current_password') ? $this->getInput('current_password') : null;
+		$current_password = $this->getInput('current_password', '');
 
 		if ($current_password === '' && !$this->allow_empty_password) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Current password'), _('cannot be empty')));
@@ -94,7 +94,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 *
 	 * @return bool
 	 */
-	protected function validatePassword() {
+	protected function validatePassword(): bool {
 		$this->allow_empty_password = !self::hasInternalAuth($this->getUserGroups());
 
 		$password1 = $this->hasInput('password1') ? $this->getInput('password1') : null;

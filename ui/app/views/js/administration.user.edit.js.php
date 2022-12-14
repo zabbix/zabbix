@@ -36,16 +36,16 @@
 				}
 			});
 
-			$('#roleid').change(function() {
-				if (this.querySelectorAll('[name="roleid"]').length > 0) {
+			const roleid_elem = document.getElementById('roleid');
+			new MutationObserver((mutations) => {
+				if (roleid_elem.querySelectorAll('[name="roleid"]').length > 0) {
 					document.getElementById('user-form').submit();
 				}
-			});
+			}).observe(roleid_elem, {childList: true});
 		}
 
 		_userFormSubmit() {
-			const fields_to_trim = ['#username', '#name', '#surname', '#autologout', '#refresh', '#url'];
-			document.querySelectorAll(fields_to_trim.join(', ')).forEach((elem) => {
+			document.querySelectorAll('#username, #name, #surname, #autologout, #refresh, #url').forEach((elem) => {
 				elem.value = elem.value.trim();
 			});
 
@@ -59,9 +59,8 @@
 
 				return confirm(warning_msg);
 			}
-			else {
-				return true;
-			}
+
+			return true;
 		}
 	}
 </script>
