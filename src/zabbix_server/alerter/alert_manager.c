@@ -20,7 +20,6 @@
 #include "alerter.h"
 
 #include "alerter_protocol.h"
-#include "config.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -1224,6 +1223,7 @@ static void	am_destroy(zbx_am_t *manager)
  *             alert   - [IN]                                                 *
  *             status  - [IN] alert status                                    *
  *             retries - [IN] number of attempted sending retries             *
+ *             value   - [IN]
  *             error   - [IN] error message                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1264,12 +1264,12 @@ static void	am_db_update_alert(zbx_am_t *manager, zbx_am_alert_t *alert, int sta
  *                                                                            *
  * Purpose: send response to external alert request                           *
  *                                                                            *
- * Parameters: alerter_service - [IN] the alerter service                     *
+ * Parameters: alerter_service - [IN] alerter service                         *
  *             alert           - [IN]                                         *
  *             value           - [IN]                                         *
  *             errcode         - [IN]                                         *
- *             error           - [IN] the error message                       *
- *             debug           - [IN] the debug message                       *
+ *             error           - [IN] error message                           *
+ *             debug           - [IN] debug message                           *
  *                                                                            *
  ******************************************************************************/
 static void	am_external_alert_send_response(const zbx_ipc_service_t *alerter_service, const zbx_am_alert_t *alert,
@@ -1437,7 +1437,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  * Parameters: manager         - [IN] alert manager                           *
  *             alerter         - [IN]                                         *
  *             alert           - [IN] alert to send                           *
- *             scripts_path    - [IN] scripts path                            *
+ *             scripts_path    - [IN]                                         *
  *                                                                            *
  * Return value: SUCCEED - the alert was successfully sent to alerter         *
  *               FAIL    - otherwise                                          *
