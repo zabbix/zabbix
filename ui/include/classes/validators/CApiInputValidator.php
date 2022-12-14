@@ -2155,13 +2155,17 @@ class CApiInputValidator {
 
 										if ($data_field['name'] == $value) {
 											if (array_key_exists($path_name, $menu_path)) {
-												$duplicate_field[] = $field_names[0];
 												$duplicate = (($path_name != null) ? $path_name . '/' . $value : $value);
 												$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+
+												$parameter  = (array_key_first($menu_path) === '')
+													? $field_names[0]
+													: implode(', ', $field_names) ;
+
 												$error = _s('Invalid parameter "%1$s": %2$s.',
 													$subpath,
 													_s('value %1$s already exists',
-														'(' . implode(', ', $duplicate_field) . ')=(' . $duplicate . ')'
+														'(' .  $parameter . ')=(' . $duplicate . ')'
 													));
 												return false;
 											}

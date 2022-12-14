@@ -1105,7 +1105,7 @@ class testScripts extends CAPITest {
 						'menu_path' => 'menu_path1'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(menu_path1/API create script same name1) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(menu_path1/API create script same name1) already exists.'
 			]
 		];
 	}
