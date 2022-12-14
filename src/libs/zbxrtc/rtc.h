@@ -22,7 +22,7 @@
 
 #include "zbxtypes.h"
 
-int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		char **error);
+int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
+		int *scope, char **error);
 
 #endif
