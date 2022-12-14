@@ -178,11 +178,18 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$error = false;
 	$message = '';
 
-	if (!is_array($var) && $has_array_flag) {
-		$error = true;
-		$message = _s('Field "%1$s" is not array.', $caption);
+	if ($has_array_flag) {
+		if (!is_array($var)) {
+			error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('an array is expected')));
+			return ZBX_VALID_ERROR;
+		}
 	}
-	elseif ($type == T_ZBX_INT) {
+	elseif (is_array($var)) {
+		error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('invalid data type')));
+		return ZBX_VALID_ERROR;
+	}
+
+	if ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer.', $caption);
@@ -252,9 +259,16 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	}
 
 	if ($error) {
-		error($message);
+		if ($flags & P_SYS) {
+			error($message);
 
-		return ZBX_VALID_ERROR;
+			return ZBX_VALID_ERROR;
+		}
+		else {
+			info($message);
+
+			return ZBX_VALID_WARNING;
+		}
 	}
 
 	return ZBX_VALID_OK;
