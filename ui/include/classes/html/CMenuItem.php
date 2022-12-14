@@ -205,9 +205,32 @@ class CMenuItem extends CTag {
 						}
 					}
 
-					$no_unacceptable_params = array_diff_assoc($unacceptable_params, $unacceptable_params_existing)
-						? true
-						: false;
+					if (!array_diff_assoc($unacceptable_params, $unacceptable_params_existing)) {
+						continue;
+					}
+				}
+
+				foreach ($alias_params as $name => $value) {
+					if (!array_key_exists($name, $request_params)) {
+						continue;
+					}
+
+					if (is_array($value)) {
+						if (!is_array($request_params[$name])) {
+							continue 2;
+						}
+
+						foreach ($value as $value_param) {
+							if (!in_array($value_param, $request_params[$name])) {
+								continue 3;
+							}
+						}
+					}
+
+					if (is_string($value) && is_array($request_params[$name])) {
+						$request_params[$name] = reset($request_params[$name]);
+						continue;
+					}
 				}
 
 				$alias_params_diff = array_diff_assoc($alias_params, $request_params);
