@@ -110,27 +110,41 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$range_time_parser->parse($this->getInput('to'));
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+		$alert_options = [];
+		$alerts = [];
 
-		$alerts = API::Alert()->get([
-			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
-				'mediatypeid', 'alerttype'
-			],
-			'selectMediatypes' => ['name', 'maxattempts'],
-			'userids' => $userids ?: null,
-			'actionids' => $actionids ?: null,
-			'mediatypeids' => $mediatypeids ?: null,
-			'filter' => ['status' => $data['statuses']],
-			'search' => [
-				'subject' => $search_strings,
-				'message' => $search_strings
-			],
-			'searchByAny' => true,
-			'time_from' => $time_from - 1,
-			'time_till' => $time_to + 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $this->fields_values['show_lines']
-		]);
+		foreach (eventSourceObjects() as $eventSource) {
+			$alert_options[] = API::Alert()->get([
+				'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid',
+					'actionid', 'mediatypeid', 'alerttype'
+				],
+				'eventsource' => $eventSource['source'],
+				'eventobject' => $eventSource['object'],
+				'selectMediatypes' => ['name', 'maxattempts'],
+				'userids' => $userids ?: null,
+				'actionids' => $actionids ?: null,
+				'mediatypeids' => $mediatypeids ?: null,
+				'filter' => ['status' => $data['statuses']],
+				'search' => [
+					'subject' => $search_strings,
+					'message' => $search_strings
+				],
+				'searchByAny' => true,
+				'time_from' => $time_from - 1,
+				'time_till' => $time_to + 1,
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => $this->fields_values['show_lines']
+			]);
+		}
+
+		foreach ($alert_options as $alert_option) {
+			if (count($alert_option) !== 0) {
+				foreach ($alert_option as $alert) {
+					$alerts[] = $alert;
+				}
+			}
+		}
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
