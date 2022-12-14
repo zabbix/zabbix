@@ -63,7 +63,16 @@ class ClockWidgets {
 				'value_type' => 1,
 				'interfaceid' => $interfaceid,
 				'delay' => '5s',
-			]
+			],
+			[
+				'hostid' => $hostid['Host for clock widget'],
+				'name' => 'Item for clock widget 2',
+				'key_' => 'system.localtime[local2]',
+				'type' => 0,
+				'value_type' => 1,
+				'interfaceid' => $interfaceid,
+				'delay' => '5s',
+			],
 		]);
 		$itemid = CDataHelper::getIds('name');
 
@@ -73,48 +82,11 @@ class ClockWidgets {
 				'widgets' => [
 					[
 						'type' => 'clock',
-						'name' => 'UpdateClock',
-						'x' => 0,
-						'y' => 0,
-						'width' => 5,
-						'height' => 5,
-						'fields' => [
-							[
-								'type' => 0,
-								'name' => 'rf_rate',
-								'value' => -1
-							]
-						]
-					],
-					[
-						'type' => 'clock',
-						'name' => 'CopyClock',
-						'x' => 15,
-						'y' => 0,
-						'width' => 5,
-						'height' => 5,
-						'fields' => [
-							[
-								'type' => 0,
-								'name' => 'rf_rate',
-								'value' => -1
-							]
-						]
-					],
-					[
-						'type' => 'clock',
 						'name' => 'DeleteClock',
 						'x' => 5,
 						'y' => 0,
 						'width' => 5,
-						'height' => 5,
-						'fields' => [
-							[
-								'type' => 0,
-								'name' => 'rf_rate',
-								'value' => -1
-							]
-						]
+						'height' => 5
 					],
 					[
 						'type' => 'clock',
@@ -122,14 +94,7 @@ class ClockWidgets {
 						'x' => 20,
 						'y' => 0,
 						'width' => 4,
-						'height' => 5,
-						'fields' => [
-							[
-								'type' => 0,
-								'name' => 'rf_rate',
-								'value' => -1
-							]
-						]
+						'height' => 5
 					],
 					[
 						'type' => 'clock',
@@ -150,6 +115,25 @@ class ClockWidgets {
 								'value' => 2
 							]
 						]
+					]
+				],
+				'userGroups' => [
+					[
+						'usrgrpid' => 7,
+						'permission' => 3
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for updating clock widgets',
+				'widgets' => [
+					[
+						'type' => 'clock',
+						'name' => 'UpdateClock',
+						'x' => 0,
+						'y' => 0,
+						'width' => 5,
+						'height' => 5
 					]
 				],
 				'userGroups' => [
