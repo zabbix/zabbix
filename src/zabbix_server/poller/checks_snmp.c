@@ -2091,6 +2091,8 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 			for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 			{
+				char	buffer[MAX_STRING_LEN];
+
 				if (var->name_length < p_oid->root_oid_len ||
 						0 != memcmp(p_oid->root_oid, var->name, p_oid->root_oid_len * sizeof(oid)))
 				{
@@ -2098,23 +2100,21 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 					break;
 				}
 
+				snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
+
+				if (NULL != results)
+					zbx_chrcpy_alloc(&results, &results_alloc, &results_offset, '\n');
+
+				zbx_strcpy_alloc(&results, &results_alloc, &results_offset, buffer);
+
 				if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
 						SNMP_NOSUCHINSTANCE != var->type)
 				{
-					char	buffer[MAX_STRING_LEN];
-
 					if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
 					{
 						running = 0;
 						break;
 					}
-
-					snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
-
-					if (NULL != results)
-						zbx_chrcpy_alloc(&results, &results_alloc, &results_offset, '\n');
-
-					zbx_strcpy_alloc(&results, &results_alloc, &results_offset, buffer);
 
 					if (NULL == var->next_variable)
 					{
