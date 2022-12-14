@@ -717,8 +717,8 @@ class testFormTabIndicators extends CWebTest {
 
 		// Open Operations tab and check indicator value.
 
-		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
-		$form = $dialog->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady();
+		$form = $dialog->asForm()->one();
 		$form->selectTab('Operations');
 		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
@@ -736,7 +736,7 @@ class testFormTabIndicators extends CWebTest {
 			$operations_overlay->query('xpath://button[@class="js-add"]')->one()->click()->waitUntilNotVisible();
 		}
 
-		$form->waitUntilReady();
+		$dialog->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.

@@ -557,7 +557,7 @@ class CLegacyWebTest extends CWebTest {
 	}
 
 	public function zbxTestAssertVisibleXpath($xpath){
-		$this->assertTrue($this->query('xpath', $xpath)->waitUntilVisible()->one()->isDisplayed());
+		$this->assertTrue($this->query('xpath', $xpath)->one()->isDisplayed());
 	}
 
 	public function zbxTestIsEnabled($xpath){
