@@ -82,7 +82,7 @@ func (p *Plugin) exportNetTcpListen(params []string) (result interface{}, err er
 	return exportSystemTcpListen(uint16(port))
 }
 
-func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
+func (p *Plugin) exportNetTcpPort(params []string, timeout time.Duration) (result int, err error) {
 	if len(params) > 2 {
 		err = errors.New(errorTooManyParams)
 		return
@@ -107,7 +107,7 @@ func (p *Plugin) exportNetTcpPort(params []string) (result int, err error) {
 		address = net.JoinHostPort(params[0], port)
 	}
 
-	if _, err := net.Dial("tcp", address); err != nil {
+	if _, err := net.DialTimeout("tcp", address, timeout*time.Second); err != nil {
 		return 0, nil
 	}
 	return 1, nil
@@ -495,7 +495,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "net.tcp.listen":
 		return p.exportNetTcpListen(params)
 	case "net.tcp.port":
-		return p.exportNetTcpPort(params)
+		return p.exportNetTcpPort(params, p.options.Timeout)
 	case "net.tcp.service", "net.tcp.service.perf":
 		if len(params) > 3 {
 			err = errors.New(errorTooManyParams)
