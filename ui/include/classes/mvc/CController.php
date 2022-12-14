@@ -28,6 +28,8 @@ abstract class CController {
 	protected const VALIDATION_ERROR = 1;
 	protected const VALIDATION_FATAL_ERROR = 2;
 
+	public const CSRF_TOKEN_NAME = '_csrf_token';
+
 	/**
 	 * Content type of the POST request.
 	 *
@@ -71,11 +73,11 @@ abstract class CController {
 	protected $input = [];
 
 	/**
-	 * SID validation flag, if true SID must be validated.
+	 * Validate CSRF token flag, if true CSRF token must be validated.
 	 *
 	 * @var bool
 	 */
-	private $validate_sid = true;
+	protected $validate_csrf_token = true;
 
 	public function __construct() {
 		$this->init();
@@ -184,6 +186,28 @@ abstract class CController {
 		}
 
 		return substr($sessionid, 16, 16);
+	}
+
+
+	/**
+	 * Generates CSRF token that is used in forms.
+	 *
+	 * @param string $action  action that controller should perform.
+	 *
+	 * @return string  Returns CSRF token in string format or null if session id is not set.
+	 */
+	public static function generateCsrfToken(string $action): ?string {
+		$csrf_token = DB::select('sessions', [
+			'output' => ['csrf_token'],
+			'filter' => ['sessionid' => CSessionHelper::getId()],
+			'limit' => 1
+		]);
+
+		if (!$csrf_token || !$csrf_token[0]['csrf_token']) {
+			return null;
+		}
+
+		return CEncryptHelper::sign($csrf_token[0]['csrf_token'] . $action);
 	}
 
 	/**
@@ -407,29 +431,19 @@ abstract class CController {
 	abstract protected function checkInput();
 
 	/**
-	 * Validate session ID (SID).
-	 */
-	protected function disableSIDvalidation() {
-		$this->validate_sid = false;
-	}
-
-	/**
-	 * Validate session ID (SID).
+	 * Checks if CSRF token in the request is valid.
 	 *
 	 * @return bool
 	 */
-	private function checkSID(): bool {
-		$sessionid = $this->getUserSID();
-
-		if ($sessionid === null) {
+	private function checkCsrfToken(): bool {
+		if (!is_array($this->raw_input) || !array_key_exists(self::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 
-		if (!is_array($this->raw_input) || !array_key_exists('sid', $this->raw_input)) {
-			return false;
-		}
+		$csrf_token_form = $this->raw_input[self::CSRF_TOKEN_NAME];
+		$csrf_token_correct = self::generateCsrfToken($this->action);
 
-		return $this->raw_input['sid'] === $sessionid;
+		return CEncryptHelper::checkSign($csrf_token_correct, $csrf_token_form);
 	}
 
 	/**
@@ -462,7 +476,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_sid && !$this->checkSID()) {
+		if ($this->validate_csrf_token && !$this->checkCsrfToken()) {
 			throw new CAccessDeniedException();
 		}
 
