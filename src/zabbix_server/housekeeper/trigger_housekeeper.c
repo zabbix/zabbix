@@ -77,12 +77,41 @@ static int	housekeep_problems_without_triggers(void)
 
 	if (0 != ids.values_num)
 	{
-		if (SUCCEED == DBexecute_multiple_query("delete from problem where", "eventid", &ids))
+		if (SUCCEED != DBexecute_multiple_query(
+				"update problem"
+				" set cause_eventid=null"
+				" where", "cause_eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink problem symptoms while housekeeping a cause"
+					" problem without a trigger");
+			goto fail;
+		}
+
+		if (SUCCEED != DBexecute_multiple_query(
+				"delete"
+				" from event_symptom"
+				" where", "cause_eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to unlink event symptoms while housekeeping a cause"
+					" problem without a trigger");
+			goto fail;
+		}
+
+		if (SUCCEED != DBexecute_multiple_query(
+				"delete"
+				" from problem"
+				" where", "eventid", &ids))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problem without a trigger");
+		}
+		else
+		{
 			deleted = ids.values_num;
+		}
 
 		housekeep_service_problems(&ids);
 	}
-
+fail:
 	zbx_vector_uint64_destroy(&ids);
 
 	return deleted;
