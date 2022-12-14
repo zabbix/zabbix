@@ -323,7 +323,7 @@ window.operation_popup = new class {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
 				fields = [
 					'step-from', 'operation-step-range', 'operation-step-duration', 'operation-command-targets-label',
-					'operation-command-checkbox', 'operation-command-chst-label', 'operation_opcommand_host_ms'
+					'operation-command-checkbox', 'operation-command-chst-label', 'operation_opcommand_host_ms',
 					'operation-opcommand-hst-label', 'operation-opcommand-grp', 'operation-command-targets',
 					'operation-condition-table', 'operation-condition-list-label', 'operation-condition-list',
 					'operation_opcommand_hst__hostidch', 'operation_opcommand_hst__hostid_current_host',
@@ -341,11 +341,10 @@ window.operation_popup = new class {
 			case <?= EVENT_SOURCE_DISCOVERY ?>:
 			case <?= EVENT_SOURCE_AUTOREGISTRATION ?>:
 				fields = [
-					'operation-command-targets-label',
-					'operation-command-checkbox', 'operation-command-chst', 'operation-command-chst-label',
-					'operation-opcommand-hst-label', 'operation-opcommand-grp', 'operation-command-targets',
-					'operation-condition-table', 'operation-condition-list-label', 'operation-condition-list',
-					'operation_opcommand_hst__hostidch', 'operation_opcommand_host_ms',
+					'operation-command-targets-label', 'operation-command-checkbox', 'operation-command-chst',
+					'operation-command-chst-label', 'operation-opcommand-hst-label', 'operation-opcommand-grp',
+					'operation-command-targets', 'operation-condition-table', 'operation-condition-list-label',
+					'operation-condition-list', 'operation_opcommand_hst__hostidch', 'operation_opcommand_host_ms',
 					'operation_opcommand_hostgroup_ms'
 				];
 		}
