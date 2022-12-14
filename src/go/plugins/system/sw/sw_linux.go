@@ -23,17 +23,17 @@
 package sw
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
-	"bufio"
-	"os"
 	"syscall"
+	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
