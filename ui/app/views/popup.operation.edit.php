@@ -201,20 +201,25 @@ $form_grid->addItem([
 // Operation custom message subject row.
 $form_grid->addItem([
 	(new CLabel(_('Subject'), 'operation-opmessage-subject'))->setId('operation-message-subject-label'),
-	(new CTextBox('operation[opmessage][subject]'))
-		->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('operation-opmessage-subject')
+	(new CFormField(
+		(new CTextBox('operation[opmessage][subject]'))
+			->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('operation-opmessage-subject')
+	))->setId('operation-message-subject')
+
 ]);
 
 // Operation custom message body row.
 $form_grid->addItem([
 	(new CLabel(_('Message'), 'operation_opmessage_message'))->setId('operation-message-label'),
-	(new CTextArea('operation[opmessage][message]'))
-		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
-		->setMaxlength(DB::getFieldLength('opmessage', 'message'))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('operation_opmessage_message')
+	(new CFormField(
+		(new CTextArea('operation[opmessage][message]'))
+			->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
+			->setMaxlength(DB::getFieldLength('opmessage', 'message'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('operation_opmessage_message')
+	))->setId('operation-message')
 ]);
 
 $opcommand_hst_value = null;
@@ -254,39 +259,43 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 				])
 				->addItem([
 					(new CLabel(_('Hosts'), 'operation_opcommand_hst__hostid_ms')),
-					(new CMultiSelect([
-						'name' => 'operation[opcommand_hst][][hostid]',
-						'object_name' => 'hosts',
-						'data' => $hosts_ms,
-						'popup' => [
-							'parameters' => [
-								'multiselect' => '1',
-								'srctbl' => 'hosts',
-								'srcfld1' => 'hostid',
-								'dstfrm' => 'action.edit',
-								'dstfld1' => 'operation_opcommand_hst__hostid',
-								'editable' => '1',
+					(new CFormField(
+						(new CMultiSelect([
+							'name' => 'operation[opcommand_hst][][hostid]',
+							'object_name' => 'hosts',
+							'data' => $hosts_ms,
+							'popup' => [
+								'parameters' => [
+									'multiselect' => '1',
+									'srctbl' => 'hosts',
+									'srcfld1' => 'hostid',
+									'dstfrm' => 'action.edit',
+									'dstfld1' => 'operation_opcommand_hst__hostid',
+									'editable' => '1',
+								]
 							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					))->setId('operation_opcommand_host_ms')
 				])
 				->addItem([
 					new CLabel(_('Host groups'), 'operation_opcommand_grp__groupid_ms'),
-					(new CMultiSelect([
-						'name' => 'operation[opcommand_grp][][groupid]',
-						'object_name' => 'hostGroup',
-						'data' => $operation['opcommand_grp'],
-						'popup' => [
-							'parameters' => [
-								'multiselect' => '1',
-								'srctbl' => 'host_groups',
-								'srcfld1' => 'groupid',
-								'dstfrm' => 'action.edit',
-								'dstfld1' => 'operation_opcommand_grp__groupid',
-								'editable' => '1',
+					(new CFormField(
+						(new CMultiSelect([
+							'name' => 'operation[opcommand_grp][][groupid]',
+							'object_name' => 'hostGroup',
+							'data' => $operation['opcommand_grp'],
+							'popup' => [
+								'parameters' => [
+									'multiselect' => '1',
+									'srctbl' => 'host_groups',
+									'srcfld1' => 'groupid',
+									'dstfrm' => 'action.edit',
+									'dstfld1' => 'operation_opcommand_grp__groupid',
+									'editable' => '1',
+								]
 							]
-						]
-					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					))->setId('operation_opcommand_hostgroup_ms')
 				])
 		))
 			->setId('operation-command-targets')

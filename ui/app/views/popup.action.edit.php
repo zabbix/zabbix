@@ -35,10 +35,12 @@ $form = (new CForm())
 $action_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['action']['name'] ?: ''))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
+		new CFormField(
+			(new CTextBox('name', $data['action']['name'] ?: ''))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
+		)
 	]);
 
 // Create condition table.
@@ -177,10 +179,12 @@ $operations_tab = (new CFormGrid());
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_tab->addItem([
 		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-		(new CTextBox('esc_period', $data['action']['esc_period']))
-			->setId('esc_period')
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
+		new CFormField(
+			(new CTextBox('esc_period', $data['action']['esc_period']))
+				->setId('esc_period')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		)
 	]);
 }
 
