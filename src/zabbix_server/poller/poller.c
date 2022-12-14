@@ -285,7 +285,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
-		const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	int	res = FAIL;
 
@@ -294,7 +294,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			zbx_alarm_on(zbx_config_comms->config_timeout);
+			zbx_alarm_on(config_comms->config_timeout);
 			res = get_value_agent(item, result);
 			zbx_alarm_off();
 			break;
@@ -303,11 +303,11 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_simple(item, result, add_results);
 			break;
 		case ITEM_TYPE_INTERNAL:
-			res = get_value_internal(item, result, zbx_config_comms, config_startup_time);
+			res = get_value_internal(item, result, config_comms, config_startup_time);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			res = get_value_db(item, zbx_config_comms->config_timeout, result);
+			res = get_value_db(item, config_comms->config_timeout, result);
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -316,11 +316,11 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
-			res = get_value_external(item, zbx_config_comms->config_timeout, result);
+			res = get_value_external(item, config_comms->config_timeout, result);
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			zbx_alarm_on(zbx_config_comms->config_timeout);
+			zbx_alarm_on(config_comms->config_timeout);
 			res = get_value_ssh(item, result);
 			zbx_alarm_off();
 #else
@@ -329,7 +329,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			zbx_alarm_on(zbx_config_comms->config_timeout);
+			zbx_alarm_on(config_comms->config_timeout);
 			res = get_value_telnet(item, result);
 			zbx_alarm_off();
 			break;
@@ -697,7 +697,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 }
 
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
+		unsigned char poller_type, const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -716,20 +716,20 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, zbx_config_comms->config_timeout);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
-		zbx_alarm_on(zbx_config_comms->config_timeout);
+		zbx_alarm_on(config_comms->config_timeout);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
-				zbx_config_comms->config_timeout);
+				config_comms->config_timeout);
 		zbx_alarm_off();
 	}
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0], add_results, zbx_config_comms,
+			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 				config_startup_time);
 	}
 	else
@@ -800,7 +800,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  * Parameters: poller_type         - [IN] poller type (ZBX_POLLER_TYPE_...)   *
  *             nextcheck           - [OUT] item nextcheck                     *
- *             zbx_config_comms    - [IN] server/proxy configuration for      *
+ *             config_comms        - [IN] server/proxy configuration for      *
  *                                      communication                         *
  *             config_startup_time - [IN] program startup time                *
  *                                                                            *
@@ -810,7 +810,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *           see DCconfig_get_poller_items()                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *zbx_config_comms,
+static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time)
 {
 	DC_ITEM			item, *items;
@@ -825,7 +825,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = DCconfig_get_poller_items(poller_type, zbx_config_comms->config_timeout, &items);
+	num = DCconfig_get_poller_items(poller_type, config_comms->config_timeout, &items);
 
 	if (0 == num)
 	{
@@ -836,8 +836,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, zbx_config_comms,
-			config_startup_time);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time);
 
 	zbx_timespec(&timespec);
 

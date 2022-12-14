@@ -859,7 +859,8 @@ out:
  *                                                                            *
  * Parameters: sock                - [IN] request socket                      *
  *             jp                  - [IN] request data                        *
- *             config_comms        - [IN] Zabbix server/proxy comms config    *
+ *             config_comms        - [IN] Zabbix server/proxy configuration   *
+ *                        for communication                                   *
  *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
@@ -1069,7 +1070,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 }
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	int	ret = SUCCEED;
 
@@ -1084,7 +1085,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if (SUCCEED != zbx_json_open(s, &jp))
 		{
-			zbx_send_response(sock, FAIL, zbx_json_strerror(), zbx_config_comms->config_timeout);
+			zbx_send_response(sock, FAIL, zbx_json_strerror(), config_comms->config_timeout);
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object from %s: %s",
 					sock->peer, zbx_json_strerror());
 			return FAIL;
@@ -1103,23 +1104,23 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
-			recv_agenthistory(sock, &jp, ts, zbx_config_comms->config_timeout);
+			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
-			recv_senderhistory(sock, &jp, ts, zbx_config_comms->config_timeout);
+			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_task_data(sock, ts, zbx_config_comms);
+				zbx_send_task_data(sock, ts, config_comms);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_recv_proxy_data(sock, &jp, ts, zbx_config_comms->config_timeout);
+				zbx_recv_proxy_data(sock, &jp, ts, config_comms->config_timeout);
 			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_proxy_data(sock, ts, zbx_config_comms);
+				zbx_send_proxy_data(sock, ts, config_comms);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 		{
@@ -1128,48 +1129,48 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
-			ret = send_list_of_active_checks_json(sock, &jp, zbx_config_comms->config_timeout);
+			ret = send_list_of_active_checks_json(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = node_process_command(sock, s, &jp, zbx_config_comms->config_timeout);
+				ret = node_process_command(sock, s, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = recv_getqueue(sock, &jp, zbx_config_comms->config_timeout);
+				ret = recv_getqueue(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_STATUS))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = recv_getstatus(sock, &jp, zbx_config_comms->config_timeout);
+				ret = recv_getstatus(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 		{
-			ret = send_internal_stats_json(sock, &jp, zbx_config_comms, config_startup_time);
+			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_preproc_test(sock, &jp, zbx_config_comms->config_timeout);
+				ret = zbx_trapper_preproc_test(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_expressions_evaluate(sock, &jp, zbx_config_comms->config_timeout);
+				ret = zbx_trapper_expressions_evaluate(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				zbx_trapper_item_test(sock, &jp, zbx_config_comms, config_startup_time);
+				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, zbx_config_comms->zbx_config_tls,
-				zbx_get_program_type_cb, zbx_config_comms->config_timeout))
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->zbx_config_tls,
+				zbx_get_program_type_cb, config_comms->config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1177,7 +1178,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
-		ret = send_list_of_active_checks(sock, s, zbx_config_comms->config_timeout);
+		ret = send_list_of_active_checks(sock, s, config_comms->config_timeout);
 	}
 	else
 	{
@@ -1245,7 +1246,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
 		process_history_data(&item, &av, &errcode, 1, NULL);
 
-		zbx_alarm_on(zbx_config_comms->config_timeout);
+		zbx_alarm_on(config_comms->config_timeout);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
 		zbx_alarm_off();
@@ -1255,14 +1256,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 }
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *zbx_config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, zbx_config_comms, config_startup_time);
+	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_startup_time);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)

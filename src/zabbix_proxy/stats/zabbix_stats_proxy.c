@@ -27,28 +27,28 @@
  *                                                                            *
  * Purpose: get program type (proxy) specific internal statistics             *
  *                                                                            *
- * Parameters: json       - [OUT] the json data                               *
- *             zbx_config - [IN] proxy config                                 *
+ * Parameters: json         - [OUT] the json data                             *
+ *             config_comms - [IN] proxy config                               *
  *                                                                            *
  * Comments: This function is used to gather proxy specific internal          *
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms)
 {
 	unsigned int	encryption;
 
-	zbx_json_addstring(json, "name", ZBX_NULL2EMPTY_STR(zbx_config->hostname), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "name", ZBX_NULL2EMPTY_STR(config_comms->hostname), ZBX_JSON_TYPE_STRING);
 
-	if (ZBX_PROXYMODE_PASSIVE == zbx_config->proxymode)
+	if (ZBX_PROXYMODE_PASSIVE == config_comms->proxymode)
 	{
 		zbx_json_addstring(json, "passive", "true", ZBX_JSON_TYPE_INT);
-		encryption = zbx_config->zbx_config_tls->accept_modes;
+		encryption = config_comms->zbx_config_tls->accept_modes;
 	}
 	else
 	{
 		zbx_json_addstring(json, "passive", "false", ZBX_JSON_TYPE_INT);
-		encryption = zbx_config->zbx_config_tls->connect_mode;
+		encryption = config_comms->zbx_config_tls->connect_mode;
 	}
 
 	zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT,
