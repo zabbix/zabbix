@@ -484,8 +484,6 @@ jQuery(document).ready(function($) {
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
 				$not_supported = $('#not_supported', $form);
 
-			console.log($rows);
-
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
 				$not_supported.prop('disabled', true);
@@ -509,7 +507,6 @@ jQuery(document).ready(function($) {
 
 				$submit_btn.html('<?= _('Get value and test') ?>');
 				$rows.show();
-
 
 				<?php if ($data['show_snmp_form']): ?>
 					$('#interface_details_version').on('change', function (e) {
