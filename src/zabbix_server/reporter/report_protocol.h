@@ -20,9 +20,11 @@
 #ifndef ZABBIX_REPORT_PROTOCOL_H
 #define ZABBIX_REPORT_PROTOCOL_H
 
-#include "../alerter/alert.h"
+#include "../alerter/alerter.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
 
 #define ZBX_REPORT_PARAM_SUBJECT	"subject"
 #define ZBX_REPORT_PARAM_BODY		"body"

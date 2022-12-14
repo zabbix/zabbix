@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alert_manager.h"
+#include "alerter.h"
 
-#include "alert.h"
 #include "alerter_protocol.h"
 #include "config.h"
 #include "log.h"
@@ -35,6 +34,7 @@
 #include "zbxserialize.h"
 #include "zbxserver.h"
 #include "zbxstr.h"
+#include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxxml.h"
@@ -2252,7 +2252,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-ZBX_THREAD_ENTRY(alert_manager_thread, args)
+ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
 	zbx_thread_alert_manager_args	*alert_manager_args_in = (zbx_thread_alert_manager_args *)
 							(((zbx_thread_args_t *)args)->args);

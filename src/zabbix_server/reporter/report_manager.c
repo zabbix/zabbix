@@ -27,7 +27,7 @@
 #include "base64.h"
 #include "../zbxreport.h"
 #include "zbxcrypto.h"
-#include "../alerter/alert.h"
+#include "../alerter/alerter.h"
 #include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

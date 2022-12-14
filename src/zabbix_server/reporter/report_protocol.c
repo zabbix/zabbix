@@ -20,8 +20,10 @@
 #include "../zbxreport.h"
 #include "report_protocol.h"
 
+#include "../alerter/alerter.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "zbxserialize.h"
-#include "../alerter/alert.h"
 
 static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zbx_uint64_t *value, char **error)
 {

@@ -290,7 +290,7 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(alerter_thread, args)
+ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 {
 	zbx_thread_alert_args	*alert_args_in = (zbx_thread_alert_args *)(((zbx_thread_args_t *)args)->args);
 	char			*error = NULL;

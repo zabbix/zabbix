@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alert_syncer.h"
-#include "../server.h"
+#include "alerter.h"
 
+#include "../server.h"
 #include "alerter_protocol.h"
 #include "log.h"
 #include "zbxalgo.h"
@@ -32,6 +32,7 @@
 #include "zbxself.h"
 #include "zbxservice.h"
 #include "zbxstr.h"
+#include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
 
@@ -918,7 +919,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, medias_num);
 }
 
-ZBX_THREAD_ENTRY(alert_syncer_thread, args)
+ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 {
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);

@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter_protocol.h"
+#include "alerter.h"
 
-#include "alert.h"
+#include "alerter_protocol.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"

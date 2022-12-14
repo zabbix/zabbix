@@ -36,8 +36,6 @@
 #include "zbxcomms.h"
 
 #include "alerter/alerter.h"
-#include "alerter/alert_manager.h"
-#include "alerter/alert_syncer.h"
 #include "dbsyncer/dbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
@@ -1520,7 +1518,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_ALERTER:
 				thread_args.args = &alert_args;
-				zbx_thread_start(alerter_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_alerter_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
 				thread_args.args = &housekeeper_args;
@@ -1583,7 +1581,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 #endif
 			case ZBX_PROCESS_TYPE_ALERTMANAGER:
 				thread_args.args = &alert_manager_args;
-				zbx_thread_start(alert_manager_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_alert_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LLDMANAGER:
 				zbx_thread_start(lld_manager_thread, &thread_args, &threads[i]);
@@ -1593,7 +1591,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_ALERTSYNCER:
 				thread_args.args = &alert_syncer_args;
-				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HISTORY;
