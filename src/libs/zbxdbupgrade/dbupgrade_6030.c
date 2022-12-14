@@ -1406,6 +1406,13 @@ static int	DBpatch_6030149(void)
 
 	return DBmodify_field_type("task_result", &field, &old_field);
 }
+
+static int DBpatch_6030150(void)
+{
+	const ZBX_FIELD field = {"csrf_token", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sessions", &field);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1562,5 +1569,6 @@ DBPATCH_ADD(6030146, 0, 1)
 DBPATCH_ADD(6030147, 0, 1)
 DBPATCH_ADD(6030148, 0, 1)
 DBPATCH_ADD(6030149, 0, 1)
+DBPATCH_ADD(6030150, 0, 1)
 
 DBPATCH_END()

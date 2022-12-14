@@ -1336,6 +1336,7 @@ FIELD		|sessionid	|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|csrf_token	|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|userid,status,lastaccess
 
 TABLE|trigger_discovery|triggerid|0
@@ -2064,4 +2065,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030149	|6030149
+ROW		|1		|6030150	|6030150
