@@ -76,6 +76,14 @@ type system_info struct {
 	VersionFull    string `json:"version_full"`
 }
 
+func (p *Plugin) systemSwPackages(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
+func (p *Plugin) systemSwPackagesGet(params []string) (result interface{}, err error) {
+	return nil, plugin.UnsupportedMetricError
+}
+
 func joinNonEmptyStrings(delim string, strs []string) (res string) {
 	var nonEmpty []string
 	for _, s := range strs {
@@ -161,10 +169,6 @@ func getPrettyOSInfoString(handle registry.Key) (result string, err error) {
 	spVer, _ = getRegistryValue(handle, regSPVersion, registry.SZ)
 
 	return createWinInfoLineOrErr([]string{name, build, spVer})
-}
-
-func (p *Plugin) getPackages(params []string) (result interface{}, err error) {
-	return nil, plugin.UnsupportedMetricError
 }
 
 func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
