@@ -140,6 +140,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->setArgumentSID()
 			->getUrl()
 	))
+		->addSID()
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
