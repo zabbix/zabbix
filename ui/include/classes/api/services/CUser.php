@@ -2153,12 +2153,14 @@ class CUser extends CApiService {
 	 */
 	private static function createSession(array $db_user): array {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
+		$db_user['csrf_token'] = CEncryptHelper::generateKey();
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE
+			'status' => ZBX_SESSION_ACTIVE,
+			'csrf_token' => $db_user['csrf_token']
 		]], false);
 
 		self::$userData = $db_user;
