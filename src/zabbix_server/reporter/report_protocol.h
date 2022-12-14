@@ -23,8 +23,6 @@
 #include "../alerter/alerter.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
-#include "zbxipcservice.h"
-#include "zbxjson.h"
 
 #define ZBX_REPORT_PARAM_SUBJECT	"subject"
 #define ZBX_REPORT_PARAM_BODY		"body"

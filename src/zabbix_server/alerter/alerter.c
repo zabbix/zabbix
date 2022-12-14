@@ -41,7 +41,7 @@ static zbx_es_t	es_engine;
  *                                                                            *
  * Purpose: execute script alert type                                         *
  *                                                                            *
- * Parameters: alert         - [IN] command for execution                     *
+ * Parameters: command       - [IN] command for execution                     *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *

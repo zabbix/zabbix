@@ -1125,19 +1125,17 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MED
 	}
 }
 
-#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
-
 /******************************************************************************
  *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
- * Parameters: dispatch     - [IN] dispatcher                                 *
- *             subject      - [IN] subject                                    *
- *             message      - [IN] message                                    *
- *             content_name - [IN] content name                               *
- *             content_type - [IN] content type                               *
+ * Parameters: dispatch     - [IN]                                            *
+ *             subject      - [IN]                                            *
+ *             message      - [IN]                                            *
+ *             content_name - [IN]                                            *
+ *             content_type - [IN]                                            *
  *             content      - [IN] additional content to dispatch             *
- *             content_size - [IN] content size                               *
+ *             content_size - [IN] additional content size                    *
  *             error          [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was started successfully              *
@@ -1261,9 +1259,13 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 		goto out;
 	}
 
+#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
+
 	/* wait for the send alert responses for all recipients */
 
 	time_stop = time(NULL) + ZBX_ALERTER_REPORT_TIMEOUT;
+
+#undef ZBX_ALERTER_REPORT_TIMEOUT
 
 	for (i = 0; i < dispatch->total_num; i++)
 	{

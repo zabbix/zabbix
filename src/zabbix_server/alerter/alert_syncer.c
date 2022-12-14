@@ -673,7 +673,7 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
  * Purpose: retrieves alert updates from alert manager and flushes them into  *
  *          database                                                          *
  *                                                                            *
- * Parameters: amdb - [IN]                                                    *
+ * Parameters: amdb - [IN] alert manager cache                                *
  *                                                                            *
  * Return value: count of results                                             *
  *                                                                            *
@@ -797,7 +797,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: removes cached media types used more than a day ago               *
  *                                                                            *
- * Parameters: amdb - [IN]                                                    *
+ * Parameters: amdb - [IN] alert manager cache                                *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
@@ -843,7 +843,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  *                                                                            *
  * Purpose: updates watchdog recipients                                       *
  *                                                                            *
- * Parameters: amdb - [IN]                                                    *
+ * Parameters: amdb - [IN] alert manager cache                                *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_watchdog(zbx_am_db_t *amdb)
