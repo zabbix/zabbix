@@ -280,7 +280,7 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 		if (isset($_REQUEST['templates_rem'])) {
 			$unlinkTemplates = array_keys($_REQUEST['templates_rem']);
 		}
-		elseif (is_array($_REQUEST['unlink'])) {
+		else {
 			$unlinkTemplates = array_keys($_REQUEST['unlink']);
 		}
 	}
