@@ -1402,7 +1402,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type, CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type, get_config_forks,
 							get_alert_scripts_path};
-	zbx_thread_alert_args		alert_args = {get_program_type, get_alert_scripts_path};
+	zbx_thread_alert_args		alert_args = {get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))
 	{

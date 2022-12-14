@@ -87,7 +87,6 @@ zbx_alerter_dispatch_t;
 typedef struct
 {
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	zbx_get_config_str_f	get_alert_script_path_cb_arg;
 }
 zbx_thread_alert_args;
 
