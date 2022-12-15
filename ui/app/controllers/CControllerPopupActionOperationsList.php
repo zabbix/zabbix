@@ -114,7 +114,9 @@ class CControllerPopupActionOperationsList extends CController {
 
 				if ($unique_operations[$new_operation['operationtype']] > 1) {
 					$result = false;
-					CMessageHelper::addError(_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype'])));
+					CMessageHelper::addError(
+						_s('Operation "%1$s" already exists.', operation_type2str($new_operation['operationtype']))
+					);
 				}
 			}
 

@@ -21,6 +21,7 @@
 
 
 window.action_edit_popup = new class {
+
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -246,6 +247,7 @@ window.action_edit_popup = new class {
 
 	_createConditionsRow(input) {
 		let template;
+
 		if (is_array(input.value)) {
 			input.value.forEach((value, index) => {
 				const element = {...input, name: input.name[index], value: input.value[index]};

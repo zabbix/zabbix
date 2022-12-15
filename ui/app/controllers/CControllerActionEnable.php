@@ -27,7 +27,7 @@ class CControllerActionEnable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'actionids' =>		'required|array_db actions.actionid'
+			'actionids' =>	'required|array_db actions.actionid'
 		];
 
 		$ret = $this->validateInput($fields);
