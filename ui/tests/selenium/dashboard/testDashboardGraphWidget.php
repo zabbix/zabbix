@@ -2468,7 +2468,7 @@ class testDashboardGraphWidget extends CWebTest {
 		// Check hint next to the "Data set label" field.
 		$form->query('xpath:.//label[text()="Data set label"]/a')->one()->click();
 		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
-		$this->assertEquals('Used as legend label for aggregated data sets.', $hint->getText());
+		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
 		$this->fillForm($input_data, $form);
 		$form->submit();

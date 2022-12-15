@@ -399,8 +399,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						->addItem([
 							new CLabel([
 								_('Data set label'),
-								makeHelpIcon(_('Used as legend label for aggregated data sets.'))
-							], 'label-'.$field_name.'_'.$row_num.'_data_set_label'),
+								makeHelpIcon(_('Also used as legend label for aggregated data sets.'))
+							], $field_name.'_'.$row_num.'_data_set_label'),
 							new CFormField(
 								(new CTextBox($field_name.'['.$row_num.'][data_set_label]', $value['data_set_label']))
 									->setId($field_name.'_'.$row_num.'_data_set_label')
