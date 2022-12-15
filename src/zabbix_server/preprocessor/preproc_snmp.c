@@ -268,17 +268,26 @@ static size_t	preproc_snmp_parse_value(const char *ptr, zbx_snmp_value_pair_t *p
 
 	if ('"' != *ptr)
 	{
-
 		if (NULL == (ptr = strchr(ptr, '\n')))
 		{
 			len = strlen(start);
 		}
 		else
+		{
+			if (ZBX_SNMP_TYPE_HEX == p->type)
+			{
+				while ('.' != *(ptr + 1) && '\0' != *(ptr + 1))
+					ptr++;
+			}
+
 			len = (size_t)(ptr - start);
+		}
 
 		p->value = zbx_malloc(NULL, len + 1);
 		memcpy(p->value, start, len);
 		(p->value)[len] = '\0';
+		zbx_remove_chars(p->value, "\n");
+		zbx_rtrim(p->value, " ");
 
 		return len;
 	}
