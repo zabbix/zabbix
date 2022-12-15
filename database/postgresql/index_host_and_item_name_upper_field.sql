@@ -7,9 +7,9 @@ UPDATE hosts SET name_upper=UPPER(name);
 CREATE OR REPLACE FUNCTION hosts_name_upper_upper()
 RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$
 BEGIN
-UPDATE hosts SET name_upper=UPPER(name)
-WHERE hostid=NEW.hostid;
-RETURN NULL;
+	UPDATE hosts SET name_upper=UPPER(name)
+	WHERE hostid=NEW.hostid;
+	RETURN NULL;
 END $func$;
 
 CREATE TRIGGER hosts_name_upper_insert AFTER INSERT ON hosts
@@ -27,9 +27,9 @@ UPDATE items SET name_upper=UPPER(name);
 CREATE OR REPLACE FUNCTION items_name_upper_upper()
 RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$
 BEGIN
-UPDATE items SET name_upper=UPPER(name)
-WHERE itemid=NEW.itemid;
-RETURN NULL;
+	UPDATE items SET name_upper=UPPER(name)
+	WHERE itemid=NEW.itemid;
+	RETURN NULL;
 END $func$;
 
 CREATE TRIGGER items_name_upper_insert AFTER INSERT ON items

@@ -14,10 +14,10 @@ $$
 CREATE TRIGGER hosts_name_upper_update BEFORE UPDATE ON hosts
 FOR EACH ROW
 BEGIN
-IF NEW.name<>OLD.name
-THEN
-SET NEW.name_upper=UPPER(NEW.name);
-END IF;
+	IF NEW.name<>OLD.name
+	THEN
+		SET NEW.name_upper=UPPER(NEW.name);
+	END IF;
 END;
 $$
 DELIMITER ;
@@ -37,10 +37,10 @@ $$
 CREATE TRIGGER items_name_upper_update BEFORE UPDATE ON items
 FOR EACH ROW
 BEGIN
-IF NEW.name<>OLD.name
-THEN
-SET NEW.name_upper=UPPER(NEW.name);
-END IF;
+	IF NEW.name<>OLD.name
+	THEN
+		SET NEW.name_upper=UPPER(NEW.name);
+	END IF;
 END;
 $$
 DELIMITER ;
