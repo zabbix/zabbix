@@ -1,7 +1,7 @@
 
 # Opsgenie webhook 
 
-This guide describes how to integrate your Zabbix installation with Opsgenie using Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix installation with Opsgenie using Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In Opsgenie
 
