@@ -2050,15 +2050,20 @@ static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *i
 				char	buffer[MAX_STRING_LEN];
 				vars_num++;
 
-				if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
+				if (SNMP_MSG_GET != pdu_type)
 				{
-					running = 0;
-					break;
+					if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
+					{
+						running = 0;
+						break;
+					}
 				}
+				else
+					running = 0;
 
 				snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
 
-				if (NULL != results)
+				if (NULL != *results)
 					zbx_chrcpy_alloc(results, results_alloc, results_offset, '\n');
 
 				zbx_strcpy_alloc(results, results_alloc, results_offset, buffer);
