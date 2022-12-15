@@ -21,6 +21,10 @@
 
 class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
+	protected function init() {
+		$this->validate_csrf_token = false;
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'templategroup_rights'    => 'required|array',

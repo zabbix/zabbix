@@ -33,6 +33,7 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())
 	->setId('user-group-form')
 	->setName('user_group_form')
+	->addCsrfToken($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['usrgrpid'] != 0) {

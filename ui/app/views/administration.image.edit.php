@@ -34,6 +34,7 @@ $form = (new CForm('post', (new CUrl('zabbix.php'))
 		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
 		->getUrl(), 'multipart/form-data')
 	)
+		->addCsrfToken($data['imageid'] == 0 ? 'image.create' : 'image.update')
 		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addVar('imagetype', $data['imagetype']);
 

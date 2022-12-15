@@ -189,6 +189,7 @@ $form = (new CForm())
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
 	)
+	->addCsrfToken('miscconfig.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())

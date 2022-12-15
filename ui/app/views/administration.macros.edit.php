@@ -103,6 +103,7 @@ $form = (new CForm())
 	->setName('macrosForm')
 	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
+	->addCsrfToken('macros.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem($tab_view);
 

@@ -27,6 +27,7 @@
 $form = (new CForm())
 	->setId('hostgroupForm')
 	->setName('hostgroupForm')
+	->addCsrfToken($data['groupid'] == null ? 'hostgroup.create' : 'hostgroup.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('groupid', $data['groupid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));

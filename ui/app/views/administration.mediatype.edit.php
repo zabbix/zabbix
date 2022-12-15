@@ -41,6 +41,7 @@ if ($data['form_refresh'] == 0) {
 // create form
 $mediaTypeForm = (new CForm())
 	->setId('media-type-form')
+	->addCsrfToken($data['mediatypeid'] == 0 ? 'mediatype.create' : 'mediatype.update')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())

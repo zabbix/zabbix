@@ -161,6 +161,7 @@ $form = (new CForm())
 		->setArgument('action', 'trigdisplay.update')
 		->getUrl()
 	)
+	->addCsrfToken('trigdisplay.update')
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $form_list)

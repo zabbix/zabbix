@@ -46,6 +46,7 @@ $form = (new CForm())
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
 		->getUrl()
 	)
+	->addCsrfToken($data['iconmapid'] == 0 ? 'iconmap.create' : 'iconmap.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1);
 

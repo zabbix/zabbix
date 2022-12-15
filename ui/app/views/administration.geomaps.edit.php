@@ -114,6 +114,7 @@ $form = (new CForm())
 			->setArgument('action', 'geomaps.update')
 			->getUrl()
 	)
+	->addCsrfToken('geomaps.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())

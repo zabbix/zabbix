@@ -27,6 +27,7 @@
 $form = (new CForm('post'))
 	->setId('service-form')
 	->setName('service_form')
+	->addCsrfToken($data['serviceid'] == null ? 'service.create' : 'service.update')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.

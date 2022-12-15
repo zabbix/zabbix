@@ -154,6 +154,7 @@ $form = (new CForm())
 		->setArgument('action', 'gui.update')
 		->getUrl()
 	)
+	->addCsrfToken('gui.update')
 	->addItem($gui_view);
 
 $html_page

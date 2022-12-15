@@ -37,6 +37,7 @@ $form = (new CForm())
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
+	->addCsrfToken('module.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create module tab

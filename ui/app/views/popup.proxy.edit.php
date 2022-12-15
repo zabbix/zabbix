@@ -27,6 +27,7 @@
 $form = (new CForm('post'))
 	->setId('proxy-form')
 	->setName('proxy_form')
+	->addCsrfToken($data['proxyid'] == 0 ? 'proxy.create' : 'proxy.update')
 	->addStyle('display: none;')
 	->addItem(getMessages());
 

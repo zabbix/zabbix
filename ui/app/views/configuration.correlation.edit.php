@@ -37,7 +37,8 @@ $form = (new CForm())
 		->setArgument('action', 'correlation.condition.add')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addCsrfToken($data['correlationid'] == 0 ? 'correlation.create' : 'correlation.update');
 
 if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);

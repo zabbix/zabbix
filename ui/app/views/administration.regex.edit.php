@@ -39,6 +39,7 @@ if ($data['regexid'] != 0) {
 $form = (new CForm())
 	->setId('regex')
 	->setAction($action->getUrl())
+	->addCsrfToken($data['regexid'] == 0 ? 'regex.create' : 'regex.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $table = (new CTable())

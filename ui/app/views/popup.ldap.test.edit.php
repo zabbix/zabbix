@@ -65,6 +65,7 @@ if ($data['ldap_config']['provision_status'] == JIT_PROVISIONING_ENABLED) {
 }
 
 $form = (new CForm('post', $form_action))
+	->addCsrfToken('popup.ldap.test.send')
 	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addItem($formgrid)
 	->addItem((new CScriptTag('ldap_test_edit_popup.init();'))->setOnDocumentReady());

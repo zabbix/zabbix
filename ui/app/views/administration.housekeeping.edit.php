@@ -35,6 +35,7 @@ $form = (new CForm())
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
 	)
+	->addCsrfToken('housekeeping.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())

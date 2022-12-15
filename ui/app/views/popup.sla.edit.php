@@ -27,6 +27,7 @@
 $form = (new CForm('post'))
 	->setId('sla-form')
 	->setName('sla_form')
+	->addCsrfToken($data['slaid'] == null ? 'sla.create' : 'sla.update')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.

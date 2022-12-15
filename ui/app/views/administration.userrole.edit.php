@@ -33,6 +33,7 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())
 	->setId('userrole-form')
 	->setName('user_role_form')
+	->addCsrfToken($data['roleid'] == null ? 'userrole.create' : 'userrole.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['roleid'] !== null) {

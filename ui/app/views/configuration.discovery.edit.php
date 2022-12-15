@@ -33,6 +33,7 @@ $html_page = (new CHtmlPage())
 $discoveryForm = (new CForm())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
+	->addCsrfToken(!empty($this->data['druleid']) ? 'discovery.update' : 'discovery.create')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if (!empty($this->data['druleid'])) {

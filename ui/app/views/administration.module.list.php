@@ -35,6 +35,7 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CForm())
+				->addCsrfToken('module.scan')
 				->addVar('action', 'module.scan')
 				->addItem((new CList())
 					->addItem(new CSubmit('form', _('Scan directory')))

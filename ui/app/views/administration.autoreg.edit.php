@@ -38,6 +38,7 @@ $autoreg_form = (new CForm())
 		->getUrl()
 	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addCsrfToken('autoreg.update')
 	->addVar('tls_accept', $data['tls_accept']);
 
 $autoreg_tab = (new CFormList())

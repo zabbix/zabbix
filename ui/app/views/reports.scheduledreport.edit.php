@@ -41,6 +41,7 @@ $form = (new CForm())
 			->setArgument('action', ($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 			->getUrl()
 	)
+	->addCsrfToken(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['reportid'] != 0) {

@@ -34,6 +34,7 @@ $html_page = new CHtmlPage();
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
 	$doc_url = CDocHelper::USERS_USER_EDIT;
+	$csrf_token_action = $data['userid'] != 0 ? 'user.update' : 'user.create';
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -42,6 +43,7 @@ else {
 		: $data['username'];
 	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
 	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
+	$csrf_token_action = 'userprofile.update';
 }
 
 $html_page
@@ -65,6 +67,7 @@ if ($data['readonly'] == true) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
+	->addCsrfToken($csrf_token_action)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);

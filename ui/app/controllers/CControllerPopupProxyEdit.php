@@ -26,6 +26,10 @@ class CControllerPopupProxyEdit extends CController {
 	 */
 	private $proxy;
 
+	protected function init() {
+		$this->validate_csrf_token = false;
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'proxyid' => 'id'

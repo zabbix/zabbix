@@ -36,7 +36,8 @@ $form = (new CForm())
 			->setArgument('action', 'audit.settings.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addCsrfToken('audit.settings.update');
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([

@@ -22,6 +22,7 @@
 class CControllerPopupLdapCheck extends CController {
 
 	protected function init(): void {
+		$this->validate_csrf_token = false;
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
