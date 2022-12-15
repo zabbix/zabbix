@@ -74,7 +74,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				]],
 				'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
 				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])],
-				'legend_label'			=> ['type' => API_STRING_UTF8, 'length' => 255]
+				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
 			]]);
 	}
 
@@ -126,7 +126,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_interval' => GRAPH_AGGREGATE_DEFAULT_INTERVAL,
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
 			'approximation' => APPROXIMATION_AVG,
-			'legend_label' => ''
+			'data_set_label' => ''
 		];
 	}
 
@@ -231,7 +231,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'legend_label' => ZBX_WIDGET_FIELD_TYPE_STR
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 		$dataset_defaults = self::getDefaults();
 

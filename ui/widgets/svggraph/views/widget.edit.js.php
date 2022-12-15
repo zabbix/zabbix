@@ -103,7 +103,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	_datasetTabInit() {
-		this._updateDatasetsLegend();
+		this._updateDatasetsLabel();
 
 		// Initialize vertical accordion.
 		jQuery(this._dataset_wrapper)
@@ -267,20 +267,20 @@ window.widget_svggraph_form = new class {
 			});
 	}
 
-	_updateDatasetsLegend() {
+	_updateDatasetsLabel() {
 		for (const dataset of this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
-			this._updateDatasetLegend(dataset);
+			this._updateDatasetLabel(dataset);
 		}
 	}
 
-	_updateDatasetLegend(dataset) {
+	_updateDatasetLabel(dataset) {
 		const placeholder_text = <?= json_encode(_('Data set')) ?> + ` #${parseInt(dataset.dataset.set) + 1}`;
 
-		const legend_label = dataset.querySelector('.js-dataset-label');
-		const legend_label_input = dataset.querySelector(`[name="ds[${dataset.dataset.set}][legend_label]"]`);
+		const data_set_label = dataset.querySelector('.js-dataset-label');
+		const data_set_label_input = dataset.querySelector(`[name="ds[${dataset.dataset.set}][data_set_label]"]`);
 
-		legend_label.textContent = legend_label_input.value !== '' ? legend_label_input.value : placeholder_text;
-		legend_label_input.placeholder = placeholder_text;
+		data_set_label.textContent = data_set_label_input.value !== '' ? data_set_label_input.value : placeholder_text;
+		data_set_label_input.placeholder = placeholder_text;
 	}
 
 	_addDatasetMenu(e) {
@@ -417,7 +417,7 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
-		this._updateDatasetLegend(cloned_dataset);
+		this._updateDatasetLabel(cloned_dataset);
 		this._updatePreview();
 	}
 
@@ -427,7 +427,7 @@ window.widget_svggraph_form = new class {
 			.remove();
 
 		this.updateVariableOrder(jQuery(this._dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
-		this._updateDatasetsLegend();
+		this._updateDatasetsLabel();
 
 		const dataset = this._getOpenedDataset();
 
@@ -460,7 +460,7 @@ window.widget_svggraph_form = new class {
 
 			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
 				this.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
-				this._updateDatasetsLegend();
+				this._updateDatasetsLabel();
 				this._updatePreview();
 			});
 		}
@@ -638,7 +638,7 @@ window.widget_svggraph_form = new class {
 		const dataset = this._getOpenedDataset();
 
 		if (dataset !== null) {
-			this._updateDatasetLegend(dataset);
+			this._updateDatasetLabel(dataset);
 
 			const dataset_index = dataset.getAttribute('data-set');
 

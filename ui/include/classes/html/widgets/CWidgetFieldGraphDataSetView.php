@@ -212,7 +212,6 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 
 		return (new CListItem([
 			(new CLabel(''))
-				->setId($field_name.'_'.$row_num.'_dataset_label')
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-dataset-label'),
 			(new CDiv())
@@ -398,10 +397,13 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Legend label'), 'label-'.$field_name.'_'.$row_num.'_legend_label'),
+							new CLabel([
+								_('Data set label'),
+								makeHelpIcon([_('Used as legend label for aggregated data sets.')])
+							], 'label-'.$field_name.'_'.$row_num.'_data_set_label'),
 							new CFormField(
-								(new CTextBox($field_name.'['.$row_num.'][legend_label]', $value['legend_label']))
-									->setId($field_name.'_'.$row_num.'_legend_label')
+								(new CTextBox($field_name.'['.$row_num.'][data_set_label]', $value['data_set_label']))
+									->setId($field_name.'_'.$row_num.'_data_set_label')
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							)
 						])
