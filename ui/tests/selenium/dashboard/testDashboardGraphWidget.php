@@ -1443,7 +1443,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
-							'Data set label' => 'Staicase graph'
+							'Data set label' => 'Staircase graph'
 						],
 						[
 							'host' => 'Two host',
@@ -2482,7 +2482,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $widget->edit();
 
 		// Check Data set names in created widget configuration form.
-		$data_set_labels = $form->query('xpath:.//label[@class = "sortable-drag-handle js-dataset-label"]')->all()->asText();
+		$data_set_labels = $form->query('xpath:.//label[@class="sortable-drag-handle js-dataset-label"]')->all()->asText();
 		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
 	}
 
