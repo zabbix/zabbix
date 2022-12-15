@@ -22,9 +22,9 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 [![](images/tn_2.png?raw=true)](images/2.png)
 
 3. Change the values of variables:
-* opsgenie_api (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts);
-* opsgenie_web (e.g., https://myzabbix.app.opsgenie.com);
-* opsgenie_token.
+	* opsgenie_api (https://api.opsgenie.com/v2/alerts or https://api.eu.opsgenie.com/v2/alerts);
+	* opsgenie_web (e.g., https://myzabbix.app.opsgenie.com);
+	* opsgenie_token.
 
 You can also set your own tags into `opsgenie_tags` as <comma_separated_list_of_tags> and team names into `opsgenie_teams` as <comma_separated_list_of_responders>.  
 The priority level in `severity_default` will be used for non-triggered actions.
