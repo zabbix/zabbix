@@ -110,17 +110,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$range_time_parser->parse($this->getInput('to'));
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-		$alert_options = [];
 		$alerts = [];
 
 		foreach (eventSourceObjects() as $eventSource) {
-			$alert_options[] = API::Alert()->get([
-				'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid',
-					'actionid', 'mediatypeid', 'alerttype'
+			$alerts = array_merge($alerts, API::Alert()->get([
+				'output' => ['actionid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
 				],
+				'selectMediatypes' => ['name', 'maxattempts'],
 				'eventsource' => $eventSource['source'],
 				'eventobject' => $eventSource['object'],
-				'selectMediatypes' => ['name', 'maxattempts'],
 				'userids' => $userids ?: null,
 				'actionids' => $actionids ?: null,
 				'mediatypeids' => $mediatypeids ?: null,
@@ -135,15 +134,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => $this->fields_values['show_lines']
-			]);
-		}
-
-		foreach ($alert_options as $alert_option) {
-			if (count($alert_option) !== 0) {
-				foreach ($alert_option as $alert) {
-					$alerts[] = $alert;
-				}
-			}
+			]));
 		}
 
 		foreach ($alerts as &$alert) {
