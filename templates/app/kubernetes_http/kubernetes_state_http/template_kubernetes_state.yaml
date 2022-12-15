@@ -62,15 +62,17 @@ zabbix_export:
           params: |
             var Kube = {
                 params: {},
-            
+
                 setParams: function (params) {
-                    ['api_endpoint', 'token'].forEach(function (field) {
+                    ['api_endpoint', 'token', 'api_server_scheme', 'api_server_port',
+                     'controller_scheme', 'controller_port',
+                     'scheduler_scheme', 'scheduler_port'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
-            
+
                     Kube.params = params;
                     if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
                         Kube.params.api_endpoint += '/';
@@ -384,15 +386,15 @@ zabbix_export:
           params: |
             var Kube = {
                 params: {},
-            
+
                 setParams: function (params) {
-                    ['api_endpoint', 'token'].forEach(function (field) {
+                    ['api_endpoint', 'token', 'kubelet_scheme', 'kubelet_port'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
-            
+
                     Kube.params = params;
                     if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
                         Kube.params.api_endpoint += '/';
@@ -575,7 +577,7 @@ zabbix_export:
             var Kube = {
                 params: {},
                 metrics_endpoint: undefined,
-            
+
                 setParams: function (params) {
                     ['api_endpoint', 'token', 'state_endpoint_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
@@ -583,7 +585,7 @@ zabbix_export:
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
-            
+
                       Kube.params = params;
                       if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
                           Kube.params.api_endpoint += '/';
