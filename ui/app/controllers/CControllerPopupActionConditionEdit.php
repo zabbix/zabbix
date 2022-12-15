@@ -34,7 +34,7 @@ class CControllerPopupActionConditionEdit extends CController {
 			'condition_type' =>		'db conditions.conditiontype|in '.implode(',', array_keys(condition_type2str())),
 			'operator' =>			'db conditions.operator|in '.implode(',', array_keys(condition_operator2str())),
 			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
-			'row_index' =>			'required|int32',
+			'row_index' =>			'required|int32'
 		];
 
 		$ret = $this->validateInput($fields);

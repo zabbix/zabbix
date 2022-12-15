@@ -187,7 +187,7 @@ class CControllerPopupActionOperationEdit extends CController {
 				unset($operation['opcommand_hst'][0]);
 			}
 
-			if(count($operation['opcommand_hst']) > 0) {
+			if (count($operation['opcommand_hst']) > 0) {
 				$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'hostids' => array_column($operation['opcommand_hst'], 'hostid')
