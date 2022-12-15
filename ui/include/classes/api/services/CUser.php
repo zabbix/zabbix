@@ -1728,8 +1728,6 @@ class CUser extends CApiService {
 		$this->setTimezone($db_user['timezone']);
 
 		if ($token !== null) {
-			$db_user['sessionid'] = $token;
-
 			// Check permissions.
 			if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
