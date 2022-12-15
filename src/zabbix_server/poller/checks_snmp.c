@@ -1952,7 +1952,6 @@ static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oid_t *oids_out,
 		char *error, size_t max_error_len)
 {
-	size_t	len;
 	int	i;
 
 	for (i = 0; i < request->nparam; i++)
@@ -1990,13 +1989,113 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 	return SUCCEED;
 }
 
+static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
+		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
+{
+	struct snmp_pdu		*pdu = NULL, *response = NULL;
+	int			ret, running = 1, vars_num = 0, status;
+	oid			name[MAX_OID_LEN];
+	size_t			name_length = MAX_OID_LEN;
+	struct variable_list	*var;
+
+	memcpy(name, p_oid->root_oid, p_oid->root_oid_len * sizeof(oid));
+	name_length = p_oid->root_oid_len;
+
+	while (running)
+	{
+		/* create PDU */
+		if (NULL == (pdu = snmp_pdu_create(pdu_type)))
+		{
+			zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (SNMP_MSG_GETBULK == pdu_type)
+		{
+			pdu->non_repeaters = 0;
+			pdu->max_repetitions = item->snmp_max_repetitions;
+		}
+
+		if (NULL == snmp_add_null_var(pdu, name, name_length))
+		{
+			zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
+			ret = CONFIG_ERROR;
+			snmp_free_pdu(pdu);
+			goto out;
+		}
+
+		status = snmp_synch_response(ss, pdu, &response);
+		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
+		{
+			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
+			goto out;
+		}
+
+		if (SNMP_ERR_NOSUCHNAME == response->errstat)
+			break;
+
+		for (var = response->variables; NULL != var; var = var->next_variable)
+		{
+			if (var->name_length < p_oid->root_oid_len ||
+					0 != memcmp(p_oid->root_oid, var->name, p_oid->root_oid_len * sizeof(oid)))
+			{
+				running = 0;
+				break;
+			}
+
+			if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
+					SNMP_NOSUCHINSTANCE != var->type)
+			{
+				char	buffer[MAX_STRING_LEN];
+				vars_num++;
+
+				if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
+				{
+					running = 0;
+					break;
+				}
+
+				snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
+
+				if (NULL != results)
+					zbx_chrcpy_alloc(results, results_alloc, results_offset, '\n');
+
+				zbx_strcpy_alloc(results, results_alloc, results_offset, buffer);
+
+				if (NULL == var->next_variable)
+				{
+					memcpy(name, var->name, var->name_length * sizeof(oid));
+					name_length = var->name_length;
+				}
+			}
+			else
+			{
+				running = 0;
+				break;
+			}
+		}
+
+		if (NULL != response)
+		{
+			snmp_free_pdu(response);
+			response = NULL;
+		}
+	}
+
+	ret = vars_num;
+out:
+	if (NULL != response)
+		snmp_free_pdu(response);
+
+	return ret;
+}
+
 static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
 		int *errcode, char *error, size_t max_error_len)
 {
-	struct snmp_pdu		*pdu = NULL, *response = NULL;
-	int			i, ret = SUCCEED, status, num_vars, pdu_type, pdu_type_orig;
+	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
-	struct variable_list	*var;
 	char			*results = NULL;
 	size_t			results_alloc = 0, results_offset = 0;
 	zbx_snmp_format_opts_t	default_opts, bulk_opts;
@@ -2028,7 +2127,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 		goto out;
 	}
 
-	pdu_type_orig = pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
+	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
 	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
 	{
@@ -2045,121 +2144,25 @@ static int	zbx_snmp_process_snmp_bulkwalk(struct snmp_session *ss, const DC_ITEM
 
 	for (i = 0; i < param_oids.values_num; i++)
 	{
-		int		running = 1, retry_get = 0, vars_found = 0;
-		oid		name[MAX_OID_LEN];
-		size_t		name_length = MAX_OID_LEN;
-		zbx_snmp_oid_t	*p_oid;
-
-		p_oid = param_oids.values[i];
-
-retry:
-		memcpy(name, p_oid->root_oid, p_oid->root_oid_len * sizeof(oid));
-		name_length = p_oid->root_oid_len;
-
-		while (running)
+		if (SUCCEED > (ret = snmp_bulkwalk(ss, pdu_type, item, param_oids.values[i], &results, &results_alloc,
+				&results_offset, error, max_error_len)))
 		{
-			/* create PDU */
-			if (NULL == (pdu = snmp_pdu_create(pdu_type)))
-			{
-				zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
-				ret = CONFIG_ERROR;
-				goto out;
-			}
-
-			if (SNMP_MSG_GETBULK == pdu_type)
-			{
-				pdu->non_repeaters = 0;
-				pdu->max_repetitions = item->snmp_max_repetitions;
-			}
-
-			if (NULL == snmp_add_null_var(pdu, name, name_length))
-			{
-				zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
-				ret = CONFIG_ERROR;
-				snmp_free_pdu(pdu);
-				break;
-			}
-
-			status = snmp_synch_response(ss, pdu, &response);
-			if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
-			{
-				ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
-				goto out;
-			}
-
-			if (SNMP_ERR_NOSUCHNAME == response->errstat)
-				break;
-
-			for (var = response->variables; NULL != var; var = var->next_variable)
-			{
-				if (0 == retry_get && (var->name_length < p_oid->root_oid_len ||
-						0 != memcmp(p_oid->root_oid, var->name, p_oid->root_oid_len * sizeof(oid))))
-				{
-					running = 0;
-					break;
-				}
-
-				if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type &&
-						SNMP_NOSUCHINSTANCE != var->type)
-				{
-					char	buffer[MAX_STRING_LEN];
-					vars_found++;
-
-					if (0 <= snmp_oid_compare(name, name_length, var->name, var->name_length))
-					{
-						running = 0;
-						break;
-					}
-
-					snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
-
-					if (NULL != results)
-						zbx_chrcpy_alloc(&results, &results_alloc, &results_offset, '\n');
-
-					zbx_strcpy_alloc(&results, &results_alloc, &results_offset, buffer);
-
-					if (NULL == var->next_variable)
-					{
-						memcpy(name, var->name, var->name_length * sizeof(oid));
-						name_length = var->name_length;
-					}
-				}
-				else
-				{
-					running = 0;
-					break;
-				}
-			}
-
-			if (1 == retry_get)
-				running = 0;
-
-			if (NULL != response)
-			{
-				snmp_free_pdu(response);
-				response = NULL;
-			}
+			goto out;
 		}
 
-		if (0 == retry_get)
+		if (0 == ret && SNMP_MSG_GETBULK == pdu_type)
 		{
-			if (0 == vars_found && STAT_SUCCESS == status)
+			if (SUCCEED > (ret = snmp_bulkwalk(ss, SNMP_MSG_GET, item, param_oids.values[i], &results,
+					&results_alloc, &results_offset, error, max_error_len)))
 			{
-				retry_get = 1;
-				running = 1;
-				pdu_type = SNMP_MSG_GET;
-				goto retry;
+				goto out;
 			}
 		}
-		else
-			pdu_type = pdu_type_orig;
 	}
 
 	SET_TEXT_RESULT(result, NULL != results ? results : zbx_strdup(NULL, ""));
+	ret = SUCCEED;
 out:
-	if (NULL != response)
-		snmp_free_pdu(response);
-
 	zbx_free_agent_request(&request);
 
 	if (SUCCEED != (*errcode = ret))
