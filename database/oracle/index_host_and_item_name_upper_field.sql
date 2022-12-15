@@ -9,6 +9,7 @@ BEFORE INSERT ON hosts FOR EACH ROW
 BEGIN
 	:NEW.name_upper:=UPPER(:NEW.name);
 END;
+/
 
 CREATE TRIGGER hosts_name_upper_update
 BEFORE UPDATE ON hosts FOR EACH ROW
@@ -18,6 +19,7 @@ BEGIN
 		:NEW.name_upper:=UPPER(:NEW.name);
 	END IF;
 END;
+/
 
 ALTER TABLE items ADD name_upper nvarchar2(255) DEFAULT '';
 
@@ -30,6 +32,7 @@ BEFORE INSERT ON items FOR EACH ROW
 BEGIN
 	:NEW.name_upper:=UPPER(:NEW.name);
 END;
+/
 
 CREATE TRIGGER items_name_upper_update
 BEFORE UPDATE ON items FOR EACH ROW
@@ -39,3 +42,4 @@ BEGIN
 		:NEW.name_upper:=UPPER(:NEW.name);
 	END IF;
 END;
+/
