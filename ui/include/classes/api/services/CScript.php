@@ -1328,8 +1328,6 @@ class CScript extends CApiService {
 					$scripts[0]['menu_path'] =  '';
 				}
 				else if (!array_key_exists('menu_path', $scripts[0])) {
-					$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
-
 					if ($db_script === null) {
 						$scripts[0]['menu_path'] =  '';
 					}
@@ -1360,38 +1358,40 @@ class CScript extends CApiService {
 			return;
 		}
 
-		$duplicates = DB::select('scripts', [
-			'output' => ['name', 'menu_path'],
-			'filter' => ['name' => $names, 'menu_path' => $menu_paths],
-			'limit' => 1
-		]);
-
 		$dbScripts = DB::select('scripts', [
 			'output' => ['name', 'menu_path'],
 		]);
 
 		$duplicateScripts = false;
+		$duplicates = [];
+		$trim_names = trim($names[0], '/');
+		$trim_menu_paths = trim($menu_paths[0], '/');
 
-		if ($duplicates) {
-			foreach ($names as $key => $name) {
-				foreach ($dbScripts as $dbScript) {
-					if ($dbScript['menu_path'] === $menu_paths[$key] && $dbScript['name'] === $name) {
-						$duplicates[0]['menu_path'] = $dbScript['menu_path'];
-						$duplicates[0]['name'] = $dbScript['name'];
-						$duplicateScripts = true;
-					}
+		foreach ($dbScripts as $key => $dbScript) {
+			$trim_name = trim($dbScript['name'], '/');
+			$trim_menu_path = trim($dbScript['menu_path'], '/');
+
+			if ($trim_name === $trim_names && $trim_menu_path === $trim_menu_paths) {
+				$duplicates['name'] = $trim_name;
+				$duplicates['menu_path'] = $trim_menu_path;
+
+				if (array_key_exists('scriptid', $scripts[0])) {
+					$duplicateScripts = !(($key === $scripts[0]['scriptid']));
+				}
+				else {
+					$duplicateScripts = true;
 				}
 			}
 		}
 
 		if ($duplicateScripts) {
-			if ($duplicates[0]['menu_path'] == null) {
+			if ($duplicates['menu_path'] == null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
-					$duplicates[0]['name']));
+					$duplicates['name']));
 			}
 			else {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
-					$duplicates[0]['menu_path'].'/'.$duplicates[0]['name']));
+					$duplicates['menu_path'].'/'.$duplicates['name']));
 			}
 		}
 	}

@@ -1106,6 +1106,25 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(menu_path1/API create script same name1) already exists.'
+			],
+			'Test unsuccessful same name with same menu paths (leading "/") ' => [
+				'script' => [
+					[
+						'name' => 'API create script same name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => 'menu_path1'
+					],
+					[
+						'name' => 'API create script same name1',
+						'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+						'command' => 'reboot server',
+						'scope' => ZBX_SCRIPT_SCOPE_HOST,
+						'menu_path' => '/menu_path1'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (name, menu_path)=(menu_path1/API create script same name1) already exists.'
 			]
 		];
 	}
@@ -2938,7 +2957,7 @@ class testScripts extends CAPITest {
 					'scriptid' => 61,
 					'name' => 'API scope reset to action'
 				],
-				'expected_error' => 'Script "/home/API scope reset to action" already exists.'
+				'expected_error' => 'Script "home/API scope reset to action" already exists.'
 			],
 			'Test unsuccessful existing name and delete menu_path' => [
 				'script' => [

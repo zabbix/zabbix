@@ -2140,6 +2140,7 @@ class CApiInputValidator {
 							if (!array_key_exists($value, $_uniq)) {
 								$_uniq[$value] = [];
 							}
+
 							$_uniq = &$_uniq[$value];
 						}
 						else {
@@ -2154,14 +2155,16 @@ class CApiInputValidator {
 											: '';
 
 										if ($data_field['name'] == $value) {
-											if (array_key_exists($path_name, $menu_path)) {
-												$duplicate = (($path_name != null) ? $path_name . '/' . $value : $value);
-												$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+											$trim_path_name = trim($path_name, '/');
 
+											if (array_key_exists($trim_path_name, $menu_path)) {
+												$duplicate = (($path_name != null)
+													? $trim_path_name . '/' . $value
+													: $value);
+												$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
 												$parameter  = (array_key_first($menu_path) === '')
 													? $field_names[0]
 													: implode(', ', $field_names) ;
-
 												$error = _s('Invalid parameter "%1$s": %2$s.',
 													$subpath,
 													_s('value %1$s already exists',
