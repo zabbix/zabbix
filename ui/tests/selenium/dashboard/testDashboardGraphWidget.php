@@ -1275,14 +1275,14 @@ class testDashboardGraphWidget extends CWebTest {
 							'item' => 'Agent, Ping',
 							'Aggregation function' => 'min',
 							'Aggregate' => 'Data set',
-							'Legend label' => '祝你今天過得愉快'
+							'Data set label' => '祝你今天過得愉快'
 						],
 						[
 							'host' => ',Zabbix Server',
 							'item' => ',Agentp ping',
 							'Draw' => 'Bar',
 							'Aggregation function' => 'max',
-							'Legend label' => 'Bar ping'
+							'Data set label' => 'Bar ping'
 						],
 						[
 							'host' => ',Zabbix, Server,',
@@ -1443,7 +1443,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
-							'Legend label' => 'Staicase graph'
+							'Data set label' => 'Staicase graph'
 						],
 						[
 							'host' => 'Two host',
@@ -2433,13 +2433,13 @@ class testDashboardGraphWidget extends CWebTest {
 					'item' => 'Available memory*',
 					'Aggregation function' => 'avg',
 					'Aggregate' => 'Data set',
-					'Legend label' => '祝你今天過得愉快'
+					'Data set label' => '祝你今天過得愉快'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
 					'item' => 'CPU guest*',
 					'Aggregation function' => 'max',
-					'Legend label' => 'Data set only'
+					'Data set label' => 'Data set only'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
@@ -2452,9 +2452,9 @@ class testDashboardGraphWidget extends CWebTest {
 		];
 		$displayed_data = [
 			'Data sets' => [
-				'ds_0_dataset_label' => '祝你今天過得愉快',
-				'ds_1_dataset_label' =>  'Data set only',
-				'ds_2_dataset_label' => 'Data set #3'
+				'祝你今天過得愉快',
+				'Data set only',
+				'Data set #3'
 			],
 			'Legend labels' => [
 				'avg(祝你今天過得愉快)', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
@@ -2465,21 +2465,25 @@ class testDashboardGraphWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 
+		// Check hint next to the "Data set label" field.
+		$form->query('xpath:.//label[text()="Data set label"]/a')->one()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
+		$this->assertEquals('Used as legend label for aggregated data sets.', $hint->getText());
+
 		$this->fillForm($input_data, $form);
 		$form->submit();
 		$this->saveGraphWidget($input_data['main_fields']['Name']);
 
-		// Check legend labels.
+		// Check labels in legend.
 		$widget = CDashboardElement::find()->one()->getWidget($input_data['main_fields']['Name']);
 		$legend_labels = $widget->query('class:svg-graph-legend')->one()->getText();
 		$this->assertEquals($displayed_data['Legend labels'], explode("\n", $legend_labels));
 
-		// Check Data set names in created widget.
 		$form = $widget->edit();
 
-		foreach($displayed_data['Data sets'] as $id => $dataset_name) {
-			$this->assertEquals($dataset_name, $form->query('id', $id)->one()->getText());
-		}
+		// Check Data set names in created widget configuration form.
+		$data_set_labels = $form->query('xpath:.//label[@class = "sortable-drag-handle js-dataset-label"]')->all()->asText();
+		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
 	}
 
 	/**
