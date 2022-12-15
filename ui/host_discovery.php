@@ -183,7 +183,7 @@ $fields = [
 											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Password')
 								],
-	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'preprocessing' =>			[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
