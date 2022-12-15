@@ -1673,7 +1673,7 @@ class CUser extends CApiService {
 	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' => ['type' => API_STRING_UTF8],
-			'extend' => ['type' => API_BOOLEAN, 'default' => true],
+			'extend' => ['type' => API_BOOLEAN],
 			'token' => ['type' => API_STRING_UTF8]
 		]];
 
@@ -1686,6 +1686,15 @@ class CUser extends CApiService {
 
 		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session ID or token is expected.'));
+		}
+
+		if (array_key_exists('extend', $session)) {
+			if ($token !== null) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Extend not compatible with token.'));
+			}
+		}
+		else {
+			$session['extend'] = true;
 		}
 
 		$time = time();
