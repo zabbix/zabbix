@@ -148,14 +148,14 @@ func dpkgList(in []string, regex string) (out []string, err error) {
 	return
 }
 
-func appendPackage(name string, manager string, version string, arch string, size uint64, buildtime_value string,
-	buildtime_timestamp int64, installtime_value string, installtime_timestamp int64) PackageDetails {
+func appendPackage(name string, manager string, version string, size uint64, arch string, buildtime_timestamp int64,
+	buildtime_value string, installtime_timestamp int64, installtime_value string) PackageDetails {
 	return PackageDetails{
 		Name:    name,
 		Manager: manager,
 		Version: version,
-		Arch:    arch,
 		Size:    size,
+		Arch:    arch,
 		Buildtime: TimeDetails{
 			Timestamp: buildtime_timestamp,
 			Value:     buildtime_value,
@@ -211,7 +211,7 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 		size *= 1024
 
 		// dpkg has no build/install time information
-		pd = append(pd, appendPackage(split[1], manager, split[2], split[3], size, "", 0, "", 0))
+		pd = append(pd, appendPackage(split[1], manager, split[2], size, split[3], 0, "", 0, ""))
 	}
 
 	var b []byte
@@ -276,8 +276,8 @@ func rpmDetails(manager string, in []string, regex string) (out string, err erro
 		buildtime_tm := time.Unix(buildtime_timestamp, 0)
 		installtime_tm := time.Unix(installtime_timestamp, 0)
 
-		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, buildtime_tm.Format(timeFmt),
-			buildtime_timestamp, installtime_tm.Format(timeFmt), installtime_timestamp))
+		pd = append(pd, appendPackage(split[0], manager, split[1], size, split[2], buildtime_timestamp,
+			buildtime_tm.Format(timeFmt), installtime_timestamp, installtime_tm.Format(timeFmt)))
 	}
 
 	var b []byte
@@ -377,8 +377,8 @@ func pacmanDetails(manager string, in []string, regex string) (out string, err e
 			continue
 		}
 
-		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, split[4], buildtime.Unix(),
-			split[5], installtime.Unix()))
+		pd = append(pd, appendPackage(split[0], manager, split[1], size, split[2], buildtime.Unix(), split[4],
+			installtime.Unix(), split[5]))
 	}
 
 	var b []byte
@@ -468,7 +468,7 @@ func pkgtoolsDetails(manager string, in []string, regex string) (out string, err
 		}
 
 		// pkgtools has no build/install time information
-		pd = append(pd, appendPackage(split[0], manager, split[1], split[2], size, "", 0, "", 0))
+		pd = append(pd, appendPackage(split[0], manager, split[1], size, split[2], 0, "", 0, ""))
 	}
 
 	var b []byte
