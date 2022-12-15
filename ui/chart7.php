@@ -40,7 +40,7 @@ $fields = [
 	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),			null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
 	'i' =>				[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,		null],
-	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,		null],
+	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
@@ -49,7 +49,7 @@ if (!check_fields($fields)) {
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $items = hasRequest('i')
-	? array_map('expandShortGraphItem', getRequest('i', []))
+	? array_map('expandShortGraphItem', getRequest('i'))
 	: getRequest('items', []);
 
 if (!$items) {
