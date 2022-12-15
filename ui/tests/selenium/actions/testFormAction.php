@@ -1467,6 +1467,7 @@ class testFormAction extends CLegacyWebTest {
 	public function testFormAction_SimpleCreate($data) {
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource='.$data['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
+		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
 		$this->zbxTestClickButtonText('Create action');
 		$this->assertEquals('New action', $this->query('tag:h4')->waitUntilVisible()->one()->getText());
 
@@ -1578,7 +1579,7 @@ class testFormAction extends CLegacyWebTest {
 	public function testFormAction_Create() {
 		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->query('class:js-action-create')->one()->click()->waitUntilReady();
+		$this->query('button:Create action')->one()->click()->waitUntilReady();
 		$dialog = COverlayDialogElement::find()->waitUntilReady();
 		$form = $dialog->asForm()->one();
 		$form->getField('id:name')->fill('action test');
@@ -1651,7 +1652,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
 		$operation_form->submit();
-		$dialog->waitUntilReady();
+		$this->page->waitUntilReady();
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::className('js-add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
@@ -1668,7 +1669,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		$operation_form->submit();
-		$dialog->waitUntilReady();
+		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
@@ -1716,7 +1717,8 @@ class testFormAction extends CLegacyWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Action added');
 
-		$id = CDBHelper::getValue('SELECT actionid FROM actions WHERE name='.zbx_dbstr(self::$action_name.' Clone'));
+		// Unused variable.
+//		$id = CDBHelper::getValue('SELECT actionid FROM actions WHERE name='.zbx_dbstr(self::$action_name.' Clone'));
 		$this->assertEquals($original_hash, CDBHelper::getHash($sql));
 	}
 }

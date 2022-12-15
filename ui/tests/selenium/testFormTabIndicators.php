@@ -713,10 +713,9 @@ class testFormTabIndicators extends CWebTest {
 
 	public function testFormTabIndicators_CheckActionOperationsCounter() {
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource=0')->waitUntilReady();
-		$this->query('class:js-action-create')->one()->click()->waitUntilReady();
+		$this->query('button:Create action')->one()->click()->waitUntilReady();
 
 		// Open Operations tab and check indicator value.
-
 		$dialog = COverlayDialogElement::find()->waitUntilReady();
 		$form = $dialog->asForm()->one();
 		$form->selectTab('Operations');

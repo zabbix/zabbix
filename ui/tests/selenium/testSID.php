@@ -1514,7 +1514,7 @@ class testSID extends CWebTest {
 					break;
 
 				case 'action create':
-					$this->query('class:js-action-create')->one()->click()->waitUntilReady();
+					$this->query('button:Create action')->one()->click()->waitUntilReady();
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					break;
 
