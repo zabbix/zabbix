@@ -324,52 +324,41 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 }
 
 /**
- * Returns a list of graph templates.
+ * Returns graph template element.
  *
  * @param string $graphid
  * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
  * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
- * @return array
+ * @return CTag|null
  */
-function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $provide_links) {
-	$list = [];
-
-	while (array_key_exists($graphid, $parent_templates['links'])) {
-		$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
-
-		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$url = (new CUrl('graphs.php'))
-				->setArgument('form', 'update')
-				->setArgument('context', 'template');
-
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
-			}
-
-			$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
-
-			if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$url->setArgument('hostid', $template['hostid']);
-			}
-
-			$name = new CLink(CHtml::encode($template['name']), $url);
-		}
-		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
-
-		$graphid = $parent_templates['links'][$graphid]['graphid'];
+function makeGraphTemplateHtml(string $graphid, array $parent_templates, int $flag, bool $provide_links): ?CTag {
+	if (!array_key_exists($graphid, $parent_templates['links'])) {
+		return null;
 	}
 
-	if ($list) {
-		array_pop($list);
+	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
+
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+		$url = (new CUrl('graphs.php'))
+			->setArgument('form', 'update')
+			->setArgument('context', 'template');
+
+		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+		}
+
+		$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
+
+		if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
+			$url->setArgument('hostid', $template['hostid']);
+		}
+
+		return new CLink(CHtml::encode($template['name']), $url);
 	}
 
-	return $list;
+	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 }
 
 /**

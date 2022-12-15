@@ -2249,7 +2249,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 }
 
 /**
- * Returns a list of trigger templates.
+ * Returns trigger template elements.
  *
  * @param string $triggerid
  * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
@@ -2258,65 +2258,46 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
  *
  * @return array
  */
-function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bool $provide_links) {
+function makeTriggerTemplateHtml(string $triggerid, array $parent_templates, int $flag, bool $provide_links): array {
 	$list = [];
 
-	while (array_key_exists($triggerid, $parent_templates['links'])) {
-		$list_item = [];
-		$templates = [];
+	if (!array_key_exists($triggerid, $parent_templates['links'])) {
+		return $list;
+	}
 
-		foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
-			$templates[] = $parent_templates['templates'][$hostid];
-		}
+	$templates = [];
 
-		$show_parentheses = (count($templates) > 1 && $list);
+	foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
+		$templates[] = $parent_templates['templates'][$hostid];
+	}
 
-		if ($show_parentheses) {
-			CArrayHelper::sort($templates, ['name']);
-			$list_item[] = '(';
-		}
-
-		foreach ($templates as $template) {
-			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('trigger_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('context', 'template');
-				}
-				// ZBX_FLAG_DISCOVERY_NORMAL
-				else {
-					$url = (new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid'])
-						->setArgument('context', 'template');
-				}
-
-				$name = new CLink(CHtml::encode($template['name']), $url);
+	foreach ($templates as $template) {
+		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$url = (new CUrl('trigger_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
+					->setArgument('context', 'template');
 			}
+			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+				$url = (new CUrl('triggers.php'))
+					->setArgument('form', 'update')
+					->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setArgument('hostid', $template['hostid'])
+					->setArgument('context', 'template');
 			}
 
-			$list_item[] = $name;
-			$list_item[] = ', ';
+			$list[] = new CLink(CHtml::encode($template['name']), $url);
 		}
-		array_pop($list_item);
-
-		if ($show_parentheses) {
-			$list_item[] = ')';
+		else {
+			$list[] = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $list_item, '&nbsp;&rArr;&nbsp;');
-
-		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
+		$list[] = ', ';
 	}
-
-	if ($list) {
-		array_pop($list);
-	}
+	array_pop($list);
 
 	return $list;
 }

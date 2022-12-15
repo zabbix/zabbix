@@ -941,9 +941,8 @@ function makeItemTemplateHtml(string $itemid, array $parent_templates, int $flag
 
 		return new CLink(CHtml::encode($template['name']), $url);
 	}
-	else {
-		return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-	}
+
+	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 }
 
 /**

@@ -759,7 +759,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
-		'templates' => [],
 		'jmx_endpoint' => getRequest('jmx_endpoint', ZBX_DEFAULT_JMX_ENDPOINT),
 		'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 		'url' => getRequest('url'),
@@ -919,9 +918,11 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		$data['template'] = makeItemTemplateHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+		if ($data['context'] !== 'template') {
+			$data['template'] = makeItemTemplateHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+		}
 	}
 
 	// caption
@@ -1706,7 +1707,7 @@ function getTriggerMassupdateFormData() {
  * @param string      $data['expression_constructor']           Trigger expression constructor mode.
  * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
  * @param bool        $data['limited']                          Templated trigger.
- * @param array       $data['templates']                        Trigger templates.
+ * @param array       $data['template']                         Trigger template.
  * @param string      $data['hostid']                           Host ID.
  * @param string      $data['expression_action']                Trigger expression action.
  * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
@@ -1756,11 +1757,12 @@ function getTriggerFormData(array $data) {
 			$data['tags'] = $trigger['tags'];
 		}
 
-		// Get templates.
-		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+		if ($data['context'] !== 'template') {
+			$data['template'] = makeTriggerTemplateHtml($trigger['triggerid'],
+				getTriggerParentTemplates([$trigger], $flag), $flag,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+		}
 
 		if ($data['show_inherited_tags']) {
 			if ($data['parent_discoveryid'] === null) {

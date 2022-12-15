@@ -65,9 +65,11 @@ if ($data['limited']) {
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
-if (!empty($data['templates'])) {
-	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
+
+if (array_key_exists('template', $data)) {
+	$triggersFormList->addRow(_('Parent trigger'), $data['template']);
 }
+
 $triggersFormList
 	->addRow(
 		(new CLabel(_('Name'), 'description'))->setAsteriskMark(),

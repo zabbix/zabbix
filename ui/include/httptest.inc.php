@@ -257,43 +257,32 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates, bool $
 }
 
 /**
- * Returns a list of web scenario templates.
+ * Returns web scenario template element.
  *
  * @param string $httptestid
  * @param array  $parent_templates  The list of the templates, prepared by getHttpTestParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
- * @return array
+ * @return CTag|null
  */
-function makeHttpTestTemplatesHtml($httptestid, array $parent_templates, bool $provide_links) {
-	$list = [];
-
-	while (array_key_exists($httptestid, $parent_templates['links'])) {
-		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
-
-		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
-				(new CUrl('httpconf.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', $template['hostid'])
-					->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
-					->setArgument('context', 'template')
-			);
-		}
-		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
-
-		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
+function makeHttpTestTemplateHtml(string $httptestid, array $parent_templates, bool $provide_links): ?CTag {
+	if (!array_key_exists($httptestid, $parent_templates['links'])) {
+		return null;
 	}
 
-	if ($list) {
-		array_pop($list);
+	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
+
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+		return new CLink(CHtml::encode($template['name']),
+			(new CUrl('httpconf.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', $template['hostid'])
+				->setArgument('httptestid', $parent_templates['links'][$httptestid]['httptestid'])
+				->setArgument('context', 'template')
+		);
 	}
 
-	return $list;
+	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 }
 
 /**

@@ -61,9 +61,10 @@ if ($data['graphid'] != 0) {
 // Create form list.
 $graphFormList = new CFormList('graphFormList');
 
-$is_templated = (bool) $data['templates'];
+$is_templated = array_key_exists('template', $data);
+
 if ($is_templated) {
-	$graphFormList->addRow(_('Parent graphs'), $data['templates']);
+	$graphFormList->addRow(_('Parent graph'), $data['template']);
 }
 
 $discovered_graph = false;

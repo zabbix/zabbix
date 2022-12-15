@@ -509,7 +509,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
-		$data['templates'] = [];
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
@@ -528,9 +527,12 @@ elseif (isset($_REQUEST['form'])) {
 
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
+
+		if ($data['context'] !== 'template') {
+			$data['template'] = makeGraphTemplateHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
+				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+		}
 
 		// items
 		$data['items'] = API::GraphItem()->get([
@@ -569,7 +571,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
-		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
 			$data['percent_left'] = getRequest('percent_left', 0);

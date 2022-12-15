@@ -49,10 +49,10 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (!empty($data['templates'])) {
+if (array_key_exists('template', $data)) {
 	$item_tab->addItem([
-		new CLabel(_('Parent discovery rules')),
-		new CFormField($data['templates'])
+		new CLabel(_('Parent discovery rule')),
+		new CFormField($data['template'])
 	]);
 }
 

@@ -402,9 +402,7 @@ if (hasRequest('form')) {
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
-		'context' => getRequest('context'),
-		// Parent discovery rules.
-		'templates' => []
+		'context' => getRequest('context')
 	];
 
 	// Add already linked and new templates.
@@ -503,9 +501,12 @@ if (hasRequest('form')) {
 	}
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['templates'] = makeHostPrototypeTemplatesHtml($data['host_prototype']['hostid'],
-		getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
-	);
+
+	if ($data['context'] !== 'template') {
+		$data['template'] = makeHostPrototypeTemplateHtml($data['host_prototype']['hostid'],
+			getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
+		);
+	}
 
 	// Select writable templates
 	$templateids = zbx_objectValues($data['host_prototype']['templates'], 'templateid');

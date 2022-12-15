@@ -54,9 +54,8 @@ if (!empty($this->data['httptestid'])) {
  */
 $http_form_list = new CFormList();
 
-// Parent http tests
-if (!empty($this->data['templates'])) {
-	$http_form_list->addRow(_('Parent web scenarios'), $this->data['templates']);
+if (array_key_exists('template', $this->data)) {
+	$http_form_list->addRow(_('Parent web scenario'), $this->data['template']);
 }
 
 // Name

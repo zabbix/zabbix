@@ -694,43 +694,32 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 }
 
 /**
- * Returns a list of host prototype templates.
+ * Returns host prototype template.
  *
  * @param string $host_prototypeid
  * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
  * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
  *
- * @return array
+ * @return CTag|null
  */
-function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templates, bool $provide_links) {
-	$list = [];
-
-	while (array_key_exists($host_prototypeid, $parent_templates['links'])) {
-		$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
-
-		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
-					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
-					->setArgument('context', 'template')
-			);
-		}
-		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
-
-		$host_prototypeid = $parent_templates['links'][$host_prototypeid]['hostid'];
+function makeHostPrototypeTemplateHtml(string $host_prototypeid, array $parent_templates, bool $provide_links): ?CTag {
+	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
+		return null;
 	}
 
-	if ($list) {
-		array_pop($list);
+	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
+
+	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
+		return new CLink(CHtml::encode($template['name']),
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
+				->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
+				->setArgument('context', 'template')
+		);
 	}
 
-	return $list;
+	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 }
 
 function isTemplate($hostId) {
