@@ -67,13 +67,12 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 * @return array
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines) {
-		$alert_options = [];
 		$alerts = [];
 
 		foreach (eventSourceObjects() as $eventsource) {
-			$alert_options[] = API::Alert()->get([
-				'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid',
-					'actionid', 'mediatypeid', 'alerttype'
+			$alerts = array_merge($alerts, API::Alert()->get([
+				'output' => ['actionid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
 				],
 				'selectMediatypes' => ['name', 'maxattempts'],
 				'eventsource' => $eventsource['source'],
@@ -81,15 +80,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => $show_lines
-			]);
-		}
-
-		foreach ($alert_options as $alert_option) {
-			if (count($alert_option) !== 0) {
-				foreach ($alert_option as $alert) {
-					$alerts[] = $alert;
-				}
-			}
+			]));
 		}
 
 		foreach ($alerts as &$alert) {
