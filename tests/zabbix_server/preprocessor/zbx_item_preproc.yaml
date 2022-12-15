@@ -2354,6 +2354,24 @@ out:
   return: SUCCEED
   value: '71 71 AA'
 ---
+test case: SNMP walk to value - Hex-STRING (multiline)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '71 71 AA BB CC DD'
+---
 test case: SNMP walk to value - Hex-STRING - to UTF8
 in:
   value:
