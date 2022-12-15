@@ -624,6 +624,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
 int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
 
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
+#define DBlock_triggerid(id)			DBlock_record("triggers", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
 #define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
 #define DBlock_graphid(id)			DBlock_record("graphs", id, NULL, 0)

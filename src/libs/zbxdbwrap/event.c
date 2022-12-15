@@ -284,7 +284,7 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
  * Purpose: allocate memory for event                                         *
  *                                                                            *
  * Parameters: eventid   - [IN] requested event id                            *
- *             event     - [OUT] event data                                   *
+ *             event     - [OUT]                                              *
  *                                                                            *
  * Comments: use 'zbx_db_free_event' function to release allocated memory     *
  *                                                                            *
@@ -480,4 +480,31 @@ zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid)
 	DBfree_result(result);
 
 	return cause_eventid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get id of the object, which generated this event                  *
+ *                                                                            *
+ * Parameters: eventid - [IN]                                                 *
+ *                                                                            *
+ * Return value: object id, or '0' if object no object id found               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	objectid;
+
+	result = DBselect("select objectid from events where eventid=" ZBX_FS_UI64, eventid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(objectid, row[0]);
+	else
+		objectid = 0;
+
+	DBfree_result(result);
+
+	return objectid;
 }

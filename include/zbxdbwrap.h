@@ -104,6 +104,7 @@ void		zbx_db_get_event_data_tags(ZBX_DB_EVENT *event);
 void		zbx_db_get_event_data_triggers(ZBX_DB_EVENT *event);
 void		zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids);
 zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid);
+zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid);
 
 void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
