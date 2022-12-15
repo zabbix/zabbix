@@ -103,7 +103,7 @@ $tabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
 			->addValue(_('Template macros'), 0)
-			->addValue(_('Global and template macros'), 1)
+			->addValue(_('Inherited and template macros'), 1)
 			->setModern(true)
 		)
 		->addRow(

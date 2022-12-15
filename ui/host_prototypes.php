@@ -621,8 +621,8 @@ else {
 	// Fetch templates linked to the prototypes.
 	$templateids = [];
 
-	foreach ($data['hostPrototypes'] as $hostPrototype) {
-		$templateids += array_column($hostPrototype['templates'], 'templateid', 'templateid');
+	foreach ($data['hostPrototypes'] as $host_prototype) {
+		$templateids += array_flip(array_column($host_prototype['templates'], 'templateid'));
 	}
 
 	$data['writable_templates'] = [];
@@ -630,7 +630,7 @@ else {
 	if ($templateids) {
 		$data['writable_templates'] = API::Template()->get([
 			'output' => [],
-			'templateids' => $templateids,
+			'templateids' => array_keys($templateids),
 			'editable' => true,
 			'preservekeys' => true
 		]);
