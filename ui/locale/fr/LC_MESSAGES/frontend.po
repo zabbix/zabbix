@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-25 19:44+0000\n"
+"PO-Revision-Date: 2022-11-13 10:26+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3710,6 +3710,10 @@ msgstr "Fermer le constructeur d'expression"
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "Fermer le nouvel événement"
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr "Fermer les nouveaux événements"
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70

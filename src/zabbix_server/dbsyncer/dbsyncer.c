@@ -26,6 +26,7 @@
 
 #include "dbcache.h"
 #include "export.h"
+#include "zbxprof.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -130,6 +131,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	{
 		sec = zbx_time();
 
+		zbx_prof_update(get_process_type_string(process_type), sec);
+
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
@@ -139,7 +142,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
+		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();

@@ -3636,6 +3636,10 @@ msgstr "조건식 빌더를 닫는다"
 msgid "Close new event"
 msgstr "새 이벤트를 닫기"
 
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"

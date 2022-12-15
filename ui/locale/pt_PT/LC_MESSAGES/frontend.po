@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-07 10:14+0000\n"
+"PO-Revision-Date: 2022-11-25 16:39+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -1029,7 +1029,7 @@ msgstr "Interfaces do agente"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Verificação da variante do agente. Retorna 1 - para o agente Zabbix; 2 - para o agente Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
@@ -1159,11 +1159,11 @@ msgstr "Alternativamente, pode instalar manualmente:"
 
 #: include/classes/data/CItemData.php:1449
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Quantidade de memória física da VM que é trocada fora do espaço swap, <url> URL de serviço VMware, <uuid> - nome do servidor virtual VMware"
 
 #: include/classes/data/CItemData.php:1469
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Quantidade de memória física da VM consumida para fazer backup de páginas de memória física do servidor, <url> - URL de serviço VMware, <uuid> - nome do servidor virtual VMware"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:117
@@ -1313,15 +1313,15 @@ msgstr "Etiqueta do activo"
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Às %1$s:%2$s %3$s de cada semana"
+msgstr[1] "Às %1$s:%2$s %3$s de cada %4$s semanas"
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Às %1$s:%2$s todos os dias"
+msgstr[1] "Às %1$s:%2$s a cada %3$s dias"
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -1354,7 +1354,7 @@ msgstr "Pelo menos uma ação é obrigatória."
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Deve existir pelo menos um utilizador ativo com a função \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
@@ -1446,7 +1446,7 @@ msgstr "Token de autenticação"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "Solicitações de autenticação AuthN"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1587,7 +1587,7 @@ msgstr "Média"
 
 #: include/classes/data/CItemData.php:1529
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Número médio de pedidos de leitura pendentes para o disco virtual durante o intervalo de coleta , <url> - URL de serviço VMware, <uuid> - nome do servidor virtual VMware, <instance> - instância do dispositivo de disco"
 
 #: include/classes/data/CItemData.php:1549
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -3709,6 +3709,10 @@ msgstr "Fechar o construtor de expressões"
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "Fechar novo evento"
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70

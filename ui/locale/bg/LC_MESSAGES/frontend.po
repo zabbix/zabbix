@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-02 17:02+0000\n"
-"Last-Translator: tihomir <tihomir@vlahovski.com>\n"
+"PO-Revision-Date: 2022-11-16 13:56+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: \n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -226,8 +226,8 @@ msgstr[1] "Общо %1$s проблема"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s опит/а остава/т"
+msgstr[1] "Остават %1$s повторни опита"
 
 #: app/views/administration.user.edit.php:667
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -417,7 +417,7 @@ msgstr[1] ""
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "API токенът е деактивиран"
 msgstr[1] ""
 
 #: app/controllers/CControllerTokenEnable.php:63
@@ -432,7 +432,7 @@ msgstr "API токенът е изтекъл"
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "API токенът е актуализиран"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -454,7 +454,7 @@ msgstr "API токени"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Над стойността"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
@@ -881,12 +881,12 @@ msgstr "Добавете няколко карти"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Добавете нов набор от данни"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
 msgid "Add new interface"
-msgstr ""
+msgstr "Добавете нов интерфейс"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -952,7 +952,7 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Добавено"
 
 #: jsLoader.php:340
 #, c-format
@@ -1052,7 +1052,7 @@ msgstr ""
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Предупредително съобщение"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1064,7 +1064,7 @@ msgstr "Псевдоним"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Подравнете елементите на картата"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1087,7 +1087,7 @@ msgstr "Всички"
 
 #: app/views/monitoring.dashboard.view.php:185
 msgid "All dashboards"
-msgstr ""
+msgstr "Всички табла"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
@@ -1109,7 +1109,7 @@ msgstr "Във всички връзки трябва да са уточнени
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Всички карти"
 
 #: include/views/configuration.trigger.prototype.edit.php:513
 #: include/views/configuration.triggers.edit.php:541
@@ -1402,13 +1402,13 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:340
 msgid "Attempt interval"
-msgstr ""
+msgstr "Интервал на опитите"
 
 #: app/views/administration.mediatype.edit.php:335 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:76
 #: include/views/configuration.httpconf.list.php:137
 msgid "Attempts"
-msgstr ""
+msgstr "Опити"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -1426,7 +1426,7 @@ msgstr "Одит"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr ""
+msgstr "Одитен дневник"
 
 #: app/views/administration.housekeeping.edit.php:179
 msgid "Audit settings"
@@ -1554,7 +1554,7 @@ msgstr "Автоматичен избор на икона"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Автоматично регистриране"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
@@ -1824,7 +1824,7 @@ msgstr "Изчислено"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Календар"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -2025,7 +2025,7 @@ msgstr "Не може да се добави потребител"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Не може да се добави потребителска група"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2038,7 +2038,7 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Не може да се премахне"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2438,7 +2438,7 @@ msgstr[1] ""
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "Не може да се изтрие потребителска групата"
 msgstr[1] ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
@@ -2454,13 +2454,13 @@ msgstr "Не може да се изтрие уеб сценарий"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
+msgstr[0] "API токенът не може да се деактивира"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
+msgstr[0] "Не може да се деактивира SLA"
 msgstr[1] ""
 
 #: actionconf.php:499
@@ -2485,13 +2485,13 @@ msgstr[1] ""
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
+msgstr[0] "Не може да деактивира хоста"
 msgstr[1] ""
 
 #: items.php:925
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
+msgstr[0] "Елементът не може да бъде деактивиран"
 msgstr[1] ""
 
 #: app/controllers/CControllerMediatypeDisable.php:75
@@ -3713,6 +3713,10 @@ msgstr "Затвори израз конструктора"
 #: app/views/configuration.correlation.edit.php:155
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
+msgstr ""
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
 msgstr ""
 
 #: app/views/configuration.correlation.edit.php:149
