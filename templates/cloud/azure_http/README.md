@@ -3,10 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
 Currently the template supports discovery of virtual machines (VMs), MySQL and PostgreSQL servers.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -19,9 +22,9 @@ Currently the template supports discovery of virtual machines (VMs), MySQL and P
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -29,8 +32,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`15s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`15s` |
 |{$AZURE.MSSQL.DB.LOCATION.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
 |{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.MSSQL.DB.NAME.MATCHES} |<p>This macro is used in Microsoft SQL databases discovery rule.</p> |`.*` |
@@ -54,11 +57,11 @@ No specific Zabbix configuration is required.
 |{$AZURE.VM.NAME.MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`.*` |
 |{$AZURE.VM.NAME.NOT_MATCHES} |<p>This macro is used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -67,14 +70,14 @@ There are no template links in this template.
 |PostgreSQL servers discovery |<p>The list of the PostgreSQL servers is provided by the subscription.</p> |DEPENDENT |azure.pgsql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforPostgreSQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforPostgreSQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
 |Virtual machines discovery |<p>The list of the virtual machines is provided by the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Azure |Azure: Get resources |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.resources<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -90,9 +93,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure virtual machines by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
