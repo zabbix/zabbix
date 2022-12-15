@@ -203,11 +203,12 @@ $form_grid->addItem([
 	(new CLabel(_('Subject'), 'operation-opmessage-subject'))->setId('operation-message-subject-label'),
 	(new CFormField(
 		(new CTextBox('operation[opmessage][subject]'))
-			->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
+			->setAttribute(
+				'value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject']
+			)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('operation-opmessage-subject')
 	))->setId('operation-message-subject')
-
 ]);
 
 // Operation custom message body row.
@@ -271,7 +272,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'action.edit',
 									'dstfld1' => 'operation_opcommand_hst__hostid',
-									'editable' => '1',
+									'editable' => '1'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -291,7 +292,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'action.edit',
 									'dstfld1' => 'operation_opcommand_grp__groupid',
-									'editable' => '1',
+									'editable' => '1'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -321,7 +322,7 @@ $form_grid->addItem([
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_opgroup__groupid',
-					'editable' => '1',
+					'editable' => '1'
 				]
 			]
 		]))
@@ -348,7 +349,7 @@ $form_grid->addItem([
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_optemplate__templateid',
-					'editable' => '1',
+					'editable' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -72,7 +72,7 @@ $condition_hidden_data = (new CCol([
 		->setName('conditions[#{row_index}][value2]'),
 	(new CInput('hidden'))
 		->setAttribute('value', '#{label}')
-		->setName('conditions[#{row_index}][formulaid]'),
+		->setName('conditions[#{row_index}][formulaid]')
 ]));
 
 $condition_suppressed_template = (new CTemplateTag('condition-suppressed-row-tmpl'))->addItem(

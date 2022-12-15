@@ -63,6 +63,8 @@ class CControllerPopupActionConditionEdit extends CController {
 			case EVENT_SOURCE_SERVICE:
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 		}
+
+		return false;
 	}
 
 	protected function getConditionLastType(): string {
