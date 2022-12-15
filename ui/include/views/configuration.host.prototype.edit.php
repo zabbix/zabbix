@@ -32,7 +32,8 @@ $parent_host = $data['parent_host'];
 $html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_EDIT))
-	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']));
+	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']))
+	->addItem(new CPartial('common.template.edit.html', ['form_name' => 'host-prototype-form']));
 
 $tabs = new CTabView();
 
@@ -335,9 +336,9 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 
 $tabs->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
+		'source' => 'host_prototype',
 		'tags' => $data['tags'],
 		'readonly' => $data['readonly'],
-		'source' => 'host_prototype',
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab'
 	]),
@@ -359,9 +360,8 @@ $tabs->addTab('macroTab', _('Macros'),
 					: 'hostmacros.list.html',
 				[
 					'macros' => $data['macros'],
-					'parent_hostid' => $data['parent_host']['hostid'],
-					'source' => 'host_protototype',
-					'readonly' => $data['templates']
+					'readonly' => $data['templates'],
+					'source' => 'host_prototype'
 				]
 			),
 			'macros_container'

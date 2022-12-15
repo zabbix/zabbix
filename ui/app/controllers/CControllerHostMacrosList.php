@@ -36,7 +36,6 @@ class CControllerHostMacrosList extends CController {
 		$fields = [
 			'macros'				=> 'array',
 			'show_inherited_macros' => 'required|in 0,1',
-			'source'				=> 'string|in template,host,host_prototype',
 			'templateids'			=> 'array_db hosts.hostid',
 			'readonly'				=> 'required|in 0,1',
 			'parent_hostid'			=> 'id'
@@ -84,6 +83,7 @@ class CControllerHostMacrosList extends CController {
 		$macros = $this->getInput('macros', []);
 		$show_inherited_macros = (bool) $this->getInput('show_inherited_macros', 0);
 		$readonly = (bool) $this->getInput('readonly', 0);
+		$templateids = $this->hasInput('templateids') ? $this->getInput('templateids') : null;
 		$parent_hostid = $this->hasInput('parent_hostid') ? $this->getInput('parent_hostid') : null;
 
 		if ($macros) {
@@ -98,7 +98,7 @@ class CControllerHostMacrosList extends CController {
 		}
 
 		if ($show_inherited_macros) {
-			addInheritedMacros($macros, $this->getInput('templateids', []), $parent_hostid);
+			addInheritedMacros($macros, $templateids, $parent_hostid);
 		}
 
 		$macros = array_values(order_macros($macros, 'macro'));
@@ -123,15 +123,22 @@ class CControllerHostMacrosList extends CController {
 		$data = [
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
-			'source' => $this->getInput('source', ''),
 			'readonly' => $readonly,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		if ($parent_hostid !== null) {
-			$data['parent_hostid'] = $parent_hostid;
+		if ($show_inherited_macros) {
+			if ($parent_hostid !== null) {
+				$data['source'] = 'host_prototype';
+			}
+			elseif ($templateids === null) {
+				$data['source'] = 'template';
+			}
+			else {
+				$data['source'] = 'host';
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

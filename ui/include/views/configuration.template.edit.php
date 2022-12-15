@@ -108,13 +108,10 @@ $tabs->addTab('macroTab', _('Macros'),
 		)
 		->addRow(
 			null,
-			new CPartial($data['show_inherited_macros']
-				? 'hostmacros.inherited.list.html'
-				: 'hostmacros.list.html',
-			[
+			new CPartial($data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html', [
 				'macros' => $data['macros'],
-				'source' => 'template',
-				'readonly' => $data['readonly']
+				'readonly' => $data['readonly'],
+				'source' => 'template'
 			]),
 			'macros_container'
 		),
@@ -124,7 +121,6 @@ $tabs->addTab('macroTab', _('Macros'),
 // Value mapping.
 $tabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
 	new CPartial('configuration.valuemap', [
-		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
 		'form' => 'template'

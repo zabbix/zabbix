@@ -28,8 +28,9 @@ if ($data['readonly'] && !$data['macros']) {
 }
 else {
 	$link = null;
-	$is_hostprototype = array_key_exists('parent_hostid', $data);
-	$inherited_width = $is_hostprototype ? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH : ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
+	$inherited_width = $data['source'] === 'host_prototype'
+		? ZBX_TEXTAREA_MACRO_INHERITED_WIDTH
+		: ZBX_TEXTAREA_MACRO_VALUE_WIDTH;
 	$table = (new CTable())
 		->setId('tbl_macros')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
@@ -47,10 +48,13 @@ else {
 	$headers = [
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
-		!$data['readonly'] ? (new CTableColumn())->addClass('table-col-action') : null,
-		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
-		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null
+		!$data['readonly'] ? (new CTableColumn())->addClass('table-col-action') : null
 	];
+
+	if ($data['source'] === 'host_prototype') {
+		$headers[] = (new CTableColumn())->addClass('table-col-arrow');
+		$headers[] = (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value');
+	}
 
 	if ($data['source'] !== 'template') {
 		$headers[] = (new CTableColumn())->addClass('table-col-arrow');
@@ -154,7 +158,7 @@ else {
 		];
 
 		// Parent host macro value.
-		if ($is_hostprototype) {
+		if ($data['source'] === 'host_prototype') {
 			$row[] = array_key_exists('parent_host', $macro) ? '&lArr;' : '';
 			$row[] = (new CDiv(array_key_exists('parent_host', $macro) ? '"'.$macro['parent_host']['value'].'"' : null))
 				->setAdaptiveWidth($inherited_width)

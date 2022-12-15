@@ -732,10 +732,10 @@ function isTemplate($hostId) {
  * Supplement the given macros with the inherited macros from the parent host, templates and global macros.
  *
  * @param array       $macros         User macros of current host/template/host prototype.
- * @param array       $templateids    Linked template IDs.
+ * @param array|null  $templateids    Linked template IDs.
  * @param string|null $parent_hostid  Parent host ID of host prototype.
  */
-function addInheritedMacros(array &$macros, array $templateids = [], ?string $parent_hostid = null): void {
+function addInheritedMacros(array &$macros, array $templateids = null, ?string $parent_hostid = null): void {
 	$inherited_macros = [];
 
 	$db_global_macros = API::UserMacro()->get([
@@ -749,7 +749,7 @@ function addInheritedMacros(array &$macros, array $templateids = [], ?string $pa
 		] + $db_macro;
 	}
 
-	if ($templateids) {
+	if ($templateids !== null) {
 		$db_templates = API::Template()->get([
 			'output' => ['name'],
 			'selectMacros' => ['macro', 'value', 'description', 'type'],

@@ -398,7 +398,6 @@ if (hasRequest('form')) {
 			'main_interfaces' => getRequest('mainInterfaces', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'source' => 'host_prototype',
 		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
 		'groups' => [],
 		'tags' => $tags,
@@ -552,12 +551,6 @@ if (hasRequest('form')) {
 		$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
 	}
 	unset($macro);
-
-	// This data is used in common.template.edit.js.php.
-	$data['macros_tab'] = [
-		'linked_templates' => array_map('strval', $templateids),
-		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
-	];
 
 	$data['groups_ms'] = [];
 
