@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-30 11:44+0000\n"
+"PO-Revision-Date: 2022-12-12 12:46+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -677,7 +677,7 @@ msgstr "アクションを更新しました"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のアクションは使用できません。"
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -906,6 +906,14 @@ msgstr "子サービスの追加"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "他から追加"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -3302,7 +3310,7 @@ msgstr "where句がないため\"%1$s\"テーブルにupdate文を実行でき�
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] ""
+msgstr[0] "ユーザーをプロビジョニングできません"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4487,6 +4495,10 @@ msgstr "データベース接続設定"
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
 msgstr "JITプロビジョニングの設定"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
 
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
@@ -6005,20 +6017,20 @@ msgstr "廃止予定のパラメーター\"%1$s\"は、\"%2$s\"と一緒に使�
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループ"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループが削除できません。"
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループを空にできません。"
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループを有効にできません。"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6051,6 +6063,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "説明"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6872,6 +6888,10 @@ msgstr "有効"
 #: app/views/administration.authentication.edit.php:110
 msgid "Enable HTTP authentication"
 msgstr "HTTP認証の有効化"
+
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
@@ -9186,6 +9206,10 @@ msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで�
 msgid "Identification of the system. Returns string"
 msgstr "システムの識別文字列。文字列値を返す。"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9451,11 +9475,11 @@ msgstr "アクセスできないウィジェットタイプ"
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "アクセスできないウィジェットはコピーできません。"
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "アクセスできないウィジェットは貼り付けられません。"
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -10517,11 +10541,11 @@ msgstr "JSONデータが正しくありません。JSONテキストのパース�
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "LDAP JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "LDAP JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10532,11 +10556,11 @@ msgstr "LDAPの設定が正しくありません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "SAML JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "SAML JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10604,7 +10628,7 @@ msgstr "キー\"%1$s\": %2$sが正しくありません。"
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr ""
+msgstr "メディアタイプのマッピング構成が正しくありません。"
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10911,7 +10935,7 @@ msgstr "期間が正しくありません。"
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr ""
+msgstr "ユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format

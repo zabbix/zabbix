@@ -907,6 +907,14 @@ msgstr "하위 서비스 추가"
 msgid "Add from"
 msgstr ""
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "호스트 추가"
@@ -4491,6 +4499,10 @@ msgstr "DB접속 설정"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "확인 텍스트"
@@ -6056,6 +6068,10 @@ msgstr ""
 msgid "Description"
 msgstr "설명"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -6878,6 +6894,10 @@ msgstr "활성"
 #: app/views/administration.authentication.edit.php:110
 msgid "Enable HTTP authentication"
 msgstr "HTTP인증 유효화"
+
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
@@ -9191,6 +9211,10 @@ msgstr "동일한 네임스페이스(%1$s)가 %2$s에 있는 모듈에서 사용
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "시스템의 식별문자. string을 리턴."
+
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

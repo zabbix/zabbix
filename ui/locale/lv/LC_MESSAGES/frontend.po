@@ -951,6 +951,14 @@ msgstr "Pievienot apakšservisus"
 msgid "Add from"
 msgstr "Pievienot no"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Pievienot mezglu"
@@ -4652,6 +4660,10 @@ msgstr "Konfigurēt DB savienojumu"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Apstiprinājuma teksts"
@@ -6208,6 +6220,10 @@ msgstr ""
 msgid "Description"
 msgstr "Apraksts"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -7034,6 +7050,10 @@ msgstr "Iespējot"
 #: app/views/administration.authentication.edit.php:110
 msgid "Enable HTTP authentication"
 msgstr "Iespējot HTTP autentifikāciju"
+
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
@@ -9362,6 +9382,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
 msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
