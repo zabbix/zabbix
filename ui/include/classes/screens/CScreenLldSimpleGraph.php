@@ -116,7 +116,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 		$item_prototype = $this->getItemPrototype();
 
 		$src = (new CUrl('chart3.php'))
-			->setArgument('items', [$item_prototype])
+			->setArgument('items', [array_diff_key($item_prototype, ['hosts' => true, 'discoveryRule' => true])])
 			->setArgument('period', 3600)
 			->setArgument('legend', 1)
 			->setArgument('width', $this->screenitem['width'])
