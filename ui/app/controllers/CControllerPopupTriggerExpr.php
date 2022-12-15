@@ -1498,7 +1498,7 @@ class CControllerPopupTriggerExpr extends CController {
 					$quote_params = array_filter($quote_params, 'strlen');
 
 					foreach ($quote_params as $param_key => $param) {
-						$data['params'][$param_key] = CExpressionParser::quoteString($param);
+						$data['params'][$param_key] = quoteFunctionParam($param, true);
 					}
 
 					// Combine sec|#num and <time_shift|period_shift> parameters into one.

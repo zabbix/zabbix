@@ -81,6 +81,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t		ts;
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
+	DC_EVALUATE_ITEM	evaluate_item;
 
 	ZBX_DOUBLE_EPSILON = 0.000001;
 
@@ -104,7 +105,13 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
+	evaluate_item.itemid = item.itemid;
+	evaluate_item.value_type = item.value_type;
+	evaluate_item.proxy_hostid = item.host.proxy_hostid;
+	evaluate_item.host = item.host.host;
+	evaluate_item.key_orig = item.key_orig;
+
+	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &evaluate_item, function, params, &ts, &error)))
 	{
 		printf("evaluate_function returned error: %s\n", error);
 		zbx_free(error);

@@ -95,7 +95,7 @@ class testFormGraphs extends CWebTest {
 						'Graph type' => 'Normal'
 					],
 					'check_fields' => [
-						'id:name' =>  ['value' => '', 'maxlength' => 255],
+						'id:name' =>  ['value' => '', 'maxlength' => 128],
 						'id:width' =>  ['value' => '900', 'maxlength' => 5],
 						'id:height' =>  ['value' => '200', 'maxlength' => 5],
 						'id:graphtype' =>  ['value' => 'Normal'],

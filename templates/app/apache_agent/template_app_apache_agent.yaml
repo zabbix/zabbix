@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-01T08:19:45Z'
+  date: '2022-11-17T11:59:28Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -30,7 +30,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Total bytes served'
+          description: 'The total bytes served.'
           preprocessing:
             -
               type: JSONPATH
@@ -56,8 +56,8 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: |
-            Calculated as change rate for 'Total bytes' stat.
-            BytesPerSec is not used, as it counts average since last Apache server start.
+            It is calculated as a rate of change for total bytes statistics.
+            `ReqPerSec` is not used, as it counts the average since the last Apache server start.
           preprocessing:
             -
               type: JSONPATH
@@ -84,7 +84,7 @@ zabbix_export:
           key: apache.requests
           delay: '0'
           history: 7d
-          description: 'A total number of accesses'
+          description: 'The total number of the Apache server accesses.'
           preprocessing:
             -
               type: JSONPATH
@@ -104,9 +104,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: |
-            Calculated as change rate for 'Total requests' stat.
-            ReqPerSec is not used, as it counts average since last Apache server start.
+          description: 'It is calculated as a rate of change for the "Total requests" statistics.</p><p>`ReqPerSec` is not used, as it counts the average since the last Apache server start.'
           preprocessing:
             -
               type: JSONPATH
@@ -130,7 +128,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'Service uptime in seconds'
+          description: 'The service uptime expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -146,8 +144,8 @@ zabbix_export:
             -
               uuid: 7872d9665c234f45941ca26206e0255c
               expression: 'last(/Apache by Zabbix agent/apache.uptime)<10m'
-              name: 'Apache: has been restarted'
-              event_name: 'Apache: has been restarted (uptime < 10m)'
+              name: 'Apache: Host has been restarted'
+              event_name: 'Apache: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -164,7 +162,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Service version'
+          description: 'The Apache service version.'
           preprocessing:
             -
               type: JSONPATH
@@ -187,7 +185,7 @@ zabbix_export:
               name: 'Apache: Version has changed'
               event_name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Apache version has changed. Ack to close.'
+              description: 'The Apache version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -200,7 +198,7 @@ zabbix_export:
           key: apache.workers.cleanup
           delay: '0'
           history: 7d
-          description: 'Number of workers in cleanup state'
+          description: 'The number of workers in cleanup state.'
           preprocessing:
             -
               type: JSONPATH
@@ -219,7 +217,7 @@ zabbix_export:
           key: apache.workers.closing
           delay: '0'
           history: 7d
-          description: 'Number of workers in closing state'
+          description: 'The number of workers in closing state.'
           preprocessing:
             -
               type: JSONPATH
@@ -238,7 +236,7 @@ zabbix_export:
           key: apache.workers.dnslookup
           delay: '0'
           history: 7d
-          description: 'Number of workers in dnslookup state'
+          description: 'The number of workers in `dnslookup` state.'
           preprocessing:
             -
               type: JSONPATH
@@ -257,7 +255,7 @@ zabbix_export:
           key: apache.workers.finishing
           delay: '0'
           history: 7d
-          description: 'Number of workers in finishing state'
+          description: 'The number of workers in finishing state.'
           preprocessing:
             -
               type: JSONPATH
@@ -276,7 +274,7 @@ zabbix_export:
           key: apache.workers.keepalive
           delay: '0'
           history: 7d
-          description: 'Number of workers in keepalive state'
+          description: 'The number of workers in `keepalive` state.'
           preprocessing:
             -
               type: JSONPATH
@@ -295,7 +293,7 @@ zabbix_export:
           key: apache.workers.logging
           delay: '0'
           history: 7d
-          description: 'Number of workers in logging state'
+          description: 'The number of workers in logging state.'
           preprocessing:
             -
               type: JSONPATH
@@ -314,7 +312,7 @@ zabbix_export:
           key: apache.workers.reading
           delay: '0'
           history: 7d
-          description: 'Number of workers in reading state'
+          description: 'The number of workers in reading state.'
           preprocessing:
             -
               type: JSONPATH
@@ -333,7 +331,7 @@ zabbix_export:
           key: apache.workers.sending
           delay: '0'
           history: 7d
-          description: 'Number of workers in sending state'
+          description: 'The number of workers in sending state.'
           preprocessing:
             -
               type: JSONPATH
@@ -352,7 +350,7 @@ zabbix_export:
           key: apache.workers.slot
           delay: '0'
           history: 7d
-          description: 'Number of slots with no current process'
+          description: 'The number of slots with no current process.'
           preprocessing:
             -
               type: JSONPATH
@@ -371,7 +369,7 @@ zabbix_export:
           key: apache.workers.starting
           delay: '0'
           history: 7d
-          description: 'Number of workers in starting state'
+          description: 'The number of workers in starting state.'
           preprocessing:
             -
               type: JSONPATH
@@ -390,7 +388,7 @@ zabbix_export:
           key: apache.workers.waiting
           delay: '0'
           history: 7d
-          description: 'Number of workers in waiting state'
+          description: 'The number of workers in waiting state.'
           preprocessing:
             -
               type: JSONPATH
@@ -409,7 +407,7 @@ zabbix_export:
           key: apache.workers_total.busy
           delay: '0'
           history: 7d
-          description: 'Total number of busy worker threads/processes'
+          description: 'The total number of busy worker threads/processes.'
           preprocessing:
             -
               type: JSONPATH
@@ -428,7 +426,7 @@ zabbix_export:
           key: apache.workers_total.idle
           delay: '0'
           history: 7d
-          description: 'Total number of idle worker threads/processes'
+          description: 'The total number of idle worker threads/processes.'
           preprocessing:
             -
               type: JSONPATH
@@ -454,25 +452,6 @@ zabbix_export:
             -
               tag: component
               value: health
-          triggers:
-            -
-              uuid: 128905793a4b4a1db5a49f87e87d3383
-              expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
-              name: 'Apache: Service response time is too high'
-              event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
-              priority: WARNING
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
-                -
-                  name: 'Apache: Service is down'
-                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: performance
         -
           uuid: 369f00e2970048c786ce3bd609e65566
           name: 'Apache: Service ping'
@@ -492,74 +471,18 @@ zabbix_export:
             -
               tag: component
               value: health
-          triggers:
-            -
-              uuid: e24dbf9b89c34d839cb12a22b1103df3
-              expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
-              name: 'Apache: Service is down'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
         -
-          uuid: b73280fb0af64c7899abfc74cc074b13
-          name: 'Apache: CPU utilization'
-          key: 'proc.cpu.util["{$APACHE.PROCESS_NAME}"]'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'Process CPU utilization percentage.'
+          uuid: 99b1a38ed45b4212974b0bea72b076d2
+          name: 'Apache: Get processes summary'
+          key: 'proc.get[,,,summary]'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'The aggregated data of summary metrics for all processes.'
           tags:
             -
               tag: component
-              value: cpu
-        -
-          uuid: 384bf197e6a241b3b63bb89d009bba6b
-          name: 'Apache: Memory usage (rss)'
-          key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]'
-          history: 7d
-          units: B
-          description: 'Resident set size memory used by process in bytes.'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
-          uuid: f20b7a01ff134a128c54ea83af8557e2
-          name: 'Apache: Memory usage (vsize)'
-          key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]'
-          history: 7d
-          units: B
-          description: 'Virtual memory size used by process in bytes.'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 233b5466014640e4b990ffd81fa19fa1
-          name: 'Apache: Number of processes running'
-          key: 'proc.num["{$APACHE.PROCESS_NAME}"]'
-          history: 7d
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
-              expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
-              name: 'Apache: Process is not running'
-              priority: HIGH
-              tags:
-                -
-                  tag: scope
-                  value: availability
+              value: raw
         -
           uuid: 115413a0f5ab4caba418ab841ad81eba
           name: 'Apache: Get status'
@@ -569,7 +492,7 @@ zabbix_export:
           value_type: TEXT
           description: |
             Getting data from a machine-readable version of the Apache status page.
-            https://httpd.apache.org/docs/current/mod/mod_status.html
+             For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).
           preprocessing:
             -
               type: JAVASCRIPT
@@ -620,26 +543,6 @@ zabbix_export:
             -
               tag: component
               value: raw
-          triggers:
-            -
-              uuid: 0166ec63913e4bbea25c54b458b3213a
-              expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1'
-              name: 'Apache: Failed to fetch status page'
-              event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
-              priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'Apache: Process is not running'
-                  expression: 'last(/Apache by Zabbix agent/proc.num["{$APACHE.PROCESS_NAME}"])=0'
-                -
-                  name: 'Apache: Service is down'
-                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
       discovery_rules:
         -
           uuid: 36a82bdda7754c51a05da3bb0b65b83e
@@ -648,8 +551,8 @@ zabbix_export:
           key: apache.mpm.event.discovery
           delay: '0'
           description: |
-            Additional metrics if event MPM is used
-            https://httpd.apache.org/docs/current/mod/event.html
+            The discovery of additional metrics if the event Multi-Processing Module (MPM) is used.
+            For more details see [Apache MPM event](https://httpd.apache.org/docs/current/mod/event.html).
           item_prototypes:
             -
               uuid: 99df2ff5970b4497887371bcd16d5ada
@@ -660,7 +563,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Average number of client requests per second'
+              description: 'The average number of client requests per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -679,7 +582,7 @@ zabbix_export:
               key: 'apache.connections[async_closing{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of async connections in closing state (only applicable to event MPM)'
+              description: 'The number of asynchronous connections in closing state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -693,12 +596,12 @@ zabbix_export:
                   value: connection
             -
               uuid: 33d3fec8f45c493097bab986d5ea1e55
-              name: 'Apache: Connections async keep alive'
+              name: 'Apache: Connections async keepalive'
               type: DEPENDENT
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of async connections in keep-alive state (only applicable to event MPM)'
+              description: 'The number of asynchronous connections in keepalive state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -717,7 +620,7 @@ zabbix_export:
               key: 'apache.connections[async_writing{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of async connections in writing state (only applicable to event MPM)'
+              description: 'The number of asynchronous connections in writing state (applicable only to the event MPM).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -736,7 +639,7 @@ zabbix_export:
               key: 'apache.connections[total{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of total connections'
+              description: 'The number of total connections.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -755,7 +658,7 @@ zabbix_export:
               key: 'apache.process[num{#SINGLETON}]'
               delay: '0'
               history: 7d
-              description: 'Number of async processes'
+              description: 'The number of asynchronous processes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -819,6 +722,221 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+        -
+          uuid: 357a2a1f056a4f59985e858d72e0bdae
+          name: 'Apache process discovery'
+          type: DEPENDENT
+          key: apache.proc.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$APACHE.PROCESS_NAME}'
+                formulaid: A
+          description: 'The discovery of the Apache process summary.'
+          item_prototypes:
+            -
+              uuid: 458bfecc83f64540838e3ffc3a7f3cb1
+              name: 'Apache: Get process data'
+              type: DEPENDENT
+              key: 'apache.proc.get[{#NAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'The summary metrics aggregated by a process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@["name"]=="{#NAME}")].first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'Failed to retrieve process {#NAME} data'
+              master_item:
+                key: 'proc.get[,,,summary]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: 233b5466014640e4b990ffd81fa19fa1
+              name: 'Apache: Number of running processes'
+              type: DEPENDENT
+              key: 'apache.proc.num[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of running processes {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.processes
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'apache.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
+                  expression: 'last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])=0'
+                  name: 'Apache: Process is not running'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 683d4489dbb549f3bb5b45d3c2696c4f
+              name: 'Apache: Memory usage, %'
+              type: DEPENDENT
+              key: 'apache.proc.pmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The percentage of real memory used by a process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.pmem
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'apache.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 384bf197e6a241b3b63bb89d009bba6b
+              name: 'Apache: Memory usage (rss)'
+              type: DEPENDENT
+              key: 'apache.proc.rss[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The summary of resident set size memory used by a process {#NAME} expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.rss
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'apache.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: f20b7a01ff134a128c54ea83af8557e2
+              name: 'Apache: Memory usage (vsize)'
+              type: DEPENDENT
+              key: 'apache.proc.vmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The summary of virtual memory used by a process {#NAME} expressed in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.vsize
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'apache.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: b73280fb0af64c7899abfc74cc074b13
+              name: 'Apache: CPU utilization'
+              key: 'proc.cpu.util[{#NAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'The percentage of the CPU utilization by a process {#NAME}.'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+          trigger_prototypes:
+            -
+              uuid: 0166ec63913e4bbea25c54b458b3213a
+              expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              name: 'Apache: Failed to fetch status page'
+              event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Apache: Service is down'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: e24dbf9b89c34d839cb12a22b1103df3
+              expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              name: 'Apache: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 128905793a4b4a1db5a49f87e87d3383
+              expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              name: 'Apache: Service response time is too high'
+              event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'Apache: Service is down'
+                  expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: d317a2ccde4f4a2ab20e983b27ae64e2
+              name: 'Apache: Memory usage[{#NAME}]'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Apache by Zabbix agent'
+                    key: 'apache.proc.vmem[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Apache by Zabbix agent'
+                    key: 'apache.proc.rss[{#NAME}]'
+          master_item:
+            key: 'proc.get[,,,summary]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
       tags:
         -
           tag: class
@@ -829,28 +947,28 @@ zabbix_export:
       macros:
         -
           macro: '{$APACHE.PROCESS_NAME}'
-          value: httpd
-          description: 'Apache server process name'
+          value: (httpd|apache2)
+          description: 'The process name of the Apache web server (Apache).'
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'Maximum Apache response time in seconds for trigger expression'
+          description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
         -
           macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'Hostname or IP address of the Apache status page'
+          description: 'The Hostname or an IP address of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
-          description: 'The URL path'
+          description: 'The URL path.'
         -
           macro: '{$APACHE.STATUS.PORT}'
           value: '80'
-          description: 'The port of Apache status page'
+          description: 'The port of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be either HTTP or HTTPS.'
       dashboards:
         -
           uuid: c27c68fb9c234a09b4023076b45affc1
@@ -966,21 +1084,6 @@ zabbix_export:
               value: '1'
               newvalue: Up
   graphs:
-    -
-      uuid: d317a2ccde4f4a2ab20e983b27ae64e2
-      name: 'Apache: Memory usage'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Apache by Zabbix agent'
-            key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,vsize]'
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Apache by Zabbix agent'
-            key: 'proc.mem["{$APACHE.PROCESS_NAME}",,,,rss]'
     -
       uuid: dfc5334e77ce45d286145cc08d036f38
       name: 'Apache: Requests per second'

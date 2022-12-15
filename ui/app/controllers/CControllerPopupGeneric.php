@@ -448,6 +448,19 @@ class CControllerPopupGeneric extends CController {
 					_('Mapping')
 				]
 			],
+			'template_valuemaps' => [
+				'title' => _('Value mapping'),
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'allowed_src_fields' => 'valuemapid,name',
+				'form' => [
+					'name' => 'valuemapform',
+					'id' => 'valuemaps'
+				],
+				'table_columns' => [
+					_('Name'),
+					_('Mapping')
+				]
+			],
 			'dashboard' => [
 				'title' => _('Dashboards'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
@@ -1009,7 +1022,7 @@ class CControllerPopupGeneric extends CController {
 		$this->template_group_preselect_required = in_array(
 			$this->source_table,
 			self::POPUPS_HAVING_TEMPLATE_GROUP_FILTER
-		);
+		) || ($this->source_table === 'template_valuemaps' && !$this->hasInput('hostids'));
 		$this->template_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_TEMPLATE_FILTER);
 		$this->page_options = $this->getPageOptions();
 
@@ -1592,53 +1605,40 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'valuemaps':
+			case 'template_valuemaps':
 				/**
 				 * Show list of value maps with their mappings for defined hosts or templates.
 				 *
-				 * context  Define context for hostids value maps: host, template. Required together with "hostids".
+				 * context  Define context for hostids value maps: host, template. Required.
 				 * hostids  Array of host or template ids to get value maps from. Filter by groups will be displayed if
-				 *          this parameter is not set;
+				 *          this parameter is not set.
 				 */
 				$records = [];
+				$hostids = $this->getInput('hostids', []);
+				$context = $this->getInput('context', '');
 
-				if (($this->hasInput('hostids') && !$this->hasInput('context'))
-						|| (!$this->hasInput('hostids') && !$this->groupids)) {
+				if ($context === '' || (!$hostids && !$this->groupids && !$this->template_groupids)) {
 					break;
 				}
 
 				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
-				if ($this->hasInput('hostids')) {
-					$hostids = $this->getInput('hostids');
-					$context = $this->getInput('context');
+				$options = [
+					'output' => ['name'],
+					'preservekeys' => true
+				];
 
-					if ($context === 'host') {
-						$hosts = API::Host()->get([
-							'output' => ['name'],
-							'hostids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
-					else {
-						$hosts = API::Template()->get([
-							'output' => ['name'],
-							'templateids' => $hostids,
-							'preservekeys' => true
-						]);
-					}
+				if ($hostids) {
+					$hosts = $context === 'host'
+						? API::Host()->get($options + ['hostids' => $hostids])
+						: API::Template()->get($options + ['templateids' => $hostids]);
 				}
 				else {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'groupids' => $this->groupids,
-						'preservekeys' => true,
-						'limit' => $limit
-					]) + API::Template()->get([
-						'output' => ['name'],
-						'groupids' => $this->groupids,
-						'preservekeys' => true,
-						'limit' => $limit
-					]);
+					$options['limit'] = $limit;
+
+					$hosts = $context === 'host'
+						? API::Host()->get($options + ['groupids' => $this->groupids])
+						: API::Template()->get($options + ['groupids' => $this->template_groupids]);
 
 					$hostids = array_keys($hosts);
 				}

@@ -6438,7 +6438,8 @@ svg {
         box-shadow: none; }
     .navtree .tree .tree-item > .tree-row > .content {
       display: flex;
-      height: 20px; }
+      height: 20px;
+      align-items: center; }
       .navtree .tree .tree-item > .tree-row > .content > .arrow {
         flex: 0 0 15px;
         text-align: center;
@@ -7069,7 +7070,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 26px; }
+  width: 10px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {
