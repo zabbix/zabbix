@@ -57,14 +57,14 @@ Media testing can be done manually, from `Media types` page. Press `Test` button
 ### Internal alerts
 To receive notifications about an internal problem and recovery events in Opsgenie, mark the Custom message checkbox in the internal action configuration  and specify custom message templates for problem and recovery operations. 
 If an internal action operation is configured without a custom message, the notification will not be sent. 
-Note, that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
+Note that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
 
 See more details on [Notifications upon events](https://www.zabbix.com/documentation/6.4/manual/config/notifications) in Zabbix documentation and on [Alert API](https://docs.opsgenie.com/docs/alert-api) in Opsgenie documentation.
 
 ### Known issues
 
 If both recovery and update operations are defined for an action and the problem is closed manually in the frontend, closing operation will be executed first.
-Update operations for the resolved event will not be executed, but the status of these operations will be changed to "Sent" in order to stop failed request attempts.
+Update operations for the resolved event will not be executed but the status of these operations will be changed to "Sent" in order to stop failed request attempts.
 
 ## Supported Versions
 
