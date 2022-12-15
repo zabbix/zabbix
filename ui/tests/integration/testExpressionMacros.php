@@ -40,7 +40,11 @@ class testExpressionMacros extends CIntegrationTest {
 	const HOST_NAME = 'test_macros';
 	const MESSAGE_PREFIX = 'message with expression macro: ';
 	const SUBJECT_PREFIX = 'subject with expression macro: ';
+	const MESSAGE_PREFIX_RECOVERY = 'recovery message with expression macro: ';
+	const SUBJECT_PREFIX_RECOVERY = 'recovery subject with expression macro: ';
 	const EVENT_PREFIX = 'event name with expression macro: ';
+	const VALUE_TO_FIRE_TRIGGER = 3;
+	const VALUE_TO_RECOVER_TRIGGER = 2;
 
 	/**
 	 * @inheritdoc
@@ -81,22 +85,28 @@ class testExpressionMacros extends CIntegrationTest {
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
-		// Create trapper item
-		$response = $this->call('item.create', [
-			'hostid' => self::$hostid,
-			'name' => self::TRAPPER_ITEM_NAME,
-			'key_' => self::TRAPPER_ITEM_NAME,
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_UINT64
-		]);
+		// Create trapper items
+		$items = [];
+		for ($i = 1; $i < 3; $i++) {
+			$items[] = [
+				'hostid' => self::$hostid,
+				'name' => self::TRAPPER_ITEM_NAME.$i,
+				'key_' => self::TRAPPER_ITEM_NAME.$i,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			];
+		}
+
+		$response = $this->call('item.create', $items);
 		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
+		$this->assertEquals(count($items), count($response['result']['itemids']));
 
 		// Create trigger
 		$response = $this->call('trigger.create', [
 			'description' => 'trigger_trap',
-			'expression' => 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_NAME.')<>3',
-			'event_name' => self::EVENT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_NAME.')}'
+			'expression' => 'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_NAME.'1)='.self::VALUE_TO_FIRE_TRIGGER.' or '.
+					'last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_NAME.'2)='.self::VALUE_TO_FIRE_TRIGGER,
+			'event_name' => self::EVENT_PREFIX.'{?last(/{HOST.HOST}/'.self::TRAPPER_ITEM_NAME.'1)}'
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
@@ -127,8 +137,8 @@ class testExpressionMacros extends CIntegrationTest {
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 1,
-						'subject' => self::SUBJECT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_NAME.')}',
-						'message' => self::MESSAGE_PREFIX.'{?last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_NAME.')}'
+						'subject' => self::SUBJECT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_NAME.'1)}',
+						'message' => self::MESSAGE_PREFIX.'{?last(/'.self::HOST_NAME.'/'.self::TRAPPER_ITEM_NAME.'1)}'
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -142,8 +152,14 @@ class testExpressionMacros extends CIntegrationTest {
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 4,
-						'subject' => self::SUBJECT_PREFIX.'{?first(//'.self::TRAPPER_ITEM_NAME.',1h)}',
-						'message' => self::MESSAGE_PREFIX.'{?first(/{HOST.HOST}/'.self::TRAPPER_ITEM_NAME.',1h)}'
+						'subject' => self::SUBJECT_PREFIX.'{?first(//'.self::TRAPPER_ITEM_NAME.'1,1h)}',
+						'message' => self::MESSAGE_PREFIX.'{?last(/{HOST.HOST}/'.self::TRAPPER_ITEM_NAME.'1,1h)}'.
+								'/host/macro:{?last(/'.self::HOST_NAME.'/{ITEM.KEY})}'.
+								'/empty/macro:{?last(//{ITEM.KEY})}'.
+								'/macro/macro:{?last(/{HOST.HOST}/{ITEM.KEY})}'.
+								'/macroN/macro:{?last(/{HOST.HOST1}/{ITEM.KEY})}'.
+								'/macro/macroN:{?last(/{HOST.HOST}/{ITEM.KEY2})}'.
+								'/empty/macroN:{?last(//{ITEM.KEY2})}'
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -157,8 +173,8 @@ class testExpressionMacros extends CIntegrationTest {
 					'opmessage' => [
 						'default_msg' => 0,
 						'mediatypeid' => 0,
-						'subject' => self::SUBJECT_PREFIX.'{?last(//'.self::TRAPPER_ITEM_NAME.')}',
-						'message' => self::MESSAGE_PREFIX.'{?last(//'.self::TRAPPER_ITEM_NAME.',#2)}'
+						'subject' => self::SUBJECT_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_NAME.'1)}',
+						'message' => self::MESSAGE_PREFIX_RECOVERY.'{?last(//'.self::TRAPPER_ITEM_NAME.'1,#2)}'
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -194,8 +210,9 @@ class testExpressionMacros extends CIntegrationTest {
 	 * @backup alerts,events,history_uint
 	 */
 	public function testExpressionMacros_getData() {
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME.'2', self::VALUE_TO_RECOVER_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME.'1', self::VALUE_TO_RECOVER_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME.'1', self::VALUE_TO_FIRE_TRIGGER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
@@ -208,7 +225,7 @@ class testExpressionMacros extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME.'1', self::VALUE_TO_RECOVER_TRIGGER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true, 10, 3);
@@ -224,42 +241,49 @@ class testExpressionMacros extends CIntegrationTest {
 	 * Test expression macro in problem message
 	 */
 	public function testExpressionMacros_checkProblemMessage() {
-		$this->assertEquals(self::MESSAGE_PREFIX.'2', self::$alert_response['result'][0]['message']);
+		$this->assertEquals(self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][0]['message']);
 	}
 
 	/**
 	 * Test expression macro with empty hostname
 	 */
 	public function testExpressionMacros_checkEmptyHostname() {
-		$this->assertEquals(self::SUBJECT_PREFIX.'2', self::$alert_response['result'][0]['subject']);
+		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][0]['subject']);
 	}
 
 	/**
 	 * Test expression macro in function with argument
 	 */
 	public function testExpressionMacros_checkFunctionArgument() {
-		$this->assertEquals(self::SUBJECT_PREFIX.'3', self::$alert_response['result'][1]['subject']);
+		$this->assertEquals(self::SUBJECT_PREFIX.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][1]['subject']);
 	}
 
 	/**
-	 * Test expression macro with {HOST.HOST} macro
+	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
 	 */
-	public function testExpressionMacros_checkHostMacro() {
-		$this->assertEquals(self::MESSAGE_PREFIX.'3', self::$alert_response['result'][1]['message']);
+	public function testExpressionMacros_checkMacros() {
+		$this->assertEquals(self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER.
+				'/host/macro:'.self::VALUE_TO_FIRE_TRIGGER.
+				'/empty/macro:'.self::VALUE_TO_FIRE_TRIGGER.
+				'/macro/macro:'.self::VALUE_TO_FIRE_TRIGGER.
+				'/macroN/macro:'.self::VALUE_TO_FIRE_TRIGGER.
+				'/macro/macroN:'.self::VALUE_TO_RECOVER_TRIGGER.
+				'/empty/macroN:'.self::VALUE_TO_RECOVER_TRIGGER,
+				self::$alert_response['result'][1]['message']);
 	}
 
 	/**
 	 * Test expression macro in recovery message
 	 */
 	public function testExpressionMacros_checkRecoveryMessage() {
-		$this->assertEquals(self::SUBJECT_PREFIX.'3', self::$alert_response['result'][2]['subject']);
-		$this->assertEquals(self::MESSAGE_PREFIX.'2', self::$alert_response['result'][2]['message']);
+		$this->assertEquals(self::SUBJECT_PREFIX_RECOVERY.self::VALUE_TO_RECOVER_TRIGGER, self::$alert_response['result'][2]['subject']);
+		$this->assertEquals(self::MESSAGE_PREFIX_RECOVERY.self::VALUE_TO_FIRE_TRIGGER, self::$alert_response['result'][2]['message']);
 	}
 
 	/**
 	 * Test expression macro in event name
 	 */
 	public function testExpressionMacros_checkEventName() {
-		$this->assertEquals(self::EVENT_PREFIX.'2', self::$event_response['result'][0]['name']);
+		$this->assertEquals(self::EVENT_PREFIX.self::VALUE_TO_FIRE_TRIGGER, self::$event_response['result'][0]['name']);
 	}
 }

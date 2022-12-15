@@ -147,7 +147,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes,
 				init_child_args_in->config_timeout);
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (SUCCEED == ret)
 		{

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-28 12:38+0000\n"
+"PO-Revision-Date: 2022-12-08 14:27+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -698,7 +698,7 @@ msgstr "המשימה עודכנה"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "פעולה עם המזהה „%1$s” אינה זמינה."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -927,6 +927,14 @@ msgstr "הוספת שירותים צאצאים"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "הוספה מתוך"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -3375,8 +3383,8 @@ msgstr "לא ניתן לבצע פעולת update על הטבלה „%1$s” לל
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להקים משתמש"
+msgstr[1] "לא ניתן להקים משתמשים"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4566,6 +4574,10 @@ msgstr "הגדרת חיבור למסד הנתונים"
 #: app/views/administration.authentication.edit.php:417
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
+msgstr "הגדרת הקמת JIT"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
 msgstr ""
 
 #: app/views/administration.script.edit.php:256
@@ -6136,6 +6148,10 @@ msgstr ""
 msgid "Description"
 msgstr "תיאור"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -6960,10 +6976,14 @@ msgstr "הפעלה"
 msgid "Enable HTTP authentication"
 msgstr "הפעלת אימות HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "הפעלת הקמת JIT"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6975,7 +6995,7 @@ msgstr "הפעלת אימות SAML"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "הפעלת הקמת SCIM"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -8327,7 +8347,7 @@ msgstr ""
 
 #: app/views/popup.ldap.edit.php:122
 msgid "Group configuration"
-msgstr ""
+msgstr "הגדרת קבוצה"
 
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
@@ -8337,7 +8357,7 @@ msgstr[1] "נמחקו קבוצות"
 
 #: app/views/popup.ldap.edit.php:182
 msgid "Group filter"
-msgstr ""
+msgstr "מסנן קבוצה"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8345,7 +8365,7 @@ msgstr "קבוצה עבור מארחים שהתגלו"
 
 #: app/views/popup.ldap.edit.php:156
 msgid "Group member attribute"
-msgstr ""
+msgstr "מאפיין חבר בקבוצה"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
@@ -8355,7 +8375,7 @@ msgstr "שם קבוצה"
 #: app/views/administration.authentication.edit.php:427
 #: app/views/popup.ldap.edit.php:148
 msgid "Group name attribute"
-msgstr ""
+msgstr "מאפיין שם בקבוצה"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9281,6 +9301,10 @@ msgstr "מרחב שם זהה (%1$s) משמש את המודולים תחת %2$s."
 msgid "Identification of the system. Returns string"
 msgstr "זיהוי המערכת. מחזירה מחרוזת"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9448,7 +9472,7 @@ msgstr "SLA בלתי נגיש"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:452
 msgid "Inaccessible action"
-msgstr ""
+msgstr "פעולה בלתי נגישה"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9501,7 +9525,7 @@ msgstr "מפה בלתי נגישה"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:453
 msgid "Inaccessible media type"
-msgstr ""
+msgstr "סוג מדיה בלתי נגיש"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -11482,7 +11506,7 @@ msgstr "אימות LDAP מושבת."
 
 #: app/views/popup.ldap.edit.php:235
 msgid "LDAP group pattern"
-msgstr ""
+msgstr "תבנית קבוצת LDAP"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -12440,7 +12464,7 @@ msgstr "סוג המדיה"
 #: widgets/actionlog/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Media type"
-msgstr ""
+msgstr "סוג מדיה"
 
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
@@ -12477,7 +12501,7 @@ msgstr[1] "סוגי המדיה מופעלים"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr ""
+msgstr "מיפוי סוגי מדיה"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13121,7 +13145,7 @@ msgstr "שם"
 
 #: app/views/administration.authentication.edit.php:520
 msgid "Name "
-msgstr ""
+msgstr "שם"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -13137,7 +13161,7 @@ msgstr "מרחב שם"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "Naming requirements:"
-msgstr ""
+msgstr "דרישות מתן שם:"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13265,7 +13289,7 @@ msgstr "קבוצת מארחים חדשה"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr ""
+msgstr "מיפוי סוגי מדיה חדש"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13298,7 +13322,7 @@ msgstr "הקפצות חדשות"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr ""
+msgstr "מיפוי קבוצת משתמשים חדש"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -15539,23 +15563,23 @@ msgstr "מחרוזת שאילתת הסוד שסופקה „%1$s” שגויה."
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
-msgstr ""
+msgstr "להקים עכשיו"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
-msgstr ""
+msgstr "להקים את משתמשי ה־LDAP הנבחרים?"
 
 #: app/views/administration.user.list.php:141
 msgid "Provisioned"
-msgstr ""
+msgstr "הוקמו"
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
-msgstr ""
+msgstr "תקופת הקמה"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr ""
+msgstr "ההקמה הצליחה."
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -15822,15 +15846,15 @@ msgstr "הנמען כבר קיים."
 
 #: app/views/reports.actionlog.list.csv.php:39
 msgid "Recipient's Zabbix username"
-msgstr ""
+msgstr "שם המשתמש ב־Zabbix של הנמען"
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
-msgstr ""
+msgstr "שם הנמען"
 
 #: app/views/reports.actionlog.list.csv.php:41
 msgid "Recipient's surname"
-msgstr ""
+msgstr "שם המשפחה של הנמען"
 
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
@@ -15887,7 +15911,7 @@ msgstr "מרובע"
 
 #: app/views/popup.ldap.edit.php:168
 msgid "Reference attribute"
-msgstr ""
+msgstr "מאפיין סימוכין"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -16619,11 +16643,11 @@ msgstr "א׳"
 #: app/views/administration.user.list.php:225
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "SAML"
-msgstr ""
+msgstr "SAML"
 
 #: app/views/administration.authentication.edit.php:483
 msgid "SAML group pattern"
-msgstr ""
+msgstr "תבנית קבוצת SAML"
 
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
@@ -17119,7 +17143,7 @@ msgstr "תבנית החיפוש ריקה"
 #: app/views/reports.actionlog.list.php:108
 #: widgets/actionlog/includes/WidgetForm.php:61
 msgid "Search string"
-msgstr ""
+msgstr "מחרוזת חיפוש"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
@@ -17289,7 +17313,7 @@ msgstr "נשלח"
 #: app/controllers/CControllerActionLogList.php:210
 #: widgets/actionlog/includes/WidgetForm.php:56
 msgid "Sent/Executed"
-msgstr ""
+msgstr "נשלח/הופעל"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -19916,7 +19940,7 @@ msgstr "לא ניתן לאתר את גרסת מסד הנתונים הנוכחי�
 #: include/classes/helpers/CAuthenticationHelper.php:88
 #: include/classes/helpers/CAuthenticationHelper.php:107
 msgid "Unable to find SAML userdirectory."
-msgstr ""
+msgstr "לא ניתן למצוא ספריית משתמשים (userdirectory) ב־SAML."
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -20435,7 +20459,7 @@ msgstr "הדוח „%2$s” נוצר בשם המשתמש „%1$s”."
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr ""
+msgstr "המשתמש „%1$s” הוקם."
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format

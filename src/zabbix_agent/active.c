@@ -45,7 +45,7 @@ extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
 static ZBX_THREAD_LOCAL ZBX_ACTIVE_BUFFER	buffer;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
-static ZBX_THREAD_LOCAL zbx_vector_ptr_t	regexps;
+static ZBX_THREAD_LOCAL zbx_vector_expression_t	regexps;
 static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
 static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
@@ -76,7 +76,7 @@ static void	init_active_metrics(void)
 	}
 
 	zbx_vector_ptr_create(&active_metrics);
-	zbx_vector_ptr_create(&regexps);
+	zbx_vector_expression_create(&regexps);
 	zbx_vector_pre_persistent_create(&pre_persistent_vec);
 	zbx_vector_persistent_inactive_create(&persistent_inactive_vec);
 
@@ -106,7 +106,7 @@ static void	free_active_metrics(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	zbx_vector_expression_destroy(&regexps);
 
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
@@ -517,7 +517,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 			case_sensitive = atoi(tmp);
 
-			add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
+			zbx_add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
 success:
@@ -1133,7 +1133,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		zbx_vector_ptr_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
+		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error)
 {
@@ -1150,9 +1150,10 @@ static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *age
 	return FAIL;
 }
 #else
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		char **error);
 #endif
 
 static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
@@ -1483,7 +1484,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 #endif
 
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if ((now = time(NULL)) >= nextsend)
 		{
