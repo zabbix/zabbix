@@ -1709,6 +1709,7 @@ FIELD		|privpassphrase	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|authprotocol	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|privprotocol	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|contextname	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|max_repetitions|t_integer	|'10'	|NOT NULL	|ZBX_PROXY
 
 TABLE|lld_override|lld_overrideid|ZBX_TEMPLATE
 FIELD		|lld_overrideid	|t_id		|	|NOT NULL	|0
@@ -2064,4 +2065,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030149	|6030149
+ROW		|1		|6030150	|6030150
