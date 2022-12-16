@@ -529,12 +529,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	{
 		struct timeval	tv;
 
-		tv.tv_sec = get_config_timeout_cb();
+		tv.tv_sec = sysinfo_get_config_timeout();
 		tv.tv_usec = 0;
 		modbus_set_response_timeout(mdb_ctx, &tv);
 	}
 #else /* HAVE_LIBMODBUS_3_1 at the moment */
-	if (0 !=  modbus_set_response_timeout(mdb_ctx, get_config_timeout_cb(), 0))
+	if (0 !=  modbus_set_response_timeout(mdb_ctx, sysinfo_get_config_timeout(), 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
 		goto out;

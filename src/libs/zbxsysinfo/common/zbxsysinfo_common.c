@@ -114,7 +114,7 @@ static int	execute_str_local(const char *command, AGENT_RESULT *result, const ch
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), get_config_timeout_cb(),
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), sysinfo_get_config_timeout(),
 			ZBX_EXIT_CODE_CHECKS_DISABLED, dir))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));

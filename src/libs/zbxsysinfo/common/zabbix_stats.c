@@ -82,7 +82,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 {
 	zbx_socket_t	s;
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, ip, port, get_config_timeout_cb(),
+	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, ip, port, sysinfo_get_config_timeout(),
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		if (SUCCEED == zbx_tcp_send(&s, json->buffer))

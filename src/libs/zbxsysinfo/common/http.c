@@ -171,7 +171,7 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			(NULL != CONFIG_SOURCE_IP &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
-					(long)get_config_timeout_cb())) ||
+					(long)sysinfo_get_config_timeout())) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
@@ -383,7 +383,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, get_config_timeout_cb(),
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, sysinfo_get_config_timeout(),
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;

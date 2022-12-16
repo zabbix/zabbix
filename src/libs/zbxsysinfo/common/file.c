@@ -79,7 +79,7 @@ int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 			char	*p1, *p2;
 			size_t	sz = (size_t)nbytes, dif;
 
-			if (get_config_timeout_cb() < zbx_time() - ts)
+			if (sysinfo_get_config_timeout() < zbx_time() - ts)
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 				close(f);
@@ -388,7 +388,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -406,7 +406,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -416,7 +416,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			zbx_free(contents);
@@ -529,7 +529,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -537,7 +537,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -649,7 +649,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -659,7 +659,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -712,7 +712,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -722,7 +722,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -850,7 +850,7 @@ static int	vfs_file_cksum_crc32(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -860,7 +860,7 @@ static int	vfs_file_cksum_crc32(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nr = (int)read(f, buf, sizeof(buf))))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
@@ -911,7 +911,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (get_config_timeout_cb() < zbx_time() - ts)
+	if (sysinfo_get_config_timeout() < zbx_time() - ts)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 		goto err;
@@ -921,7 +921,7 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 
 	while (0 < (nr = read(f, buf, sizeof(buf))))
 	{
-		if (get_config_timeout_cb() < zbx_time() - ts)
+		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
 			goto err;
