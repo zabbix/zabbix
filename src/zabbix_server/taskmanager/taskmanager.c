@@ -423,6 +423,10 @@ out:
  *             data   - [IN] JSON with with acknowledge id, action, event id  *
  *                      for all actions and cause_eventid for rank to symptom *
  *                      action                                                *
+ *                                                                            *
+ * Comments: Logic of this function is described in comments to test cases in *
+ *           the integration test testEventsCauseAndSymptoms                  *
+ *                                                                            *
  ******************************************************************************/
 static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 {

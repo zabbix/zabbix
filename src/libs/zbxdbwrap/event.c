@@ -310,7 +310,7 @@ void	zbx_db_prepare_empty_event(zbx_uint64_t eventid, ZBX_DB_EVENT **event)
  *                                                                            *
  * Purpose: get event data from events table, if it's not obtained already    *
  *                                                                            *
- * Parameters: event     - [IN/OUT] event data                                *
+ * Parameters: event     - [IN/OUT]                                           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_get_event_data_core(ZBX_DB_EVENT *event)

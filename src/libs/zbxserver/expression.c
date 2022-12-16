@@ -2426,11 +2426,6 @@ static void	get_rootcause(const ZBX_DB_SERVICE *service, char **replace_to)
 	zbx_vector_eventdata_destroy(&rootcauses);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get event symptoms                                                *
- *                                                                            *
- ******************************************************************************/
 static void	get_event_symptoms(const ZBX_DB_EVENT *event, char **replace_to)
 {
 	int			i;
