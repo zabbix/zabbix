@@ -15,6 +15,7 @@
 	.overlay-close-btn {
 		color: $font-alt-color;
 		font-size: $font-top-nav-size;
+		background-color: transparent;
 	}
 
 	.link-action {
@@ -28,6 +29,10 @@
 		.arrow-down {
 			border-top-color: darken(desaturate($green, 10%), 20%);
 		}
+	}
+
+	button {
+		background-color: $white;
 	}
 
 	&::before {

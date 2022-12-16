@@ -2065,7 +2065,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .msg-good .overlay-close-btn,
   .msg-warning .overlay-close-btn {
     color: #768d99;
-    font-size: 1.167em; }
+    font-size: 1.167em;
+    background-color: transparent; }
   .msg-bad .link-action,
   .msg-good .link-action,
   .msg-warning .link-action {
@@ -2079,6 +2080,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     .msg-good .link-action .arrow-down,
     .msg-warning .link-action .arrow-down {
       border-top-color: #2a502c; }
+  .msg-bad button,
+  .msg-good button,
+  .msg-warning button {
+    background-color: #ffffff; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
