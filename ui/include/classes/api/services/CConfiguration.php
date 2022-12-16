@@ -384,7 +384,6 @@ class CConfiguration extends CApiService {
 							'uuid' => $data['uuid'],
 							'host' => $data['template']
 						],
-						'selectParentTemplates' => ['templateid', 'name'],
 						'preservekeys' => true,
 						'searchByAny' => true
 					];
