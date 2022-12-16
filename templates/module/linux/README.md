@@ -336,7 +336,7 @@ There are no template links in this template.
 |General |Number of running processes |<p>-</p> |ZABBIX_PASSIVE |proc.num[,,run] |
 |Inventory |Operating system |<p>-</p> |ZABBIX_PASSIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the host's operating system.</p> |ZABBIX_PASSIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |Software installed |<p>-</p> |ZABBIX_PASSIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Inventory |Number of installed packages |<p>-</p> |ZABBIX_PASSIVE |system.sw.packages.get<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p><p>- JSONPATH: `$.length()`</p> |
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |System uptime |<p>The system uptime expressed in the following format:'N days, hh:mm:ss'.</p> |ZABBIX_PASSIVE |system.uptime |
 
@@ -349,6 +349,7 @@ There are no template links in this template.
 |Configured max number of open filedescriptors is too low |<p>-</p> |`last(/Linux generic by Zabbix agent/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}` |INFO | |
 |Configured max number of processes is too low |<p>-</p> |`last(/Linux generic by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit</p> |
 |Getting closer to process limit |<p>-</p> |`last(/Linux generic by Zabbix agent/proc.num)/last(/Linux generic by Zabbix agent/kernel.maxproc)*100>80` |WARNING | |
+|Number of installed packages has been changed |<p>-</p> |`change(/Linux generic by Zabbix agent/system.sw.packages.get)<>0` |WARNING |<p>Manual close: YES</p> |
 |Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`last(/Linux generic by Zabbix agent/system.sw.os,#1)<>last(/Linux generic by Zabbix agent/system.sw.os,#2) and length(last(/Linux generic by Zabbix agent/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
 |/etc/passwd has been changed |<p>-</p> |`last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux generic by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed</p> |
 |has been restarted |<p>The host uptime is less than 10 minutes</p> |`last(/Linux generic by Zabbix agent/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
