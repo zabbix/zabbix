@@ -142,8 +142,11 @@ static char	*get_registry_value(HKEY hKey, LPCTSTR name, DWORD value_type)
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
 	{
 		value = zbx_malloc(NULL, szData);
+		/* syscall RegQueryValueEx does not guarantee that the returned string will be '\0' terminated */
 		if (ERROR_SUCCESS != RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)value, &szData))
 			zbx_free(value);
+		else
+			value[szData - 1] = '\0';
 	}
 
 	if (NULL == value)
@@ -271,7 +274,7 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		/* if we were not able to get any data, no values could be retrived */
+		/* if we were not able to get any data, no values could be retrieved */
 		/* in error specify that ProductName is missing because it is required in all cases */
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Could not read registry value " ZBX_REGVALUE_PRODUCTNAME));
 	}

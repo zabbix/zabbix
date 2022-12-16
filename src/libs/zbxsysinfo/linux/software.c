@@ -62,7 +62,7 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	get_line_from_file(char **line, size_t size, FILE *f)
+static int	get_line_from_file(char **line, int size, FILE *f)
 {
 	if (NULL == fgets(*line, size, f))
 	{
