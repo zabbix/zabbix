@@ -11,7 +11,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-head h4, .dashboard-grid-iterator-head h4, form.dashboard-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, form.dashboard-widget-tophosts #list_columns .text, .list-table .action-container .link-action, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1151,7 +1151,7 @@ footer {
   display: flex;
   flex-direction: column; }
 
-.dashboard-grid-widget-head {
+.dashboard-grid-widget-header {
   position: absolute;
   top: .25rem;
   left: .25rem;
@@ -1167,24 +1167,37 @@ footer {
   border-bottom: 0;
   background-color: #2b2b2b;
   z-index: 3; }
-  .dashboard-grid-widget-head h4 {
+  .dashboard-grid-widget-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
     color: #dedede;
     font-weight: bold; }
-  .dashboard-grid-widget-head ul {
+  .dashboard-grid-widget-header ul {
     flex-shrink: 0; }
-    .dashboard-grid-widget-head ul li {
+    .dashboard-grid-widget-header ul li {
       float: left;
       padding: 0; }
-      .dashboard-grid-widget-head ul li select {
+      .dashboard-grid-widget-header ul li select {
         margin: 4px 0; }
 
 .dashboard-grid-widget-actions {
   opacity: 0;
   transition: opacity .2s ease-out; }
 
-.dashboard-grid-widget-content {
+.dashboard-grid-widget-messages .msg-bad,
+.dashboard-grid-widget-messages .msg-good,
+.dashboard-grid-widget-messages .msg-warning {
+  margin: 0 10px 8px; }
+
+.dashboard-grid-widget-body {
+  display: contents; }
+
+.dashboard-grid-widget-debug .debug-output {
+  margin: 8px 10px 0;
+  max-height: none;
+  border-color: #383838; }
+
+.dashboard-grid-widget-contents {
   flex-grow: 1;
   margin-top: 2rem;
   box-sizing: border-box;
@@ -1193,26 +1206,21 @@ footer {
   overflow: auto;
   border: 1px solid #303030;
   background-color: #2b2b2b; }
-  .dashboard-grid-widget-content .list-table {
+  .dashboard-grid-widget-contents .list-table {
     border: 0; }
-    .dashboard-grid-widget-content .list-table tbody tr:last-child th, .dashboard-grid-widget-content .list-table tbody tr:last-child td {
+    .dashboard-grid-widget-contents .list-table tbody tr:last-child th, .dashboard-grid-widget-contents .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
-      .dashboard-grid-widget-content .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-content .list-table tbody tr:last-child td.list-table-footer {
+      .dashboard-grid-widget-contents .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-widget-contents .list-table tbody tr:last-child td.list-table-footer {
         border-bottom: 0; }
-    .dashboard-grid-widget-content .list-table.sticky-footer {
+    .dashboard-grid-widget-contents .list-table.sticky-footer {
       margin-bottom: -8px; }
-      .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+      .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: -8px; }
-  .dashboard-grid-widget-content .debug-output {
-    max-height: none;
-    border-color: #383838; }
-  .dashboard-grid-widget-content .msg-bad,
-  .dashboard-grid-widget-content .msg-good,
-  .dashboard-grid-widget-content .msg-warning {
-    margin: 0 10px; }
-  .dashboard-grid-widget-content.no-padding .msg-bad,
-  .dashboard-grid-widget-content.no-padding .msg-good,
-  .dashboard-grid-widget-content.no-padding .msg-warning {
+  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
+  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
+  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
+    margin: 8px 10px; }
+  .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-debug .debug-output {
     margin: 8px 10px; }
 
 .dashboard-grid-widget-mask {
@@ -1225,18 +1233,18 @@ footer {
 
 .dashboard-grid-widget {
   position: absolute; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
     height: 0;
     transition: height .3s, margin-top .3s, box-shadow .3s; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
     padding-top: 8px; }
-    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer {
+    .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer {
       margin-bottom: 0; }
-      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-content .list-table.sticky-footer tfoot {
+      .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: 0; }
-  .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
+  .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
     height: 2rem;
     margin-top: -2rem;
     box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
@@ -1257,7 +1265,7 @@ footer {
   width: 100%;
   height: 100%; }
 
-.dashboard-grid-iterator-head {
+.dashboard-grid-iterator-header {
   position: absolute;
   top: .25rem;
   left: .25rem;
@@ -1275,31 +1283,31 @@ footer {
   opacity: 0;
   transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
   z-index: 3; }
-  .dashboard-grid-iterator-head h4 {
+  .dashboard-grid-iterator-header h4 {
     flex-grow: 1;
     margin-top: .5rem;
     color: #dedede;
     font-weight: bold; }
-  .dashboard-grid-iterator-head ul {
+  .dashboard-grid-iterator-header ul {
     flex-shrink: 0; }
-    .dashboard-grid-iterator-head ul li {
+    .dashboard-grid-iterator-header ul li {
       float: left;
       padding: 0; }
-  .dashboard-grid-iterator-head .dashboard-grid-iterator-pager {
+  .dashboard-grid-iterator-header .dashboard-grid-iterator-pager {
     margin: 0 10px;
     height: 2rem;
     display: none;
     flex-direction: row;
     flex-shrink: 0;
     align-items: center; }
-    .dashboard-grid-iterator-head .dashboard-grid-iterator-pager .dashboard-grid-iterator-pager-info {
+    .dashboard-grid-iterator-header .dashboard-grid-iterator-pager .dashboard-grid-iterator-pager-info {
       margin: 2px .5em 0;
       white-space: nowrap;
       color: #dedede; }
-  .dashboard-grid-iterator-head.pager-visible .dashboard-grid-iterator-pager {
+  .dashboard-grid-iterator-header.pager-visible .dashboard-grid-iterator-pager {
     display: flex; }
 
-.dashboard-grid-iterator-content {
+.dashboard-grid-iterator-contents {
   position: absolute;
   top: 0;
   left: 0;
@@ -1348,17 +1356,17 @@ footer {
   position: absolute; }
   .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-too-small {
     display: flex; }
-  .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-content {
+  .dashboard-grid-iterator.iterator-too-small .dashboard-grid-iterator-contents {
     display: none; }
   .dashboard-grid-iterator.dashboard-grid-iterator-focus {
     z-index: 5; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-head {
+    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
       margin-top: -2rem;
       height: 2rem;
       box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
       opacity: 1;
       transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out; }
-    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-head {
+    .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
       margin-top: calc(-4rem - 8px);
       height: calc(4rem + 8px); }
   .dashboard-grid-iterator.ui-resizable-resizing.resizing-top .dashboard-grid-iterator-container {
@@ -1367,7 +1375,7 @@ footer {
   .dashboard-grid-iterator.ui-resizable-resizing.resizing-left .dashboard-grid-iterator-container {
     left: auto;
     right: 0; }
-  .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content {
+  .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents {
     position: absolute;
     top: .25rem;
     left: .25rem;
@@ -1375,29 +1383,29 @@ footer {
     bottom: .25rem;
     border: 1px solid #303030;
     background-color: #2b2b2b; }
-    .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div {
+    .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div {
       padding-top: 8px; }
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table {
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table {
         border: 0; }
-        .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child th, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child td {
+        .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child th, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child td {
           border-bottom: 1px solid #383838; }
-          .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table tbody tr:last-child td.list-table-footer {
+          .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child th.list-table-footer, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table tbody tr:last-child td.list-table-footer {
             border-bottom: 0; }
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .msg-good,
-      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .msg-bad {
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .msg-good,
+      .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .msg-bad {
         margin: 0 10px; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-head {
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header {
   cursor: auto; }
 
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-actions {
   opacity: 1; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   transition: none; }
-.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-iterator.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   transition: none; }
 .dashboard.dashboard-is-edit-mode.dashboard-positioning .dashboard-grid-widget-mask {
   display: block; }
@@ -1407,13 +1415,13 @@ footer {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.dashboard-grid-widget-focus .ui-resizable-handle {
   visibility: visible; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   margin-top: 0;
   height: 0;
   box-shadow: none; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
@@ -1430,9 +1438,9 @@ footer {
     bottom: .25rem;
     background-color: rgba(1, 1, 1, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-content {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
     border-color: #212121; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget:not(.dashboard-grid-widget-focus) {
   transition-property: width, height, left, top;
@@ -1441,19 +1449,19 @@ footer {
   visibility: hidden; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.dashboard-grid-iterator-focus .ui-resizable-handle {
   visibility: visible; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header {
   margin-top: 0;
   height: 0;
   box-shadow: none;
   opacity: 0; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
   visibility: hidden; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: .5; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
   margin-top: calc(-4rem - 8px);
   height: calc(4rem + 8px); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging {
@@ -1468,13 +1476,13 @@ footer {
     bottom: .25rem;
     background-color: rgba(1, 1, 1, 0.75);
     box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents {
     border-color: #212121; }
-  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div {
+  .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div {
     border-color: #212121; }
   .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
     border: 1px solid #1c1c1c;
@@ -1516,9 +1524,9 @@ footer {
   .dashboard-widget .msg-warning {
     margin: 0 10px; }
 
-.dashboard-grid-widget-content .list-table th:first-child, .dashboard-grid-widget-content .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashboard-grid-widget-contents .list-table th:first-child, .dashboard-grid-widget-contents .list-table td:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:first-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:first-child, .dashboard-widget .list-table th:first-child, .dashboard-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
-.dashboard-grid-widget-content .list-table th:last-child, .dashboard-grid-widget-content .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-content > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashboard-grid-widget-contents .list-table th:last-child, .dashboard-grid-widget-contents .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
   padding-right: 10px; }
 
 .dashboard-widget-head {
@@ -1544,8 +1552,8 @@ footer {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-content.is-loading::before,
-.dashboard-grid-iterator-content.is-loading::before {
+.dashboard-grid-widget-contents.is-loading::before,
+.dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {
@@ -6118,22 +6126,22 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-content, div.dashboard-widget-item > div, .msg-details ul, z-select button.focusable,
+.dashboard-grid-widget-contents, div.dashboard-widget-item > div, .msg-details ul, z-select button.focusable,
 .z-select button.focusable, z-select .list,
 .z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
-  .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-widget-item > div::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+  .dashboard-grid-widget-contents::-webkit-scrollbar, div.dashboard-widget-item > div::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
   .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
   .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-widget-item > div::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-track, div.dashboard-widget-item > div::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
   .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
   .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-widget-item > div::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, div.dashboard-widget-item > div::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
   .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
   .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
@@ -6143,18 +6151,18 @@ span.is-loading {
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-head, .drag-icon,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, .drag-icon,
 .ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
 
-.dashboard-navigation-tabs .sortable-dragging .sortable-item > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-head,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-head, .ui-draggable .drag-icon,
+.dashboard-navigation-tabs .sortable-dragging .sortable-item > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable .drag-icon,
 .ui-draggable .dashboard-widget-head, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
@@ -7401,31 +7409,31 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard-navigation-tabs .csortable > .csortable-item > div, .dashboard-navigation-tabs .csortable-list > .csortable-item > div:hover {
   border: 1px solid transparent; }
 
-.dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-head {
+.dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 
-.dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-head {
+.dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing::before, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.5); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-content {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-resizable-resizing .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-widget.ui-draggable-dragging .dashboard-grid-widget-contents {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing::before, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging::before {
   box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.5); }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-head {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-header {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-widget .dashboard-grid-widget-content {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-widget .dashboard-grid-widget-contents {
   border-color: #303030; }
-.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-content .dashboard-grid-iterator-placeholder > div {
+.dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-contents .dashboard-grid-iterator-placeholder > div {
   border-color: #303030; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }

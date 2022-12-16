@@ -28,9 +28,9 @@ class CWidgetActionLog extends CWidget {
 		}
 	}
 
-	_getUpdateRequestData() {
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			from: this._time_period.from,
 			to: this._time_period.to
 		};

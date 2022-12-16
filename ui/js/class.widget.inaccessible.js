@@ -20,23 +20,19 @@
 
 class CWidgetInaccessible extends CWidget {
 
-	_doStart() {
-		super._doStart();
-
+	onStart() {
 		this._updateButtons();
 
-		this._content_body.innerHTML = `<div>${t('No permissions to referred object or it does not exist!')}</div>`;
+		this._body.innerHTML = `<div>${t('No permissions to referred object or it does not exist!')}</div>`;
 	}
 
 	_updateButtons() {
-		for (const button of this._content_header.querySelectorAll('button')) {
+		for (const button of this._header.querySelectorAll('button')) {
 			button.hidden = !button.classList.contains('js-widget-action') || !this.isEditMode();
 		}
 	}
 
-	setEditMode() {
-		super.setEditMode();
-
+	onEdit() {
 		const state = this.getState();
 
 		if (state === WIDGET_STATE_ACTIVE || state === WIDGET_STATE_INACTIVE) {
@@ -44,7 +40,7 @@ class CWidgetInaccessible extends CWidget {
 		}
 	}
 
-	_promiseUpdate() {
+	promiseUpdate() {
 		return Promise.resolve();
 	}
 
@@ -72,7 +68,7 @@ class CWidgetInaccessible extends CWidget {
 		return menu;
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return true;
 	}
 }

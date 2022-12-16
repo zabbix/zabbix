@@ -71,8 +71,8 @@ class CDashboardElement extends CElement {
 	 * @return CWidgetElement|CNullElement
 	 */
 	public function getWidget($name, $should_exist = true) {
-		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or'.
-				' contains(@class, "dashboard-grid-iterator-head")]/h4[text()='.
+		$query = $this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($name).']/../../..');
 
 		if ($should_exist) {
@@ -191,8 +191,8 @@ class CDashboardElement extends CElement {
 	 */
 	public function deleteWidget($name) {
 		$this->checkIfEditable();
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()
 				->select('Delete')->waitUntilNotVisible();
 
@@ -207,8 +207,8 @@ class CDashboardElement extends CElement {
 	 * @return $this
 	 */
 	public function copyWidget($name) {
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Copy');
 
 		return $this;
@@ -238,8 +238,8 @@ class CDashboardElement extends CElement {
 	public function replaceWidget($name) {
 		$this->checkIfEditable();
 
-		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head") or contains(@class,'.
-				' "dashboard-grid-iterator-head")]/h4[text()="'.$name.
+		$this->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or contains(@class,'.
+				' "dashboard-grid-iterator-header")]/h4[text()="'.$name.
 				'"]/../ul/li/button[@title="Actions"]')->asPopupButton()->one()->select('Paste');
 
 		return $this;
