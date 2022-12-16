@@ -69,12 +69,6 @@ class CControllerProblemView extends CControllerProblem {
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
 			&& $this->validateTags();
 
-		if ($this->hasInput('filter_set') && !$this->hasInput('filter_name')) {
-			error(_s('the parameter "%1$s" is missing', 'filter_name'));
-
-			invalid_url();
-		}
-
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
@@ -90,12 +84,15 @@ class CControllerProblemView extends CControllerProblem {
 		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 
-		if ($this->hasInput('filter_set')) {
-			$profile->setTabFilter(0, $this->cleanInput($this->getInputAll()));
-			$profile->update();
-		}
-		elseif ($this->hasInput('filter_reset')) {
+		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
+		}
+		else {
+			$profile->setInput($this->cleanInput($this->getInputAll()));
+
+			if ($this->hasInput('filter_set')) {
+				$profile->update();
+			}
 		}
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
