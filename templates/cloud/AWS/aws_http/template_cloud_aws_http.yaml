@@ -41,7 +41,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -102,7 +102,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsEC2.params.proxy !== 'undefined' && AwsEC2.params.proxy !== '') {
+                        request.setProxy(AwsEC2.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -237,6 +240,9 @@ zabbix_export:
             -
               name: region
               value: '{$AWS.REGION}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.EC2.INSTANCE.ID}'
@@ -255,7 +261,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -316,7 +322,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsRDS.params.proxy !== 'undefined' && AwsRDS.params.proxy !== '') {
+                        request.setProxy(AwsRDS.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -421,6 +430,9 @@ zabbix_export:
             -
               name: region
               value: '{$AWS.REGION}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.RDS.INSTANCE.ID}'
@@ -436,7 +448,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -497,7 +509,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -635,6 +650,9 @@ zabbix_export:
             -
               name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.S3.NAME}'
@@ -661,6 +679,9 @@ zabbix_export:
           macro: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered EC2 instances by namespace.'
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
