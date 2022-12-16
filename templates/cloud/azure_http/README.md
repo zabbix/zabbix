@@ -111,9 +111,9 @@ For Zabbix version: 6.4 and higher.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -121,22 +121,22 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -193,7 +193,7 @@ There are no template links in this template.
 |Azure |Azure: Network out total |<p>The number of bytes out on all network interfaces by the Virtual Machine(s) (Outgoing Traffic).</p> |DEPENDENT |azure.vm.network.out.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.NetworkOutTotal.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.1333`</p> |
 |Azure |Azure: Available memory |<p>The amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.</p> |DEPENDENT |azure.vm.memory.available<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.AvailableMemoryBytes.average`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -213,9 +213,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -228,9 +231,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -238,8 +241,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
@@ -249,14 +252,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -281,7 +284,7 @@ There are no template links in this template.
 |Azure |Azure MySQL: CPU credits remaining |<p>Remaining CPU credits.</p> |DEPENDENT |azure.db.mysql.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure MySQL: CPU credits consumed |<p>Consumed CPU credits.</p> |DEPENDENT |azure.db.mysql.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -304,9 +307,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -319,9 +325,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -329,8 +335,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
@@ -341,14 +347,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -372,7 +378,7 @@ There are no template links in this template.
 |Azure |Azure MySQL: Server log storage used |<p>The storage space used by a server log expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
 |Azure |Azure MySQL: Server log storage limit |<p>The storage limit of a server log expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -396,9 +402,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -411,9 +420,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -421,8 +430,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
@@ -432,14 +441,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -469,7 +478,7 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Transaction log storage used |<p>The storage space used by a transaction log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.txlogs.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.txlogs_storage_used.average`</p> |
 |Azure |Azure PostgreSQL: Maximum used transaction IDs |<p>The maximum number of used transaction IDs.</p> |DEPENDENT |azure.db.pgsql.txid.used.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.maximum_used_transactionIDs.average`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -492,9 +501,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -507,9 +519,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -517,8 +529,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
@@ -528,14 +540,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -560,7 +572,7 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Server log storage used |<p>The storage space used by a server log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
 |Azure |Azure PostgreSQL: Server log storage limit |<p>The storage limit of a server log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -583,9 +595,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft SQL serverless databases by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -598,9 +613,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -608,8 +623,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
@@ -619,14 +634,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -658,7 +673,7 @@ There are no template links in this template.
 |Azure |Azure Microsoft SQL: App memory percentage |<p>App memory percentage. Applies to serverless databases.</p> |DEPENDENT |azure.db.mssql.app.memory.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.app_memory_percent.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure Microsoft SQL: Data space allocated |<p>Allocated data storage. Not applicable to data warehouses.</p> |DEPENDENT |azure.db.mssql.storage.allocated<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.allocated_data_storage.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -680,9 +695,12 @@ You can also provide feedback, discuss the template, or ask for help at [ZABBIX 
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 This template is designed to monitor Microsoft SQL databases by HTTP.
 It works without any external scripts and uses the script item.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
@@ -695,9 +713,9 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -705,8 +723,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
-|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
+|{$AZURE.APP_ID} |<p>The AppID of Microsoft Azure.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>A response timeout for an API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
@@ -716,14 +734,14 @@ No specific Zabbix configuration is required.
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -756,7 +774,7 @@ There are no template links in this template.
 |Azure |Azure Microsoft SQL: Differential backup storage size |<p>Cumulative differential backup storage size. Applies to vCore-based databases. Not applicable to Hyperscale databases.</p> |DEPENDENT |azure.db.mssql.storage.backup.diff.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.diff_backup_size_bytes.maximum`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Azure |Azure Microsoft SQL: Log backup storage size |<p>Cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.</p> |DEPENDENT |azure.db.mssql.storage.backup.log.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.log_backup_size_bytes.maximum`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -773,4 +791,5 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
 
