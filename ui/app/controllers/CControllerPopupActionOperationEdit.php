@@ -158,7 +158,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		if ($operation['opmessage_grp']) {
 			$user_groups = CArrayHelper::renameObjectsKeys(API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => array_column($operation['opmessage_grp'], 'usrgrpid'),
+				'usrgrpids' => array_column($operation['opmessage_grp'], 'usrgrpid')
 			]), ['usrgrpid' => 'id']);
 
 			CArrayHelper::sort($user_groups, ['name']);
@@ -169,7 +169,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		if ($operation['opmessage_usr']) {
 			$users = CArrayHelper::renameObjectsKeys(API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => array_column($operation['opmessage_usr'], 'userid'),
+				'userids' => array_column($operation['opmessage_usr'], 'userid')
 			]), ['userid' => 'id']);
 
 			$fullnames = [];
