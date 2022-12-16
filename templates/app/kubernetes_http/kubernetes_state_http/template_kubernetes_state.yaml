@@ -64,7 +64,7 @@ zabbix_export:
                 params: {},
 
                 setParams: function (params) {
-                    ['api_token', 'api_url', 'api_server_scheme', 'api_server_port',
+                    ['api_token', 'api_url',
                      'controller_scheme', 'controller_port',
                      'scheduler_scheme', 'scheduler_port'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
@@ -74,6 +74,22 @@ zabbix_export:
                     });
 
                     Kube.params = params;
+
+                    /* This regex can be broken down into the following components
+                     *
+                     * (?:(?<scheme>https?):\/\/)
+                     * (?<host>[^:/]+)
+                     * (?::(?<port>\d+))
+                     */
+                    const match = Kube.params.api_url.match(/(?:(https?):\/\/)([^:/]+)(?::(\d+))/);
+                    if (!match) {
+                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + Kube.params.api_url + '. Expected format: <scheme>://<host>:<port>');
+                        throw 'Cannot get host from Kubernetes API url. Check debug log for more information.';
+                    }
+
+                    Kube.params.api_scheme = match[1];
+                    Kube.params.api_hostname = match[2];
+                    Kube.params.api_port = match[3];
                 },
 
                 apiRequest: function (query) {
@@ -125,13 +141,6 @@ zabbix_export:
 
                 const nodes = Kube.getNodes();
 
-                const match = Kube.params.api_url.match(/\/\/(.+):/);
-                if (!match) {
-                    Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + Kube.params.api_url + '. Expected format: <scheme>://<host>:<port>');
-                    throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                }
-                const api_hostname = match[1];
-
                 const controlPlaneNodes = [];
                 nodes.forEach(function (node) {
                     if ('node-role.kubernetes.io/control-plane' in node.metadata.labels ||
@@ -144,13 +153,13 @@ zabbix_export:
                         controlPlaneNodes.push({
                             '{#NAME}': node.metadata.name,
                             '{#IP}': internalIP,
-                            '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_server_port + '/metrics',
+                            '{#KUBE.API.SERVER.URL}': Kube.params.api_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_port + '/metrics',
                             '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
                             '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.scheduler_port + '/metrics',
                             '{#COMPONENT.API}' : 'API',
                             '{#COMPONENT.CONTROLLER}' : 'Controller manager',
                             '{#COMPONENT.SCHEDULER}' : 'Scheduler',
-                            '{#CLUSTER_HOSTNAME}': api_hostname
+                            '{#CLUSTER_HOSTNAME}': Kube.params.api_hostname
                         });
                     }
                 });
@@ -176,12 +185,6 @@ zabbix_export:
             -
               name: api_url
               value: '{$KUBE.API.URL}'
-            -
-              name: api_server_scheme
-              value: '{$KUBE.API_SERVER.SCHEME}'
-            -
-              name: api_server_port
-              value: '{$KUBE.API_SERVER.PORT}'
             -
               name: controller_scheme
               value: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
@@ -388,6 +391,20 @@ zabbix_export:
                     });
 
                     Kube.params = params;
+
+                    /* This regex can be broken down into the following components
+                     *
+                     * (?:(?<scheme>https?):\/\/)
+                     * (?<host>[^:/]+)
+                     * (?::(?<port>\d+))
+                     */
+                    const match = Kube.params.api_url.match(/(?:(https?):\/\/)([^:/]+)(?::(\d+))/);
+                    if (!match) {
+                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + Kube.params.api_url + '. Expected format: <scheme>://<host>:<port>');
+                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    }
+
+                    Kube.params.api_hostname = match[2];
                 },
 
                 apiRequest: function (query) {
@@ -439,13 +456,6 @@ zabbix_export:
 
                 const nodes = Kube.getNodes();
 
-                const match = Kube.params.api_url.match(/\/\/(.+):/);
-                if (!match) {
-                    Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + Kube.params.api_url + '. Expected format: <scheme>://<host>:<port>');
-                    throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                }
-                const api_hostname = match[1];
-
                 const kubeNodes = [];
                 nodes.forEach(function (node) {
                     var internalIPs = node.status.addresses.filter(function (addr) {
@@ -458,7 +468,7 @@ zabbix_export:
                         '{#IP}': internalIP,
                         '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']')  + ':' + Kube.params.kubelet_port,
                         '{#COMPONENT}': 'Kubelet',
-                        '{#CLUSTER_HOSTNAME}': api_hostname
+                        '{#CLUSTER_HOSTNAME}': Kube.params.api_hostname
                     });
                 });
 
@@ -3947,14 +3957,6 @@ zabbix_export:
           macro: '{$KUBE.API.URL}'
           value: 'https://localhost:6443'
           description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
-        -
-          macro: '{$KUBE.API_SERVER.PORT}'
-          value: '6443'
-          description: 'Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.'
-        -
-          macro: '{$KUBE.API_SERVER.SCHEME}'
-          value: https
-          description: 'Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.'
         -
           macro: '{$KUBE.CONTROLLER_MANAGER.PORT}'
           value: '10252'
