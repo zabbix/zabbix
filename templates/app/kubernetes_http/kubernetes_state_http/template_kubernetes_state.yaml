@@ -75,26 +75,24 @@ zabbix_export:
 
                     Kube.params = params;
                 },
-            
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_url + query;
 
+                apiRequest: function (query) {
+                    const request = new HttpRequest();
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
 
+                    const url = Kube.params.api_url + query;
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-            
-                    response = request.get(url);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
+
+                    var response = request.get(url);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
+                    Zabbix.log(5, response);
+
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
-                    if (response !== null) {
+
+                    if (response) {
                         try {
                             response = JSON.parse(response);
                         }
@@ -102,22 +100,22 @@ zabbix_export:
                             throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
                         }
                     }
-            
+
                     return {
                         status: request.getStatus(),
                         response: response
                     };
                 },
-            
+
                 getNodes: function () {
-                    var result = Kube.request('/api/v1/nodes');
-            
+                    var result = Kube.apiRequest('/api/v1/nodes');
+
                     if (typeof result.response !== 'object'
                         || typeof result.response.items === 'undefined'
                         || result.status != 200) {
                         throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
-                    };
-            
+                    }
+
                     return result.response;
                 },
             };
@@ -394,26 +392,24 @@ zabbix_export:
 
                     Kube.params = params;
                 },
-            
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_url + query;
 
+                apiRequest: function (query) {
+                    const request = new HttpRequest();
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
 
+                    const url = Kube.params.api_url + query;
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-            
-                    response = request.get(url);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
+
+                    var response = request.get(url);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
+                    Zabbix.log(5, response);
+
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
-                    if (response !== null) {
+
+                    if (response) {
                         try {
                             response = JSON.parse(response);
                         }
@@ -421,22 +417,22 @@ zabbix_export:
                             throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
                         }
                     }
-            
+
                     return {
                         status: request.getStatus(),
                         response: response
                     };
                 },
-            
+
                 getNodes: function () {
-                    var result = Kube.request('/api/v1/nodes');
-            
+                    var result = Kube.apiRequest('/api/v1/nodes');
+
                     if (typeof result.response !== 'object'
                         || typeof result.response.items === 'undefined'
                         || result.status != 200) {
                         throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
-                    };
-            
+                    }
+
                     return result.response;
                 },
             };
@@ -582,26 +578,24 @@ zabbix_export:
 
                     Kube.params = params;
                 },
-            
-                apiRequest: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_url + query;
 
+                apiRequest: function (query) {
+                    const request = new HttpRequest();
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
 
+                    const url = Kube.params.api_url + query;
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-            
-                    response = request.get(url);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
+
+                    var response = request.get(url);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
+                    Zabbix.log(5, response);
+
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
-                    if (response !== null) {
+
+                    if (response) {
                         try {
                             response = JSON.parse(response);
                         }
@@ -609,16 +603,16 @@ zabbix_export:
                             throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
                         }
                     }
-            
+
                     return {
                         status: request.getStatus(),
                         response: response
                     };
                 },
-            
+
                 getMetricsEndpointUrl: function () {
                     var result = Kube.apiRequest('/api/v1/endpoints');
-            
+
                     if (typeof result.response !== 'object'
                         || typeof result.response.items === 'undefined'
                         || result.status != 200) {
@@ -661,32 +655,29 @@ zabbix_export:
                 },
 
                 getStateMetrics: function (metricsEndpointUrl) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = metricsEndpointUrl + '/metrics';
-
+                    const request = new HttpRequest();
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
 
+                    const url = metricsEndpointUrl + '/metrics';
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-            
-                    response = request.get(url);
-            
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
+
+                    var response = request.get(url);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
+                    Zabbix.log(5, response);
+
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
+
                     if (response === null) {
                         throw 'failed to get Kubernetes state metrics. Check debug log for more information.';
                     }
-            
+
                     return response;
-            
                 }
             };
-            
+
             try {
                 Kube.setParams(JSON.parse(value));
 
