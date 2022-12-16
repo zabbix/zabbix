@@ -110,7 +110,7 @@
 		const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 		const {readonly, parent_hostid} = <?= json_encode(
 			array_intersect_key($data, array_flip(['readonly', 'parent_hostid'])) + ['parent_hostid' => null]
-		) ?>
+		) ?>;
 
 		window.macros_manager = new HostMacrosManager({readonly, parent_hostid});
 
