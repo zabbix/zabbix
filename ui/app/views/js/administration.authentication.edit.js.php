@@ -45,10 +45,43 @@
 		});
 
 		$form.find('#http_auth_enabled, #ldap_configured, #saml_auth_enabled').on('change', function() {
-			var fields;
+			let fields;
 
 			if ($(this).is('#http_auth_enabled')) {
 				fields = $form.find('[name^=http_]');
+				const http_auth_enabled = document.getElementById('http_auth_enabled');
+
+				if (http_auth_enabled.checked) {
+					overlayDialogue({
+						'title': <?= json_encode(_('Confirm changes')) ?>,
+						'class': 'position-middle',
+						'content': document.createElement('span').innerText = <?= json_encode(
+							_('Enable HTTP authentication for all users.')
+						) ?>,
+						'buttons': [
+							{
+								'title': <?= json_encode(_('Cancel')) ?>,
+								'cancel': true,
+								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+								'action': function() {
+									for (const field of fields) {
+										if (field !== http_auth_enabled) {
+											field.disabled = true;
+										}
+									}
+
+									http_auth_enabled.checked = false;
+									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+								}
+							},
+							{
+								'title': <?= json_encode(_('Ok')) ?>,
+								'focused': true,
+								'action': function() {}
+							}
+						]
+					}, this);
+				}
 			}
 			else if ($(this).is('#ldap_configured')) {
 				fields = $form.find('[name^=ldap_],#bind-password-btn');

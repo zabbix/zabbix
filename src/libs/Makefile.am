@@ -16,6 +16,7 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
+	zbxprof \
 	zbxsys \
 	zbxjson \
 	zbxserver \
@@ -106,6 +107,7 @@ SUBDIRS = \
 	zbxconf \
 	zbxhttp \
 	zbxsysinfo \
+	zbxprof \
 	zbxsys \
 	zbxcommshigh \
 	zbxcomms \

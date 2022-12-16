@@ -1991,6 +1991,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
+		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
 		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
@@ -2123,6 +2124,7 @@ AC_OUTPUT([
 	src/libs/zbxexec/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
+	src/libs/zbxprof/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxipcservice/Makefile
