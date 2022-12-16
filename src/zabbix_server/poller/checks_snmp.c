@@ -485,7 +485,8 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 	return ret;
 }
 
-static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, size_t max_error_len)
+static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, size_t max_error_len,
+		int config_timeout)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -530,7 +531,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 			break;
 	}
 
-	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds */
+	session.timeout = config_timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
 
 #ifdef HAVE_IPV6
@@ -2418,11 +2419,11 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 	return ret;
 }
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type)
+int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout)
 {
 	int	errcode = SUCCEED;
 
-	get_values_snmp(item, result, &errcode, 1, poller_type);
+	get_values_snmp(item, result, &errcode, 1, poller_type, config_timeout);
 
 	return errcode;
 }
@@ -2447,7 +2448,8 @@ static void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type)
+void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, unsigned char poller_type,
+		int config_timeout)
 {
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
@@ -2468,7 +2470,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	if (j == num)	/* all items already NOTSUPPORTED (with invalid key, port or SNMP parameters) */
 		goto out;
 
-	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error))))
+	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout)))
 	{
 		err = NETWORK_ERROR;
 		goto exit;

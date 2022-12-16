@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-29 09:55+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2022-11-30 11:44+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1519,7 +1519,7 @@ msgstr "試行回数"
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "属性"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -4486,7 +4486,7 @@ msgstr "データベース接続設定"
 #: app/views/administration.authentication.edit.php:417
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
-msgstr ""
+msgstr "JITプロビジョニングの設定"
 
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
@@ -6876,7 +6876,7 @@ msgstr "HTTP認証の有効化"
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "JITプロビジョニングの有効化"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6888,7 +6888,7 @@ msgstr "SAML認証の有効化"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "SCIMプロビジョニングの有効化"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -8234,11 +8234,11 @@ msgstr "グループを追加しました"
 
 #: app/views/popup.ldap.edit.php:134
 msgid "Group base DN"
-msgstr ""
+msgstr "グループのbase DN"
 
 #: app/views/popup.ldap.edit.php:122
 msgid "Group configuration"
-msgstr ""
+msgstr "グループ設定"
 
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
@@ -8247,7 +8247,7 @@ msgstr[0] "グループを削除しました"
 
 #: app/views/popup.ldap.edit.php:182
 msgid "Group filter"
-msgstr ""
+msgstr "グループフィルター"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8255,7 +8255,7 @@ msgstr "ディスカバリで発見されたホストのグループ"
 
 #: app/views/popup.ldap.edit.php:156
 msgid "Group member attribute"
-msgstr ""
+msgstr "グループメンバーの属性"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
@@ -8265,7 +8265,7 @@ msgstr "グループ名"
 #: app/views/administration.authentication.edit.php:427
 #: app/views/popup.ldap.edit.php:148
 msgid "Group name attribute"
-msgstr ""
+msgstr "グループ名の属性"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9351,7 +9351,7 @@ msgstr "アクセスできないSLA"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:452
 msgid "Inaccessible action"
-msgstr ""
+msgstr "アクセスできないアクション"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9404,7 +9404,7 @@ msgstr "アクセスできないマップ"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:453
 msgid "Inaccessible media type"
-msgstr ""
+msgstr "アクセスできないメディアタイプ"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -9440,14 +9440,14 @@ msgstr "アクセスできないユーザーグループ"
 
 #: jsLoader.php:147 jsLoader.php:175
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "アクセスできないウィジェット"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:52
 #: app/controllers/CControllerDashboardWidgetEdit.php:65
 #: include/classes/helpers/CDashboardHelper.php:453
 #: include/classes/helpers/CDashboardHelper.php:461
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "アクセスできないウィジェットタイプ"
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
@@ -11381,7 +11381,7 @@ msgstr "LDAP認証が無効です。"
 
 #: app/views/popup.ldap.edit.php:235
 msgid "LDAP group pattern"
-msgstr ""
+msgstr "LDAPグループのパターン"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -12332,7 +12332,7 @@ msgstr "メディアタイプ"
 #: widgets/actionlog/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Media type"
-msgstr ""
+msgstr "メディアタイプ"
 
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
@@ -12366,7 +12366,7 @@ msgstr[0] "メディアタイプを有効にしました"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr ""
+msgstr "メディアタイプのマッピング"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13005,7 +13005,7 @@ msgstr "名"
 
 #: app/views/administration.authentication.edit.php:520
 msgid "Name "
-msgstr ""
+msgstr "名前"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -13149,7 +13149,7 @@ msgstr "新しいホストグループの作成"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr ""
+msgstr "新しいメディアタイプのマッピングの作成"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13182,7 +13182,7 @@ msgstr "新規トリガー"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr ""
+msgstr "新しいユーザーグループのマッピングの作成"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -15422,7 +15422,7 @@ msgstr "指定されたシークレットクエリ文字列\"%1$s\"は正しく�
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
-msgstr ""
+msgstr "プロビジョニングの実行"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
@@ -15434,7 +15434,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
-msgstr ""
+msgstr "プロビジョニング間隔"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
@@ -15769,7 +15769,7 @@ msgstr "長方形"
 
 #: app/views/popup.ldap.edit.php:168
 msgid "Reference attribute"
-msgstr ""
+msgstr "リファレンスの属性"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -16500,11 +16500,11 @@ msgstr "S"
 #: app/views/administration.user.list.php:225
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "SAML"
-msgstr ""
+msgstr "SAML"
 
 #: app/views/administration.authentication.edit.php:483
 msgid "SAML group pattern"
-msgstr ""
+msgstr "SAMLグループのパターン"
 
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
@@ -16993,7 +16993,7 @@ msgstr "検索パターンが空白です"
 #: app/views/reports.actionlog.list.php:108
 #: widgets/actionlog/includes/WidgetForm.php:61
 msgid "Search string"
-msgstr ""
+msgstr "検索文字列"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
@@ -17163,7 +17163,7 @@ msgstr "送信済"
 #: app/controllers/CControllerActionLogList.php:210
 #: widgets/actionlog/includes/WidgetForm.php:56
 msgid "Sent/Executed"
-msgstr ""
+msgstr "送信/実行"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -18889,7 +18889,7 @@ msgstr "このフィールドはアイテム\"%1$s\"によって自動的に設�
 
 #: include/classes/scim/API.php:77
 msgid "This filter is not supported"
-msgstr ""
+msgstr "このフィルターはサポートされていません"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
@@ -19782,7 +19782,7 @@ msgstr "現在のZabbixデータベースのバージョン：%1$sを判断で�
 #: include/classes/helpers/CAuthenticationHelper.php:88
 #: include/classes/helpers/CAuthenticationHelper.php:107
 msgid "Unable to find SAML userdirectory."
-msgstr ""
+msgstr "SAMLユーザーディレクトリが見つかりません。"
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -20300,7 +20300,7 @@ msgstr "ユーザー\"%1$s\"は代わりにレポート\"%2$s\"を作成した�
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr ""
+msgstr "ユーザー\"%1$s\"をプロビジョニングしました。"
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
@@ -20412,11 +20412,11 @@ msgstr "データベース停止メッセージの送信先グループ"
 #: app/views/popup.ldap.edit.php:226
 #: app/views/popup.usergroupmapping.edit.php:126
 msgid "User group mapping"
-msgstr ""
+msgstr "ユーザーグループのマッピング"
 
 #: app/views/popup.ldap.edit.php:196
 msgid "User group membership attribute"
-msgstr ""
+msgstr "ユーザーグループメンバーシップの属性"
 
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
@@ -20456,7 +20456,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 #: app/views/administration.authentication.edit.php:457
 #: app/views/popup.ldap.edit.php:218
 msgid "User last name attribute"
-msgstr ""
+msgstr "ユーザーの姓の属性"
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
@@ -20480,7 +20480,7 @@ msgstr "ユーザー名"
 #: app/views/administration.authentication.edit.php:443
 #: app/views/popup.ldap.edit.php:210
 msgid "User name attribute"
-msgstr ""
+msgstr "ユーザー名の属性"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -22942,7 +22942,7 @@ msgstr "内部イベント"
 
 #: include/classes/validators/CApiInputValidator.php:4155
 msgid "invalid Prometheus label"
-msgstr ""
+msgstr "Prometheusラベルが正しくありません"
 
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
