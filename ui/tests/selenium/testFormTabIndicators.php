@@ -723,7 +723,8 @@ class testFormTabIndicators extends CWebTest {
 		$this->assertTabIndicator($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
-		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
+		foreach (['Operations' => 'operations_0', 'Recovery operations' => 'recovery_operations_0',
+						'Update operations' => 'update_operations_0'] as $operation => $row) {
 			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
 			$operations_overlay = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
 			$operations_overlay->query('xpath://div[@id="operation-message-users"]'.
@@ -731,10 +732,10 @@ class testFormTabIndicators extends CWebTest {
 			$users_overlay = COverlayDialogElement::find()->all()->asForm()->last();
 			$users_overlay->query('id:item_1')->asCheckbox()->one()->check();
 			$users_overlay->submit();
-			$operations_overlay->submit()->waitUntilNotVisible();
+			$operations_overlay->submit();
+			$this->query('xpath://tr[@id="'.$row.'"]')->waitUntilVisible();
 		}
 
-		$dialog->waitUntilReady();
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.
