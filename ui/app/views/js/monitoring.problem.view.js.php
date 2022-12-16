@@ -198,14 +198,11 @@
 			const rows = table.querySelectorAll('.problem-row');
 
 			if (rows.length > 0) {
-				const tds = [...rows].pop().children;
+				const row = [...rows].pop();
+				const btn = row.querySelector('button[data-action="show_symptoms"]');
+				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 
-				[...tds].forEach((td) => {
-					const btn = td.querySelector('button[data-action="show_symptoms"]');
-					const is_collapsed = btn !== null && btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
-
-					td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
-				});
+				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
 		},
 
@@ -238,13 +235,10 @@
 			rows = table.querySelectorAll('.problem-row');
 
 			if (rows.length > 0) {
-				const tds = [...rows].pop().children;
+				const row = [...rows].pop();
+				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 
-				[...tds].forEach((td) => {
-					const is_collapsed = btn !== null && btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
-
-					td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
-				});
+				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
 
 			// When complete enable button again.

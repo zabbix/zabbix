@@ -1568,10 +1568,10 @@ class CScreenProblem extends CScreenBase {
 				}
 				else {
 					// This is a stand-alone symptom event. First column is checkbox, followed by a Symptom icon.
-					$row = new CRow([
+					$row = (new CRow([
 						$checkbox_col,
 						$symptom_col->addClass(ZBX_STYLE_SECOND_COL)
-					]);
+					]))->addClass('problem-row');
 				}
 
 				/*
