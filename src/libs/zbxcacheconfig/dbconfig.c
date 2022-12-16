@@ -12367,7 +12367,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	const ZBX_DC_EXPRESSION	*expression;
@@ -12400,7 +12400,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 				rxp->case_sensitive = expression->case_sensitive;
 				rxp->expression_type = expression->type;
 
-				zbx_vector_ptr_append(expressions, rxp);
+				zbx_vector_expression_append(expressions, rxp);
 			}
 		}
 	}
@@ -12419,7 +12419,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_expression_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
 }

@@ -489,7 +489,8 @@ abstract class CItemGeneral extends CApiService {
 				'SELECT ht.templateid,ht.hostid,h.status'.
 				' FROM hosts_templates ht,hosts h'.
 				' WHERE ht.hostid=h.hostid'.
-					' AND '.dbConditionId('ht.templateid', array_keys($templateids))
+					' AND '.dbConditionId('ht.templateid', array_keys($templateids)).
+					' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
 			);
 
 			$tpl_links = [];

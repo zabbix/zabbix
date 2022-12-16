@@ -21,6 +21,7 @@
 
 namespace SCIM;
 
+use CJsonRpc;
 use Exception;
 use CHttpRequest;
 use CApiClientResponse;
@@ -43,7 +44,10 @@ class API {
 		$input = $this->parseRequestData($request);
 
 		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($class, $action, $input, $request->getAuthBearerValue());
+		$response = $client->callMethod($class, $action, $input, [
+			'type' => CJsonRpc::AUTH_TYPE_HEADER,
+			'auth' => $request->getAuthBearerValue()
+		]);
 
 		if ($response->errorCode !== null) {
 			throw new Exception($response->errorMessage, $response->errorCode);
