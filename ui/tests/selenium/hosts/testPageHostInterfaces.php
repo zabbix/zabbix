@@ -63,7 +63,8 @@ class testPageHostInterfaces extends CWebTest {
 				'details' => [
 					'version' => '3',
 					'bulk' => '1',
-					'securityname' => 'zabbix'
+					'securityname' => 'zabbix',
+					'max_repetitions' => 10
 				],
 				'available' => 1
 			],
@@ -79,7 +80,8 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'securitylevel' => 2,
 					'authprotocol' => 2,
-					'privprotocol' => 4
+					'privprotocol' => 4,
+					'max_repetitions' => 10
 				],
 				'available' => 1
 			],
@@ -93,7 +95,8 @@ class testPageHostInterfaces extends CWebTest {
 				'details' => [
 					'version' => '2',
 					'bulk' => '1',
-					'community' => '{$SNMP_COMMUNITY}'
+					'community' => '{$SNMP_COMMUNITY}',
+					'max_repetitions' => 10
 				],
 				'available' => 2
 			],

@@ -230,37 +230,46 @@ class CMenuHelper {
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)
 							? (new CMenuItem(_('Trigger actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
-									'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
+									'action.list?eventsource='.EVENT_SOURCE_TRIGGERS
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)
 							? (new CMenuItem(_('Service actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
-									'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+									'action.list?eventsource='.EVENT_SOURCE_SERVICE
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS)
 							? (new CMenuItem(_('Discovery actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
-									'actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_DISCOVERY),
+									'action.list?eventsource='.EVENT_SOURCE_DISCOVERY
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS)
 							? (new CMenuItem(_('Autoregistration actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
 										->setArgument('eventsource', EVENT_SOURCE_AUTOREGISTRATION),
-										'actionconf.php?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
+									'action.list?eventsource='.EVENT_SOURCE_AUTOREGISTRATION
 								)
 							: null,
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS)
 							? (new CMenuItem(_('Internal actions')))
 								->setUrl(
-									(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
-									'actionconf.php?eventsource='.EVENT_SOURCE_INTERNAL
+									(new CUrl('zabbix.php'))
+										->setArgument('action', 'action.list')
+										->setArgument('eventsource', EVENT_SOURCE_INTERNAL),
+									'action.list?eventsource='.EVENT_SOURCE_INTERNAL
 								)
 							: null
 					])))
