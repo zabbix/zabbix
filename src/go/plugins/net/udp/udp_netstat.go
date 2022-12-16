@@ -24,11 +24,11 @@ package udp
 
 import (
 	"errors"
-	"os"
 	"net"
+	"os"
 	"strconv"
 
-	"github.com/cakturk/go-netstat/netstat"
+	"github.com/sokurenko/go-netstat/netstat"
 )
 
 // exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
