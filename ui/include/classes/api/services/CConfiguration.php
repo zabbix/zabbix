@@ -399,19 +399,24 @@ class CConfiguration extends CApiService {
 					break;
 
 				case 'templates':
-					$templates_to_export = API::Template()->get([
-						'output' => ['templateid'],
+
+					$options = [
+						'output' => ['templateid', 'uuid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
 							'host' => $data['template']
 						],
-						'selectParentTemplates' => ['templateid', 'name'],
 						'preservekeys' => true,
 						'searchByAny' => true
-					]);
+					];
 
-					$imported_ids['templates'] = array_keys($templates_to_export);
+					if ($params['rules']['templateLinkage']['deleteMissing']) {
+						$options['selectParentTemplates'] = ['templateid', 'name'];
+					}
 
+					$db_templates = API::Template()->get($options);
+
+					$imported_ids['templates'] = array_keys($db_templates);
 					break;
 
 				default:
@@ -421,21 +426,36 @@ class CConfiguration extends CApiService {
 
 		$unlink_templates_data = [];
 
-		foreach ($templates_to_export as $child_template) {
-			$parent_template_names = array_column($child_template['parentTemplates'], 'name', 'templateid');
+		if ($params['rules']['templateLinkage']['deleteMissing']) {
+			$import_tmp_parent_tmp_names = [];
 
-			foreach ($import['templates'] as $import_template) {
-				$import_tmp_parent_tmp_names = array_key_exists('templates', $import_template)
-					? array_column($import_template['templates'], 'name')
-					: [];
+			foreach ($import['templates'] as $template) {
+				if (array_key_exists('templates', $template)) {
+					$parent_tmp = array_column($template['templates'], 'name');
 
-				$unlink_templateids = array_diff($parent_template_names, $import_tmp_parent_tmp_names);
+					$import_tmp_parent_tmp_names[$template['name']] = $parent_tmp;
+					$import_tmp_parent_tmp_names[$template['uuid']] = $parent_tmp;
+				}
+				else {
+					$import_tmp_parent_tmp_names[$template['name']] = [];
+					$import_tmp_parent_tmp_names[$template['uuid']] = [];
+				}
+			}
 
-				if ($unlink_templateids) {
-					$unlink_templates_data[$child_template['templateid']] = [
-						'templateid' => $child_template['templateid'],
-						'unlink_templateids' => array_keys($unlink_templateids)
-					];
+			foreach ($db_templates as $db_template) {
+				$db_parent_tmp_names = array_column($db_template['parentTemplates'], 'name', 'templateid');
+
+				if ($db_parent_tmp_names) {
+					$unlink_templateids = array_key_exists($db_template['uuid'], $import_tmp_parent_tmp_names)
+						? array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['uuid']])
+						: array_diff($db_parent_tmp_names, $import_tmp_parent_tmp_names[$db_template['name']]);
+
+					if ($unlink_templateids) {
+						$unlink_templates_data[$db_template['templateid']] = [
+							'templateid' => $db_template['templateid'],
+							'unlink_templateids' => array_keys($unlink_templateids)
+						];
+					}
 				}
 			}
 		}
