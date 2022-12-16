@@ -1,6 +1,13 @@
 Changes for 6.4.0rc1
 
 New features:
+..F....... [ZBXNEXT-7835] added modal form for actions in Alerts->Actions (esekace)
+A.F....PS. [ZBXNEXT-4428] optimized SNMP discovery and data collection, added GetBulk support (dgoloscapov, rlataria, wiper)
+.........T [ZBXNEXT-7889] moved to vfs.fs.get key in the filesystem discovery for Zabbix agent based templates (atocko)
+..F....... [ZBXNEXT-7963] added hint box for "Enable HTTP authentication"; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
+.......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
+...G...... [ZBXNEXT-2580] implemented new agent and agent2 key system.sw.packages.get (dimir)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 A......... [ZBXNEXT-8085] removed deprecated property "alias" in user.get, user.create, user.update methods and "user" in user.login (kkuzmina)
 .........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
@@ -8,6 +15,19 @@ A......... [ZBXNEXT-8085] removed deprecated property "alias" in user.get, user.
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+A......... [ZBX-22016] fixed host.get API method not returning any results for hosts with no interfaces when filtering by "hostid" (Ivo)
+.........T [ZBX-21985] fixed lld rules in AWS by HTTP template (abakaldin)
+.......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
+A......... [ZBX-22005] fixed inability to update the template with dependent item prototypes using the configuration.import when the template is linked to some host prototype (rdetlavs)
+..F....... [ZBX-22013] fixed incorrect possibility to change password for guest user (epulke)
+...G...... [ZBX-21300] fixed high CPU usage when using net.tcp.socket.count key on Windows (vso)
+..F....... [ZBX-21904] fixed possibility to add value mappings from templates in mass update form (agriscenko)
+........S. [ZBX-21793] fixed error message for "diaginfo" runtime command (asitals)
+A......... [ZBX-22042] fixed inability to get the existing group prototypes by hostprototype.get API method when using Oracle database (vmaksimovs)
+....I..... [ZBX-21221] enlarged character limit of task_result.info (dgoloscapov)
+...G...... [ZBX-21696] fixed windows Agent 2 unicode path support for log* items (MVekslers)
+.......PS. [ZBX-21872] fixed VMware HV missing multipath data for some datastores (MVekslers)
+...G...... [ZBX-21903] fixed Agent 2 timeout behavior for net.tcp.port item (MVekslers)
 .........T [ZBX-21039] fixed readme in PostgreSQL by Zabbix agent 2 template (atocko)
 ........S. [ZBX-21922] fixed expression macros to use corresponding item keys (asestakovs)
 ..F....... [ZBX-21806] fixed fatal PHP error in case incorrect variable type for controller action is given (Ivo)
