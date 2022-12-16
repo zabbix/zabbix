@@ -45,13 +45,15 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type)
  * Purpose: register callback to add information to main element              *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
+ *             arg              - [IN] additional argument passed to calback  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
+void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg)
 {
 	zbx_stats_ext_func_entry_t	*entry;
 
 	entry = (zbx_stats_ext_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_func_entry_t));
+	entry->arg = arg;
 	entry->stats_ext_get_cb = stats_ext_get_cb;
 
 	zbx_vector_stats_ext_func_append(&stats_ext_funcs, entry);
@@ -62,13 +64,15 @@ void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_c
  * Purpose: register callback to add information to data subelement           *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
+ *             arg              - [IN] additional argument passed to calback  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb)
+void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg)
 {
 	zbx_stats_ext_func_entry_t	*entry;
 
 	entry = (zbx_stats_ext_func_entry_t *)zbx_malloc(NULL, sizeof(zbx_stats_ext_func_entry_t));
+	entry->arg = arg;
 	entry->stats_ext_get_cb = stats_ext_get_cb;
 
 	zbx_vector_stats_ext_func_append(&stats_data_funcs, entry);
@@ -79,13 +83,10 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
  * Parameters: json                - [OUT] resulting json structure           *
- *             config_comms        - [IN] Zabbix server/proxy configuration   *
- *                        for communication                                   *
  *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 {
 	int			i;
 	zbx_config_cache_info_t	count_stats;
@@ -115,7 +116,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_data_funcs.values_num; i++)
 	{
-		stats_data_funcs.values[i]->stats_ext_get_cb(json, config_comms);
+		stats_data_funcs.values[i]->stats_ext_get_cb(json, stats_data_funcs.values[i]->arg);
 	}
 
 	/* zabbix[rcache,<cache>,<mode>] */
@@ -178,7 +179,7 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 
 	for (i = 0; i < stats_ext_funcs.values_num; i++)
 	{
-		stats_ext_funcs.values[i]->stats_ext_get_cb(json, config_comms);
+		stats_ext_funcs.values[i]->stats_ext_get_cb(json, stats_ext_funcs.values[i]->arg);
 	}
 
 	/* zabbix[process,<type>,<mode>,<state>] */

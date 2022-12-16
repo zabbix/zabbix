@@ -928,7 +928,7 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-		zbx_zabbix_stats_get(&json, config_comms, config_startup_time);
+		zbx_zabbix_stats_get(&json, config_startup_time);
 
 		zbx_json_close(&json);
 	}

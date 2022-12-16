@@ -567,7 +567,7 @@ void	zbx_vmware_unlock(void);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 char	*zbx_vmware_get_vm_resourcepool_path(zbx_vector_vmware_resourcepool_t *rp, char *id);
 
-void zbx_vmware_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *config_comms);
+void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

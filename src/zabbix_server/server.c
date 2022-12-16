@@ -2002,9 +2002,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_register_stats_data_func(zbx_preproc_stats_ext_get);
-	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get);
-	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get);
+	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
+	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
+	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)

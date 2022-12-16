@@ -771,7 +771,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_zabbix_stats_get(&json, config_comms, config_startup_time);
+				zbx_zabbix_stats_get(&json, config_startup_time);
 
 				zbx_json_close(&json);
 
