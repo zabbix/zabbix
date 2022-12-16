@@ -57,7 +57,7 @@
 static int	proc_argv(pid_t pid, char ***argv, size_t *argv_alloc, int *argc)
 {
 	size_t	sz;
-	int	mib[4];
+	int	mib[4], nargv = 0;
 
 	if (NULL == *argv)
 	{
@@ -82,11 +82,10 @@ retry:
 		return FAIL;
 	}
 
-	mib[3] = KERN_PROC_NARGV;
+	while (NULL != (*argv)[nargv])
+		nargv++;
 
-	sz = sizeof(int);
-	if (0 != sysctl(mib, 4, argc, &sz, NULL, 0))
-		return FAIL;
+	*argc = nargv;
 
 	return SUCCEED;
 }

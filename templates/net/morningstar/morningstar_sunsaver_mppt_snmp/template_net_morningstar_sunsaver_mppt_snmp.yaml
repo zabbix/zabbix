@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-16T02:55:50Z'
+  date: '2022-10-27T12:58:40Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: f1336fd88ab0415a9c02892a71e50032
-      template: 'Morningstar SunSaver MPPT SNMP'
-      name: 'Morningstar SunSaver MPPT SNMP'
+      template: 'Morningstar SunSaver MPPT by SNMP'
+      name: 'Morningstar SunSaver MPPT by SNMP'
       description: |
         MIBs used:
         SUNSAVER-MPPT
@@ -231,7 +231,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0362139c66f4464db8c022b9ffce5502
-              expression: 'last(/Morningstar SunSaver MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+              expression: 'last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               name: 'Battery: Device charge in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -241,14 +241,14 @@ zabbix_export:
                   value: notice
             -
               uuid: d5439cee53b148ecb4186286c4e93ada
-              expression: 'last(/Morningstar SunSaver MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
+              expression: 'last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
               name: 'Battery: Device charge in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Battery: Device charge in critical state'
-                  expression: 'last(/Morningstar SunSaver MPPT SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+                  expression: 'last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
               tags:
                 -
                   tag: scope
@@ -382,7 +382,7 @@ zabbix_export:
           triggers:
             -
               uuid: bbd3a89b012a40daa646ec7113d43e43
-              expression: 'last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              expression: 'last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
               name: 'Load: Device load in critical state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -392,14 +392,14 @@ zabbix_export:
                   value: notice
             -
               uuid: 8f6967c1b577431c995a3c13f8cdb1c1
-              expression: 'last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
+              expression: 'last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
               name: 'Load: Device load in warning state'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Load: Device load in critical state'
-                  expression: 'last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+                  expression: 'last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
               tags:
                 -
                   tag: scope
@@ -494,7 +494,7 @@ zabbix_export:
           triggers:
             -
               uuid: 86220f6cc9164490b6d80be4a249e749
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
               name: 'Status: Device has "currentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -504,7 +504,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 69016ea6a1204435b3ddb8de6b8944dc
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2'
               name: 'Status: Device has "currentOffset" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -514,7 +514,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 2c02465ea74e4c63ab783d235c8f1a30
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
               name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -524,7 +524,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 1aa289c68f0b4b44a043281e6df9e462
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
               name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -534,7 +534,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 6d0ce7d6e2cc407ba0f4d989bdd9a141
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","highVaCurrentLimit")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","highVaCurrentLimit")=2'
               name: 'Status: Device has "highVaCurrentLimit" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -544,7 +544,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 718a3426363040e1ab82864635444056
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2'
               name: 'Status: Device has "mosfetSOpen" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -554,7 +554,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 4eb4df0b4cf04a198190312cdb33538f
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2'
               name: 'Status: Device has "p12VoltageReferenceOff" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -564,7 +564,7 @@ zabbix_export:
                   value: notice
             -
               uuid: e2ac890bb16d4e0798b0410f33c8a860
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
               name: 'Status: Device has "rtsDisconnected" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -574,7 +574,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 3b02b27bd4674ae3b820730cee8e611a
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2'
               name: 'Status: Device has "rtsMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -584,7 +584,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d253c037d5974ee38e888162687b96ef
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -594,7 +594,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 1bea0c0e01314dbaa1cfdfa5a0625755
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","sspptHot")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","sspptHot")=2'
               name: 'Status: Device has "sspptHot" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -604,7 +604,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d28d0e51500a45859ccb6969d9b5493f
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2'
               name: 'Status: Device has "systemMiswire" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -614,7 +614,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 427f75a98d4440a38e40522bccec03bb
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
               name: 'Status: Device has "uncalibrated" alarm flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -673,7 +673,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2d8b0bdeb95c49d68771af384d985311
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
               name: 'Status: Device has "arrayHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -683,7 +683,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 2e07c5d51691462ca0961d77ea974bd5
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
               name: 'Status: Device has "batteryHvd" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -693,7 +693,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 65d2cd1ff93f45db9d7f572ee0a8f568
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -703,7 +703,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fe217d10399044d7b1008f0010691e1e
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
               name: 'Status: Device has "localTempSensorDamaged" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -713,7 +713,7 @@ zabbix_export:
                   value: notice
             -
               uuid: fa62f9e4f0f84e278938ba18785a1b5f
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
               name: 'Status: Device has "mosfetSShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -723,7 +723,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 6f450621a12e46369745b2a0fed018ac
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -733,7 +733,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 7ea38daa41a94ab3a9c1efc34276b17b
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
               name: 'Status: Device has "rtsNoLongerValid" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -743,7 +743,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 91edc885c3f140cc85bb6085f06e6820
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
               name: 'Status: Device has "rtsShorted" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -753,7 +753,7 @@ zabbix_export:
                   value: notice
             -
               uuid: cae74543a0da478d80b9302a2431fe4b
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.array_faults[arrayFaults.0],#3,"like","softwareFault")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","softwareFault")=2'
               name: 'Status: Device has "softwareFault" array faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -835,7 +835,7 @@ zabbix_export:
           triggers:
             -
               uuid: d086fbb093344723a4bb5fe928e984ff
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
               name: 'Status: Device has "customSettingsEdit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -845,7 +845,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 5743ed062a954330928092fb8574002a
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
               name: 'Status: Device has "externalShortCircuit" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -855,7 +855,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 354a1512bca5468585a489dd14fc793d
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
               name: 'Status: Device has "highTempDisconnect" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -865,7 +865,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 3640e470580846ac9e1651cba186d0a3
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
               name: 'Status: Device has "loadHvd" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -875,7 +875,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d3911d64792e4b88b31cb51a405a1a2e
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
               name: 'Status: Device has "mosfetShorted" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -885,7 +885,7 @@ zabbix_export:
                   value: notice
             -
               uuid: d1bfa4177c0844ec9fc2bc7270c09338
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
               name: 'Status: Device has "overcurrent" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -895,7 +895,7 @@ zabbix_export:
                   value: notice
             -
               uuid: baaba919b58546f08cdcd1e2791feb27
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
               name: 'Status: Device has "software" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -905,7 +905,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 41e47074c983421a83b1e500d4591188
-              expression: 'count(/Morningstar SunSaver MPPT SNMP/status.load_faults[loadFaults.0],#3,"like","unknownLoadFault")=2'
+              expression: 'count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","unknownLoadFault")=2'
               name: 'Status: Device has "unknownLoadFault" load faults flag'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -934,7 +934,7 @@ zabbix_export:
           triggers:
             -
               uuid: 72e6e08faed647a98a027bd25b6a7106
-              expression: 'nodata(/Morningstar SunSaver MPPT SNMP/status.net.uptime,5m)=1'
+              expression: 'nodata(/Morningstar SunSaver MPPT by SNMP/status.net.uptime,5m)=1'
               name: 'Status: Failed to fetch data'
               event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
@@ -1017,7 +1017,7 @@ zabbix_export:
           triggers:
             -
               uuid: cc121c44be05440a82d3344c530456e5
-              expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              expression: 'min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               name: 'Temperature: Critically high battery temperature'
               event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1028,7 +1028,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 9e0d552b93ae402d98c327420c99d160
-              expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              expression: 'max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               name: 'Temperature: Critically low battery temperature'
               event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1039,7 +1039,7 @@ zabbix_export:
                   value: notice
             -
               uuid: 95b600e280b94949b41422eb60def010
-              expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
+              expression: 'min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
               name: 'Temperature: High battery temperature'
               event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1047,14 +1047,14 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Temperature: Critically high battery temperature'
-                  expression: 'min(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+                  expression: 'min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
               tags:
                 -
                   tag: scope
                   value: notice
             -
               uuid: e351922a0a8c4c53972d9477d47af528
-              expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
+              expression: 'max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
               name: 'Temperature: Low battery temperature'
               event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1062,7 +1062,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Temperature: Critically low battery temperature'
-                  expression: 'max(/Morningstar SunSaver MPPT SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+                  expression: 'max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
               tags:
                 -
                   tag: scope
@@ -1126,7 +1126,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bf4ad2cee8cf41baafa3d81df5fbe4d3
-                  expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  expression: 'min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   name: 'Battery: Critically high battery voltage'
                   event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1137,7 +1137,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 2aedfef9b8764881a4768e6b32793820
-                  expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  expression: 'max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   name: 'Battery: Critically low battery voltage'
                   event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1148,7 +1148,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: bec4c7a6a1ab44a4adc8e4286b9a41d9
-                  expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  expression: 'min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
                   name: 'Battery: High battery voltage'
                   event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1156,14 +1156,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery: Critically high battery voltage'
-                      expression: 'min(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                      expression: 'min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
                   tags:
                     -
                       tag: scope
                       value: capacity
                 -
                   uuid: c06425d8a0a24b5f80fd0591be61b3f0
-                  expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  expression: 'max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
                   name: 'Battery: Low battery voltage'
                   event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1171,7 +1171,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Battery: Critically low battery voltage'
-                      expression: 'max(/Morningstar SunSaver MPPT SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                      expression: 'max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1185,14 +1185,14 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Morningstar SunSaver MPPT SNMP'
+                    host: 'Morningstar SunSaver MPPT by SNMP'
                     key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: 2774A4
                   item:
-                    host: 'Morningstar SunSaver MPPT SNMP'
+                    host: 'Morningstar SunSaver MPPT by SNMP'
                     key: 'load.voltage[loadVoltage.0]'
           master_item:
             key: 'battery.voltage.discovery[batteryVoltage.0]'
@@ -1348,7 +1348,7 @@ zabbix_export:
   triggers:
     -
       uuid: fd5dcb256d4547da9c432c1b9c01b0ae
-      expression: '(last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT SNMP/status.net.uptime)<10m)'
+      expression: '(last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)<10m)'
       name: 'Status: Device has been restarted'
       event_name: 'Status: Device has been restarted (uptime < 10m)'
       priority: INFO
@@ -1367,21 +1367,21 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'array.sweep_vmp[arrayVmp.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'array.sweep_voc[arrayVoc.0]'
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'array.voltage[arrayVoltage.0]'
     -
       uuid: ad5b73c7352747a6930c9d8647f70bf1
@@ -1391,14 +1391,14 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'charge.current[chargeCurrent.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'load.current[loadCurrent.0]'
     -
       uuid: 7b96265600a748728d881f5dfee485d2
@@ -1408,19 +1408,19 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'temp.ambient[ambientTemperature.0]'
         -
           sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 2774A4
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'temp.battery[batteryTemperature.0]'
         -
           sortorder: '2'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
-            host: 'Morningstar SunSaver MPPT SNMP'
+            host: 'Morningstar SunSaver MPPT by SNMP'
             key: 'temp.heatsink[heatsinkTemperature.0]'

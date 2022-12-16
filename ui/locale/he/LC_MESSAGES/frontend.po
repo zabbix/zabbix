@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-03 20:13+0000\n"
+"PO-Revision-Date: 2022-10-27 12:50+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -3709,6 +3709,10 @@ msgstr "סגירת מרכיב הביטויים"
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "סגירת אירוע חדש"
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -12901,12 +12905,12 @@ msgstr "כלום"
 
 #: report4.php:24
 msgid "Notification report"
-msgstr "דוח התרעות"
+msgstr "דוח התראות"
 
 #: include/classes/helpers/CMenuHelper.php:154
 #: include/classes/helpers/CRoleHelper.php:389 report4.php:64
 msgid "Notifications"
-msgstr "התרעות"
+msgstr "התראות"
 
 #: actionconf.php:87 include/views/configuration.action.edit.php:479
 msgid "Notify about canceled escalations"
@@ -12915,7 +12919,7 @@ msgstr "להודיע על הסלמות מבוטלות"
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
-msgstr "לשלוח התרעות לכל המעורבים"
+msgstr "לשלוח התראות לכל המעורבים"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -13285,7 +13289,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -17685,6 +17689,16 @@ msgstr "החודש הזה עד כה"
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות ההיסטוריה מכילות חלקים דחוסים."
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות המגמות מכילות חלקים דחוסים."
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109

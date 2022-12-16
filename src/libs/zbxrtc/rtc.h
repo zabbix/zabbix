@@ -25,8 +25,8 @@
 
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
-int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		char **error);
+int	zbx_rtc_parse_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
+		int *scope, char **error);
 
 int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error);
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);

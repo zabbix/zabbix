@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-22T14:09:56Z'
+  date: '2022-10-24T16:52:02Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'AIX by Zabbix agent'
       name: 'AIX by Zabbix agent'
       description: |
-        Official AIX template. Requires agent of Zabbix 4.0.0 or newer.
+        It is an official AIX template. It requires Zabbix agent 4.0 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -42,7 +42,7 @@ zabbix_export:
           name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -71,7 +71,7 @@ zabbix_export:
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
-          description: 'Number of processes in running state.'
+          description: 'The number of processes in a running state.'
           tags:
             -
               tag: component
@@ -94,7 +94,7 @@ zabbix_export:
           name: 'Number of processes'
           key: 'proc.num[]'
           history: 1w
-          description: 'Total number of processes in any state.'
+          description: 'The total number of processes in any state.'
           tags:
             -
               tag: component
@@ -133,7 +133,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg1]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -154,7 +154,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg5]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -165,7 +165,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg15]'
           history: 1w
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -193,7 +193,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'System host name.'
+          description: 'A host name of the system.'
           inventory_link: NAME
           preprocessing:
             -
@@ -316,7 +316,7 @@ zabbix_export:
               expression: 'avg(/AIX by Zabbix agent/system.stat[cpu,wa],5m)>20'
               name: 'Disk I/O is overloaded'
               priority: WARNING
-              description: 'OS spends significant time waiting for I/O (input/output) operations. It could be indicator of performance issues with storage system.'
+              description: 'The OS spends significant time waiting for the I/O (input/output) operations. It could be an indicator of performance issues with the storage system.'
               tags:
                 -
                   tag: scope
@@ -489,7 +489,7 @@ zabbix_export:
           history: 1w
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by ''uname -a''.'
+          description: 'The information as normally returned by the ''uname -a''.'
           inventory_link: OS
           preprocessing:
             -
@@ -536,7 +536,7 @@ zabbix_export:
           name: 'Number of logged in users'
           key: system.users.num
           history: 1w
-          description: 'Number of users who are currently logged in.'
+          description: 'The number of users who are currently logged in.'
           tags:
             -
               tag: component
@@ -545,10 +545,15 @@ zabbix_export:
           uuid: 4771d6d33c2247d6843198152a7065a8
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 1w
           trends: '0'
           value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             -
               tag: component
@@ -569,7 +574,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 1w
           units: B
-          description: 'Available memory is defined as free+cached+buffers memory.'
+          description: 'The available memory is defined as free+cached+buffers memory.'
           tags:
             -
               tag: component
@@ -604,7 +609,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring agent availability status'
+          description: 'Monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -618,7 +623,7 @@ zabbix_export:
               name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive checks only the availability of the agent(s) and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
               manual_close: 'YES'
               tags:
                 -
@@ -636,7 +641,7 @@ zabbix_export:
                 macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
                 formulaid: A
-          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          description: 'The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".'
           item_prototypes:
             -
               uuid: df9710a48eaa4a72911de3971b37c596
@@ -709,7 +714,7 @@ zabbix_export:
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          description: 'The discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
           item_prototypes:
             -
               uuid: ee5ae5de6f7b40b4a9b064bdc733de91
@@ -832,7 +837,7 @@ zabbix_export:
         -
           macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+          description: 'The timeout after which agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
       dashboards:
         -
           uuid: 873e38e16ef94f2b9b743a3251db0fbb
@@ -853,8 +858,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'AIX by Zabbix agent'
                         name: 'CPU load'
+                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -869,8 +874,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'AIX by Zabbix agent'
                         name: 'CPU jumps'
+                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -885,8 +890,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'AIX by Zabbix agent'
                         name: 'CPU utilization'
+                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -902,8 +907,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'AIX by Zabbix agent'
                         name: 'Memory usage'
+                        host: 'AIX by Zabbix agent'
       valuemaps:
         -
           uuid: 4a25a6b3d6e4482ab2a748c79cb55524

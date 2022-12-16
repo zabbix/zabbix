@@ -297,10 +297,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and h.status in (%d,%d)"
+							" and h.flags<>%d"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
 						" order by h.hostid",
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						DBsql_id_cmp(proxy_hostid), dhostid);
 
 				if (NULL != (row2 = DBfetch(result2)))
