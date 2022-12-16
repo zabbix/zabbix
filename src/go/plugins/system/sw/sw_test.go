@@ -23,8 +23,8 @@
 package sw
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 var testData = map[string]map[string]string{
