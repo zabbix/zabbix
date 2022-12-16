@@ -2005,12 +2005,12 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value, const char *pattern,
+static int	zbx_match_log_rec(const zbx_vector_expression_t *regexps, const char *value, const char *pattern,
 		const char *output_template, char **output, char **err_msg)
 {
 	int	ret;
 
-	if (FAIL == (ret = regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
+	if (FAIL == (ret = zbx_regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
 		*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
 
 	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or FAIL */
@@ -2022,12 +2022,12 @@ static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value,
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
-		const int *mtime, int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
-		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
-		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
-		char **err_msg)
+		const int *mtime, int *big_rec, const char *encoding, zbx_vector_expression_t *regexps,
+		const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2386,7 +2386,7 @@ out:
  *                       encodings.                                           *
  *                       "" (empty string) means a single-byte character set  *
  *                       (e.g. ASCII).                                        *
- *     regexps         - [IN] array of regexps                                *
+ *     regexps         - [IN] vector of regexps                               *
  *     pattern         - [IN] pattern to match                                *
  *     output_template - [IN] output formatting template                      *
  *     p_count         - [IN/OUT] limit of records to be processed            *
@@ -2419,11 +2419,12 @@ out:
  ******************************************************************************/
 static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
-		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
-		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **err_msg)
+		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
+		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
+		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
+		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
+		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -3287,10 +3288,10 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
-		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
-		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
+		zbx_vector_expression_t *regexps, const char *pattern, const char *output_template, int *p_count,
+		int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
+		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, int *jumped, float max_delay,
+		double *start_time, zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
 {
@@ -3835,7 +3836,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *zbx_config_tls, int config_timeout)

@@ -155,6 +155,7 @@ int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);

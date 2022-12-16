@@ -284,7 +284,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		}
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{

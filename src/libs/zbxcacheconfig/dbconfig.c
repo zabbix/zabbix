@@ -343,6 +343,15 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 	if (ITEM_TYPE_SNMP == type)
 	{
 		ZBX_DC_SNMPINTERFACE	*snmp;
+		ZBX_DC_SNMPITEM		*snmpitem;
+
+		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
+		{
+			if (0 == strncmp(snmpitem->snmp_oid, "snmp.walk[", 10))
+			{
+				return itemid;
+			}
+		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
 				|| SNMP_BULK_ENABLED != snmp->bulk)
@@ -2063,6 +2072,7 @@ static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, con
 	ZBX_STR2UCHAR(snmp->authprotocol, row[19]);
 	ZBX_STR2UCHAR(snmp->privprotocol, row[20]);
 	dc_strpool_replace(found, &snmp->contextname, row[21]);
+	ZBX_STR2UCHAR(snmp->max_repetitions, row[22]);
 
 	return snmp;
 }
@@ -8551,6 +8561,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = snmp->privprotocol;
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
+				dst_item->snmp_max_repetitions = snmp->max_repetitions;
 			}
 			else
 			{
@@ -8564,6 +8575,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->snmpv3_privprotocol = 0;
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+				dst_item->snmp_max_repetitions = 0;
 			}
 
 			dst_item->snmp_community = NULL;
@@ -12355,7 +12367,7 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	const ZBX_DC_EXPRESSION	*expression;
@@ -12388,7 +12400,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 				rxp->case_sensitive = expression->case_sensitive;
 				rxp->expression_type = expression->type;
 
-				zbx_vector_ptr_append(expressions, rxp);
+				zbx_vector_expression_append(expressions, rxp);
 			}
 		}
 	}
@@ -12407,7 +12419,7 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_expression_t *expressions, const char *name)
 {
 	DCget_expressions_by_names(expressions, &name, 1);
 }
