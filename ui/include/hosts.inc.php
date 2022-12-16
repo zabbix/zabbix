@@ -828,10 +828,20 @@ function addInheritedMacros(array &$macros, array $templateids = null, ?string $
 	foreach ($inherited_macros as $inherited_macro) {
 		$inherited_level = key(array_intersect_key($inherit_order, $inherited_macro));
 
-		$macros[] = [
+		$macro = [
 			'inherited_type' => ZBX_PROPERTY_INHERITED,
 			'inherited_level' => $inherited_level
-		] + $inherited_macro[$inherited_level] + $inherited_macro;
+		];
+
+		$ignored_fields = ['hostmacroid'];
+
+		if ($inherited_macro[$inherited_level]['type'] == ZBX_MACRO_TYPE_SECRET) {
+			$ignored_fields[] = 'value';
+		}
+
+		$macro += array_diff_key($inherited_macro[$inherited_level], array_flip($ignored_fields));
+
+		$macros[] = $macro + $inherited_macro;
 	}
 }
 
