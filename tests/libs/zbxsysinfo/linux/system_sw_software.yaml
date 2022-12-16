@@ -1,0 +1,155 @@
+---
+test case: '#1 get full os info'
+in:
+  type: os
+  key: 'system.sw.os[full]'
+  proc_version: 'file with full os info   '
+out:
+  value: 'file with full os info'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#2 get full os info'
+in:
+  type: os
+  key: 'system.sw.os[full]'
+  proc_version: ''
+out:
+  value: ''
+  return: 'SYSINFO_RET_FAIL'
+---
+test case: '#1 get short os info'
+in:
+  type: os
+  key: 'system.sw.os[short]'
+  proc_version_sign: 'file with short os info   '
+out:
+  value: 'file with short os info'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#2 get short os info'
+in:
+  type: os
+  key: 'system.sw.os[short]'
+  proc_version_sign: ''
+out:
+  value: ''
+  return: 'SYSINFO_RET_FAIL'
+---
+test case: '#1 get name of the os'
+in:
+  type: os
+  key: 'system.sw.os[name]'
+  os_release: |
+    FIELD1=123
+    FIELD2="123"
+    PRETTY_NAME="Linux123 v234"
+    FIELD3="123 123"
+out:
+  value: 'Linux123 v234'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#2 get name of the os'
+in:
+  type: os
+  key: 'system.sw.os[name]'
+  os_release: |
+    FIELD1=123
+    FIELD2="123"
+    PRETTY_NAME=Linux123
+    FIELD3="123 123"
+out:
+  value: 'Linux123'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#3 get name of the os'
+in:
+  type: os
+  key: 'system.sw.os[name]'
+  issue_net: ''
+  os_release: |
+    FIELD1=123
+    FIELD2="123"
+    PRETTY_NAME=Linux123 v234
+    FIELD3="123 123"
+out:
+  value: ''
+  return: 'SYSINFO_RET_FAIL'
+---
+test case: '#4 get name of the os'
+in:
+  type: os
+  key: 'system.sw.os[name]'
+  issue_net: 'something in issue.net  '
+  os_release: |
+    FIELD1=123
+    FIELD2="123"
+    PRETTY_NAME=Linux123 v234
+    FIELD3="123 123"
+out:
+  value: 'something in issue.net'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#1 get system info json'
+in:
+  type: get
+  key: 'system.sw.get'
+  issue_net: ''
+  os_release: ''
+  proc_version: ''
+  proc_version_sign: ''
+  uname:
+    return: 1
+out:
+  value: '{"os_type":"linux","version_full":""}'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#2 get system info json'
+in:
+  type: get
+  key: 'system.sw.get'
+  issue_net: ''
+  os_release: ''
+  proc_version: 'version_full filled'
+  proc_version_sign: ''
+  uname:
+    return: 1
+out:
+  value: '{"os_type":"linux","version_full":"version_full filled"}'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#3 get system info json'
+in:
+  type: get
+  key: 'system.sw.get'
+  issue_net: ''
+  os_release: ''
+  proc_version: 'version_full filled'
+  proc_version_sign: ''
+  uname:
+    return: 0
+    machine: "x86_64"
+    release: "1.2.-some-text"
+out:
+  value: '{"os_type":"linux","architecture":"x86_64","kernel_major":"1","kernel_minor":"2","kernel":"1.2.-some-text","version_pretty":"x86_64 1.2.-some-text","version_full":"version_full filled"}'
+  return: 'SYSINFO_RET_OK'
+---
+test case: '#3 get system info json'
+in:
+  type: get
+  key: 'system.sw.get'
+  issue_net: ''
+  os_release: |
+    FIELD1=123
+    FIELD2="123"
+    PRETTY_NAME="Linux Distro"
+    FIELD3="123 123"
+  proc_version: 'version_full filled'
+  proc_version_sign: ''
+  uname:
+    return: 0
+    machine: "x86_64"
+    release: "1.2.3-some-text"
+out:
+  value: '{"os_type":"linux","product_name":"Linux Distro","architecture":"x86_64","kernel_major":"1","kernel_minor":"2","kernel_patch":"3","kernel":"1.2.3-some-text","version_pretty":"Linux Distro x86_64 1.2.3-some-text","version_full":"version_full filled"}'
+  return: 'SYSINFO_RET_OK'
+...
