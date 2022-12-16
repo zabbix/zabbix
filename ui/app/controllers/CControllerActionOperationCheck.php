@@ -19,12 +19,18 @@
 **/
 
 
-class CControllerActionOperationValidate extends CController {
+class CControllerActionOperationCheck extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableSIDvalidation();
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
-			'operation' => 'array',
-			'actionid'	=> 'db actions.actionid'
+			'operation' =>	'array',
+			'actionid' =>	'db actions.actionid',
+			'row_index' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateOperation();
@@ -56,8 +62,12 @@ class CControllerActionOperationValidate extends CController {
 
 		$eventsource = $operation['eventsource'];
 		$recovery = $operation['recovery'];
-		$operationtype = $operation['operationtype'];
+		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 		$allowed_operations = getAllowedOperations($eventsource);
+
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
+			$operationtype = OPERATION_TYPE_COMMAND;
+		}
 
 		if (!array_key_exists($recovery, $allowed_operations)
 				|| !in_array($operationtype, $allowed_operations[$recovery])) {
@@ -66,14 +76,12 @@ class CControllerActionOperationValidate extends CController {
 			return false;
 		}
 
-		$default_msg_validator = new CLimitedSetValidator([
-			'values' => [0, 1]
-		]);
+		$default_msg_validator = new CLimitedSetValidator(['values' => [0, 1]]);
 
 		if ($recovery == ACTION_OPERATION) {
 			if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 					&& (!array_key_exists('esc_step_from', $operation)
-						|| !array_key_exists('esc_step_to', $operation))) {
+					|| !array_key_exists('esc_step_to', $operation))) {
 				error(_('Parameters "esc_step_from" and "esc_step_to" must be set together.'));
 
 				return false;
@@ -126,6 +134,9 @@ class CControllerActionOperationValidate extends CController {
 				break;
 
 			case OPERATION_TYPE_COMMAND:
+				$scriptid = preg_replace('[\D]', '', $operation['operationtype']);
+				$operation['opcommand'] = ['scriptid' => $scriptid];
+
 				if (!array_key_exists('scriptid', $operation['opcommand']) || !$operation['opcommand']['scriptid']) {
 					error(_('No script specified for action operation command.'));
 
@@ -184,7 +195,7 @@ class CControllerActionOperationValidate extends CController {
 		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
 			if (!$this->getInput('actionid', '0')) {
 				return true;
@@ -200,7 +211,39 @@ class CControllerActionOperationValidate extends CController {
 		return false;
 	}
 
-	protected function doAction() {
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+	protected function doAction(): void {
+		$operation = $this->getInput('operation');
+
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
+			$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
+			$operationtype = OPERATION_TYPE_COMMAND;
+
+			if (array_key_exists('opcommand_hst', $operation)) {
+				foreach ($operation['opcommand_hst'] as $host) {
+					if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
+						$operation['opcommand_hst'][0]['hostid'] = 0;
+					}
+				}
+			}
+		}
+		else {
+			$operationtype = (int) preg_replace('[\D]', '', $operation['operationtype']);
+		}
+
+		if (array_key_exists('opmessage', $operation)) {
+			if (!array_key_exists('default_msg', $operation['opmessage'])
+					&& ($operationtype == OPERATION_TYPE_MESSAGE
+					|| $operationtype == OPERATION_TYPE_RECOVERY_MESSAGE
+					|| $operationtype == OPERATION_TYPE_UPDATE_MESSAGE)) {
+				$operation['opmessage']['default_msg'] = '1';
+
+				unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+			}
+		}
+		$operation['operationtype'] = $operationtype;
+		$data['operation'] = $operation;
+		$data['operation']['row_index'] = $this->getInput('row_index');
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 }

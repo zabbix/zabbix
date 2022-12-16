@@ -1293,19 +1293,19 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		// Depending on preprocessing type, display corresponding params field and placeholders.
 		$params = '';
 
-		// Create a primary param text box, so it can be hidden if necessary.
-		$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
-		$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
-			->setTitle($step_param_0_value)
-			->setReadonly($readonly);
+		if ($step['type'] != ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+			// Create a primary param text box, so it can be hidden if necessary.
+			$step_param_0_value = array_key_exists('params', $step) ? $step['params'][0] : '';
+			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params][0]', $step_param_0_value))
+				->setReadonly($readonly);
 
-		// Create a secondary param text box, so it can be hidden if necessary.
-		$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
-			? $step['params'][1]
-			: '';
-		$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
-			->setTitle($step_param_1_value)
-			->setReadonly($readonly);
+			// Create a secondary param text box, so it can be hidden if necessary.
+			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
+				? $step['params'][1]
+				: '';
+			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params][1]', $step_param_1_value))
+				->setReadonly($readonly);
+		}
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
@@ -1440,6 +1440,88 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					$step_param_0->setAttribute('placeholder', _('search string')),
 					$step_param_1->setAttribute('placeholder', _('replacement'))
 				];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
+				$params = [
+					$step_param_0->setAttribute('placeholder', _('OID')),
+					(new CSelect('preprocessing['.$i.'][params][1]'))
+						->setValue($step_param_1_value)
+						->setAdaptiveWidth(202)
+						->addOptions([
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+							new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+						])
+						->setReadonly($readonly)
+				];
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+				$mapping_rows = [];
+				$count = count($step['params']);
+
+				for ($j = 0; $j < $count; $j += 3) {
+					$mapping_rows[] = [
+						(new CRow([
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('Field name'))
+							),
+							new CCol(
+								(new CTextBox('preprocessing['.$i.'][params][]', $step['params'][$j + 1]))
+									->setReadonly($readonly)
+									->removeId()
+									->setAttribute('placeholder', _('OID prefix'))
+							),
+							new CCol(
+								(new CSelect('preprocessing['.$i.'][params][]'))
+									->setValue($step['params'][$j + 2])
+									->setWidth(ZBX_TEXTAREA_PREPROC_TREAT_SELECT)
+									->addOptions([
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED, _('Unchanged')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, _('UTF-8 from Hex-STRING')),
+										new CSelectOption(ZBX_PREPROC_SNMP_WALK_TREAT_MAC, _('MAC from Hex-STRING'))
+									])
+									->setReadonly($readonly)
+							),
+							(new CCol(
+								(new CSimpleButton(_('Remove')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass('js-group-json-action-delete')
+									->setEnabled($count > 3)
+							))->addClass(ZBX_STYLE_NOWRAP)
+						]))->addClass('group-json-row')
+					];
+				}
+
+				$params = (new CDiv())
+					->addItem([
+						(new CTable())
+							->addClass('group-json-mapping')
+							->setHeader(
+								(new CRowHeader([
+									new CColHeader(_('Field name')),
+									new CColHeader(_('OID prefix')),
+									new CColHeader(_('Format')),
+									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+								]))->addClass(ZBX_STYLE_GREY)
+							)
+							->addItem($mapping_rows)
+							->addItem(
+								(new CTag('tfoot', true))
+									->addItem(
+										(new CCol(
+											(new CSimpleButton(_('Add')))
+												->addClass(ZBX_STYLE_BTN_LINK)
+												->addClass('js-group-json-action-add')
+										))->setColSpan(4)
+									)
+							)
+							->setAttribute('data-index', $i)
+					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 				break;
 		}
 

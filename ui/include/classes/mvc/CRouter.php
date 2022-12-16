@@ -45,8 +45,14 @@ class CRouter {
 	 */
 	private array $routes = [
 		// action									controller												layout					view
-		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
-		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
+		'action.create'								=> ['CControllerActionCreate',							'layout.json',			null],
+		'action.delete'								=> ['CControllerActionDelete',							'layout.json',			null],
+		'action.disable'							=> ['CControllerActionDisable',							'layout.json',			null],
+		'action.enable'								=> ['CControllerActionEnable',							'layout.json',			null],
+		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'action.list'],
+		'action.operation.check'					=> ['CControllerActionOperationCheck',					'layout.json',			null],
+		'action.operation.condition.check'			=> ['CControllerActionOperationConditionCheck',			'layout.json',			null],
+		'action.update'								=> ['CControllerActionUpdate',							'layout.json',			null],
 		'actionlog.csv'								=> ['CControllerActionLogList',							'layout.csv',			'reports.actionlog.list.csv'],
 		'actionlog.list'							=> ['CControllerActionLogList',							'layout.htmlpage',		'reports.actionlog.list'],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
@@ -157,9 +163,13 @@ class CRouter {
 		'popup'										=> ['CControllerPopup',									'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.create'					=> ['CControllerPopupAcknowledgeCreate',				'layout.json',			null],
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
-		'popup.condition.actions'					=> ['CControllerPopupConditionActions',					'layout.json',			'popup.condition.common'],
-		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.common'],
-		'popup.condition.operations'				=> ['CControllerPopupConditionOperations',				'layout.json',			'popup.condition.common'],
+		'popup.action.edit'							=> ['CControllerPopupActionEdit',						'layout.json',			'popup.action.edit'],
+		'popup.action.operation.edit'				=> ['CControllerPopupActionOperationEdit',				'layout.json',			'popup.operation.edit'],
+		'popup.action.operations.list'				=> ['CControllerPopupActionOperationsList',				'layout.json',			'popup.action.operations.list'],
+		'popup.condition.check'						=> ['CControllerActionConditionCheck',					'layout.json',			null],
+		'popup.condition.edit'						=> ['CControllerPopupActionConditionEdit',				'layout.json',			'popup.condition.edit'],
+		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.edit'],
+		'popup.condition.operations'				=> ['CControllerPopupConditionOperations',				'layout.json',			'popup.condition.edit'],
 		'popup.dashboard.share.edit'				=> ['CControllerPopupDashboardShareEdit',				'layout.json',			'popup.dashboard.share.edit'],
 		'popup.discovery.check'						=> ['CControllerPopupDiscoveryCheck',					'layout.json',			'popup.discovery.check'],
 		'popup.generic'								=> ['CControllerPopupGeneric',							'layout.json',			'popup.generic'],
@@ -312,7 +322,7 @@ class CRouter {
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 
 		// legacy actions
-		'actionconf.php'				=> ['CLegacyAction', null, null],
+		'auditacts.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
 		'chart2.php'					=> ['CLegacyAction', null, null],

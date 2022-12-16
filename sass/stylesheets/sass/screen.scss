@@ -4866,6 +4866,10 @@ svg {
 		padding: 5px 5px 5px 0;
 	}
 
+	.preprocessing-step {
+		align-items: baseline;
+	}
+
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;
@@ -4883,6 +4887,10 @@ svg {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
+		}
+
+		.table-forms-separator {
+			width: 100%;
 		}
 	}
 
