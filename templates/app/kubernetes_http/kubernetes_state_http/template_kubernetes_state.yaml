@@ -642,19 +642,9 @@ zabbix_export:
                     return endpoint;
                 },
 
-                getMetricsEndpointUrl: function () {
-                    var result = Kube.apiRequest('/api/v1/endpoints');
-
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.items === 'undefined'
-                        || result.status != 200) {
-                        throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
-                    };
-
-                    const ep = Kube.findEndpoint(Kube.params.state_endpoint_name, result.response.items);
-
+                getEndpointUrl: function (endpoint) {
                     var scheme, addr, port;
-                    ep.subsets.forEach(function (subset) {
+                    endpoint.subsets.forEach(function (subset) {
                         subset.ports.forEach(function (item) {
                             if (item.name !== 'http' &&
                                 item.name !== 'https' &&
@@ -705,8 +695,17 @@ zabbix_export:
             try {
                 Kube.setParams(JSON.parse(value));
 
-                var metricsEndpointUrl = Kube.getMetricsEndpointUrl();
-                var stateMetrics = Kube.getStateMetrics(metricsEndpointUrl);
+                var result = Kube.apiRequest('/api/v1/endpoints');
+
+                if (typeof result.response !== 'object'
+                    || typeof result.response.items === 'undefined'
+                    || result.status != 200) {
+                    throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
+                };
+
+                const metricsEndpoint = Kube.findEndpoint(Kube.params.state_endpoint_name, result.response.items);
+                const metricsEndpointUrl = Kube.getEndpointUrl(metricsEndpoint);
+                const stateMetrics = Kube.getStateMetrics(metricsEndpointUrl);
 
                 return stateMetrics;
             }
