@@ -2603,40 +2603,6 @@ out:
   return: SUCCEED
   value: 123
 ---
-test case: SNMP walk to value - MIB translation 1
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.2.1.2.2.1.2 = 20
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
-    params: |-
-      IF-MIB::ifDescr
-      1
-  netsnmp_required: y
-out:
-  return: SUCCEED
-  value: 20
----
-test case: SNMP walk to value - MIB translation 2
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.2.1.1.1 = 20
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
-    params: |-
-      SNMPv2-MIB::sysDescr
-      0
-  netsnmp_required: y
-out:
-  return: SUCCEED
-  value: 20
----
 test case: SNMP walk to JSON - bad data
 in:
   value:
@@ -2920,25 +2886,6 @@ in:
 out:
   return: SUCCEED
   value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
----
-test case: SNMP walk to JSON - MIB translation 1
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: |
-      .1.3.6.1.2.1.2.2.1.2.1 = 20
-      .1.3.6.1.2.1.2.2.1.2.2 = 30
-  step:
-    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
-    params: |-
-      IFDESCR
-      IF-MIB::ifDescr
-      0
-  netsnmp_required: y
-out:
-  return: SUCCEED
-  value: '[{"{#SNMPINDEX}":"2","IFDESCR":"30"},{"{#SNMPINDEX}":"1","IFDESCR":"20"}]'
 ---
 test case: SNMP walk to JSON - No more variables 1
 in:
