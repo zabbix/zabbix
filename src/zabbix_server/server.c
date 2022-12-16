@@ -306,10 +306,10 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-static int	CONFIG_TIMEOUT = 3;
+static int	config_timeout = 3;
 static int	get_config_timeout(void)
 {
-	return CONFIG_TIMEOUT;
+	return config_timeout;
 }
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
@@ -879,7 +879,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+		{"Timeout",			&config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
 			PARM_OPT,	1,			300},
@@ -1273,7 +1273,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, config_timeout, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1383,25 +1383,25 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0, CONFIG_TIMEOUT};
+	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0, config_timeout};
 
 	zbx_thread_args_t		thread_args;
 	zbx_thread_poller_args		poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_trapper_args		trapper_args = {&zbx_config_comms, get_program_type, listen_sock};
-	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type, config_timeout};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
-	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info, CONFIG_TIMEOUT};
+	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info, config_timeout};
 
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type,
-							CONFIG_TIMEOUT};
-	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_pinger_args		pinger_args = {get_program_type, CONFIG_TIMEOUT};
+							config_timeout};
+	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, config_timeout};
+	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, config_timeout};
+	zbx_thread_pinger_args		pinger_args = {get_program_type, config_timeout};
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_ipmi_manager_args	ipmi_manager_args = {get_program_type, config_timeout};
 #endif
 
 	if (SUCCEED != init_database_cache(&error))
@@ -1903,7 +1903,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_initialize_events();
 
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);

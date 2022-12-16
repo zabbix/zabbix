@@ -183,10 +183,10 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-static int	CONFIG_TIMEOUT = 3;
+static int	config_timeout = 3;
 int		get_config_timeout(void)
 {
-	return CONFIG_TIMEOUT;
+	return config_timeout;
 }
 
 /* test itself */

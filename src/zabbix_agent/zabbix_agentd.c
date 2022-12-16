@@ -251,10 +251,10 @@ static const char	*get_progname(void)
 }
 #endif
 
-static int	CONFIG_TIMEOUT = 3;
+static int	config_timeout = 3;
 static int	get_config_timeout(void)
 {
-	return CONFIG_TIMEOUT;
+	return config_timeout;
 }
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
@@ -758,7 +758,7 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].config_timeout = CONFIG_TIMEOUT;
+		config_active_args[forks].config_timeout = config_timeout;
 		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
@@ -876,7 +876,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+		{"Timeout",			&config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
@@ -1157,7 +1157,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 #ifndef _WINDOWS
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		zbx_free_service_resources(FAIL);
@@ -1237,7 +1237,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
-								config_file, CONFIG_TIMEOUT};
+								config_file, config_timeout};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
@@ -1293,8 +1293,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_tcp_close(&listen_sock);
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
-		/* CONFIG_TIMEOUT seconds if they're waiting for external processes to finish / timeout */
-		zbx_sleep(CONFIG_TIMEOUT);
+		/* config_timeout seconds if they're waiting for external processes to finish / timeout */
+		zbx_sleep(config_timeout);
 
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
@@ -1459,7 +1459,7 @@ int	main(int argc, char **argv)
 			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
+			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
