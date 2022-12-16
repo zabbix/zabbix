@@ -61,8 +61,8 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
-if ($data['templates']) {
-	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
+if (array_key_exists('template', $data)) {
+	$host_tab->addRow(_('Parent host prototype'), $data['template']);
 }
 
 $host_tab->addRow(
@@ -360,7 +360,7 @@ $tabs->addTab('macroTab', _('Macros'),
 					: 'hostmacros.list.html',
 				[
 					'macros' => $data['macros'],
-					'readonly' => $data['templates'],
+					'readonly' => array_key_exists('template', $data),
 					'source' => 'host_prototype'
 				]
 			),
