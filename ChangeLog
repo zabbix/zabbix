@@ -1,12 +1,25 @@
 Changes for 6.2.7rc1
 
 New features:
+..F....... [ZBXNEXT-7963] added hint box for "Enable HTTP authentication"; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
 .........T [ZBXNEXT-7924] Switched templates to proc.get (egordymov)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+A......... [ZBX-22016] fixed host.get API method not returning any results for hosts with no interfaces when filtering by "hostid" (Ivo)
+.........T [ZBX-21985] fixed lld rules in AWS by HTTP template (abakaldin)
+.......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
+...G...... [ZBX-21300] fixed high CPU usage when using net.tcp.socket.count key on Windows (vso)
+..F....... [ZBX-21904] fixed possibility to add value mappings from templates in mass update form (agriscenko)
+........S. [ZBX-21793] fixed error message for "diaginfo" runtime command (asitals)
+A......... [ZBX-22042] fixed inability to get the existing group prototypes by hostprototype.get API method when using Oracle database (vmaksimovs)
+....I..... [ZBX-21221] enlarged character limit of task_result.info (dgoloscapov)
+...G...... [ZBX-21696] fixed windows Agent 2 unicode path support for log* items (MVekslers)
+.......PS. [ZBX-21872] fixed VMware HV missing multipath data for some datastores (MVekslers)
+...G...... [ZBX-21903] fixed Agent 2 timeout behavior for net.tcp.port item (MVekslers)
 .........T [ZBX-21039] fixed readme in PostgreSQL by Zabbix agent 2 template (atocko)
 ........S. [ZBX-21922] fixed expression macros to use corresponding item keys (asestakovs)
 ..F....... [ZBX-21806] fixed fatal PHP error in case incorrect variable type for controller action is given (Ivo)
