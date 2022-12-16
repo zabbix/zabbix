@@ -1254,7 +1254,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'users':
 				$options += [
-					'output' => ['username', 'name', 'surname', 'type', 'theme', 'lang']
+					'output' => ['userid', 'username', 'name', 'surname', 'type', 'theme', 'lang']
 				];
 
 				$records = API::User()->get($options);
