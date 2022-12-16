@@ -1,1 +1,1 @@
-..F....... [ZBX-21961] fixed message/command label in Actions block in Event details (esekace)
+..F....... [ZBX-21961] removed unnecessary "Command:" label for message actions in Event details page (esekace)
