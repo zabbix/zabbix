@@ -108,7 +108,7 @@ static int	DBpatch_3050008(void)
 	int		res;
 	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", trdefault,
@@ -125,7 +125,7 @@ static int	DBpatch_3050009(void)
 	int		res;
 	char		*trdefault = (char *)ZBX_DEFAULT_INTERNAL_TRIGGER_EVENT_NAME;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d ", trdefault,
@@ -142,7 +142,7 @@ static int	DBpatch_3050010(void)
 	int		res;
 	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update events set name='%s' where source=%d and object=%d and value=%d", itdefault,
@@ -159,7 +159,7 @@ static int	DBpatch_3050011(void)
 	int		res;
 	char		*itdefault = (char *)ZBX_DEFAULT_INTERNAL_ITEM_EVENT_NAME;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update problem set name='%s' where source=%d and object=%d", itdefault,
@@ -175,7 +175,7 @@ static int	DBpatch_3050012(void)
 {
 	int		res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update profiles set idx='web.problem.filter.name' where idx='web.problem.filter.problem'");
@@ -264,7 +264,7 @@ static int	DBpatch_3050020(void)
 
 static int	DBpatch_3050021(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type_cb()))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -280,7 +280,7 @@ static int	DBpatch_3050021(void)
 
 static int	DBpatch_3050022(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type_cb()))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -296,7 +296,7 @@ static int	DBpatch_3050022(void)
 
 static int	DBpatch_3050023(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type_cb()))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -312,7 +312,7 @@ static int	DBpatch_3050023(void)
 
 static int	DBpatch_3050024(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type_cb()))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -334,7 +334,7 @@ static int	DBpatch_3050025(void)
 	zbx_db_insert_t	db_insert;
 	int		ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
@@ -351,7 +351,7 @@ static int	DBpatch_3050026(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update profiles set value_str='name' where idx='web.problem.sort' and value_str='problem'");
@@ -531,7 +531,7 @@ static int	DBpatch_3050043(void)
 					" and w.type='problems'"
 			")";
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -547,7 +547,7 @@ static int	DBpatch_3050044(void)
 		" where idx in ('web.paging.lastpage','web.menu.view.last') and value_str='tr_status.php'"
 			" or idx like 'web.tr_status%'";
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -560,7 +560,7 @@ static int	DBpatch_3050045(void)
 {
 	const char	*sql = "update users set url='zabbix.php?action=problem.view' where url like '%tr_status.php%'";
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
@@ -706,7 +706,7 @@ static int	DBpatch_3050065(void)
 {
 	int	ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* 5 - HOST_STATUS_PROXY_ACTIVE, 6 - HOST_STATUS_PROXY_PASSIVE */
@@ -736,7 +736,7 @@ static int	DBpatch_3050066(void)
 			NULL
 		};
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; NULL != types[i]; i += 2)
@@ -1021,7 +1021,7 @@ static int	DBpatch_3050106(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute("update profiles set value_int=2 where idx='web.problem.filter.evaltype' and value_int=1");
@@ -1036,7 +1036,7 @@ static int	DBpatch_3050107(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute(
@@ -1061,7 +1061,7 @@ static int	DBpatch_3050108(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute(
@@ -1137,7 +1137,7 @@ static int	DBpatch_3050117(void)
 {
 	int	ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	ret = DBexecute("update problem set acknowledged="
@@ -1157,7 +1157,7 @@ static int	DBpatch_3050118(void)
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1199,7 +1199,7 @@ static int	DBpatch_3050119(void)
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1243,7 +1243,7 @@ static int	DBpatch_3050120(void)
 	char		*sql;
 	size_t		sql_alloc = 4096, sql_offset = 0;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
@@ -1292,7 +1292,7 @@ static int	DBpatch_3050121(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute(
@@ -1419,7 +1419,7 @@ static int	DBpatch_3050123(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute(
@@ -1562,7 +1562,7 @@ static int	DBpatch_3050141(void)
 {
 	int		ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	ret = DBexecute("update profiles"
@@ -1579,7 +1579,7 @@ static int	DBpatch_3050142(void)
 {
 	int		ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	ret = DBexecute("update profiles"
@@ -1596,7 +1596,7 @@ static int	DBpatch_3050143(void)
 {
 	int	ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	ret = DBexecute("update widget_field"
@@ -1620,7 +1620,7 @@ static int	DBpatch_3050144(void)
 	int		ret = FAIL;
 	zbx_db_insert_t	db_insert;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
@@ -1655,7 +1655,7 @@ static int	DBpatch_3050145(void)
 {
 	int	ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* ZBX_CONDITION_OPERATOR_IN (4) -> ZBX_CONDITION_OPERATOR_YES (10) */
@@ -1675,7 +1675,7 @@ static int	DBpatch_3050146(void)
 {
 	int	ret;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* ZBX_CONDITION_OPERATOR_NOT_IN (7) -> ZBX_CONDITION_OPERATOR_NO (11) */
@@ -1737,7 +1737,7 @@ static int	DBpatch_3050153(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* Change ZBX_AUTH_HTTP to ZBX_AUTH_INTERNAL and enable HTTP_AUTH option. */
@@ -1753,7 +1753,7 @@ static int	DBpatch_3050154(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* New GUI access type is added GROUP_GUI_ACCESS_LDAP, update value of GROUP_GUI_ACCESS_DISABLED. */
@@ -1771,7 +1771,7 @@ static int	DBpatch_3050155(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	/* Update ldap_configured to ZBX_AUTH_LDAP_ENABLED for config with default authentication type ZBX_AUTH_LDAP. */
@@ -1788,7 +1788,7 @@ static int	DBpatch_3050156(void)
 {
 	int	res;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	res = DBexecute(

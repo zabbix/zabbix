@@ -1231,6 +1231,7 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 	zbx_load_config(&t);
 
+	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1275,7 +1276,7 @@ static void	zbx_check_db(void)
 #ifdef HAVE_POSTGRESQL
 			SUCCEED != zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS) ||
 #endif
-			SUCCEED != DBcheck_version(get_program_type)))
+			SUCCEED != DBcheck_version()))
 	{
 		result = FAIL;
 	}

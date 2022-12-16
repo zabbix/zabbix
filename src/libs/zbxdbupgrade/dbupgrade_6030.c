@@ -35,7 +35,7 @@ static int	DBpatch_6030000(void)
 	zbx_db_insert_t		db_insert;
 	int			ret = SUCCEED;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = DBselect("select roleid,type,name,value_int from role_rule where name in ("
@@ -482,7 +482,7 @@ static int	DBpatch_6030062(void)
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	int			ret = SUCCEED;
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
@@ -538,7 +538,7 @@ static int	DBpatch_6030063(void)
 			"url", "web"
 		};
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
@@ -702,7 +702,7 @@ static int	DBpatch_6030074(void)
 			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
 		};
 
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -1189,7 +1189,7 @@ static int	migrate_ldap_data(void)
 
 static int	DBpatch_6030124(void)
 {
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return migrate_ldap_data();
@@ -1264,7 +1264,7 @@ static int	migrate_saml_data(void)
 
 static int	DBpatch_6030125(void)
 {
-	if (0 == (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return migrate_saml_data();

@@ -903,7 +903,17 @@ static void	DBget_version(int *mandatory, int *optional)
 	}
 }
 
-int	DBcheck_version(zbx_get_program_type_f get_program_type_cb)
+unsigned char	DBget_program_type(void)
+{
+	return DBget_program_type_cb();
+}
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
+{
+	DBget_program_type_cb = get_program_type_cb;
+}
+
+int	DBcheck_version(void)
 {
 	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
@@ -915,7 +925,6 @@ int	DBcheck_version(zbx_get_program_type_f get_program_type_cb)
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBget_program_type_cb = get_program_type_cb;
 	required = ZBX_FIRST_DB_VERSION;
 
 	/* find out the required version number by getting the last mandatory version */

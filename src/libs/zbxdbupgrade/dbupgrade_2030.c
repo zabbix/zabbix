@@ -377,7 +377,7 @@ static int	DBpatch_2030037(void)
 				NULL
 			};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -385,7 +385,7 @@ static int	DBpatch_2030037(void)
 
 static int	DBpatch_2030038(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -429,7 +429,7 @@ static int	DBpatch_2030040(void)
 
 static int	DBpatch_2030041(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	if (ZBX_DB_OK <= DBexecute(
@@ -443,7 +443,7 @@ static int	DBpatch_2030041(void)
 
 static int	DBpatch_2030042(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 		return SUCCEED;
 
 	return DBdrop_table("ids_tmp");
@@ -716,7 +716,7 @@ static int	DBpatch_2030067(void)
 
 static int	DBpatch_2030068(void)
 {
-	if (0 != (DBget_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 	{
 		/* "name" is empty on proxy side, because it is not synchronized between server and proxy */
 		/* in 2.2, and should therefore be filled with unique values to create a unique index.    */

@@ -2037,7 +2037,7 @@ static int	DBpatch_3030173(void)
 
 static int	DBpatch_3030174(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
 		if (ZBX_DB_OK > DBexecute(
@@ -2066,7 +2066,7 @@ static int	DBpatch_3030175(void)
 		NULL
 	};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type_cb())
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		for (i = 0; NULL != values[i]; i++)
 		{
