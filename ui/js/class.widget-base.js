@@ -707,7 +707,7 @@ class CWidgetBase {
 					}
 				})
 				.catch((exception) => {
-					console.warn('Could not update widget refresh rate:', exception);
+					console.log('Could not update widget refresh rate:', exception);
 				});
 		}
 	}
@@ -934,7 +934,7 @@ class CWidgetBase {
 		new Promise((resolve) => resolve(this.promiseUpdate()))
 			.then(() => this._hidePreloader())
 			.catch((exception) => {
-				console.warn('Could not update widget:', exception);
+				console.log('Could not update widget:', exception);
 
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
