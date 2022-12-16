@@ -503,9 +503,13 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 			old_cause_eventid = zbx_db_get_cause_eventid(eventid);
 		}
 
-		target_cause_triggerid = zbx_get_objectid_by_eventid(target_cause_eventid);
-
-		if (SUCCEED != DBlock_triggerid(target_cause_triggerid))
+		if (0 == (target_cause_triggerid = zbx_get_objectid_by_eventid(target_cause_eventid)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger id should never be '0' for target cause event (eventid: "
+					ZBX_FS_UI64 ")", target_cause_eventid);
+			goto fail;
+		}
+		else if (SUCCEED != DBlock_triggerid(target_cause_triggerid))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "the trigger (triggerid: " ZBX_FS_UI64 "), which generated the"
 					" target cause event (eventid: " ZBX_FS_UI64 ") was deleted, skip ranking"
