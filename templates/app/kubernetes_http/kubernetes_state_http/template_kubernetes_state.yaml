@@ -139,29 +139,32 @@ zabbix_export:
             try {
                 Kube.setParams(JSON.parse(value));
 
-                const nodes = Kube.getNodes();
+                // if we could turn this into a multi-label selector somehow;
+                // /api/v1/nodes?labelSelector=node-role.kubernetes.io/control-plane
+                // for now we're stuck with filtering down the nodes manually
+                const nodes = Kube.getNodes().filter(function (node) {
+                    return ('node-role.kubernetes.io/control-plane' in node.metadata.labels ||
+                            'node-role.kubernetes.io/master' in node.metadata.labels);
+                });
 
                 const controlPlaneNodes = [];
                 nodes.forEach(function (node) {
-                    if ('node-role.kubernetes.io/control-plane' in node.metadata.labels ||
-                        'node-role.kubernetes.io/master' in node.metadata.labels) {
-                        var internalIPs = node.status.addresses.filter(function (addr) {
-                            return addr.type === 'InternalIP';
-                        });
-                        var internalIP = internalIPs.length && internalIPs[0].address;
+                    var internalIPs = node.status.addresses.filter(function (addr) {
+                        return addr.type === 'InternalIP';
+                    });
+                    var internalIP = internalIPs.length && internalIPs[0].address;
 
-                        controlPlaneNodes.push({
-                            '{#NAME}': node.metadata.name,
-                            '{#IP}': internalIP,
-                            '{#KUBE.API.SERVER.URL}': Kube.params.api_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_port + '/metrics',
-                            '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
-                            '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.scheduler_port + '/metrics',
-                            '{#COMPONENT.API}' : 'API',
-                            '{#COMPONENT.CONTROLLER}' : 'Controller manager',
-                            '{#COMPONENT.SCHEDULER}' : 'Scheduler',
-                            '{#CLUSTER_HOSTNAME}': Kube.params.api_hostname
-                        });
-                    }
+                    controlPlaneNodes.push({
+                        '{#NAME}': node.metadata.name,
+                        '{#IP}': internalIP,
+                        '{#KUBE.API.SERVER.URL}': Kube.params.api_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_port + '/metrics',
+                        '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
+                        '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.scheduler_port + '/metrics',
+                        '{#COMPONENT.API}' : 'API',
+                        '{#COMPONENT.CONTROLLER}' : 'Controller manager',
+                        '{#COMPONENT.SCHEDULER}' : 'Scheduler',
+                        '{#CLUSTER_HOSTNAME}': Kube.params.api_hostname
+                    });
                 });
 
                 return JSON.stringify(controlPlaneNodes);
