@@ -116,15 +116,14 @@ zabbix_export:
                         throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
                     }
 
-                    return result.response;
+                    return result.response.items;
                 },
             };
 
             try {
                 Kube.setParams(JSON.parse(value));
-            
-                var nodes = Kube.getNodes(),
-                    controlPlaneNodes = [];
+
+                const nodes = Kube.getNodes();
 
                 const match = Kube.params.api_url.match(/\/\/(.+):/);
                 if (!match) {
@@ -132,17 +131,18 @@ zabbix_export:
                     throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
                 }
                 const api_hostname = match[1];
-            
-                for (idx in nodes.items) {
-                    if ('node-role.kubernetes.io/control-plane' in nodes.items[idx].metadata.labels ||
-                        'node-role.kubernetes.io/master' in nodes.items[idx].metadata.labels) {
-                        var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+
+                const controlPlaneNodes = [];
+                nodes.forEach(function (node) {
+                    if ('node-role.kubernetes.io/control-plane' in node.metadata.labels ||
+                        'node-role.kubernetes.io/master' in node.metadata.labels) {
+                        var internalIPs = node.status.addresses.filter(function (addr) {
                             return addr.type === 'InternalIP';
                         });
-
                         var internalIP = internalIPs.length && internalIPs[0].address;
+
                         controlPlaneNodes.push({
-                            '{#NAME}': nodes.items[idx].metadata.name,
+                            '{#NAME}': node.metadata.name,
                             '{#IP}': internalIP,
                             '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_server_port + '/metrics',
                             '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
@@ -153,8 +153,8 @@ zabbix_export:
                             '{#CLUSTER_HOSTNAME}': api_hostname
                         });
                     }
-                }
-            
+                });
+
                 return JSON.stringify(controlPlaneNodes);
             }
             catch (error) {
@@ -430,15 +430,14 @@ zabbix_export:
                         throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
                     }
 
-                    return result.response;
+                    return result.response.items;
                 },
             };
 
             try {
                 Kube.setParams(JSON.parse(value));
 
-                var nodes = Kube.getNodes(),
-                    kubeNodes = [];
+                const nodes = Kube.getNodes();
 
                 const match = Kube.params.api_url.match(/\/\/(.+):/);
                 if (!match) {
@@ -447,22 +446,22 @@ zabbix_export:
                 }
                 const api_hostname = match[1];
 
-                for (idx in nodes.items) {
-                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                const kubeNodes = [];
+                nodes.forEach(function (node) {
+                    var internalIPs = node.status.addresses.filter(function (addr) {
                         return addr.type === 'InternalIP';
                     });
-            
                     var internalIP = internalIPs.length && internalIPs[0].address;
-            
+
                     kubeNodes.push({
-                        '{#NAME}': nodes.items[idx].metadata.name,
+                        '{#NAME}': node.metadata.name,
                         '{#IP}': internalIP,
                         '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']')  + ':' + Kube.params.kubelet_port,
                         '{#COMPONENT}': 'Kubelet',
                         '{#CLUSTER_HOSTNAME}': api_hostname
                     });
-                }
-            
+                });
+
                 return JSON.stringify(kubeNodes);
             }
             catch (error) {
