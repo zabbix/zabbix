@@ -695,15 +695,14 @@ zabbix_export:
             try {
                 Kube.setParams(JSON.parse(value));
 
-                var result = Kube.apiRequest('/api/v1/endpoints');
+                var metricsEndpoint;
+                if (Kube.params.state_endpoint_namespace) {
+                    metricsEndpoint = Kube.apiRequest('/api/v1/namespaces/' + Kube.params.state_endpoint_namespace + '/endpoints/' + Kube.params.state_endpoint_name).response;
+                } else {
+                    const endpointList = Kube.apiRequest('/api/v1/endpoints').response.items;
+                    metricsEndpoint = Kube.findEndpoint(Kube.params.state_endpoint_name, endpointList);
+                }
 
-                if (typeof result.response !== 'object'
-                    || typeof result.response.items === 'undefined'
-                    || result.status != 200) {
-                    throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
-                };
-
-                const metricsEndpoint = Kube.findEndpoint(Kube.params.state_endpoint_name, result.response.items);
                 const metricsEndpointUrl = Kube.getEndpointUrl(metricsEndpoint);
                 const stateMetrics = Kube.getStateMetrics(metricsEndpointUrl);
 
@@ -723,6 +722,9 @@ zabbix_export:
             -
               name: api_url
               value: '{$KUBE.API.URL}'
+            -
+              name: state_endpoint_namespace
+              value: '{$KUBE.STATE.ENDPOINT.NAMESPACE}'
             -
               name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
@@ -4022,6 +4024,9 @@ zabbix_export:
           macro: '{$KUBE.SCHEDULER.SCHEME}'
           value: http
           description: 'Kubernetes Scheduler manager metrics endpoint scheme. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.STATE.ENDPOINT.NAMESPACE}'
+          description: 'Kubernetes state endpoint namespace'
         -
           macro: '{$KUBE.STATE.ENDPOINT.NAME}'
           value: zabbix-kube-state-metrics
