@@ -262,7 +262,7 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 }
 #endif
 
-int sysinfo_get_config_timeout(void)
+int	sysinfo_get_config_timeout(void)
 {
 	return get_config_timeout_cb();
 }
