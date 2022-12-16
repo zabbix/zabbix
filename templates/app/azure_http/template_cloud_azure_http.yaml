@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-14T09:33:04Z'
+  date: '2022-12-16T12:03:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -20,7 +20,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -767,11 +767,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
           value: '.*'
@@ -871,7 +871,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -1814,11 +1814,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -1878,7 +1878,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -2777,11 +2777,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -2841,7 +2841,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -3583,11 +3583,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
           value: '25'
@@ -3647,7 +3647,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -4384,11 +4384,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -4452,7 +4452,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -5317,11 +5317,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -5381,7 +5381,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -6129,11 +6129,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -6193,7 +6193,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -7635,11 +7635,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
