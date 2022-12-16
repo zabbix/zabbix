@@ -20,11 +20,10 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
 #include "cfg.h"
 #include "zbxtime.h"
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 #pragma comment(lib, "user32.lib")
 

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXSERVER_H
 #define ZABBIX_ZBXSERVER_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxvariant.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
@@ -56,6 +56,28 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
+/* service supported by discoverer */
+typedef enum
+{
+	SVC_SSH = 0,
+	SVC_LDAP,
+	SVC_SMTP,
+	SVC_FTP,
+	SVC_HTTP,
+	SVC_POP,
+	SVC_NNTP,
+	SVC_IMAP,
+	SVC_TCP,
+	SVC_AGENT,
+	SVC_SNMPv1,
+	SVC_SNMPv2c,
+	SVC_ICMPPING,
+	SVC_SNMPv3,
+	SVC_HTTPS,
+	SVC_TELNET
+}
+zbx_dservice_type_t;
+
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
@@ -67,8 +89,10 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZB
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
+void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
+
 void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const DC_ITEM *history_items, const int *history_errcodes);
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
 void	zbx_prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,

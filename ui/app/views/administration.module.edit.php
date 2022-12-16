@@ -19,7 +19,12 @@
 **/
 
 
-$widget = (new CWidget())
+/**
+ * @var CView $this
+ * @var array $data
+ */
+
+$html_page = (new CHtmlPage())
 	->setTitle(_('Modules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_EDIT))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
@@ -32,7 +37,7 @@ $form = (new CForm())
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create module tab
 $module_tab = (new CFormList())
@@ -70,6 +75,6 @@ $tabs->setFooter(makeFormFooter(
 $form->addItem($tabs);
 
 // append form to widget
-$widget->addItem($form);
+$html_page->addItem($form);
 
-$widget->show();
+$html_page->show();

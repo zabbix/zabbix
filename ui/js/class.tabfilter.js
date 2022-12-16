@@ -56,7 +56,7 @@ class CTabFilter extends CBaseComponent {
 			options.data[options.selected].expanded = true;
 		}
 
-		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
+		for (const template of this._target.querySelectorAll('[data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
 		}
 
@@ -620,14 +620,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			buttonUpdateAction: () => {
-				var params = this._active_item.getFilterParams();
+				var params = this._active_item.getFilterParams(false);
 
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				})
 				.then(() => {
-					this._active_item.updateApplyUrl();
+					this._active_item.updateApplyUrl(false);
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -650,8 +650,8 @@ class CTabFilter extends CBaseComponent {
 			buttonApplyAction: () => {
 				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
+				this._active_item.updateUnsavedState(false);
+				this._active_item.updateApplyUrl(false);
 				this._active_item.setBrowserLocationToApplyUrl();
 			},
 

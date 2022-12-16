@@ -238,11 +238,6 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
-	unset($fields['interfaceid']);
-	unset($_REQUEST['interfaceid']);
-}
-
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -420,13 +415,21 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 	$type = getRequest('type', ITEM_TYPE_ZABBIX);
+	$item_key = getRequest('key', '');
+
+	if (($type == ITEM_TYPE_DB_MONITOR && $item_key === ZBX_DEFAULT_KEY_DB_MONITOR)
+			|| ($type == ITEM_TYPE_SSH && $item_key === ZBX_DEFAULT_KEY_SSH)
+			|| ($type == ITEM_TYPE_TELNET && $item_key === ZBX_DEFAULT_KEY_TELNET)) {
+		error(_('Check the key, please. Default example was passed.'));
+		$result = false;
+	}
 
 	/*
 	 * "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
 	 * In the end, custom intervals together with "delay" are stored in the "delay" variable.
 	 */
-	if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
-			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp(getRequest('key'), 'mqtt.get', 8) !== 0)
+	if ($result && $type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP
+			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item_key, 'mqtt.get', 8) !== 0)
 			&& hasRequest('delay_flex')) {
 		$intervals = [];
 		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
@@ -475,54 +478,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		$preprocessing = getRequest('preprocessing', []);
-
-		foreach ($preprocessing as &$step) {
-			switch ($step['type']) {
-				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-					$step['params'] = trim($step['params'][0]);
-					break;
-
-				case ZBX_PREPROC_XPATH:
-				case ZBX_PREPROC_JSONPATH:
-				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				case ZBX_PREPROC_ERROR_FIELD_JSON:
-				case ZBX_PREPROC_ERROR_FIELD_XML:
-				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				case ZBX_PREPROC_SCRIPT:
-					$step['params'] = $step['params'][0];
-					break;
-
-				case ZBX_PREPROC_REGSUB:
-				case ZBX_PREPROC_STR_REPLACE:
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				case ZBX_PREPROC_CSV_TO_JSON:
-					if (!array_key_exists(2, $step['params'])) {
-						$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
-					}
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				default:
-					$step['params'] = '';
-			}
-
-			$step += [
-				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-				'error_handler_params' => ''
-			];
-
-			unset($step['sortorder']);
-		}
-		unset($step);
+		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
 
 		$newItem = [
 			'itemid' => getRequest('itemid'),
 			'interfaceid' => getRequest('interfaceid', 0),
 			'name' => getRequest('name'),
 			'description' => getRequest('description'),
-			'key_' => getRequest('key'),
+			'key_' => $item_key,
 			'hostid' => getRequest('hostid'),
 			'delay' => $delay,
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),

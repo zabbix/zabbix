@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/* strptime() on newer and older GNU/Linux systems */
+#define _GNU_SOURCE
+
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
@@ -25,12 +28,15 @@
 #include "zbxexec.h"
 #include "cfg.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>
 #endif
+
+#define TIME_FMT	"%a %b %e %H:%M:%S %Y"
+
+#define DETAIL_BUF	128
 
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -133,7 +139,7 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
+static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 {
 	char	fmt[32], tmp[32];
 
@@ -144,6 +150,338 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 		return FAIL;
 
 	return SUCCEED;
+}
+
+static void	add_package_to_json(struct zbx_json *json, const char *name, const char *manager, const char *version,
+		const char *arch, zbx_uint64_t size, const char *buildtime_value, time_t buildtime_timestamp,
+		const char *installtime_value, time_t installtime_timestamp)
+{
+	zbx_json_addobject(json, NULL);
+
+	zbx_json_addstring(json, "name", name, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "manager", manager, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "arch", arch, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "size", size);
+
+	zbx_json_addobject(json, "buildtime");
+	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "timestamp", buildtime_timestamp);
+	zbx_json_close(json);
+
+	zbx_json_addobject(json, "installtime");
+	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(json, "timestamp", installtime_timestamp);
+	zbx_json_close(json);
+
+	zbx_json_close(json);
+}
+
+static void	dpkg_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		status[DETAIL_BUF] = "", name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "";
+	zbx_uint64_t	size;
+	int		rv;
+
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%" ZBX_FS_UI64,
+				(zbx_fs_size_t)(sizeof(status) - 1),
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1));
+	}
+
+#define NUM_FIELDS	5
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, status, name, version, arch, &size)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (0 != strcmp(status, "install ok installed"))
+		return;
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	/* the reported size is in kB, we want bytes */
+	size *= ZBX_KIBIBYTE;
+
+	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+}
+
+static void	rpm_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
+			installtime_value[DETAIL_BUF];
+	zbx_uint64_t	size;
+	time_t		buildtime_timestamp, installtime_timestamp;
+	int		rv;
+
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%" ZBX_FS_TIME_T ","
+				"%" ZBX_FS_TIME_T ","
+				"%" ZBX_FS_UI64,
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1));
+	}
+
+#define NUM_FIELDS	6
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, &size, &buildtime_timestamp,
+			&installtime_timestamp)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
+	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
+
+	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
+			installtime_value, installtime_timestamp);
+}
+
+static void	pacman_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			size_str[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF] = "", installtime_value[DETAIL_BUF],
+			*suffix;
+	const char	*p;
+	zbx_uint64_t	size;
+	time_t		buildtime_timestamp, installtime_timestamp;
+	struct tm	tm;
+	double		size_double;
+	int		rv;
+
+	/* e. g. " tpm2-tss, 3.2.0-3, x86_64, 2.86 MiB, Tue Nov 1 20:46:18 2022, Sun Nov 6 00:04:09 2022" */
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,]",
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1),
+				(zbx_fs_size_t)(sizeof(size_str) - 1),
+				(zbx_fs_size_t)(sizeof(buildtime_value) - 1),
+				(zbx_fs_size_t)(sizeof(installtime_value) - 1));
+	}
+
+#define NUM_FIELDS	6
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, size_str, buildtime_value, installtime_value)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	if (NULL == (suffix = strchr(size_str, ' ')))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected whitespace), ignoring",
+				line, size_str);
+		return;
+	}
+
+	*suffix++ = '\0';
+
+	if (SUCCEED != zbx_is_double(size_str, &size_double))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Installed Size \"%s\" (expected type double), ignoring",
+				line, size_str);
+		return;
+	}
+
+	/* pacman supports the following labels:                       */
+	/* "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" */
+	if (0 == strcmp(suffix, "B"))
+	{
+		size = (zbx_uint64_t)size_double;
+	}
+	else if (0 == strcmp(suffix, "KiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_KIBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "MiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_MEBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "GiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_GIBIBYTE);
+	}
+	else if (0 == strcmp(suffix, "TiB"))
+	{
+		size = (zbx_uint64_t)(size_double * ZBX_TEBIBYTE);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unrecognized Installed Size suffix \"%s %s\", ignoring",
+				line, size_str, suffix);
+		return;
+	}
+
+	memset(&tm, 0, sizeof(tm));
+	tm.tm_isdst = -1;	/* tell mktime() to determine whether daylight saving time is in effect */
+
+	if (NULL == (p = strptime(buildtime_value, TIME_FMT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date \"%s\", ignoring", line, buildtime_value);
+		return;
+	}
+
+	if ('\0' != *p)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Build Date format at \"%s\" (expected %s), ignoring",
+				line, p, TIME_FMT);
+		return;
+	}
+
+	buildtime_timestamp = mktime(&tm);
+
+	memset(&tm, 0, sizeof(tm));
+	tm.tm_isdst = -1;	/* tell mktime() to determine whether daylight saving time is in effect */
+
+	if (NULL == strptime(installtime_value, TIME_FMT, &tm))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date \"%s\", ignoring", line, installtime_value);
+		return;
+	}
+
+	if ('\0' != *p)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected Install Date format at \"%s\" (expected %s), ignoring",
+				line, p, TIME_FMT);
+		return;
+	}
+
+	installtime_timestamp = mktime(&tm);
+
+	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
+			installtime_value, installtime_timestamp);
+}
+
+static void	pkgtools_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			size_str[DETAIL_BUF] = "", *out = NULL, *suffix;
+	zbx_uint64_t	size, multiplier;
+	double		size_double;
+	int		rv;
+
+	/* Since <name> can contain dashes we cannot use sscanf() here so regex is the only way. */
+	/* /var/log/packages/util-linux-2.27.1-x86_64-1:UNCOMPRESSED PACKAGE SIZE:     1.9M      */
+	/* "version" and "build" must be combined: <name>-<version>-<arch>-<build>...:<size>     */
+	if (SUCCEED != zbx_regexp_sub(
+			line,
+			"^/var/log/packages/(.*)-([^-]+)-([^-]+)-([^:]+):UNCOMPRESSED PACKAGE SIZE:\\s+(.*)$",
+			"\\1,\\2-\\4,\\3,\\5",
+			&out))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "internal error: could not compile regex");
+		goto out;
+	}
+
+	if (NULL == out)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected line \"%s\", ignoring", line);
+		goto out;
+	}
+
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],"
+				" %%" ZBX_FS_SIZE_T "[^,],",
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1),
+				(zbx_fs_size_t)(sizeof(size_str) - 1));
+	}
+
+#define NUM_FIELDS	4
+	rv = sscanf(out, fmt, name, version, arch, size_str);
+
+	if (NUM_FIELDS != rv)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could only collect %d (expected %d) values, ignoring",
+				line, rv, NUM_FIELDS);
+		goto out;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		goto out;
+
+	/* according to pkgtools source code the size suffix is    */
+	/* either 'K' or 'M' and it may be specified in 3 formats: */
+	/*   <n>K                                                  */
+	/*   <n>.<n>M                                              */
+	/*   <n>M                                                  */
+	if (NULL != (suffix = strchr(size_str, 'K')))
+	{
+		multiplier = ZBX_KIBIBYTE;
+	}
+	else if (NULL != (suffix = strchr(size_str, 'M')))
+	{
+		multiplier = ZBX_MEBIBYTE;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected size suffix in \"%s\": expected 'K' or 'M', ignoring",
+				line, size_str);
+		goto out;
+	}
+
+	*suffix = '\0';
+
+	if (SUCCEED != zbx_is_double(size_str, &size_double))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: unexpected size in \"%s\"", line, size_str);
+		goto out;
+	}
+
+	size = (zbx_uint64_t)(size_double * multiplier);
+
+	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+out:
+	zbx_free(out);
 }
 
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
@@ -172,13 +510,48 @@ static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packag
 	return offset;
 }
 
+/**
+ * NAME
+ * TEST_CMD
+ * LIST_CMD
+ * DETAILS_CMD
+ * LIST_PARSER
+ * DETAILS_PARSER
+ */
 static ZBX_PACKAGE_MANAGER	package_managers[] =
-/*	NAME		TEST_CMD					LIST_CMD			PARSER */
 {
-	{"dpkg",	"dpkg --version 2> /dev/null",			"dpkg --get-selections",	dpkg_parser},
-	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL},
-	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL},
-	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL},
+	{
+		"dpkg",
+		"dpkg --version 2> /dev/null",
+		"dpkg --get-selections",
+		"LC_ALL=C dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
+		dpkg_list,
+		dpkg_details
+	},
+	{
+		"pkgtools",
+		"[ -d /var/log/packages ] && echo true",
+		"ls /var/log/packages",
+		"grep -r '^UNCOMPRESSED PACKAGE SIZE' /var/log/packages",
+		NULL,
+		pkgtools_details
+	},
+	{
+		"rpm",
+		"rpm --version 2> /dev/null",
+		"rpm -qa",
+		"LC_ALL=C rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
+		NULL,
+		rpm_details
+	},
+	{
+		"pacman",
+		"pacman --version 2> /dev/null",
+		"pacman -Q",
+		"LC_ALL=C pacman -Qi 2>/dev/null | grep -E '^(Name|Installed Size|Version|Architecture|(Install|Build) Date)' | cut -f2- -d: | paste -d, - - - - - -",
+		NULL,
+		pacman_details
+	},
 	{NULL}
 };
 
@@ -226,7 +599,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
-				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
+				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
 			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
@@ -240,9 +613,9 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			while (NULL != package)
 			{
-				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
+				if (NULL != mng->list_parser)	/* check if the package name needs to be parsed */
 				{
-					if (SUCCEED == mng->parser(package, tmp, sizeof(tmp)))
+					if (SUCCEED == mng->list_parser(package, tmp, sizeof(tmp)))
 						package = tmp;
 					else
 						goto next;
@@ -284,6 +657,69 @@ next:
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+
+	return ret;
+}
+
+int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
+	char			*regex, *manager, *line, *buf = NULL, error[MAX_STRING_LEN];
+	ZBX_PACKAGE_MANAGER	*mng;
+	struct zbx_json		json;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return ret;
+	}
+
+	regex = get_rparam(request, 0);
+	manager = get_rparam(request, 1);
+
+	check_regex = (NULL != regex && '\0' != *regex && 0 != strcmp(regex, "all"));
+	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
+
+	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
+
+	for (i = 0; NULL != package_managers[i].name; i++)
+	{
+		mng = &package_managers[i];
+
+		if (1 == check_manager && 0 != strcmp(manager, mng->name))
+			continue;
+
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
+				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
+		{
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
+			{
+				continue;
+			}
+
+			ret = SYSINFO_RET_OK;
+
+			line = strtok(buf, "\n");
+
+			while (NULL != line)
+			{
+				mng->details_parser(mng->name, line, (1 == check_regex ? regex : NULL), &json);
+
+				line = strtok(NULL, "\n");
+			}
+		}
+	}
+
+	zbx_free(buf);
+
+	if (SYSINFO_RET_OK == ret)
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+
+	zbx_json_free(&json);
 
 	return ret;
 }

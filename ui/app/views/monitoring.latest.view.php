@@ -35,7 +35,11 @@ $this->includeJsFile('monitoring.latest.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$widget = (new CWidget())
+if ($data['uncheck']) {
+	uncheckTableRows('latest');
+}
+
+$html_page = (new CHtmlPage())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_LATEST_VIEW))
@@ -60,19 +64,19 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 
 	// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
 	$data['filter_options'] = $filter->options;
-	$widget->addItem($filter);
+	$html_page->addItem($filter);
 }
 else {
 	$data['filter_options'] = null;
 }
 
-$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-		'tags', 'maintenances', 'items_rw'
-	])
-)));
-
-$widget->show();
+$html_page
+	->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
+		array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
+			'tags', 'maintenances', 'items_rw'
+		])
+	)))
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

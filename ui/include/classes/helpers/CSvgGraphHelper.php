@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+
 /**
  * Class calculates graph data and makes SVG graph.
  */
@@ -59,7 +61,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -109,7 +111,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -179,7 +181,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
@@ -527,7 +529,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -541,7 +543,9 @@ class CSvgGraphHelper {
 				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 			}
 			else {
-				$name = 'Dataset #'.($dataset_num + 1);
+				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
+					? $data_sets[$dataset_num]['data_set_label']
+					: _('Data set').' #'.($dataset_num + 1);
 			}
 
 			$item = [
@@ -750,7 +754,7 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
-		if ($problem_options['show_problems'] != SVG_GRAPH_PROBLEMS_SHOW) {
+		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 

@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('scheduledreport');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scheduled reports'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_LIST))
 	->setControls(
@@ -100,6 +100,6 @@ $form->addItem([
 		], 'scheduledreport')
 	]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

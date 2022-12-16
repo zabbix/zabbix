@@ -18,15 +18,17 @@
 **/
 
 #include "lld_worker.h"
+#include "lld.h"
 
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "proxy.h"
 #include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
+#include "zbxdbwrap.h"
+#include "zbx_item_constants.h"
 
 extern unsigned char			program_type;
 
@@ -112,7 +114,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, item.error))
+		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
 		{
 			diff.error = error;
 			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
@@ -227,7 +229,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{

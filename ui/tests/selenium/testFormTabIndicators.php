@@ -25,8 +25,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource Services
+ * @dataSource EntitiesTags
  *
- * @backup services
  * @backup profiles
  */
 class testFormTabIndicators extends CWebTest {
@@ -475,7 +475,7 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'LDAP settings',
 							'entries' => [
-								'selector' => 'id:ldap_configured',
+								'selector' => 'id:ldap_auth_enabled',
 								'value' => true,
 								'old_value' => false
 							],
@@ -694,6 +694,11 @@ class testFormTabIndicators extends CWebTest {
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
 			$this->assertTabIndicator($tab_selector, $old_value);
 
+			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
+				$form->fill(['Enable HTTP authentication' => true]);
+				$this->query('button:Ok')->one()->click();
+			}
+
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
 			// Input elements change their attribute values only after focus is removed from the element.
@@ -825,7 +830,7 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		$overlay->waitUntilNotVisible();
-		$this->assertTabIndicator($tab_selector, count(CDataHelper::get('Services.serviceids')));
+		$this->assertTabIndicator($tab_selector, CDBHelper::getCount('SELECT null FROM services'));
 
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();

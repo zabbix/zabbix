@@ -26,7 +26,7 @@
 
 $this->includeJsFile('configuration.hostgroup.list.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOSTGROUPS_LIST))
 	->setControls(
@@ -201,7 +201,7 @@ $form->addItem([
 	], 'hostgroup')
 ]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

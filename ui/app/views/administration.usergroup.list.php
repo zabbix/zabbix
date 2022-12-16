@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('usergroup');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_LIST))
 	->setControls(
@@ -240,5 +240,6 @@ $form->addItem([
 	], 'usergroup')
 ]);
 
-$widget->addItem($form);
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

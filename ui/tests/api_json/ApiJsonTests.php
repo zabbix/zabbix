@@ -48,6 +48,7 @@ require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testTagFiltering.php';
 require_once dirname(__FILE__).'/testToken.php';
+require_once dirname(__FILE__).'/testUserDirectory.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
@@ -55,7 +56,7 @@ require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
-require_once dirname(__FILE__).'/testDependentItems.php';
+// require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 require_once dirname(__FILE__).'/testAuditlogAction.php';
 require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
@@ -81,7 +82,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testConfiguration');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fixed later
+		// $suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');
@@ -107,6 +108,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testTagFiltering');
 		$suite->addTestSuite('testToken');
+		$suite->addTestSuite('testUserDirectory');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
 		$suite->addTestSuite('testUsers');

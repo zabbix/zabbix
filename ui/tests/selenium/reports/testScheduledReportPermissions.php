@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -211,10 +212,10 @@ class testScheduledReportPermissions extends CWebTest {
 						'access_userid' => 1
 					],
 					[
-						'userid' => 4
+						'userid' => 40
 					],
 					[
-						'userid' => 5,
+						'userid' => 50,
 						'access_userid' => self::$userids['super-admin report permissions']
 					],
 					[

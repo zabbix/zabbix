@@ -25,14 +25,14 @@
 
 require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT));
 
 $maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
 if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
@@ -281,6 +281,6 @@ else {
 
 $maintenance_form->addItem($maintenance_tab);
 
-$widget->addItem($maintenance_form);
-
-$widget->show();
+$html_page
+	->addItem($maintenance_form)
+	->show();

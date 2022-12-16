@@ -27,9 +27,8 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-extern unsigned char			program_type;
-
-extern int	CONFIG_LLDWORKER_FORKS;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
  * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,
@@ -162,7 +161,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 	int			i;
 	zbx_lld_worker_t	*worker;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_LLDWORKER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]);
 
 	zbx_vector_ptr_create(&manager->workers);
 	zbx_queue_ptr_create(&manager->free_workers);
@@ -176,7 +175,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 
 	manager->next_worker_index = 0;
 
-	for (i = 0; i < CONFIG_LLDWORKER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]; i++)
 	{
 		worker = (zbx_lld_worker_t *)zbx_malloc(NULL, sizeof(zbx_lld_worker_t));
 
@@ -612,7 +611,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

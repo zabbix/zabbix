@@ -339,4 +339,90 @@ class testDataCollection extends CIntegrationTest {
 			$this->assertEquals('proxy_agent', $item['value']);
 		}
 	}
+
+	/**
+	 * Test incremental pre-processing manager cache refresh.
+	 *
+	 * @required-components server
+	 */
+	public function testDataCollection_preprocManagerCacheRefresh() {
+		$response = $this->call('host.create', [
+			[
+				'host' => 'trapper_host',
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => 'trap',
+			'key_' => 'trap',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'preprocessing' => [[
+				'params' => '100',
+				'type' => 1,
+				'error_handler' => 1,
+				'error_handler_params' => ''
+			]]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue('trapper_host', 'trap', 1, self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => [$itemid]
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+		$this->assertEquals(100, $response['result'][0]['value']);
+
+		$response = $this->call('item.update', [
+			'itemid' => $itemid,
+			'preprocessing' => [[
+				'params' => '200',
+				'type' => 1,
+				'error_handler' => 1,
+				'error_handler_params' => ''
+			]]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+
+		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => [$itemid]
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+		$this->assertEquals(400, $response['result'][0]['value']);
+	}
 }

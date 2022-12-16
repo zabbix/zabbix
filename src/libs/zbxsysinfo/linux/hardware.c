@@ -24,7 +24,6 @@
 
 #include "zbxalgo.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxnum.h"
 
 #include <sys/mman.h>
@@ -496,7 +495,12 @@ int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 				filter))
 		{
 			ret = SYSINFO_RET_OK;
-			sscanf(tmp, ZBX_FS_UI64, &curfreq);
+			if (1 != sscanf(tmp, ZBX_FS_UI64, &curfreq))
+			{
+				zbx_fclose(f);
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU frequency."));
+				return SYSINFO_RET_FAIL;
+			}
 		}
 	}
 
