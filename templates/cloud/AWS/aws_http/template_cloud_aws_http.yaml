@@ -144,22 +144,18 @@ zabbix_export:
                             || item.instancesSet.item.hasOwnProperty('instanceId') === false)
                             throw 'Failed response parse. Check debug log for more information.';
                         var instanceName = item.instancesSet.item.instanceId
-                        if (typeof item.instancesSet.item.tagSet !== 'object'
-                            || typeof item.instancesSet.item.tagSet.item !== 'object')
-                            throw 'Failed response parse. Check debug log for more information.';
-                        if (Array.isArray(item.instancesSet.item.tagSet.item)) {
+                        if (typeof item.instancesSet.item.tagSet === 'object'
+                            && typeof item.instancesSet.item.tagSet.item === 'object') {
+                            if (!Array.isArray(item.instancesSet.item.tagSet.item))
+                              item.instancesSet.item.tagSet.item = [item.instancesSet.item.tagSet.item];
                             item.instancesSet.item.tagSet.item.forEach(
                                 function (tag) {
                                     if (tag.hasOwnProperty('key') && tag.key === 'Name') {
                                         instanceName = tag.value;
                                     }
                                 }
-                            )
-                        } else {
-                            if (item.instancesSet.item.tagSet.item.hasOwnProperty('key') && item.instancesSet.item.tagSet.item.key === 'Name')
-                                instanceName = item.instancesSet.item.tagSet.item.value
+                            );
                         }
-            
                         instance_array[index]['instanceName'] = instanceName;
                     });
             
@@ -176,10 +172,15 @@ zabbix_export:
             
                     if (typeof result !== 'object'
                         || typeof result.DescribeInstancesResponse !== 'object'
-                        || typeof result.DescribeInstancesResponse.reservationSet !== 'object'
-                        || typeof result.DescribeInstancesResponse.reservationSet.item !== 'object') {
+                        || typeof result.DescribeInstancesResponse.reservationSet !== 'object') {
                         throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
                     }
+            
+                    if (result.DescribeInstancesResponse.reservationSet === null)
+                        return [];
+            
+                    if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
+                        throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
             
                     return AwsEC2.tagToNameInstances(result.DescribeInstancesResponse.reservationSet.item);
                 }
@@ -566,12 +567,16 @@ zabbix_export:
                         result = AwsS3.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AwsS3.prepareParams(payload), '', '');
                     if (typeof result !== 'object'
                         || typeof result.ListAllMyBucketsResult !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
+                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object') {
+                        throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
+                    }
+                    if (result.ListAllMyBucketsResult.Buckets === null)
+                        return []
+                    if (typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
                         throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
                     }
             
-                    var buckets = []
+                    var buckets = [];
                     if (!Array.isArray(result.ListAllMyBucketsResult.Buckets.Bucket))
                         buckets = [result.ListAllMyBucketsResult.Buckets.Bucket]
                     else
