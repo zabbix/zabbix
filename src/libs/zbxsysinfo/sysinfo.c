@@ -33,8 +33,6 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 
-extern int	CONFIG_TIMEOUT;
-
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
 #endif
@@ -71,6 +69,7 @@ extern ZBX_METRIC	parameter_hostname;
 static ZBX_METRIC	*commands = NULL;
 static ZBX_METRIC	*commands_local = NULL;
 zbx_vector_ptr_t	key_access_rules;
+zbx_get_config_int_f	get_config_timeout_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -262,6 +261,11 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 	commands = metrics;
 }
 #endif
+
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f)
+{
+	get_config_timeout_cb = get_config_timeout_f;
+}
 
 void	zbx_init_metrics(void)
 {
@@ -1795,7 +1799,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	close(fds[1]);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(get_config_timeout_cb());
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
@@ -1948,7 +1952,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	}
 
 	/* 1000 is multiplier for converting seconds into milliseconds */
-	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, CONFIG_TIMEOUT * 1000)))
+	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, get_config_timeout_cb() * 1000)))
 	{
 		/* unexpected error */
 

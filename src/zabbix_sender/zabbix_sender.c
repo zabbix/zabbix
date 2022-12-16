@@ -137,6 +137,8 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+static int	CONFIG_TIMEOUT = 3;
+
 static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 
 #define CONFIG_SENDER_TIMEOUT_MIN	1

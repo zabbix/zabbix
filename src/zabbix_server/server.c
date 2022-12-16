@@ -306,6 +306,12 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
+static int	CONFIG_TIMEOUT = 3;
+static int	get_config_timeout(void)
+{
+	return CONFIG_TIMEOUT;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -1253,6 +1259,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_sysinfo(get_config_timeout);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{

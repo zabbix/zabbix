@@ -251,6 +251,12 @@ static const char	*get_progname(void)
 }
 #endif
 
+static int	CONFIG_TIMEOUT = 3;
+static int	get_config_timeout(void)
+{
+	return CONFIG_TIMEOUT;
+}
+
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
@@ -1357,6 +1363,7 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
+	zbx_init_library_sysinfo(get_config_timeout);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif

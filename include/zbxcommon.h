@@ -462,6 +462,7 @@ typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
+typedef int		(*zbx_get_config_int_f)(void);
 
 typedef enum
 {
