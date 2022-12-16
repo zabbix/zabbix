@@ -696,6 +696,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 
 			case ZBX_FLAG_DISCOVERY_RULE:
 				switch ($upd_db_item['flags']) {
@@ -717,6 +718,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				switch ($upd_db_item['flags']) {
@@ -738,6 +740,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 		}
 
 		if ($error) {
