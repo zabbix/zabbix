@@ -175,8 +175,8 @@
 			const expandable_buttons = table.querySelectorAll("button[data-action='show_symptoms']");
 
 			expandable_buttons.forEach((btn, idx, array) => {
-				['click','keydown'].forEach((e) => {
-					btn.addEventListener(e, (e) => {
+				['click','keydown'].forEach((type) => {
+					btn.addEventListener(type, (e) => {
 						if (e.type === 'click' || e.which === 13) {
 							this.showSymptoms(btn, idx, array);
 						}
@@ -185,9 +185,9 @@
 
 				// Check if cause events were opened. If so, after (not full) refresh open them again.
 				if (this.opened_eventids.includes(btn.dataset.eventid)) {
-					let rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+					const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
 
-					[...rows].forEach(row => row.classList.remove('hidden'));
+					[...rows].forEach((row) => row.classList.remove('hidden'));
 
 					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 					btn.title = '<?= _('Collapse') ?>';
@@ -195,24 +195,18 @@
 			});
 
 			// Fix last row border depending if it is opened or closed.
-			rows = table.querySelectorAll('.problem-row');
+			const rows = table.querySelectorAll('.problem-row');
 
-			rows.forEach((row, idx, array) => {
-				if (idx === array.length - 1) {
-					const tds = [...row.children];
-					let is_collapsed = false;
+			if (rows.length > 0) {
+				const tds = [...rows].pop().children;
 
-					tds.forEach((td) => {
-						const btn = td.querySelector("button[data-action='show_symptoms']");
+				[...tds].forEach((td) => {
+					const btn = td.querySelector('button[data-action="show_symptoms"]');
+					const is_collapsed = btn !== null && btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
 
-						if (btn !== null) {
-							is_collapsed = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
-						}
-
-						td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
-					});
-				}
-			});
+					td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
+				});
+			}
 		},
 
 		showSymptoms(btn, idx, array) {
@@ -229,7 +223,7 @@
 
 				this.opened_eventids.push(btn.dataset.eventid);
 
-				[...rows].forEach(row => row.classList.remove('hidden'));
+				[...rows].forEach((row) => row.classList.remove('hidden'));
 			}
 			else {
 				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>', '<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
@@ -237,23 +231,21 @@
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
 
-				[...rows].forEach(row => row.classList.add('hidden'));
+				[...rows].forEach((row) => row.classList.add('hidden'));
 			}
 
 			// Fix last row border depending if it is opened or closed.
 			rows = table.querySelectorAll('.problem-row');
 
-			rows.forEach((row, idx, array) => {
-				if (idx === array.length - 1) {
-					const tds = [...row.children];
+			if (rows.length > 0) {
+				const tds = [...rows].pop().children;
 
-					tds.forEach((td) => {
-						td.style.borderBottomStyle = btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'))
-							? 'hidden'
-							: 'solid';
-					});
-				}
-			});
+				[...tds].forEach((td) => {
+					const is_collapsed = btn !== null && btn.classList.contains(('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>'));
+
+					td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid';
+				});
+			}
 
 			// When complete enable button again.
 			btn.disabled = false;
