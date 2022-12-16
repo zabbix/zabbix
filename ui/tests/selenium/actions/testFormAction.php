@@ -1652,7 +1652,11 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
 		$operation_form->submit();
-		$this->page->waitUntilReady();
+
+		foreach (['operations_0', 'operations_1'] as $row) {
+			$this->query('xpath://tr[@id="'.$row.'"]')->waitUntilVisible();
+		}
+
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::className('js-add'));
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
@@ -1669,7 +1673,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('operation-command-chst');
 
 		$operation_form->submit();
-		$this->page->waitUntilReady();
+		$this->query('xpath://tr[@id="operations_2"]')->waitUntilVisible();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
