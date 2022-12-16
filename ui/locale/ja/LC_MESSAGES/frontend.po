@@ -883,6 +883,14 @@ msgstr "子サービスの追加"
 msgid "Add from"
 msgstr "他から追加"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "ホストを追加"
@@ -4131,6 +4139,10 @@ msgstr "設定を更新しました"
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "確認テキスト"
@@ -6471,6 +6483,10 @@ msgstr "有効"
 msgid "Enable HTTP authentication"
 msgstr "HTTP認証の有効化"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "LDAP認証の有効化"
@@ -8745,6 +8761,10 @@ msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで�
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "システムの識別文字列。文字列値を返す。"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

@@ -882,6 +882,14 @@ msgstr ""
 msgid "Add from"
 msgstr ""
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Thêm host"
@@ -4137,6 +4145,10 @@ msgstr "Cấu hình đã cập nhật"
 msgid "Configure DB connection"
 msgstr "Cấu hình kết nối DB"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Xác nhận văn bản"
@@ -6468,6 +6480,10 @@ msgstr "Kích hoạt"
 msgid "Enable HTTP authentication"
 msgstr "Kích hoạt xác thực HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Kích hoạt xác thực LDAP"
@@ -8742,6 +8758,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "Nhận dạng hệ thống. Trả về kiểu string"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

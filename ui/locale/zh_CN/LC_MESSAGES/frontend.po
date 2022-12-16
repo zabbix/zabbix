@@ -886,6 +886,14 @@ msgstr "添加子服务"
 msgid "Add from"
 msgstr "添加自"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "添加主机"
@@ -4134,6 +4142,10 @@ msgstr "配置已更新"
 msgid "Configure DB connection"
 msgstr "配置数据库连接"
 
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "确认文字"
@@ -6485,6 +6497,10 @@ msgstr "启用"
 msgid "Enable HTTP authentication"
 msgstr "启用HTTP 验证"
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "启用LDAP 验证"
@@ -8760,6 +8776,10 @@ msgstr "位于 %2$s 的模块使用了相同的命名空间 (%1$s)。"
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
