@@ -61,7 +61,7 @@ void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register callback to add information to data subelement           *
+ * Purpose: register callback to add information to data sub-element          *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
  *             arg              - [IN] additional argument passed to calback  *
