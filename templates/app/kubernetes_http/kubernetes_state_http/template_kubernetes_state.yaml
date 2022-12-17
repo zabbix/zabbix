@@ -67,8 +67,7 @@ zabbix_export:
                     ['api_token', 'api_url',
                      'controller_scheme', 'controller_port',
                      'scheduler_scheme', 'scheduler_port'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
+                        if (!params[field]) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -389,8 +388,7 @@ zabbix_export:
 
                 setParams: function (params) {
                     ['api_token', 'api_url', 'kubelet_scheme', 'kubelet_port'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
+                        if (!params[field]) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
@@ -583,8 +581,7 @@ zabbix_export:
 
                 setParams: function (params) {
                     ['api_token', 'api_url', 'state_endpoint_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
+                        if (!params[field]) {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
