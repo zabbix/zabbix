@@ -31,7 +31,7 @@ $form = (new CForm())
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 // create module tab
 $module_tab = (new CFormList())

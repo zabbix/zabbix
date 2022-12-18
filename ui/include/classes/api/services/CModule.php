@@ -207,7 +207,7 @@ class CModule extends CApiService {
 		$rules = [
 			'type' => API_OBJECT,
 			'fields' => [
-				'moduleid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'moduleid' => ['type' => API_ID, 'flags' => API_REQUIRED],
 				'status' => ['type' => API_INT32, 'in' => MODULE_STATUS_DISABLED.','.MODULE_STATUS_ENABLED]
 			]
 		];

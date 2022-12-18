@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-04-10T22:48:48Z</date>
+   <date>2022-09-12T10:57:39Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1421,7 +1421,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <dependencies>
                         <dependency>
                            <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-                           <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+                           <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -2157,7 +2157,7 @@ Template tooling version used: 0.39</description>
          <priority>WARNING</priority>
       </trigger>
       <trigger>
-         <expression>{Template Module Linux memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
+         <expression>{Template Module Linux memory by Zabbix agent active:system.swap.size[,pfree].max(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)</name>
          <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
@@ -2169,12 +2169,12 @@ Template tooling version used: 0.39</description>
             </dependency>
             <dependency>
                <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+               <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
             </dependency>
          </dependencies>
       </trigger>
       <trigger>
-         <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
+         <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].max(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
          <name>Lack of available memory (&lt;{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
          <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>

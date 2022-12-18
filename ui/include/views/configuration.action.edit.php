@@ -31,7 +31,7 @@ $widget = (new CWidget())->setTitle(_('Actions'));
 $actionForm = (new CForm())
 	->setId('action.edit')
 	->setName('action.edit')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('eventsource', $data['eventsource']);
 

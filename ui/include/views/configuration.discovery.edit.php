@@ -30,7 +30,7 @@ $widget = (new CWidget())->setTitle(_('Discovery rules'));
 // Create form.
 $discoveryForm = (new CForm())
 	->setName('discoveryForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);

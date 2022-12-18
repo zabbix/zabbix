@@ -35,7 +35,7 @@ if (!empty($data['hostid'])) {
 $form = (new CForm())
 	->setId('itemForm')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
