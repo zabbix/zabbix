@@ -74,14 +74,6 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		}
 	}
 }
-else {
-	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
-		access_deny();
-	}
-	if (getRequest('filter_hostid') && !isReadableHosts([getRequest('filter_hostid')])) {
-		access_deny();
-	}
-}
 if (getRequest('triggerid') && !isReadableTriggers([getRequest('triggerid')])) {
 	access_deny();
 }
@@ -520,9 +512,6 @@ else {
 		$url = (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']);
 		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 			$url->setArgument('filter_templateid', $data['filter']['hostids']);
-		}
-		else {
-			$url->setArgument('filter_hostids[]', $trigger['hosts'][0]['hostid']);
 		}
 
 		$triggerTable->addRow([
