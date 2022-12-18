@@ -143,7 +143,7 @@ $fields = [
 	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
-	'applications' =>				[T_ZBX_STR, O_OPT, P_AS_IS,	null,		null],
+	'applications' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
@@ -1278,8 +1278,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 	}
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
 	$result = false;
 	$config = select_config();
 
