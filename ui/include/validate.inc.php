@@ -152,7 +152,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 	$is_td_array_flag = ($flags & P_ONLY_TD_ARRAY);
 	$has_array_flag = $is_array_flag || $is_td_array_flag;
 
-	if (is_array($var) && $type != T_ZBX_RANGE_TIME && ($has_array_flag || $flags & P_AS_IS)) {
+	if (is_array($var) && $type != T_ZBX_RANGE_TIME && $has_array_flag) {
 		$err = ZBX_VALID_OK;
 
 		if ($flags & P_ONLY_ARRAY) {
