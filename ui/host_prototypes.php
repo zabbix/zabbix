@@ -48,7 +48,7 @@ $fields = [
 	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
 	'group_hostid' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,			null,		null],
+	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,			null,		null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"hostprototype.massdelete","hostprototype.massdisable",'.
