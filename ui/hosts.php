@@ -54,7 +54,7 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,
 									IN([HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]), null
 								],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,			NOT_EMPTY,
+	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,			NOT_EMPTY,
 									'isset({add}) || isset({update})'
 								],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,			DB_ID,		null],
