@@ -522,7 +522,7 @@ else {
 			$url->setArgument('filter_templateid', $data['filter']['hostids']);
 		}
 		else {
-			$url->setArgument('filter_hostids', $trigger['hosts'][0]['hostid']);
+			$url->setArgument('filter_hostids[]', $trigger['hosts'][0]['hostid']);
 		}
 
 		$triggerTable->addRow([
