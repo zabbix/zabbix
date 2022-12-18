@@ -48,8 +48,8 @@ $fields = [
 	],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
-	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
-	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
+	'users' =>			[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
+	'userGroups' =>		[T_ZBX_INT, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"screen.export","screen.massdelete"'),		null],
 	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
