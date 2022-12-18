@@ -188,59 +188,16 @@ class CMenuItem extends CTag {
 	public function setSelectedByAction(string $action_name, array $request_params, bool $expand = false): bool {
 		if (array_key_exists($action_name, $this->aliases)) {
 			foreach ($this->aliases[$action_name] as $alias_params) {
-				$no_unacceptable_params = true;
-				$unacceptable_params = [];
-				foreach ($alias_params as $name => $value) {
-					if ($name[0] === '!') {
-						$unacceptable_params[substr($name, 1)] = $value;
-						unset($alias_params[$name]);
-					}
-				}
-
-				if ($unacceptable_params) {
-					$unacceptable_params_existing = array_intersect_assoc($unacceptable_params, $request_params);
-					foreach ($unacceptable_params as $name => $value) {
-						if ($value === '*' && array_key_exists($name, $request_params)) {
-							$unacceptable_params_existing[$name] = '*';
-						}
-					}
-
-					if (!array_diff_assoc($unacceptable_params, $unacceptable_params_existing)) {
-						continue;
-					}
-				}
+				$has_mandatory_params = true;
 
 				foreach ($alias_params as $name => $value) {
-					if (!array_key_exists($name, $request_params)) {
-						continue;
-					}
-
-					if (is_array($value)) {
-						if (!is_array($request_params[$name])) {
-							continue 2;
-						}
-
-						foreach ($value as $value_param) {
-							if (!in_array($value_param, $request_params[$name])) {
-								continue 3;
-							}
-						}
-					}
-
-					if (is_string($value) && is_array($request_params[$name])) {
-						$request_params[$name] = reset($request_params[$name]);
-						continue;
+					if (!array_key_exists($name, $request_params)
+							|| ($value !== '*' && $value !== $request_params[$name])) {
+						$has_mandatory_params = false;
 					}
 				}
 
-				$alias_params_diff = array_diff_assoc($alias_params, $request_params);
-				foreach ($alias_params_diff as $name => $value) {
-					if ($value === '*') {
-						unset($alias_params_diff[$name]);
-					}
-				}
-
-				if ($no_unacceptable_params && !$alias_params_diff) {
+				if ($has_mandatory_params) {
 					$this->setSelected();
 
 					return true;
