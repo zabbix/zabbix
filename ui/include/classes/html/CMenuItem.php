@@ -210,9 +210,10 @@ class CMenuItem extends CTag {
 						: false;
 				}
 
-				$alias_params_diff = array_diff_assoc($alias_params, $request_params);
-				foreach ($alias_params_diff as $name => $value) {
-					if ($value === '*') {
+				$alias_params_diff = array_intersect_key($request_params, $alias_params);
+				foreach ($alias_params as $name => $value) {
+					if (array_key_exists($name, $alias_params_diff)
+							&& ($value === '*' || $value === $alias_params_diff[$name])) {
 						unset($alias_params_diff[$name]);
 					}
 				}
