@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
-	'groups'			=> [T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'groups'			=> [null,      O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
