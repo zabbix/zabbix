@@ -101,7 +101,7 @@ class testProxyConfSync extends CIntegrationTest
 		[
 			'interfaces' =>
 			[
-				'insert' => '13',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -109,7 +109,7 @@ class testProxyConfSync extends CIntegrationTest
 		[
 			'items' =>
 			[
-				'insert' => '76',
+				'insert' => '78',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -396,7 +396,7 @@ class testProxyConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"36",
+				"37",
 				"delete" =>
 				"0"
 			]
@@ -739,7 +739,7 @@ class testProxyConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"13"
+				"15"
 			]
 		],
 		[
@@ -750,7 +750,7 @@ class testProxyConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"76"
+				"78"
 			]
 		],
 		[
@@ -772,7 +772,7 @@ class testProxyConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"76"
+				"78"
 			]
 		],
 		[
