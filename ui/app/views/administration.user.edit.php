@@ -195,7 +195,7 @@ else {
 	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
 		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
 
-	$hint = !$data['internal_authentication']
+	$hint = !$change_password_enabled
 		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
 			->addStyle('margin-left: 5px; margin-top: 4px')
 		: null;
