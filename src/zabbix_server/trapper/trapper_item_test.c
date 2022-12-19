@@ -128,8 +128,19 @@ static void	db_uchar_from_json(const struct zbx_json_parse *jp, const char *name
 		ZBX_STR2UCHAR(*string, DBget_field(table, fieldname)->default_value);
 }
 
+static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, const ZBX_TABLE *table,
+		const char *fieldname, int *num)
+{
+	char	tmp[ZBX_MAX_UINT64_LEN + 1];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, name, tmp, sizeof(tmp), NULL))
+		*num = atoi(tmp);
+	else
+		*num = atoi(DBget_field(table, fieldname)->default_value);
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **info,
-		const zbx_config_comms_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config_comms)
 {
 	char			tmp[MAX_STRING_LEN + 1], **pvalue;
 	DC_ITEM			item;
@@ -254,6 +265,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.snmpv3_privpassphrase = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_PRIVPASSPHRASE,
 			table_interface_snmp, "privpassphrase");
 
+	db_int_from_json(&jp_details, ZBX_PROTO_TAG_MAX_REPS, table_interface_snmp, "max_repetitions",
+			&item.snmp_max_repetitions);
+
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_AUTHPROTOCOL, table_interface_snmp, "authprotocol",
 			&item.snmpv3_authprotocol);
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_PRIVPROTOCOL, table_interface_snmp, "privprotocol",
@@ -353,7 +367,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_clear(&ctx);
 		}
 
-		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, zbx_config);
+		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, zbx_config_comms);
 
 		switch (errcode)
 		{
@@ -412,7 +426,8 @@ out:
 	return ret;
 }
 
-void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_config_comms_args_t *zbx_config)
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_comms_args_t *zbx_config_comms)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -428,7 +443,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, 
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
-		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Permission denied.", zbx_config_comms->config_timeout);
 		goto out;
 	}
 
@@ -437,7 +452,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, 
 		char	*error;
 
 		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, error, zbx_config_comms->config_timeout);
 		zbx_free(error);
 		goto out;
 	}
@@ -449,13 +464,13 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, 
 	else
 		proxy_hostid = 0;
 
-	ret = zbx_trapper_item_test_run(&jp_data, proxy_hostid, &info, zbx_config);
+	ret = zbx_trapper_item_test_run(&jp_data, proxy_hostid, &info, zbx_config_comms);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
 			ZBX_JSON_TYPE_STRING);
-	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
+	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, zbx_config_comms->config_timeout);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
 

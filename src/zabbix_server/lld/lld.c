@@ -37,7 +37,7 @@ typedef struct
 	zbx_uint64_t		id;
 	char			*macro;
 	char			*regexp;
-	zbx_vector_ptr_t	regexps;
+	zbx_vector_expression_t	regexps;
 	unsigned char		op;
 }
 lld_condition_t;
@@ -72,7 +72,7 @@ lld_override_t;
 static void	lld_condition_free(lld_condition_t *condition)
 {
 	zbx_regexp_clean_expressions(&condition->regexps);
-	zbx_vector_ptr_destroy(&condition->regexps);
+	zbx_vector_expression_destroy(&condition->regexps);
 
 	zbx_free(condition->macro);
 	zbx_free(condition->regexp);
@@ -146,7 +146,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
 	condition->regexp = zbx_strdup(NULL, regexp);
 	condition->op = (unsigned char)atoi(op);
 
-	zbx_vector_ptr_create(&condition->regexps);
+	zbx_vector_expression_create(&condition->regexps);
 
 	zbx_vector_ptr_append(conditions, condition);
 
@@ -238,7 +238,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 		}
 		else
 		{
-			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
+			switch (zbx_regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
 				case ZBX_REGEXP_MATCH:
 					*result = (ZBX_CONDITION_OPERATOR_REGEXP == condition->op ? 1 : 0);
@@ -317,7 +317,7 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 				}
 				else if (0 != strcmp(lastmacro, condition->macro))
 				{
-					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, ") and ");
+					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, ") and (");
 				}
 				else
 					zbx_strcpy_alloc(&expression, &expression_alloc, &expression_offset, " or ");
@@ -351,15 +351,10 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 			zbx_vector_ptr_append(&errmsgs, errmsg);
 			errmsg = NULL;
 		}
-
-		if (filter->conditions.values_num == i + 1)
-		{
-			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
-				zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
-
-			expression_offset++;
-		}
 	}
+
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+		zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
 
 	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), &errmsgs))
 	{

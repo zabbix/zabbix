@@ -861,22 +861,23 @@ out:
  *             rate             - [IN] threshold of records count at a time   *
  *             process_value_cb - [IN] callback function for sending data to  *
  *                                     the server                             *
+ *             zbx_config_tls   - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
  *             error            - [OUT] the error message in the case of      *
  *                                      failure                               *
- *             zbx_config_tls   - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
 static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
 		EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
-		zbx_uint64_t LastID, zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity,
+		zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate,
-		zbx_process_value_func_t process_value_cb, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, char **error)
+		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 #	define EVT_ARRAY_SIZE	100
 
@@ -992,28 +993,28 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 			{
 				int	ret1, ret2, ret3, ret4;
 
-				if (FAIL == (ret1 = regexp_match_ex(regexps, evt_message, pattern,
+				if (FAIL == (ret1 = zbx_regexp_match_ex(regexps, evt_message, pattern,
 						ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the second parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret2 = regexp_match_ex(regexps, str_severity, key_severity,
+				else if (FAIL == (ret2 = zbx_regexp_match_ex(regexps, str_severity, key_severity,
 						ZBX_IGNORE_CASE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the third parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret3 = regexp_match_ex(regexps, evt_provider, key_source,
+				else if (FAIL == (ret3 = zbx_regexp_match_ex(regexps, evt_provider, key_source,
 						ZBX_IGNORE_CASE)))
 				{
 					*error = zbx_strdup(*error,
 							"Invalid regular expression in the fourth parameter.");
 					match = FAIL;
 				}
-				else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid,
+				else if (FAIL == (ret4 = zbx_regexp_match_ex(regexps, str_logeventid,
 						key_logeventid, ZBX_CASE_SENSITIVE)))
 				{
 					*error = zbx_strdup(*error,
@@ -1036,13 +1037,13 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 			}
 			else
 			{
-				match = ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_message, pattern,
+				match = ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, evt_message, pattern,
 							ZBX_CASE_SENSITIVE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
+						ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, str_severity,
 							key_severity, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, evt_provider,
+						ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, evt_provider,
 							key_source, ZBX_IGNORE_CASE) &&
-						ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
+						ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, str_logeventid,
 							key_logeventid, ZBX_CASE_SENSITIVE);
 			}
 
@@ -1051,7 +1052,8 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
-						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls);
+						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls,
+						config_timeout);
 
 				if (SUCCEED == send_err)
 				{
@@ -1388,21 +1390,22 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *             rate             - [IN] threshold of records count at a time   *
  *             process_value_cb - [IN] callback function for sending data to  *
  *                                     the server                             *
+ *             zbx_config_tls   - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
  *             error            - [OUT] the error message in the case of      *
  *                                     failure                                *
- *             zbx_config_tls   - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
 static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
-		zbx_vector_ptr_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
+		zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
-		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls,
-		char **error)
+		const zbx_config_tls_t *zbx_config_tls, int config_timeout, ZBX_ACTIVE_METRIC *metric,
+		zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int		ret = FAIL;
 	HANDLE		eventlog_handle = NULL;
@@ -1583,28 +1586,28 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 				{
 					int	ret1, ret2, ret3, ret4;
 
-					if (FAIL == (ret1 = regexp_match_ex(regexps, value, pattern,
+					if (FAIL == (ret1 = zbx_regexp_match_ex(regexps, value, pattern,
 							ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the second parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret2 = regexp_match_ex(regexps, str_severity, key_severity,
+					else if (FAIL == (ret2 = zbx_regexp_match_ex(regexps, str_severity, key_severity,
 							ZBX_IGNORE_CASE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the third parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret3 = regexp_match_ex(regexps, source, key_source,
+					else if (FAIL == (ret3 = zbx_regexp_match_ex(regexps, source, key_source,
 							ZBX_IGNORE_CASE)))
 					{
 						*error = zbx_strdup(*error,
 								"Invalid regular expression in the fourth parameter.");
 						match = FAIL;
 					}
-					else if (FAIL == (ret4 = regexp_match_ex(regexps, str_logeventid,
+					else if (FAIL == (ret4 = zbx_regexp_match_ex(regexps, str_logeventid,
 							key_logeventid, ZBX_CASE_SENSITIVE)))
 					{
 						*error = zbx_strdup(*error,
@@ -1626,14 +1629,14 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 				}
 				else
 				{
-					match = ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, pattern,
+					match = ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_severity,
+							ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, str_severity,
 								key_severity, ZBX_IGNORE_CASE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, source,
+							ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps, source,
 								key_source, ZBX_IGNORE_CASE) &&
-							ZBX_REGEXP_MATCH == regexp_match_ex(regexps, str_logeventid,
-								key_logeventid, ZBX_CASE_SENSITIVE);
+							ZBX_REGEXP_MATCH == zbx_regexp_match_ex(regexps,
+								str_logeventid, key_logeventid, ZBX_CASE_SENSITIVE);
 				}
 
 				if (1 == match)
@@ -1641,7 +1644,8 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
 							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &timestamp, source, &severity, &logeventid,
-							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls);
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls,
+							config_timeout);
 
 					if (SUCCEED == send_err)
 					{
@@ -1692,9 +1696,10 @@ out:
 	return ret;
 }
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, char **error)
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		char **error)
 {
 	int 		ret = FAIL;
 	AGENT_REQUEST	request;
@@ -1812,7 +1817,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
-					metric, lastlogsize_sent, zbx_config_tls, error);
+					zbx_config_tls, config_timeout, metric, lastlogsize_sent, error);
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -1824,8 +1829,8 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
-				key_logeventid, rate, process_value_cb, metric, lastlogsize_sent, zbx_config_tls,
-				error);
+				key_logeventid, rate, process_value_cb, zbx_config_tls, config_timeout, metric,
+				lastlogsize_sent, error);
 	}
 out:
 	zbx_free_agent_request(&request);

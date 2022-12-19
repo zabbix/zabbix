@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-27 16:27+0000\n"
+"PO-Revision-Date: 2022-12-16 15:07+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -158,7 +158,7 @@ msgstr[2] "%1$s zdarzeń"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "Wzorzec grupy %1$s"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -295,7 +295,7 @@ msgstr "%1$s. %2$s: %3$s. %4$s."
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "Klasa %1$s.php musi rozszerzać %2$s dla modułu znajdującego się w %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -721,7 +721,7 @@ msgstr "Zaktualizowano akcję"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Akcja o identyfikatorze „%1$s” jest niedostępna."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -937,7 +937,7 @@ msgstr "Dodaj element potomny"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Dodaj elementy potomne"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -950,6 +950,14 @@ msgstr "Dodaj usługi podrzędne"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "Dodaj z"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1254,6 +1262,10 @@ msgstr "Dopuszczalne hosty"
 msgid "Allowed methods"
 msgstr "Dopuszczalne metody"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatywnie, można zainstalować to ręcznie:"
@@ -1269,32 +1281,32 @@ msgstr "Ilość fizycznej pamięci zyżytej na kopie stron fizycznej pamięci, <
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Reguła LLD z kluczem „%1$s” już istnieje na hoście „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Reguła LLD z kluczem „%1$s” już istnieje na szablonie „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Prototyp pozycji z kluczem „%1$s” już istnieje na hoście „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Prototyp pozycji z kluczem „%1$s” już istnieje na szablonie „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Pozycja z kluczem „%1$s” już istnieje na hoście „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Pozycja z kluczem „%1$s” już istnieje na szablonie „%2$s”."
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -1567,7 +1579,7 @@ msgstr "Próby"
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "Atrybut"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -2209,7 +2221,7 @@ msgstr "Nie można dodać scenariusza sieci www"
 
 #: jsLoader.php:129
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Nie można dodać widżetu: brak dostępnych widżetów."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
@@ -2218,17 +2230,17 @@ msgstr "Nie można dodać widżetu: za mało miejsca na panelu."
 #: include/classes/api/services/CItem.php:1532
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Nie można przypisać pola inwentarza „%1$s” do pozycji z kluczem „%2$s” hosta „%3$s”, ponieważ jest już zajęty przez pozycję z kluczem „%4$s”."
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
-msgstr ""
+msgstr "Nie można przypisać pola inwentarza „%1$s” do pozycji z kluczem „%2$s” szablonu „%3$s”, ponieważ jest już zajęty przez pozycję z kluczem „%4$s”."
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Nie można przypisać pola inwentarza „%1$s” do pozycji z kluczem „%2$s” szablonu „%3$s”, ponieważ jest już zajęty przez pozycję z kluczem „%4$s”."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2306,12 +2318,12 @@ msgstr[2] "Nie można skopiować pozycji"
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Nie można skopiować prototypu pozycji z kluczem „%1$s” bez głównej pozycji z kluczem „%2$s”."
 
 #: include/items.inc.php:590
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Nie można skopiować pozycji z kluczem „%1$s” bez głównej pozycji z kluczem „%2$s”."
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2967,12 +2979,12 @@ msgstr "Nie można znaleźć interfejsu hosta \"%1$s\" dla klucza pozycji \"%2$s
 #: include/classes/api/services/CDiscoveryRule.php:2517
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć interfejsu hosta „%1$s” dla prototypu pozycji z kluczem „%2$s”."
 
 #: include/items.inc.php:640
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć interfejsu hosta „%1$s” dla pozycji z kluczem „%2$s”."
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -3095,201 +3107,201 @@ msgstr[2] "Nie można zaimportować szablonu \"%1$s\", nie istnieją podłączon
 #: include/classes/api/services/CItemGeneral.php:588
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć reguł LDD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:589
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć reguł LDD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:704
 #: include/classes/api/services/CItemGeneral.php:716
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:1030
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wymagany jest interfejs hosta typu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ prototyp pozycji z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:704
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:705
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ prototyp pozycji z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:705
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:770
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItemPrototype.php:1230
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” i reguły LLD  „%3$s” do hosta „%4$s”, ponieważ prototyp pozycji z takim samym kluczem już należy do reguły LLD „%5$s”."
 
 #: include/classes/api/services/CItemPrototype.php:1231
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” i reguły LLD  „%3$s” do szablonu „%4$s”, ponieważ prototyp pozycji z takim samym kluczem już należy do reguły LLD „%5$s”."
 
 #: include/classes/api/services/CItemGeneral.php:725
 #: include/classes/api/services/CItemGeneral.php:737
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:1034
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wymagany jest interfejs hosta typu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:731
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pozycja z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:726
 #: include/classes/api/services/CItemGeneral.php:738
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ reguła LLD z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć prototypu pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:776
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyćprototypu pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:582
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypów pozycji z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:583
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć prototypów pozycji z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na szablonie „%4$s”."
 
 #: include/classes/api/services/CItem.php:1455
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” i pozycji z kluczem „%3$s” szablonu „%4$s” do hosta „%5$s”, ponieważ wypełniłyby to samo pole inwentarza „%6$s”."
 
 #: include/classes/api/services/CItem.php:1454
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” i pozycji z kluczem „%3$s” szablonu „%4$s” do szablonu „%5$s”, ponieważ wypełniłyby to samo pole inwentarza „%6$s”."
 
 #: include/classes/api/services/CItemGeneral.php:695
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:1026
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ wymagany jest interfejs hosta typu „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ prototyp pozycji z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:763
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItem.php:1509
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do hosta „%3$s”, ponieważ pole ekwipunku \"%4$s\" jest już wypełnione przez pozycję z kluczem „%5$s”."
 
 #: include/classes/api/services/CItemGeneral.php:696
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ wykryta pozycja z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ reguła LLD z tym samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ prototyp pozycji z takim samym kluczem już istnieje."
 
 #: include/classes/api/services/CItemGeneral.php:764
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z tym samym kluczem jest już dziedziczona z szablonu „%4$s”."
 
 #: include/classes/api/services/CItem.php:1508
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Nie można odziedziczyć pozycji z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pole ekwipunku \"%4$s\" jest już wypełnione przez pozycję z kluczem „%5$s”."
 
 #: include/classes/api/services/CItemGeneral.php:576
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć pozycji z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:577
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć pozycji z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na szablonie „%4$s”."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3430,7 +3442,7 @@ msgstr "Nie można przekazać zduplikowanych identyfikatorów szablonów dla pow
 
 #: jsLoader.php:130
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "Nie można wkleić niedostępnego widżetu."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3450,9 +3462,9 @@ msgstr "Nie można wykonać zapytania UPDATE na tabeli \"%1$s\" bez warunku WHER
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można przydzielić dostępu użytkownikowi"
+msgstr[1] "Nie można przydzielić dostępu użytkownikom"
+msgstr[2] "Nie można przydzielić dostępu użytkownikom"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4648,6 +4660,10 @@ msgstr "Konfiguruj połączenie DB"
 #: app/views/administration.authentication.edit.php:417
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
+msgstr "Konfiguruj dostępy JIT"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
 msgstr ""
 
 #: app/views/administration.script.edit.php:256
@@ -5494,6 +5510,10 @@ msgstr "Przegląd danych"
 msgid "Data set"
 msgstr "Dane zapisane"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5919,6 +5939,10 @@ msgstr "Usunąć wybrane SLA?"
 msgid "Delete selected SLAs?"
 msgstr "Usunąć wybrane SLA?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Usunąć wybrane akcje?"
@@ -6175,20 +6199,20 @@ msgstr "Przestarzałego parametru \"%1$s\" nie można używać z \"%2$s\"."
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być usunięta."
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być pusta."
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być włączona."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6221,6 +6245,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Opis"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6341,6 +6369,10 @@ msgstr "Wyłączyć wybrane SLA?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "Wyłączyć wybrane SLA?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7049,10 +7081,14 @@ msgstr "Włącz"
 msgid "Enable HTTP authentication"
 msgstr "Włącz autentykację HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "Włącz przydzielanie dostępów JIT"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -7064,7 +7100,7 @@ msgstr "Włącz autentykację SAML"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "Włącz przydzielanie dostępów SCIM"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -7136,6 +7172,10 @@ msgstr "Włączyć wybrane SLA?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "Włączyć wybrane SLA?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7816,6 +7856,13 @@ msgstr "Pole \"%1$s\" nie zawiera ciągu znaków."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musi być puste."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9378,6 +9425,10 @@ msgstr "Ta sama przestrzeń nazw (%1$s) jest używane przez moduły zlokalizowan
 msgid "Identification of the system. Returns string"
 msgstr "Identyfikacja systemu. Zwraca ciąg znaków"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -10713,11 +10764,11 @@ msgstr "Nieprawidłowe dane JSON. Wystąpił błąd serwera podczas przetwarzani
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP JIT dla mapowania typów mediów."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP JIT dla mapowania grup użytkowników."
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10728,11 +10779,11 @@ msgstr "Nieprawidłowa konfiguracja LDAP"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP SAML dla mapowania typów mediów."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP SAML dla mapowania grup użytkowników."
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11585,7 +11636,7 @@ msgstr "Uwierzytelnianie LDAP jest wyłączone."
 
 #: app/views/popup.ldap.edit.php:235
 msgid "LDAP group pattern"
-msgstr ""
+msgstr "Wzorzec grupy LDAP"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -12123,6 +12174,13 @@ msgstr "MAC adres A"
 msgid "MAC address B"
 msgstr "MAC adres B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12488,6 +12546,19 @@ msgstr "Maksymalna liczba kolumn i wierszy w przeglądzie tabel"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Maksymalny okres dla wyboru czasu"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13331,6 +13402,11 @@ msgstr "Nowy serwer LDAP"
 msgid "New SLA"
 msgstr "Nowe SLA"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "Nowa dodatkowa reguła"
@@ -14032,7 +14108,7 @@ msgstr "Nie zezwolno ustawienia motywu dla użytkownika \"guest\"."
 #: include/classes/api/services/CUser.php:484
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "Nie można zaktualizować pola „%1$s” dla użytkownika z przydzielonym dostępem."
 
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
@@ -14262,6 +14338,17 @@ msgstr "Liczba (całkowita bez znaku)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14395,7 +14482,7 @@ msgstr "Tylko administrator może ustawić właściciela mapy."
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "Tylko dla użytkowników z nieprzydzielonym dostępem można ustawić wyłączoną grupę."
 
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
@@ -14469,6 +14556,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "Informacje o systemie operacyjnym. Zwraca ciąg znaków"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15142,7 +15233,7 @@ msgstr "Wklej bez zewnętrznych łączy"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:909
 msgid "Pattern"
-msgstr "Wzór"
+msgstr "Wzorzec"
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
@@ -15658,23 +15749,23 @@ msgstr "Podane zapytanie do sekretu \"%1$s\" jest nieprawidłowe."
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
-msgstr ""
+msgstr "Przydziel dostęp teraz"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
-msgstr ""
+msgstr "Przydzielić dostęp dla wybranych użytkowników LDAP?"
 
 #: app/views/administration.user.list.php:141
 msgid "Provisioned"
-msgstr ""
+msgstr "Przydzielono dostęp"
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
-msgstr ""
+msgstr "Okres przydzielania dostępu"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr ""
+msgstr "Pomyślnie przydzielono dostępy."
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -16744,7 +16835,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:483
 msgid "SAML group pattern"
-msgstr ""
+msgstr "Wzorzec grupy SAML"
 
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
@@ -16920,6 +17011,14 @@ msgstr "Nieprawidłowy klucz pułapki SNMP."
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "Wersja SNMP"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -19190,7 +19289,7 @@ msgstr "Ten typ informacji może być nieodpowiedni dla tego klucza."
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "Ten użytkownik ma przydzielony dostęp przez IdP. Ręczne zmiany dla pól z przydzielonego dostępu nie są dozwolone."
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -20025,6 +20124,13 @@ msgstr "URL powinien mieć oba pola \"name\" (nazwa) i \"url\" dla mapy \"%1$s\"
 msgid "URLs"
 msgstr "Adresy URL"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -20127,6 +20233,13 @@ msgstr "Odblokuj"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Odblokować wybranych użytkowników?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20496,6 +20609,10 @@ msgstr ""
 msgid "Use bulk requests"
 msgstr "Użyj żądań zbiorowych"
 
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
 msgstr "Użyj własnych kolorów dla stanów zdarzeń"
@@ -20572,7 +20689,7 @@ msgstr "Raport \"%2$s\" został stworzony w imieniu użytkownika \"%1$s\"."
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr ""
+msgstr "Przydzielono dostęp użytkownikowi \"%1$s\"."
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
@@ -22788,11 +22905,11 @@ msgstr "nie można przekonwertować JSON, wynik wartości za długi"
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
-msgstr ""
+msgstr "Dziedziczonej pozycji nie można usunąć"
 
 #: include/classes/api/services/CItemPrototype.php:810
 msgid "cannot delete inherited item prototype"
-msgstr ""
+msgstr "Dziedziczonego prototypu pozycji nie można usunąć"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -23142,7 +23259,7 @@ msgstr "grupa hostów"
 #: include/classes/widgets/CWidgetHelper.php:1158
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:336
 msgid "host pattern"
-msgstr "wzór hosta"
+msgstr "wzorzec hosta"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -23217,6 +23334,12 @@ msgstr "niepoprawna składnia przy \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "niewłaściwe wykorzystanie funkcji \"%1$s\""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - Wstaw podane znaki lub spacje w określonej pozycji ciągu znaków"
@@ -23238,7 +23361,7 @@ msgstr "niepoprawne dane wyjściowe Prometeusza"
 #: include/classes/api/services/CItemGeneral.php:1519
 #: include/classes/api/services/CItemGeneral.php:1568
 msgid "invalid Prometheus pattern"
-msgstr "niepoprawny wzór Prometeusza"
+msgstr "niepoprawny wzorzec Prometeusza"
 
 #: include/classes/parsers/CIPRangeParser.php:135
 #, c-format
@@ -23363,7 +23486,7 @@ msgstr "pozycja \"%1$s\" będąca na hoście \"%2$s\" nie jest monitorowana"
 #: include/classes/widgets/CWidgetHelper.php:819
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
-msgstr "wzór elementu"
+msgstr "wzorzec pozycji"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -23829,7 +23952,7 @@ msgstr "ścieżka/do/tajny:klucz"
 #: include/views/js/item.preprocessing.js.php:178
 #: include/views/js/item.preprocessing.js.php:193
 msgid "pattern"
-msgstr "wzór"
+msgstr "wzorzec"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:849
 msgid "percentile() - Percentile P of a period T"
@@ -23845,7 +23968,7 @@ msgstr "power() - Podnosi wartość do potęgi zgodnie z podanym wykładnikiem"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:361
 msgid "problem pattern"
-msgstr "problem ze wzorem"
+msgstr "wzorzec problemu"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"
@@ -24589,7 +24712,7 @@ msgstr "t"
 
 #: app/views/popup.usergroupmapping.edit.php:83
 msgid "wildcard patterns with '*' may be used"
-msgstr ""
+msgstr "Można używać wzorców symboli wieloznacznych z „*”"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
