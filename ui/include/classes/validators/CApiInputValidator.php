@@ -2295,6 +2295,11 @@ class CApiInputValidator {
 					$_uniq = &$uniq;
 					$object_values = [];
 					$level = 1;
+					$field_names_count = count($field_names);
+
+					if (($field_names_count > 1) && ($field_names[1] === 'menu_path')) {
+						$level = $field_names_count;
+					}
 
 					foreach ($field_names as $field_name) {
 						if (!array_key_exists($field_name, $object)) {
@@ -2316,89 +2321,53 @@ class CApiInputValidator {
 						}
 						else {
 							if (array_key_exists($object_value, $_uniq)) {
-								$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-								$error = _s('Invalid parameter "%1$s": %2$s.', $subpath, _s('value %1$s already exists',
-									'('.implode(', ', $field_names).')=('.implode(', ', $object_values).')'
-								));
-								return false;
+								if (array_search('menu_path', $field_names)) {
+									$menu_path = [];
+									$_menu_path = &$menu_path;
+
+									foreach ($data as $data_field) {
+										$path_name = (array_key_exists('menu_path', $data_field))
+											? $data_field['menu_path']
+											: '';
+
+										if ($data_field['name'] == $object_value) {
+											$trim_path_name = trim($path_name, '/');
+
+											if (array_key_exists($trim_path_name, $menu_path)) {
+												$duplicate = (($path_name != null)
+													? $trim_path_name . '/' . $object_value
+													: $object_value);
+
+												$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+
+												$parameter  = (array_key_first($menu_path) === '')
+													? $field_names[0]
+													: implode(', ', $field_names) ;
+
+												$error = _s('Invalid parameter "%1$s": %2$s.',
+													$subpath,
+													_s('value %1$s already exists',
+														'(' .  $parameter . ')=(' . $duplicate . ')'
+													));
+												return false;
+											}
+
+											$_menu_path[$path_name] = true;
+										}
+									}
+								}
+								else {
+									$subpath = ($path === '/' ? $path : $path . '/') . ($index + 1);
+									$error = _s('Invalid parameter "%1$s": %2$s.',
+										$subpath,
+										_s('value %1$s already exists',
+											'(' . implode(', ', $field_names) . ')=(' . implode(', ', $object_values) . ')'
+										));
+									return false;
+								}
 							}
 
 							$_uniq[$object_value] = true;
-						}
-
-						$level++;
-					}
-				}
-			}
-		}
-
-		if (array_key_exists('uniq_by_values', $rule)) {
-			foreach ($rule['uniq_by_values'] as $field_values) {
-				$uniq = [];
-				$_uniqs = [&$uniq];
-
-				foreach ($data as $index => $object) {
-					$object_values = [];
-					$level = 1;
-
-					foreach ($field_values as $field_name => $values) {
-						if (!array_key_exists($field_name, $object)) {
-							$_uniqs = [&$uniq];
-							break;
-						}
-
-						$object_values[] = $object[$field_name];
-
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
-
-						if (!in_array($object_value, $values)) {
-							$_uniqs = [&$uniq];
-							break;
-						}
-
-						if ($level < count($field_values)) {
-							$__uniqs = [];
-
-							foreach ($_uniqs as &$_uniq) {
-								foreach ($values as $value) {
-									if (!array_key_exists($value, $_uniq)) {
-										$_uniq[$value] = [];
-									}
-
-									$__uniqs[] = &$_uniq[$value];
-								}
-							}
-							unset($_uniq);
-
-							$_uniqs = $__uniqs;
-						}
-						else {
-							foreach ($_uniqs as &$_uniq) {
-								foreach ($values as $value) {
-									if (array_key_exists($value, $_uniq)) {
-										$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
-
-										$combinations = array_map(static function (array $values): string {
-											return '('.implode(', ', $values).')';
-										}, $field_values);
-
-										$error = _s('Invalid parameter "%1$s": %2$s.', $subpath,
-											_s('only one object can exist within the combinations of %1$s',
-												'('.implode(', ', array_keys($field_values)).')=('.
-													implode(', ', $combinations).')'
-											)
-										);
-										return false;
-									}
-
-									$_uniq[$value] = true;
-								}
-							}
-							unset($_uniq);
-
-							$_uniqs = [&$uniq];
 						}
 
 						$level++;

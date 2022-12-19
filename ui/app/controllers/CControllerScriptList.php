@@ -84,7 +84,7 @@ class CControllerScriptList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['scripts'] = API::Script()->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on',
-				'scope'
+				'scope', 'menu_path'
 			],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -98,7 +98,30 @@ class CControllerScriptList extends CController {
 		]);
 
 		// Data sort and pager.
-		order_result($data['scripts'], $sortField, $sortOrder);
+		$name_path = [];
+
+		foreach ($data['scripts'] as $script) {
+			$trim_menu_path = trim($script['menu_path'], "/");
+			$trim_name = trim($script['name'], "/");
+
+			if ($script['menu_path'] != null) {
+				$script['name_path'] = ('/'.$trim_menu_path.'/'.$trim_name);
+			}
+			else {
+				$script['name_path'] = ($trim_name);
+			}
+			$name_path[] = $script;
+		}
+		unset($script);
+
+		$data['scripts'] = $name_path;
+
+		if ($sortField != 'name') {
+			order_result($data['scripts'], $sortField, $sortOrder);
+		}
+		else {
+			order_result($data['scripts'], 'name_path', $sortOrder);
+		}
 
 		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('script.list', $page_num);

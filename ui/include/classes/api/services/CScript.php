@@ -629,13 +629,13 @@ class CScript extends CApiService {
 		];
 
 		if ($method === 'create') {
-			$api_input_rules['uniq'] = [['name']];
+			$api_input_rules['uniq'] = [['name', 'menu_path']];
 			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
 			$common_fields['scope']['flags'] = API_REQUIRED;
 		}
 		else {
-			$api_input_rules['uniq'] = [['scriptid'], ['name']];
+			$api_input_rules['uniq'] = [['scriptid'], ['name', 'menu_path']];
 			$common_fields += ['scriptid' => ['type' => API_ID, 'flags' => API_REQUIRED]];
 		}
 
@@ -1097,7 +1097,7 @@ class CScript extends CApiService {
 				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 			],
 			'hostids' => $hostids,
-			'sortfield' => 'name',
+			'sortfield' => ['name', 'menu_path'],
 			'preservekeys' => true
 		]);
 
@@ -1583,29 +1583,93 @@ class CScript extends CApiService {
 	 */
 	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
 		$names = [];
+		$menu_paths = [];
+		$script_update = false;
+
+		if (array_key_exists('scriptid', $scripts[0])) {
+			$db_script = DB::find('scripts', ['scriptid' => $scripts[0]['scriptid']]);
+			$script_update = true;
+		}
+
+		if (!array_key_exists('name', $scripts[0])) {
+			$scripts[0]['name'] =  $db_script[0]['name'];
+		}
+
+		if (!array_key_exists('scope', $scripts[0])) {
+			$scripts[0]['scope'] = $db_scripts[$scripts[0]['scriptid']]['scope'];
+		}
+
+		if (array_key_exists('scope', $scripts[0]) && $script_update) {
+			if ($scripts[0]['scope'] != 1) {
+				if (!array_key_exists('scriptid', $scripts[0])) {
+					$scripts[0]['menu_path'] =  '';
+				}
+				else if (!array_key_exists('menu_path', $scripts[0])) {
+					if ($db_script === null) {
+						$scripts[0]['menu_path'] =  '';
+					}
+					else {
+						$scripts[0]['menu_path'] =  $db_script[0]['menu_path'];
+					}
+				}
+			}
+		}
 
 		foreach ($scripts as $script) {
 			if (!array_key_exists('name', $script)) {
 				continue;
 			}
 
-			if ($db_scripts === null || $script['name'] !== $db_scripts[$script['scriptid']]['name']) {
+			$menu_path = array_key_exists('menu_path', $script) ? $script['menu_path'] : '';
+			$scriptid = array_key_exists('scriptid', $script) ? $script['scriptid'] : '';
+			$path_name = $menu_path.'/'.$script['name'];
+
+			if ($db_scripts === null
+				|| $path_name !== $db_scripts[$scriptid]['menu_path'].'/'.$db_scripts[$script['scriptid']]['name']) {
 				$names[] = $script['name'];
+				$menu_paths[] = $menu_path;
 			}
 		}
 
-		if (!$names) {
+		if (!$names && !$menu_paths) {
 			return;
 		}
 
-		$duplicates = DB::select('scripts', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
+		$dbScripts = DB::select('scripts', [
+			'output' => ['name', 'menu_path'],
 		]);
 
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $duplicates[0]['name']));
+		$duplicateScripts = false;
+		$duplicates = [];
+		$trim_names = trim($names[0], '/');
+		$trim_menu_paths = trim($menu_paths[0], '/');
+
+		foreach ($dbScripts as $key => $dbScript) {
+			$trim_name = trim($dbScript['name'], '/');
+			$trim_menu_path = trim($dbScript['menu_path'], '/');
+
+			if ($trim_name === $trim_names && $trim_menu_path === $trim_menu_paths) {
+				$duplicates['name'] = $trim_name;
+				$duplicates['menu_path'] = $trim_menu_path;
+
+				if (array_key_exists('scriptid', $scripts[0])) {
+					$duplicateScripts = !(($key === $scripts[0]['scriptid']));
+				}
+				else {
+					$duplicateScripts = true;
+				}
+			}
+		}
+
+		if ($duplicateScripts) {
+			if ($duplicates['menu_path'] == null) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
+					$duplicates['name']));
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
+					$duplicates['menu_path'].'/'.$duplicates['name']));
+			}
 		}
 	}
 
