@@ -341,14 +341,20 @@ class testDocumentationLinks extends CWebTest {
 			// #29 List of service actions.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=4',
+					'url' => 'zabbix.php?action=action.list&eventsource=4',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
-			// #30 Service action configuration form.
+			// #30 Create service action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=4&form=Create+action',
+					'url' => 'zabbix.php?action=action.list&eventsource=4',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create action'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
@@ -1287,84 +1293,132 @@ class testDocumentationLinks extends CWebTest {
 			// #136 Trigger actions list view.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=0',
+					'url' => 'zabbix.php?action=action.list&eventsource=0',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
-			// #137 Create trigger action form view.
+			// #137 Create trigger action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=0&form=Create+action',
+					'url' => 'zabbix.php?action=action.list&eventsource=0',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create action'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #138 Edit trigger action form view.
+			// #138 Edit trigger action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=0&form=update&actionid=3',
+					'url' => 'zabbix.php?action=action.list&eventsource=0',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Report problems to Zabbix administrators"]'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
 			// #139 Discovery actions list view.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=1',
+					'url' => 'zabbix.php?action=action.list&eventsource=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
-			// #140 Create discovery action form view.
+			// #140 Create discovery action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=1&form=Create+action',
+					'url' => 'zabbix.php?action=action.list&eventsource=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create action'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #141 Edit discovery action form view.
+			// #141 Edit discovery action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=1&form=update&actionid=2',
+					'url' => 'zabbix.php?action=action.list&eventsource=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Auto discovery. Linux servers."]'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
 			// #142 Autoregistration actions list view.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=2',
+					'url' => 'zabbix.php?action=action.list&eventsource=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
-			// #143 Create autoregistration action form view.
+			// #143 Create autoregistration action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=2&form=Create+action',
+					'url' => 'zabbix.php?action=action.list&eventsource=2',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create action'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #144 Edit autoregistration action form view.
+			// #144 Edit autoregistration action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=2&form=update&actionid=9',
+					'url' => 'zabbix.php?action=action.list&eventsource=2',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Autoregistration action 1"]'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
 			// #145 Internal actions list view.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=3',
+					'url' => 'zabbix.php?action=action.list&eventsource=3',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/actions'
 				]
 			],
-			// #146 Create internal action form view.
+			// #146 Create internal action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=3&form=Create+action',
+					'url' => 'zabbix.php?action=action.list&eventsource=3',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create action'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #147 Edit internal action form view.
+			// #147 Edit internal action form popup.
 			[
 				[
-					'url' => 'actionconf.php?eventsource=3&form=update&actionid=4',
+					'url' => 'zabbix.php?action=action.list&eventsource=3',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://a[text()="Report not supported items"]'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],

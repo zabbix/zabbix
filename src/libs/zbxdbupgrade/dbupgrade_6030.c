@@ -1409,10 +1409,17 @@ static int	DBpatch_6030149(void)
 
 static int	DBpatch_6030150(void)
 {
-	return DBdrop_index("scripts", "scripts_3");
+	const ZBX_FIELD	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
 }
 
 static int	DBpatch_6030151(void)
+{
+	return DBdrop_index("scripts", "scripts_3");
+}
+
+static int	DBpatch_6030152(void)
 {
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
@@ -1574,5 +1581,6 @@ DBPATCH_ADD(6030148, 0, 1)
 DBPATCH_ADD(6030149, 0, 1)
 DBPATCH_ADD(6030150, 0, 1)
 DBPATCH_ADD(6030151, 0, 1)
+DBPATCH_ADD(6030152, 0, 1)
 
 DBPATCH_END()
