@@ -824,15 +824,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -841,8 +842,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }

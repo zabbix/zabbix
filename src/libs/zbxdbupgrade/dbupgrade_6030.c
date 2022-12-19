@@ -1398,6 +1398,21 @@ static int	DBpatch_6030148(void)
 	return DBdrop_field("userdirectory", "search_filter");
 }
 /* end of ZBXNEXT-276 patches */
+
+static int	DBpatch_6030149(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_result", &field, &old_field);
+}
+
+static int	DBpatch_6030150(void)
+{
+	const ZBX_FIELD	field = {"max_repetitions", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("interface_snmp", &field);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1553,5 +1568,7 @@ DBPATCH_ADD(6030145, 0, 1)
 DBPATCH_ADD(6030146, 0, 1)
 DBPATCH_ADD(6030147, 0, 1)
 DBPATCH_ADD(6030148, 0, 1)
+DBPATCH_ADD(6030149, 0, 1)
+DBPATCH_ADD(6030150, 0, 1)
 
 DBPATCH_END()

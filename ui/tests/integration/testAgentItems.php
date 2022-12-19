@@ -297,7 +297,7 @@ class testAgentItems extends CIntegrationTest {
 				]
 		],
 		[
-			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
+			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
@@ -318,7 +318,7 @@ class testAgentItems extends CIntegrationTest {
 			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
 		],
 		[
-			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
+			'key' => 'net.tcp.socket.count[0.0.0.0,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
@@ -623,6 +623,34 @@ class testAgentItems extends CIntegrationTest {
 					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
 				]
 			]
+		],
+		[
+			'key' => 'net.tcp.port[123.123.123.123,111]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
+		],
+		[
+			'key' => 'net.tcp.port[123.123.123.123,111]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 0
+		],
+		[
+			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
+		],
+		[
+			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
+			'type' => ITEM_TYPE_ZABBIX,
+			'component' => self::COMPONENT_AGENT2,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'result' => 1
 		]
 	];
 
