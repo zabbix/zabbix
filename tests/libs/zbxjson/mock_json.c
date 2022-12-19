@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "mock_json.h"
 

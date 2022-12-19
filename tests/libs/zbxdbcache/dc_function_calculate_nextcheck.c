@@ -22,11 +22,11 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxtrends.h"
 #include "log.h"
 #include "zbxdbhigh.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	zbx_dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, time_t from, zbx_uint64_t seed);
 

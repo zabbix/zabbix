@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:38:00Z'
   template_groups:
     -
@@ -173,42 +173,6 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix proxy health/process.discoverer.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"discoverer"}'
               name: 'Remote Zabbix proxy: Utilization of discoverer processes is high'
               event_name: 'Remote Zabbix proxy: Utilization of discoverer processes over {$ZABBIX.PROXY.UTIL.MAX:"discoverer"}%'
-              priority: AVERAGE
-              tags:
-                -
-                  tag: scope
-                  value: performance
-        -
-          uuid: 9ca58c0a87f54733ae9794d052092944
-          name: 'Remote Zabbix proxy: Utilization of heartbeat sender internal processes, in %'
-          type: DEPENDENT
-          key: process.heartbeat_sender.avg.busy
-          delay: '0'
-          history: 1w
-          value_type: FLOAT
-          units: '%'
-          description: 'Average percentage of time heartbeat sender processes have been busy in the last minute.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.data.process[''heartbeat sender''].busy.avg'
-              error_handler: CUSTOM_ERROR
-              error_handler_params: 'Processes heartbeat sender not started'
-          master_item:
-            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
-          tags:
-            -
-              tag: component
-              value: internal-process
-          triggers:
-            -
-              uuid: f75e8a72ae1642999c7560387f189129
-              expression: 'avg(/Remote Zabbix proxy health/process.heartbeat_sender.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Remote Zabbix proxy health/process.heartbeat_sender.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"heartbeat sender"}'
-              name: 'Remote Zabbix proxy: Utilization of heartbeat sender processes is high'
-              event_name: 'Remote Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}%'
               priority: AVERAGE
               tags:
                 -
@@ -1370,7 +1334,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -1385,7 +1349,7 @@ zabbix_export:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix proxy performance'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -1401,7 +1365,7 @@ zabbix_export:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix data gathering process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1417,7 +1381,7 @@ zabbix_export:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix internal process busy %'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -1571,42 +1535,36 @@ zabbix_export:
             key: process.self-monitoring.avg.busy
         -
           sortorder: '4'
-          color: 0000EE
-          item:
-            host: 'Remote Zabbix proxy health'
-            key: process.heartbeat_sender.avg.busy
-        -
-          sortorder: '5'
           color: 00EE00
           item:
             host: 'Remote Zabbix proxy health'
             key: process.data_sender.avg.busy
         -
-          sortorder: '6'
+          sortorder: '5'
           color: '009999'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.task_manager.avg.busy
         -
-          sortorder: '7'
+          sortorder: '6'
           color: BBBB00
           item:
             host: 'Remote Zabbix proxy health'
             key: process.ipmi_manager.avg.busy
         -
-          sortorder: '8'
+          sortorder: '7'
           color: '990000'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.preprocessing_manager.avg.busy
         -
-          sortorder: '9'
+          sortorder: '8'
           color: '008800'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.preprocessing_worker.avg.busy
         -
-          sortorder: '10'
+          sortorder: '9'
           color: 2B5429
           item:
             host: 'Remote Zabbix proxy health'

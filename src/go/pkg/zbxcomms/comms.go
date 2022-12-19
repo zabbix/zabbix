@@ -287,22 +287,6 @@ func (c *Connection) RemoteIP() string {
 	return addr
 }
 
-func Listen(address string, args ...interface{}) (c *Listener, err error) {
-	var tlsconfig *tls.Config
-	if len(args) > 0 {
-		var ok bool
-		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
-		}
-	}
-	l, tmperr := net.Listen("tcp", address)
-	if tmperr != nil {
-		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
-	}
-	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
-	return
-}
-
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {
 	var conn net.Conn
 	if conn, err = l.listener.Accept(); err != nil {
@@ -330,12 +314,11 @@ func (c *Listener) Close() (err error) {
 }
 
 func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
-	data []byte, args ...interface{}) ([]byte, []error) {
+	data []byte, args ...interface{}) (b []byte, errs []error, errRead error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
 	var err error
-	var errs []error
 	var c *Connection
 	var no_response = false
 
@@ -345,7 +328,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 			errs = append(errs, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0]))
 			log.Tracef("%s", errs[len(errs)-1])
 
-			return nil, errs
+			return nil, errs, nil
 		}
 
 		if len(args) > 1 {
@@ -353,7 +336,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 				errs = append(errs, fmt.Errorf("invalid response handling flag of type %T", args[1]))
 				log.Tracef("%s", errs[len(errs)-1])
 
-				return nil, errs
+				return nil, errs, nil
 			}
 		}
 	}
@@ -373,7 +356,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	}
 
 	if err != nil {
-		return nil, errs
+		return nil, errs, nil
 	}
 
 	defer c.Close()
@@ -385,30 +368,26 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		return nil, errs
-	}
-
-	if no_response {
-		return nil, nil
+		return nil, errs, nil
 	}
 
 	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
-	b, err := c.Read()
+	b, err = c.Read()
 	if err != nil {
 		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		return nil, errs
+		return nil, errs, errs[len(errs)-1]
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
-	if len(b) == 0 {
+	if len(b) == 0 && false == no_response {
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		return nil, errs
+		return nil, errs, errs[len(errs)-1]
 	}
 
-	return b, nil
+	return b, nil, nil
 }

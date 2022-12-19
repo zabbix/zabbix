@@ -35,7 +35,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'username' =>			'db users.username',
 			'name' =>				'db users.name',
 			'surname' =>			'db users.surname',
-			'user_groups' =>		'array_id|not_empty',
+			'user_groups' =>		'array_id',
 			'change_password' =>	'in 1',
 			'password1' =>			'string',
 			'password2' =>			'string',
@@ -51,7 +51,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
-			'roleid' =>				'db users.roleid',
+			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
 
@@ -72,7 +72,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone'
+					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -113,11 +113,13 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' => [],
 			'roleid' => '',
 			'role' => [],
+			'modules_rules' => [],
 			'user_type' => '',
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
-			'db_user' => ['username' => '']
+			'db_user' => ['username' => ''],
+			'userdirectoryid' => 0
 		];
 		$user_groups = [];
 
@@ -126,7 +128,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['username'] = $this->user['username'];
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
-			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
+			$user_groups = array_column($this->user['usrgrps'], 'usrgrpid');
 			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 			$data['password1'] = '';
 			$data['password2'] = '';
@@ -140,6 +142,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
+			$data['userdirectoryid'] = $this->user['userdirectoryid'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -175,7 +178,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$roles = API::Role()->get([
 				'output' => ['name', 'type'],
 				'selectRules' => ['services.read.mode', 'services.read.list', 'services.read.tag',
-					'services.write.mode', 'services.write.list', 'services.write.tag'
+					'services.write.mode', 'services.write.list', 'services.write.tag', 'modules'
 				],
 				'roleids' => $data['roleid']
 			]);
@@ -217,6 +220,10 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'serviceids' => array_column($role['rules']['services.write.list'], 'serviceid')
 				]);
 				$data['service_write_tag'] = $role['rules']['services.write.tag'];
+
+				foreach ($role['rules']['modules'] as $rule) {
+					$data['modules_rules'][$rule['moduleid']] = $rule['status'];
+				}
 			}
 		}
 
@@ -241,9 +248,41 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules'] = API::Module()->get([
-			'output' => ['id'],
-			'filter' => ['status' => MODULE_STATUS_ENABLED],
+		$data['modules'] = [];
+
+		$db_modules = API::Module()->get([
+			'output' => ['moduleid', 'relative_path', 'status']
+		]);
+
+		$data['readonly'] = false;
+		if ($data['userdirectoryid'] != 0) {
+			$data['readonly'] = true;
+		}
+
+		if ($db_modules) {
+			$module_manager = new CModuleManager(APP::getRootDir());
+
+			foreach ($db_modules as $db_module) {
+				$manifest = $module_manager->addModule($db_module['relative_path']);
+
+				if ($manifest !== null) {
+					$data['modules'][$db_module['moduleid']] = $manifest['name'];
+				}
+			}
+		}
+
+		natcasesort($data['modules']);
+
+		$disabled_modules = array_filter($db_modules,
+			static function(array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
+
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+
+		$data['mediatypes'] = API::MediaType()->get([
+			'output' => ['status'],
 			'preservekeys' => true
 		]);
 

@@ -40,10 +40,7 @@
 package resultcache
 
 import (
-	"crypto/md5"
 	"database/sql"
-	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -95,6 +92,7 @@ type Uploader interface {
 	Addr() (s string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
+	Session() (s string)
 }
 
 // common cache data
@@ -103,7 +101,6 @@ type cacheData struct {
 	input      chan interface{}
 	uploader   Uploader
 	clientID   uint64
-	token      string
 	lastDataID uint64
 	lastErrors []error
 	retry      *time.Timer
@@ -136,12 +133,6 @@ func (c *cacheData) Flush() {
 	c.Upload(nil)
 }
 
-func newToken() string {
-	h := md5.New()
-	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
-	return hex.EncodeToString(h.Sum(nil))
-}
-
 func tableName(prefix string, index int) string {
 	return fmt.Sprintf("%s_%d", prefix, index)
 }
@@ -163,7 +154,6 @@ func New(options *agent.AgentOptions, clientid uint64, output Uploader) ResultCa
 		clientID: clientid,
 		input:    make(chan interface{}, 100),
 		uploader: output,
-		token:    newToken(),
 	}
 
 	if options.EnablePersistentBuffer == 0 {

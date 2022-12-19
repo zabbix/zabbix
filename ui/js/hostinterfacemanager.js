@@ -46,7 +46,7 @@ class HostInterfaceManager {
 	static ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER = 'interface-container-header';
 	static ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND = 'interface-input-expand';
 	static ZBX_STYLE_HOST_INTERFACE_ROW = 'interface-row';
-	static ZBX_STYLE_GREY = 'grey';
+	static ZBX_STYLE_HOST_NO_INTERFACE = 'no-interface';
 	static ZBX_STYLE_LIST_ACCORDION_ITEM = 'list-accordion-item';
 	static ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED = 'list-accordion-item-opened';
 
@@ -82,10 +82,7 @@ class HostInterfaceManager {
 
 		this.$noInterfacesMsg = jQuery('<div>', {
 			html: t('No interfaces are defined.'),
-			class: HostInterfaceManager.ZBX_STYLE_GREY,
-			css: {
-				'padding': '5px 0px'
-			}
+			class: HostInterfaceManager.ZBX_STYLE_HOST_NO_INTERFACE
 		})
 			.insertAfter(jQuery('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_CONTAINER_HEADER));
 
@@ -166,7 +163,9 @@ class HostInterfaceManager {
 				],
 				[HostInterfaceManager.SNMP_V2C]: [
 					`snmp_community_label_${iface.interfaceid}`,
-					`snmp_community_field_${iface.interfaceid}`
+					`snmp_community_field_${iface.interfaceid}`,
+					`snmp_repetition_count_label_${iface.interfaceid}`,
+					`snmp_repetition_count_field_${iface.interfaceid}`
 				],
 				[HostInterfaceManager.SNMP_V3]: [
 					`snmpv3_contextname_label_${iface.interfaceid}`,
@@ -182,7 +181,9 @@ class HostInterfaceManager {
 					`snmpv3_privprotocol_label_${iface.interfaceid}`,
 					`snmpv3_privprotocol_field_${iface.interfaceid}`,
 					`snmpv3_privpassphrase_label_${iface.interfaceid}`,
-					`snmpv3_privpassphrase_field_${iface.interfaceid}`
+					`snmpv3_privpassphrase_field_${iface.interfaceid}`,
+					`snmp_repetition_count_label_${iface.interfaceid}`,
+					`snmp_repetition_count_field_${iface.interfaceid}`
 				]
 			}
 		);
@@ -236,6 +237,7 @@ class HostInterfaceManager {
 			details: {
 				version: HostInterfaceManager.SNMP_V2C,
 				community: '{$SNMP_COMMUNITY}',
+				max_repetitions: 10,
 				bulk: HostInterfaceManager.SNMP_BULK_ENABLED,
 				securitylevel: HostInterfaceManager.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,
 				authprotocol: HostInterfaceManager.ITEM_SNMPV3_AUTHPROTOCOL_MD5,

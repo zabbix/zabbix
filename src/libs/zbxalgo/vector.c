@@ -19,7 +19,7 @@
 
 #include "zbxalgo.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
 ZBX_PTR_VECTOR_IMPL(str, char *)

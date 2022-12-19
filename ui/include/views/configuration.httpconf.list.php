@@ -46,15 +46,16 @@ $filter_column_left = (new CFormList())
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	)
 	->addRow(
-		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
+		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -87,11 +88,11 @@ $filter = (new CFilter())
 	->addvar('context', $data['context'])
 	->addFilterTab(_('Filter'), [$filter_column_left, $filter_column_right]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -114,10 +115,10 @@ $widget = (new CWidget())
 	);
 
 if (!empty($this->data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('web', $this->data['hostid']));
+	$html_page->setNavigation(getHostNavigation('web', $this->data['hostid']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('httpconf.php'))
 	->setArgument('context', $data['context'])
@@ -236,10 +237,9 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 	$data['hostid']
 )]);
 
-// Append form to widget.
-$widget->addItem($httpForm);
-
-$widget->show();
+$html_page
+	->addItem($httpForm)
+	->show();
 
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()

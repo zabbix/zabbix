@@ -42,6 +42,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #cacaca;
 $body-bg-color: #111111;
 $overlay-bg-color: #222222;
+$overlay-border-color: #666666;
 
 // Main menu
 
@@ -97,13 +98,17 @@ $menu-user-arrow-hover-bg-position: -579px -434px;
 $sidebar-server-name-color: #787878;
 
 $menu-main-icons: (
+	dashboards: -600px -856px,
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
 	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
+	data-collection: -600px -784px,
+	alerts: -600px -879px,
 	configuration: -600px -784px,
+	users: -600px -904px,
 	administration: -600px -808px
 );
 
@@ -139,6 +144,7 @@ $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #666666;
 $form-border-focus-color: #bbbbbb;
+$form-fields-group-border-color: #333333;
 
 $form-disabled-font-color: #7d7d7d;
 $form-disabled-bg-color: #000000;
@@ -952,6 +958,18 @@ a.icon-count {
 	}
 }
 
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
+		}
+	}
+}
+
 // Filter checkboxes.
 .filter-highlight-row-cb {
 	display: none;
@@ -1188,6 +1206,7 @@ td.inactive-bg {
 }
 
 // Multiline input control.
+
 .multilineinput-control {
 	button {
 		&::after {
@@ -1213,6 +1232,7 @@ td.inactive-bg {
 }
 
 // Time selection.
+
 .ui-tabs-nav {
 	.btn-info {
 		&::after {
@@ -1462,19 +1482,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-.overrides-options-list {
-	> li > div {
-		border: 1px solid $ui-tab-bg-selected-color;
-		background-color: transparent !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;
@@ -1493,6 +1500,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1506,7 +1514,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1514,6 +1523,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1526,13 +1536,13 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
 }
 
-// Tabfilter
+// Tabfilter.
 
 .filter-container.tabfilter-container {
 	.icon-filter::before {
@@ -1553,5 +1563,37 @@ td.inactive-bg {
 
 	&>:last-child::after {
 		content: "";
+	}
+}
+
+// Host interfaces.
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -318px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -318px -655px;
+				}
+			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -318px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -318px -690px;
+		}
 	}
 }

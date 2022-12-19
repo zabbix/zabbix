@@ -69,10 +69,6 @@ $filter = [
 $ms_groups = [];
 $filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups) : null;
 
-if (count($ms_groups) != count($filter['groups'])) {
-	show_error_message(_('No permissions to referred object or it does not exist!'));
-}
-
 $inventories = [];
 foreach (getHostInventories() as $inventory) {
 	$inventories[$inventory['db_field']] = $inventory['title'];
@@ -146,7 +142,7 @@ $select_groupby = (new CSelect('filter_groupby'))
 	->addOption(new CSelectOption('', _('not selected')))
 	->addOptions(CSelect::createOptionsFromArray($inventories));
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Host inventory overview'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::INVENTORY_HOST_OVERVIEW))
 	->addItem(

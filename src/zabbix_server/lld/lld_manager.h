@@ -21,6 +21,7 @@
 #define ZABBIX_LLD_MANAGER_H
 
 #include "zbxthreads.h"
+#include "zbxtime.h"
 
 typedef struct zbx_lld_value
 {

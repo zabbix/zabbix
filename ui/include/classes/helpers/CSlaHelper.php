@@ -48,22 +48,33 @@ final class CSlaHelper {
 	}
 
 	/**
+	 * @param bool $compact
+	 *
 	 * @return array
 	 */
-	public static function getReportNames(): array {
+	public static function getReportNames(bool $compact = false): array {
 		static $report_names;
 
 		if ($report_names === null) {
 			$report_names = [
-				ZBX_SLA_PERIOD_DAILY => _('Day'),
-				ZBX_SLA_PERIOD_WEEKLY => _('Week'),
-				ZBX_SLA_PERIOD_MONTHLY => _('Month'),
-				ZBX_SLA_PERIOD_QUARTERLY => _('Quarter'),
-				ZBX_SLA_PERIOD_ANNUALLY => _('Year')
+				'default' => [
+					ZBX_SLA_PERIOD_DAILY => _('Day'),
+					ZBX_SLA_PERIOD_WEEKLY => _('Week'),
+					ZBX_SLA_PERIOD_MONTHLY => _('Month'),
+					ZBX_SLA_PERIOD_QUARTERLY => _('Quarter'),
+					ZBX_SLA_PERIOD_ANNUALLY => _('Year')
+				],
+				'compact' => [
+					ZBX_SLA_PERIOD_DAILY => _x('Day', 'compact table header'),
+					ZBX_SLA_PERIOD_WEEKLY => _x('Week', 'compact table header'),
+					ZBX_SLA_PERIOD_MONTHLY => _x('Month', 'compact table header'),
+					ZBX_SLA_PERIOD_QUARTERLY => _x('Quarter', 'compact table header'),
+					ZBX_SLA_PERIOD_ANNUALLY => _x('Year', 'compact table header')
+				]
 			];
 		}
 
-		return $report_names;
+		return $report_names[$compact ? 'compact' : 'default'];
 	}
 
 	/**

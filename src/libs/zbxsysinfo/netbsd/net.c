@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxjson.h"
 #include "log.h"
 
@@ -29,14 +30,13 @@ static struct nlist kernel_symbols[] =
 	{NULL, 0, 0, 0, 0}
 };
 
-#define IFNET_ID 0
-
 static int	get_ifdata(const char *if_name,
 		zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
 		zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
 		zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
 		zbx_uint64_t *icollisions, char **error)
 {
+#define IFNET_ID 0
 	struct ifnet_head	head;
 	struct ifnet		*ifp;
 	struct ifnet		v;
@@ -144,9 +144,10 @@ static int	get_ifdata(const char *if_name,
 	}
 
 	return ret;
+#undef IFNET_ID
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode, *error;
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;
@@ -184,7 +185,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode, *error;
 	zbx_uint64_t	obytes, opackets, oerrors;
@@ -220,7 +221,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode, *error;
 	zbx_uint64_t	tbytes, tpackets, terrors;
@@ -256,7 +257,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *error;
 	zbx_uint64_t	icollisions;
@@ -281,7 +282,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			i;
 	struct zbx_json		j;

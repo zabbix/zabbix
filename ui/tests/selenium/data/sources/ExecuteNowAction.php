@@ -26,8 +26,6 @@ class ExecuteNowAction {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::reset();
-
 		// Create host group.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'HG-for-executenow']
@@ -99,7 +97,7 @@ class ExecuteNowAction {
 			]
 		]);
 
-		// Get item from web scenrio.
+		// Get item from web scenario.
 		$web_item = CDataHelper::call('item.get', [
 			'hostids' => $hosts['hostids']['Host for execute now permissions'],
 			'webitems' => 'extend',

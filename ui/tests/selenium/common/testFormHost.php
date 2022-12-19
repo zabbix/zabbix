@@ -18,14 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * Base class for Host form tests.
  */
 class testFormHost extends CWebTest {
+
+	use TableTrait;
+
+	/**
+	 * All objects created in dataSource DiscoveredHosts.
+	 */
+	const DISCOVERED_HOST = 'Discovered host from prototype 1'; // "LLD for Discovered host tests", Host: "Test of discovered host".
+	const TEMPLATE_NAMES = [
+		'Test of discovered host 1 template for unlink',
+		'Test of discovered host 2 template for clear',
+		'Test of discovered host Template'
+	];
 
 	/**
 	 * Attach Behaviors to the test.
@@ -94,7 +108,7 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
-			'Use bulk requests' => true
+			'Use combined requests' => true
 		],
 		'JMX' => [
 			'ip' => '127.0.0.1',
@@ -164,7 +178,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -172,7 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -197,6 +211,18 @@ class testFormHost extends CWebTest {
 						'delay' => '1s',
 						'username' => '',
 						'password' => ''
+					]
+				]
+			],
+			[
+				'host' => 'testFormHost with secret Macro',
+				'groups' => $groups,
+				'macros' => [
+					[
+						'macro' => '{$USER_MACRO}',
+						'value' => 'secret',
+						'description' => 'secret text',
+						'type' => '1'
 					]
 				]
 			]
@@ -252,9 +278,9 @@ class testFormHost extends CWebTest {
 				->asForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
-			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase'
 			]
 		];
@@ -266,7 +292,7 @@ class testFormHost extends CWebTest {
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
 			);
-			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
+			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use combined requests"]')->one()
 					->asCheckbox()->isChecked()
 			);
 		}
@@ -708,7 +734,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Host with all interfaces visible name',
 						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
-						'Monitored by proxy' => 'Active proxy 1',
+						'Monitored by proxy' => 'Proxy for Discovery rule',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -735,7 +761,7 @@ class testFormHost extends CWebTest {
 							'Authentication passphrase' => 'ccc',
 							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
-							'Use bulk requests' => false
+							'Use combined requests' => false
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -745,7 +771,7 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'SNMP version' => 'SNMPv1',
 							'SNMP community' => 'test',
-							'Use bulk requests' => true
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1284,7 +1310,8 @@ class testFormHost extends CWebTest {
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1385,7 +1412,8 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
@@ -1414,7 +1442,7 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'Monitored by proxy' => 'Active proxy 2',
+				'Monitored by proxy' => 'Proxy for Discovery rule',
 				'Enabled' => true
 			],
 			'interfaces' => [
@@ -1435,7 +1463,7 @@ class testFormHost extends CWebTest {
 						'port' => '122',
 						'SNMP version' => 'SNMPv1',
 						'SNMP community' => '🙃zabbix🙃',
-						'Use bulk requests' => false
+						'Use combined requests' => false
 					]
 				],
 				'JMX' => [
@@ -1470,6 +1498,7 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
 		$form->submit();
+		$this->page->WaitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -1601,32 +1630,51 @@ class testFormHost extends CWebTest {
 		return [
 			[
 				[
-					'Host name' => microtime().' clone without interface changes'
-
+					'host' => 'testFormHost with secret Macro',
+					'items' => 0,
+					'fields'  => [
+						'Host name' => microtime().' clone with secret Macros'
+					],
+					'expected' => TEST_ERROR,
+					'error' => 'The cloned host contains user defined macros with type "Secret text".'.
+							' The value and type of these macros were reset.'
 				]
 			],
 			[
 				[
-					'Host name' => microtime().' clone with interface changes',
-					'Visible name' => microtime().'😀😀😀',
-					'Description' => '😀😀😀😀😀😀😀',
-					'Interfaces' => [
-						[
-							'action' => USER_ACTION_ADD,
-							'type' => 'SNMP',
-							'ip' => '127.3.3.3',
-							'dns' => '',
-							'Connect to' => 'IP',
-							'port' => '122',
-							'SNMP version' => 'SNMPv3',
-							'Context name' => 'zabbix',
-							'Security name' => 'selenium',
-							'Security level' => 'authPriv',
-							'Authentication protocol' => 'SHA256',
-							'Authentication passphrase' => 'test123',
-							'Privacy protocol' => 'AES256',
-							'Privacy passphrase' => '456test',
-							'Use bulk requests' => false
+					'host' => 'testFormHost with items',
+					'items' => 3,
+					'fields' => [
+						'Host name' => microtime().' clone without interface changes'
+					]
+				]
+			],
+			[
+				[
+					'host' => 'testFormHost with items',
+					'items' => 3,
+					'fields' => [
+						'Host name' => microtime().' clone with interface changes',
+						'Visible name' => microtime().'😀😀😀',
+						'Description' => '😀😀😀😀😀😀😀',
+						'Interfaces' => [
+							[
+								'action' => USER_ACTION_ADD,
+								'type' => 'SNMP',
+								'ip' => '127.3.3.3',
+								'dns' => '',
+								'Connect to' => 'IP',
+								'port' => '122',
+								'SNMP version' => 'SNMPv3',
+								'Context name' => 'zabbix',
+								'Security name' => 'selenium',
+								'Security level' => 'authPriv',
+								'Authentication protocol' => 'SHA256',
+								'Authentication passphrase' => 'test123',
+								'Privacy protocol' => 'AES256',
+								'Privacy passphrase' => '456test',
+								'Use combined requests' => false
+							]
 						]
 					]
 				]
@@ -1641,13 +1689,12 @@ class testFormHost extends CWebTest {
 	 * @param string    $button        Clone or Full clone
 	 */
 	public function cloneHost($data, $button = 'Clone') {
-		$host = 'testFormHost with items';
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
 		// Get values from form.
-		$form->fill($data);
-		$original = $form->getFields()->asValues();
+		$form->fill($data['fields']);
+		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
@@ -1656,12 +1703,17 @@ class testFormHost extends CWebTest {
 			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
+		if (CTestArrayHelper::get($data, 'expected')) {
+			$this->assertMessage(TEST_ERROR, null, $data['error']);
+			CMessageElement::find()->one()->close();
+		}
+
 		$cloned_form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data['fields'], 'Visible name', $data['fields']['Host name'])))
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -1757,7 +1809,7 @@ class testFormHost extends CWebTest {
 				'port' => '500',
 				'SNMP version' => 'SNMPv1',
 				'SNMP community' => 'test',
-				'Use bulk requests' => false
+				'Use combined requests' => false
 			]
 		];
 
@@ -1878,6 +1930,10 @@ class testFormHost extends CWebTest {
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertMessage(TEST_BAD, 'Cannot delete host', $data['error']);
+
+				if (!$this->standalone) {
+					$form_type->close();
+				}
 		}
 	}
 
@@ -1910,10 +1966,11 @@ class testFormHost extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 
-		$host_link = $table->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')
+				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
-			$host_link->asPopupButton()->one()->select('Configuration');
+			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$host_link->one()->click();
@@ -1931,5 +1988,172 @@ class testFormHost extends CWebTest {
 	public function assertItemsDBCount($host, $count) {
 		$sql = 'SELECT null FROM items WHERE hostid IN (SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host).')';
 		$this->assertEquals($count, CDBHelper::getCount($sql));
+	}
+
+	public function checkDiscoveredHostLayout() {
+		$form = $this->openForm((
+				($this->standalone)
+					? $this->link.CDataHelper::get('DiscoveredHosts.discovered_hostid')
+					: $this->link
+				), self::DISCOVERED_HOST
+		);
+		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Check tabs available in the form.
+		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption'];
+		$this->assertEquals($tabs, $form->getTabs());
+
+		$discovered_interface_id = CDataHelper::get('DiscoveredHosts.discovered_interfaceid');
+
+		foreach ($tabs as $tab) {
+			$form->selectTab($tab);
+
+			switch ($tab) {
+				case 'Host':
+					foreach (['Discovered by', 'Host name', 'Templates', 'Host groups', 'Interfaces', 'Description',
+							'Monitored by proxy', 'Enabled'] as $label) {
+						$this->assertEquals($label, $form->getLabel($label)->getText());
+					}
+
+					$this->assertEquals('LLD for Discovered host tests', $form->getField('Discovered by')->getText());
+
+					// Check fields' editability, maxlength and default values.
+					$host_fields = [
+						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
+						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
+						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
+						['name' => 'Host groups', 'value' => ['Group for discovered host test'], 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
+								'maxlength' => 64, 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
+								'maxlength' => 255, 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' =>  'IP', 'enabled' => false],
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_port', 'value' => 10050,
+								'maxlength' => 64, 'enabled' => false],
+						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
+								'enabled' => false],
+						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
+						['name' => 'Monitored by proxy', 'value' => '(no proxy)', 'enabled' => false],
+						['name' => 'Enabled', 'value' => true, 'enabled' => true]
+					];
+
+					foreach ($host_fields as $field) {
+						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
+						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+						if (CTestArrayHelper::get($field, 'maxlength')) {
+							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
+						}
+					}
+
+					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
+
+					// Check hintbox.
+					$form->query('class:icon-help-hint')->one()->click();
+					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
+							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
+							$hint->one()->getText()
+					);
+
+					// Close the hint-box.
+					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+					$hint->waitUntilNotPresent();
+
+					$host_templates = [
+						['Name' => self::TEMPLATE_NAMES[0], 'Action' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[1], 'Action' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[2], 'Action' => 'UnlinkUnlink and clear']
+					];
+					$this->assertTableData($host_templates, 'id:linked-templates');
+
+					foreach (self::TEMPLATE_NAMES as $template) {
+						$this->assertTrue( $form->query('link', $template)->one()->isClickable());
+					}
+
+					break;
+
+				case 'IPMI':
+					$ipmi_values = [
+						'Authentication algorithm' => 'Default',
+						'Privilege level' => 'User',
+						'Username' => '',
+						'Password' => ''
+					];
+					$form->checkValue($ipmi_values);
+
+					foreach (array_keys($ipmi_values) as $label) {
+						$this->assertFalse($form->getField($label)->isEnabled());
+					}
+
+					foreach (['Username', 'Password'] as $fields) {
+						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+					}
+
+					break;
+
+				case 'Tags':
+					$tags_table = $form->query('class:tags-table')->asMultifieldTable()->one()->waitUntilVisible();
+
+					$expected_tags = [
+						[
+							'tag' => 'action',
+							'value' => 'update'
+						],
+						[
+							'tag' => 'tag without value',
+							'value' => ''
+						],
+						[
+							'tag' => 'test',
+							'value' => 'update'
+						]
+					];
+					$tags_table->checkValue($expected_tags);
+
+					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());
+					$tags_table->query('button:Add')->waitUntilClickable()->one()->click();
+
+					foreach (['id:tags_2_tag' => 'tag', 'id:tags_2_value' => 'value'] as $field => $placeholder) {
+						$this->assertEquals($placeholder, $form->getField($field)->getAttribute('placeholder'));
+						$this->assertEquals(255, $form->getField($field)->getAttribute('maxlength'));
+					}
+					break;
+
+				case 'Macros':
+					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
+					$macros_table = $this->query('id:tbl_macros')->asMultifieldTable()->one();
+					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
+					$radio_switcher->select('Inherited and host macros');
+					$macros_table->waitUntilReloaded();
+					$this->assertSame(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'],
+							$macros_table->getHeadersText()
+					);
+					break;
+
+				case 'Inventory':
+					$this->assertFalse($this->query('id:inventory_mode')->asSegmentedRadio()->waitUntilPresent()->one()->isEnabled());
+
+					foreach ($form->query("xpath://div[@id='inventory-tab']//div/label")->all()->asText() as $label) {
+						$this->assertFalse($form->getField($label)->isEnabled());
+					}
+					break;
+
+				case 'Encryption':
+					foreach (['Connections to host', 'id:tls_in_none', 'id:tls_in_psk', 'id:tls_in_cert'] as $field) {
+						$this->assertFalse($form->getField($field)->isEnabled());
+					}
+
+					$this->assertTrue($form->getField('id:tls_in_none')->isChecked());
+					break;
+			}
+		}
+
+		$this->assertEquals(5, $form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
+
+		if (!$this->standalone) {
+			$form_type->close();
+		}
 	}
 }

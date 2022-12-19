@@ -24,10 +24,10 @@
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
 #include "zbxnix.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static sigset_t				orig_mask;
 
 typedef struct
@@ -41,6 +41,7 @@ zbx_active_avail_proxy_t;
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
 #define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
 #define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
@@ -214,6 +215,8 @@ static void	send_avail_check_status_response(zbx_avail_active_hb_cache_t *cache,
 
 	data_len = zbx_availability_serialize_active_status_response(&data, status);
 	zbx_ipc_client_send(client, ZBX_IPC_AVAILMAN_ACTIVE_STATUS, data, data_len);
+
+	zbx_free(data);
 }
 
 static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
@@ -324,7 +327,6 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	db_update_active_check_status(&status_available, INTERFACE_AVAILABLE_TRUE);
 	db_update_active_check_status(&status_unavailable, INTERFACE_AVAILABLE_FALSE);
 
-
 	if (ZBX_DB_OK == DBcommit())
 		zbx_hashset_clear(&cache->queue);
 
@@ -355,7 +357,7 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 	if (0 == cache->hosts.num_data)
 		return;
 
-	zbx_hashset_iter_reset(&cache->queue, &iter);
+	zbx_hashset_iter_reset(&cache->hosts, &iter);
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -393,6 +395,17 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 	}
 }
 
+static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
+{
+	zbx_active_avail_proxy_t	*proxy_avail;
+	zbx_uint64_t			proxy_hostid;
+
+	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxy_hostid);
+
+	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
+		proxy_avail->lastaccess = (int)time(NULL);
+}
+
 ZBX_THREAD_ENTRY(availability_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -400,22 +413,22 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
 	int				ret, processed_num = 0;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec;
+	double				time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
 	zbx_vector_availability_ptr_t	interface_availabilities;
 	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
 	zbx_avail_active_hb_cache_t	active_hb_cache;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -429,7 +442,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	}
 
 	/* initialize statistics */
-	time_stat = zbx_time();
+	time_stat = last_proxy_flush = zbx_time();
 	time_flush = time_stat;
 	active_hb_cache.last_proxy_avail_refresh = active_hb_cache.last_status_refresh = zbx_time();
 
@@ -458,11 +471,11 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 			processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
@@ -474,7 +487,6 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				case ZBX_IPC_AVAILABILITY_REQUEST:
 					zbx_availability_deserialize(message->data, message->size,
 							&interface_availabilities);
-
 					break;
 				case ZBX_IPC_AVAILMAN_ACTIVE_HB:
 					process_active_hb(&active_hb_cache, message);
@@ -492,8 +504,8 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				case ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA:
 					flush_proxy_hostdata(&active_hb_cache, message);
 					break;
-				case ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS:
-					flush_all_hosts(&active_hb_cache);
+				case ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE:
+					update_proxy_heartbeat(&active_hb_cache, message);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -541,6 +553,13 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		{
 			active_hb_cache.last_proxy_avail_refresh = time_now;
 			active_checks_calculate_proxy_availability(&active_hb_cache);
+		}
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) &&
+				last_proxy_flush + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY <= time_now)
+		{
+			flush_all_hosts(&active_hb_cache);
+			last_proxy_flush = time_now;
 		}
 	}
 

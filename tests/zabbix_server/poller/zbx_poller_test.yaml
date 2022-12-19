@@ -1,0 +1,73 @@
+---
+test case: (SSH) Both interface and key parameter are present
+in:
+  type: ZBX_TEST_GET_VALUE_SSH
+  item:
+    interface: 127.0.0.1:10051
+    key: ssh.run[clear,127.0.0.1]
+out:
+  return: SUCCEED
+---
+test case: (SSH) Only interface is present
+in:
+  type: ZBX_TEST_GET_VALUE_SSH
+  item:
+    interface: 127.0.0.1:10051
+    key: ssh.run[clear]
+out:
+  return: SUCCEED
+---
+test case: (SSH) Only key parameter is present
+in:
+  type: ZBX_TEST_GET_VALUE_SSH
+  item:
+    interface: ""
+    key: ssh.run[clear,127.0.0.1]
+out:
+  return: SUCCEED
+---
+test case: (SSH) Both interface and key parameter are missing
+in:
+  type: ZBX_TEST_GET_VALUE_SSH
+  item:
+    interface: ""
+    key: ssh.run[clear]
+out:
+  return: NOTSUPPORTED
+---
+test case: (TELNET) Both interface and key parameter are present
+in:
+  type: ZBX_TEST_GET_VALUE_TELNET
+  item:
+    interface: 127.0.0.1:10051
+    key: telnet.run[clear,127.0.0.1]
+out:
+  return: SUCCEED
+---
+test case: (TELNET) Only interface is present
+in:
+  type: ZBX_TEST_GET_VALUE_TELNET
+  item:
+    interface: 127.0.0.1:10051
+    key: telnet.run[clear]
+out:
+  return: SUCCEED
+---
+test case: (TELNET) Only key parameter is present
+in:
+  type: ZBX_TEST_GET_VALUE_TELNET
+  item:
+    interface: ""
+    key: telnet.run[clear,127.0.0.1]
+out:
+  return: SUCCEED
+---
+test case: (TELNET) Both interface and key parameter are missing
+in:
+  type: ZBX_TEST_GET_VALUE_TELNET
+  item:
+    interface: ""
+    key: telnet.run[clear]
+out:
+  return: NOTSUPPORTED
+...

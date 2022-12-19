@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -343,7 +344,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 				ptr++;
 			if (0 != isdigit(*ptr))
 			{
-				del_zeros(buffer);
+				zbx_del_zeros(buffer);
 				zbx_variant_set_str(value, zbx_strdup(NULL, buffer));
 				ret = SUCCEED;
 			}
@@ -1220,6 +1221,14 @@ int	zbx_xml_try_read_value(const char *data, size_t len, const char *xpath, xmlD
 
 	ret = SUCCEED;
 
+	if (XPATH_STRING == xpathObj->type)
+	{
+		if ('\0' != *xpathObj->stringval)
+			*value = zbx_strdup(NULL, (const char *)xpathObj->stringval);
+
+		goto clean;
+	}
+
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 		goto clean;
 
@@ -1253,11 +1262,32 @@ out:
  ******************************************************************************/
 int	zbx_xml_doc_read_num(xmlDoc *xdoc, const char *xpath, int *num)
 {
+	return zbx_xml_node_read_num(xdoc, NULL, xpath, num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves numeric xpath value                                     *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] xml document                                      *
+ *             node  - [IN] the XML node                                     *
+ *             xpath - [IN] xpath                                             *
+ *             num   - [OUT] numeric value                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the count was retrieved successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_node_read_num(xmlDoc *xdoc, xmlNode *node, const char *xpath, int *num)
+{
 	int		ret = FAIL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 
 	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL != node)
+		xpathCtx->node = node;
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 		goto out;

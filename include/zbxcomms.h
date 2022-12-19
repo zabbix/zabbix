@@ -22,6 +22,9 @@
 
 #include "zbxalgo.h"
 
+#define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
+
 #ifdef _WINDOWS
 #	define zbx_socket_last_error()		WSAGetLastError()
 
@@ -55,6 +58,46 @@ zbx_buf_type_t;
 
 #define ZBX_SOCKET_COUNT	256
 #define ZBX_STAT_BUF_LEN	2048
+
+typedef struct
+{
+	unsigned int	connect_mode;	/* not used in server */
+	unsigned int	accept_modes;	/* not used in server */
+
+	char		*connect;
+	char		*accept;	/* not used in zabbix_sender, zabbix_get */
+	char		*ca_file;
+	char		*crl_file;
+	char		*server_cert_issuer;
+	char		*server_cert_subject;
+	char		*cert_file;
+	char		*key_file;
+	char		*psk_identity;
+	char		*psk_file;
+	char		*cipher_cert13;	/* not used in zabbix_get, config file parameter 'TLSCipherCert13' */
+	char		*cipher_cert;	/* not used in zabbix_get, config file parameter 'TLSCipherCert' */
+	char		*cipher_psk13;	/* not used in zabbix_get, config file parameter 'TLSCipherPSK13' */
+	char		*cipher_psk;	/* not used in zabbix_get, config file parameter 'TLSCipherPSK' */
+	char		*cipher_all13;	/* not used in zabbix_sender, zabbix_get, config file parameter */
+					/*'TLSCipherAll13' */
+	char		*cipher_all;	/* not used in zabbix_sender, zabbix_get, config file parameter */
+					/*'TLSCipherAll' */
+	char		*cipher_cmd13;	/* not used in agent, server, proxy, config file parameter '--tls-cipher13' */
+	char		*cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
+} zbx_config_tls_t;
+
+zbx_config_tls_t	*zbx_config_tls_new(void);
+void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
+
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	const char		*hostname;
+	const int		proxymode;
+	const int		config_timeout;
+}
+zbx_config_comms_args_t;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
@@ -148,7 +191,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
@@ -258,10 +301,13 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void	zbx_tls_validate_config(void);
+void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks,
+		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb);
 void	zbx_tls_library_deinit(void);
-void	zbx_tls_init_parent(void);
-void	zbx_tls_init_child(void);
+void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
+
+void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
 void	zbx_tls_version(void);
@@ -278,7 +324,11 @@ zbx_tls_conn_attr_t;
 
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
+int		zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error);
+int		zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
+				const char *tls_subject, const char *tls_psk_identity, const char **msg);
+int		zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowed_issuer,
+				const char *allowed_subject, char **error);
 unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */

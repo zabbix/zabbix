@@ -40,7 +40,7 @@ class CControllerMacrosEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MACROS);
 	}
 
 	protected function doAction() {

@@ -19,7 +19,7 @@
 
 #include "zbxservice.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxserialize.h"
 #include "zbxdbhigh.h"
 

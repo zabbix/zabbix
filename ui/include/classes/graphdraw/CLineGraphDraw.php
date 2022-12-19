@@ -539,12 +539,21 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymin_itemid != 0) {
-			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymin_itemid],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$history = Manager::History()->getLastValues($items);
+
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
+			}
+			else {
+				$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
@@ -609,12 +618,21 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymax_itemid != 0) {
-			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymax_itemid],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$history = Manager::History()->getLastValues($items);
+
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
+			}
+			else {
+				$this->ymax_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
@@ -930,12 +948,14 @@ class CLineGraphDraw extends CGraphDraw {
 	/**
 	 * Get best matching X-axis interval specification for the preferred sub-interval.
 	 *
-	 * @param int   $pref_sub_interval  Preferred sub-interval in seconds.
-	 * @param float $min_sub_interval   Preferred minimal sub-interval in seconds (float). Discarded if no matches.
+	 * @param int    $pref_sub_interval  Preferred sub-interval in seconds.
+	 * @param float  $min_sub_interval   Preferred minimal sub-interval in seconds (float). Discarded if no matches.
+	 * @param string $magnitude          The highest non-permanent date component (Y, m, d, H, i, s).
 	 *
 	 * @return array
 	 */
-	private function getOptimalDateTimeIntervalSpec(int $pref_sub_interval, float $min_sub_interval): array {
+	private function getOptimalDateTimeIntervalSpec(int $pref_sub_interval, float $min_sub_interval,
+			string $magnitude): array {
 		// Possible X-axis main and sub-intervals.
 		$intervals = [
 			'PT1M' => ['PT1S', 'PT5S', 'PT10S', 'PT30S'],
@@ -962,9 +982,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$formats = [
 			'PT1M' => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
 			'PT1H' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
-			'P1D' => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
-			'P1W' => ['main' => _('m-d'), 'sub' => _('m-d')],
-			'P1M' => ['main' => _('m-d'), 'sub' => _('m-d')],
+			'P1D' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => TIME_FORMAT],
+			'P1W' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],
+			'P1M' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],
 			'P1Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _('M')],
 			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
@@ -1082,7 +1102,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
 
-		$optimal = $this->getOptimalDateTimeIntervalSpec($preferred_sub_interval, $label_size);
+		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $magnitude) {
+			if (date($magnitude, $this->stime) !== date($magnitude, $this->stime + $this->period)) {
+				break;
+			}
+		}
+
+		$optimal = $this->getOptimalDateTimeIntervalSpec($preferred_sub_interval, $label_size, $magnitude);
 
 		// Align starting date and time with the interval.
 		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
@@ -1958,20 +1984,20 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	public function getMinDimensions() {
-		$min_dimentions = [
+		$min_dimensions = [
 			'width' => self::GRAPH_WIDTH_MIN,
 			'height' => self::GRAPH_HEIGHT_MIN
 		];
 
 		if ($this->outer) {
-			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
-			$min_dimentions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
-			$min_dimentions['width']++;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
+			$min_dimensions['width'] += $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
+			$min_dimensions['width']++;
 
-			$min_dimentions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
+			$min_dimensions['height'] += $this->shiftY + self::LEGEND_OFFSET_Y;
 		}
 
-		return $min_dimentions;
+		return $min_dimensions;
 	}
 
 	/**

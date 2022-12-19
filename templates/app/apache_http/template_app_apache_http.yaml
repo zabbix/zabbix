@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:33:01Z'
+  version: '6.4'
+  date: '2022-08-01T08:19:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -113,7 +113,7 @@ zabbix_export:
                   
                   // Multiversion metrics
                   output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
-                  output.ServerVersion = output.Server || output.ServerVersion;
+                  output.ServerVersion = output.ServerVersion || output.Server;
                   
                   // Parse "Scoreboard" to get worker count.
                   if (typeof output.Scoreboard === 'string') {
@@ -793,7 +793,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -808,7 +808,7 @@ zabbix_export:
                         host: 'Apache by HTTP'
                         name: 'Apache: Requests per second'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -824,7 +824,7 @@ zabbix_export:
                         host: 'Apache by HTTP'
                         name: 'Apache: Workers total'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -848,7 +848,7 @@ zabbix_export:
                         host: 'Apache by HTTP'
                         name: 'Apache: Current async connections{#SINGLETON}'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -873,7 +873,7 @@ zabbix_export:
                         host: 'Apache by HTTP'
                         name: 'Apache: Current async processes{#SINGLETON}'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'

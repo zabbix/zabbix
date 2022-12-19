@@ -44,6 +44,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_STATUS = 1;
 	const TRIGGER_COMMENTS_PRE = 'strata_comment';
 	const TRIGGER_URL_PRE = 'strata_url';
+	const TRIGGER_URL_NAME_PRE = 'strata_url_name';
 	const TRIGGER_TYPE = 1;
 	const TRIGGER_RECOVERY_MODE = 1;
 	const TRIGGER_CORRELATION_MODE = 1;
@@ -154,6 +155,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'status' => self::TRIGGER_STATUS,
 				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
 				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
+				'url_name' => self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
@@ -221,11 +223,11 @@ class testTriggerLinking extends CIntegrationTest {
 
 	public function checkTriggersCreate() {
 
-		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
+		$response = $this->callUntilDataIsPresent('host.get', ['filter' => ['host' => self::HOST_NAME]], 10, 2);
 		$this->assertArrayHasKey(0, $response['result'], json_encode($response, JSON_PRETTY_PRINT));
 		$this->assertArrayHasKey('host', $response['result'][0]);
 
-		$response = $this->call('trigger.get', [
+		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME
@@ -238,6 +240,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'templateid',
 				'comments',
 				'url',
+				'url_name',
 				'type',
 				'flags',
 				'recovery_mode',
@@ -253,8 +256,7 @@ class testTriggerLinking extends CIntegrationTest {
 			],
 			'selectFunctions' => 'extend',
 			'sortfield' => 'description'
-		]
-		);
+		], 10, 2);
 
 		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE,
 							count($response['result']));
@@ -274,6 +276,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
 			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['url'],         self::TRIGGER_URL_PRE . "_" . self::$stringids[$i], $ep);
+			$this->assertEquals($entry['url_name'],         self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
 
 			$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
@@ -302,7 +305,6 @@ class testTriggerLinking extends CIntegrationTest {
 	public function testTriggerLinking_checkMe() {
 		$this->reloadConfigurationCache();
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkTriggersCreate();
 	}
 }

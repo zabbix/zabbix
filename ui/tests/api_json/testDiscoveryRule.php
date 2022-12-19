@@ -5479,10 +5479,10 @@ class testDiscoveryRule extends CAPITest {
 		);
 		CTestArrayHelper::usort($db_lld_overrides, ['lld_overrideid']);
 
-		// Operation that had only optamplate is deleted.
+		// Operation that had only optemplate is deleted.
 		unset($request_lld_overrides[0]['operations']);
 
-		// Operation that had not only optamplate is not deleted.
+		// Operation that had not only optemplate is not deleted.
 		unset($request_lld_overrides[1]['operations'][0]['optemplate']);
 
 		foreach ($request_lld_overrides as $override_num => $request_lld_override) {

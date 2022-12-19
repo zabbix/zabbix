@@ -17,27 +17,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxdbhigh.h"
-
+#include "zbxnum.h"
 #include "zbxtasks.h"
+#include "zbxversion.h"
+#include "taskmanager.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on a proxy                     *
  *                                                                            *
- * Parameters: tasks        - [OUT] the tasks to execute                      *
- *             proxy_hostid - [IN] the target proxy                           *
+ * Parameters: tasks         - [OUT] the tasks to execute                     *
+ *             proxy_hostid  - [IN] the target proxy                          *
+ *             compatibility - [IN] proxy version compatibility with server   *
  *                                                                            *
  * Comments: This function is used by server to get tasks to be sent to the   *
  *           specified proxy. Expired tasks are ignored and handled by the    *
  *           server task manager.                                             *
+ *           All tasks are disabled on unsupported proxies. Only remote       *
+ *           command and check now are supported by outdated proxies.         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	if (ZBX_PROXY_VERSION_UNDEFINED == compatibility || ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
+		return;
 
 	/* skip tasks past expiry data - task manager will handle them */
 	result = DBselect(
@@ -95,7 +103,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				task->data = (void *)zbx_tm_check_now_create(itemid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				if (SUCCEED == DBis_null(row[17]))
+				if (ZBX_PROXY_VERSION_OUTDATED == compatibility || SUCCEED == DBis_null(row[17]))
 				{
 					zbx_free(task);
 					continue;
@@ -107,7 +115,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 				break;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 	DBfree_result(result);
 }

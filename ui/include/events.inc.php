@@ -79,10 +79,8 @@ function eventObject($object = null) {
 
 /**
  * Returns all supported event source-object pairs.
- *
- * @return array
  */
-function eventSourceObjects() {
+function eventSourceObjects(): array {
 	return [
 		['source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER],
 		['source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST],
@@ -170,7 +168,7 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Operational data'),
-			$event['opdata']
+			$event['opdata']->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			_('Severity'),
@@ -251,7 +249,7 @@ function make_event_details(array $event, array $allowed) {
 
 	$table
 		->addRow([_('Tags'), $tags[$event['eventid']]])
-		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))]);
+		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
 	return $table;
 }
@@ -460,6 +458,10 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
 	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 	foreach ($acknowledges as $ack) {
+		if (!array_key_exists('suppress_until', $ack)) {
+			continue;
+		}
+
 		if (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
 			return false;
 		}
@@ -571,7 +573,8 @@ function orderEventTagsByPriority(array $event_tags, array $priorities) {
  *                                            - 'eventid' - for events and problems (default);
  *                                            - 'hostid' - for hosts and host prototypes;
  *                                            - 'templateid' - for templates;
- *                                            - 'triggerid' - for triggers.
+ *                                            - 'triggerid' - for triggers;
+ *                                            - 'httptestid' - for web scenarios.
  * @param int    $list_tag_count             Maximum number of tags to display.
  * @param array  $filter_tags                An array of tag filtering data.
  * @param ?array $subfilter_tags             Array of selected sub-filter tags. Null when tags are not clickable.
@@ -641,7 +644,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$tags[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -671,7 +680,13 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 							&& !(array_key_exists($tag['tag'], $subfilter_tags)
 								&& array_key_exists($tag['value'], $subfilter_tags[$tag['tag']]))) {
 						$hint_content[$element[$key]][] = (new CSimpleButton($value))
-							->setAttribute('data-subfilter-tag', ['subfilter_tags['.$tag['tag'].'][]', $tag['value']])
+							->setAttribute('data-key', $tag['tag'])
+							->setAttribute('data-value', $tag['value'])
+							->onClick(
+								'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+									'this.dataset.value'.
+								']);'
+							)
 							->addClass(ZBX_STYLE_BTN_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
@@ -715,7 +730,7 @@ function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 			return $tag['value'];
 
 		case TAG_NAME_SHORTENED:
-			return substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
+			return mb_substr($tag['tag'], 0, 3).(($tag['value'] === '') ? '' : ': '.$tag['value']);
 
 		default:
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);

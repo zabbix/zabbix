@@ -100,10 +100,9 @@ $filter = (new CFilter())
 			)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('API tokens'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu())
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_TOKEN_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_TOKEN_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(
@@ -211,7 +210,7 @@ $token_form->addItem([
 	], 'token')
 ]);
 
-$widget
+$html_page
 	->addItem($token_form)
 	->show();
 

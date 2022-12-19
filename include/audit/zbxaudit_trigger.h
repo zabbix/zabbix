@@ -20,16 +20,16 @@
 #ifndef ZABBIX_AUDIT_TRIGGER_H
 #define ZABBIX_AUDIT_TRIGGER_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxalgo.h"
 
 void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, const char *name, int flags);
 
 void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid,
 		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
-		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url, int flags,
-		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
-		const char *opdata, unsigned char discover, const char *event_name);
+		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url,
+		const char *url_name, int flags, unsigned char correlation_mode, const char *correlation_tag,
+		unsigned char manual_close, const char *opdata, unsigned char discover, const char *event_name);
 
 void	zbx_audit_trigger_update_json_add_expr(zbx_uint64_t triggerid, int flags, const char *expression);
 void	zbx_audit_trigger_update_json_add_rexpr(zbx_uint64_t triggerid, int flags, const char *recovery_expression);
@@ -48,6 +48,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(event_name, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(priority, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(comments, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(url, const char*)
+PREPARE_AUDIT_TRIGGER_UPDATE_H(url_name, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(type, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(status, int)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(templateid, zbx_uint64_t)
@@ -62,8 +63,8 @@ void	zbx_audit_trigger_update_json_remove_dependency(int flags, zbx_uint64_t tri
 void	zbx_audit_trigger_update_json_add_tags_and_values(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid,
 		const char *tag, const char *value);
 void	zbx_audit_trigger_update_json_delete_tags(zbx_uint64_t triggerid, int flags, zbx_uint64_t triggertagid);
-void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t trigger, int trigger_flags,
-		zbx_uint64_t tagid);
+void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t triggerid, int trigger_flags,
+		zbx_uint64_t triggertagid);
 
 #define PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(resource, type1)							\
 void	zbx_audit_trigger_update_json_update_tag_##resource(zbx_uint64_t triggerid, int trigger_flags, 		\

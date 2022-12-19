@@ -18,11 +18,14 @@
 **/
 
 #include "postinit.h"
+#include "zbxserver.h"
 
 #include "db_lengths.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "zbxserver.h"
+#include "zbxnum.h"
+#include "zbxcachevalue.h"
+#include "zbxdbwrap.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0
@@ -368,8 +371,8 @@ static int	update_event_names(void)
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select triggerid,description,expression,priority,comments,url,recovery_expression,"
-				"recovery_mode,value"
+			"select triggerid,description,expression,priority,comments,url,url_name,"
+				"recovery_expression,recovery_mode,value"
 			" from triggers"
 			" order by triggerid");
 
@@ -383,9 +386,10 @@ static int	update_event_names(void)
 		ZBX_STR2UCHAR(trigger.priority, row[3]);
 		trigger.comments = zbx_strdup(NULL, row[4]);
 		trigger.url = zbx_strdup(NULL, row[5]);
-		trigger.recovery_expression = zbx_strdup(NULL, row[6]);
-		ZBX_STR2UCHAR(trigger.recovery_mode, row[7]);
-		ZBX_STR2UCHAR(trigger.value, row[8]);
+		trigger.url_name = zbx_strdup(NULL, row[6]);
+		trigger.recovery_expression = zbx_strdup(NULL, row[7]);
+		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
+		ZBX_STR2UCHAR(trigger.value, row[9]);
 
 		preprocess_trigger_name(&trigger, &historical);
 
@@ -441,6 +445,9 @@ int	zbx_check_postinit_tasks(char **error)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
+	/* avoid filling value cache with unnecessary data during event name update */
+	zbx_vc_disable();
+
 	result = DBselect("select taskid from task where type=%d and status=%d", ZBX_TM_TASK_UPDATE_EVENTNAMES,
 			ZBX_TM_STATUS_NEW);
 
@@ -461,6 +468,8 @@ int	zbx_check_postinit_tasks(char **error)
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, "cannot update event names");
+
+	zbx_vc_enable();
 
 	return ret;
 }

@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxdbhigh.h"
+
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
-
-#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {

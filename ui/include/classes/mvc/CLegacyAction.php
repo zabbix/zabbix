@@ -82,10 +82,6 @@ class CLegacyAction extends CAction {
 			]);
 		}
 
-		if ($user_type != USER_TYPE_SUPER_ADMIN) {
-			$denied = array_merge($denied, ['auditacts.php']);
-		}
-
 		if (in_array($action, $denied)) {
 			return false;
 		}
@@ -113,22 +109,25 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
 
-			if ($action === 'actionconf.php' && getRequest('eventsource') === (string) EVENT_SOURCE_SERVICE) {
-				$rule_actions += [
-					CRoleHelper::UI_SERVICES_ACTIONS => ['actionconf.php']
-				];
+			if ($action === 'actionconf.php') {
+				switch (getRequest('eventsource')) {
+					case EVENT_SOURCE_TRIGGERS:
+						$rule_actions += [CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS => ['actionconf.php']];
+						break;
+					case EVENT_SOURCE_SERVICE:
+						$rule_actions += [CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS => ['actionconf.php']];
+						break;
+					case EVENT_SOURCE_DISCOVERY:
+						$rule_actions += [CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => ['actionconf.php']];
+						break;
+					case EVENT_SOURCE_AUTOREGISTRATION:
+						$rule_actions += [CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => ['actionconf.php']];
+						break;
+					case EVENT_SOURCE_INTERNAL:
+						$rule_actions += [CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => ['actionconf.php']];
+						break;
+				}
 			}
-			else {
-				$rule_actions += [
-					CRoleHelper::UI_CONFIGURATION_ACTIONS => ['actionconf.php']
-				];
-			}
-		}
-
-		if ($user_type == USER_TYPE_SUPER_ADMIN) {
-			$rule_actions += [
-				CRoleHelper::UI_REPORTS_ACTION_LOG => ['auditacts.php']
-			];
 		}
 
 		foreach ($rule_actions as $rule_name => $actions) {

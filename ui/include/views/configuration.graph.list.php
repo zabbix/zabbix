@@ -27,11 +27,11 @@
 $this->includeJsFile('configuration.graph.list.js.php');
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -49,11 +49,11 @@ if (!empty($this->data['parent_discoveryid'])) {
 		->setNavigation(getHostNavigation('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -76,13 +76,13 @@ else {
 		);
 
 	if (!empty($this->data['hostid'])) {
-		$widget->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
+		$html_page->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
 	}
 
 	// Add filter tab.
 	$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setResetUrl((new CUrl('graphs.php'))->setArgument('context', $data['context']))
 			->setProfile($data['profileIdx'])
@@ -92,7 +92,7 @@ else {
 				(new CFormList())
 					->addRow(
 						new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'),
-							'filter_groups__ms'
+							'filter_groupids__ms'
 						),
 						(new CMultiSelect([
 							'name' => 'filter_groupids[]',
@@ -111,15 +111,16 @@ else {
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
-						new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
+						(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
 						(new CMultiSelect([
 							'name' => 'filter_hostids[]',
 							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
-								'filter_preselect_fields' => $data['context'] === 'host'
-									? ['hostgroups' => 'filter_groupids_']
-									: ['templategroups' => 'filter_groupids_'],
+								'filter_preselect' => [
+									'id' => 'filter_groupids_',
+									'submit_as' => 'groupid'
+								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
@@ -276,10 +277,10 @@ $graphForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($graphForm);
-$widget->show();
-
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()
+	->show();
+
+$html_page
+	->addItem($graphForm)
 	->show();

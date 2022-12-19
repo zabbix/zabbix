@@ -17,19 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
+
+#if HAVE_LIBJAIL
+#	include <jail.h>
+#endif
 
 #if (__FreeBSD_version) < 500000
-#	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
 #	define ZBX_PROC_PPID		kp_eproc.e_ppid
-#	define ZBX_PROC_JID		kp_eproc.e_jobc
-#	define ZBX_PROC_TID		kp_proc.p_wakeup
-#	define ZBX_PROC_TNAME		kp_proc.p_nice
 #	define ZBX_PROC_COMM		kp_proc.p_comm
 #	define ZBX_PROC_STAT		kp_proc.p_stat
 #	define ZBX_PROC_TSIZE		kp_eproc.e_vm.vm_tsize
@@ -49,12 +51,11 @@
 #	define ZBX_PROC_UID		kp_proc.p_ruid
 #	define ZBX_PROC_GID		kp_proc.p_rgid
 #else
-#	define ZBX_COMMLEN		COMMLEN
 #	define ZBX_PROC_PID		ki_pid
 #	define ZBX_PROC_PPID		ki_ppid
 #	define ZBX_PROC_JID		ki_jid
 #	define ZBX_PROC_TID		ki_tid
-#	define ZBX_PROC_TNAME		ki_tdname
+#	define ZBX_PROC_TNAME		ki_ocomm
 #	define ZBX_PROC_COMM		ki_comm
 #	define ZBX_PROC_STAT		ki_stat
 #	define ZBX_PROC_TSIZE		ki_tsize
@@ -95,6 +96,7 @@ typedef struct
 	int		jid;
 
 	char		*name;
+	char		*jname;
 	char		*tname;
 	char		*cmdline;
 	char		*state;
@@ -135,6 +137,7 @@ ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
+	zbx_free(proc_data->jname);
 	zbx_free(proc_data->tname);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
@@ -144,18 +147,25 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
+#define ARGV_START_SIZE	64
 static char	*get_commandline(struct kinfo_proc *proc)
 {
 	int		mib[4], i;
 	size_t		sz;
 	static char	*args = NULL;
+#if (__FreeBSD_version >= 802510)
 	static int	args_alloc = 0;
+#else
+	int		argv_max, err = -1;
+	static int	args_alloc = ARGV_START_SIZE;
+#endif
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
 	mib[2] = KERN_PROC_ARGS;
 	mib[3] = proc->ZBX_PROC_PID;
 
+#if (__FreeBSD_version >= 802510)
 	if (-1 == sysctl(mib, 4, NULL, &sz, NULL, 0))
 		return NULL;
 
@@ -172,18 +182,52 @@ static char	*get_commandline(struct kinfo_proc *proc)
 
 	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
 		return NULL;
+#else
+	/*
+	 * Before FreeBSD 8.3 sysctl() API for kern.proc.args didn't follow the regular convention
+	 * that a user can query the needed size for results by passing in a NULL old pointer
+	 * and a valid oldsize, given that we have to estimate the required output buffer size manually:
+	 *
+	 * https://github.com/freebsd/freebsd-src/commit/9f688f2ce3c01f30b0c98d17c6ce057660819c8c
+	*/
 
+	if (NULL == args)
+		args = zbx_malloc(args, args_alloc);
+
+	if (-1 == (argv_max = sysconf(_SC_ARG_MAX)))
+		return NULL;
+
+	while (0 != err && args_alloc < argv_max)
+	{
+		sz = (size_t)args_alloc;
+
+		if (-1 == (err = sysctl(mib, 4, args, &sz, NULL, 0)))
+		{
+			if (ENOMEM == errno)
+			{
+				args_alloc *= 2;
+				args = zbx_realloc(args, args_alloc);
+			}
+			else
+				return NULL;
+		}
+	}
+
+	if (-1 == err)
+		return NULL;
+#endif
 	for (i = 0; i < (int)(sz - 1); i++)
 		if (args[i] == '\0')
 			args[i] = ' ';
 
-	if (sz == 0)
+	if (0 == sz)
 		zbx_strlcpy(args, proc->ZBX_PROC_COMM, args_alloc);
 
 	return args;
 }
+#undef ARGV_START_SIZE
 
-int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
 #define ZBX_RSS		2
@@ -192,7 +236,6 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_TSIZE	5
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
-
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
 	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
@@ -439,7 +482,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
@@ -449,7 +491,7 @@ out:
 #undef ZBX_SSIZE
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
@@ -565,22 +607,30 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SRUN == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_SLEEP:
-				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+			case ZBX_PROC_STAT_TRACE:
+				if (SSTOP == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
 			case ZBX_PROC_STAT_ZOMB:
 				if (SZOMB == proc[i].ZBX_PROC_STAT)
 					stat_ok = 1;
 				break;
+#if (__FreeBSD_version) < 700000
+			case ZBX_PROC_STAT_SLEEP:
+			case ZBX_PROC_STAT_DISK:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT)
+					stat_ok = 1;
+				break;
+#else
+			case ZBX_PROC_STAT_SLEEP:
+				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 != (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
+					stat_ok = 1;
+				break;
 			case ZBX_PROC_STAT_DISK:
 				if (SSLEEP == proc[i].ZBX_PROC_STAT && 0 == (proc[i].ZBX_PROC_TDFLAG & TDF_SINTR))
 					stat_ok = 1;
 				break;
-			case ZBX_PROC_STAT_TRACE:
-				if (SSTOP == proc[i].ZBX_PROC_STAT)
-					stat_ok = 1;
-				break;
+#endif
 			}
 		}
 		else
@@ -609,23 +659,36 @@ static char	*get_state(struct kinfo_proc *proc)
 {
 	char	*state;
 
-	if (SRUN == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "running");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "sleeping");
-	else if (SZOMB == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "zombie");
-	else if (SSLEEP == proc->ZBX_PROC_STAT && 0 == (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
-		state = zbx_strdup(NULL, "disk sleep");
-	else if (SSTOP == proc->ZBX_PROC_STAT)
-		state = zbx_strdup(NULL, "tracing stop");
-	else
-		state = zbx_strdup(NULL, "other");
+	switch (proc->ZBX_PROC_STAT)
+	{
+		case SRUN:
+			state = zbx_strdup(NULL, "running");
+			break;
+		case SZOMB:
+			state = zbx_strdup(NULL, "zombie");
+			break;
+		case SSTOP:
+			state = zbx_strdup(NULL, "tracing stop");
+			break;
+		case SSLEEP:
+#if (__FreeBSD_version) < 700000
+			state = zbx_strdup(NULL, "sleeping");
+#else
+			if (0 != (proc->ZBX_PROC_TDFLAG & TDF_SINTR))
+				state = zbx_strdup(NULL, "sleeping");
+			else
+				state = zbx_strdup(NULL, "disk sleep");
+#endif
+
+			break;
+		default:
+			state = zbx_strdup(NULL, "other");
+	}
 
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
 	int				count, i, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;
@@ -794,11 +857,21 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
 
+#if (__FreeBSD_version) < 500000
+				proc_data->tid = proc_data->jid = 0;
+				proc_data->tname = NULL;
+#else
 				proc_data->tid = proc_thread[k].ZBX_PROC_TID;
+				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 				proc_data->tname = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_TNAME);
+#endif
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
-				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
+#if HAVE_LIBJAIL
+				proc_data->jname = jail_getname(proc_data->jid);
+#else
+				proc_data->jname = NULL;
+#endif
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -855,9 +928,18 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 			{
+#if (__FreeBSD_version) < 500000
+				proc_data->jid = 0;
+#else
+				proc_data->jid = proc[i].ZBX_PROC_JID;
+#endif
 				proc_data->pid = proc[i].ZBX_PROC_PID;
 				proc_data->ppid = proc[i].ZBX_PROC_PPID;
-				proc_data->jid = proc[i].ZBX_PROC_JID;
+#if HAVE_LIBJAIL
+				proc_data->jname = jail_getname(proc_data->jid);
+#else
+				proc_data->jname = NULL;
+#endif
 				proc_data->cmdline = zbx_strdup(NULL, args);
 				proc_data->state = get_state(&proc[i]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -869,6 +951,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 			else
 			{
+				proc_data->jname = NULL;
 				proc_data->cmdline = NULL;
 				proc_data->state = NULL;
 				proc_data->user = NULL;
@@ -939,6 +1022,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
@@ -967,6 +1051,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "uid", pdata->uid);

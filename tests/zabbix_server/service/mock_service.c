@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxalgo.h"
 #include "zbxself.h"
+#include "../../../src/zabbix_server/server.h"
 
 #include "mock_service.h"
 
@@ -47,9 +48,10 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY = 0;
 pid_t	*threads;
 int	threads_num;
 
-void	update_selfmon_counter(unsigned char state)
+void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char state)
 {
 	ZBX_UNUSED(state);
+	ZBX_UNUSED(info);
 }
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)

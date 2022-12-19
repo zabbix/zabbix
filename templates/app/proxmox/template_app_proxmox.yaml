@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-08T12:50:21Z'
+  version: '6.4'
+  date: '2022-08-18T06:18:27Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 4958b76448d74ff1b6d7d6280449beee
       template: 'Proxmox VE by HTTP'
       name: 'Proxmox VE by HTTP'
-      description: 'Template tooling version used: 0.42'
+      description: 'Template tooling version used: 0.41'
       groups:
         -
           name: Templates/Applications
@@ -529,6 +529,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running'
+                      expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.vmstatus[{#LXC.ID}])<>"running"'
                   tags:
                     -
                       tag: scope
@@ -1275,6 +1279,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Proxmox: Node [{#NODE.NAME}] offline'
+                      expression: 'last(/Proxmox VE by HTTP/proxmox.node.online[{#NODE.NAME}]) <> 1'
                   tags:
                     -
                       tag: scope
@@ -1782,6 +1790,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Not running'
+                      expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.vmstatus[{#QEMU.ID}])<>"running"'
                   tags:
                     -
                       tag: scope

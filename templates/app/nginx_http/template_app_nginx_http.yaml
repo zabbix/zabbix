@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:36:32Z'
   template_groups:
     -
@@ -424,7 +424,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -439,7 +439,7 @@ zabbix_export:
                         host: 'Nginx by HTTP'
                         name: 'Nginx: Connections by state'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -455,7 +455,7 @@ zabbix_export:
                         host: 'Nginx by HTTP'
                         name: 'Nginx: Requests per second'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'

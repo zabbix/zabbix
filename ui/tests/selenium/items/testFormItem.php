@@ -499,12 +499,13 @@ class testFormItem extends CLegacyWebTest {
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_IPMI :
 				case INTERFACE_TYPE_ANY :
+				case INTERFACE_TYPE_OPT :
 					$this->zbxTestTextPresent('Host interface');
 					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
 					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
@@ -701,7 +702,7 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Value mapping');
 			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->assertEquals([], $valuemap_field->getValue());
+				$this->assertEquals('', $valuemap_field->getValue());
 
 				$db_valuemap = [];
 				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);
@@ -978,7 +979,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
+						'An item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
 					]
 				]
 			],
@@ -1013,7 +1014,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 					]
 				]
 			],
@@ -1039,7 +1040,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
@@ -1149,7 +1150,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1188,7 +1189,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": must have at least one interval greater than 0.'
 					]
 				]
 			],
@@ -1219,7 +1220,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1258,7 +1259,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1287,7 +1288,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1305,7 +1306,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1321,7 +1322,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1337,7 +1338,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1421,7 +1422,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => ' ',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": a time unit is expected.'
+						'Invalid parameter "/1/history": cannot be empty'
 					]
 				]
 			],
@@ -1434,7 +1435,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 3599,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1447,7 +1448,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1460,7 +1461,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => '-1',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "history": a time unit is expected.'
+						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1473,7 +1474,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => ' ',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "trends": a time unit is expected.'
+						'Invalid parameter "/1/trends": cannot be empty.'
 					]
 				]
 			],
@@ -1486,7 +1487,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => '-1',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "trends": a time unit is expected.'
+						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1499,7 +1500,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
+						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1512,7 +1513,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 86399,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
+						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1704,7 +1705,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Incorrect value for field "ipmi_sensor": cannot be empty.'
+						'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
 					]
 				]
 			],
@@ -2023,6 +2024,7 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		if (isset($data['formCheck'])) {
+			$this->page->waitUntilReady();
 			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$name']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
@@ -2084,8 +2086,7 @@ class testFormItem extends CLegacyWebTest {
 	}
 
 	public function testFormItem_HousekeeperUpdate() {
-		$this->zbxTestLogin('zabbix.php?action=gui.edit');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
+		$this->zbxTestLogin('zabbix.php?action=housekeeping.edit');
 
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
@@ -2098,8 +2099,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
 		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
+		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
 		$this->zbxTestInputType('hk_history', '99d');
@@ -2118,8 +2118,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickWait('trends_mode_hint');
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
-		$this->zbxTestOpen('zabbix.php?action=gui.edit');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Housekeeping');
+		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 
 		$this->zbxTestInputType('hk_history', 90);
 		$this->zbxTestCheckboxSelect('hk_history_global', false);

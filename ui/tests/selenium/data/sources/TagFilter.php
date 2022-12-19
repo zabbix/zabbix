@@ -26,8 +26,6 @@ class TagFilter {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::reset();
-
 		// Create templates.
 		$templates = CDataHelper::createTemplates([
 			[

@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"
@@ -25,16 +26,17 @@
 #include "log.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define ZBX_POLL_INTERVAL	1
 
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern int	CONFIG_CONFSYNCER_FREQUENCY;
 
@@ -333,7 +335,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	now = time(NULL);
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == is_ushort(row[9], &smtp_port))
+		if (FAIL == zbx_is_ushort(row[9], &smtp_port))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -624,7 +626,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 
 		for (j = 0; j < local_event_tags->tags.values_num; j++)
 		{
-			tag = (zbx_tag_t *)(local_event_tags->tags).values[j];
+			tag = local_event_tags->tags.values[j];
 			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag,
 					tag->value);
 
@@ -910,15 +912,14 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
-	double		sec1, sec2;
-	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0, time_cleanup = 0,
-			results_num;
-	zbx_am_db_t	amdb;
-	char		*error = NULL;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	double			sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+	int			alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
+	zbx_am_db_t		amdb;
+	char			*error = NULL;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -942,10 +943,10 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 
 		sec1 = zbx_time();
-		zbx_update_env(sec1);
+		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 

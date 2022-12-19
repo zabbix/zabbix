@@ -24,9 +24,9 @@
  * @var array $data
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_DISCOVERY_EDIT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -38,7 +38,7 @@ $url = (new CUrl('host_discovery.php'))
 $form = (new CForm('post', $url))
 	->setId('host-discovery-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('backurl', $data['backurl']);
@@ -1006,7 +1006,7 @@ if (!empty($data['itemid'])) {
 }
 else {
 	$cancel_button = $data['backurl'] !== null
-		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 		: new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(
@@ -1021,11 +1021,11 @@ else {
 $tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.host.discovery.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([

@@ -27,6 +27,7 @@ import (
 	"os"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/tls"
@@ -34,9 +35,15 @@ import (
 
 var Options AgentOptions
 
-const HostNameLen = 128
-const hostNameListLen = 2048
+const (
+	HostNameLen      = 128
+	hostNameListLen  = 2048
+	HostMetadataLen  = 65535 // UTF-8 characters, not bytes
+	HostInterfaceLen = 255   // UTF-8 characters, not bytes
+)
 
+// CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the
+// beginning of the string s, which is cut after the fist n runes.
 func CutAfterN(s string, n int) string {
 	var i int
 	for pos := range s {
@@ -106,6 +113,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			options.TLSPSKIdentity != "" {
 			return nil, errors.New(tls.SupportedErrMsg())
 		}
+
 		return
 	}
 
@@ -207,7 +215,6 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			return nil, errors.New("TLSCRLFile configuration parameter set without certificates being used")
 		}
 	}
-
 	return c, nil
 }
 
@@ -220,8 +227,6 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 }
 
 func ValidateOptions(options *AgentOptions) error {
-	const hostMetadataLen = 255
-	const hostInterfaceLen = 255
 	var err error
 	var maxLen int
 
@@ -235,16 +240,15 @@ func ValidateOptions(options *AgentOptions) error {
 	}
 
 	if len(options.Hostname) > maxLen {
-		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d characters", maxLen)
+		return fmt.Errorf("the value of \"Hostname\" configuration parameter cannot be longer than %d"+
+			" characters", maxLen)
 	}
 	if err = CheckHostnameParameter(options.Hostname); err != nil {
 		return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 	}
-	if len(options.HostMetadata) > 0 && len(options.HostMetadata) > hostMetadataLen {
-		return fmt.Errorf("the value of \"HostMetadata\" configuration parameter cannot be longer than %d characters", hostMetadataLen)
-	}
-	if len(options.HostInterface) > hostInterfaceLen {
-		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d characters", hostInterfaceLen)
+	if utf8.RuneCountInString(options.HostInterface) > HostInterfaceLen {
+		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d"+
+			" characters", HostInterfaceLen)
 	}
 
 	return nil

@@ -38,11 +38,8 @@
 #	endif
 #endif
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-#elif defined(__MINGW32__)
-#	define zbx_open(pathname, flags)	open(pathname, flags | O_BINARY)
 #	define PATH_SEPARATOR	'\\'
 #else
 #	define zbx_open(pathname, flags)	open(pathname, flags)
@@ -51,9 +48,6 @@
 
 #if defined(_WINDOWS)
 #	include <strsafe.h>
-
-#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
-#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
@@ -85,9 +79,6 @@ typedef uint32_t		zbx_uint32_t;
 
 #	define strcasecmp	lstrcmpiA
 
-typedef __int64	zbx_offset_t;
-#	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
-
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int	ssize_t;
 #	else
@@ -95,9 +86,6 @@ typedef long	ssize_t;
 #	endif
 
 #else	/* _WINDOWS */
-#	define zbx_stat(path, buf)		stat(path, buf)
-#	define zbx_fstat(fd, buf)		fstat(fd, buf)
-
 #	ifndef __UINT64_C
 #		ifdef UINT64_C
 #			define __UINT64_C(c)	(UINT64_C(c))
@@ -115,7 +103,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_uint64_t	uint64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_UI64	"%llu"
 #			define ZBX_FS_UO64	"%llo"
@@ -138,7 +126,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_int64_t	int64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_I64	"%lld"
 #			define ZBX_FS_O64	"%llo"
@@ -162,10 +150,30 @@ typedef long	ssize_t;
 
 typedef uint32_t	zbx_uint32_t;
 
+#endif	/* _WINDOWS */
+
+#if defined(_WINDOWS)
+#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
+
+typedef __int64	zbx_offset_t;
+#	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
+
+#elif defined(__MINGW32__)
+#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
+
+typedef off64_t	zbx_offset_t;
+#	define zbx_lseek(fd, offset, whence)	lseek64(fd, (zbx_offset_t)(offset), whence)
+
+#else
+#	define zbx_stat(path, buf)		stat(path, buf)
+#	define zbx_fstat(fd, buf)		fstat(fd, buf)
+
 typedef off_t	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	lseek(fd, (zbx_offset_t)(offset), whence)
 
-#endif	/* _WINDOWS */
+#endif
 
 #define ZBX_FS_DBL		"%lf"
 #define ZBX_FS_DBL_EXT(p)	"%." #p "lf"
@@ -193,15 +201,6 @@ typedef off_t	zbx_offset_t;
 #	define S_ISDIR(x) (((x) & S_IFMT) == S_IFDIR)
 #endif
 
-#define ZBX_STR2UINT64(uint, string) is_uint64(string, &uint)
-#define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
-#define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
-
-#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
-
-#define ZBX_CONST_STRING(str) "" str
-#define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)
-
 typedef struct
 {
 	zbx_uint64_t	lo;
@@ -219,5 +218,15 @@ zbx_uint128_t;
 #endif
 
 typedef struct zbx_variant zbx_variant_t;
+
+#define	SUCCEED		0
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
+#define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #endif

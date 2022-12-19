@@ -249,6 +249,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => '{$SNMP_COMMUNITY}',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -672,6 +673,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger'
@@ -691,6 +693,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger2'
@@ -716,6 +719,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger'
@@ -735,6 +739,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger2'
@@ -976,7 +981,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1026,7 +1030,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1076,7 +1079,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [
 								[
 									'tag' => 'Application',
@@ -1130,6 +1132,7 @@ class CImportDataAdapterTest extends TestCase {
 							'correlation_tag' => '',
 							'event_name' => '',
 							'opdata' => '',
+							'url_name' => '',
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
 						]
@@ -1380,7 +1383,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1430,7 +1432,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1480,7 +1481,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [
 								[
 									'tag' => 'Application',
@@ -1533,6 +1533,7 @@ class CImportDataAdapterTest extends TestCase {
 							'correlation_tag' => '',
 							'event_name' => '',
 							'opdata' => '',
+							'url_name' => '',
 							'tags' => [],
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
@@ -1914,34 +1915,40 @@ class CImportDataAdapterTest extends TestCase {
 			[
 				'name' => 'Email',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_EMAIL,
+				'provider' => (string) CXmlConstantValue::GENERIC_SMTP,
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
 				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Script without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => ''
+				'exec_params' => '',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Script with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => "100\n200\n300\n"
+				'exec_params' => "100\n200\n300\n",
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'SMS',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SMS,
 				'gsm_modem' => '/dev/ttyS0',
-				'parameters' => []
+				'parameters' => [],
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Webhook without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
 				'parameters' => [],
-				'script' => 'return true;'
+				'script' => 'return true;',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Webhook with parameters',
@@ -1964,7 +1971,8 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '{ALERT.MESSAGE}'
 					]
 				],
-				'script' => 'return true;'
+				'script' => 'return true;',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults
 		]);
 	}
@@ -2263,6 +2271,7 @@ class CImportDataAdapterTest extends TestCase {
 					'correlation_tag' => '',
 					'event_name' => '',
 					'opdata' => '',
+					'url_name' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 					'dependencies' => []
@@ -2282,6 +2291,7 @@ class CImportDataAdapterTest extends TestCase {
 					'correlation_tag' => '',
 					'event_name' => '',
 					'opdata' => '',
+					'url_name' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 					'dependencies' => []
@@ -2448,7 +2458,7 @@ class CImportDataAdapterTest extends TestCase {
 		$this->getAdapter($xml);
 	}
 
-	public function test10SchemaTranformationToLatest() {
+	public function test10SchemaTransformationToLatest() {
 		$adapter = $this->getAdapter($this->get10Xml());
 
 		$this->assertEquals($adapter->getHosts(), [
@@ -3181,7 +3191,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3283,7 +3292,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3385,7 +3393,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3498,6 +3505,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3519,6 +3527,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3540,6 +3549,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3561,6 +3571,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3588,7 +3599,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3609,7 +3621,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3630,7 +3643,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3979,7 +3993,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4081,7 +4094,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4183,7 +4195,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4276,9 +4287,7 @@ class CImportDataAdapterTest extends TestCase {
 			->setStrict(true)
 			->validate($source, '/');
 
-		$versions = ['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0'];
-
-		foreach ($versions as $version) {
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}

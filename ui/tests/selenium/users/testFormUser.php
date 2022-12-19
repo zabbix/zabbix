@@ -18,10 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
  * @backup users
+ * @dataSource LoginUsers
  */
 class testFormUser extends CWebTest {
 
@@ -73,14 +75,12 @@ class testFormUser extends CWebTest {
 			// Empty 'Group' field.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Username' => 'Negative_Test1',
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
-					],
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					]
 				]
 			],
 			// 'Password' fields not specified.
@@ -643,10 +643,10 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => ''
+						'Username' => ''
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
 			// Empty 'Password (once again)' field.
@@ -906,9 +906,7 @@ class testFormUser extends CWebTest {
 						'Username' => 'Updated_user',
 						'Name' => 'Road',
 						'Last name' => 'Runner',
-						'Groups' => [
-							'Selenium user group in configuration'
-						],
+						'Groups' => [],
 						'Language' => 'English (en_US)',
 						'Theme' => 'High-contrast light',
 						'Auto-login' => true,

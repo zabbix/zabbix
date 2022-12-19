@@ -27,7 +27,6 @@
 $form = (new CForm())
 	->setId('massupdate-form')
 	->setName('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('ids', $data['ids'])
 	->addVar('action', $data['action'])
 	->addVar('prototype', $data['prototype'])
@@ -303,7 +302,7 @@ $item_form_list
 		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
 				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -348,12 +347,12 @@ if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data[
 		(new CDiv([
 			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -362,8 +361,7 @@ if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data[
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		]))->setId('valuemapid_div')
 	);
 }
@@ -480,7 +478,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 				->addStyle('margin-bottom: 10px;'),
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
-				->setId('tags-table')
+				->addClass('tags-table')
 		]))->setId('tags-div')
 	);
 

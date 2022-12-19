@@ -25,16 +25,15 @@
 #include "zbxself.h"
 #include "zbxexec.h"
 #include "zbxipcservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
 #include "zbxhash.h"
+#include "zbxtime.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static zbx_es_t	es_engine;
 
@@ -114,7 +113,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
 	zbx_md5_finish(&state, hash);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".", eventid);
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 ".", eventid);
 
 	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
@@ -122,7 +121,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
 	}
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com", mediatypeid,
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com>", mediatypeid,
 			zbx_dc_get_instanceid());
 
 	return str;
@@ -290,15 +289,15 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	zbx_ipc_socket_t	alerter_socket;
 	zbx_ipc_message_t	message;
 	double			time_stat, time_idle = 0, time_now, time_read;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -319,7 +318,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -337,7 +336,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			fail_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
@@ -345,11 +344,11 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{

@@ -25,11 +25,11 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_DISCOVERY_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_DISCOVERY_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_DISCOVERY_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_DISCOVERY_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -52,7 +52,7 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('discoveries', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('discoveries', $data['hostid']));
 }
 
 // Add filter tab.
@@ -90,9 +90,10 @@ $filter_column1 = (new CFormList())
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -176,7 +177,7 @@ $filter_column3->addRow(_('Status'),
 
 $filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('host_discovery.php'))
 	->setArgument('context', $data['context'])
@@ -360,10 +361,9 @@ $discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList
 	$button_list, $data['checkbox_hash']
 )]);
 
-// Append form to widget.
-$widget->addItem($discoveryForm);
-
-$widget->show();
+$html_page
+	->addItem($discoveryForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

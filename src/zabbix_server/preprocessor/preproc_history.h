@@ -20,8 +20,8 @@
 #ifndef ZABBIX_PREPROC_HISTORY_H
 #define ZABBIX_PREPROC_HISTORY_H
 
-#include "common.h"
 #include "zbxvariant.h"
+#include "zbxtime.h"
 
 typedef struct
 {

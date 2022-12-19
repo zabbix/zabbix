@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXMODULES_H
 #define ZABBIX_ZBXMODULES_H
 
+#include "module.h"
+
 typedef struct
 {
 	void	*lib;

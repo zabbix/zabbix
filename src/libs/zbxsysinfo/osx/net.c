@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 #include "../common/zbxsysinfo_common.h"
+
+#include "zbxnum.h"
 #include "log.h"
 
 static struct ifmibdata	ifmd;
@@ -75,7 +77,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode, *error;
 
@@ -111,7 +113,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode, *error;
 
@@ -145,7 +147,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode, *error;
 
@@ -179,7 +181,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -193,7 +195,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -201,7 +203,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (ret = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result)))
 		return ret;
 
 	if (1 < result->ui64)
@@ -210,7 +212,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -224,7 +226,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -232,7 +234,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (ret = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (ret = execute_int(command, result)))
 		return ret;
 
 	if (1 < result->ui64)
@@ -241,7 +243,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *error;
 

@@ -27,7 +27,7 @@
 $form = (new CForm())
 	->setId('templategroupForm')
 	->setName('templategroupForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('groupid', $data['groupid'])
 	->addItem((new CInput('submit'))->addStyle('display: none;'));
 

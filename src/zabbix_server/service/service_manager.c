@@ -18,6 +18,7 @@
 **/
 
 #include "service_manager.h"
+#include "../server.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -25,10 +26,13 @@
 #include "zbxservice.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxexpr.h"
+#include "zbxcacheconfig.h"
+#include "zbx_trigger_constants.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
 /* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
@@ -349,6 +353,8 @@ static void	values_eq_clean(void *data)
 static void	add_service_problem_tag_index(zbx_hashset_t *service_problem_tags_index,
 		zbx_service_problem_tag_t *service_problem_tag)
 {
+/* service problem tag operators */
+#define ZBX_SERVICE_TAG_OPERATOR_LIKE	2
 	zbx_tag_services_t	tag_services_local, *tag_services;
 	zbx_values_eq_t		value_eq_local, *value_eq;
 
@@ -438,6 +444,7 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 		if (0 == tag_services->values.num_data && 0 == tag_services->service_problem_tags_like.values_num)
 			zbx_hashset_remove_direct(service_problem_tags_index, tag_services);
 	}
+#undef ZBX_SERVICE_TAG_OPERATOR_LIKE
 }
 
 static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, int *updated, int revision)
@@ -951,29 +958,29 @@ static int	condition_type_compare(const void *d1, const void *d2)
 
 static void	update_action_formula(zbx_service_action_t *action)
 {
-#define CONDITION_TYPE_NONE	255
+#define ZBX_CONDITION_TYPE_NONE	255
 
 	char				*formula = NULL;
 	size_t				formula_alloc = 0, formula_offset = 0;
 	int				i;
 	zbx_service_action_condition_t	*condition;
-	unsigned char			last_type = CONDITION_TYPE_NONE;
+	unsigned char			last_type = ZBX_CONDITION_TYPE_NONE;
 	char				*ops[] = {NULL, "and", "or"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, action->actionid);
 
-	if (0 == action->conditions.values_num || CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (0 == action->conditions.values_num || ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		goto out;
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_service_action_condition_t *)action->conditions.values[i];
 
-		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		{
 			if (last_type != condition->conditiontype)
 			{
-				if (CONDITION_TYPE_NONE != last_type)
+				if (ZBX_CONDITION_TYPE_NONE != last_type)
 					zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, ") and ");
 
 				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, '(');
@@ -983,7 +990,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		}
 		else
 		{
-			if (CONDITION_TYPE_NONE != last_type)
+			if (ZBX_CONDITION_TYPE_NONE != last_type)
 			{
 				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ' ');
 				zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, ops[action->evaltype]);
@@ -996,7 +1003,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 		last_type = condition->conditiontype;
 	}
 
-	if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 		zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ')');
 
 	zbx_free(action->formula);
@@ -1004,7 +1011,7 @@ static void	update_action_formula(zbx_service_action_t *action)
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() formula:%s", __func__, action->formula);
 
-#undef CONDITION_TYPE_NONE
+#undef ZBX_CONDITION_TYPE_NONE
 }
 
 static void	sync_action_conditions(zbx_service_manager_t *service_manager, int revision)
@@ -1996,6 +2003,9 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
 		return zbx_dsprintf(NULL, "Status of unknown service changed to %s", severity);
 }
 
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
 /******************************************************************************
  *                                                                            *
  * Purpose: create service events based on service updates                    *
@@ -2308,6 +2318,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+#undef SERVICE_VALUE_OK
+#undef SERVICE_VALUE_PROBLEM
 
 static int	compare_uint64_pair_second(const void *d1, const void *d2)
 {
@@ -3261,18 +3273,18 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_service_manager_t	service_manager;
 	zbx_timespec_t		timeout = {1, 0};
 	int			service_cache_reload_requested = 0;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -3322,10 +3334,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			int	updated = 0, revision;
 
 			if (1 == service_cache_reload_requested)
-			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
-				service_cache_reload_requested = 0;
-			}
 
 			do
 			{
@@ -3352,6 +3361,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			if (0 != updated)
 				recalculate_services(&service_manager);
 
+			if (1 == service_cache_reload_requested)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the service manager cache");
+				service_cache_reload_requested = 0;
+			}
+
+
 			service_update_num += updated;
 			time_flush = time_now;
 			time_now = zbx_time();
@@ -3365,11 +3381,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			time_now = zbx_time();
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

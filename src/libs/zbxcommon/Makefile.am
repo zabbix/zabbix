@@ -5,12 +5,12 @@ noinst_LIBRARIES = libzbxcommon.a
 libzbxcommon_a_SOURCES = \
 	comms.c \
 	file.c \
-	iprange.c \
+	libc_wrappers.c \
 	misc.c \
 	setproctitle.c \
-	str.c \
-	time.c \
-	cuid.c
+	common_str.c \
+	cuid.c \
+	components_strings_representations.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
 

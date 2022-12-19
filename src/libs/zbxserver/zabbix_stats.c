@@ -17,27 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxserver.h"
+#include "zbxstats.h"
 
-#include "common.h"
-#include "dbcache.h"
+#include "zbxcommon.h"
+#include "zbxcachehistory.h"
+#include "zbxcacheconfig.h"
 #include "zbxself.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
+#include "zbxcomms.h"
 
 extern unsigned char	program_type;
 extern int	CONFIG_SERVER_STARTUP_TIME;
 
-static zbx_get_zabbix_stats_ext_func_t	stats_ex_cb;
+static zbx_zabbix_stats_ext_get_func_t	stats_ex_cb;
 
 /******************************************************************************
  *                                                                            *
  * Purpose: sets stats callback function                                      *
  *                                                                            *
- * Parameters: cb - [IN] callback function                                    *
+ * Parameters: cb   - [IN] callback function                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext_func_t cb)
+void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
 {
 	stats_ex_cb = cb;
 }
@@ -46,10 +48,11 @@ void	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext_func_t cb)
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json             - [OUT] the json data                         *
+ *             zbx_config_comms - [IN] Zabbix server/proxy comms config       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_zabbix_stats(struct zbx_json *json)
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	zbx_config_cache_info_t	count_stats;
 	zbx_vmware_stats_t	vmware_stats;
@@ -71,8 +74,8 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	/* zabbix[items] */
 	zbx_json_adduint64(json, "items", count_stats.items);
 
-	/* zabbix[item_unsupported] */
-	zbx_json_adduint64(json, "item_unsupported", count_stats.items_unsupported);
+	/* zabbix[items_unsupported] */
+	zbx_json_adduint64(json, "items_unsupported", count_stats.items_unsupported);
 
 	/* zabbix[requiredperformance] */
 	zbx_json_addfloat(json, "requiredperformance", count_stats.requiredperformance);
@@ -80,7 +83,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	/* zabbix[preprocessing_queue] */
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
-	stats_ex_cb(json);
+	stats_ex_cb(json, zbx_config_comms);
 
 	/* zabbix[rcache,<cache>,<mode>] */
 	zbx_json_addobject(json, "rcache");

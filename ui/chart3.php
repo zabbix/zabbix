@@ -56,6 +56,7 @@ $fields = [
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
+	session_write_close();
 	exit();
 }
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
@@ -143,7 +144,8 @@ elseif (hasRequest('i') || hasRequest('items')) {
 }
 else {
 	show_error_message(_('No items defined.'));
-	exit;
+	session_write_close();
+	exit();
 }
 
 /*
@@ -194,4 +196,4 @@ else {
 	$graph->draw();
 }
 
-require_once dirname(__FILE__).'/include/page_footer.php';
+require_once __DIR__.'/include/page_footer.php';

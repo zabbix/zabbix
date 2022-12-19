@@ -23,13 +23,15 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.mediatype.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
@@ -91,10 +93,17 @@ $mediaTypeTable = (new CTableInfo())
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
-			$details =
-				_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
-				_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
-				_('SMTP email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
+			if ($mediaType['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+				$details =
+					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+					_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
+					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
+			}
+			else {
+				$details =
+					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'] . '"';
+			}
 			break;
 
 		case MEDIA_TYPE_EXEC:
@@ -114,13 +123,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'],
-				(new CUrl('actionconf.php'))
-					->setArgument('eventsource', $action['eventsource'])
-					->setArgument('form', 'update')
-					->setArgument('actionid', $action['actionid'])
-					->getUrl()
-			);
+			$actionLinks[] = (new CLink($action['name']))
+				->addClass('js-action-edit')
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-eventsource', $action['eventsource']);
+
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
@@ -166,7 +173,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		media_type2str($mediaType['typeid']),
+		CMediatypeHelper::getMediaTypes($mediaType['typeid']),
 		$status,
 		$actionColumn,
 		$details,
@@ -194,4 +201,10 @@ $mediaTypeForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($mediaTypeForm)->show();
+$html_page
+	->addItem($mediaTypeForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

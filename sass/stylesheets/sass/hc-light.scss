@@ -40,6 +40,7 @@ $font-selected-color: #ffffff;
 $font-alt-color: #333333;
 $body-bg-color: #ffffff;
 $overlay-bg-color: #000000;
+$overlay-border-color: #383838;
 
 // Main menu
 $menu-main-color: #ffffff;
@@ -91,13 +92,17 @@ $menu-user-selected-arrow-bg-position: -579px -434px;
 $sidebar-server-name-color: #9f9f9f;
 
 $menu-main-icons: (
+	dashboards: -570px -856px,
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
 	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
+	data-collection: -570px -784px,
+	alerts: -570px -879px,
 	configuration: -570px -784px,
+	users: -570px -904px,
 	administration: -570px -808px
 );
 
@@ -133,6 +138,7 @@ $form-font-color: #000000;
 $form-bg-color: #ffffff;
 $form-border-color: #888888;
 $form-border-focus-color: #000000;
+$form-fields-group-border-color: #888888;
 
 $form-disabled-font-color: #9f9f9f;
 $form-disabled-bg-color: #f0f0f0;
@@ -836,6 +842,18 @@ a.link-action {
 	}
 }
 
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
+		}
+	}
+}
+
 // Checkbox disabling.
 .filter-highlight-row-cb {
 	display: none;
@@ -1296,18 +1314,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-.overrides-options-list {
-	> li > div {
-		background-color: $ui-bg-selected-color !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;
@@ -1326,6 +1332,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1339,7 +1346,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1347,6 +1355,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1359,7 +1368,7 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
@@ -1382,5 +1391,37 @@ td.inactive-bg {
 
 	&>:last-child::after {
 		content: "";
+	}
+}
+
+// Host interfaces.
+
+.interfaces {
+	.interface-row {
+		&[data-type="2"] {
+			.interface-btn-toggle {
+				background-position: -165px -690px;
+			}
+
+			&.list-accordion-item-opened {
+				.interface-btn-toggle {
+					background-position: -165px -655px;
+				}
+			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -165px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -165px -690px;
+		}
 	}
 }

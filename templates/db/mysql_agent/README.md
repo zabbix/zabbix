@@ -3,18 +3,18 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template is developed for monitoring DBMS MySQL and its forks.
 
 This template was tested on:
 
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
-- MariaDB, version 10.4
+- MariaDB, version 10.4, 10.6.8
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 1. Install Zabbix agent and MySQL client. If necessary, add the path to the `mysql` and `mysqladmin` utilities to the global environment variable PATH.
 2. Copy `template_db_mysql.conf` into the folder with Zabbix agent configuration (`/etc/zabbix/zabbix_agentd.d/` by default). Don't forget to restart Zabbix agent.
@@ -81,7 +81,7 @@ No specific Zabbix configuration is required.
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
-|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`localhost` |
+|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`127.0.0.1` |
 |{$MYSQL.INNODB_LOG_FILES} |<p>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</p> |`2` |
 |{$MYSQL.PORT} |<p>MySQL service port.</p> |`3306` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |

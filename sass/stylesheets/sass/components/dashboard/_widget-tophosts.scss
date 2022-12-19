@@ -1,7 +1,7 @@
 // Widget configuration.
 
-form.dashboard-grid-widget-tophosts {
-	$width-small: 150px;
+form.dashboard-widget-tophosts {
+	$width-small: 250px;
 
 	#list_columns .text {
 		@extend %overflow-ellipsis;
@@ -15,7 +15,7 @@ form.dashboard-grid-widget-tophosts {
 
 // Widget view.
 
-div.dashboard-grid-widget-tophosts {
+div.dashboard-widget-tophosts {
 	$bar-gauge-height: 20px;
 
 	.list-table th.center {

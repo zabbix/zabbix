@@ -18,12 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup services
+ * @dataSource Services
+ * @dataSource EntitiesTags
+ *
  * @backup profiles
  */
 class testFormTabIndicators extends CWebTest {
@@ -53,7 +56,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => 'tag2'
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 3
 						],
@@ -110,7 +113,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 4
 						],
@@ -180,7 +183,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
@@ -281,7 +284,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
@@ -318,7 +321,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 3
 						],
@@ -472,7 +475,7 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'LDAP settings',
 							'entries' => [
-								'selector' => 'id:ldap_configured',
+								'selector' => 'id:ldap_auth_enabled',
 								'value' => true,
 								'old_value' => false
 							],
@@ -570,9 +573,9 @@ class testFormTabIndicators extends CWebTest {
 							],
 							'field_type' => 'general_field'
 						],
+						// There is no tab indicator if the default values are set.
 						[
 							'name' => 'Legend',
-							'set by default' => true,
 							'entries' => [
 								'selector' => 'id:legend',
 								'value' => false,
@@ -679,18 +682,22 @@ class testFormTabIndicators extends CWebTest {
 			$form->selectTab($tab['name']);
 
 			if (array_key_exists('count', $tab)) {
-				$data_indicator = 'count';
 				$new_value = $tab['count'];
 				$old_value = CTestArrayHelper::get($tab, 'initial_count', 0);
 			}
 			else {
-				$data_indicator = 'mark';
-				$old_value = CTestArrayHelper::get($tab, 'set by default', false);
+				// There is no tab indicator if the default values are set.
+				$old_value = false;
 				$new_value = !$old_value;
 			}
 
 			$tab_selector = $form->query('xpath:.//a[text()="'.$tab['name'].'"]')->one();
 			$this->assertTabIndicator($tab_selector, $old_value);
+
+			if (CTestArrayHelper::get($tab, 'name') === 'HTTP settings') {
+				$form->fill(['Enable HTTP authentication' => true]);
+				$this->query('button:Ok')->one()->click();
+			}
 
 			// Populate fields in tab and check indicator value.
 			$this->updateTabFields($tab, $form);
@@ -710,27 +717,30 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	public function testFormTabIndicators_CheckActionOperationsCounter() {
-		$this->page->login()->open('actionconf.php?eventsource=0&form=Create+action')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=action.list&eventsource=0')->waitUntilReady();
+		$this->query('button:Create action')->one()->click()->waitUntilReady();
 
 		// Open Operations tab and check indicator value.
-		$form = $this->query('id:action-form')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady();
+		$form = $dialog->asForm()->one();
 		$form->selectTab('Operations');
-		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one();
+		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
-		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
+		foreach (['Operations' => 'operations_0', 'Recovery operations' => 'recovery_operations_0',
+						'Update operations' => 'update_operations_0'] as $operation => $row) {
 			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
-			$operations_overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-			$operations_overlay->getField('Send to users')->query('button:Add')->one()->click();
-
+			$operations_overlay = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$operations_overlay->query('xpath://div[@id="operation-message-users"]'.
+					'//button[text()="Select"]')->one()->click();
 			$users_overlay = COverlayDialogElement::find()->all()->asForm()->last();
 			$users_overlay->query('id:item_1')->asCheckbox()->one()->check();
 			$users_overlay->submit();
 			$operations_overlay->submit();
-
-			COverlayDialogElement::ensureNotPresent();
+			$this->query('xpath://tr[@id="'.$row.'"]')->waitUntilVisible();
 		}
+
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the previously created operations and check indicator value.
@@ -805,27 +815,6 @@ class testFormTabIndicators extends CWebTest {
 		$this->assertTabIndicator($tab_selector, false);
 	}
 
-	/**
-	 * Function used to create services for dependencies indicator test.
-	 */
-	public function prepareServiceData() {
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Service 1',
-				'algorithm' => 0,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Service 2',
-				'algorithm' => 0,
-				'sortorder' => 0
-			]
-		]);
-	}
-
-	/**
-	 * @onBeforeOnce prepareServiceData
-	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
 		$this->page->login()->open('zabbix.php?action=service.list.edit')->waitUntilReady();
 
@@ -844,7 +833,7 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		$overlay->waitUntilNotVisible();
-		$this->assertTabIndicator($tab_selector, 2);
+		$this->assertTabIndicator($tab_selector, CDBHelper::getCount('SELECT null FROM services'));
 
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();
@@ -869,11 +858,11 @@ class testFormTabIndicators extends CWebTest {
 				'tag' => 'tag2'
 			]
 		];
-		$form->query('id:tags-table')->asMultifieldTable()->one()->fill($tags);
+		$form->query('class:tags-table')->asMultifieldTable()->one()->fill($tags);
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the tags and check count indicator.
-		$form->query('id:tags-table')->one()->query('button:Remove')->all()->click();
+		$form->query('class:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 	}
 

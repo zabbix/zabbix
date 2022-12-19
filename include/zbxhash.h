@@ -113,7 +113,7 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 
 /* ------------------ end of included md5.h file ------------------------- */
 
-#include "common.h"
+#include "zbxcommon.h"
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 

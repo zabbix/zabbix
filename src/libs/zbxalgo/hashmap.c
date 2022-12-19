@@ -20,7 +20,7 @@
 #include "zbxalgo.h"
 #include "algodefs.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *slot);
 

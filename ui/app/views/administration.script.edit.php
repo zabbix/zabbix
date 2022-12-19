@@ -27,9 +27,9 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.script.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT));
 
 $row_template = (new CTag('script', true))
 	->setId('parameters-row')
@@ -50,12 +50,12 @@ $row_template = (new CTag('script', true))
 		]))->addClass('form_row')
 	);
 
-$widget->addItem($row_template);
+$html_page->addItem($row_template);
 
 $form = (new CForm())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
@@ -113,6 +113,7 @@ $form_list = (new CFormList())
 	)
 	->addRow((new CLabel(_('Type'), 'type')),
 		(new CRadioButtonList('type', (int) $data['type']))
+			->addValue(_('URL'), ZBX_SCRIPT_TYPE_URL)
 			->addValue(_('Webhook'), ZBX_SCRIPT_TYPE_WEBHOOK)
 			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
 			->addValue(_('SSH'), ZBX_SCRIPT_TYPE_SSH)
@@ -169,7 +170,7 @@ $form_list = (new CFormList())
 		(new CTextArea('command', $data['command']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(DB::getFieldLength('scripts', 'command'))
+			->setMaxlength(DB::getFieldLength('scripts', 'command'))
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
@@ -183,6 +184,16 @@ $form_list = (new CFormList())
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row-webhook-parameters'
+	)
+	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark(),
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('scripts', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	)
+	->addRow(_('Open in a new window'),
+		(new CCheckBox('new_window'))
+			->setChecked($data['new_window'])
+			->setUncheckedValue(ZBX_SCRIPT_URL_NEW_WINDOW_NO)
 	)
 	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['script'], [
@@ -303,4 +314,4 @@ else {
 
 $form->addItem($scriptView);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

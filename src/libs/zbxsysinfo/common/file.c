@@ -18,14 +18,17 @@
 **/
 
 #include "file.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "dir.h"
-#include "zbxhash.h"
+#include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
@@ -36,7 +39,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename, *mode;
@@ -129,7 +132,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_time(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_file_time_t	file_time;
 	char		*filename, *type;
@@ -174,7 +177,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 	int		ret = SYSINFO_RET_FAIL, file_exists = 0, types, types_incl, types_excl;
@@ -266,7 +269,7 @@ err:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
@@ -345,12 +348,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 #endif
 
-int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return vfs_file_exists(request, result);
+	return vfs_file_exists_local(request, result);
 }
 
-int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
@@ -373,7 +376,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == filename || '\0' == *filename)
 	{
@@ -429,7 +432,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(read_buf, nbytes, encoding);
 		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
 		zbx_free(utf8);
 	}
@@ -460,7 +463,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
 	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
@@ -498,11 +501,11 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -510,7 +513,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -545,7 +548,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
@@ -581,7 +584,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, *tmp, encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
@@ -618,11 +621,11 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -630,7 +633,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -667,7 +670,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
 			res = 1;
@@ -756,7 +759,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_md5sum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 
@@ -963,7 +966,7 @@ err:
  * Comments: computes POSIX 1003.2 checksum                                   *
  *                                                                            *
  ******************************************************************************/
-int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_cksum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *method;
 	int	ret = SYSINFO_RET_FAIL;
@@ -996,7 +999,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*filename, *ownertype, *resulttype;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1096,7 +1099,7 @@ err:
 	return ret;
 }
 #else
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *ownertype, *resulttype;
 	int		ret = SYSINFO_RET_FAIL, type;
@@ -1179,7 +1182,7 @@ err:
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported on Windows."));
@@ -1193,7 +1196,7 @@ static char	*get_file_permissions(zbx_stat_t *st)
 				(S_IRWXU & st->st_mode) >> 6, (S_IRWXG & st->st_mode) >> 3, S_IRWXO & st->st_mode);
 }
 
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 	int		ret = SYSINFO_RET_FAIL;
@@ -1269,6 +1272,69 @@ static char	*get_print_time(time_t st_raw)
 #	define ZBX_DIR_DELIMITER	"\\"
 #else
 #	define ZBX_DIR_DELIMITER	"/"
+
+static char	*canonicalize_path(const char *fullname)
+{
+	int			i, up_level = 0;
+	char			*name;
+	const char		*p_start = &fullname[1], *p_to_delimiter;
+	size_t			name_alloc = 0, name_offset = 0;
+	zbx_vector_str_t	names;
+
+	zbx_vector_str_create(&names);
+
+	do
+	{
+		if (NULL != (p_to_delimiter = strchr(p_start, '/')))
+		{
+			name = zbx_dsprintf(NULL, "%.*s", (int)(p_to_delimiter - p_start), p_start);
+			p_start = p_to_delimiter + 1;
+		}
+		else
+			name = zbx_strdup(NULL, p_start);
+
+		zbx_vector_str_append(&names, name);
+	}
+	while (NULL != p_to_delimiter);
+
+	name = NULL;
+
+	for (i = names.values_num - 1; 0 <= i; i--)
+	{
+		char *ptr = names.values[i];
+
+		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+		}
+		else if (0 == strcmp(ptr, ".."))
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level++;
+		}
+		else if (0 < up_level)
+		{
+			zbx_free(ptr);
+			zbx_vector_str_remove(&names, i);
+			up_level--;
+		}
+	}
+
+	if (0 < names.values_num)
+	{
+		for (i = 0; i < names.values_num; i++)
+			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
+	}
+	else
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/");
+
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
+
+	return name;
+}
 #endif
 
 static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
@@ -1279,16 +1345,36 @@ static int	get_dir_names(const char *filename, char **basename, char **dirname, 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
 		return FAIL;
-#elif defined(__hpux)
-	char resolved_path[PATH_MAX + 1];
-
-	if (NULL == (*pathname = realpath(filename, resolved_path)))
-		return FAIL;
-
-	*pathname = zbx_strdup(NULL, *pathname);
 #else
-	if (NULL == (*pathname = realpath(filename, NULL)))
-		return FAIL;
+	if ( '/' != filename[0])
+	{
+#ifdef PATH_MAX
+#	define MAX_PATH_BUFFER	PATH_MAX
+#else
+#	define MAX_PATH_BUFFER	4096
+#endif
+		char	resolved_path[MAX_PATH_BUFFER + 1], *name = NULL;
+		size_t	name_alloc = 0, name_offset = 0;
+
+#define ZBX_UNREACHABLE_STR		"(unreachable)"
+#define ZBX_UNREACHABLE_STR_LEN		ZBX_CONST_STRLEN(ZBX_UNREACHABLE_STR)
+
+		if (NULL == getcwd(resolved_path, MAX_PATH_BUFFER) || 0 == strncmp(ZBX_UNREACHABLE_STR, resolved_path,
+				ZBX_UNREACHABLE_STR_LEN))
+		{
+			return FAIL;
+		}
+
+		zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "%s/%s", resolved_path, filename);
+
+		*pathname = canonicalize_path(name);
+		zbx_free(name);
+#undef ZBX_UNREACHABLE_STR_LEN
+#undef ZBX_UNREACHABLE_STR
+#undef MAX_PATH_BUFFER
+	}
+	else
+		*pathname = canonicalize_path(filename);
 #endif
 
 	ptr1 = *pathname;
@@ -1606,7 +1692,7 @@ err:
 }
 #endif
 
-static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+static int	vfs_file_get_local(const char *filename, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*error = NULL;
@@ -1633,7 +1719,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 #undef VFS_FILE_ADD_TIME
 #undef VFS_FILE_ADD_TS
 
-int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 
@@ -1651,5 +1737,5 @@ int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return vfs_file_get(filename, result);
+	return vfs_file_get_local(filename, result);
 }

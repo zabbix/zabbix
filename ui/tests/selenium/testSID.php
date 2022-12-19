@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * @backup token
  *
- * @dataSource ScheduledReports
+ * @dataSource ScheduledReports, Proxies
  *
  * @onBefore prepareTokenData
  */
@@ -60,6 +61,48 @@ class testSID extends CWebTest {
 
 	public static function getLinksData() {
 		return [
+			// Action create
+			[[
+				'link' => 'zabbix.php?action=action.create&form_refresh=1&actionid=0&eventsource=0&name=testsid&evaltype=0'.
+					'&formula=&status=0&esc_period=1h&operations[0][eventsource]=0&operations[0][recovery]=0'.
+					'&operations[0][operationtype]=0&operations[0][esc_step_from]=1&operations[0][esc_step_to]=1'.
+					'&operations[0][esc_period]=0&operations[0][opmessage_grp][0][usrgrpid]=8&operations[0][opmessage][mediatypeid]=0'.
+					'&operations[0][opmessage][default_msg]=1&operations[0][evaltype]=0&pause_suppressed=1&notify_if_canceled=1',
+				'json_output' => true
+			]],
+			// Action update
+			[[
+				'link' => 'zabbix.php?action=action.update&form_refresh=1&actionid=3&eventsource=0'.
+					'&name=Report problems to Zabbix administrators&evaltype=0&formula=&esc_period=1h&operations[0][operationid]=3'.
+					'&operations[0][actionid]=3&operations[0][operationtype]=0&operations[0][esc_period]=0&operations[0][esc_step_from]=1'.
+					'&operations[0][esc_step_to]=1&operations[0][evaltype]=0&operations[0][opmessage][default_msg]=1'.
+					'&operations[0][opmessage][subject]=&operations[0][opmessage][message]=&operations[0][opmessage][mediatypeid]=0'.
+					'&operations[0][opmessage_grp][0][usrgrpid]=7&operations_for_popup[0][0]={"operationid":"3","actionid":"3"'.
+					',"operationtype":"0","esc_period":"0","esc_step_from":"1","esc_step_to":"1","evaltype":"0","opconditions":[]'.
+					',"opmessage":{"default_msg":"1","subject":"","message":"","mediatypeid":"0"},"opmessage_grp":[{"usrgrpid":"7"}]'.
+					',"opmessage_usr":[],"id":0}&operations_for_popup[1][0]={"operationid":"7","actionid":"3","operationtype":"11"'.
+					',"evaltype":"0","opconditions":[],"opmessage":{"default_msg":"1","subject":"","message":"","mediatypeid":"0"}'.
+					',"id":0}&recovery_operations[0][operationid]=7&recovery_operations[0][actionid]=3'.
+					'&recovery_operations[0][operationtype]=11&recovery_operations[0][evaltype]=0&recovery_operations[0][opmessage]'.
+					'[default_msg]=1&recovery_operations[0][opmessage][subject]=&recovery_operations[0][opmessage][message]='.
+					'&recovery_operations[0][opmessage][mediatypeid]=0&pause_suppressed=1&notify_if_canceled=1',
+				'json_output' => true
+			]],
+			// Action delete
+			[[
+				'link' => 'zabbix.php?action=action.delete&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
+			// Action disable
+			[[
+				'link' => 'zabbix.php?action=action.disable&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
+			// Action enable
+			[[
+				'link' => 'zabbix.php?action=action.enable&eventsource=0&actionids[]=3',
+				'json_output' => true
+			]],
 			// Icon mapping delete.
 			[['link' => 'zabbix.php?action=iconmap.delete&iconmapid=101']],
 
@@ -247,13 +290,6 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// Dashboard widget configure.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.configure&type=actionlog&view_mode=0&fields=%7B%22rf_rate'.
-					'%22%3A%22-1%22%2C%22sort_triggers%22%3A%224%22%2C%22show_lines%22%3A%2225%22%7D',
-				'json_output' => true
-			]],
-
 			// Dashboard widget refresh rate.
 			[[
 				'link' => 'zabbix.php?action=dashboard.widget.rfrate&widgetid=2002&rf_rate=120',
@@ -275,12 +311,6 @@ class testSID extends CWebTest {
 			// Template dashboard delete.
 			[[
 				'link' => 'zabbix.php?form_refresh=1&templateid=10076&dashboardids%5B146%5D=146&action=template.dashboard.delete'
-			]],
-
-			// Template dashboard widget edit.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076',
-				'json_output' => true
 			]],
 
 			// User token delete.
@@ -444,14 +474,18 @@ class testSID extends CWebTest {
 					'ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_availability_report=1&ui_reports_top_triggers'.
 					'=1&ui_reports_audit=0&ui_reports_action_log=0&ui_reports_notifications=0&ui_configuration_host_groups=0'.
 					'&ui_configuration_templates=0&ui_configuration_hosts=0&ui_configuration_maintenance=0&'.
-					'ui_configuration_actions=0&ui_configuration_event_correlation=0&ui_configuration_discovery=0&'.
-					'ui_configuration_services=0&ui_administration_general=0&ui_administration_proxies=0&'.
-					'ui_administration_authentication=0&ui_administration_user_groups=0&ui_administration_user_roles=0&'.
-					'ui_administration_users=0&ui_administration_media_types=0&ui_administration_scripts=0&'.
+					'ui_configuration_trigger_actions=0&ui_configuration_discovery_actions=0&'.
+					'ui_configuration_autoregistration_actions=0&ui_configuration_internal_actions=0&'.
+					'ui_configuration_event_correlation=0&ui_configuration_discovery=0&ui_configuration_services=0&'.
+					'ui_administration_general=0&ui_administration_audit_log=0&ui_administration_housekeeping=0&'.
+					'ui_administration_proxies=0&ui_administration_macros=0&ui_administration_authentication=0&'.
+					'ui_administration_user_groups=0&ui_administration_user_roles=0&ui_administration_users=0&'.
+					'ui_administration_api_tokens=0&ui_administration_media_types=0&ui_administration_scripts=0&'.
 					'ui_administration_queue=0&ui_default_access=1&modules_default_access=1&api_access=1&api_mode=0&'.
-					'actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0&actions_add_problem_comments'.
-					'=1&actions_change_severity=1&actions_acknowledge_problems=1&actions_close_problems=1&'.
-					'actions_execute_scripts=1&actions_manage_api_tokens=1&actions_default_access=1&action=userrole.create']],
+					'actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0&'.
+					'actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1&'.
+					'actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1&'.
+					'actions_default_access=1&action=userrole.create']],
 
 			// User role update.
 			[['link' => 'zabbix.php?form_refresh=1&roleid=5&name=sadasda&type=2&ui_monitoring_dashboard=1&'.
@@ -462,16 +496,20 @@ class testSID extends CWebTest {
 					'&ui_reports_notifications=0&ui_reports_notifications=1&ui_configuration_host_groups=0&'.
 					'ui_configuration_host_groups=1&ui_configuration_templates=0&ui_configuration_templates=1&'.
 					'ui_configuration_hosts=0&ui_configuration_hosts=1&ui_configuration_maintenance=0&'.
-					'ui_configuration_maintenance=1&ui_configuration_actions=0&ui_configuration_actions=1&'.
+					'ui_configuration_maintenance=1&ui_configuration_trigger_actions=0&ui_configuration_trigger_actions=1&'.
+					'ui_configuration_discovery_actions=0&ui_configuration_discovery_actions=1&'.
+					'ui_configuration_autoregistration_actions=0&ui_configuration_autoregistration_actions=1&'.
+					'ui_configuration_internal_actions=0&ui_configuration_internal_actions=1&'.
 					'ui_configuration_event_correlation=0&ui_configuration_discovery=0&ui_configuration_discovery=1&'.
 					'ui_configuration_services=0&ui_configuration_services=1&ui_administration_general=0&'.
-					'ui_administration_proxies=0&ui_administration_authentication=0&ui_administration_user_groups=0&'.
-					'ui_administration_user_roles=0&ui_administration_users=0&ui_administration_media_types=0&'.
-					'ui_administration_scripts=0&ui_administration_queue=0&ui_default_access=1&modules_default_access=1'.
-					'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0'.
-					'&actions_edit_maintenance=1&actions_add_problem_comments=1&actions_change_severity=1&'.
-					'actions_acknowledge_problems=1&actions_close_problems=1&actions_execute_scripts=1&'.
-					'actions_manage_api_tokens=1&actions_default_access=1&action=userrole.update']],
+					'ui_administration_audit_log=0&ui_administration_proxies=0&ui_administration_authentication=0&'.
+					'ui_administration_user_groups=0&ui_administration_user_roles=0&ui_administration_users=0&'.
+					'ui_administration_api_tokens=0&ui_administration_media_types=0&ui_administration_scripts=0&'.
+					'ui_administration_queue=0&ui_default_access=1&modules_default_access=1&api_access=1&api_mode=0&'.
+					'actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=0&actions_edit_maintenance=1&'.
+					'actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1&'.
+					'actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1&'.
+					'actions_default_access=1&action=userrole.update']],
 
 			// User role delete.
 			[['link' => 'zabbix.php?action=userrole.delete&roleids%5B0%5D=5']],
@@ -519,7 +557,7 @@ class testSID extends CWebTest {
 			[['link' => 'zabbix.php?form_refresh=3&action=authentication.update&db_authentication_type=0&'.
 					'authentication_type=0&passwd_min_length=8&passwd_check_rules%5B%5D=1&passwd_check_rules%5B%5D=2&'.
 					'passwd_check_rules%5B%5D=4&passwd_check_rules%5B%5D=8&http_auth_enabled=1&http_login_form=0&'.
-					'http_strip_domains=&http_case_sensitive=1&ldap_configured=0&change_bind_password=1&'.
+					'http_strip_domains=&http_case_sensitive=1&ldap_auth_enabled=0&change_bind_password=1&'.
 					'saml_auth_enabled=0&update=Update']],
 
 			// Media type create.
@@ -597,11 +635,11 @@ class testSID extends CWebTest {
 			// Export.
 			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
 
-			// Favourite create.
-			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
+			// Favorite create.
+			[['link' => 'zabbix.php?action=favorite.create&object=screenid&objectid=200021']],
 
-			// Favourite delete.
-			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
+			// Favorite delete.
+			[['link' => 'zabbix.php?action=favorite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
 			[[
@@ -899,7 +937,7 @@ class testSID extends CWebTest {
 				$this->assertMessage(TEST_BAD, 'Access denied',
 						'You are logged in as "Admin". You have no permissions to access this page.'
 				);
-				$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+				$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
 				$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 			}
 		}
@@ -1091,7 +1129,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'link' => 'actionconf.php?eventsource=0&form=Create+action'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=action.list&eventsource=0',
+					'case' => 'action create'
 				]
 			],
 
@@ -1099,7 +1139,9 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
-					'link' => 'actionconf.php?form=update&actionid=3'
+					'access_denied' => true,
+					'link' => 'zabbix.php?action=action.list&eventsource=0',
+					'case' => 'action update'
 				]
 			],
 
@@ -1470,6 +1512,16 @@ class testSID extends CWebTest {
 					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					$dialog->asForm()->fill(['Proxy name' => 'test remove sid']);
 					break;
+
+				case 'action create':
+					$this->query('button:Create action')->one()->click()->waitUntilReady();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					break;
+
+				case 'action update':
+					$this->query('xpath://a[text()="Report problems to Zabbix administrators"]')->one()->click()->waitUntilReady();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					break;
 			}
 
 			$element = $dialog;
@@ -1500,7 +1552,7 @@ class testSID extends CWebTest {
 		$this->assertMessage(TEST_BAD, $message, $details);
 
 		if (CTestArrayHelper::get($data, 'incorrect_request'))  {
-			$this->query('button:Go to "Dashboard"')->one()->waitUntilClickable()->click();
+			$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->assertStringContainsString('zabbix.php?action=dashboard', $this->page->getCurrentUrl());
 		}

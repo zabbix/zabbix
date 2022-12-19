@@ -483,7 +483,7 @@ class testHost extends CAPITest {
 					]
 				],
 
-				// First two templates. Third and fourth templates are manualy added.
+				// First two templates. Third and fourth templates are manually added.
 				'templates' => [
 					[
 						'templateid' => self::$data['templateids']['api_test_hosts_f_tpl']
@@ -588,7 +588,7 @@ class testHost extends CAPITest {
 				]
 			],
 
-			// First three macros are automatic. The rest are manualy added.
+			// First three macros are automatic. The rest are manually added.
 			[
 				'host' => '{#HOST}_auto_and_manual_macros',
 				'ruleid' => $discoveryrules['itemids'][0],
@@ -720,7 +720,7 @@ class testHost extends CAPITest {
 		/*
 		 * Add few manual templates to discovered hosts to test the template removal. Do not use API at this point.
 		 * Cannot use CDBHelper::getValue, because it will add "LIMIT 1" at the end of query and MySQL does not support
-		 * a syntaxt like that.
+		 * a syntax like that.
 		 */
 		$nextid = CDBHelper::getAll(
 			'SELECT i.nextid'.
@@ -936,7 +936,7 @@ class testHost extends CAPITest {
 				],
 				'expected_error' => 'Wrong fields for host "".'
 			],
-			'Test host.create common error - mssing "groups"' => [
+			'Test host.create common error - missing "groups"' => [
 				'request' => [
 					'host' => 'API test hosts create fail'
 				],
@@ -1264,12 +1264,13 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check it is not possible to select write-only fields' => [
 				'request' => [
-					'output' => ['host', 'tls_psk', 'tls_psk_identity'],
+					'output' => ['host', 'tls_psk', 'tls_psk_identity', 'name_upper'],
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1280,12 +1281,13 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check direct request of inventory_mode and other properties' => [
 				'request' => [
-					'output' => ['inventory_mode', 'tls_connect', 'name'],
+					'output' => ['inventory_mode', 'tls_connect', 'name', 'name_upper'],
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1294,7 +1296,8 @@ class testHost extends CAPITest {
 
 					// Samples of other specified properties.
 					'tls_connect' => '1',
-					'name' => 'API test hosts - write-only fields'
+					'name' => 'API test hosts - write-only fields',
+					'name_upper' => null
 				]
 			]
 		];
@@ -1498,7 +1501,7 @@ class testHost extends CAPITest {
 
 			/*
 			 * Possibly incorrect behavior in API in case templates that are added are same as the ones that should be
-			 * cleared. Currenlty templates that are added take priority. They do not cancel each other out.
+			 * cleared. Currently templates that are added take priority. They do not cancel each other out.
 			 */
 			'Test host.update with clear - host has no templates (same)' => [
 				'request' => [
@@ -2028,7 +2031,7 @@ class testHost extends CAPITest {
 
 			/*
 			 * Possibly incorrect behavior in API in case templates that are added are same as the ones that should be
-			 * cleared. Currenlty templates that are added take priority. They do not cancel each other out.
+			 * cleared. Currently templates that are added take priority. They do not cancel each other out.
 			 */
 			'Test host.massupdate with clear - host has no templates (same)' => [
 				'request' => [
@@ -2503,7 +2506,7 @@ class testHost extends CAPITest {
 				]
 			],
 
-			// Add templates to exising manual templates.
+			// Add templates to existing manual templates.
 			'Test host.massadd - host has manual templates' => [
 				'request' => [
 					'hosts' => [
@@ -2546,7 +2549,7 @@ class testHost extends CAPITest {
 				]
 			],
 
-			// Add same templates to exising auto templates. Not possible, since those templates are already auto.
+			// Add same templates to existing auto templates. Not possible, since those templates are already auto.
 			'Test host.massadd - host has auto templates (same)' => [
 				'request' => [
 					'hosts' => [
@@ -2579,7 +2582,7 @@ class testHost extends CAPITest {
 				]
 			],
 
-			// Add different templates to exising auto templates.
+			// Add different templates to existing auto templates.
 			'Test host.massadd - host has auto templates (different)' => [
 				'request' => [
 					'hosts' => [
@@ -2622,7 +2625,7 @@ class testHost extends CAPITest {
 				]
 			],
 
-			// Add templates to exising auto and manual templates.
+			// Add templates to existing auto and manual templates.
 			'Test host.massadd - host has manual and auto templates' => [
 				'request' => [
 					'hosts' => [
@@ -2678,7 +2681,7 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * Test host.massadd by adding new templates to exising manual and auto templates.
+	 * Test host.massadd by adding new templates to existing manual and auto templates.
 	 *
 	 * @dataProvider getHostMassAddTemplatesData
 	 */
@@ -3420,7 +3423,7 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * Test host.get to check if hosts have vairous macros and their properties.
+	 * Test host.get to check if hosts have various macros and their properties.
 	 *
 	 * @dataProvider getHostGetMacrosData
 	 */
@@ -3443,7 +3446,7 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * Data provider for host.update to check how macros are replaced and coverted from automatic to manual.
+	 * Data provider for host.update to check how macros are replaced and converted from automatic to manual.
 	 *
 	 * @return array
 	 */
@@ -3650,7 +3653,7 @@ class testHost extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Convert automatic macros to manual, leave some orignial, add new.
+			// Convert automatic macros to manual, leave some original, add new.
 			'Test host.update - host has auto and manual macros' => [
 				'request' => [
 					'hostid' => 'discovered_auto_and_manual_macros',
@@ -4066,12 +4069,12 @@ class testHost extends CAPITest {
 						$key = strtolower($key);
 					}
 
-					// Add macros to references just like in data perparation.
+					// Add macros to references just like in data preparation.
 					self::$data['hostmacroids'][$key] = $db_hostmacro['hostmacroid'];
 				}
 
 				if ($del_macros) {
-					// Delete the macros that were insterted in host.update method.
+					// Delete the macros that were inserted in host.update method.
 					$res = $res && DB::delete('hostmacro', [
 						'hostmacroid' => array_column($del_macros, 'hostmacroid')
 					]);

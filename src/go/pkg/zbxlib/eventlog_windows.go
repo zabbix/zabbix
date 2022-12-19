@@ -22,16 +22,21 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include -I${SRCDIR}/../../../../../build/win32/include
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
+#include "zbx_item_constants.h"
+
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
+		char *ServerCertIssuer, char *ServerCertSubject);
 
 extern int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
+typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
 void metric_set_refresh(ZBX_ACTIVE_METRIC *metric, int refresh);
@@ -40,9 +45,9 @@ void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric);
 int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last);
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
 
 typedef struct
 {
@@ -143,6 +148,10 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/tls"
+
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 type EventLogItem struct {
@@ -164,19 +173,48 @@ type EventLogResult struct {
 }
 
 func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, cblob unsafe.Pointer) {
+	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cstate, cmtime C.int
+	log.Tracef("Calling C function \"metric_get_meta()\"")
 	C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeSent, &cmtime)
 	clastLogsizeLast = clastLogsizeSent
 
+	log.Tracef("Calling C function \"new_eventlog_result()\"")
 	result := C.new_eventlog_result(C.int(item.Output.PersistSlotsAvailable()))
 
+	var tlsConfig *tls.Config
+	var err error
+	var ctlsConfig C.zbx_config_tls_t;
+	var ctlsConfig_p *C.zbx_config_tls_t;
+
+	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
+		result := &EventLogResult{
+			Ts:    time.Now(),
+			Error: err,
+		}
+		item.Results = append(item.Results, result)
+
+		return
+	}
+	if (nil != tlsConfig) {
+		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
+		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
+			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
+			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
+			(C.CString)(tlsConfig.ServerCertSubject));
+		ctlsConfig_p = &ctlsConfig
+	}
+
 	var cerrmsg *C.char
+	log.Tracef("Calling C function \"process_eventlog_check()\"")
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
-		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, &cerrmsg)
+		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p,
+		(C.int)(agent.Options.Timeout), &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char
@@ -186,6 +224,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	if logTs.Before(item.LastTs) {
 		logTs = item.LastTs
 	}
+	log.Tracef("Calling C function \"get_eventlog_value()\"")
 	for i := 0; C.get_eventlog_value(result, C.int(i), &cvalue, &csource, &clogeventid, &cseverity, &ctimestamp, &cstate,
 		&clastlogsize) != C.FAIL; i++ {
 
@@ -221,16 +260,19 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		item.Results = append(item.Results, &r)
 		logTs = logTs.Add(time.Nanosecond)
 	}
+	log.Tracef("Calling C function \"free_eventlog_result()\"")
 	C.free_eventlog_result(result)
 
 	item.LastTs = logTs
 
 	if ret == C.FAIL {
+		log.Tracef("Calling C function \"metric_set_unsupported()\"")
 		C.metric_set_unsupported(C.ZBX_ACTIVE_METRIC_LP(data))
 
 		var err error
 		if cerrmsg != nil {
 			err = errors.New(C.GoString(cerrmsg))
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cerrmsg))
 		} else {
 			err = errors.New("Unknown error.")
@@ -241,9 +283,11 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		}
 		item.Results = append(item.Results, result)
 	} else {
+		log.Tracef("Calling C function \"metric_set_supported()\"")
 		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, 0, clastLogsizeLast, 0)
 
 		if ret == Succeed {
+			log.Tracef("Calling C function \"metric_get_meta()\"")
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtime)
 			result := EventLogResult{
 				Ts:          time.Now(),

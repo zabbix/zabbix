@@ -19,7 +19,7 @@ Additional information about metrics and used API methods:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
@@ -83,6 +83,7 @@ No specific Zabbix configuration is required.
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES} |<p>Filter to exclude discovered volumes by type.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.REGION} |<p>Amazon EC2 Region code.</p> |`us-west-1` |
 |{$AWS.SECRET.ACCESS.KEY} |<p>Secret access key.</p> |`` |
+|{$AWS.PROXY} |<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p> |`` |
 
 ## Template links
 
@@ -172,4 +173,3 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com
 
 You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
-

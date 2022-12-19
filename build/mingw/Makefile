@@ -14,9 +14,20 @@ WINDRES = windres.exe
 
 OBJS = \
 	$(OUTPUTDIR)\threads.o \
+	$(OUTPUTDIR)\interval.o \
+	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \
+	$(OUTPUTDIR)\common_str.o \
+	$(OUTPUTDIR)\components_strings_representations.o \
+	$(OUTPUTDIR)\libc_wrappers.o \
+	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
+	$(OUTPUTDIR)\expr.o \
+	$(OUTPUTDIR)\host.o \
+	$(OUTPUTDIR)\macro.o \
+	$(OUTPUTDIR)\function.o \
+	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
@@ -24,6 +35,7 @@ OBJS = \
 	$(OUTPUTDIR)\md5.o \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
+	$(OUTPUTDIR)\hashset.o \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
@@ -32,6 +44,7 @@ OBJS = \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
 	$(OUTPUTDIR)\jsonpath.o \
+	$(OUTPUTDIR)\jsonobj.o \
 	$(OUTPUTDIR)\sha256crypt.o \
 	$(OUTPUTDIR)\variant.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
@@ -103,16 +116,49 @@ all: $(TARGETBIN)
 $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxcommon\iprange.c
+$(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxip\iprange.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxcommon\str.c
+$(OUTPUTDIR)\num.o: $(TOPDIR)\src\libs\zbxnum\num.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxcommon\time.c
+$(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\expr.o: $(TOPDIR)\src\libs\zbxexpr\expr.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\host.o: $(TOPDIR)\src\libs\zbxexpr\host.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\macro.o: $(TOPDIR)\src\libs\zbxexpr\macro.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\function.o: $(TOPDIR)\src\libs\zbxexpr\function.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\token.o: $(TOPDIR)\src\libs\zbxexpr\token.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\components_strings_representations.o: $(TOPDIR)\src\libs\zbxcommon\components_strings_representations.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\libc_wrappers.o: $(TOPDIR)\src\libs\zbxcommon\libc_wrappers.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\param.o: $(TOPDIR)\src\libs\zbxparam\param.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcomms\tls_version.c
@@ -137,6 +183,9 @@ $(OUTPUTDIR)\json_parser.o: $(TOPDIR)\src\libs\zbxjson\json_parser.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\jsonpath.o: $(TOPDIR)\src\libs\zbxjson\jsonpath.c
+	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
+
+$(OUTPUTDIR)\jsonobj.o: $(TOPDIR)\src\libs\zbxjson\jsonobj.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxhash\sha256crypt.c
@@ -167,6 +216,12 @@ $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\vector.o: $(TOPDIR)\src\libs\zbxalgo\vector.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\hashset.o: $(TOPDIR)\src\libs\zbxalgo\hashset.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\version.o: $(TOPDIR)\src\libs\zbxversion\version.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c

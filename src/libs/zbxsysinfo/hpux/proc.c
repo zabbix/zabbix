@@ -24,11 +24,14 @@
 #	define _PSTAT64
 #endif
 
-#include "common.h"
-#include "sysinfo.h"
-#include <sys/pstat.h>
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxstr.h"
+
+#include <sys/pstat.h>
 
 static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 {
@@ -48,10 +51,9 @@ static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 	return FAIL;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_BURST	((size_t)10)
-
 	char			*procname, *proccomm, *param;
 	struct passwd		*usrinfo;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat, count, idx = 0;
@@ -157,4 +159,5 @@ out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
+#undef ZBX_BURST
 }

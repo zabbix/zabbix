@@ -290,12 +290,13 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				case INTERFACE_TYPE_AGENT :
 				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
+				case INTERFACE_TYPE_OPT :
 					$this->zbxTestTextPresent('Host interface');
 					$dbInterfaces = CDBHelper::getAll(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
 					);
 					if ($dbInterfaces) {
 						foreach ($dbInterfaces as $host_interface) {

@@ -1,0 +1,29 @@
+---
+test case: Both interface and key parameter are present
+in:
+  interface: "127.0.0.1:10051"
+  ip: "127.0.0.1"
+out:
+  return: "SUCCEED"
+---
+test case: Only interface is present
+in:
+  interface: "127.0.0.1:10051"
+  ip: ""
+out:
+  return: "SUCCEED"
+---
+test case: Only key parameter is present
+in:
+  interface: ""
+  ip: "127.0.0.1"
+out:
+  return: "SUCCEED"
+---
+test case: Both interface and key parameter are missing
+in:
+  interface: ""
+  ip: ""
+out:
+  return: "SYSINFO_RET_FAIL"
+...

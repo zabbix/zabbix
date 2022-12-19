@@ -44,4 +44,3 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
 
 	*p = '\0';
 }
-

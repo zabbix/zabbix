@@ -181,9 +181,9 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	);
 }
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('SLA'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLA_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLA_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())

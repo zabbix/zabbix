@@ -154,6 +154,11 @@ msgid_plural "%1$s events"
 msgstr[0] "%1$s hendelse"
 msgstr[1] "%1$s hendelser"
 
+#: app/views/popup.usergroupmapping.edit.php:90
+#, c-format
+msgid "%1$s group pattern"
+msgstr ""
+
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
@@ -268,6 +273,21 @@ msgstr ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: include/classes/core/CModuleManager.php:153
+#, c-format
+msgid "%1$s.php class must extend %2$s for module located at %3$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
 msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1262
@@ -524,6 +544,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Ack"
 
+#: app/views/monitoring.widget.problems.view.php:81
+msgctxt "compact table header"
+msgid "Ack"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Bekrefte"
@@ -617,6 +642,11 @@ msgstr ""
 msgid "Action"
 msgstr "Handling"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr ""
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -669,6 +699,11 @@ msgstr ""
 msgid "Action updated"
 msgstr "Handling oppdatert"
 
+#: include/classes/api/services/CDashboardGeneral.php:672
+#, c-format
+msgid "Action with ID \"%1$s\" is not available."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
 #: app/views/monitoring.dashboard.view.php:122
@@ -685,6 +720,11 @@ msgstr "Handling oppdatert"
 #: jsLoader.php:352 tr_events.php:183
 msgid "Actions"
 msgstr "Handlinger"
+
+#: app/views/monitoring.widget.problems.view.php:82
+msgctxt "compact table header"
+msgid "Actions"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -876,6 +916,10 @@ msgstr "Legg til ny widget"
 msgid "Add child element"
 msgstr "Legg til barnelement"
 
+#: widgets/navtree/Widget.php:39
+msgid "Add child elements"
+msgstr ""
+
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
 msgstr ""
@@ -886,6 +930,14 @@ msgstr ""
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
 msgstr ""
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
@@ -1086,6 +1138,11 @@ msgstr ""
 msgid "Alert message"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:283
+#: include/classes/helpers/CRoleHelper.php:338
+msgid "Alerts"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
 msgstr ""
@@ -1186,6 +1243,10 @@ msgstr "Tillatte verter"
 msgid "Allowed methods"
 msgstr ""
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternativt kan du installere det manuelt:"
@@ -1196,6 +1257,36 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1544
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1543
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1538
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1537
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1532
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1531
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
@@ -1461,6 +1552,12 @@ msgstr "Forsøkintervall"
 msgid "Attempts"
 msgstr "Forsøk"
 
+#: app/views/administration.authentication.edit.php:520
+#: app/views/popup.ldap.edit.php:265
+#: app/views/popup.mediatypemapping.edit.php:59
+msgid "Attribute"
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
 msgstr ""
@@ -1631,6 +1728,11 @@ msgstr "Tilgjengelighetsrapport"
 #: include/classes/html/CHostAvailability.php:80
 msgid "Available"
 msgstr "Tilgjengelig"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
+msgid "Available"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -2093,8 +2195,27 @@ msgstr ""
 msgid "Cannot add web scenario"
 msgstr "Kan ikke legge til webscenario"
 
+#: jsLoader.php:129
+msgid "Cannot add widget: no widgets available."
+msgstr ""
+
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1532
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
 msgstr ""
 
 #: jsLoader.php:343
@@ -2167,6 +2288,16 @@ msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "Kan ikke kopiere element"
 msgstr[1] "Kan ikke kopiere elementer"
+
+#: include/classes/api/services/CDiscoveryRule.php:2475
+#, c-format
+msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:590
+#, c-format
+msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2722,6 +2853,10 @@ msgstr[1] "Kan ikke aktivere webscenarier"
 msgid "Cannot evaluate expression"
 msgstr ""
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -2772,6 +2907,16 @@ msgstr "Kan ikke finne vertsgruppe \"%1$s\" for vertsprototype \"%2$s\" av oppda
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Kan ikke finne vertsgrensesnitt på \"%1$s\" for elementstasten \"%2$s\"."
+
+#: include/classes/api/services/CDiscoveryRule.php:2517
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:640
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -2889,6 +3034,205 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "Kan ikke importere mal \"%1$s\", koblet mal \"%2$s\" eksisterer ikke."
 msgstr[1] "Kan ikke importere mal \"%1$s\", koblete maler \"%2$s\" eksisterer ikke."
+
+#: include/classes/api/services/CItemGeneral.php:588
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:589
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:704
+#: include/classes/api/services/CItemGeneral.php:716
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1030
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:710
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:769
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:711
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:770
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1230
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1231
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#: include/classes/api/services/CItemGeneral.php:737
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1034
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:731
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:775
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#: include/classes/api/services/CItemGeneral.php:738
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:732
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:776
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:582
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:583
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1455
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1454
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:695
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1026
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:683
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:689
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:763
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1509
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:696
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:690
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:764
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1508
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:576
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:577
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3026,6 +3370,10 @@ msgstr "Kan ikke masse oppdatere synlig vertsnavn."
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr ""
 
+#: jsLoader.php:130
+msgid "Cannot paste inaccessible widget."
+msgstr ""
+
 #: include/classes/db/DB.php:958
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
@@ -3040,6 +3388,12 @@ msgstr "Kan ikke utføre oppdateringsoppsett på tabell \"%1$s\" uten verdier."
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Kan ikke utføre oppdateringsoppgave på tabell \"%1$s\" uten hvor tilstand."
+
+#: app/controllers/CControllerUserProvision.php:69
+msgid "Cannot provision user"
+msgid_plural "Cannot provision users"
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -3111,6 +3465,46 @@ msgstr "Kan ikke angi \"%1$s\" for graf prototype \"%2$s\"."
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Kan ikke angi \"%1$s\" for elementet \"%2$s\"."
+
+#: include/classes/api/services/CItemGeneral.php:2237
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2236
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2231
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2230
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2226
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2225
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2220
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2219
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -3955,6 +4349,13 @@ msgstr ""
 msgid "Compression"
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:164
+#: app/views/administration.housekeeping.edit.php:169
+#: app/views/administration.housekeeping.edit.php:174
+#: app/views/administration.housekeeping.edit.php:184
+msgid "Compression is not supported."
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
 msgstr "Samtidige økter"
@@ -4179,6 +4580,15 @@ msgstr "Konfigurasjon oppdatert"
 msgid "Configure DB connection"
 msgstr "Konfigurer DB-tilkobling"
 
+#: app/views/administration.authentication.edit.php:417
+#: app/views/popup.ldap.edit.php:115
+msgid "Configure JIT provisioning"
+msgstr ""
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Bekreftelsestekst"
@@ -4217,12 +4627,30 @@ msgstr ""
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Tilkoblingstidsavbrudd på %1$s sekunder overskredet når du koblet til Zabbix-serveren \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
@@ -4233,6 +4661,14 @@ msgid ""
 "2. Security environment (for example, SELinux) is blocking the connection;\n"
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
@@ -4728,6 +5164,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Kritisk"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Nåværende vert"
@@ -4943,6 +5383,11 @@ msgstr "Stiplede linje"
 msgid "Data"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:215
+#: include/classes/helpers/CRoleHelper.php:337
+msgid "Data collection"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
 #, c-format
@@ -4961,6 +5406,10 @@ msgstr "Dataoversikt"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
+msgstr ""
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
 msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:52
@@ -5086,6 +5535,11 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:58 report4.php:177
 msgid "Day"
 msgstr "Dag"
+
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr ""
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5383,6 +5837,10 @@ msgstr ""
 msgid "Delete selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Slett valgte handlinger?"
@@ -5637,6 +6095,23 @@ msgstr ""
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr ""
 
+#: app/views/administration.authentication.edit.php:50
+msgid "Deprovisioned users group"
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1011
+msgid "Deprovisioned users group cannot be deleted."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:183
+msgid "Deprovisioned users group cannot be empty."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:178
+#: include/classes/api/services/CUserGroup.php:321
+msgid "Deprovisioned users group cannot be enabled."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
@@ -5669,6 +6144,10 @@ msgstr ""
 msgid "Description"
 msgstr "Beskrivelse"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -5685,6 +6164,10 @@ msgstr "Detaljer"
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
 msgstr "Detaljer om webscenario"
+
+#: app/views/administration.housekeeping.edit.php:195
+msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -5783,6 +6266,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:171
@@ -6006,6 +6493,11 @@ msgstr ""
 #: include/forms.inc.php:930
 msgid "Discovery rule"
 msgstr "Discovery regel"
+
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6232,6 +6724,11 @@ msgstr "Last ned konfigurasjonsfilen"
 msgid "Downtime"
 msgstr "nedetid"
 
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
+msgid "Downtime"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -6295,6 +6792,11 @@ msgstr "Dupliser userid \"%1$s\" i brukere for kart \"%2$s\"."
 #: include/views/configuration.action.edit.php:174
 msgid "Duration"
 msgstr "Varighet"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
+msgid "Duration"
+msgstr ""
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6400,6 +6902,14 @@ msgstr "ellipse"
 msgid "Email"
 msgstr "e-post"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "Tom"
@@ -6467,12 +6977,25 @@ msgstr "Sl"
 msgid "Enable HTTP authentication"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:202
+#: app/views/administration.authentication.edit.php:276
+msgid "Enable JIT provisioning"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr ""
 
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:543
+msgid "Enable SCIM provisioning"
 msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:44
@@ -6498,6 +7021,14 @@ msgstr "Aktiver feilsøkingsmodus i utvalgte grupper?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "Aktiver verten"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -6536,6 +7067,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:170
@@ -6724,6 +7259,11 @@ msgstr "Feil"
 msgid "Error budget"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr ""
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6736,6 +7276,13 @@ msgstr ""
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -6862,6 +7409,11 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr ""
 
@@ -7069,6 +7621,11 @@ msgstr ""
 msgid "Failed"
 msgstr "mislyktes"
 
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
+msgid "Failed"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
 msgstr ""
@@ -7195,6 +7752,13 @@ msgstr "Felt \"%1$s\" er ikke streng."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Felt \"%1$s\" må mangle."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -7790,20 +8354,41 @@ msgstr "Gruppe \"%1$s\" for verten \"%2$s\" eksisterer ikke."
 msgid "Group added"
 msgstr "Gruppe lagt til"
 
+#: app/views/popup.ldap.edit.php:134
+msgid "Group base DN"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:122
+msgid "Group configuration"
+msgstr ""
+
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Gruppe slettet"
 msgstr[1] "Grupper slettet"
 
+#: app/views/popup.ldap.edit.php:182
+msgid "Group filter"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
 msgstr "Gruppe for oppdagede verter"
+
+#: app/views/popup.ldap.edit.php:156
+msgid "Group member attribute"
+msgstr ""
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
 msgid "Group name"
 msgstr "Gruppe navn"
+
+#: app/views/administration.authentication.edit.php:427
+#: app/views/popup.ldap.edit.php:148
+msgid "Group name attribute"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -8127,6 +8712,12 @@ msgid_plural "Hosts"
 msgstr[0] "Vert"
 msgstr[1] "Verter"
 
+#: app/views/monitoring.widget.problems.view.php:66
+#: app/views/monitoring.widget.problems.view.php:67
+msgctxt "compact table header"
+msgid "Host"
+msgstr ""
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8216,6 +8807,13 @@ msgstr ""
 #: report2.php:400
 msgid "Host group"
 msgstr "Vertsgruppe"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+#: app/views/monitoring.widget.problemsbysv.view.php:41
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Host group"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -8716,6 +9314,10 @@ msgstr ""
 msgid "Identification of the system. Returns string"
 msgstr "Identifikasjon av systemet. Returnerer streng"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -8881,6 +9483,10 @@ msgstr ""
 msgid "Inaccessible SLA"
 msgstr ""
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:452
+msgid "Inaccessible action"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
@@ -8930,6 +9536,10 @@ msgstr ""
 msgid "Inaccessible map"
 msgstr "Utilgjengelig kart"
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:453
+msgid "Inaccessible media type"
+msgstr ""
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
 msgstr ""
@@ -8962,6 +9572,25 @@ msgstr "Utilgjengelig bruker"
 msgid "Inaccessible user group"
 msgstr ""
 
+#: jsLoader.php:147 jsLoader.php:175
+msgid "Inaccessible widget"
+msgstr ""
+
+#: app/controllers/CControllerDashboardWidgetCheck.php:52
+#: app/controllers/CControllerDashboardWidgetEdit.php:65
+#: include/classes/helpers/CDashboardHelper.php:453
+#: include/classes/helpers/CDashboardHelper.php:461
+msgid "Inaccessible widget type."
+msgstr ""
+
+#: jsLoader.php:138
+msgid "Inaccessible widgets were not copied."
+msgstr ""
+
+#: jsLoader.php:139
+msgid "Inaccessible widgets were not pasted."
+msgstr ""
+
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
 #: app/views/popup.scheduledreport.subscription.php:117
@@ -8984,6 +9613,11 @@ msgstr "Innkommende trafikkstatistikk på nettgrensesnitt. Returnerer heltall"
 #: include/classes/api/services/CService.php:1441
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:655
@@ -9805,6 +10439,16 @@ msgstr ""
 msgid "Info"
 msgstr "info"
 
+#: app/views/monitoring.widget.actionlog.view.php:48
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Info"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -10005,11 +10649,27 @@ msgstr "Ugyldig IP-adresse \"%1$s\"."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Ugyldig JSON. Det oppsto en feil på serveren mens du analyserte JSON-teksten."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:171
+msgid "Invalid LDAP JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:164
+msgid "Invalid LDAP JIT provisioning user group mapping configuration."
+msgstr ""
+
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:214
+msgid "Invalid SAML JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:208
+msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr ""
 
 #: include/classes/import/readers/CYamlImportReader.php:55
@@ -10073,6 +10733,12 @@ msgstr "Ugyldig nøkkel \"%1$s\" for element prototype \"%2$s\" på \"%3$s\" : %
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "Ugyldig nøkkel \"%1$s\" : %2$s."
+
+#: app/controllers/CControllerPopupLdapCheck.php:67
+#: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
+#: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
+msgid "Invalid media type mapping configuration."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10374,6 +11040,12 @@ msgstr "Ugyldig tag \"%1$s\" : %2$s."
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "Ugyldig tidsperiode."
+
+#: app/controllers/CControllerPopupLdapCheck.php:62
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
+#: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
+msgid "Invalid user group mapping configuration."
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -10845,6 +11517,10 @@ msgstr "LDAP-godkjenning"
 msgid "LDAP authentication is disabled."
 msgstr ""
 
+#: app/views/popup.ldap.edit.php:235
+msgid "LDAP group pattern"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
 msgstr "LDAP-vert"
@@ -11181,6 +11857,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -11359,6 +12039,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:226
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
 msgstr "MAC-adresse A"
@@ -11366,6 +12051,13 @@ msgstr "MAC-adresse A"
 #: include/hosts.inc.php:159
 msgid "MAC address B"
 msgstr "MAC-adresse B"
+
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
 
 #: include/hosts.inc.php:33
 msgid "MD2"
@@ -11604,6 +12296,14 @@ msgstr "Kartform"
 msgid "Map update failed."
 msgstr "Kartoppdatering mislyktes."
 
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:508
+msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
@@ -11725,6 +12425,19 @@ msgstr ""
 msgid "Max period for time selector"
 msgstr ""
 
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr ""
@@ -11781,6 +12494,12 @@ msgstr "Media"
 msgid "Media type"
 msgstr "Media type"
 
+#: widgets/actionlog/views/widget.view.php:40
+#: widgets/actionlog/views/widget.view.php:41
+msgctxt "compact table header"
+msgid "Media type"
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
@@ -11802,11 +12521,21 @@ msgid_plural "Media types disabled"
 msgstr[0] "Medietype deaktivert"
 msgstr[1] "Medietyper deaktivert"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Medietype aktivert"
 msgstr[1] "Medietyper aktivert"
+
+#: app/views/administration.authentication.edit.php:506
+#: app/views/popup.ldap.edit.php:255
+#: app/views/popup.mediatypemapping.edit.php:85
+msgid "Media type mapping"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -11836,6 +12565,10 @@ msgstr "Medietype med ID \"%1$s\" er ikke tilgjengelig."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Medietyper"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -11872,6 +12605,11 @@ msgstr ""
 msgid "Menu entry name"
 msgstr ""
 
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
+
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr ""
@@ -11887,6 +12625,11 @@ msgstr ""
 #: include/views/administration.auditacts.list.php:100
 msgid "Message"
 msgstr "Melding"
+
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -11969,6 +12712,11 @@ msgstr ""
 #: include/classes/setup/CFrontendSetup.php:106
 #, c-format
 msgid "Minimum required PHP version is %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:175
+#, c-format
+msgid "Minimum required TimescaleDB version is %1$s."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:193
@@ -12150,6 +12898,11 @@ msgstr "Monospace"
 #: include/classes/helpers/CSlaHelper.php:60 report4.php:165
 msgid "Month"
 msgstr "Måned"
+
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12412,12 +13165,21 @@ msgstr "NTLM"
 msgid "Name"
 msgstr "Navn"
 
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
+msgid "Name"
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
 #: app/views/administration.user.list.php:108
 msgctxt "user first name"
 msgid "Name"
 msgstr "Navn"
+
+#: app/views/administration.authentication.edit.php:520
+msgid "Name "
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -12429,6 +13191,10 @@ msgstr "Navnet på skjemafeltet bør ikke overstige 255 tegn."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
+msgstr ""
+
+#: app/views/popup.usergroupmapping.edit.php:80
+msgid "Naming requirements:"
 msgstr ""
 
 #: jsLoader.php:189
@@ -12505,6 +13271,11 @@ msgstr ""
 msgid "New SLA"
 msgstr ""
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr ""
@@ -12555,6 +13326,10 @@ msgstr ""
 msgid "New host group"
 msgstr ""
 
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "New media type mapping"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr ""
@@ -12583,6 +13358,10 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "Nye utløsere"
+
+#: app/views/popup.usergroupmapping.edit.php:114
+msgid "New user group mapping"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13195,6 +13974,11 @@ msgstr "Ikke lov til å angi passord for brukerens \"gjest\"."
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr ""
 
+#: include/classes/api/services/CUser.php:484
+#, c-format
+msgid "Not allowed to update field \"%1$s\" for provisioned user."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
@@ -13208,9 +13992,18 @@ msgstr ""
 msgid "Not available"
 msgstr "Ikke tilgjengelig"
 
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
+msgid "Not available"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "Ikke klassifisert"
+
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13414,6 +14207,17 @@ msgstr "Numerisk (usignert)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -13496,6 +14300,11 @@ msgstr "Av"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
+msgid "Ok"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13540,6 +14349,10 @@ msgstr "Kun Zabbix-agent, SNMPv1, SNMPv2 og SNMPv3-kontroller kan gjøres unike.
 msgid "Only administrators can set map owner."
 msgstr "Bare administratorer kan sette inn karteieren."
 
+#: app/views/administration.authentication.edit.php:51
+msgid "Only disabled group can be set for deprovisioned users."
+msgstr ""
+
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Bare elementer som er tilordnet aktiverte verter, telles"
@@ -13563,6 +14376,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:1421
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
+msgstr ""
+
+#: include/classes/api/services/CUserDirectory.php:519
+#, c-format
+msgid "Only one user directory of type \"%1$s\" can exist."
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:58
@@ -13591,6 +14409,14 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Bare utløsere som er tilordnet aktiverte verter, og avhengig av aktiverte elementer telles"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13598,6 +14424,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "Operativsysteminformasjon. Returnerer streng"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -13637,6 +14467,11 @@ msgstr "Operasjonen har ingen mal å betjene."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -13800,6 +14635,10 @@ msgstr "Andre parametere"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Andre"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14078,6 +14917,10 @@ msgstr ""
 msgid "Page display period"
 msgstr ""
 
+#: include/classes/core/ZBase.php:565
+msgid "Page not found"
+msgstr ""
+
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
 msgid "Page received incorrect data"
@@ -14138,6 +14981,10 @@ msgstr "Oppdagelsesregler for foreldre"
 #: include/views/configuration.graph.edit.php:68
 msgid "Parent graphs"
 msgstr "Foreldre grafer"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14452,6 +15299,10 @@ msgstr "Portugisisk (pt_PT)"
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:143
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr "Postfelt"
@@ -14459,6 +15310,10 @@ msgstr "Postfelt"
 #: app/views/popup.httpstep.php:84
 msgid "Post type"
 msgstr "Posttype"
+
+#: app/views/administration.housekeeping.edit.php:165
+msgid "PostgreSQL database server version is too old."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14620,6 +15475,12 @@ msgstr "Privilege nivå"
 msgid "Problem"
 msgstr "Problem"
 
+#: app/views/monitoring.widget.problems.view.php:70
+#: app/views/monitoring.widget.problems.view.php:71
+msgctxt "compact table header"
+msgid "Problem"
+msgstr ""
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr ""
@@ -14754,6 +15615,26 @@ msgstr ""
 msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr ""
 
+#: app/views/administration.user.list.php:301
+msgid "Provision now"
+msgstr ""
+
+#: app/views/administration.user.list.php:303
+msgid "Provision selected LDAP users?"
+msgstr ""
+
+#: app/views/administration.user.list.php:141
+msgid "Provisioned"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:251
+msgid "Provisioning period"
+msgstr ""
+
+#: app/controllers/CControllerUserProvision.php:65
+msgid "Provisioning successful."
+msgstr ""
+
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
 #: app/views/administration.proxy.list.php:34
@@ -14822,6 +15703,16 @@ msgstr "Proxy-navn"
 msgid "Proxy updated"
 msgstr "Proxy oppdatert"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -14844,6 +15735,11 @@ msgid "Public key file"
 msgstr "Offentlig nøkkelfil"
 
 #: include/classes/helpers/CSlaHelper.php:61
+msgid "Quarter"
+msgstr ""
+
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
 msgid "Quarter"
 msgstr ""
 
@@ -14992,8 +15888,26 @@ msgstr "Nylige problemer"
 msgid "Recipient"
 msgstr "Mottaker"
 
+#: app/views/monitoring.widget.actionlog.view.php:42
+#: app/views/monitoring.widget.actionlog.view.php:43
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
+msgstr ""
+
+#: app/views/reports.actionlog.list.csv.php:39
+msgid "Recipient's Zabbix username"
+msgstr ""
+
+#: app/views/reports.actionlog.list.csv.php:40
+msgid "Recipient's name"
+msgstr ""
+
+#: app/views/reports.actionlog.list.csv.php:41
+msgid "Recipient's surname"
 msgstr ""
 
 #: include/views/administration.auditacts.list.php:32
@@ -15039,10 +15953,19 @@ msgstr "Gjenopprettingsoperasjoner"
 msgid "Recovery time"
 msgstr "Restitusjonstid"
 
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Recovery time"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
 msgid "Rectangle"
 msgstr "Rektangel"
+
+#: app/views/popup.ldap.edit.php:168
+msgid "Reference attribute"
+msgstr ""
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -15460,6 +16383,10 @@ msgstr "Nødvendige statuskoder"
 msgid "Required string"
 msgstr "Nødvendig streng"
 
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
+
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -15766,6 +16693,16 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
 
+#: app/views/administration.user.list.php:224
+#: app/views/administration.user.list.php:225
+#: app/views/popup.usergroupmapping.edit.php:77
+msgid "SAML"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:483
+msgid "SAML group pattern"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
 msgstr ""
@@ -15843,11 +16780,22 @@ msgstr ""
 msgid "SLI"
 msgstr ""
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr ""
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr ""
 
@@ -15925,6 +16873,14 @@ msgstr "SNMP fellenøkkel er ugyldig."
 #: app/partials/configuration.host.interface.row.php:76
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
+msgstr ""
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
 msgstr ""
 
 #: include/items.inc.php:1299
@@ -16246,6 +17202,11 @@ msgstr ""
 msgid "Search pattern is empty"
 msgstr "Søkemønsteret er tomt"
 
+#: app/views/reports.actionlog.list.php:108
+#: widgets/actionlog/includes/WidgetForm.php:61
+msgid "Search string"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
@@ -16411,6 +17372,11 @@ msgstr ""
 msgid "Sent"
 msgstr "Sendt"
 
+#: app/controllers/CControllerActionLogList.php:210
+#: widgets/actionlog/includes/WidgetForm.php:56
+msgid "Sent/Executed"
+msgstr ""
+
 #: include/func.inc.php:244
 msgid "Sep"
 msgstr "Sep"
@@ -16475,6 +17441,11 @@ msgstr ""
 #: include/classes/widgets/views/js/widget.slareport.form.view.js.php:45
 msgid "Service"
 msgstr "Tjeneste"
+
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
+msgid "Service"
+msgstr ""
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16675,6 +17646,12 @@ msgstr ""
 #: include/views/reports.toptriggers.php:86
 msgid "Severity"
 msgstr "Viktighet"
+
+#: app/views/monitoring.widget.problems.view.php:74
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
+msgid "Severity"
+msgstr ""
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17225,6 +18202,13 @@ msgstr ""
 msgid "Status"
 msgstr "Status"
 
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.actionlog.view.php:47
+#: app/views/monitoring.widget.problems.view.php:62
+msgctxt "compact table header"
+msgid "Status"
+msgstr ""
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17668,6 +18652,11 @@ msgstr ""
 msgid "Tags"
 msgstr "Tagger"
 
+#: app/views/monitoring.widget.problems.view.php:83
+msgctxt "compact table header"
+msgid "Tags"
+msgstr ""
+
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
 #: include/views/configuration.trigger.prototype.edit.php:401
@@ -17974,6 +18963,11 @@ msgstr "Tekst"
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
 msgstr ""
 
+#: include/classes/api/clients/CLocalApiClient.php:96
+#, c-format
+msgid "The \"%1$s.%2$s\" method must be called without authorization header."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
@@ -18110,6 +19104,10 @@ msgstr ""
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr ""
 
+#: include/classes/scim/API.php:77
+msgid "This filter is not supported"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
 msgstr ""
@@ -18122,13 +19120,31 @@ msgstr "Denne måneden"
 msgid "This month so far"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
+msgstr ""
+
+#: app/views/administration.user.edit.php:59
+msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
 msgstr ""
 
 #: include/func.inc.php:2474
@@ -18207,6 +19223,14 @@ msgstr "Inntil"
 msgid "Time"
 msgstr "Tid"
 
+#: app/views/monitoring.widget.actionlog.view.php:35
+#: app/views/monitoring.widget.actionlog.view.php:36
+#: app/views/monitoring.widget.problems.view.php:40
+#: app/views/monitoring.widget.problems.view.php:41
+msgctxt "compact table header"
+msgid "Time"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
@@ -18270,6 +19294,11 @@ msgstr "Tidsavbrudd"
 msgid "Timestamp"
 msgstr "Tidsstempel"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr ""
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr ""
@@ -18326,6 +19355,12 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgid "Total"
 msgstr "Total"
+
+#: app/views/monitoring.widget.hostavail.view.php:40
+#: app/views/monitoring.widget.problemhosts.view.php:35
+msgctxt "compact table header"
+msgid "Total"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18833,6 +19868,12 @@ msgstr ""
 msgid "Type"
 msgstr "Type"
 
+#: app/views/monitoring.widget.actionlog.view.php:39
+#: app/views/monitoring.widget.actionlog.view.php:40
+msgctxt "compact table header"
+msgid "Type"
+msgstr ""
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Type (full detaljer)"
@@ -18935,6 +19976,13 @@ msgstr "Nettadressen skal ha både \"navn\" og \"url\" -felt for kart \"%1$s\"."
 msgid "URLs"
 msgstr "webadresser"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -18959,6 +20007,11 @@ msgstr "Kan ikke opprette konfigurasjonsfilen."
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr ""
 
+#: include/classes/helpers/CAuthenticationHelper.php:88
+#: include/classes/helpers/CAuthenticationHelper.php:107
+msgid "Unable to find SAML userdirectory."
+msgstr ""
+
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
 msgstr ""
@@ -18978,6 +20031,14 @@ msgstr ""
 #: include/classes/core/CConfigFile.php:257
 msgid "Unable to overwrite the existing configuration file."
 msgstr "Kan ikke overskrive den eksisterende konfigurasjonsfilen."
+
+#: app/views/administration.housekeeping.edit.php:160
+msgid "Unable to retrieve TimescaleDB compression support status."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:170
+msgid "Unable to retrieve TimescaleDB version."
+msgstr ""
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -19024,6 +20085,13 @@ msgstr "Unblock"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Fjern blokkering av valgte brukere?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -19088,6 +20156,12 @@ msgstr "Enheter"
 #: include/views/configuration.triggers.list.php:77
 msgid "Unknown"
 msgstr "Ukjent"
+
+#: app/views/monitoring.widget.hostavail.view.php:39
+#: app/views/monitoring.widget.web.view.php:35
+msgctxt "compact table header"
+msgid "Unknown"
+msgstr ""
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19158,6 +20232,26 @@ msgstr "Fjern kobling fra maler"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Mikrofon"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:179
+#, c-format
+msgid "Unsupported TimescaleDB version. Should be at least %1$s."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:189
+#, c-format
+msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19345,6 +20439,11 @@ msgstr "Øvre nivå kart"
 msgid "Uptime"
 msgstr "Oppetid"
 
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Uptime av Zabbix serverprosess i løpet av sekunder."
@@ -19353,9 +20452,17 @@ msgstr "Uptime av Zabbix serverprosess i løpet av sekunder."
 msgid "Uptime/Downtime"
 msgstr "Oppetid/Nedetid"
 
+#: app/views/popup.ldap.edit.php:169
+msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Bruk bulkforespørsler"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -19430,6 +20537,11 @@ msgstr "Bruker \"%1$s\" brukes i \"%2$s\" handling."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr ""
 
+#: app/controllers/CControllerUserProvision.php:61
+#, c-format
+msgid "User \"%1$s\" provisioned."
+msgstr ""
+
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
@@ -19474,6 +20586,19 @@ msgstr ""
 #: include/classes/api/services/CUserDirectory.php:330
 #, c-format
 msgid "User directory \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:715
+#, c-format
+msgid "User directory with ID \"%1$s\" is not available."
+msgstr ""
+
+#: app/views/administration.user.list.php:211
+msgid "User does not have user groups."
+msgstr ""
+
+#: app/views/administration.user.list.php:232
+msgid "User does not have user role."
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:245
@@ -19525,6 +20650,16 @@ msgstr[1] ""
 msgid "User group for database down message"
 msgstr "Brukergruppe for database ned melding"
 
+#: app/views/administration.authentication.edit.php:471
+#: app/views/popup.ldap.edit.php:226
+#: app/views/popup.usergroupmapping.edit.php:126
+msgid "User group mapping"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:196
+msgid "User group membership attribute"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -19561,6 +20696,11 @@ msgstr "Brukergrupper"
 msgid "User is not allowed to delete himself."
 msgstr "Brukeren har ikke lov til å slette seg selv."
 
+#: app/views/administration.authentication.edit.php:457
+#: app/views/popup.ldap.edit.php:218
+msgid "User last name attribute"
+msgstr ""
+
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
 msgstr ""
@@ -19579,6 +20719,11 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:655 items.php:94
 msgid "User name"
 msgstr "Bruker navn"
+
+#: app/views/administration.authentication.edit.php:443
+#: app/views/popup.ldap.edit.php:210
+msgid "User name attribute"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -19740,13 +20885,33 @@ msgstr ""
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware-cachestatistikk. Gyldige moduser er: totalt, gratis, pfree, brukt og pusset."
 
+#: include/classes/data/CItemData.php:1252
+msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware-klyngestatus, <url> - VMware-tjenesteadresse, <navn> - VMware-klyngenavn"
+
+#: include/classes/data/CItemData.php:1264
+msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1296
+msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1304
+msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19754,6 +20919,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1268
+msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1242
@@ -19765,8 +20934,20 @@ msgstr "VMware datastore kapasitetsstatistikk i byte eller i prosent fra totalt.
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1288
+msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1246
@@ -19783,6 +20964,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1324
+msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1350
@@ -19853,6 +21038,10 @@ msgstr "VMware hypervisor prosessormodell, <url> - VMware service URL, <uuid> - 
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor prosessor bruk i Hz, <url> - VMware tjeneste URL, <uuid> - VMware hypervisor vertsnavn"
 
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr ""
@@ -19864,6 +21053,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor vertsnavn"
+
+#: include/classes/data/CItemData.php:1472
+msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19892,6 +21085,14 @@ msgstr "VMware-tjenesten fullt navn, <url> - VMware-tjenesteadresse"
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware-tjenesteversjon, <url> - VMware-tjenesteadresse"
+
+#: include/classes/data/CItemData.php:1244
+msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1500
+msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19973,6 +21174,10 @@ msgstr "VMware virtuell maskinprosessor klartid ms, <url> - VMware-tjenesteadres
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bruk av VMware virtuell maskinprosessor i Hz, <url> - VMware-tjenesteadresse, <uuid> - VMware-maskinens vertsnavn"
 
+#: include/classes/data/CItemData.php:1644
+msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin delt minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
@@ -19988,6 +21193,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin byttet minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
+
+#: include/classes/data/CItemData.php:1664
+msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20085,6 +21294,11 @@ msgstr ""
 #, c-format
 msgid "Value"
 msgstr "Verdi"
+
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20345,9 +21559,23 @@ msgstr "Advarsel"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301
@@ -20441,6 +21669,11 @@ msgstr "Onsdag"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:120
 #: include/classes/helpers/CSlaHelper.php:59
+msgid "Week"
+msgstr ""
+
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
 msgid "Week"
 msgstr ""
 
@@ -20538,6 +21771,11 @@ msgstr ""
 msgid "With problems"
 msgstr "Med problemer"
 
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
+msgid "With problems"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20554,6 +21792,11 @@ msgstr ""
 msgid "Without problems"
 msgstr "Uten problemer"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "Without problems"
+msgstr ""
+
 #: include/forms.inc.php:343
 msgid "Without triggers"
 msgstr "Uten utløsere"
@@ -20566,6 +21809,11 @@ msgstr "Jobbe tid"
 #: app/views/administration.script.list.php:194
 msgid "Write"
 msgstr "Skriv"
+
+#: include/classes/core/CModuleManager.php:136
+#, c-format
+msgid "Wrong %1$s.php class name for module located at %2$s."
+msgstr ""
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -20745,6 +21993,11 @@ msgstr "ÅÅÅÅ-MM-DDThh: mm: ssZ"
 msgid "Year"
 msgstr "År"
 
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
+msgid "Year"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
 msgid "Yearly"
@@ -20886,6 +22139,14 @@ msgstr ""
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -20949,6 +22210,10 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "en tegnstreng forventes"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -21091,6 +22356,14 @@ msgstr "alle"
 msgid "all media"
 msgstr "alle medier"
 
+#: include/classes/api/services/CItemGeneral.php:1877
+msgid "allowed count of dependency levels would be exceeded"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1888
+msgid "allowed count of dependent items would be exceeded"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr ""
@@ -21158,6 +22431,18 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:677
 msgid "an integer is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1806
+#: include/classes/api/services/CItemGeneral.php:1827
+#: include/classes/api/services/CItemGeneral.php:1930
+msgid "an item ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1805
+#: include/classes/api/services/CItemGeneral.php:1826
+#: include/classes/api/services/CItemGeneral.php:1929
+msgid "an item/item prototype ID is expected"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:716
@@ -21313,6 +22598,22 @@ msgstr ""
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:2383
+msgid "cannot be a value map ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1942
+msgid "cannot be an item ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1956
+msgid "cannot be an item prototype ID from another LLD rule"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1941
+msgid "cannot be an item/item prototype ID from another host or template"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
 msgstr "kan ikke endres"
@@ -21413,6 +22714,10 @@ msgstr "kan ikke endres"
 msgid "cannot be empty"
 msgstr "kan ikke være tomt"
 
+#: include/classes/validators/CApiInputValidator.php:3560
+msgid "cannot be equal to zero without custom intervals"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -21424,12 +22729,24 @@ msgstr ""
 msgid "cannot be specified the value of parameter \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:1658
+msgid "cannot be the host interface ID from another host"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
+msgstr ""
+
+#: include/classes/api/services/CItem.php:899
+msgid "cannot delete inherited item"
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:810
+msgid "cannot delete inherited item prototype"
 msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:2167
@@ -21661,6 +22978,11 @@ msgstr ""
 msgid "e() - Returns Euler's number"
 msgstr ""
 
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
@@ -21745,6 +23067,11 @@ msgstr ""
 msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globale housekeeping innstillinger"
+
+#: app/views/popup.usergroupmapping.edit.php:82
+#, c-format
+msgid "group name must match %1$s group name"
+msgstr ""
 
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
@@ -21846,6 +23173,12 @@ msgstr "feil syntaks nær \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
@@ -21854,6 +23187,10 @@ msgstr ""
 msgctxt "event source"
 msgid "internal"
 msgstr "intern"
+
+#: include/classes/validators/CApiInputValidator.php:4155
+msgid "invalid Prometheus label"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
@@ -22156,6 +23493,10 @@ msgstr "Maksimalt avhengige gjenstandstall nås"
 msgid "maximum number of dependency levels reached"
 msgstr "maksimalt antall avhengighetsnivåer nådd"
 
+#: app/views/popup.ldap.edit.php:123
+msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
@@ -22238,6 +23579,14 @@ msgstr ""
 #: app/views/administration.user.edit.php:143
 #: include/classes/validators/CPasswordComplexityValidator.php:95
 msgid "must contain at least one special character"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:3818
+msgid "must have a polling interval not blocked by non-active interval periods"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:3653
+msgid "must have at least one interval greater than 0"
 msgstr ""
 
 #: app/views/administration.authentication.edit.php:98
@@ -22329,6 +23678,10 @@ msgstr ""
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:3681
+msgid "non-active intervals cannot fill the entire time"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
 #: include/classes/widgets/CWidgetHelper.php:1285 include/graphs.inc.php:74
@@ -22403,6 +23756,11 @@ msgstr "av"
 #: include/classes/setup/CFrontendSetup.php:626
 msgid "on"
 msgstr "på"
+
+#: include/classes/validators/CApiInputValidator.php:2388
+#, c-format
+msgid "only one object can exist within the combinations of %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -22670,6 +24028,10 @@ msgstr ""
 msgid "stddevsamp() - Sample standard deviation"
 msgstr ""
 
+#: widgets/actionlog/views/widget.edit.php:49
+msgid "subject or body text"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
 msgstr ""
@@ -22716,6 +24078,18 @@ msgstr ""
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "mal ID \"%1$s\" er passert %2$s ganger"
+
+#: include/classes/api/services/CItemGeneral.php:1577
+#: include/classes/api/services/CItemGeneral.php:1594
+#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1652
+msgid "the host interface ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1668
+#, c-format
+msgid "the host interface ID of type \"%1$s\" is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
@@ -22961,6 +24335,11 @@ msgstr ""
 msgid "unsupported version number"
 msgstr "ikke-støttet versjonsnummer"
 
+#: include/classes/validators/CApiInputValidator.php:3626
+#, c-format
+msgid "update interval \"%1$s\" is longer than period \"%2$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"
 msgstr ""
@@ -23162,6 +24541,15 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
+
+#: app/views/popup.usergroupmapping.edit.php:83
+msgid "wildcard patterns with '*' may be used"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

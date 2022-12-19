@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxtrends.h"
 #include "log.h"
 #include "zbxdbhigh.h"

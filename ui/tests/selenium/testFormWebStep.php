@@ -160,6 +160,19 @@ class testFormWebStep extends CLegacyWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'name' => 'Call to Prometheus API',
+					'step_name' => 'Step call to Prometheus API',
+					'url' => 'http://localhost:9090/api/v1/query?query=irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])',
+					'parse' => true,
+					'parsed_query' => [
+						['name' => 'query', 'value' => 'irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])']
+					],
+					'check_url' => 'http://localhost:9090/api/v1/query'
+				]
+			],
+			[
+				[
 					'expected' => TEST_ERROR,
 					'name' => 'URL parse validation',
 					'step_name' => 'Step URL parse validation',
@@ -381,11 +394,11 @@ class testFormWebStep extends CLegacyWebTest {
 					'errors' => 'Cannot convert POST data: Name of the form field should not exceed 255 characters.'
 				]
 			],
-			// Variables -just numbers
+			// Variables - just numbers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -just numbers',
+					'name' => 'Variables - just numbers',
 					'step_name' => 'Step variables -just numbers',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -393,11 +406,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -symbols
+			// Variables - symbols
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -just symbols',
+					'name' => 'Variables - just symbols',
 					'step_name' => 'Step variables -just symbols',
 					'url' => 'http://www.zabbix.com',
 					'name' => 'Variables -symbols',
@@ -406,11 +419,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -255 max allowed
+			// Variables - 255 max allowed
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -255 length',
+					'name' => 'Variables - 255 length',
 					'step_name' => 'Step variables -255 length',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -422,11 +435,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -without {}
+			// Variables - without {}
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'step_name' => 'Step variables -without {}',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -442,7 +455,7 @@ class testFormWebStep extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'step_name' => 'Step variables -without {}',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -458,7 +471,7 @@ class testFormWebStep extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'step_name' => 'Step variables -without {}',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -471,11 +484,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -with the same names
+			// Variables - with the same names
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -with the same names',
+					'name' => 'Variables - with the same names',
 					'step_name' => 'Step variables -with the same names',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -489,11 +502,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -two different
+			// Variables - two different
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -two different',
+					'name' => 'Variables - two different',
 					'step_name' => 'Step variables -two different',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -502,11 +515,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -empty name
+			// Variables - empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -empty name',
+					'name' => 'Variables - empty name',
 					'step_name' => 'Step variables -empty name',
 					'url' => 'http://www.zabbix.com',
 					'variables' => [
@@ -519,11 +532,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -just numbers
+			// Headers - just numbers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -just numbers',
+					'name' => 'Headers - just numbers',
 					'step_name' => 'Step headers -just numbers',
 					'url' => 'http://www.zabbix.com',
 					'name' => 'Headers -just numbers',
@@ -532,11 +545,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -just symbols
+			// Headers - just symbols
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -just symbols',
+					'name' => 'Headers - just symbols',
 					'step_name' => 'Step headers -just symbols',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
@@ -544,11 +557,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -255 length
+			// Headers - 255 length
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -255 length',
+					'name' => 'Headers - 255 length',
 					'step_name' => 'Step headers -255 length',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
@@ -565,11 +578,11 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -the same names and values
+			// Headers - the same names and values
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -the same names and values',
+					'name' => 'Headers - the same names and values',
 					'step_name' => 'Step headers -the same names and values',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
@@ -578,28 +591,23 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -empty value
+			// Headers - empty value
 			[
 				[
-					'expected' => TEST_BAD,
-					'name' => 'Headers -empty value',
+					'expected' => TEST_GOOD,
+					'name' => 'Headers - empty value',
 					'step_name' => 'Step headers -empty value',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
 						['name' => 'test']
-					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/steps/1/headers/1/value": cannot be empty.'
 					]
 				]
 			],
-			// Headers -empty name
+			// Headers - empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Headers -empty name',
+					'name' => 'Headers - empty name',
 					'step_name' => 'Step headers -empty name',
 					'url' => 'http://www.zabbix.com',
 					'headers' => [

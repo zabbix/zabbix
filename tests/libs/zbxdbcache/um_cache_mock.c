@@ -22,10 +22,11 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
-#include "zbxdbcache/user_macro.h"
+#include "zbxcacheconfig/user_macro.h"
 #include "um_cache_mock.h"
+#include "zbxshmem.h"
 
 ZBX_PTR_VECTOR_IMPL(um_mock_macro, zbx_um_mock_macro_t *)
 
@@ -113,7 +114,7 @@ static void	um_mock_host_init(zbx_um_mock_host_t *host, zbx_mock_handle_t handle
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(htemplate, &template)))
 			fail_msg("Cannot read templateid: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint64(template, &templateid))
+		if (SUCCEED != zbx_is_uint64(template, &templateid))
 			fail_msg("Invalid templateid: %s", template);
 
 		zbx_vector_uint64_append(&host->templateids, templateid);
@@ -640,7 +641,7 @@ static int	mock_strpool_compare(const void *d1, const void *d2)
  *          pool                                                                 *
  *                                                                               *
  *********************************************************************************/
-void	um_mock_config_init()
+void	um_mock_config_init(void)
 {
 	config = (ZBX_DC_CONFIG *)zbx_malloc(NULL, sizeof(ZBX_DC_CONFIG));
 	memset(config, 0, sizeof(ZBX_DC_CONFIG));
@@ -673,7 +674,7 @@ static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
  * Purpose: destroy configuration cache                                          *
  *                                                                               *
  *********************************************************************************/
-void	um_mock_config_destroy()
+void	um_mock_config_destroy(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_um_macro_t		**pmacro;

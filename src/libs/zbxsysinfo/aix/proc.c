@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
+#include "zbxstr.h"
 
 static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 {
@@ -41,8 +43,8 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 
 static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 {
-	int	i;
-	char	procargs[MAX_BUFFER_LEN];
+	unsigned int	i;
+	char		procargs[MAX_BUFFER_LEN];
 
 	if (0 != getargs(procentry, (int)sizeof(*procentry), procargs, (int)sizeof(procargs)))
 		return FAIL;
@@ -64,7 +66,7 @@ static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 	return NULL != zbx_regexp_match(procargs, proccomm, NULL) ? SUCCEED : FAIL;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_VSIZE	0
 #define ZBX_RSS		1
@@ -193,8 +195,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_RSS:
 				/* try to be compatible with "ps -o rssize" */
-				byte_value = ((zbx_uint64_t)procentry.pi_drss << ZBX_L2PSIZE(procentry.pi_data_l2psize)) +
-						((zbx_uint64_t)procentry.pi_trss << ZBX_L2PSIZE(procentry.pi_text_l2psize));
+				byte_value = ((zbx_uint64_t)procentry.pi_drss <<
+						ZBX_L2PSIZE(procentry.pi_data_l2psize)) +
+						((zbx_uint64_t)procentry.pi_trss <<
+						ZBX_L2PSIZE(procentry.pi_text_l2psize));
 				break;
 			case ZBX_PMEM:
 				/* try to be compatible with "ps -o pmem" */
@@ -282,7 +286,7 @@ out:
 #undef ZBX_TRSS
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*param, *procname, *proccomm;
 	struct passwd		*usrinfo;

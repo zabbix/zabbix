@@ -21,6 +21,7 @@
 #define ZABBIX_ZJSON_H
 
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 
 #define ZBX_PROTO_TAG_CLOCK			"clock"
 #define ZBX_PROTO_TAG_NS			"ns"
@@ -146,6 +147,7 @@
 #define ZBX_PROTO_TAG_AUTHPROTOCOL		"authprotocol"
 #define ZBX_PROTO_TAG_PRIVPROTOCOL		"privprotocol"
 #define ZBX_PROTO_TAG_CONTEXTNAME		"contextname"
+#define ZBX_PROTO_TAG_MAX_REPS			"max_repetitions"
 #define ZBX_PROTO_TAG_IPMI_SENSOR		"ipmi_sensor"
 #define ZBX_PROTO_TAG_TIMEOUT			"timeout"
 #define ZBX_PROTO_TAG_URL			"url"
@@ -188,6 +190,7 @@
 #define ZBX_PROTO_TAG_PID			"pid"
 #define ZBX_PROTO_TAG_PROCESS_NAME		"process_name"
 #define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
+#define ZBX_PROTO_TAG_SCOPE			"scope"
 #define ZBX_PROTO_TAG_HEARTBEAT_FREQ		"heartbeat_freq"
 #define ZBX_PROTO_TAG_ACTIVE_STATUS		"active_status"
 #define ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA	"host data"
@@ -195,6 +198,11 @@
 #define ZBX_PROTO_TAG_PROXY_NAMES		"proxy_names"
 #define ZBX_PROTO_TAG_PROXY_HOSTIDS		"proxy_hostids"
 #define ZBX_PROTO_TAG_SUPPRESS_UNTIL		"suppress_until"
+#define ZBX_PROTO_TAG_CONFIG_REVISION		"config_revision"
+#define ZBX_PROTO_TAG_FULL_SYNC			"full_sync"
+#define ZBX_PROTO_TAG_MACRO_SECRETS		"macro.secrets"
+#define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
+#define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -245,7 +253,8 @@ typedef enum
 	ZBX_JSON_TYPE_OBJECT,
 	ZBX_JSON_TYPE_NULL,
 	ZBX_JSON_TYPE_TRUE,
-	ZBX_JSON_TYPE_FALSE
+	ZBX_JSON_TYPE_FALSE,
+	ZBX_JSON_TYPE_NUMBER
 }
 zbx_json_type_t;
 
@@ -325,11 +334,51 @@ typedef struct
 
 	/* set to 1 when jsonpath points at single location */
 	unsigned char		definite;
+	unsigned char		first_match;	/* set to 1 if first match must be returned */
 }
 zbx_jsonpath_t;
 
-void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
+typedef struct zbx_jsonobj zbx_jsonobj_t;
+
+ZBX_PTR_VECTOR_DECL(jsonobj_ptr, zbx_jsonobj_t *)
+
+typedef union
+{
+	char				*string;
+	double				number;
+	zbx_hashset_t			object;
+	zbx_vector_jsonobj_ptr_t	array;
+}
+zbx_jsonobj_data_t;
+
+typedef struct
+{
+	char		*path;	/* the path that was indexed - for example @.a.b.c */
+	zbx_hashset_t	objects;
+}
+zbx_jsonobj_index_t;
+
+struct zbx_jsonobj
+{
+	zbx_json_type_t		type;
+	zbx_jsonobj_data_t	data;
+	zbx_jsonobj_index_t	*index;
+};
+
+typedef struct
+{
+	char		*name;
+	zbx_jsonobj_t	value;
+}
+zbx_jsonobj_el_t;
+
 int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output);
+void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
+
+int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
+void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
+int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
+int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
 
 #endif /* ZABBIX_ZJSON_H */

@@ -18,10 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testItemTest.php';
 
 /**
  * "Test item prototype" function tests.
+ *
+ * @dataSource Proxies
  *
  * @backup items
  */
@@ -56,7 +59,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 * @depends testFormTestItemPrototype_CheckButtonStateHost
 	 */
 	public function testFormTestItemPrototype_TestItemHost($data) {
-		$this->checkTestItem($data, true, self::HOST_LLD_ID, null, true);
+		$this->checkTestItem($data, true, self::HOST_LLD_ID, null, false);
 	}
 
 	/**
@@ -66,7 +69,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 *
 	 * @depends testFormTestItemPrototype_CheckButtonStateTemplate
 	 */
-	public function ttestFormTestItemPrototype_TestItemTemplate($data) {
-		$this->checkTestItem($data, false, self::TEMPLATE_LLD_ID, null, true);
+	public function testFormTestItemPrototype_TestItemTemplate($data) {
+		$this->checkTestItem($data, false, self::TEMPLATE_LLD_ID, null, false);
 	}
 }

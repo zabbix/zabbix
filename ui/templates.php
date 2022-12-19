@@ -244,6 +244,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$template_name = getRequest('template_name', '');
 
+		$save_macros = $macros;
+
+		foreach ($save_macros as &$macro) {
+			unset($macro['allow_revert']);
+		}
+		unset($macro);
+
 		// create / update template
 		$template = [
 			'host' => $template_name,
@@ -252,7 +259,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'groups' => zbx_toObject($groups, 'groupid'),
 			'templates' => $templates,
 			'tags' => $tags,
-			'macros' => $macros
+			'macros' => $save_macros
 		];
 
 		if ($input_templateid == 0) {
@@ -333,7 +340,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $input_templateid, true)) {
+			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
 				throw new Exception();
 			}
 
@@ -574,6 +581,14 @@ if (hasRequest('form')) {
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $data['dbTemplate']['tags'];
 			$data['macros'] = $data['dbTemplate']['macros'];
+
+			foreach ($data['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro['allow_revert'] = true;
+				}
+			}
+			unset($macro);
+
 			order_result($data['dbTemplate']['valuemaps'], 'name');
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 		}

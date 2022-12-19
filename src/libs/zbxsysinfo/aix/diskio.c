@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-#include "log.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
-#define ZBX_DEV_PFX	"/dev/"
+#include "log.h"
+#include "zbxstr.h"
 
 typedef struct
 {
@@ -32,8 +32,11 @@ typedef struct
 }
 zbx_perfstat_t;
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
+	ZBX_UNUSED(devname);
+	ZBX_UNUSED(dstat);
+
 	return FAIL;
 }
 
@@ -47,7 +50,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 		perfstat_id_t	name;
 		perfstat_disk_t	data;
 
-		strscpy(name.name, devname);
+		zbx_strscpy(name.name, devname);
 
 		if (0 < (err = perfstat_disk(&name, &data, sizeof(data), 1)))
 		{
@@ -82,11 +85,12 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 	return SYSINFO_RET_FAIL;
 #else
 	*error = zbx_strdup(NULL, "Agent was compiled without support for Perfstat API.");
+
 	return SYSINFO_RET_FAIL;
 #endif
 }
 
-static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_perfstat_t	zp;
 	char		*error;
@@ -102,7 +106,7 @@ static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_perfstat_t	zp;
 	char		*error;
@@ -118,7 +122,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_perfstat_t	zp;
 	char		*error;
@@ -134,7 +138,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_perfstat_t	zp;
 	char		*error;
@@ -150,7 +154,9 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+#define ZBX_DEV_PFX	"/dev/"
+
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*devname, *type;
 	int		ret;
@@ -171,9 +177,9 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 1);
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "operations"))
-		ret = VFS_DEV_READ_OPERATIONS(devname, result);
+		ret = vfs_dev_read_operations(devname, result);
 	else if (0 == strcmp(type, "bytes"))
-		ret = VFS_DEV_READ_BYTES(devname, result);
+		ret = vfs_dev_read_bytes(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -183,7 +189,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*devname, *type;
 	int		ret;
@@ -204,9 +210,9 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 1);
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "operations"))
-		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
+		ret = vfs_dev_write_operations(devname, result);
 	else if (0 == strcmp(type, "bytes"))
-		ret = VFS_DEV_WRITE_BYTES(devname, result);
+		ret = vfs_dev_write_bytes(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -215,3 +221,4 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return ret;
 }
+#undef ZBX_DEV_PFX

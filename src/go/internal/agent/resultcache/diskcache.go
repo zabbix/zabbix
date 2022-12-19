@@ -244,7 +244,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	request := AgentDataRequest{
 		Request: "agent data",
 		Data:    results,
-		Session: c.token,
+		Session: u.Session(),
 		Host:    u.Hostname(),
 		Version: version.Short(),
 	}

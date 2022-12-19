@@ -22,11 +22,12 @@
 #include "fatal.h"
 #include "sigcommon.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "cfg.h"
 #include "log.h"
 #include "control.h"
 #include "pid.h"
+#include "zbx_rtc_constants.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20
@@ -71,6 +72,12 @@ static void	common_sigusr_handler(int flags)
 				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
 						zabbix_get_log_level_string());
 			}
+			break;
+		case ZBX_RTC_PROF_ENABLE:
+			zbx_prof_enable(ZBX_RTC_GET_SCOPE(flags));
+			break;
+		case ZBX_RTC_PROF_DISABLE:
+			zbx_prof_disable();
 			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
 			if (SUCCEED != zabbix_decrease_log_level())
@@ -172,7 +179,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 		if (-1 != sigqueue(threads[i], SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",	threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", threads[i]);
 		}
 		else
 		{
@@ -323,12 +330,15 @@ static void	set_daemon_signal_handlers(void)
  *                          name of PID file                                  *
  *       zbx_on_exit_cb_arg - callback function called when terminating       *
  *                            signal handler                                  *
+ *        config_log_type - [IN]                                              *
+ *        config_log_file - [IN]                                              *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg)
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		const char *config_log_file)
 {
 	struct passwd	*pwd;
 
@@ -422,7 +432,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL))
+		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
 			exit(EXIT_FAILURE);
 	}
 

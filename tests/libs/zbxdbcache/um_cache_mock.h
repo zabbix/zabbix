@@ -20,8 +20,8 @@
 #ifndef ZABBIX_UM_CACHE_MOCK_H
 #define ZABBIX_UM_CACHE_MOCK_H
 
-#include "zbxdbcache/dbconfig.h"
-#include "zbxdbcache/dbsync.h"
+#include "zbxcacheconfig/dbconfig.h"
+#include "zbxcacheconfig/dbsync.h"
 
 typedef struct
 {
@@ -68,8 +68,8 @@ typedef struct
 }
 zbx_um_mock_cache_t;
 
-void	um_mock_config_init();
-void	um_mock_config_destroy();
+void	um_mock_config_init(void);
+void	um_mock_config_destroy(void);
 
 void	um_mock_cache_init(zbx_um_mock_cache_t *cache, zbx_mock_handle_t handle);
 void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *cfg);

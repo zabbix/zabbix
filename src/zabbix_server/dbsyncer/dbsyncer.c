@@ -22,15 +22,32 @@
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-
-#include "dbcache.h"
+#include "zbxtime.h"
+#include "zbxcachehistory.h"
 #include "zbxexport.h"
+#include "zbxprof.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static sigset_t				orig_mask;
+
+static zbx_export_file_t	*problems_export = NULL;
+static zbx_export_file_t	*get_problems_export(void)
+{
+	return problems_export;
+}
+
+static zbx_export_file_t	*history_export = NULL;
+static zbx_export_file_t	*get_history_export(void)
+{
+	return history_export;
+}
+
+static zbx_export_file_t	*trends_export = NULL;
+static zbx_export_file_t	*get_trends_export(void)
+{
+	return trends_export;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -83,21 +100,22 @@ static void	db_trigger_queue_cleanup(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int		sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0, triggers_num;
-	double		sec, total_sec = 0.0;
-	time_t		last_stat_time;
-	char		*stats = NULL;
-	const char	*process_name;
-	size_t		stats_alloc = 0, stats_offset = 0;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
+				triggers_num;
+	double			sec, total_sec = 0.0;
+	time_t			last_stat_time;
+	char			*stats = NULL;
+	const char		*process_name;
+	size_t			stats_alloc = 0, stats_offset = 0;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
 			(process_name = get_process_type_string(process_type)), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -117,18 +135,19 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	zbx_unblock_signals(&orig_mask);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
-		zbx_history_export_init("history-syncer", process_num);
+		history_export = zbx_history_export_init(get_history_export, "history-syncer", process_num);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
-		zbx_trends_export_init("history-syncer", process_num);
+		trends_export = zbx_trends_export_init(get_trends_export, "history-syncer", process_num);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_problems_export_init("history-syncer", process_num);
+		problems_export = zbx_problems_export_init(get_problems_export, "history-syncer", process_num);
 
 	for (;;)
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+
+		zbx_prof_update(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
@@ -139,7 +158,9 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 		zbx_block_signals(&orig_mask);
+		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
 			zbx_db_flush_timer_queue();
@@ -182,7 +203,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
@@ -194,6 +215,15 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	zbx_unblock_signals(&orig_mask);
 
 	zbx_log_sync_history_cache_progress();
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_export_deinit(history_export);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_export_deinit(trends_export);
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_export_deinit(problems_export);
 
 	zbx_free(stats);
 

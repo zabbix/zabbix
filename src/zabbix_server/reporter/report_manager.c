@@ -18,17 +18,19 @@
 **/
 
 #include "report_manager.h"
+#include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "base64.h"
 #include "../zbxreport.h"
-#include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxalert.h"
-#include "zbxserver.h"
 #include "report_protocol.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1
@@ -45,10 +47,8 @@
 #define ZBX_REPORT_STATE_ERROR		2
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-extern int				CONFIG_REPORTWRITER_FORKS;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* report manager data */
 typedef struct
@@ -250,7 +250,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	int		i, ret;
 	zbx_rm_writer_t	*writer;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_REPORTWRITER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_REPORTER, error)))
 		goto out;
@@ -271,7 +271,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	manager->zabbix_url = NULL;
 	manager->last_batchid = 0;
 
-	for (i = 0; i < CONFIG_REPORTWRITER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]; i++)
 	{
 		writer = (zbx_rm_writer_t *)zbx_malloc(NULL, sizeof(zbx_rm_writer_t));
 		writer->client = NULL;
@@ -2300,17 +2300,17 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	int			ret, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
 	zbx_timespec_t		timeout;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == rm_init(&manager, &error))
 	{
@@ -2383,12 +2383,12 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 		time_now = sec;
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&manager.ipc, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

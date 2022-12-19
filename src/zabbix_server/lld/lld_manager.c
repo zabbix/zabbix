@@ -24,12 +24,11 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
-extern int	CONFIG_LLDWORKER_FORKS;
+extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
  * The LLD queue is organized as a queue (rule_queue binary heap) of LLD rules,
@@ -162,7 +161,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 	int			i;
 	zbx_lld_worker_t	*worker;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_LLDWORKER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]);
 
 	zbx_vector_ptr_create(&manager->workers);
 	zbx_queue_ptr_create(&manager->free_workers);
@@ -176,7 +175,7 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 
 	manager->next_worker_index = 0;
 
-	for (i = 0; i < CONFIG_LLDWORKER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER]; i++)
 	{
 		worker = (zbx_lld_worker_t *)zbx_malloc(NULL, sizeof(zbx_lld_worker_t));
 
@@ -565,10 +564,10 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	zbx_uint64_t		processed_num = 0;
 	int			ret;
 	zbx_timespec_t		timeout = {1, 0};
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -589,7 +588,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -607,12 +606,12 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 			processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&lld_service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

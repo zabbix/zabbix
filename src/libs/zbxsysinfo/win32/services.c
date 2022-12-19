@@ -17,8 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxjson.h"
 
@@ -137,6 +139,7 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
 		return SUCCEED;
 
 	log_if_buffer_too_small("QueryServiceConfig", sz);
+
 	return FAIL;
 }
 
@@ -163,6 +166,7 @@ static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE
 		return SUCCEED;
 
 	log_if_buffer_too_small("QueryServiceConfig2", sz);
+
 	return FAIL;
 }
 
@@ -250,7 +254,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 }
 
-int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	discover_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
@@ -387,17 +391,15 @@ next:
 	return SYSINFO_RET_OK;
 }
 
+int	get_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
 #define ZBX_SRV_PARAM_DESCRIPTION	0x06
-
 #define ZBX_NON_EXISTING_SRV		255
-
-int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	int			param_type;
@@ -539,9 +541,16 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	CloseServiceHandle(h_mgr);
 
 	return SYSINFO_RET_OK;
+#undef ZBX_SRV_PARAM_STATE
+#undef ZBX_SRV_PARAM_DISPLAYNAME
+#undef ZBX_SRV_PARAM_PATH
+#undef ZBX_SRV_PARAM_USER
+#undef ZBX_SRV_PARAM_STARTUP
+#undef ZBX_SRV_PARAM_DESCRIPTION
+#undef ZBX_NON_EXISTING_SRV
 }
 
-int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;
@@ -648,7 +657,8 @@ static int	check_service_starttype(SC_HANDLE h_srv, int start_type)
 						 */
 #define ZBX_SRV_STATE_ALL		0x007f  /* ZBX_SRV_STATE_STOPPED | ZBX_SRV_STATE_STARTED
 						 */
-static int	check_service_state(SC_HANDLE h_srv, int service_state)
+
+static int	get_service_state_local(SC_HANDLE h_srv, int service_state)
 {
 	SERVICE_STATUS	status;
 
@@ -690,7 +700,7 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_list_of_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int				start_type, service_state;
 	char				*type, *state, *exclude, *buf = NULL, *utf8;
@@ -767,11 +777,11 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
 			{
-				if (SUCCEED == check_service_state(h_srv, service_state))
+				if (SUCCEED == get_service_state_local(h_srv, service_state))
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 
-					if (NULL == exclude || FAIL == str_in_list(exclude, utf8, ','))
+					if (NULL == exclude || FAIL == zbx_str_in_list(exclude, utf8, ','))
 						buf = zbx_strdcatf(buf, "%s\n", utf8);
 
 					zbx_free(utf8);

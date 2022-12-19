@@ -29,7 +29,7 @@ $filter_view_data = array_key_exists('filter_view_data', $data) ? $data['filter_
 $left_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
-		new CLabel(_('Host groups'), 'groupids__ms'),
+		new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms'),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'groupids[]',
@@ -53,7 +53,7 @@ $left_column = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Hosts'), 'hostids__ms'),
+		new CLabel(_('Hosts'), 'hostids_#{uniqid}_ms'),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'hostids[]',
@@ -62,8 +62,9 @@ $left_column = (new CFormGrid())
 					? $filter_view_data['hosts_multiselect']
 					: [],
 				'popup' => [
-					'filter_preselect_fields' => [
-						'hostgroups' => 'groupids_'
+					'filter_preselect' => [
+						'id' => 'groupids_',
+						'submit_as' => 'groupid'
 					],
 					'parameters' => [
 						'srctbl' => 'hosts',
@@ -169,7 +170,7 @@ $right_column = (new CFormGrid())
 		new CFormField($tag_format_line)
 	])
 	->addItem([
-		new CLabel(_('Tag display priority')),
+		new CLabel(_('Tag display priority'), 'tag_priority_#{uniqid}'),
 		new CFormField(
 			(new CTextBox('tag_priority', $data['tag_priority']))
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -179,12 +180,11 @@ $right_column = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Show details')),
+		new CLabel(_('Show details'), 'show_details'),
 		new CFormField([
 			(new CCheckBox('show_details'))
 				->setChecked($data['show_details'] == 1)
 				->setUncheckedValue(0)
-				->removeId()
 		])
 	]);
 
@@ -220,12 +220,12 @@ if (array_key_exists('render_html', $data)) {
 	return;
 }
 
-(new CScriptTemplate('filter-monitoring-latest'))
+(new CTemplateTag('filter-monitoring-latest'))
 	->setAttribute('data-template', 'monitoring.latest.filter')
 	->addItem($template)
 	->show();
 
-(new CScriptTemplate('filter-tag-row-tmpl'))
+(new CTemplateTag('filter-tag-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}'))
@@ -298,8 +298,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'hostids[]',
 			data: (data.filter_view_data.hosts_multiselect || []),
 			popup: {
-				filter_preselect_fields: {
-					hostgroups: 'groupids_' + data.uniqid
+				filter_preselect: {
+					id: 'groupids_' + data.uniqid,
+					submit_as: 'groupid'
 				},
 				parameters: {
 					multiselect: 1,

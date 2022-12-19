@@ -19,10 +19,15 @@ zabbix_sender_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_builddir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(SENDER_LIBS)
 
 zabbix_sender_LDFLAGS = $(SENDER_LDFLAGS)

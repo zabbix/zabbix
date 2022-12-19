@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
-int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	kstat_ctl_t	*kc;

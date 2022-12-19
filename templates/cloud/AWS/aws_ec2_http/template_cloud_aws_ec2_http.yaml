@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-27T11:53:27Z'
+  version: '6.4'
+  date: '2022-09-01T13:23:30Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -595,7 +595,10 @@ zabbix_export:
             
                    var request = new HttpRequest(),
                        url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                   if (typeof AwsEc2.params.proxy !== 'undefined' && AwsEc2.params.proxy !== '') {
+                       request.setProxy(AwsEc2.params.proxy);
+                   }
                    request.addHeader('x-amz-date: ' + amzdate);
                    request.addHeader('Accept: application/json');
                    request.addHeader('Content-Type: application/json');
@@ -644,13 +647,15 @@ zabbix_export:
             
                    while (payload.NextToken !== '') {
                        var volumes = AwsEc2.request('GET', AwsEc2.params.region, 'ec2', AwsEc2.prepareParams(payload));
-                       if (typeof result !== 'object'
+                       if (typeof volumes !== 'object'
                            || typeof volumes.DescribeVolumesResponse !== 'object'
                            || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
                            || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
                            throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
                        }
                        payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
+                       if (!Array.isArray(volumes.DescribeVolumesResponse.volumeSet.item))
+                           volumes.DescribeVolumesResponse.volumeSet.item = [volumes.DescribeVolumesResponse.volumeSet.item]
                        volumes.DescribeVolumesResponse.volumeSet.item.forEach(function (volume) {
                            result.push(volume.volumeId)
                        });
@@ -679,6 +684,8 @@ zabbix_export:
             
                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
             
+                       if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
+                           alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
                            var dimensions = alarm.Dimensions;
             
@@ -739,6 +746,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -901,7 +911,10 @@ zabbix_export:
             
                       var request = new HttpRequest(),
                           url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                      if (typeof AwsEc2.params.proxy !== 'undefined' && AwsEc2.params.proxy !== '') {
+                          request.setProxy(AwsEc2.params.proxy);
+                      }
                       request.addHeader('x-amz-date: ' + amzdate);
                       request.addHeader('Accept: application/json');
                       request.addHeader('Content-Type: application/json');
@@ -988,6 +1001,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1068,7 +1084,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsEbs.params.proxy !== 'undefined' && AwsEbs.params.proxy !== '') {
+                        request.setProxy(AwsEbs.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
@@ -1166,6 +1185,9 @@ zabbix_export:
             -
               name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           tags:
             -
               tag: component
@@ -1852,7 +1874,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@.Label == "VolumeConsumedReadWriteOps")].Values.first().first()'
+                    - '$.[?(@.Label == "BurstBalance")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
@@ -2329,7 +2351,10 @@ zabbix_export:
                 
                         var request = new HttpRequest(),
                             url = 'https://' + host + canonical_uri + '?' + params;
-                
+
+                        if (typeof AwsEbs.params.proxy !== 'undefined' && AwsEbs.params.proxy !== '') {
+                            request.setProxy(AwsEbs.params.proxy);
+                        }
                         request.addHeader('x-amz-date: ' + amzdate);
                         request.addHeader('Accept: application/json');
                         request.addHeader('Content-Type: application/json');
@@ -2416,6 +2441,9 @@ zabbix_export:
                 -
                   name: volume_id
                   value: '{#VOLUME_ID}'
+                -
+                  name: proxy
+                  value: '{$AWS.PROXY}'
               tags:
                 -
                   tag: component
@@ -2506,6 +2534,9 @@ zabbix_export:
           tag: target
           value: ec2
       macros:
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'

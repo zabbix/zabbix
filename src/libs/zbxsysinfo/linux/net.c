@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxip.h"
 
 typedef struct
 {
@@ -52,9 +55,6 @@ typedef struct
 	unsigned char	mapped;
 }
 net_count_info_t;
-
-#define IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
-#define IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
 #define NET_CONN_TYPE_TCP	0
 #define NET_CONN_TYPE_UDP	1
@@ -416,7 +416,7 @@ out:
 	return ret;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -461,7 +461,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -506,7 +506,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -547,7 +547,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *error;
@@ -571,7 +571,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		line[MAX_STRING_LEN], *p;
 	FILE		*f;
@@ -614,7 +614,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
@@ -631,7 +631,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -715,7 +715,7 @@ out:
 	return ret;
 }
 
-int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
@@ -730,7 +730,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -992,7 +992,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 				goto err;
 			}
 		}
-		else if (FAIL == is_supported_ip(addr))
+		else if (FAIL == zbx_is_supported_ip(addr))
 		{
 			*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 			goto err;
@@ -1003,7 +1003,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 	if (NULL != port_in && '\0' != *port_in)
 	{
-		if (SUCCEED != is_ushort(port_in, &info->port))
+		if (SUCCEED != zbx_is_ushort(port_in, &info->port))
 		{
 			if (0 != atoi(port_in))
 			{
@@ -1029,7 +1029,6 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
 		goto err;
 	}
-
 #ifdef HAVE_IPV6
 	if (info->ai->ai_family == AF_INET6)
 	{
@@ -1038,7 +1037,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		if (NULL != addr)
 		{
 			if (-1 == prefix_sz_local)
-				prefix_sz_local = IPV6_MAX_CIDR_PREFIX;
+				prefix_sz_local = ZBX_IPV6_MAX_CIDR_PREFIX;
 
 			if (0 == memcmp(((struct sockaddr_in6*)info->ai->ai_addr)->sin6_addr.s6_addr, ipv6_mapped, 12))
 				info->mapped = 1;
@@ -1051,7 +1050,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 #endif
 	{
 		if (NULL != addr && -1 == prefix_sz_local)
-			prefix_sz_local = IPV4_MAX_CIDR_PREFIX;
+			prefix_sz_local = ZBX_IPV4_MAX_CIDR_PREFIX;
 
 		if (NULL != service)
 			info->port = ntohs(((struct sockaddr_in*)info->ai->ai_addr)->sin_port);
@@ -1162,12 +1161,12 @@ err:
 	return ret;
 }
 
-int	NET_TCP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_TCP, request, result);
 }
 
-int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }

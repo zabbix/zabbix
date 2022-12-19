@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:33:11Z'
+  version: '6.4'
+  date: '2022-07-22T09:08:46Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get node metrics from ClickHouse HTTP interface using HTTP agent.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Databases
@@ -1274,7 +1274,7 @@ zabbix_export:
           uuid: 381805a8145a48c2a1f2586996b66a94
           name: 'ClickHouse: ZooKeeper exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.exceptions.rate
+          key: clickhouse.zookeeper.exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1295,12 +1295,12 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: f8e6a866d8c745d39ed124f19afe8041
           name: 'ClickHouse: ZooKeeper hardware exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.hw_exceptions.rate
+          key: clickhouse.zookeeper.hw_exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1321,12 +1321,12 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: 071fb0471b8e40c3a5bb79c694cecce0
           name: 'ClickHouse: ZooKeeper requests'
           type: DEPENDENT
-          key: clickhouse.zookeper.request
+          key: clickhouse.zookeeper.request
           delay: '0'
           history: 7d
           description: 'Number of requests to ZooKeeper in progress.'
@@ -1340,12 +1340,12 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: 3e344ea728a54bc38b4098e7f6e2d087
           name: 'ClickHouse: ZooKeeper sessions'
           type: DEPENDENT
-          key: clickhouse.zookeper.session
+          key: clickhouse.zookeeper.session
           delay: '0'
           history: 7d
           description: 'Number of sessions (connections) to ZooKeeper. Should be no more than one.'
@@ -1359,11 +1359,11 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
           triggers:
             -
               uuid: 655622aa6c5c48c8b38d5a519602ef05
-              expression: 'min(/ClickHouse by HTTP/clickhouse.zookeper.session,5m)>1'
+              expression: 'min(/ClickHouse by HTTP/clickhouse.zookeeper.session,5m)>1'
               name: 'ClickHouse: Too many ZooKeeper sessions opened'
               priority: WARNING
               description: |
@@ -1377,7 +1377,7 @@ zabbix_export:
           uuid: 4931797c1034488fb9a2fc01e22b599c
           name: 'ClickHouse: ZooKeeper user exceptions per second'
           type: DEPENDENT
-          key: clickhouse.zookeper.user_exceptions.rate
+          key: clickhouse.zookeeper.user_exceptions.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1398,12 +1398,12 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: b9fbc2f76b9c4de3b196ffc82ec10209
           name: 'ClickHouse: ZooKeeper wait time'
           type: DEPENDENT
-          key: clickhouse.zookeper.wait.time
+          key: clickhouse.zookeeper.wait.time
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -1429,12 +1429,12 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: 696aa071a9b24b29acbce2f1b5c49da3
           name: 'ClickHouse: ZooKeeper watches'
           type: DEPENDENT
-          key: clickhouse.zookeper.watch
+          key: clickhouse.zookeeper.watch
           delay: '0'
           history: 7d
           description: 'Number of watches (e.g., event subscriptions) in ZooKeeper.'
@@ -1448,7 +1448,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: zookeper
+              value: zookeeper
         -
           uuid: 68d1e19a6ec2401ba0dd509de7df2812
           name: 'ClickHouse: Check port availability'
@@ -2483,19 +2483,19 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.exceptions.rate
+            key: clickhouse.zookeeper.exceptions.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.hw_exceptions.rate
+            key: clickhouse.zookeeper.hw_exceptions.rate
         -
           sortorder: '2'
           color: F63100
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.user_exceptions.rate
+            key: clickhouse.zookeeper.user_exceptions.rate
         -
           sortorder: '3'
           drawtype: BOLD_LINE
@@ -2503,4 +2503,4 @@ zabbix_export:
           yaxisside: RIGHT
           item:
             host: 'ClickHouse by HTTP'
-            key: clickhouse.zookeper.watch
+            key: clickhouse.zookeeper.watch

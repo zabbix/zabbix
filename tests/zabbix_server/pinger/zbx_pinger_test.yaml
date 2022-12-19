@@ -1,0 +1,29 @@
+---
+test case: Both interface and key parameter are present
+in:
+  interface: "127.0.0.1:10051"
+  key: icmpping[127.0.0.1]
+out:
+  address: "127.0.0.1"
+---
+test case: Only interface is present
+in:
+  interface: "127.0.0.1:10051"
+  key: icmpping[]
+out:
+  address: "127.0.0.1:10051"
+---
+test case: Only key parameter is present
+in:
+  interface: ""
+  key: icmpping[127.0.0.1]
+out:
+  address: "127.0.0.1"
+---
+test case: Both interface and key parameter are missing
+in:
+  interface: ""
+  key: icmpping[]
+out:
+  address: ""
+...

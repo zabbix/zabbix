@@ -21,24 +21,23 @@
 
 class CButtonCancel extends CButton {
 
-	public function __construct($vars = null, $action = null) {
+	/**
+	 * @param string $vars
+	 */
+	public function __construct(string $vars = '') {
 		parent::__construct('cancel', _('Cancel'));
-		if (is_null($action)) {
-			$this->setVars($vars);
-		}
-		if ($action !== null) {
-			$this->onClick($action);
-		}
+
+		$this->setVars($vars);
 	}
 
-	public function setVars($value = null) {
-		$url = '?cancel=1';
-		if (!empty($value)) {
-			$url .= $value;
-		}
-		$uri = new CUrl($url);
-		$url = $uri->getUrl();
-		$this->onClick("javascript: return redirect('".$url."');");
-		return $this;
+	/**
+	 * @param string $value
+	 *
+	 * @return $this
+	 */
+	public function setVars(string $value): CButtonCancel {
+		$url = (new CUrl('?cancel=1'.$value))->getUrl();
+
+		return $this->onClick("javascript: return redirect('".$url."');");
 	}
 }

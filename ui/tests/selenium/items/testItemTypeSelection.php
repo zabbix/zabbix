@@ -49,7 +49,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Character',
-						'Key' => 'agent.hostmetadata'
+						'Key' => 'agent.hostmetadata[{#KEY}]'
 					],
 					'type' => 'Character'
 				]
@@ -58,7 +58,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Numeric unsigned',
-						'Key' => 'agent.ping'
+						'Key' => 'agent.ping[{#KEY}]'
 					],
 					'type' => 'Numeric (unsigned)'
 				]
@@ -68,7 +68,7 @@ class testItemTypeSelection extends CWebTest {
 
 					'fields' => [
 						'Name' => 'Numeric float',
-						'Key' => 'net.udp.service.perf[service]'
+						'Key' => 'net.udp.service.perf[service,{#KEY}]'
 					],
 					'type' => 'Numeric (float)'
 				]
@@ -76,8 +76,9 @@ class testItemTypeSelection extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Type' => 'Zabbix agent (active)',
 						'Name' => 'Log',
-						'Key' => 'eventlog[name]'
+						'Key' => 'eventlog[name,{#KEY}]'
 					],
 					'type' => 'Log'
 				]
@@ -85,8 +86,17 @@ class testItemTypeSelection extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Name' => 'Log',
+						'Key' => 'eventlog[agent,{#KEY}]'
+					],
+					'type' => 'Numeric (unsigned)'
+				]
+			],
+			[
+				[
+					'fields' => [
 						'Name' => 'Text',
-						'Key' => 'net.if.discovery'
+						'Key' => 'net.if.discovery[{#KEY}]'
 					],
 					'type' => 'Text'
 				]
@@ -95,7 +105,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Custom key',
-						'Key' => 'custom.key'
+						'Key' => 'custom.key[{#KEY}]'
 					],
 					'type' => 'Numeric (unsigned)'
 				]
@@ -104,7 +114,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Custom key 2',
-						'Key' => 'custom.key2',
+						'Key' => 'custom.key2[{#KEY}]',
 						'Type of information' => 'Text'
 					],
 					'type' => 'Text',
@@ -115,7 +125,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Test Info Hint',
-						'Key' => 'net.if.list',
+						'Key' => 'net.if.list[{#KEY}]',
 						'Type of information' => 'Log'
 					],
 					'hint' => true,

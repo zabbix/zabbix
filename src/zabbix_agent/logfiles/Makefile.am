@@ -7,3 +7,4 @@ libzbxlogfiles_a_SOURCES = \
 	persistent_state.c persistent_state.h \
 	../metrics.h
 
+libzbxlogfiles_a_CFLAGS = $(TLS_CFLAGS)

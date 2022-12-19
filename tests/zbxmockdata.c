@@ -22,7 +22,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 
 FILE	*__real_fopen(const char *path, const char *mode);
@@ -758,7 +759,7 @@ zbx_mock_error_t	zbx_mock_binary(zbx_mock_handle_t binary, const char **value, s
 		if ('\\' == src[i])
 		{
 			if (i + 3 >= handle->node->data.scalar.length || 'x' != src[i + 1] ||
-					SUCCEED != is_hex_n_range(&src[i + 2], 2, dst, sizeof(char), 0, 0xff))
+					SUCCEED != zbx_is_hex_n_range(&src[i + 2], 2, dst, sizeof(char), 0, 0xff))
 			{
 				zbx_free(tmp);
 				return ZBX_MOCK_NOT_A_BINARY;
@@ -943,7 +944,7 @@ zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
 	if (YAML_SCALAR_NODE != handle->node->type || ZBX_MAX_UINT64_LEN < handle->node->data.scalar.length)
 		return ZBX_MOCK_NOT_AN_UINT64;
 
-	if (SUCCEED != is_uint64_n((const char *)handle->node->data.scalar.value, handle->node->data.scalar.length,
+	if (SUCCEED != zbx_is_uint64_n((const char *)handle->node->data.scalar.value, handle->node->data.scalar.length,
 			value))
 	{
 		return ZBX_MOCK_NOT_AN_UINT64;
@@ -970,7 +971,7 @@ zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value)
 	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
 	tmp[handle->node->data.scalar.length] = '\0';
 
-	if (SUCCEED != is_double(tmp, value))
+	if (SUCCEED != zbx_is_double(tmp, value))
 		res = ZBX_MOCK_NOT_A_FLOAT;
 
 	zbx_free(tmp);
@@ -1000,7 +1001,7 @@ zbx_mock_error_t	zbx_mock_int(zbx_mock_handle_t object, int *value)
 	if ('-' == *ptr)
 		ptr++;
 
-	if (SUCCEED != is_uint31(ptr, value))
+	if (SUCCEED != zbx_is_uint31(ptr, value))
 		res = ZBX_MOCK_NOT_AN_INT;
 
 	if (ptr != tmp)

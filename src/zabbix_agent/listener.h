@@ -21,6 +21,17 @@
 #define ZABBIX_LISTENER_H
 
 #include "zbxthreads.h"
+#include "zbxcomms.h"
+
+typedef struct
+{
+	zbx_socket_t		*listen_sock;
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	char			*config_file;
+	int			config_timeout;
+}
+zbx_thread_listener_args;
 
 ZBX_THREAD_ENTRY(listener_thread, args);
 

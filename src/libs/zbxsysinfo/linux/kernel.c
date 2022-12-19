@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 static int	read_uint64_from_procfs(const char *path, int first_num, zbx_uint64_t *value)
 {
@@ -47,7 +47,7 @@ static int	read_uint64_from_procfs(const char *path, int first_num, zbx_uint64_t
 	return ret;
 }
 
-int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 
@@ -60,10 +60,11 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
-int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 
@@ -76,10 +77,11 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
-int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_openfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 
@@ -92,5 +94,6 @@ int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }

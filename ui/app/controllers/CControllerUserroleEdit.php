@@ -32,73 +32,80 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'roleid' => 								'db users.roleid',
-			'name' => 									'db role.name',
-			'type' => 									'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
-			'ui_monitoring_dashboard' => 				'in 0,1',
-			'ui_monitoring_problems' => 				'in 0,1',
-			'ui_monitoring_hosts' => 					'in 0,1',
-			'ui_monitoring_latest_data' => 				'in 0,1',
-			'ui_monitoring_maps' => 					'in 0,1',
-			'ui_monitoring_discovery' => 				'in 0,1',
-			'ui_services_services' => 					'in 0,1',
-			'ui_services_actions' => 					'in 0,1',
-			'ui_services_sla' => 						'in 0,1',
-			'ui_services_sla_report' => 				'in 0,1',
-			'ui_inventory_overview' => 					'in 0,1',
-			'ui_inventory_hosts' => 					'in 0,1',
-			'ui_reports_system_info' => 				'in 0,1',
-			'ui_reports_scheduled_reports' => 			'in 0,1',
-			'ui_reports_availability_report' => 		'in 0,1',
-			'ui_reports_top_triggers' => 				'in 0,1',
-			'ui_reports_audit' => 						'in 0,1',
-			'ui_reports_action_log' => 					'in 0,1',
-			'ui_reports_notifications' => 				'in 0,1',
-			'ui_configuration_template_groups' => 		'in 0,1',
-			'ui_configuration_host_groups' => 			'in 0,1',
-			'ui_configuration_templates' => 			'in 0,1',
-			'ui_configuration_hosts' => 				'in 0,1',
-			'ui_configuration_maintenance' => 			'in 0,1',
-			'ui_configuration_actions' => 				'in 0,1',
-			'ui_configuration_event_correlation' => 	'in 0,1',
-			'ui_configuration_discovery' => 			'in 0,1',
-			'ui_administration_general' => 				'in 0,1',
-			'ui_administration_proxies' => 				'in 0,1',
-			'ui_administration_authentication' => 		'in 0,1',
-			'ui_administration_user_groups' => 			'in 0,1',
-			'ui_administration_user_roles' => 			'in 0,1',
-			'ui_administration_users' => 				'in 0,1',
-			'ui_administration_media_types' => 			'in 0,1',
-			'ui_administration_scripts' => 				'in 0,1',
-			'ui_administration_queue' => 				'in 0,1',
-			'actions_edit_dashboards' => 				'in 0,1',
-			'actions_edit_maps' => 						'in 0,1',
-			'actions_edit_maintenance' => 				'in 0,1',
-			'actions_acknowledge_problems' => 			'in 0,1',
-			'actions_close_problems' => 				'in 0,1',
-			'actions_change_severity' => 				'in 0,1',
-			'actions_add_problem_comments' => 			'in 0,1',
-			'actions_execute_scripts' => 				'in 0,1',
-			'actions_manage_api_tokens' => 				'in 0,1',
-			'actions_manage_scheduled_reports' => 		'in 0,1',
-			'actions_manage_sla' => 					'in 0,1',
-			'actions_invoke_execute_now' =>				'in 0,1',
-			'ui_default_access' => 						'in 0,1',
-			'modules_default_access' => 				'in 0,1',
-			'actions_default_access' => 				'in 0,1',
-			'modules' => 								'array',
-			'api_access' => 							'in 0,1',
-			'api_mode' => 								'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
-			'api_methods' => 							'array',
-			'service_read_access' => 					'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
-			'service_read_list' => 						'array_db services.serviceid',
-			'service_read_tag_tag' => 					'string',
-			'service_read_tag_value' => 				'string',
-			'service_write_access' => 					'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
-			'service_write_list' => 					'array_db services.serviceid',
-			'service_write_tag_tag' => 					'string',
-			'service_write_tag_value' => 				'string',
-			'form_refresh' => 							'int32'
+			'roleid' => 									'db users.roleid',
+			'name' => 										'db role.name',
+			'type' => 										'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
+			'ui_monitoring_dashboard' => 					'in 0,1',
+			'ui_monitoring_problems' => 					'in 0,1',
+			'ui_monitoring_hosts' => 						'in 0,1',
+			'ui_monitoring_latest_data' => 					'in 0,1',
+			'ui_monitoring_maps' => 						'in 0,1',
+			'ui_monitoring_discovery' => 					'in 0,1',
+			'ui_services_services' => 						'in 0,1',
+			'ui_services_sla' => 							'in 0,1',
+			'ui_services_sla_report' => 					'in 0,1',
+			'ui_inventory_overview' => 						'in 0,1',
+			'ui_inventory_hosts' => 						'in 0,1',
+			'ui_reports_system_info' => 					'in 0,1',
+			'ui_reports_scheduled_reports' => 				'in 0,1',
+			'ui_reports_availability_report' => 			'in 0,1',
+			'ui_reports_top_triggers' => 					'in 0,1',
+			'ui_reports_audit' => 							'in 0,1',
+			'ui_reports_action_log' => 						'in 0,1',
+			'ui_reports_notifications' => 					'in 0,1',
+			'ui_configuration_template_groups' => 			'in 0,1',
+			'ui_configuration_host_groups' => 				'in 0,1',
+			'ui_configuration_templates' => 				'in 0,1',
+			'ui_configuration_hosts' => 					'in 0,1',
+			'ui_configuration_maintenance' => 				'in 0,1',
+			'ui_configuration_trigger_actions' => 			'in 0,1',
+			'ui_configuration_service_actions' => 			'in 0,1',
+			'ui_configuration_discovery_actions' => 		'in 0,1',
+			'ui_configuration_autoregistration_actions' => 	'in 0,1',
+			'ui_configuration_internal_actions' => 			'in 0,1',
+			'ui_configuration_event_correlation' => 		'in 0,1',
+			'ui_configuration_discovery' => 				'in 0,1',
+			'ui_administration_general' => 					'in 0,1',
+			'ui_administration_audit_log' =>				'in 0,1',
+			'ui_administration_housekeeping' => 			'in 0,1',
+			'ui_administration_proxies' => 					'in 0,1',
+			'ui_administration_macros' => 					'in 0,1',
+			'ui_administration_authentication' => 			'in 0,1',
+			'ui_administration_user_groups' => 				'in 0,1',
+			'ui_administration_user_roles' => 				'in 0,1',
+			'ui_administration_users' => 					'in 0,1',
+			'ui_administration_api_tokens' => 				'in 0,1',
+			'ui_administration_media_types' => 				'in 0,1',
+			'ui_administration_scripts' => 					'in 0,1',
+			'ui_administration_queue' => 					'in 0,1',
+			'actions_edit_dashboards' => 					'in 0,1',
+			'actions_edit_maps' => 							'in 0,1',
+			'actions_edit_maintenance' => 					'in 0,1',
+			'actions_acknowledge_problems' => 				'in 0,1',
+			'actions_close_problems' => 					'in 0,1',
+			'actions_change_severity' => 					'in 0,1',
+			'actions_add_problem_comments' => 				'in 0,1',
+			'actions_execute_scripts' => 					'in 0,1',
+			'actions_manage_api_tokens' => 					'in 0,1',
+			'actions_manage_scheduled_reports' => 			'in 0,1',
+			'actions_manage_sla' => 						'in 0,1',
+			'actions_invoke_execute_now' =>					'in 0,1',
+			'ui_default_access' => 							'in 0,1',
+			'modules_default_access' => 					'in 0,1',
+			'actions_default_access' => 					'in 0,1',
+			'modules' => 									'array',
+			'api_access' => 								'in 0,1',
+			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
+			'api_methods' => 								'array',
+			'service_read_access' => 						'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_read_list' => 							'array_db services.serviceid',
+			'service_read_tag_tag' => 						'string',
+			'service_read_tag_value' => 					'string',
+			'service_write_access' => 						'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
+			'service_write_list' => 						'array_db services.serviceid',
+			'service_write_tag_tag' => 						'string',
+			'service_write_tag_value' => 					'string',
+			'form_refresh' => 								'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -173,7 +180,19 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			];
 		}
 
-		$data['labels'] = $this->getLabels();
+		$db_modules = API::Module()->get([
+			'output' => ['moduleid', 'relative_path', 'status']
+		]);
+
+		$disabled_modules = array_filter($db_modules,
+			static function(array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
+
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+
+		$data['labels'] = $this->getLabels($db_modules);
 
 		$data['rules']['service_read_list'] = API::Service()->get([
 			'output' => ['serviceid', 'name'],
@@ -284,10 +303,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		return $data;
 	}
 
-	/**
-	 * @throws APIException
-	 */
-	private function getLabels(): array {
+	private function getLabels(array $db_modules): array {
 		$labels = [
 			'sections' => CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN),
 			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN)
@@ -297,23 +313,21 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$labels['rules'][$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
 		}
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
+		$labels['modules'] = [];
 
 		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
-			foreach ($db_modules as $module) {
-				$manifest = $module_manager->addModule($module['relative_path']);
-				$labels['modules'][$module['moduleid']] = $manifest['name'];
+			$module_manager = new CModuleManager(APP::getRootDir());
+
+			foreach ($db_modules as $db_module) {
+				$manifest = $module_manager->addModule($db_module['relative_path']);
+
+				if ($manifest !== null) {
+					$labels['modules'][$db_module['moduleid']] = $manifest['name'];
+				}
 			}
 		}
-		else {
-			$labels['modules'] = [];
-		}
+
+		natcasesort($labels['modules']);
 
 		return $labels;
 	}

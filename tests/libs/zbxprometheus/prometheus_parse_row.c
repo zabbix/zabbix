@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxexpr.h"
 #include "zbxalgo.h"
 #include "prometheus_test.h"
 

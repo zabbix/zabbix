@@ -16,16 +16,16 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-#include "selfmon.h"
-
 #include "zbxself.h"
-#include "common.h"
+
+#include "zbxcommon.h"
 
 #ifndef _WINDOWS
 #	include "zbxmutexs.h"
 #	include "zbxnix.h"
 #	include "log.h"
+#	include "zbxtime.h"
+#	include "zbxthreads.h"
 
 #	define MAX_HISTORY	60
 
@@ -46,7 +46,7 @@ typedef struct
 	/* the current process state (see ZBX_PROCESS_STATE_* defines) */
 	unsigned char	state;
 }
-zxb_stat_process_cache_t;
+zbx_stat_process_cache_t;
 
 /* process state statistics */
 typedef struct
@@ -61,7 +61,7 @@ typedef struct
 	zbx_uint64_t			counter_used[ZBX_PROCESS_STATE_COUNT];
 
 	/* the process state cache */
-	zxb_stat_process_cache_t	cache;
+	zbx_stat_process_cache_t	cache;
 }
 zbx_stat_process_t;
 
@@ -81,6 +81,7 @@ zbx_selfmon_collector_t;
 
 static zbx_selfmon_collector_t	*collector = NULL;
 static int			shm_id;
+static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
 #	define LOCK_SM		zbx_mutex_lock(sm_lock)
 #	define UNLOCK_SM	zbx_mutex_unlock(sm_lock)
@@ -88,135 +89,7 @@ static int			shm_id;
 static zbx_mutex_t	sm_lock = ZBX_MUTEX_NULL;
 #endif
 
-extern int	CONFIG_POLLER_FORKS;
-extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
-extern int	CONFIG_IPMIPOLLER_FORKS;
-extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_JAVAPOLLER_FORKS;
-extern int	CONFIG_HTTPPOLLER_FORKS;
-extern int	CONFIG_TRAPPER_FORKS;
-extern int	CONFIG_SNMPTRAPPER_FORKS;
-extern int	CONFIG_PROXYPOLLER_FORKS;
-extern int	CONFIG_ESCALATOR_FORKS;
-extern int	CONFIG_HISTSYNCER_FORKS;
-extern int	CONFIG_DISCOVERER_FORKS;
-extern int	CONFIG_ALERTER_FORKS;
-extern int	CONFIG_TIMER_FORKS;
-extern int	CONFIG_HOUSEKEEPER_FORKS;
-extern int	CONFIG_DATASENDER_FORKS;
-extern int	CONFIG_CONFSYNCER_FORKS;
-extern int	CONFIG_HEARTBEAT_FORKS;
-extern int	CONFIG_SELFMON_FORKS;
-extern int	CONFIG_VMWARE_FORKS;
-extern int	CONFIG_COLLECTOR_FORKS;
-extern int	CONFIG_PASSIVE_FORKS;
-extern int	CONFIG_ACTIVE_FORKS;
-extern int	CONFIG_TASKMANAGER_FORKS;
-extern int	CONFIG_IPMIMANAGER_FORKS;
-extern int	CONFIG_ALERTMANAGER_FORKS;
-extern int	CONFIG_PREPROCMAN_FORKS;
-extern int	CONFIG_PREPROCESSOR_FORKS;
-extern int	CONFIG_LLDMANAGER_FORKS;
-extern int	CONFIG_LLDWORKER_FORKS;
-extern int	CONFIG_ALERTDB_FORKS;
-extern int	CONFIG_HISTORYPOLLER_FORKS;
-extern int	CONFIG_AVAILMAN_FORKS;
-extern int	CONFIG_SERVICEMAN_FORKS;
-extern int	CONFIG_TRIGGERHOUSEKEEPER_FORKS;
-extern int	CONFIG_ODBCPOLLER_FORKS;
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		process_num;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Returns number of processes depending on process type             *
- *                                                                            *
- * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*              *
- *                                                                            *
- * Return value: number of processes                                          *
- *                                                                            *
- ******************************************************************************/
-int	get_process_type_forks(unsigned char proc_type)
-{
-	switch (proc_type)
-	{
-		case ZBX_PROCESS_TYPE_POLLER:
-			return CONFIG_POLLER_FORKS;
-		case ZBX_PROCESS_TYPE_UNREACHABLE:
-			return CONFIG_UNREACHABLE_POLLER_FORKS;
-		case ZBX_PROCESS_TYPE_IPMIPOLLER:
-			return CONFIG_IPMIPOLLER_FORKS;
-		case ZBX_PROCESS_TYPE_PINGER:
-			return CONFIG_PINGER_FORKS;
-		case ZBX_PROCESS_TYPE_JAVAPOLLER:
-			return CONFIG_JAVAPOLLER_FORKS;
-		case ZBX_PROCESS_TYPE_HTTPPOLLER:
-			return CONFIG_HTTPPOLLER_FORKS;
-		case ZBX_PROCESS_TYPE_TRAPPER:
-			return CONFIG_TRAPPER_FORKS;
-		case ZBX_PROCESS_TYPE_SNMPTRAPPER:
-			return CONFIG_SNMPTRAPPER_FORKS;
-		case ZBX_PROCESS_TYPE_PROXYPOLLER:
-			return CONFIG_PROXYPOLLER_FORKS;
-		case ZBX_PROCESS_TYPE_ESCALATOR:
-			return CONFIG_ESCALATOR_FORKS;
-		case ZBX_PROCESS_TYPE_HISTSYNCER:
-			return CONFIG_HISTSYNCER_FORKS;
-		case ZBX_PROCESS_TYPE_DISCOVERER:
-			return CONFIG_DISCOVERER_FORKS;
-		case ZBX_PROCESS_TYPE_ALERTER:
-			return CONFIG_ALERTER_FORKS;
-		case ZBX_PROCESS_TYPE_TIMER:
-			return CONFIG_TIMER_FORKS;
-		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
-			return CONFIG_HOUSEKEEPER_FORKS;
-		case ZBX_PROCESS_TYPE_DATASENDER:
-			return CONFIG_DATASENDER_FORKS;
-		case ZBX_PROCESS_TYPE_CONFSYNCER:
-			return CONFIG_CONFSYNCER_FORKS;
-		case ZBX_PROCESS_TYPE_HEARTBEAT:
-			return CONFIG_HEARTBEAT_FORKS;
-		case ZBX_PROCESS_TYPE_SELFMON:
-			return CONFIG_SELFMON_FORKS;
-		case ZBX_PROCESS_TYPE_VMWARE:
-			return CONFIG_VMWARE_FORKS;
-		case ZBX_PROCESS_TYPE_COLLECTOR:
-			return CONFIG_COLLECTOR_FORKS;
-		case ZBX_PROCESS_TYPE_LISTENER:
-			return CONFIG_PASSIVE_FORKS;
-		case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
-			return CONFIG_ACTIVE_FORKS;
-		case ZBX_PROCESS_TYPE_TASKMANAGER:
-			return CONFIG_TASKMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_IPMIMANAGER:
-			return CONFIG_IPMIMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_ALERTMANAGER:
-			return CONFIG_ALERTMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_PREPROCMAN:
-			return CONFIG_PREPROCMAN_FORKS;
-		case ZBX_PROCESS_TYPE_PREPROCESSOR:
-			return CONFIG_PREPROCESSOR_FORKS;
-		case ZBX_PROCESS_TYPE_LLDMANAGER:
-			return CONFIG_LLDMANAGER_FORKS;
-		case ZBX_PROCESS_TYPE_LLDWORKER:
-			return CONFIG_LLDWORKER_FORKS;
-		case ZBX_PROCESS_TYPE_ALERTSYNCER:
-			return CONFIG_ALERTDB_FORKS;
-		case ZBX_PROCESS_TYPE_HISTORYPOLLER:
-			return CONFIG_HISTORYPOLLER_FORKS;
-		case ZBX_PROCESS_TYPE_AVAILMAN:
-			return CONFIG_AVAILMAN_FORKS;
-		case ZBX_PROCESS_TYPE_SERVICEMAN:
-			return CONFIG_SERVICEMAN_FORKS;
-		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
-			return CONFIG_TRIGGERHOUSEKEEPER_FORKS;
-		case ZBX_PROCESS_TYPE_ODBCPOLLER:
-			return CONFIG_ODBCPOLLER_FORKS;
-	}
-
-	return get_component_process_type_forks(proc_type);
-}
+extern unsigned char	program_type;
 
 #ifndef _WINDOWS
 /******************************************************************************
@@ -225,7 +98,7 @@ int	get_process_type_forks(unsigned char proc_type)
  *          for self-monitoring collector                                     *
  *                                                                            *
  ******************************************************************************/
-int	init_selfmon_collector(char **error)
+int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **error)
 {
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
@@ -234,11 +107,12 @@ int	init_selfmon_collector(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	get_config_forks_cb = get_config_forks;
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
 
 	for (proc_type = 0; ZBX_PROCESS_TYPE_COUNT > proc_type; proc_type++)
-		sz_total += sz_process[proc_type] = sizeof(zbx_stat_process_t) * get_process_type_forks(proc_type);
+		sz_total += sz_process[proc_type] = sizeof(zbx_stat_process_t) * get_config_forks_cb(proc_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)sz_total);
 
@@ -274,7 +148,7 @@ int	init_selfmon_collector(char **error)
 		collector->process[proc_type] = (zbx_stat_process_t *)p; p += sz_process[proc_type];
 		memset(collector->process[proc_type], 0, sz_process[proc_type]);
 
-		process_forks = get_process_type_forks(proc_type);
+		process_forks = get_config_forks_cb(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			collector->process[proc_type][proc_num].cache.state = ZBX_PROCESS_STATE_IDLE;
@@ -293,7 +167,7 @@ out:
  * Purpose: Free memory allocated for self-monitoring collector               *
  *                                                                            *
  ******************************************************************************/
-void	free_selfmon_collector(void)
+void	zbx_free_selfmon_collector(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __func__, (void *)collector);
 
@@ -314,20 +188,21 @@ void	free_selfmon_collector(void)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
+ * Parameters: info  - [IN] caller process info                               *
+ *             state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
  ******************************************************************************/
-void	update_selfmon_counter(unsigned char state)
+void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char state)
 {
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
 	struct tms		buf;
 	int			i;
 
-	if (ZBX_PROCESS_TYPE_UNKNOWN == process_type)
+	if (ZBX_PROCESS_TYPE_UNKNOWN == info->process_type)
 		return;
 
-	process = &collector->process[process_type][process_num - 1];
+	process = &collector->process[info->process_type][info->process_num - 1];
 
 	if (-1 == (ticks = times(&buf)))
 	{
@@ -379,7 +254,7 @@ void	update_selfmon_counter(unsigned char state)
 	process->cache.ticks = ticks;
 }
 
-void	collect_selfmon_stats(void)
+static void	collect_selfmon_stats(void)
 {
 	zbx_stat_process_t	*process;
 	clock_t			ticks, ticks_done;
@@ -418,7 +293,7 @@ void	collect_selfmon_stats(void)
 
 	for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 	{
-		process_forks = get_process_type_forks(proc_type);
+		process_forks = get_config_forks_cb(proc_type);
 		for (proc_num = 0; proc_num < process_forks; proc_num++)
 		{
 			process = &collector->process[proc_type][proc_num];
@@ -458,7 +333,7 @@ out:
  * Purpose: calculate statistics for selected process                         *
  *                                                                            *
  * Parameters: proc_type    - [IN] type of process; ZBX_PROCESS_TYPE_*        *
- *             aggr_func    - [IN] one of ZBX_AGGR_FUNC_*                     *
+ *             aggr_func    - [IN] one of ZBX_SELFMON_AGGR_FUNC_*             *
  *             proc_num     - [IN] process number; 1 - first process;         *
  *                                 0 - all processes                          *
  *             state        - [IN] process state; ZBX_PROCESS_STATE_*         *
@@ -466,7 +341,7 @@ out:
  *                                  requested statistics                      *
  *                                                                            *
  ******************************************************************************/
-void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
+void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
 		double *value)
 {
 	unsigned int	total = 0, counter = 0;
@@ -475,17 +350,17 @@ void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int pro
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	process_forks = get_process_type_forks(proc_type);
+	process_forks = get_config_forks_cb(proc_type);
 
 	switch (aggr_func)
 	{
-		case ZBX_AGGR_FUNC_ONE:
+		case ZBX_SELFMON_AGGR_FUNC_ONE:
 			assert(0 < proc_num && proc_num <= process_forks);
 			process_forks = proc_num--;
 			break;
-		case ZBX_AGGR_FUNC_AVG:
-		case ZBX_AGGR_FUNC_MAX:
-		case ZBX_AGGR_FUNC_MIN:
+		case ZBX_SELFMON_AGGR_FUNC_AVG:
+		case ZBX_SELFMON_AGGR_FUNC_MAX:
+		case ZBX_SELFMON_AGGR_FUNC_MIN:
 			assert(0 == proc_num && 0 < process_forks);
 			break;
 		default:
@@ -518,19 +393,19 @@ void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int pro
 
 		switch (aggr_func)
 		{
-			case ZBX_AGGR_FUNC_ONE:
-			case ZBX_AGGR_FUNC_AVG:
+			case ZBX_SELFMON_AGGR_FUNC_ONE:
+			case ZBX_SELFMON_AGGR_FUNC_AVG:
 				total += one_total;
 				counter += one_counter;
 				break;
-			case ZBX_AGGR_FUNC_MAX:
+			case ZBX_SELFMON_AGGR_FUNC_MAX:
 				if (0 == proc_num || one_counter > counter)
 				{
 					counter = one_counter;
 					total = one_total;
 				}
 				break;
-			case ZBX_AGGR_FUNC_MIN:
+			case ZBX_SELFMON_AGGR_FUNC_MIN:
 				if (0 == proc_num || one_counter < counter)
 				{
 					counter = one_counter;
@@ -578,7 +453,7 @@ int	zbx_get_all_process_stats(zbx_process_info_t *stats)
 				total_max = 0, counter_max_busy = 0, counter_max_idle = 0,
 				total_min = 0, counter_min_busy = 0, counter_min_idle = 0;
 
-		stats[proc_type].count = get_process_type_forks(proc_type);
+		stats[proc_type].count = get_config_forks_cb(proc_type);
 
 		for (proc_num = 0; proc_num < stats[proc_type].count; proc_num++)
 		{
@@ -653,17 +528,18 @@ static int	sleep_remains;
  *                                                                            *
  * Purpose: sleeping process                                                  *
  *                                                                            *
- * Parameters: sleeptime - [IN] required sleeptime, in seconds                *
+ * Parameters: info      - [IN] caller process info                           *
+ *             sleeptime - [IN] required sleeptime, in seconds                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_sleep_loop(int sleeptime)
+void	zbx_sleep_loop(const zbx_thread_info_t *info, int sleeptime)
 {
 	if (0 >= sleeptime)
 		return;
 
 	sleep_remains = sleeptime;
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 	do
 	{
@@ -671,16 +547,41 @@ void	zbx_sleep_loop(int sleeptime)
 	}
 	while (0 < --sleep_remains);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 }
 
-void	zbx_wakeup(void)
+ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 {
-	sleep_remains = 0;
-}
+	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	const zbx_thread_info_t	*info = &thread_args->info;
+	int			process_num = info->process_num;
+	const char		*program_type_str = get_program_type_string(program_type);
+	const char		*process_type_str = get_process_type_string(info->process_type);
 
-int	zbx_sleep_get_remainder(void)
-{
-	return sleep_remains;
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",  program_type_str, info->server_num,
+			process_type_str, process_num);
+
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+	while (ZBX_IS_RUNNING())
+	{
+		double	sec = zbx_time();
+
+		zbx_update_env(get_process_type_string(info->process_type), sec);
+
+		zbx_setproctitle("%s [processing data]", process_type_str);
+
+		collect_selfmon_stats();
+		sec = zbx_time() - sec;
+
+		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]", process_type_str, sec);
+
+		zbx_sleep_loop(info, ZBX_SELFMON_DELAY);
+	}
+
+	zbx_setproctitle("%s #%d [terminated]", process_type_str, process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }
 #endif

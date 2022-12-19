@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "stats.h"
 #include "diskdevices.h"
+#include "zbxstr.h"
 
 #define ZBX_DEV_PFX	"/dev/"
 #define ZBX_DEV_READ	0
@@ -28,7 +30,7 @@
 
 static struct statinfo	*si = NULL;
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	int		i;
 	struct devstat	*ds = NULL;
@@ -112,7 +114,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if (NULL == tmp || 0 == strcmp(tmp, "all"))
 		*devname = '\0';
 	else
-		strscpy(devname, tmp);
+		zbx_strscpy(devname, tmp);
 
 	pd = devname;
 
@@ -147,7 +149,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (FAIL == get_diskstat(pd, dstats))
+		if (FAIL == zbx_get_diskstat(pd, dstats))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
@@ -189,7 +191,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	if (NULL == (device = collector_diskdevice_get(pd)))
 	{
-		if (FAIL == get_diskstat(pd, dstats))	/* validate device name */
+		if (FAIL == zbx_get_diskstat(pd, dstats))	/* validate device name */
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
@@ -210,12 +212,12 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }

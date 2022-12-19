@@ -147,14 +147,6 @@
 			color: $font-selected-color;
 		}
 	}
-
-	.sortable-dragging {
-		.sortable-item {
-			& > div {
-				@extend %cursor-dragging;
-			}
-		}
-	}
 }
 
 .dashboard-navigation-controls {
@@ -978,10 +970,6 @@
 	.msg-warning {
 		margin: 0 10px;
 	}
-
-	&.dashboard-widget-fluid {
-		margin-right: 0;
-	}
 }
 
 %dashboard-widget-td {
@@ -1058,6 +1046,24 @@
 	&.modal-popup.modal-widget-configuration {
 		max-width: 1120px;
 		min-width: 650px;
+	}
+}
+
+.dashboard-widget-form {
+	position: relative;
+
+	.form-field-show-header {
+		position: absolute;
+		right: 5px;
+	}
+
+	.table-tags {
+		tr:last-of-type {
+			td {
+				padding-bottom: 0;
+				line-height: 1.4;
+			}
+		}
 	}
 }
 

@@ -20,7 +20,7 @@
 #include "stats.h"
 
 #include "log.h"
-
+#include "zbxtime.h"
 #include "zbxmutexs.h"
 
 #ifdef _WINDOWS
@@ -34,12 +34,9 @@ extern int get_cpu_num_win32(void);
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
 #ifndef _WINDOWS
 static int		shm_id;
-int 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
+int			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
 zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
@@ -144,7 +141,8 @@ int	init_collector_data(char **error)
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 #ifdef _AIX
 	sz_cpu = ZBX_SIZE_T_ALIGN8(sz_cpu);
-	sz_cpu_phys_util = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_CPU_UTIL_PCT_AIX)) * MAX_COLLECTOR_HISTORY * (cpu_count + 1);
+	sz_cpu_phys_util = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_CPU_UTIL_PCT_AIX)) * ZBX_MAX_COLLECTOR_HISTORY *
+			(cpu_count + 1);
 #endif
 
 	if (-1 == (shm_id = zbx_shm_create(sz + sz_cpu + sz_cpu_phys_util)))
@@ -171,7 +169,7 @@ int	init_collector_data(char **error)
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 #ifdef _AIX
 	collector->cpus_phys_util.counters = (ZBX_CPU_UTIL_PCT_AIX *)((char *)collector + sz + sz_cpu);
-	collector->cpus_phys_util.row_num = MAX_COLLECTOR_HISTORY;
+	collector->cpus_phys_util.row_num = ZBX_MAX_COLLECTOR_HISTORY;
 	collector->cpus_phys_util.column_num = cpu_count + 1;	/* each CPU + total for all CPUs */
 	collector->cpus_phys_util.h_latest = 0;
 	collector->cpus_phys_util.h_count = 0;
@@ -394,11 +392,9 @@ void	diskstat_shm_extend(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-	assert(args);
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	unsigned char	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int		server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int		process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 
@@ -414,7 +410,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		zbx_setproctitle("collector [processing data]");
 #ifdef _WINDOWS

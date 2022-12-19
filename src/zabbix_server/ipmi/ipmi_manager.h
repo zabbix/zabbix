@@ -20,11 +20,18 @@
 #ifndef ZABBIX_IPMI_MANAGER_H
 #define ZABBIX_IPMI_MANAGER_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
 
 #include "zbxthreads.h"
+
+typedef struct
+{
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	int			config_timeout;
+}
+zbx_thread_ipmi_manager_args;
 
 ZBX_THREAD_ENTRY(ipmi_manager_thread, args);
 

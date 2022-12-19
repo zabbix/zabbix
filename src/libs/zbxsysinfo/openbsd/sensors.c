@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 
@@ -67,7 +68,8 @@ static void	count_sensor(int do_task, const struct sensor *sensor, double *aggr,
 	}
 }
 
-static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name, double *aggr, int *cnt)
+static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sensordev, const char *name,
+		double *aggr, int *cnt)
 {
 	if (ZBX_DO_ONE == do_task)
 	{
@@ -84,7 +86,7 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 		if (i == SENSOR_MAX_TYPES)
 			return FAIL;
 
-		if (SUCCEED != is_uint31(name + len, &mib[4]))
+		if (SUCCEED != zbx_is_uint31(name + len, &mib[4]))
 			return FAIL;
 
 		mib[3] = i;
@@ -125,7 +127,7 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 	return SUCCEED;
 }
 
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*device, *name, *function;
 	int	do_task, mib[5], dev, cnt = 0;
@@ -216,9 +218,10 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 #else
 
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"sensordev\" structure."));
+
 	return SYSINFO_RET_FAIL;
 }
 

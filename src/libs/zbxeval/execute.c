@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-#include "zbxalgo.h"
 #include "zbxeval.h"
-#include "zbxvariant.h"
-
 #include "eval.h"
+
+#include "zbxalgo.h"
+#include "zbxvariant.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
@@ -455,7 +456,7 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 		{
 			zbx_uint64_t	ui64;
 
-			if (SUCCEED == is_uint64_n(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
+			if (SUCCEED == zbx_is_uint64_n(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
 					&ui64))
 			{
 				zbx_variant_set_ui64(&value, ui64);
@@ -2029,7 +2030,7 @@ static int	eval_execute_function_char(const zbx_eval_context_t *ctx, const zbx_e
 	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_UI64, arg, error))
 		return FAIL;
 
-	if (255 < arg->data.ui64)
+	if (127 < arg->data.ui64)
 	{
 		*error = zbx_dsprintf(*error, "function argument \"%s\" is out of allowed range at \"%s\"",
 				zbx_variant_value_desc(arg), ctx->expression + token->loc.l);

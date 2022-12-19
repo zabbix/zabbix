@@ -24,7 +24,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 void	__wrap_exit(int status);
 

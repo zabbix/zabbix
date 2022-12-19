@@ -1471,6 +1471,10 @@ class CSvgGraph extends CSvg {
 			$x2 = floor($this->canvas_x + $this->canvas_width
 				- $this->canvas_width * ($this->time_till - $time_to) / $time_range);
 
+			if ($this->canvas_x > $x1) {
+				$x1 = $this->canvas_x;
+			}
+
 			// Make problem info.
 			if ($problem['r_clock'] != 0) {
 				$status_str = _('RESOLVED');
@@ -1591,9 +1595,7 @@ class CSvgGraph extends CSvg {
 				$gap_interval = floor(($clock - $prev_clock) / $threshold);
 
 				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
-					$value = ['min' => null, 'avg' => null, 'max' => null];
-
-					$missing_points[$prev_clock + $gap_interval] = $value;
+					$missing_points[$prev_clock + $gap_interval] = null;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
 					$value = ['min' => 0, 'avg' => 0, 'max' => 0];

@@ -18,12 +18,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup users
+ * @backup users, media_type
+ *
+ * @onBefore prepareMediaTypeData
+ *
+ * @dataSource LoginUsers
  */
 class testFormUserMedia extends CWebTest {
+
+	/**
+	 * Enable media types before test.
+	 */
+	public function prepareMediaTypeData() {
+		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
+				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
+		);
+
+		foreach ($mediatypeids as $mediatype) {
+			CDataHelper::call('mediatype.update', [
+				[
+					'mediatypeid' => $mediatype['mediatypeid'],
+					'status' => 0
+				]
+			]);
+		}
+	}
 
 	public function getMediaData() {
 		return [
@@ -408,7 +431,7 @@ class testFormUserMedia extends CWebTest {
 			['email' => '2@zabbix.com'],
 			['email' => '3@zabbix.com']
 		];
-		$this->page->login()->open('zabbix.php?action=user.edit&userid=5');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=50');
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
 		$user_form->selectTab('Media');
 

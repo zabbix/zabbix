@@ -20,8 +20,8 @@
 #ifndef ZABBIX_SYSINFO_COMMON_CPU_H
 #define ZABBIX_SYSINFO_COMMON_CPU_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
-int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif	/* ZABBIX_SYSINFO_COMMON_CPU_H */

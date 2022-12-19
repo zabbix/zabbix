@@ -19,6 +19,10 @@
 
 #include "prometheus_test.h"
 
+#include "zbxalgo.h"
+
+ZBX_PTR_VECTOR_IMPL(prometheus_condition_test, zbx_prometheus_condition_test_t *)
+
 static zbx_prometheus_condition_test_t	*prometheus_condition_dup(zbx_prometheus_condition_t *condition)
 {
 	zbx_prometheus_condition_test_t	*test_condition;
@@ -56,7 +60,7 @@ static zbx_prometheus_condition_test_t	*prometheus_condition_dup(zbx_prometheus_
 }
 
 int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
-		zbx_vector_ptr_t *labels, zbx_prometheus_condition_test_t **value, char **error)
+		zbx_vector_prometheus_condition_test_t *labels, zbx_prometheus_condition_test_t **value, char **error)
 {
 	zbx_prometheus_filter_t	filter;
 	int			i;
@@ -71,7 +75,7 @@ int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_
 	*value = prometheus_condition_dup(filter.value);
 
 	for (i = 0; i < filter.labels.values_num; i++)
-		zbx_vector_ptr_append(labels, prometheus_condition_dup(filter.labels.values[i]));
+		zbx_vector_prometheus_condition_test_append(labels, prometheus_condition_dup(filter.labels.values[i]));
 
 	prometheus_filter_clear(&filter);
 
@@ -104,13 +108,14 @@ int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pai
 
 	for (i = 0; i < prow->labels.values_num; i++)
 	{
-		zbx_prometheus_label_t	*label = (zbx_prometheus_label_t *)prow->labels.values[i];
+		zbx_prometheus_label_t	*label = prow->labels.values[i];
 		zbx_ptr_pair_t		pair = {label->name, label->value};
 
 		zbx_vector_ptr_pair_append_ptr(labels, &pair);
 	}
 
-	zbx_vector_ptr_clear_ext(&prow->labels, zbx_ptr_free);
+	/* free only label structure not internals - they're used */
+	zbx_vector_prometheus_label_clear_ext(&prow->labels, (zbx_prometheus_label_free_func_t)zbx_ptr_free);
 	prometheus_row_free(prow);
 
 	return SUCCEED;

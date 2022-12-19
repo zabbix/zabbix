@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
@@ -47,8 +48,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
 
-	use MacrosTrait;
-
 	/**
 	 * The name of the host for updating macros, id=99200.
 	 *
@@ -68,7 +67,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 *
 	 * @var integer
 	 */
-	protected static $host_prototoypeid_remove_inherited;
+	protected static $host_prototypeid_remove_inherited;
 
 	public $vault_object = 'host prototype';
 	public $hashi_error_field = '/1/macros/6/value';
@@ -88,7 +87,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
 		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
@@ -148,7 +148,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 				]
 		]);
 		$this->assertArrayHasKey('hostids', $response);
-		self::$host_prototoypeid_remove_inherited = $response['hostids'][0];
+		self::$host_prototypeid_remove_inherited = $response['hostids'][0];
 	}
 
 	/**
@@ -157,7 +157,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @onBeforeOnce prepareHostPrototypeRemoveMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototoypeid_remove_inherited,
+		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$host_prototypeid_remove_inherited,
 				self::IS_PROTOTYPE, self::LLD_ID);
 	}
 
@@ -284,7 +284,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',

@@ -22,8 +22,8 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
-#include "dbcache.h"
+#include "zbxcommon.h"
+#include "zbxcacheconfig.h"
 
 void	zbx_mock_test_entry(void **state)
 {

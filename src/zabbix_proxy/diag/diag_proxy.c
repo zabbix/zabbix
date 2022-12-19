@@ -20,7 +20,7 @@
 #include "zbxdiag.h"
 #include "diag_proxy.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /******************************************************************************
  *                                                                            *

@@ -20,7 +20,7 @@
 #include "zbxnix.h"
 #include "sigcommon.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 #include "fatal.h"
 #include "zbxcomms.h"

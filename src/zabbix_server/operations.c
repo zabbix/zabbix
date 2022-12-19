@@ -17,12 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxserver.h"
 #include "operations.h"
 
 #include "log.h"
 #include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
+#include "zbxnum.h"
+#include "zbxdbwrap.h"
+#include "zbx_host_constants.h"
 
 typedef enum
 {
@@ -298,12 +302,13 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and h.status in (%d,%d)"
+							" and h.flags<>%d"
 							" and h.proxy_hostid%s"
 							" and ds.dhostid=" ZBX_FS_UI64
-							" and h.flags <> %d"
 						" order by h.hostid",
 						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-						DBsql_id_cmp(proxy_hostid), dhostid, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						DBsql_id_cmp(proxy_hostid), dhostid);
 
 				if (NULL != (row2 = DBfetch(result2)))
 				{
@@ -367,7 +372,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				DBfree_result(result3);
 
 				/* for host uniqueness purposes */
-				make_hostname(host);	/* replace not-allowed symbols */
+				zbx_make_hostname(host);	/* replace not-allowed symbols */
 				host_unique = DBget_unique_hostname_by_sample(host, "host");
 				zbx_free(host);
 
@@ -421,7 +426,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				DBfree_result(result3);
 				zbx_free(sql);
 
-				make_hostname(host_visible);	/* replace not-allowed symbols */
+				zbx_make_hostname(host_visible);	/* replace not-allowed symbols */
 				zbx_free(hostname);
 				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);

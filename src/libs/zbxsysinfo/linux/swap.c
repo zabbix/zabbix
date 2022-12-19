@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-#include "log.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	char		*swapdev, *mode;
@@ -65,7 +64,8 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
-		SET_DBL_RESULT(result, 0 != info.totalswap ? 100.0 - 100.0 * (info.freeswap / (double)info.totalswap) : 0.0);
+		SET_DBL_RESULT(result, 0 != info.totalswap ? 100.0 - 100.0 * (info.freeswap / (double)info.totalswap) :
+				0.0);
 	}
 	else
 	{
@@ -94,8 +94,8 @@ swap_stat_t;
 		if (6 != sscanf(line, "%d %d %*d %*s "					\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
-				&rdev_major, 		/* major */			\
-				&rdev_minor, 		/* minor */			\
+				&rdev_major,		/* major */			\
+				&rdev_minor,		/* minor */			\
 				&result->rio,		/* rio */			\
 				&result->rsect,		/* rsect */			\
 				&result->wio,		/* wio */			\
@@ -108,8 +108,8 @@ swap_stat_t;
 		if (6 != sscanf(line, "%u %u %*s "					\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
-				&rdev_major, 		/* major */			\
-				&rdev_minor, 		/* minor */			\
+				&rdev_major,		/* major */			\
+				&rdev_minor,		/* minor */			\
 				&result->rio,		/* rio */			\
 				&result->rsect,		/* rsect */			\
 				&result->wio,		/* wio */			\
@@ -118,8 +118,8 @@ swap_stat_t;
 			if (6 != sscanf(line, "%u %u %*s "				\
 					ZBX_FS_UI64 " " ZBX_FS_UI64 " "			\
 					ZBX_FS_UI64 " " ZBX_FS_UI64,			\
-					&rdev_major, 		/* major */		\
-					&rdev_minor, 		/* minor */		\
+					&rdev_major,		/* major */		\
+					&rdev_minor,		/* minor */		\
 					&result->rio,		/* rio */		\
 					&result->rsect,		/* rsect */		\
 					&result->wio,		/* wio */		\
@@ -259,7 +259,7 @@ static int	get_swap_stat(const char *swapdev, swap_stat_t *result)
 	return ret;
 }
 
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*swapdev, *mode;
 	swap_stat_t	ss;
@@ -302,7 +302,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*swapdev, *mode;
 	swap_stat_t	ss;

@@ -18,36 +18,39 @@ noinst_PROGRAMS = $(SERVER_tests)
 
 if SERVER
 VALUECACHE_LIBS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
-	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
-	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a
+	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
@@ -72,30 +75,41 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
-	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
-	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
 	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 COMMON_WRAP_FUNCS = \
@@ -118,7 +132,7 @@ COMMON_WRAP_FUNCS = \
 zbx_vc_get_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_values.c \
-	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
+	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -127,14 +141,16 @@ zbx_vc_get_values_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
 
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_add_values.c \
-	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
+	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -143,14 +159,16 @@ zbx_vc_add_values_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_add_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
 
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_common.c \
 	zbx_vc_get_value.c \
-	@top_srcdir@/src/libs/zbxdbcache/valuecache.c \
+	@top_srcdir@/src/libs/zbxcachevalue/valuecache.c \
 	@top_srcdir@/src/libs/zbxhistory/history.c \
 	../../zbxmocktest.h
 
@@ -159,16 +177,22 @@ zbx_vc_get_value_LDFLAGS = @SERVER_LDFLAGS@ $(COMMON_WRAP_FUNCS)
 
 zbx_vc_get_value_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests
 
 dc_maintenance_match_tags_CFLAGS = \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests
 
 dc_check_maintenance_period_CFLAGS = \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests
 
 dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
@@ -187,12 +211,16 @@ is_item_processed_by_server_CFLAGS = -I@top_srcdir@/tests
 dc_item_poller_type_update_SOURCES = dc_item_poller_type_update.c
 dc_item_poller_type_update_LDADD = $(CACHE_LIBS) @SERVER_LIBS@
 dc_item_poller_type_update_LDFLAGS = @SERVER_LDFLAGS@
-dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxdbcache
+dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory -I@top_srcdir@/src/libs/zbxcachevalue
 
 dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/tests/mocks/configcache \
-	-I@top_srcdir@/src/libs/zbxdbcache
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue
+	
 dc_expand_user_macros_in_func_params_SOURCES = \
 	dc_expand_user_macros_in_func_params.c
 dc_expand_user_macros_in_func_params_LDADD = \

@@ -21,9 +21,17 @@
 #define ZABBIX_POLLER_H
 
 #include "zbxthreads.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
 
-extern int	CONFIG_TIMEOUT;
+typedef struct
+{
+	zbx_config_comms_args_t	*zbx_config_comms;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	unsigned char		poller_type;
+}
+zbx_thread_poller_args;
+
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
@@ -36,8 +44,8 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, DC_ITEM *item,  unsigned 
 		size_t *data_offset, const char *error);
 void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, unsigned char expand_macros);
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type);
+		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config_comms);
 void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results);
-void	zbx_free_result_ptr(AGENT_RESULT *result);
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 
 #endif

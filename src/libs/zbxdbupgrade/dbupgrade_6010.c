@@ -17,10 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
+
+#include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxavailability.h"
+#include "zbx_host_constants.h"
 
 extern unsigned char	program_type;
 
@@ -758,7 +761,7 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM("opgroup");
 	ADD_GROUPIDS_FROM("scripts");
 
-	/* 0 - CONDITION_TYPE_HOST_GROUP */
+	/* 0 - ZBX_CONDITION_TYPE_HOST_GROUP */
 	result = DBselect("select distinct value from conditions where conditiontype=0");
 
 	while (NULL != (row = DBfetch(result)))

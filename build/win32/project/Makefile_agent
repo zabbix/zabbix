@@ -37,12 +37,24 @@ ADD_RFLAGS = /d "ZABBIX_AGENT"
 OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
-	..\..\..\src\libs\zbxcommon\iprange.o \
+	..\..\..\src\libs\zbxip\ip.o \
+	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxnum\num.o \
+	..\..\..\src\libs\zbxstr\str.o \
+	..\..\..\src\libs\zbxcommon\common_str.o \
+	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxcommon\file.o \
-	..\..\..\src\libs\zbxcommon\time.o \
+	..\..\..\src\libs\zbxtime\time.o \
+	..\..\..\src\libs\zbxexpr\expr.o \
+	..\..\..\src\libs\zbxexpr\function.o \
+	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\macro.o \
+	..\..\..\src\libs\zbxexpr\token.o \
+	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
+	..\..\..\src\libs\zbxcommon\libc_wrappers.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
@@ -56,6 +68,7 @@ OBJS = \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
+	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
 	..\..\..\src\libs\zbxsymbols\symbols.o \
@@ -98,8 +111,9 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxsysinfo\alias\alias.o \
 	..\..\..\src\libs\zbxvariant\variant.o \
+	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
-	..\..\..\src\libs\zbxwin32\service.o \
+	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active.o \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \

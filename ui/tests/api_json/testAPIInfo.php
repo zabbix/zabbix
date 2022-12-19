@@ -26,7 +26,7 @@ class testAPIInfo extends CAPITest {
 		$error = [
 			'code' => -32602,
 			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
+			'data' => 'The "apiinfo.version" method must be called without authorization header.'
 		];
 
 		$this->call('apiinfo.version', [], $error);
@@ -36,6 +36,6 @@ class testAPIInfo extends CAPITest {
 		$this->disableAuthorization();
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('6.2.0', $result['result']);
+		$this->assertSame('6.4.0', $result['result']);
 	}
 }

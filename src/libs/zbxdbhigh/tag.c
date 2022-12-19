@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "zbxdbhigh.h"
 
@@ -53,28 +53,6 @@ void	zbx_db_tag_free(zbx_db_tag_t *tag)
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
 	zbx_free(tag);
-}
-
-int	zbx_db_tag_compare_func(const void *d1, const void *d2)
-{
-	const zbx_db_tag_t	* const tag1 = *(const zbx_db_tag_t * const *)d1;
-	const zbx_db_tag_t	* const tag2 = *(const zbx_db_tag_t * const *)d2;
-	int			ret;
-
-	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
-		return ret;
-
-	return strcmp(tag1->value, tag2->value);
-}
-
-int	zbx_db_tag_compare_func_template(const void *d1, const void *d2)
-{
-	const zbx_db_tag_t	* const it1 = *(const zbx_db_tag_t * const *)d1;
-	const zbx_db_tag_t	* const it2 = *(const zbx_db_tag_t * const *)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
-
-	return 0;
 }
 
 static void	db_tag_merge_automatic(zbx_db_tag_t *dst, zbx_db_tag_t *src)

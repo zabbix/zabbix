@@ -149,7 +149,7 @@ class CControllerLatestView extends CControllerLatest {
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		// Prepare subfilter data.
-		$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+		$subfilters_fields = self::getSubfilterFields($filter);
 		$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 		$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
@@ -200,6 +200,7 @@ class CControllerLatestView extends CControllerLatest {
 			'sort_order' => $sort_order,
 			'view_curl' => $view_url,
 			'paging' => $paging,
+			'uncheck' => $this->hasInput('filter_reset'),
 			'config' => [
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),

@@ -3,11 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor CockroachDB nodes by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `CockroacDB node by HTTP` — collects metrics by HTTP agent from Prometheus endpoint and health endpoints.
+Template `CockroachDB node by HTTP` — collects metrics by HTTP agent from Prometheus endpoint and health endpoints.
 
 
 This template was tested on:
@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal node metrics are collected from Prometheus /_status/vars endpoint.
 Node health metrics are collected from /health and /health?ready=1 endpoints.

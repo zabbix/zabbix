@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#include "zbxcommon.h"
+#include "zbxcachehistory.h"
 #include "checks_internal.h"
 
 /******************************************************************************

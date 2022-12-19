@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_AGENT_H
 #define ZABBIX_CHECKS_AGENT_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "module.h"
 
 extern char	*CONFIG_SOURCE_IP;

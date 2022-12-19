@@ -21,6 +21,7 @@
 #define ZABBIX_EVENTS_H
 
 #include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormApiTokens.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -25,6 +26,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @backup token
  *
  * @onBefore prepareTokenData
+ * @dataSource LoginUsers
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 
@@ -51,7 +53,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 			],
 			[
 				'name' => 'user-zabbix token',
-				'userid' => 5,
+				'userid' => 50,
 				'description' => 'Token that is generated for user',
 				'status' => '0',
 				'expires_at' => '1798754399'

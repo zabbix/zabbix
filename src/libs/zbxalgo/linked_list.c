@@ -19,7 +19,7 @@
 
 #include "zbxalgo.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /******************************************************************************
  *                                                                            *
@@ -334,7 +334,6 @@ void	zbx_list_iterator_update(zbx_list_iterator_t *iterator)
 	if (NULL != iterator->current)
 		iterator->next = iterator->current->next;
 }
-
 
 /******************************************************************************
  *                                                                            *

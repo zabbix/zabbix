@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxvariant.h"
 
 #include "item_preproc_test.h"

@@ -37,6 +37,7 @@ require_once dirname(__FILE__).'/testItem.php';
 require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
+require_once dirname(__FILE__).'/testRole.php';
 require_once dirname(__FILE__).'/testServices.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testTemplate.php';
@@ -47,6 +48,7 @@ require_once dirname(__FILE__).'/testTriggerValidation.php';
 require_once dirname(__FILE__).'/testTaskCreate.php';
 require_once dirname(__FILE__).'/testTagFiltering.php';
 require_once dirname(__FILE__).'/testToken.php';
+require_once dirname(__FILE__).'/testUserDirectory.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
@@ -54,8 +56,21 @@ require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
-require_once dirname(__FILE__).'/testDependentItems.php';
+// require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
+require_once dirname(__FILE__).'/testAuditlogAction.php';
+require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
+require_once dirname(__FILE__).'/testAuditlogDashboard.php';
+require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
+require_once dirname(__FILE__).'/testAuditlogIconMap.php';
+require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
+require_once dirname(__FILE__).'/testAuditlogMediaType.php';
+require_once dirname(__FILE__).'/testAuditlogProxy.php';
+require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
+require_once dirname(__FILE__).'/testAuditlogSettings.php';
+require_once dirname(__FILE__).'/testAuditlogToken.php';
+require_once dirname(__FILE__).'/testAuditlogUser.php';
+require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -67,7 +82,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testConfiguration');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fixed later
+		// $suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');
@@ -82,6 +97,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testItemPrototype');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
+		$suite->addTestSuite('testRole');
 		$suite->addTestSuite('testServices');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testTemplate');
@@ -92,6 +108,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testTaskCreate');
 		$suite->addTestSuite('testTagFiltering');
 		$suite->addTestSuite('testToken');
+		$suite->addTestSuite('testUserDirectory');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
 		$suite->addTestSuite('testUsers');
@@ -100,6 +117,19 @@ class ApiJsonTests {
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testAuthentication');
+		$suite->addTestSuite('testAuditlogAction');
+		$suite->addTestSuite('testAuditlogAutoregistration');
+		$suite->addTestSuite('testAuditlogDashboard');
+		$suite->addTestSuite('testAuditlogEventCorrelation');
+		$suite->addTestSuite('testAuditlogIconMap');
+		$suite->addTestSuite('testAuditlogMaintenance');
+		$suite->addTestSuite('testAuditlogMediaType');
+		$suite->addTestSuite('testAuditlogProxy');
+		$suite->addTestSuite('testAuditlogScheduledReport');
+		$suite->addTestSuite('testAuditlogSettings');
+		$suite->addTestSuite('testAuditlogToken');
+		$suite->addTestSuite('testAuditlogUser');
+		$suite->addTestSuite('testAuditlogUserGroups');
 
 		return $suite;
 	}

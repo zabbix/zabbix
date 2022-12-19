@@ -20,9 +20,11 @@
 #ifndef ZABBIX_IPMI_PROTOCOL_H
 #define ZABBIX_IPMI_PROTOCOL_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
+
+#include "zbxtime.h"
 
 #define ZBX_IPC_SERVICE_IPMI	"ipmi"
 

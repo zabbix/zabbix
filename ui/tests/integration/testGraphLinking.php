@@ -225,12 +225,16 @@ class testGraphLinking extends CIntegrationTest {
 	}
 
 	public function checkGraphsCreate() {
-		$response = $this->call('host.get', ['filter' => ['host' => self::HOST_NAME]]);
+		$response = $this->callUntilDataIsPresent('host.get', ['filter' => ['host' => self::HOST_NAME]], 10, 1);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('host', $response['result'][0]);
 		$hostid = $response['result'][0]['hostid'];
 
-		$response = $this->call('item.get', ['hostids' => $hostid,'search' => ['key_' => self::ITEM_KEY_PRE]]);
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'hostids' => $hostid,
+			'search' => ['key_' => self::ITEM_KEY_PRE]
+		], 10, 1);
+
 		$this->assertArrayHasKey(0, $response['result']);
 		$item_data = $response['result'];
 
@@ -240,7 +244,7 @@ class testGraphLinking extends CIntegrationTest {
 		}
 		sort($itemids);
 
-		$response = $this->call('graph.get', [
+		$response = $this->callUntilDataIsPresent('graph.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME
@@ -266,8 +270,7 @@ class testGraphLinking extends CIntegrationTest {
 			],
 			'selectFunctions' => 'extend',
 			'sortfield' => 'name'
-		]
-		);
+		], 10, 2);
 
 		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_GRAPHS_PER_TEMPLATE,
 				count($response['result']));
@@ -315,7 +318,6 @@ class testGraphLinking extends CIntegrationTest {
 	public function testGraphLinking_checkGraphsCreate() {
 		$this->reloadConfigurationCache();
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkGraphsCreate();
 	}
 }

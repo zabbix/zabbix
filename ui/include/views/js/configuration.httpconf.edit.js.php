@@ -42,7 +42,10 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addStyle('top: 0px;')
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
@@ -209,7 +212,7 @@
 	});
 
 	/**
-	 * Implementation of jQuery.val for radio buttons. Use this methon within scoped jQuery object;
+	 * Implementation of jQuery.val for radio buttons. Use this method within scoped jQuery object;
 	 * Use with jQuery collection of input nodes.
 	 *
 	 * @param {string} value  Check button by value. Read value if no param is given.

@@ -19,9 +19,10 @@
 
 #include "zbxdiscovery.h"
 
-#include "common.h"
 #include "log.h"
 #include "../../zabbix_server/events.h"
+#include "zbxtime.h"
+#include "zbxnum.h"
 
 typedef struct
 {

@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+
 /**
  * Class calculates graph data and makes SVG graph.
  */
@@ -59,7 +61,7 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -109,7 +111,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -134,7 +136,7 @@ class CSvgGraphHelper {
 
 			if ($hosts) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
@@ -179,7 +181,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
@@ -192,7 +194,7 @@ class CSvgGraphHelper {
 			}
 
 			$items_db = API::Item()->get([
-				'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
 				'filter' => [
@@ -527,7 +529,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -541,7 +543,9 @@ class CSvgGraphHelper {
 				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 			}
 			else {
-				$name = 'Dataset #'.($dataset_num + 1);
+				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
+					? $data_sets[$dataset_num]['data_set_label']
+					: _('Data set').' #'.($dataset_num + 1);
 			}
 
 			$item = [
@@ -557,8 +561,14 @@ class CSvgGraphHelper {
 					'points' => []
 				]);
 
-				$metric['options']['aggregate_interval'] =
-					(int) timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+				$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+
+				if ($aggregate_interval === null || $aggregate_interval < 1
+						|| $aggregate_interval > ZBX_MAX_TIMESHIFT) {
+					continue;
+				}
+
+				$metric['options']['aggregate_interval'] = (int) $aggregate_interval;
 
 				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
 					$dataset_metrics[$dataset_num] = $metric_num;
@@ -578,6 +588,10 @@ class CSvgGraphHelper {
 				continue;
 			}
 
+			if (!$metric['items']) {
+				continue;
+			}
+
 			$result = Manager::History()->getAggregationByInterval(
 				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
@@ -585,13 +599,30 @@ class CSvgGraphHelper {
 
 			if ($result) {
 				$metric_points = [];
+
+				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
+				$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
+					? ceil($period / $width)
+					: 0;
+
 				foreach ($result as $points) {
+					$tick = 0;
+
+					usort($points['data'],
+						static function (array $point_a, array $point_b): int {
+							return $point_a['clock'] <=> $point_b['clock'];
+						}
+					);
+
 					foreach ($points['data'] as $point) {
+						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
+							$tick = $point['tick'];
+						}
 						if (array_key_exists('count', $point)) {
-							$metric_points[$point['tick']]['value'][] = $point['count'];
+							$metric_points[$tick]['value'][] = $point['count'];
 						}
 						if (array_key_exists('value', $point)) {
-							$metric_points[$point['tick']]['value'][] = $point['value'];
+							$metric_points[$tick]['value'][] = $point['value'];
 						}
 					}
 				}
@@ -723,7 +754,7 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
-		if ($problem_options['show_problems'] != SVG_GRAPH_PROBLEMS_SHOW) {
+		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 

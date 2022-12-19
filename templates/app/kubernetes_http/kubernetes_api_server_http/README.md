@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The template to monitor InfluxDB by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Internal service metrics are collected from /metrics endpoint.
 Template needs to use Authorization via API token.
@@ -101,7 +101,7 @@ There are no template links in this template.
 |Kubernetes API |Kubernetes API: ["{#NAME}"] Workqueue depth |<p>Current depth of workqueue.</p> |DEPENDENT |kubernetes.api.workqueue_depth["{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `workqueue_depth{name = "{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes API |Kubernetes API: ["{#NAME}"] Workqueue adds total, rate |<p>Total number of adds handled by workqueue per second.</p> |DEPENDENT |kubernetes.api.workqueue_adds_total.rate["{#NAME}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `workqueue_adds_total{name = "{#NAME}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Kubernetes API |Kubernetes API: Certificate expiration seconds bucket, {#LE} |<p>Distribution of the remaining lifetime on the certificate used to authenticate a request.</p> |DEPENDENT |kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `apiserver_client_certificate_expiration_seconds_bucket{le = "{#LE}"}`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes API |Kubernetes API: Client certificate expiration, p1 |<p>1 percentile of of the remaining lifetime on the certificate used to authenticate a request.</p> |CALCULATED |kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]<p>**Expression**:</p>`bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)` |
+|Kubernetes API |Kubernetes API: Client certificate expiration, p1 |<p>1 percentile of the remaining lifetime on the certificate used to authenticate a request.</p> |CALCULATED |kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]<p>**Expression**:</p>`bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)` |
 |Zabbix raw items |Kubernetes API: Get API instance metrics |<p>Get raw metrics from API instance /metrics endpoint.</p> |HTTP_AGENT |kubernetes.api.get_metrics<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ## Triggers

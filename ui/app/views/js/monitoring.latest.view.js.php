@@ -71,24 +71,20 @@
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
 					this.active_filter = this.filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
-				}
-			});
-
-			document.addEventListener('click', (event) => {
-				if (event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
-					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
 				}
 			});
 
 			// Tags must be activated also using the enter button on keyboard.
 			document.addEventListener('keydown', (event) => {
 				if (event.which == 13 && event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
-					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+					view.setSubfilter([`subfilter_tags[${encodeURIComponent(event.target.dataset.key)}][]`,
+						event.target.dataset.value
+					]);
 				}
 			});
 		},
@@ -218,7 +214,9 @@
 					return post_data;
 				}, {});
 
-			post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+			if (this.filter) {
+				post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+			}
 
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,

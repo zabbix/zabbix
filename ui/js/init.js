@@ -105,9 +105,9 @@ jQuery(function($) {
 		var $this = $(this);
 
 		uncheckedHandler($this);
-		$this.on('change enable disable', function() {
-			uncheckedHandler($(this));
-		});
+		$this.on('change enable disable', function () {
+			uncheckedHandler($(this))
+		})
 	});
 
 	function showMenuPopup($obj, data, event, options) {
@@ -154,12 +154,8 @@ jQuery(function($) {
 				sections = getMenuPopupItem(data);
 				break;
 
-			case 'item_configuration':
-				sections = getMenuPopupItemConfiguration(data);
-				break;
-
-			case 'item_prototype_configuration':
-				sections = getMenuPopupItemPrototypeConfiguration(data);
+			case 'item_prototype':
+				sections = getMenuPopupItemPrototype(data);
 				break;
 
 			case 'dropdown':
@@ -211,7 +207,6 @@ jQuery(function($) {
 			case 'dashboard':
 			case 'dropdown':
 			case 'submenu':
-			case 'widget_actions':
 				return false;
 
 			default:

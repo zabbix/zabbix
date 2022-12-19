@@ -18,12 +18,13 @@
 **/
 
 #include "audit/zbxaudit_trigger.h"
-
 #include "audit/zbxaudit.h"
+#include "audit.h"
+
 #include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
-#include "audit.h"
+#include "zbxnum.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {
@@ -81,9 +82,9 @@ void	zbx_audit_trigger_create_entry(int audit_action, zbx_uint64_t triggerid, co
 
 void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t templateid,
 		unsigned char recovery_mode, unsigned char status, unsigned char type, zbx_uint64_t value,
-		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url, int flags,
-		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
-		const char *opdata, unsigned char discover, const char *event_name)
+		zbx_uint64_t state, unsigned char priority, const char *comments, const char *url,
+		const char *url_name, int flags, unsigned char correlation_mode, const char *correlation_tag,
+		unsigned char manual_close, const char *opdata, unsigned char discover, const char *event_name)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_event_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_opdata[AUDIT_DETAILS_KEY_LEN], audit_key_comments[AUDIT_DETAILS_KEY_LEN],
@@ -93,7 +94,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 		audit_key_url[AUDIT_DETAILS_KEY_LEN], audit_key_value[AUDIT_DETAILS_KEY_LEN],
 		audit_key_recovery_mode[AUDIT_DETAILS_KEY_LEN], audit_key_correlation_mode[AUDIT_DETAILS_KEY_LEN],
 		audit_key_correlation_tag[AUDIT_DETAILS_KEY_LEN], audit_key_manual_close[AUDIT_DETAILS_KEY_LEN],
-		audit_key_discover[AUDIT_DETAILS_KEY_LEN];
+		audit_key_discover[AUDIT_DETAILS_KEY_LEN], audit_key_url_name[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF();
@@ -113,6 +114,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	AUDIT_KEY_SNPRINTF(templateid)
 	AUDIT_KEY_SNPRINTF(type)
 	AUDIT_KEY_SNPRINTF(url)
+	AUDIT_KEY_SNPRINTF(url_name)
 	AUDIT_KEY_SNPRINTF(value)
 	AUDIT_KEY_SNPRINTF(recovery_mode)
 	AUDIT_KEY_SNPRINTF(correlation_mode)
@@ -139,6 +141,7 @@ void	zbx_audit_trigger_update_json_add_data(zbx_uint64_t triggerid, zbx_uint64_t
 	ADD_UINT64(templateid, AUDIT_TABLE_NAME, "templateid")
 	ADD_INT(type, AUDIT_TABLE_NAME, "type")
 	ADD_STR(url, AUDIT_TABLE_NAME, "url")
+	ADD_STR(url_name, AUDIT_TABLE_NAME, "url_name")
 	ADD_UINT64(value, AUDIT_TABLE_NAME, "value")
 	ADD_INT(recovery_mode, AUDIT_TABLE_NAME, "recovery_mode")
 	ADD_INT(correlation_mode, AUDIT_TABLE_NAME, "correlation_mode")
@@ -208,6 +211,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(event_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(priority, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(comments, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(url, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE(url_name, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(type, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(status, int, int)
 PREPARE_AUDIT_TRIGGER_UPDATE(templateid, zbx_uint64_t, uint64)
@@ -215,7 +219,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE(description, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(expression, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 
-#undef PREPARE_AUDIT_ITEM_UPDATE
+#undef PREPARE_AUDIT_TRIGGER_UPDATE
 #undef TR_OR_TRP
 
 /******************************************************************************
@@ -404,3 +408,4 @@ void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(zbx_uint64_t 
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
 }
+#undef TRIGGER_RESOURCE_KEY_RESOLVE_TAG

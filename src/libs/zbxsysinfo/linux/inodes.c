@@ -18,25 +18,8 @@
 **/
 
 #include "inodes.h"
-
-#include "common.h"
-#include "sysinfo.h"
-#include "log.h"
-
-#define get_string(field)	#field
-
-#define validate(error, structure, field)								\
-													\
-do													\
-{													\
-	if (__UINT64_C(0xffffffffffffffff) == structure.field)						\
-	{												\
-		error =  zbx_strdup(NULL, "Cannot obtain filesystem information: value of " 		\
-				get_string(field) " is unknown.");					\
-		return SYSINFO_RET_FAIL;								\
-	}												\
-}													\
-while(0)
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
 		double *pused, const char *mode, char **error)
@@ -48,6 +31,20 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 #	define ZBX_STATFS	statfs
 #	define ZBX_FFREE	f_ffree
 #endif
+
+#define get_string(field)	#field
+#define validate(error, structure, field)								\
+													\
+do													\
+{													\
+	if (__UINT64_C(0xffffffffffffffff) == structure.field)						\
+	{												\
+		error =  zbx_strdup(NULL, "Cannot obtain filesystem information: value of "		\
+				get_string(field) " is unknown.");					\
+		return SYSINFO_RET_FAIL;								\
+	}												\
+}													\
+while(0)
 	zbx_uint64_t		total;
 	struct ZBX_STATFS	s;
 
@@ -78,17 +75,22 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 	}
 	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-		return SYSINFO_RET_FAIL;
+		*pfree = 100.0;
+		*pused = 0.0;
 	}
+
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_FFREE
+#undef validate
+#undef get_string
 }
 
-static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_inode_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
-	zbx_uint64_t 		total, free, used;
-	double 			pfree, pused;
+	zbx_uint64_t		total, free, used;
+	double			pfree, pused;
 
 	if (2 < request->nparam)
 	{
@@ -140,7 +142,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_inode, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_inode_local, request, result);
 }

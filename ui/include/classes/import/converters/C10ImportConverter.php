@@ -324,22 +324,21 @@ class C10ImportConverter extends CConverter {
 		// map items to new interfaces
 		if (isset($host['items']) && $host['items']) {
 			foreach ($host['items'] as &$item) {
-				if (!isset($item['type'])) {
+				if (!array_key_exists('type', $item)) {
 					continue;
 				}
 
 				// 1.8 till 4.4 uses the old item types.
-				if ($item['type'] == ITEM_TYPE_SNMPV1 || $item['type'] == ITEM_TYPE_SNMPV2C
-						|| $item['type'] == ITEM_TYPE_SNMPV3) {
-					$interfaceType = INTERFACE_TYPE_SNMP;
+				if (in_array($item['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
+					$interface_type = INTERFACE_TYPE_SNMP;
 				}
 				else {
-					$interfaceType = itemTypeInterface($item['type']);
+					$interface_type = itemTypeInterface($item['type']);
 				}
 
-				switch ($interfaceType) {
+				switch ($interface_type) {
 					case INTERFACE_TYPE_AGENT:
-					case INTERFACE_TYPE_ANY:
+					case INTERFACE_TYPE_OPT:
 						$item['interface_ref'] = $agentInterface['interface_ref'];
 						break;
 

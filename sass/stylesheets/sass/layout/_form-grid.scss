@@ -1,6 +1,5 @@
 .form-grid {
 	display: grid;
-	padding: 5px;
 	row-gap: 10px;
 	column-gap: 10px;
 
@@ -12,15 +11,30 @@
 		grid-template-columns: max-content auto;
 	}
 
+	.fields-group {
+		grid-column: 2 / -1;
+		padding: 5px;
+		border: 1px solid $form-fields-group-border-color;
+	}
+
 	> label {
 		line-height: 24px;
 		text-align: right;
 		word-wrap: break-word;
+
+		&.fields-group-label {
+			padding-top: 5px;
+		}
+
+		.icon-help-hint,
+		.icon-info {
+			margin-left: 5px;
+		}
 	}
 
-	.form-actions,
-	.form-field,
-	.field-fluid {
+	> .form-field,
+	> .field-fluid,
+	.form-actions {
 		grid-column: 2 / -1;
 		text-align: left;
 		line-height: 24px;
@@ -56,6 +70,12 @@
 
 			&.table-initial-width {
 				width: auto;
+			}
+
+			.sortable td {
+				padding-bottom: 0;
+				vertical-align: middle;
+				line-height: 24px;
 			}
 		}
 

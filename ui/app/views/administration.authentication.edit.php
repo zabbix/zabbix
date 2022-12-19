@@ -26,72 +26,106 @@
 
 $this->includeJsFile('administration.authentication.edit.js.php');
 
-// Authentication general, HTTP authentication and password policy fields.
-$auth_tab = (new CFormList('list_auth'))
-	->addRow(new CLabel(_('Default authentication'), 'authentication_type'),
-		(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
-			->setAttribute('autofocus', 'autofocus')
-			->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
-			->addValue(_('LDAP'), ZBX_AUTH_LDAP)
-			->setModern(true)
-			->removeId()
+$form = (new CForm())
+	->addVar('action', $data['action_submit'])
+	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->setId('authentication-form')
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->disablePasswordAutofill();
+
+// Authentication general fields.
+$auth_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Default authentication')),
+		new CFormField(
+			(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
+				->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
+				->addValue(_('LDAP'), ZBX_AUTH_LDAP)
+				->setModern(true)
+				->removeId()
+		)
+	])
+	->addItem([
+		new CLabel([
+			_('Deprovisioned users group'),
+			makeHelpIcon(_('Only disabled group can be set for deprovisioned users.'))
+		]),
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'disabled_usrgrpid',
+				'object_name' => 'usersGroups',
+				'data' => $data['disabled_usrgrpid_ms'],
+				'multiple' => false,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getId(),
+						'dstfld1' => 'disabled_usrgrpid',
+						'group_status' => GROUP_STATUS_DISABLED
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+		)
+	])
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('Password policy')))->addClass('input-section-header')
+		)
 	)
-	->addRow((new CTag('h4', true, _('Password policy')))->addClass('input-section-header'))
-	->addRow(new CLabel(_('Minimum password length'), 'passwd_min_length'),
-		(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false, false))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	)
-	->addRow(
-		new CLabel([_('Password must contain'),
+	->addItem([
+		new CLabel(_('Minimum password length'), 'passwd_min_length'),
+		new CFormField(
+			(new CNumericBox('passwd_min_length', $data['passwd_min_length'], 2, false, false, false))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		new CLabel([
+			_('Password must contain'),
 			makeHelpIcon([
 				_('Password requirements:'),
-				(new CList(
-					[
-						new CListItem([
-							_('must contain at least one lowercase and one uppercase Latin letter'),
-							' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
-							(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
-						]),
-						new CListItem([
-							_('must contain at least one digit'),
-							' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
-						]),
-						new CListItem([
-							_('must contain at least one special character'),
-							' (', (new CSpan(
-								' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT
-							), ')'
-						])
-					]
-				))->addClass(ZBX_STYLE_LIST_DASHED)
+				(new CList([
+					new CListItem([
+						_('must contain at least one lowercase and one uppercase Latin letter'),
+						' (', (new CSpan('A-Z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ', ',
+						(new CSpan('a-z'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+					]),
+					new CListItem([
+						_('must contain at least one digit'),
+						' (', (new CSpan('0-9'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+					]),
+					new CListItem([
+						_('must contain at least one special character'),
+						' (', (new CSpan(' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
+					])
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 		]),
-		(new CList())
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem(
+		new CFormField(
+			(new CList([
 				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_CASE))
 					->setLabel(_('an uppercase and a lowercase Latin letter'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE)
 					->setUncheckedValue(0x00)
-					->setId('passwd_check_rules_case')
-			)
-			->addItem(
+					->setId('passwd_check_rules_case'),
 				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_DIGITS))
 					->setLabel(_('a digit'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
 					->setUncheckedValue(0x00)
-					->setId('passwd_check_rules_digits')
-			)
-			->addItem(
+					->setId('passwd_check_rules_digits'),
 				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SPECIAL))
 					->setLabel(_('a special character'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
 					->setUncheckedValue(0x00)
 					->setId('passwd_check_rules_special')
-			)
-	)
-	->addRow(
-		new CLabel([_('Avoid easy-to-guess passwords'),
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+		)
+	])
+	->addItem([
+		new CLabel([
+			_('Avoid easy-to-guess passwords'),
 			makeHelpIcon([
 				_('Password requirements:'),
 				(new CList([
@@ -100,220 +134,527 @@ $auth_tab = (new CFormList('list_auth'))
 				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 		], 'passwd_check_rules_simple'),
-		(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SIMPLE))
-			->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SIMPLE) == PASSWD_CHECK_SIMPLE)
-			->setUncheckedValue(0x00)
-			->setId('passwd_check_rules_simple')
-	);
+		new CFormField(
+			(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SIMPLE))
+				->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SIMPLE) == PASSWD_CHECK_SIMPLE)
+				->setUncheckedValue(0x00)
+				->setId('passwd_check_rules_simple')
+		)
+	]);
 
 // HTTP authentication fields.
-$http_tab = (new CFormList('list_http'))
-	->addRow(new CLabel(_('Enable HTTP authentication'), 'http_auth_enabled'),
-		(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
-			->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-			->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
-	)
-	->addRow(new CLabel(_('Default login form'), 'label-http-login-form'),
-		(new CSelect('http_login_form'))
-			->setFocusableElementId('label-http-login-form')
-			->setValue($data['http_login_form'])
-			->addOptions(CSelect::createOptionsFromArray([
-				ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
-				ZBX_AUTH_FORM_HTTP => _('HTTP login form')
-			]))
-			->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
-	)
-	->addRow(new CLabel(_('Remove domain name'), 'http_strip_domains'),
-		(new CTextBox('http_strip_domains', $data['http_strip_domains']))
-			->setEnabled($data['http_auth_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
-		(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-			->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-			->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
-			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-	);
+$http_tab = (new CFormGrid())
+	->addItem([
+		new CLabel([_('Enable HTTP authentication'),
+			makeHelpIcon(
+				_("If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix.")
+			)
+		], 'http_auth_enabled'),
+		new CFormField(
+			(new CCheckBox('http_auth_enabled', ZBX_AUTH_HTTP_ENABLED))
+				->setChecked($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_HTTP_DISABLED)
+		)
+	])
+	->addItem([
+		new CLabel(_('Default login form'), 'label-http-login-form'),
+		new CFormField(
+			(new CSelect('http_login_form'))
+				->setFocusableElementId('label-http-login-form')
+				->setValue($data['http_login_form'])
+				->addOptions(CSelect::createOptionsFromArray([
+					ZBX_AUTH_FORM_ZABBIX => _('Zabbix login form'),
+					ZBX_AUTH_FORM_HTTP => _('HTTP login form')
+				]))
+				->setDisabled($data['http_auth_enabled'] != ZBX_AUTH_HTTP_ENABLED)
+		)
+	])
+	->addItem([
+		new CLabel(_('Remove domain name'), 'http_strip_domains'),
+		new CFormField(
+			(new CTextBox('http_strip_domains', $data['http_strip_domains'], false,
+				DB::getFieldLength('config', 'http_strip_domains')
+			))
+				->setEnabled($data['http_auth_enabled'])
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		new CLabel(_('Case-sensitive login'), 'http_case_sensitive'),
+		new CFormField(
+			(new CCheckBox('http_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+				->setChecked($data['http_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+				->setEnabled($data['http_auth_enabled'] == ZBX_AUTH_HTTP_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+		)
+	]);
 
-$ldap_tab = (new CFormList('list_ldap'))
-	->addRow(new CLabel(_('Enable LDAP authentication'), 'ldap_configured'),
-		$data['ldap_error']
+// LDAP authentication fields.
+$ldap_auth_enabled = $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
+$form->addVar('ldap_default_row_index', $data['ldap_default_row_index']);
+$ldap_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable LDAP authentication'), 'ldap_auth_enabled'),
+		new CFormField($data['ldap_error']
 			? (new CLabel($data['ldap_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('ldap_configured', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($data['ldap_configured'] == ZBX_AUTH_LDAP_ENABLED)
+			: (new CCheckBox('ldap_auth_enabled', ZBX_AUTH_LDAP_ENABLED))
+				->setChecked($ldap_auth_enabled)
 				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
-	)
-	->addRow((new CLabel(_('Servers')))->setAsteriskMark(),
-		(new CDiv(
-			(new CTable())
-				->setId('ldap-servers')
-				->setHeader(
-					(new CRowHeader([
-						(new CColHeader(_('Name')))->addStyle('width: 40%'),
-						(new CColHeader(_('Host')))->addStyle('width: 40%'),
-						(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
-						_('Default'),
-						''
-					]))->addClass(ZBX_STYLE_GREY)
-				)
-				->addItem(
-					(new CTag('tfoot', true))
-						->addItem(
+		)
+	])
+	->addItem([
+		new CLabel(_('Enable JIT provisioning'), 'ldap_jit_status'),
+		new CFormField(
+			(new CCheckBox('ldap_jit_status', JIT_PROVISIONING_ENABLED))
+				->setChecked($data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
+				->setReadonly(!$ldap_auth_enabled)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Servers')))->setAsteriskMark(),
+		new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('ldap-servers')
+					->addClass($ldap_auth_enabled ? null : ZBX_STYLE_DISABLED)
+					->setHeader(
+						(new CRowHeader([
+							new CColHeader(_('Name')),
+							new CColHeader(_('Host')),
+							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
+							_('Default'),
+							''
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								(new CCol(
+									(new CSimpleButton(_('Add')))
+										->addClass(ZBX_STYLE_BTN_LINK)
+										->addClass('js-add')
+								))->setColSpan(5)
+							)
+					)->addStyle('width: 100%;')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
+	])
+	->addItem([
+		new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
+		new CFormField(
+			(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
+				->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+				->setReadonly(!$ldap_auth_enabled)
+		)
+	])
+	->addItem([
+		new CLabel(_('Provisioning period'), 'jit_provision_interval'),
+		new CFormField(
+			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
+				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
+				->setReadonly(!$ldap_auth_enabled || $data['ldap_jit_status'] == JIT_PROVISIONING_DISABLED)
+		)
+	]);
+
+// SAML authentication fields.
+$view_url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'authentication.edit')
+	->getUrl();
+$saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
+$saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
+$saml_tab = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
+		new CFormField($data['saml_error']
+			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
+			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+				->setChecked($saml_auth_enabled)
+				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
+		)
+	])
+	->addItem([
+		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
+		new CFormField(
+			(new CCheckBox('saml_jit_status', JIT_PROVISIONING_ENABLED))
+				->setChecked($data['saml_jit_status'] == JIT_PROVISIONING_ENABLED)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
+				->setReadonly(!$saml_auth_enabled)
+				->addClass('saml-enabled')
+		)
+	])
+	->addItem([
+		(new CLabel(_('IdP entity ID'), 'idp_entityid'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('idp_entityid', $data['idp_entityid'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'idp_entityid')
+			))
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SSO service URL'), 'sso_url'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('sso_url', $data['sso_url'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'sso_url'))
+			)
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		new CLabel(_('SLO service URL'), 'slo_url'),
+		new CFormField(
+			(new CTextBox('slo_url', $data['slo_url'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'slo_url'))
+			)
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Username attribute'), 'username_attribute'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('username_attribute', $data['username_attribute'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'username_attribute')
+			))
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SP entity ID'), 'sp_entityid'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('sp_entityid', $data['sp_entityid'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'sp_entityid')
+			))
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		new CLabel(_('SP name ID format'), 'nameid_format'),
+		new CFormField(
+			(new CTextBox('nameid_format', $data['nameid_format'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'nameid_format')
+			))
+				->addClass('saml-enabled')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
+		)
+	])
+	->addItem([
+		new CLabel(_('Sign')),
+		new CFormField(
+			(new CList([
+				(new CCheckBox('sign_messages'))
+					->setLabel(_('Messages'))
+					->setChecked($data['sign_messages'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_assertions'))
+					->setLabel(_('Assertions'))
+					->setChecked($data['sign_assertions'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_authn_requests'))
+					->setLabel(_('AuthN requests'))
+					->setChecked($data['sign_authn_requests'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_logout_requests'))
+					->setLabel(_('Logout requests'))
+					->setChecked($data['sign_logout_requests'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled'),
+				(new CCheckBox('sign_logout_responses'))
+					->setLabel(_('Logout responses'))
+					->setChecked($data['sign_logout_responses'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled')
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+		)
+	])
+	->addItem([
+		new CLabel(_('Encrypt')),
+		new CFormField(
+			(new CList([
+				(new CCheckBox('encrypt_nameid'))
+					->setLabel(_('Name ID'))
+					->setChecked($data['encrypt_nameid'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled'),
+				(new CCheckBox('encrypt_assertions'))
+					->setLabel(_('Assertions'))
+					->setChecked($data['encrypt_assertions'] == 1)
+					->setUncheckedValue(0)
+					->setReadonly(!$saml_auth_enabled)
+					->addClass('saml-enabled')
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+		)
+	])
+	->addItem([
+		new CLabel(_('Case-sensitive login'), 'saml_case_sensitive'),
+		new CFormField(
+			(new CCheckBox('saml_case_sensitive'))
+				->setChecked($data['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
+				->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
+				->setReadonly(!$saml_auth_enabled)
+				->addClass('saml-enabled')
+		)
+	])
+	->addItem([
+		new CLabel(_('Configure JIT provisioning'), 'saml_provision_status'),
+		new CFormField(
+			(new CCheckBox('saml_provision_status'))
+				->setChecked($saml_provisioning)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
+				->setReadonly(!$saml_auth_enabled)
+				->addClass('saml-enabled')
+		)
+	])
+	->addItem([
+		(new CLabel(_('Group name attribute'), 'saml_group_name'))
+			->setAsteriskMark()
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status'),
+		(new CFormField(
+			(new CTextBox('saml_group_name', $data['saml_group_name'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'group_name')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->addClass('saml-enabled')
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	])
+	->addItem([
+		(new CLabel(_('User name attribute'), 'saml_user_username'))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status'),
+		(new CFormField(
+			(new CTextBox('saml_user_username', $data['saml_user_username'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'user_username')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('saml-enabled')
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	])
+	->addItem([
+		(new CLabel(_('User last name attribute'), 'saml_user_lastname'))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status'),
+		(new CFormField(
+			(new CTextBox('saml_user_lastname', $data['saml_user_lastname'], !$saml_auth_enabled,
+				DB::getFieldLength('userdirectory_saml', 'user_lastname')
+			))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->addClass('saml-enabled')
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	])
+	->addItem([
+		(new CLabel(_('User group mapping')))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('saml-group-table')
+					->setAttribute('style', 'width: 100%;')
+					->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
+					->setHeader(
+						(new CRowHeader([
+							_('SAML group pattern'), _('User groups'), _('User role'), _('Action')
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))->addItem(
 							(new CCol(
 								(new CSimpleButton(_('Add')))
 									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
+									->setEnabled($data['saml_enabled'])
 									->addClass('js-add')
 							))->setColSpan(5)
 						)
-				)
-				->addStyle('width: 100%;')
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
-	->addRow(new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
-		(new CCheckBox('ldap_case_sensitive', ZBX_AUTH_CASE_SENSITIVE))
-			->setChecked($data['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-	);
-
-// SAML authentication fields.
-$saml_tab = (new CFormList('list_saml'))
-	->addRow(new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
-		$data['saml_error']
-			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
-				->setChecked($data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
-	)
-	->addRow((new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
-		(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
-			DB::getFieldLength('config', 'saml_idp_entityid')
-		))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
-		(new CTextBox('saml_sso_url', $data['saml_sso_url'], false, DB::getFieldLength('config', 'saml_sso_url')))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(new CLabel(_('SLO service URL'), 'saml_slo_url'),
-		(new CTextBox('saml_slo_url', $data['saml_slo_url'], false, DB::getFieldLength('config', 'saml_slo_url')))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow((new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
-		(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
-			DB::getFieldLength('config', 'saml_username_attribute')
-		))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
-		(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
-			DB::getFieldLength('config', 'saml_sp_entityid')
-		))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(new CLabel(_('SP name ID format'), 'saml_nameid_format'),
-		(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
-			DB::getFieldLength('config', 'saml_nameid_format')
-		))
-			->setEnabled($data['saml_enabled'])
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
-	)
-	->addRow(_('Sign'),
-		(new CList())
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('saml_sign_messages'))
-				->setLabel(_('Messages'))
-				->setChecked($data['saml_sign_messages'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-			->addItem((new CCheckBox('saml_sign_assertions'))
-				->setLabel(_('Assertions'))
-				->setChecked($data['saml_sign_assertions'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-			->addItem((new CCheckBox('saml_sign_authn_requests'))
-				->setLabel(_('AuthN requests'))
-				->setChecked($data['saml_sign_authn_requests'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-			->addItem((new CCheckBox('saml_sign_logout_requests'))
-				->setLabel(_('Logout requests'))
-				->setChecked($data['saml_sign_logout_requests'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-			->addItem((new CCheckBox('saml_sign_logout_responses'))
-				->setLabel(_('Logout responses'))
-				->setChecked($data['saml_sign_logout_responses'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-	)
-	->addRow(_('Encrypt'),
-		(new CList())
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('saml_encrypt_nameid'))
-				->setLabel(_('Name ID'))
-				->setChecked($data['saml_encrypt_nameid'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-			->addItem((new CCheckBox('saml_encrypt_assertions'))
-				->setLabel(_('Assertions'))
-				->setChecked($data['saml_encrypt_assertions'] == 1)
-				->setUncheckedValue(0)
-				->setEnabled($data['saml_enabled'])
-			)
-	)
-	->addRow(new CLabel(_('Case-sensitive login'), 'saml_case_sensitive'),
-		(new CCheckBox('saml_case_sensitive'))
-			->setChecked($data['saml_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE)
-			->setUncheckedValue(ZBX_AUTH_CASE_INSENSITIVE)
-			->setEnabled($data['saml_enabled'])
-	);
-
-(new CWidget())
-	->setTitle(_('Authentication'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTHENTICATION_EDIT))
-	->addItem((new CForm())
-		->addVar('action', $data['action_submit'])
-		->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
-		->setId('authentication-form')
-		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-		->disablePasswordAutofill()
-		->addItem((new CTabView())
-			->setSelected($data['form_refresh'] ? null : 0)
-			->addTab('auth', _('Authentication'), $auth_tab)
-			->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
-			->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
-			->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
-			->setFooter(makeFormFooter(
-				(new CSubmit('update', _('Update')))
+					)
 			))
-			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
-	))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	])
+	->addItem([
+		(new CLabel([
+			_('Media type mapping'),
+			makeHelpIcon(
+				_('Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications.')
+			)
+		]))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status'),
+		(new CFormField(
+			(new CDiv(
+				(new CTable())
+					->setId('saml-media-type-mapping-table')
+					->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
+					->setHeader(
+						(new CRowHeader([
+							_('Name '), _('Media type'), _('Attribute'), ''
+						]))->addClass(ZBX_STYLE_GREY)
+					)
+					->addItem(
+						(new CTag('tfoot', true))->addItem(
+							(new CCol(
+								(new CSimpleButton(_('Add')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
+									->setEnabled($data['saml_enabled'])
+									->addClass('js-add')
+							))->setColSpan(5)
+						)
+					)
+					->addStyle('width: 100%;')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	])
+	->addItem([
+		(new CLabel(_('Enable SCIM provisioning'), 'scim_status'))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status'),
+		(new CFormField(
+			(new CCheckBox('scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
+				->setChecked($data['scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
+				->setReadonly(!$saml_auth_enabled)
+				->addClass('saml-enabled')
+		))
+			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
+			->addClass('saml-provision-status')
+	]);
+
+	$form->addItem((new CTabView())
+		->setSelected($data['form_refresh'] ? null : 0)
+		->addTab('auth', _('Authentication'), $auth_tab)
+		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
+		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
+		->addTab('saml', _('SAML settings'), $saml_tab, TAB_INDICATOR_AUTH_SAML)
+		->setFooter(makeFormFooter(
+			(new CSubmit('update', _('Update')))
+		))
+	);
+
+(new CHtmlPage())
+	->setTitle(_('Authentication'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_AUTHENTICATION_EDIT))
+	->addItem($form)
 	->show();
 
+$templates = [];
+// SAML provisioning group row template.
+$templates['saml_provisioning_group_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('saml_provision_groups[#{row_index}][name]', '#{name}'))->removeId()
+	],
+	(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CButton(null, _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+// SAML provisioning medias row template.
+$templates['saml_provisioning_media_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))->removeId(),
+		(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId()
+	],
+	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CButton(null, _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+// LDAP servers list row.
+$templates['ldap_servers_row'] = (string) (new CRow([
+	[
+		(new CLink('#{name}', 'javascript:void(0);'))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass('js-edit'),
+		(new CVar('ldap_servers[#{row_index}][userdirectoryid]', '#{userdirectoryid}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][host]', '#{host}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][port]', '#{port}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][base_dn]', '#{base_dn}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][search_attribute]', '#{search_attribute}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][search_filter]', '#{search_filter}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][start_tls]', '#{start_tls}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][bind_dn]', '#{bind_dn}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][bind_password]', '#{bind_password}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][description]', '#{description}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][provision_status]', '#{provision_status}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][group_basedn]', '#{group_basedn}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][group_name]', '#{group_name}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][group_member]', '#{group_member}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][user_ref_attr]', '#{user_ref_attr}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][group_filter]', '#{group_filter}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][group_membership]', '#{group_membership}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][user_username]', '#{user_username}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][user_lastname]', '#{user_lastname}'))->removeId()
+	],
+	(new CCol('#{host}'))->addClass(ZBX_STYLE_WORDBREAK),
+	(new CCol('#{usrgrps}'))->addClass('js-ldap-usergroups'),
+	[
+		(new CInput('radio', 'ldap_default_row_index', '#{row_index}'))
+			->addClass(ZBX_STYLE_CHECKBOX_RADIO)
+			->setId('ldap_default_row_index_#{row_index}'),
+		(new CLabel(new CSpan(), 'ldap_default_row_index_#{row_index}'))->addClass(ZBX_STYLE_WORDWRAP)
+	],
+	(new CButton(null, _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-remove')
+]))->setAttribute('data-row_index', '#{row_index}');
+
 (new CScriptTag(
-	'view.init('. json_encode([
+	'view.init('.json_encode([
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
-		'db_authentication_type' => $data['db_authentication_type']
-	], JSON_FORCE_OBJECT).');'
+		'db_authentication_type' => $data['db_authentication_type'],
+		'saml_provision_groups' => $data['saml_provision_groups'],
+		'saml_provision_media' => $data['saml_provision_media'],
+		'templates' => $templates
+	]).');'
 ))
 	->setOnDocumentReady()
 	->show();

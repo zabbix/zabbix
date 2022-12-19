@@ -19,6 +19,9 @@
 
 #include "eval.h"
 
+#include "zbxexpr.h"
+#include "zbxstr.h"
+
 /* The tag expression token is virtual token used during item query filter processing. */
 #define ZBX_EVAL_TOKEN_TAG_EXPRESSION		(1000)
 

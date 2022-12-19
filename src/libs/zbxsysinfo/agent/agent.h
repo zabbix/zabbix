@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_AGENT_H
 #define ZABBIX_SYSINFO_AGENT_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 extern ZBX_METRIC	parameters_agent[];
 

@@ -79,3 +79,19 @@ func TestParseServerActive(t *testing.T) {
 		}
 	}
 }
+
+func TestToken(t *testing.T) {
+	tokens := make(map[string]bool)
+	for i := 0; i < 100000; i++ {
+		token := newToken()
+		if len(token) != 32 {
+			t.Errorf("Expected token length 32 while got %d", len(token))
+
+			return
+		}
+		if _, ok := tokens[token]; ok {
+			t.Errorf("Duplicated token detected")
+		}
+		tokens[token] = true
+	}
+}

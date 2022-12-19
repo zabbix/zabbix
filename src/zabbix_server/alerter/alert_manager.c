@@ -28,6 +28,7 @@
 #include "zbxembed.h"
 #include "zbxserialize.h"
 #include "zbxxml.h"
+#include "zbxtime.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -56,12 +57,11 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
-extern int	CONFIG_ALERTER_FORKS;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
+
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
  * The alert queue is implemented as a nested queue.
@@ -382,7 +382,7 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
 static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediatype, const char *script,
 		const char *timeout)
 {
-	if (FAIL == is_time_suffix(timeout, &mediatype->timeout, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(timeout, &mediatype->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		mediatype->error = zbx_strdup(mediatype->error, "Invalid timeout value in media type configuration.");
 		return;
@@ -467,7 +467,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 	mediatype->maxattempts = maxattempts;
 	mediatype->content_type = content_type;
 
-	if (FAIL == is_time_suffix(attempt_interval, &mediatype->attempt_interval, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(attempt_interval, &mediatype->attempt_interval, ZBX_LENGTH_UNLIMITED))
 	{
 		mediatype->error = zbx_strdup(mediatype->error, "Invalid media type attempt interval.");
 		return;
@@ -847,7 +847,8 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
 		return NULL;
 
-	alertpool = am_pop_alertpool(mediatype);
+	if (NULL == (alertpool = am_pop_alertpool(mediatype)))
+		return NULL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
 	alert = (zbx_am_alert_t *)elem->data;
@@ -1136,7 +1137,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 	int			i, ret;
 	zbx_am_alerter_t	*alerter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, CONFIG_ALERTER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerters:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_ALERTER, error)))
 		goto out;
@@ -1148,7 +1149,7 @@ static int	am_init(zbx_am_t *manager, char **error)
 
 	manager->next_alerter_index = 0;
 
-	for (i = 0; i < CONFIG_ALERTER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_ALERTER]; i++)
 	{
 		alerter = (zbx_am_alerter_t *)zbx_malloc(NULL, sizeof(zbx_am_alerter_t));
 
@@ -2239,17 +2240,17 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				time_mediatype = 0;
 	double			time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t		timeout = {1, 0};
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == am_init(&manager, &error))
 	{
@@ -2268,9 +2269,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		now = time_now;
+		now = (int)time_now;
 
-		if (time_ping + ZBX_DB_PING_FREQUENCY < now)
+		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
 			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 			DBclose();
@@ -2322,12 +2323,12 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			time_mediatype = now;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&manager.ipc, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

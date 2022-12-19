@@ -24,12 +24,12 @@
  * @var array $data
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_PROTOTYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 }
 
 $url = (new CUrl('disc_prototypes.php'))
@@ -40,7 +40,7 @@ $url = (new CUrl('disc_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -597,8 +597,7 @@ if ($data['display_interfaces']) {
 		->setValue($data['interfaceid'])
 		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 		->setFocusableElementId('interfaceid')
-		->setAriaRequired()
-		->setReadonly($readonly);
+		->setAriaRequired();
 
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -629,9 +628,12 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))
+			->setAsteriskMark()
+			->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([
@@ -822,15 +824,16 @@ $item_tab
 if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$item_tab->addItem([
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
-		(new CFormField((new CMultiSelect([
+		(new CFormField(
+			(new CMultiSelect([
 				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
+				'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 				'disabled' => $readonly,
 				'multiple' => false,
 				'data' => $data['valuemap'],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'valuemaps',
+						'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 						'srcfld1' => 'valuemapid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'valuemapid',
@@ -839,8 +842,7 @@ if ($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						'editable' => true
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-value-map-field')
 	]);
 }
@@ -888,7 +890,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => false,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -939,16 +942,17 @@ else {
 }
 
 $form->addItem($item_tabs);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.item.prototype.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([
 		'interfaces' => $data['interfaces'],
-		'key_type_suggestions' => CItemData::getTypeSuggestionsByKey(),
+		'value_type_by_keys' => CItemData::getValueTypeByKey(),
+		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface()

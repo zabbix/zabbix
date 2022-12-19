@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "../sysinfo.h"
 #include "net.h"
 
-#include "common.h"
 #include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
@@ -75,7 +77,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;
@@ -91,11 +93,11 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 1);
 
 	if (NULL == ip_str || '\0' == *ip_str)
-		strscpy(ip, "127.0.0.1");
+		zbx_strscpy(ip, "127.0.0.1");
 	else
-		strscpy(ip, ip_str);
+		zbx_strscpy(ip, ip_str);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		return SYSINFO_RET_FAIL;

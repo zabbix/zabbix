@@ -20,6 +20,8 @@
 #ifndef VALUECACHE_MOCK_H
 #define VALUECACHE_MOCK_H
 
+#include "zbxhistory.h"
+
 typedef struct
 {
 	zbx_uint64_t			itemid;

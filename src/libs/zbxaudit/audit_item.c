@@ -18,12 +18,13 @@
 **/
 
 #include "audit/zbxaudit_item.h"
-
 #include "audit/zbxaudit.h"
-#include "log.h"
 #include "audit.h"
+
+#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 static int	item_flag_to_resource_type(int flag)
 {

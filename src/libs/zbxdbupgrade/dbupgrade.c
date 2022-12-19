@@ -845,6 +845,8 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -872,6 +874,8 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(5050), "6.0 development"},
 	{DBPATCH_VERSION(6000), "6.0 maintenance"},
 	{DBPATCH_VERSION(6010), "6.2 development"},
+	{DBPATCH_VERSION(6020), "6.2 maintenance"},
+	{DBPATCH_VERSION(6030), "6.4 development"},
 	{NULL}
 };
 
@@ -949,6 +953,7 @@ int	DBcheck_version(void)
 				get_program_type_string(program_type), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
+		ret = NOTSUPPORTED;
 		goto out;
 #endif
 	}
@@ -981,7 +986,9 @@ int	DBcheck_version(void)
 				get_program_type_string(program_type), db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
-			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix does not support SQLite3 database upgrade.");
+		else
+			ret = NOTSUPPORTED;
 #endif
 		goto out;
 	}
@@ -1297,5 +1304,115 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 	return ret;
 }
 
-#endif
+int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+#ifdef HAVE_ORACLE
+	ZBX_UNUSED(idname);
 
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_%s_insert\n"
+			"before insert on %s for each row\n"
+			"begin\n"
+				":new.%s:=%s(:new.%s);\n"
+			"end;",
+			table_name, indexed_column_name, table_name, indexed_column_name, function,
+			original_column_name);
+#elif HAVE_MYSQL
+	ZBX_UNUSED(idname);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_%s_insert\n"
+			"before insert on %s for each row\n"
+				"set new.%s=%s(new.%s)",
+			table_name, indexed_column_name, table_name, indexed_column_name, function,
+			original_column_name);
+#elif defined(HAVE_POSTGRESQL)
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function %s_%s_%s()\n"
+			"returns trigger language plpgsql AS $func$\n"
+			"begin\n"
+				"update %s set %s=%s(%s)\n"
+				"where %s=new.%s;\n"
+				"return null;\n"
+			"end $func$;\n"
+
+			"create trigger %s_%s_insert after insert\n"
+				"on %s\n"
+				"for each row execute function %s_%s_%s();",
+			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
+			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
+			table_name, indexed_column_name, function);
+#endif
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = FAIL;
+#ifdef HAVE_ORACLE
+	ZBX_UNUSED(idname);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_%s_update\n"
+			"before update on %s for each row\n"
+			"begin\n"
+				"if :new.%s<>:old.%s\n"
+				"then\n"
+					":new.%s:=%s(:new.%s);\n"
+				"end if;\n"
+			"end;",
+			table_name, indexed_column_name, table_name, original_column_name,
+			original_column_name, indexed_column_name, function, original_column_name);
+#elif HAVE_MYSQL
+	ZBX_UNUSED(idname);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_%s_update\n"
+			"before update on %s for each row\n"
+			"begin\n"
+				"if new.%s<>old.%s\n"
+				"then\n"
+					"set new.%s=%s(new.%s);\n"
+				"end if;\n"
+			"end",
+			table_name, indexed_column_name, table_name, original_column_name,
+			original_column_name, indexed_column_name, function, original_column_name);
+#elif defined(HAVE_POSTGRESQL)
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function %s_%s_%s()\n"
+			"returns trigger language plpgsql AS $func$\n"
+			"begin\n"
+				"update %s set %s=%s(%s)\n"
+				"where %s=new.%s;\n"
+				"return null;\n"
+			"end $func$;\n"
+
+			"create trigger %s_%s_update after update of %s on %s\n"
+				"for each row execute function %s_%s_%s();",
+			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
+			original_column_name, idname, idname, table_name, indexed_column_name,
+			original_column_name, table_name, table_name, indexed_column_name, function);
+#endif
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+#endif

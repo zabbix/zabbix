@@ -22,7 +22,7 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 int zbx_log_level = LOG_LEVEL_WARNING;
@@ -52,15 +52,6 @@ void __zbx_zabbix_log(int level, const char *format, ...)
 	}
 }
 
-#define ZBX_MESSAGE_BUF_SIZE	1024
-
-char	*zbx_strerror(int errnum)
-{
-	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];
-	zbx_snprintf(utf8_string, sizeof(utf8_string), "[%d] %s", errnum, strerror(errnum));
-	return utf8_string;
-}
-
 void	zbx_handle_log(void)
 {
 	// rotation is handled by go logger backend
@@ -75,10 +66,15 @@ int	zbx_redirect_stdio(const char *filename)
 */
 import "C"
 
+import (
+	"git.zabbix.com/ap/plugin-support/log"
+)
+
 func SetLogLevel(level int) {
 	C.zbx_log_level = C.int(level)
 }
 
 func init() {
+	log.Tracef("Calling C function \"getpid()\"")
 	C.zbx_agent_pid = C.getpid()
 }

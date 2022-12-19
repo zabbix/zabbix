@@ -20,7 +20,10 @@
 #include "zbxconf.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "zbxstr.h"
+#include "zbxparam.h"
+#include "zbxexpr.h"
 
 #ifdef _WINDOWS
 #	include "perfstat.h"
@@ -44,7 +47,7 @@ void	load_aliases(char **lines)
 		char		*c;
 		const char	*r = *pline;
 
-		if (SUCCEED != parse_key(&r) || ':' != *r)
+		if (SUCCEED != zbx_parse_key(&r) || ':' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));
@@ -53,7 +56,7 @@ void	load_aliases(char **lines)
 
 		c = (char *)r++;
 
-		if (SUCCEED != parse_key(&r) || '\0' != *r)
+		if (SUCCEED != zbx_parse_key(&r) || '\0' != *r)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add alias \"%s\": invalid character at position %d",
 					*pline, (int)((r - *pline) + 1));
@@ -78,7 +81,7 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- * Comments: calls add_user_parameter() for each entry                        *
+ * Comments: calls zbx_add_user_parameter() for each entry                    *
  *                                                                            *
  ******************************************************************************/
 int	load_user_parameters(char **lines, char **err)
@@ -94,7 +97,7 @@ int	load_user_parameters(char **lines, char **err)
 		}
 		*p = '\0';
 
-		if (FAIL == add_user_parameter(*pline, p + 1, error, sizeof(error)))
+		if (FAIL == zbx_add_user_parameter(*pline, p + 1, error, sizeof(error)))
 		{
 			*p = ',';
 			*err = zbx_dsprintf(*err, "user parameter \"%s\": %s", *pline, error);
@@ -128,7 +131,7 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 	else
 		return FAIL;
 
-	return add_key_access_rule(cfg->parameter, (char *)value, rule_type);
+	return zbx_add_key_access_rule(cfg->parameter, (char *)value, rule_type);
 }
 
 #ifdef _WINDOWS
@@ -154,25 +157,25 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 
 		for (pline = lines; NULL != *pline; pline++)
 		{
-			if (3 < num_param(*pline))
+			if (3 < zbx_num_param(*pline))
 			{
 				error = zbx_strdup(error, "Required parameter missing.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 1, name, sizeof(name), NULL))
+			if (0 != zbx_get_param(*pline, 1, name, sizeof(name), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse key.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 2, counterpath, sizeof(counterpath), NULL))
+			if (0 != zbx_get_param(*pline, 2, counterpath, sizeof(counterpath), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse counter path.");
 				goto pc_fail;
 			}
 
-			if (0 != get_param(*pline, 3, interval, sizeof(interval), NULL))
+			if (0 != zbx_get_param(*pline, 3, interval, sizeof(interval), NULL))
 			{
 				error = zbx_strdup(error, "Cannot parse interval.");
 				goto pc_fail;
@@ -182,7 +185,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 			zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 			zbx_free(wcounterPath);
 
-			if (FAIL == check_counter_path(counterpath, lang == PERF_COUNTER_LANG_DEFAULT))
+			if (FAIL == zbx_check_counter_path(counterpath, lang == PERF_COUNTER_LANG_DEFAULT))
 			{
 				error = zbx_strdup(error, "Invalid counter path.");
 				goto pc_fail;
@@ -190,7 +193,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 
 			period = atoi(interval);
 
-			if (1 > period || MAX_COLLECTOR_PERIOD < period)
+			if (1 > period || ZBX_MAX_COLLECTOR_PERIOD < period)
 			{
 				error = zbx_strdup(NULL, "Interval out of range.");
 				goto pc_fail;
@@ -221,7 +224,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  * Purpose: load user parameters from configuration file                      *
  *                                                                            *
  ******************************************************************************/
-static int	load_config_user_params(void)
+static int	load_config_user_params(const char *config_file)
 {
 	struct cfg_line	cfg[] =
 	{
@@ -232,44 +235,36 @@ static int	load_config_user_params(void)
 		{NULL}
 	};
 
-	return parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
+	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: reload user parameters                                            *
- *                                                                            *
- * Parameters: process_type - process type                                    *
- *             process_num - process number                                   *
- *                                                                            *
- ******************************************************************************/
-void	reload_user_parameters(unsigned char process_type, int process_num)
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
 {
 	char		*error = NULL;
 	ZBX_METRIC	*metrics_fallback = NULL;
 
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
-	if (FAIL == load_config_user_params())
+	if (FAIL == load_config_user_params(config_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
 				get_process_type_string(process_type), process_num);
 		goto out;
 	}
 
-	get_metrics_copy(&metrics_fallback);
-	remove_user_parameters();
+	zbx_get_metrics_copy(&metrics_fallback);
+	zbx_remove_user_parameters();
 
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		set_metrics(metrics_fallback);
+		zbx_set_metrics(metrics_fallback);
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
-	free_metrics_ext(&metrics_fallback);
+	zbx_free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:

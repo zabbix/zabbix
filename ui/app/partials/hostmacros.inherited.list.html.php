@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 if ($data['readonly'] && !$data['macros']) {
@@ -47,9 +48,9 @@ else {
 	$table->setColumns([
 		(new CTableColumn(_('Macro')))->addClass('table-col-macro'),
 		(new CTableColumn(_('Effective value')))->addClass('table-col-value'),
-		(new CTableColumn($data['readonly'] ? null : ''))->addClass('table-col-action'),
+		!$data['readonly'] ? (new CTableColumn())->addClass('table-col-action') : null,
 		$is_hostprototype ? (new CTableColumn())->addClass('table-col-arrow') : null,
-		$is_hostprototype ? (new CTableColumn())->addClass('table-col-parent-value') : null,
+		$is_hostprototype ? (new CTableColumn(_('Parent host value')))->addClass('table-col-parent-value') : null,
 		(new CTableColumn())->addClass('table-col-arrow'),
 		(new CTableColumn(_('Template value')))->addClass('table-col-template-value'),
 		(new CTableColumn())->addClass('table-col-arrow'),
@@ -57,6 +58,12 @@ else {
 	]);
 
 	foreach ($data['macros'] as $i => $macro) {
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))
+			->setReadonly($data['readonly']
+				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
+				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
+			);
+
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 				->setReadonly($data['readonly']
@@ -65,8 +72,7 @@ else {
 				)
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->setAttribute('placeholder', '{$MACRO}'),
-			new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type'])
+				->setAttribute('placeholder', '{$MACRO}')
 		];
 
 		if (!$data['readonly']) {
@@ -75,6 +81,8 @@ else {
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
+
+			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 
 			if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
 				$inherited_macro = $macro[$macro['inherited_level']];
@@ -88,18 +96,16 @@ else {
 				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
 				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
 			}
-		}
 
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly(
-			$data['readonly'] || !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
-				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
-		);
+			if (array_key_exists('allow_revert', $macro)) {
+				$macro_value->setAttribute('placeholder', 'value');
+				$macro_value->addRevertButton();
+				$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+					|| array_key_exists('value', $macro)
+				);
 
-		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-			$macro_value->addRevertButton();
-			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
-				&& array_key_exists('hostmacroid', $macro)
-			);
+				$macro_cell[] = new CVar('macros[' . $i . '][allow_revert]', '1');
+			}
 		}
 
 		if (array_key_exists('value', $macro)) {

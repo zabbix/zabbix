@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ITEM_PREPROC_H
 #define ZABBIX_ITEM_PREPROC_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "preproc.h"
 
 #define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
@@ -48,6 +48,8 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
+
+int	zbx_item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
 
 int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,

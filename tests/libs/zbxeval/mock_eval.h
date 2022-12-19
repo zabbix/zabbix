@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifndef ZABBIX_MOCK_EXPRESSION_EVAL_H
 #define ZABBIX_MOCK_EXPRESSION_EVAL_H

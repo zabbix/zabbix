@@ -26,7 +26,7 @@
 $form_items = [$data['messages']];
 
 if ($data['success']) {
-	$row_decription = [
+	$row_description = [
 		(new CTextArea('', $data['output']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('monospace-font')
@@ -35,9 +35,9 @@ if ($data['success']) {
 	];
 
 	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
-		$row_decription[] = new CVar('debug', json_encode($data['debug']));
-		$row_decription[] = new CDiv(
-			(new CLinkAction('Open log'))
+		$row_description[] = new CVar('debug', json_encode($data['debug']));
+		$row_description[] = new CDiv(
+			(new CLinkAction(_('Open log')))
 				->setId('script_execution_log')
 				->addClass($data['debug'] ? '' : ZBX_STYLE_DISABLED)
 		);
@@ -45,7 +45,7 @@ if ($data['success']) {
 
 	$form_items[] = (new CFormList())->addRow(
 		new CLabel($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK ? _('Response') : _('Output')),
-		$row_decription
+		$row_description
 	);
 }
 

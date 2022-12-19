@@ -17,9 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
+
+#include "zbxtime.h"
 
 #include "checks_ipmi.h"
 
@@ -1994,7 +1996,7 @@ int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *er
 		*val = 1;
 	else if (0 == strcasecmp(p, "off"))
 		*val = 0;
-	else if (SUCCEED != is_uint31(p, val))
+	else if (SUCCEED != zbx_is_uint31(p, val))
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
 		goto fail;

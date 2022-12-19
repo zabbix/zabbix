@@ -23,11 +23,13 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxserver.h"
+
 #include "log.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
-#include "zbxserver.h"
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *
@@ -52,7 +54,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&tmp, MACRO_TYPE_COMMON, NULL, 0);
 
-	if (FAIL == is_ushort(tmp, port) || 0 == *port)
+	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{
 		*error = zbx_dsprintf(*error, "Invalid port value \"%s\"", port_orig);
 		ret = FAIL;

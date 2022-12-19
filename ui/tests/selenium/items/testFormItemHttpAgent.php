@@ -246,6 +246,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
+			// Call to Prometheus API.
+			[
+				[
+					'step_name' => 'Step call to Prometheus API',
+					'url' => 'http://localhost:9090/api/v1/query?query=irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])',
+					'parsed_query' => [
+						['name' => 'query', 'value' => 'irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])']
+					],
+					'parsed_url' => 'http://localhost:9090/api/v1/query'
+				]
+			],
 			// URL parse failed.
 			[
 				[
@@ -412,7 +423,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -429,7 +440,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -445,7 +456,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -462,7 +473,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -479,7 +490,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -496,7 +507,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -512,7 +523,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -527,7 +538,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "posts": JSON is expected.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
@@ -542,7 +553,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "posts": JSON is expected.'
+						'Invalid parameter "/1/posts": JSON is expected.'
 					]
 				]
 			],
@@ -556,7 +567,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "posts": XML is expected.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
@@ -571,7 +582,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found'
 					]
 				]
 			],
@@ -586,7 +597,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "posts": (73) expected \'>\''
+						'Invalid parameter "/1/posts": (73) expected \'>\''
 					]
 				]
 			],
@@ -601,7 +612,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Incorrect value "*" for "status_codes" field.'
+						'Invalid parameter "/1/status_codes": invalid range expression.'
 					]
 				]
 			],
@@ -615,7 +626,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Incorrect value "test" for "status_codes" field.'
+						'Invalid parameter "/1/status_codes": invalid range expression.'
 					]
 				]
 			]
@@ -656,7 +667,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -667,7 +678,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -678,7 +689,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'user update', 'value' => '', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -688,7 +699,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin update', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -699,7 +710,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -710,7 +721,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'user']
 					],
 					'error_details' => [
-						'Invalid parameter "headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 					]
 				]
 			],
@@ -719,7 +730,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'JSON data',
 					'error_details' => [
-						'Invalid parameter "posts": JSON is expected.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
@@ -727,7 +738,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Invalid parameter "posts": XML is expected.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
@@ -738,7 +749,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
 					]
 				]
 			],
@@ -749,7 +760,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'error_details' => [
-						'Incorrect value "*" for "status_codes" field.'
+						'Invalid parameter "/1/status_codes": invalid range expression.'
 					]
 				]
 			],
@@ -759,7 +770,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'error_details' => [
-						'Incorrect value "test" for "status_codes" field.'
+						'Invalid parameter "/1/status_codes": invalid range expression.'
 					]
 				]
 			]

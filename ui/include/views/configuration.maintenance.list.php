@@ -23,9 +23,9 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_MAINTENANCE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_LIST))
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
@@ -129,7 +129,6 @@ $maintenanceForm->addItem([
 	])
 ]);
 
-// append form to widget
-$widget->addItem($maintenanceForm);
-
-$widget->show();
+$html_page
+	->addItem($maintenanceForm)
+	->show();

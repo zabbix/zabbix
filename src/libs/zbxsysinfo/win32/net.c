@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "zbxstr.h"
+#include "zbxnum.h"
 #include "log.h"
 #include "zbxjson.h"
-
-#define ZBX_GUID_LEN	38
 
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
 /* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
@@ -388,11 +389,12 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 					strerror_from_system(dwRetVal));
 			continue;
 		}
-
+#define ZBX_GUID_LEN	38
 		if (ZBX_GUID_LEN == strlen(if_name) && '{' == if_name[0] && '}' == if_name[ZBX_GUID_LEN - 1])
 			utf8_descr = zbx_ifrow_get_guid_str(ifrow);
 		else
 			utf8_descr = zbx_ifrow_get_utf8_description(ifrow);
+#undef ZBX_GUID_LEN
 
 		if (NULL != utf8_descr && 0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
@@ -425,7 +427,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -475,7 +477,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -525,7 +527,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -577,7 +579,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i;
 	int		ret = SYSINFO_RET_FAIL;
@@ -677,7 +679,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 	}
 }
 
-int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	char		*buf = NULL;
@@ -783,7 +785,7 @@ clean:
 	return ret;
 }
 
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;
@@ -799,7 +801,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -836,7 +838,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (!ISSET_UI64(result))
+	if (!ZBX_ISSET_UI64(result))
 		SET_UI64_RESULT(result, 0);
 clean:
 	zbx_free(pTcpTable);

@@ -21,6 +21,7 @@
 
 #include "zbxdbhigh.h"
 #include "log.h"
+#include "zbxnum.h"
 
 /*
  * 3.4 development database patches
@@ -178,6 +179,16 @@ static int	DBpatch_3030017(void)
 
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
+
+/* item data types */
+typedef enum
+{
+	ITEM_DATA_TYPE_DECIMAL = 0,
+	ITEM_DATA_TYPE_OCTAL,
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
+}
+zbx_item_data_type_t;
 
 static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char data_type, const char *formula, unsigned char delta)
@@ -1748,7 +1759,7 @@ static int	DBpatch_3030139(void)
 
 static int	DBpatch_3030140(void)
 {
-	/* CONDITION_TYPE_TIME_PERIOD */
+	/* ZBX_CONDITION_TYPE_TIME_PERIOD */
 	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
 }
 

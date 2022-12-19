@@ -20,9 +20,9 @@
 #ifndef ZABBIX_AUDIT_ITEM_H
 #define ZABBIX_AUDIT_ITEM_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
-#include "../src/libs/zbxdbhigh/template.h"
+#include "../src/libs/zbxdbwrap/template.h"
 #include "../src/zabbix_server/lld/lld.h"
 
 void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const char *name, int flags);

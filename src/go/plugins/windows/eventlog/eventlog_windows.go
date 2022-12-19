@@ -73,7 +73,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		data = &metadata{key: key, params: params}
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
 		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
-			return
+			return nil, err
 		}
 		meta.Data = data
 	} else {
@@ -82,8 +82,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			zbxlib.FreeActiveMetric(data.blob)
 			data.key = key
 			data.params = params
-			// reset lastlogsize/mtime if item key has been changed
-			if data.blob, err = zbxlib.NewActiveMetric(key, params, 0, 0); err != nil {
+			// recreate if item key has been changed
+			if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
 				return nil, err
 			}
 		}
