@@ -37,7 +37,7 @@ To utilize the media type, it is recommended to create a dedicated Zabbix user t
 See more details on creating [Zabbix user](https://www.zabbix.com/documentation/6.4/manual/web_interface/frontend_sections/users/user_list).
 OPSgenie user should suffice the default settings as this user will not be logging into Zabbix. Note that in order to be notified about problems on a host, this user must have at least read permissions for this host.  
 When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use OPSgenie webhook when sending notifications from this action.
-Use the OPSgenie user in any actions of your choice. A text from "Action Operations" will be sent to "OPSgenie Alert" when the problem occurs. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "OPSGenie Alert Notes" when the problem is resolved or updated.
+Use the OPSgenie user in any actions of your choice. A text from "Action Operations" will be sent to "OPSgenie Alert" when the problem occurs. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "OPSgenie Alert Notes" when the problem is resolved or updated.
 
 ### Testing
 Media testing can be done manually, from `Media types` page. Press `Test` button opposite to previously defined media type.
