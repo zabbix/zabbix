@@ -252,10 +252,8 @@ class CImportReferencer {
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
-				if ($inherited || $item['templateid'] == 0) {
-					return $itemid;
-				}
+			if ($item['hostid'] === $hostid && $item['key_'] === $key && ($inherited || $item['templateid'] == 0)) {
+				return $itemid;
 			}
 		}
 
@@ -364,10 +362,9 @@ class CImportReferencer {
 		foreach ($this->db_triggers as $triggerid => $trigger) {
 			if ($trigger['description'] === $name
 					&& $trigger['expression'] === $expression
-					&& $trigger['recovery_expression'] === $recovery_expression) {
-				if ($inherited || $trigger['templateid'] == 0) {
-					return $triggerid;
-				}
+					&& $trigger['recovery_expression'] === $recovery_expression
+					&& ($inherited || $trigger['templateid'] == 0)) {
+				return $triggerid;
 			}
 		}
 
