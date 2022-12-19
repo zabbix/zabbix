@@ -1,7 +1,7 @@
 
 # OPSgenie webhook 
 
-This guide describes how to integrate your Zabbix installation with OPSGenie using Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix installation with OPSgenie using Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In OPSgenie
 
@@ -35,9 +35,9 @@ For more information on Zabbix webhook configuration, see [Zabbix documentation]
 
 To utilize the media type, it is recommended to create a dedicated Zabbix user to represent OPSgenie.
 See more details on creating [Zabbix user](https://www.zabbix.com/documentation/6.2/manual/web_interface/user_profile).
-OPSGenie User should suffice the default settings as this user will not be logging into Zabbix. Note that in order to be notified about problems on a host, this user must have at least read permissions for this host.  
+OPSgenie user should suffice the default settings as this user will not be logging into Zabbix. Note that in order to be notified about problems on a host, this user must have at least read permissions for this host.  
 When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use OPSgenie webhook when sending notifications from this action.
-Use the OPSgenie user in any actions of your choice. A text from "Action Operations" will be sent to "OPSgenie Alert" when the problem occurs. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "OPSGenie Alert Notes" when the problem is resolved or updated.
+Use the OPSgenie user in any actions of your choice. A text from "Action Operations" will be sent to "OPSgenie Alert" when the problem occurs. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "OPSgenie Alert Notes" when the problem is resolved or updated.
 
 ### Testing
 Media testing can be done manually, from `Media types` page. Press `Test` button opposite to previously defined media type.
@@ -59,7 +59,7 @@ To receive notifications about an internal problem and recovery events in OPSgen
 If an internal action operation is configured without a custom message, the notification will not be sent. 
 Note that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
 
-See more details on [Notifications upon events](https://www.zabbix.com/documentation/6.2/manual/config/notifications) in Zabbix documentation and on [Alert API](https://docs.opsgenie.com/docs/alert-api) in OPSGenie documentation.
+See more details on [Notifications upon events](https://www.zabbix.com/documentation/6.2/manual/config/notifications) in Zabbix documentation and on [Alert API](https://docs.opsgenie.com/docs/alert-api) in OPSgenie documentation.
 
 ### Known issues
 
