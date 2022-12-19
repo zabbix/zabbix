@@ -56,15 +56,15 @@ $fields = [
 	'g_actionid' =>						[T_ZBX_INT, O_OPT,	P_ONLY_ARRAY,	DB_ID,		null],
 	'conditions' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,	null],
 	'new_condition' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		'isset({add_condition})'],
-	'operations' =>						[null,		O_OPT,	P_AS_IS,		null,		null],
+	'operations' =>						[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,			null,		null],
-	'new_operation' =>					[null,		O_OPT,	P_AS_IS,		null,		null],
-	'recovery_operations' =>			[null,		O_OPT,	P_AS_IS,		null,		null],
+	'new_operation' =>					[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
+	'recovery_operations' =>			[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,			null,		null],
-	'new_recovery_operation' =>			[null,		O_OPT,	P_AS_IS,		null,		null],
-	'ack_operations' =>					[null,		O_OPT,	P_AS_IS,		null,		null],
+	'new_recovery_operation' =>			[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
+	'ack_operations' =>					[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_update_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,			null,		null],
-	'new_ack_operation' =>				[null,		O_OPT,	P_AS_IS,		null,		null],
+	'new_ack_operation' =>				[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
 	'opconditions' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -115,7 +115,7 @@ if (hasRequest('actionid')) {
 }
 
 if (hasRequest('g_actionid')) {
-	$check_actionids += array_fill_keys((array) getRequest('g_actionid'), true);
+	$check_actionids += array_fill_keys(getRequest('g_actionid'), true);
 }
 
 if ($check_actionids) {
@@ -475,7 +475,7 @@ elseif (hasRequest('edit_update_operationid')) {
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
 	$status = (getRequest('action') == 'action.massenable') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED;
-	$actionids = (array) getRequest('g_actionid', []);
+	$actionids = getRequest('g_actionid');
 	$actions_count = count($actionids);
 	$actions = [];
 
