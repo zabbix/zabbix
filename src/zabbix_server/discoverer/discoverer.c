@@ -505,7 +505,7 @@ fail:
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(ZBX_DB_DRULE *drule, zbx_events_funcs_t events_cbs, int config_timeout)
+static void	process_rule(ZBX_DB_DRULE *drule, zbx_events_funcs_t *events_cbs, int config_timeout)
 {
 	ZBX_DB_DHOST		dhost;
 	int			host_status, now;
@@ -599,7 +599,7 @@ static void	process_rule(ZBX_DB_DRULE *drule, zbx_events_funcs_t events_cbs, int
 			}
 
 			if (SUCCEED != process_services(drule, &dhost, ip, dns, now, &services,
-					&dcheckids, events_cbs.add_event_cb))
+					&dcheckids, events_cbs->add_event_cb))
 			{
 				DBrollback();
 
@@ -614,12 +614,12 @@ static void	process_rule(ZBX_DB_DRULE *drule, zbx_events_funcs_t events_cbs, int
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				zbx_discovery_update_host(&dhost, host_status, now, events_cbs.add_event_cb);
+				zbx_discovery_update_host(&dhost, host_status, now, events_cbs->add_event_cb);
 
-				if (NULL != events_cbs.process_events_cb)
-					events_cbs.process_events_cb(NULL, NULL);
-				if (NULL != events_cbs.clean_events_cb)
-					events_cbs.clean_events_cb();
+				if (NULL != events_cbs->process_events_cb)
+					events_cbs->process_events_cb(NULL, NULL);
+				if (NULL != events_cbs->clean_events_cb)
+					events_cbs->clean_events_cb();
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule->druleid, ip, dns, host_status, now);
@@ -757,7 +757,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	process_discovery(time_t *nextcheck, zbx_events_funcs_t events_cbs, int config_timeout)
+static int	process_discovery(time_t *nextcheck, zbx_events_funcs_t *events_cbs, int config_timeout)
 {
 	DB_RESULT		result;
 	DB_ROW			row;

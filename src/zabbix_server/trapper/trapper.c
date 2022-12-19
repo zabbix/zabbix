@@ -1069,7 +1069,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 }
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *zbx_config_comms, zbx_events_funcs_t events_cbs)
+		const zbx_config_comms_args_t *zbx_config_comms, zbx_events_funcs_t *events_cbs)
 {
 	int	ret = SUCCEED;
 
@@ -1255,7 +1255,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 }
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *zbx_config_comms, zbx_events_funcs_t events_cbs)
+		const zbx_config_comms_args_t *zbx_config_comms, zbx_events_funcs_t *events_cbs)
 {
 	ssize_t	bytes_received;
 

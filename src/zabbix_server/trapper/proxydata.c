@@ -131,7 +131,7 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  ******************************************************************************/
 void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		zbx_events_funcs_t events_cbs, int config_timeout)
+		zbx_events_funcs_t *events_cbs, int config_timeout)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;

@@ -1553,7 +1553,7 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, zbx_events_funcs_t events_cbs)
+		int now, zbx_events_funcs_t *events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
@@ -1747,7 +1747,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 }
 
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
-		zbx_events_funcs_t events_cbs)
+		zbx_events_funcs_t *events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	zbx_uint64_t		autoreg_hostid = 0;
@@ -1844,19 +1844,19 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 		ts.sec = autoreg_host->now;
 
-		if (NULL != events_cbs.add_event_cb)
+		if (NULL != events_cbs->add_event_cb)
 		{
-			events_cbs.add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+			events_cbs->add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
 					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
 					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 		}
 	}
 
-	if (NULL != events_cbs.process_events_cb)
-		events_cbs.process_events_cb(NULL, NULL);
+	if (NULL != events_cbs->process_events_cb)
+		events_cbs->process_events_cb(NULL, NULL);
 
-	if (NULL != events_cbs.clean_events_cb)
-		events_cbs.clean_events_cb();
+	if (NULL != events_cbs->clean_events_cb)
+		events_cbs->clean_events_cb();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

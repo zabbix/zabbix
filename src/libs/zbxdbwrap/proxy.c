@@ -2227,7 +2227,7 @@ static void	zbx_drule_free(zbx_drule_t *drule)
  * Purpose: process services discovered on IP address                         *
  *                                                                            *
  ******************************************************************************/
-static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_events_funcs_t events_cbs,
+static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_events_funcs_t *events_cbs,
 		zbx_uint64_t druleid, zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num,
 		int ip_idx)
 {
@@ -2363,7 +2363,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, events_cbs.add_event_cb);
+				service->status, service->value, service->itemtime, events_cbs->add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2377,11 +2377,11 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 		}
 
 		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, events_cbs.add_event_cb);
+				service->status, service->value, service->itemtime, events_cbs->add_event_cb);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
-	zbx_discovery_update_host(&dhost, service->status, service->itemtime, events_cbs.add_event_cb);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime, events_cbs->add_event_cb);
 
 	ret = SUCCEED;
 fail:
@@ -2406,7 +2406,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_events_funcs_t events_cbs,
+static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_events_funcs_t *events_cbs,
 		char **error)
 {
 	DB_RESULT		result;
@@ -2567,10 +2567,10 @@ json_parse_error:
 			}
 		}
 
-		if (NULL != events_cbs.process_events_cb)
-			events_cbs.process_events_cb(NULL, NULL);
-		if (NULL != events_cbs.clean_events_cb)
-			events_cbs.clean_events_cb();
+		if (NULL != events_cbs->process_events_cb)
+			events_cbs->process_events_cb(NULL, NULL);
+		if (NULL != events_cbs->clean_events_cb)
+			events_cbs->clean_events_cb();
 
 		DBcommit();
 	}
@@ -2600,7 +2600,7 @@ json_parse_return:
  *                                                                            *
  ******************************************************************************/
 static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
-		zbx_events_funcs_t events_cbs, char **error)
+		zbx_events_funcs_t *events_cbs, char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -2898,7 +2898,7 @@ static void	check_proxy_nodata_empty(zbx_timespec_t *ts, unsigned char proxy_sta
  *                                                                            *
  ******************************************************************************/
 int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, zbx_events_funcs_t events_cbs, int *more, char **error)
+		unsigned char proxy_status, zbx_events_funcs_t *events_cbs, int *more, char **error)
 {
 	struct zbx_json_parse	jp_data;
 	int			ret = SUCCEED, flags_old;

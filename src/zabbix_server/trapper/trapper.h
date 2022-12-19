@@ -34,7 +34,7 @@ typedef struct
 {
 	zbx_config_comms_args_t	*zbx_config_comms;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	zbx_events_funcs_t	events_cbs;
+	zbx_events_funcs_t	*events_cbs;
 	zbx_socket_t		*listen_sock;
 }
 zbx_thread_trapper_args;
