@@ -23,11 +23,11 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,refresh,trigger,trigger_macro,widget_actions',
+			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateInputData();
 
 		if (!$ret) {
 			$output = [];
@@ -39,6 +39,63 @@ class CControllerMenuPopup extends CController {
 		}
 
 		return $ret;
+	}
+
+	protected function validateInputData(): bool {
+		$type = $this->getInput('type');
+
+		switch ($type) {
+			case 'host':
+				$rules = [
+					'hostid' => 'required|db hosts.hostid',
+					'has_goto' => 'in 0'
+				];
+				break;
+
+			case 'history':
+			case 'item':
+				$rules = [
+					'itemid' => 'required|db items.itemid'
+				];
+				break;
+
+			case 'item_configuration':
+			case 'item_prototype_configuration':
+				$rules = [
+					'itemid' => 'required|db items.itemid',
+					'backurl' => 'required|string'
+				];
+				break;
+
+			case 'map_element':
+				$rules = [
+					'sysmapid' => 'required|db sysmaps.sysmapid',
+					'selementid' => 'required|db sysmaps_elements.selementid',
+					'unique_id' => 'string',
+					'severity_min' => 'in '.implode(',', [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER]),
+					'hostid' => 'db hosts.hostid'
+				];
+				break;
+
+			case 'trigger':
+				$rules = [
+					'triggerid' => 'required|db triggers.triggerid',
+					'eventid' => 'db events.eventid',
+					'acknowledge' => 'in 0,1'
+				];
+				break;
+
+			case 'trigger_macro':
+				$rules = [];
+				break;
+		}
+
+		$this->input['data'] = array_intersect_key($this->getInput('data', []), $rules);
+
+		$validator = new CNewValidator($this->input['data'], $rules);
+		array_map('error', $validator->getAllErrors());
+
+		return !$validator->isError() && !$validator->isErrorFatal();
 	}
 
 	protected function checkPermissions() {
@@ -422,7 +479,6 @@ class CControllerMenuPopup extends CController {
 	 * @param array   $data
 	 * @param string  $data['sysmapid']
 	 * @param string  $data['selementid']
-	 * @param array   $data['options']       (optional)
 	 * @param int     $data['severity_min']  (optional)
 	 * @param int     $data['unique_id']     (optional)
 	 * @param string  $data['hostid']        (optional)
@@ -565,13 +621,8 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
-	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge menu.
-	 * @param bool   $data['acknowledge']             (optional) Whether to show Acknowledge menu.
-	 * @param int    $data['severity_min']            (optional)
-	 * @param bool   $data['show_suppressed']         (optional)
-	 * @param array  $data['urls']                    (optional)
-	 * @param string $data['urls']['name']
-	 * @param string $data['urls']['url']
+	 * @param string $data['eventid']      (optional) Mandatory for Acknowledge menu.
+	 * @param bool   $data['acknowledge']  (optional) Whether to show Acknowledge menu.
 	 *
 	 * @return mixed
 	 */

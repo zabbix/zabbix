@@ -93,6 +93,10 @@ double	ZBX_DOUBLE_EPSILON = 2.22e-16;
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
+#endif
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
 	int	ret, fd;
@@ -2785,7 +2789,7 @@ int	_wis_uint(const wchar_t *wide_string)
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
@@ -2843,7 +2847,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 	int			len = 0;
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
@@ -3572,7 +3576,9 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	return token;
 }
 
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 /******************************************************************************
  *                                                                            *
  * Purpose: react to "/etc/resolv.conf" update                                *
@@ -3610,7 +3616,7 @@ static void	update_resolver_conf(void)
  * Parameters: time_now - [IN] the time for compare in seconds                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_env(double time_now)
+void	__zbx_update_env(double time_now)
 {
 	static double	time_update = 0;
 
@@ -3619,7 +3625,7 @@ void	zbx_update_env(double time_now)
 	{
 		time_update = time_now;
 		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H)
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
 		update_resolver_conf();
 #endif
 	}

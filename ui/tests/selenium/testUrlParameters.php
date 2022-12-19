@@ -734,6 +734,29 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
+						'url' => 'zabbix.php?action[]=dashboard.list',
+						'text_not_present' => 'Dashboards',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for field "action": a character string is expected.'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action[]=dashboard.view',
+						'text_not_present' => 'Dashboards',
+						'text_present' => [
+							'Fatal error, please report to the Zabbix team',
+							'Incorrect value for field "action": a character string is expected.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => false,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
 						'url' => 'zabbix.php?action=discovery.view&filter_druleids[]=abc',
 						'text_not_present' => 'Status of discovery',
 						'text_present' => [

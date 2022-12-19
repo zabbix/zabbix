@@ -63,6 +63,10 @@ class CTabFilter extends CBaseComponent {
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
 
+			if (index > 0) {
+				item.initUnsavedIndicator();
+			}
+
 			if (options.selected == index) {
 				item.renderContentTemplate();
 				this.setSelectedItem(item);
@@ -616,14 +620,14 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Update' button press.
 			 */
 			buttonUpdateAction: () => {
-				var params = this._active_item.getFilterParams();
+				var params = this._active_item.getFilterParams(false);
 
 				this.profileUpdate('properties', {
 					idx2: this._active_item._index,
 					value_str: params.toString()
 				})
 				.then(() => {
-					this._active_item.updateApplyUrl();
+					this._active_item.updateApplyUrl(false);
 					this._active_item.setBrowserLocation(params);
 					this._active_item.resetUnsavedState();
 				});
@@ -646,8 +650,8 @@ class CTabFilter extends CBaseComponent {
 			buttonApplyAction: () => {
 				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
+				this._active_item.updateUnsavedState(false);
+				this._active_item.updateApplyUrl(false);
 				this._active_item.setBrowserLocationToApplyUrl();
 			},
 
@@ -762,7 +766,14 @@ class CTabFilter extends CBaseComponent {
 		this._filters_footer.querySelector('[name="filter_new"]')
 			.addEventListener('click', this._events.buttonSaveAsAction);
 		this._filters_footer.querySelector('[name="filter_apply"]')
-			.addEventListener('click', this._events.buttonApplyAction);
+			.addEventListener('click', () => {
+				if (this._active_item._index == 0) {
+					this._events.buttonUpdateAction();
+				}
+				else {
+					this._events.buttonApplyAction();
+				}
+			});
 		this._filters_footer.querySelector('[name="filter_reset"]')
 			.addEventListener('click', this._events.buttonResetAction);
 		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);

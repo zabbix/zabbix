@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('layout.mode.js');
@@ -33,6 +34,10 @@ $this->includeJsFile('monitoring.latest.view.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
+
+if ($data['uncheck']) {
+	uncheckTableRows('latest');
+}
 
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))

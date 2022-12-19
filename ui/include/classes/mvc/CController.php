@@ -61,7 +61,7 @@ abstract class CController {
 	 *
 	 * @var array|null
 	 */
-	private static $raw_input;
+	private $raw_input;
 
 	/**
 	 * Validated input parameters.
@@ -79,6 +79,7 @@ abstract class CController {
 
 	public function __construct() {
 		$this->init();
+		$this->populateRawInput();
 	}
 
 	/**
@@ -188,29 +189,33 @@ abstract class CController {
 	/**
 	 * @return array
 	 */
-	private function getFormInput(): array {
-		$input = $_REQUEST;
+	private static function getFormInput(): array {
+		static $input;
 
-		if (hasRequest('formdata')) {
-			$data = base64_decode(getRequest('data'));
-			$sign = base64_decode(getRequest('sign'));
-			$request_sign = CEncryptHelper::sign($data);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-			if (CEncryptHelper::checkSign($sign, $request_sign)) {
-				$data = json_decode($data, true);
+			if (hasRequest('formdata')) {
+				$data = base64_decode(getRequest('data'));
+				$sign = base64_decode(getRequest('sign'));
+				$request_sign = CEncryptHelper::sign($data);
 
-				if ($data['messages']) {
-					CMessageHelper::setScheduleMessages($data['messages']);
+				if (CEncryptHelper::checkSign($sign, $request_sign)) {
+					$data = json_decode($data, true);
+
+					if ($data['messages']) {
+						CMessageHelper::setScheduleMessages($data['messages']);
+					}
+
+					$input = array_replace($input, $data['form']);
+				}
+				else {
+					info(_('Operation cannot be performed due to unauthorized request.'));
 				}
 
-				$input = array_replace($input, $data['form']);
+				// Replace window.history to avoid resubmission warning dialog.
+				zbx_add_post_js("history.replaceState({}, '');");
 			}
-			else {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-			}
-
-			// Replace window.history to avoid resubmission warning dialog.
-			zbx_add_post_js("history.replaceState({}, '');");
 		}
 
 		return $input;
@@ -219,16 +224,20 @@ abstract class CController {
 	/**
 	 * @return array
 	 */
-	private function getJsonInput(): array {
-		$input = $_REQUEST;
+	private static function getJsonInput(): array {
+		static $input;
 
-		$json_input = json_decode(file_get_contents('php://input'), true);
+		if ($input === null) {
+			$input = $_REQUEST;
 
-		if (is_array($json_input)) {
-			$input += $json_input;
-		}
-		else {
-			info(_('JSON array input is expected.'));
+			$json_input = json_decode(file_get_contents('php://input'), true);
+
+			if (is_array($json_input)) {
+				$input += $json_input;
+			}
+			else {
+				info(_('JSON array input is expected.'));
+			}
 		}
 
 		return $input;
@@ -242,13 +251,13 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if (self::$raw_input === null) {
+		if ($this->raw_input === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
 		}
 
-		$validator = new CNewValidator(self::$raw_input, $validation_rules);
+		$validator = new CNewValidator($this->raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
 			info($error);
@@ -262,7 +271,7 @@ abstract class CController {
 			$this->validation_result = $validator->isError() ? self::VALIDATION_ERROR : self::VALIDATION_OK;
 		}
 
-		return ($this->validation_result == self::VALIDATION_OK);
+		return $this->validation_result == self::VALIDATION_OK;
 	}
 
 	/**
@@ -416,11 +425,11 @@ abstract class CController {
 			return false;
 		}
 
-		if (!is_array(self::$raw_input) || !array_key_exists('sid', self::$raw_input)) {
+		if (!is_array($this->raw_input) || !array_key_exists('sid', $this->raw_input)) {
 			return false;
 		}
 
-		return (self::$raw_input['sid'] === $sessionid);
+		return $this->raw_input['sid'] === $sessionid;
 	}
 
 	/**
@@ -433,15 +442,15 @@ abstract class CController {
 	private function populateRawInput(): void {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
-				self::$raw_input = $this->getFormInput();
+				$this->raw_input = self::getFormInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
-				self::$raw_input = $this->getJsonInput();
+				$this->raw_input = self::getJsonInput();
 				break;
 
 			default:
-				self::$raw_input = null;
+				$this->raw_input = null;
 		}
 	}
 
@@ -451,8 +460,6 @@ abstract class CController {
 	 * @return CControllerResponse
 	 */
 	final public function run() {
-		$this->populateRawInput();
-
 		if ($this->validate_sid && !$this->checkSID()) {
 			access_deny(ACCESS_DENY_PAGE);
 		}

@@ -55,6 +55,19 @@ require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
+require_once dirname(__FILE__).'/testAuditlogAction.php';
+require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
+require_once dirname(__FILE__).'/testAuditlogDashboard.php';
+require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
+require_once dirname(__FILE__).'/testAuditlogIconMap.php';
+require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
+require_once dirname(__FILE__).'/testAuditlogMediaType.php';
+require_once dirname(__FILE__).'/testAuditlogProxy.php';
+require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
+require_once dirname(__FILE__).'/testAuditlogSettings.php';
+require_once dirname(__FILE__).'/testAuditlogToken.php';
+require_once dirname(__FILE__).'/testAuditlogUser.php';
+require_once dirname(__FILE__).'/testAuditlogUserGroups.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -98,6 +111,19 @@ class ApiJsonTests {
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testAuthentication');
+		$suite->addTestSuite('testAuditlogAction');
+		$suite->addTestSuite('testAuditlogAutoregistration');
+		$suite->addTestSuite('testAuditlogDashboard');
+		$suite->addTestSuite('testAuditlogEventCorrelation');
+		$suite->addTestSuite('testAuditlogIconMap');
+		$suite->addTestSuite('testAuditlogMaintenance');
+		$suite->addTestSuite('testAuditlogMediaType');
+		$suite->addTestSuite('testAuditlogProxy');
+		$suite->addTestSuite('testAuditlogScheduledReport');
+		$suite->addTestSuite('testAuditlogSettings');
+		$suite->addTestSuite('testAuditlogToken');
+		$suite->addTestSuite('testAuditlogUser');
+		$suite->addTestSuite('testAuditlogUserGroups');
 
 		return $suite;
 	}

@@ -23,11 +23,13 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
+	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
 
 	use TagTrait;
 	use TableTrait;

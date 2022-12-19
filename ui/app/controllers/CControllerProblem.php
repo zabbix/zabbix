@@ -20,7 +20,7 @@
 
 
 /**
- * Base controller for the "Monitoring->Problems" page.
+ * Base controller for the "Monitoring->Problems" page and the "Problems" asynchronous requests.
  */
 abstract class CControllerProblem extends CController {
 
@@ -77,18 +77,6 @@ abstract class CControllerProblem extends CController {
 	}
 
 	/**
-	 * Get resulting rows for specified filter.
-	 *
-	 * @param array $filter  Filter fields values.
-	 *
-	 * @return array
-	 */
-	protected function getData(array $filter): array {
-		// getData is handled by jsrpc.php 'screen.get' action.
-		return [];
-	}
-
-	/**
 	 * Get additional data required for render filter as HTML.
 	 *
 	 * @param array $filter  Filter fields values.
@@ -130,6 +118,7 @@ abstract class CControllerProblem extends CController {
 				$trigger['prefix'] = $trigger['hosts'][0]['name'].NAME_DELIMITER;
 				unset($trigger['hosts']);
 			}
+			unset($trigger);
 
 			$data['triggers'] = $triggers;
 		}
@@ -146,17 +135,13 @@ abstract class CControllerProblem extends CController {
 	}
 
 	/**
-	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 * Clean and convert passed filter input fields from default values required for HTML presentation.
 	 *
 	 * @param array $input  Filter fields values.
 	 *
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
-		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
-			return array_intersect_key(['filter_name' => ''], $input);
-		}
-
 		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
@@ -172,5 +157,52 @@ abstract class CControllerProblem extends CController {
 		}
 
 		return $input;
+	}
+
+	/**
+	 * Validate input of filter inventory fields.
+	 *
+	 * @return bool
+	 */
+	protected function validateInventory(): bool {
+		if (!$this->hasInput('inventory')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('inventory') as $filter_inventory) {
+			if (count($filter_inventory) != 2
+					|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
+					|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Validate values of filter tags input fields.
+	 *
+	 * @return bool
+	 */
+	protected function validateTags(): bool {
+		if (!$this->hasInput('tags')) {
+			return true;
+		}
+
+		$ret = true;
+		foreach ($this->getInput('tags') as $filter_tag) {
+			if (count($filter_tag) != 3
+					|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
+					|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
+					|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
+				$ret = false;
+				break;
+			}
+		}
+
+		return $ret;
 	}
 }

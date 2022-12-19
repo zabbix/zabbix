@@ -100,9 +100,12 @@ $left_column = (new CFormList())
 			->setId('name_#{uniqid}')
 	)
 	->addRow(_('Severity'),
-		(new CSeverityCheckBoxList('severities'))
-			->setChecked($data['severities'])
+		(new CCheckBoxList('severities'))
 			->setUniqid('#{uniqid}')
+			->setOptions(CSeverityHelper::getSeverities())
+			->setChecked($data['severities'])
+			->setColumns(3)
+			->setVertical(true)
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
@@ -280,7 +283,7 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('details_#{uniqid}'),
 		(new CDiv([
-			(new CLabel(_('Highlight whole row'), 'highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+			(new CLabel(_('Highlight whole row'), 'highlight_row_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
 				->setChecked($data['highlight_row'] == 1)
 				->setEnabled($data['compact_view'] == 1)

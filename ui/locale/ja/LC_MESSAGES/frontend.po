@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-31 04:12+0000\n"
+"PO-Revision-Date: 2022-11-18 16:34+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3631,6 +3631,10 @@ msgstr "条件式ビルダーを閉じる"
 #: app/views/configuration.correlation.edit.php:155
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
+msgstr "新しいイベントのクローズ"
+
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
 msgstr "新しいイベントのクローズ"
 
 #: app/views/configuration.correlation.edit.php:149
@@ -11766,11 +11770,11 @@ msgstr "ホストに\"%1$s\"の名前を持つグラフが1つ以上存在しま
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr "すべての子が障害であったときにもっとも重要"
+msgstr "すべての子が障害であったときに最も重要"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr "子サービスでもっとも重要"
+msgstr "子サービスで最も重要"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
@@ -13170,6 +13174,10 @@ msgstr "特権管理者のみがレポートのオーナーを設定できます
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "ログ表示"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13712,6 +13720,10 @@ msgstr "親ディスカバリルール"
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
 msgstr "親グラフ"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "親ホストの値"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -17553,6 +17565,16 @@ msgstr "今月(現在まで)"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "この設定は数値データにのみ適用されます。 非数値データは常にヒストリから取得されます。"
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "ヒストリテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "トレンドテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -19274,7 +19296,7 @@ msgstr "VMwareサービスバージョン、<url> - VMwareサービスURL"
 
 #: include/classes/data/CItemData.php:1461
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "VMwareバーチャルマシンのバルーニングされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+msgstr "VMware仮想マシンのバルーニングされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1525
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20288,6 +20310,10 @@ msgstr "論理値で指定してください"
 #: include/classes/validators/CNewValidator.php:290
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
+
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "文字列、整数または浮動小数の値で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22474,6 +22500,11 @@ msgstr "varsamp() - サンプル分散"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

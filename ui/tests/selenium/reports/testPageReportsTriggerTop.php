@@ -18,11 +18,153 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @backup hosts
+ *
+ * @onBefore prepareTriggersData
+ */
 class testPageReportsTriggerTop extends CLegacyWebTest {
+
+	/**
+	 * Id of the host with problems.
+	 *
+	 * @var integer
+	 */
+	protected static $hostid;
+
+	/**
+	 * Ids of the triggers for problems.
+	 *
+	 * @var array
+	 */
+	protected static $triggerids;
+
+	/**
+	 * Time when events were created.
+	 *
+	 * @var int
+	 */
+	protected static $time;
+	protected static $one_year_ago_approx;
+	protected static $two_years_ago_approx;
+	protected static $three_months_ago_approx;
+	protected static $two_months_ago_approx;
+
+	public function prepareTriggersData() {
+		// Create hostgroup for hosts with items triggers.
+		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Reports Trigger']]);
+		$this->assertArrayHasKey('groupids', $hostgroups);
+		$groupid = $hostgroups['groupids'][0];
+
+		// Create host for items and triggers.
+		$hosts = CDataHelper::call('host.create', [
+			'host' => 'Host for Reports Trigger',
+			'groups' => [['groupid' => $groupid]]
+		]);
+
+		$this->assertArrayHasKey('hostids', $hosts);
+		self::$hostid = $hosts['hostids'][0];
+
+		// Create items on previously created host.
+		$item_names = ['float', 'char', 'log', 'unsigned'];
+
+		$items_data = [];
+		foreach ($item_names as $i => $item) {
+			$items_data[] = [
+				'hostid' => self::$hostid,
+				'name' => $item,
+				'key_' => $item,
+				'type' => 2,
+				'value_type' => $i
+			];
+		}
+
+		$items = CDataHelper::call('item.create', $items_data);
+		$this->assertArrayHasKey('itemids', $items);
+
+		// Create triggers based on items.
+		$triggers = CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Problem 1 year ago',
+				'expression' => 'last(/Host for Reports Trigger/float)=0',
+				'priority' => 0
+			],
+			[
+				'description' => 'Problem 2 years ago',
+				'expression' => 'last(/Host for Reports Trigger/char)=0',
+				'priority' => 1
+			],
+			[
+				'description' => 'Problem 3 months ago',
+				'expression' => 'last(/Host for Reports Trigger/log)=0',
+				'priority' => 2
+			],
+			[
+				'description' => 'Problem 2 months ago',
+				'expression' => 'last(/Host for Reports Trigger/unsigned)=0',
+				'priority' => 3
+			]
+		]);
+
+		$this->assertArrayHasKey('triggerids', $triggers);
+		self::$triggerids = CDataHelper::getIds('description');
+
+		self::$time = time();
+		// Make timestamp a little less 1 year ago.
+		self::$one_year_ago_approx = self::$time - 31556952;
+
+		// Make timestamp a little less than 2 years ago.
+		self::$two_years_ago_approx = self::$time - 62985600;
+
+		// Make timestamp a little less than 2 months ago.
+		self::$two_months_ago_approx = self::$time - 5097600;
+
+		// Make timestamp a little less than 3 months ago.
+		self::$three_months_ago_approx = self::$time - 7689600;
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005500, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 1 year ago']).', '.self::$one_year_ago_approx.', 0, 1, '.zbx_dbstr('Problem 1 year ago').', 0)'
+		);
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005501, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 2 years ago']).', '.self::$two_years_ago_approx.', 0, 1, '.zbx_dbstr('Problem 2 years ago').', 1)'
+		);
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005502, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 3 months ago']).', '.self::$three_months_ago_approx.', 0, 1, '.zbx_dbstr('Problem 3 months ago').', 2)'
+		);
+
+		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005503, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 2 months ago']).', '.self::$two_months_ago_approx.', 0, 1, '.zbx_dbstr('Problem 2 months ago').', 3)'
+		);
+
+		// Create problems.
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005500, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 1 year ago']).', '.self::$one_year_ago_approx.', 0, '.zbx_dbstr('Problem 1 year ago').', 0)'
+		);
+
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005501, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 2 years ago']).', '.self::$two_years_ago_approx.', 0, '.zbx_dbstr('Problem 2 years ago').', 1)'
+		);
+
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005502, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 3 months ago']).', '.self::$three_months_ago_approx.', 0, '.zbx_dbstr('Problem 3 months ago').', 2)'
+		);
+
+		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005503, 0, 0, '.
+				zbx_dbstr(self::$triggerids['Problem 2 months ago']).', '.self::$two_months_ago_approx.', 0, '.zbx_dbstr('Problem 2 months ago').', 3)'
+		);
+
+		// Change triggers' state to Problem.
+		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Problem 1 year ago').', '.
+				zbx_dbstr('Problem 2 year ago').', '.zbx_dbstr('Problem 3 months ago').', '.zbx_dbstr('Problem 2 months ago').')'
+		);
+	}
 
 	public function testPageReportsTriggerTop_FilterLayout() {
 		$this->zbxTestLogin('toptriggers.php');
@@ -53,22 +195,24 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers'
+						'host_group' => 'Group for Reports Trigger'
 					],
 					'date' => [
-						'from' => '2020-10-23 00:00',
-						'to' => 'now/d'
+						'from' => 'now-2y',
+						'to' => 'now'
 					],
 					'result' => [
-						'Test trigger to check tag filter on problem page',
-						'Test trigger with tag'
+						'Problem 1 year ago',
+						'Problem 2 months ago',
+						'Problem 2 years ago',
+						'Problem 3 months ago'
 					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers'
+						'host_group' => 'Group for Reports Trigger'
 					],
 					'date' => [
 						'from' => 'now/d',
@@ -79,21 +223,26 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers',
-						'host' => 'ЗАББИКС Сервер'
+						'host_group' => 'Group for Reports Trigger',
+						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
-						'from' => '2020-10-23 17:00'
+						'relative' => true,
+						// Time is now - 2 years exactly.
+						'from' => 62985600
 					],
 					'result' => [
-						'Test trigger with tag'
+						'Problem 1 year ago',
+						'Problem 2 months ago',
+						'Problem 2 years ago',
+						'Problem 3 months ago'
 					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers',
+						'host_group' => 'Group for Reports Trigger',
 						'host' => 'Host ZBX6663'
 					],
 					'date' => [
@@ -105,56 +254,44 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers',
-						'host' => 'ЗАББИКС Сервер'
+						'host_group' => 'Group for Reports Trigger',
+						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
-						'from' => '2020-10-22 04:01',
-						'to' => '2020-10-24 04:01'
+						'relative' => true,
+						// Time around 1 year ago.
+						'from' => 31556990,
+						'to' => 31556900
 					],
 					'result' => [
-						'Test trigger to check tag filter on problem page',
-						'Test trigger with tag'
+						'Problem 1 year ago'
 					]
 				]
 			],
 			[
 				[
 					'filter' => [
-						'host_group' => 'Zabbix servers',
-						'host' => 'ЗАББИКС Сервер'
+						'host_group' => 'Group for Reports Trigger',
+						'host' => 'Host for Reports Trigger'
 					],
 					'date' => [
-						'from' => '2020-10-26 00:00',
-						'to' => 'now/d'
+						'relative' => true,
+						// Less thant 2 month ago.
+						'from' => 501120,
+						'to' => 'now-1d/d'
 					]
 				]
 			],
 			[
 				[
 					'date' => [
-						'from' => '2020-10-23 15:35',
-						'to' => '2020-10-23 15:36'
+						'relative' => true,
+						// Time around 3 months ago.
+						'from' => 7689700,
+						'to' => 7689500
 					],
 					'result' => [
-						'Trigger for tag permissions MySQL'
-					]
-				]
-			],
-			[
-				[
-					'filter' => [
-						'severities' => [
-							'Average',
-							'High',
-							'Disaster'
-						]
-					],
-					'date' => [
-						'from' => '2020-10-22 00:00'
-					],
-					'result' => [
-						'Test trigger to check tag filter on problem page'
+						'Problem 3 months ago'
 					]
 				]
 			],
@@ -162,24 +299,43 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 				[
 					'filter' => [
 						'severities' => [
+							'Warning',
 							'High',
 							'Disaster'
 						]
 					],
 					'date' => [
-						'from' => '2020-10-22 00:00'
+						'from' => 'now-2y'
+					],
+					'result' => [
+						'Problem 3 months ago'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'severities' => [
+							'High',
+							'Disaster'
+						]
+					],
+					'date' => [
+						'from' => 'now-2y'
 					]
 				]
 			],
 			[
 				[
 					'date' => [
-						'from' => '2020-10-23 15:33',
-						'to' => '2020-10-23 15:36'
+						'relative' => true,
+						// Time interval 3 - 2 months ago.
+						'from' => 7872400,
+						'to' => 5011200
 					],
 					'result' => [
-						'Test trigger to check tag filter on problem page',
-						'Trigger for tag permissions MySQL'
+						'Problem 2 months ago',
+						'Problem 3 months ago'
 					]
 				]
 			]
@@ -196,33 +352,17 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();
 
+		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+
 		if (array_key_exists('filter', $data)) {
 			$filter = $data['filter'];
 
 			if (array_key_exists('host_group', $filter)) {
-				$this->zbxTestClickButtonMultiselect('groupids_');
-				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$this->zbxTestClickLinkTextWait($filter['host_group']);
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
-				$this->zbxTestMultiselectAssertSelected('groupids_', $filter['host_group']);
+				$filter_form->fill(['Host groups' => $filter['host_group']]);
 			}
 
 			if (array_key_exists('host', $filter)) {
-				$this->zbxTestClickButtonMultiselect('hostids_');
-				$this->zbxTestLaunchOverlayDialog('Hosts');
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Host groups');
-				$groups_form = $this->query('name:hostGroupsform')->one();
-				$all_groups = $groups_form->query('xpath:.//a')->all()->asText();
-				$groups = ['Host group for tag permissions', 'Zabbix servers', 'ZBX6648 All Triggers',
-					'ZBX6648 Disabled Triggers', 'ZBX6648 Enabled Triggers'];
-				$this->assertTrue(count(array_diff($groups, $all_groups)) === 0);
-				$groups_form->query('xpath://a[text()="Zabbix servers"]')->one()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->zbxTestClickXpathWait('//div[contains(@class, "overlay-dialogue modal")]//a[text()="'.
-						$filter['host'].'"]');
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[contains(@class, "overlay-dialogue modal")]'));
-				$this->zbxTestMultiselectAssertSelected('hostids_', $filter['host']);
+				$filter_form->fill(['Hosts' => $filter['host']]);
 			}
 
 			if (array_key_exists('severities', $filter)) {
@@ -238,6 +378,18 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 
 		// Fill in the date in filter.
 		if (array_key_exists('date', $data)) {
+			if (CTestArrayHelper::get($data['date'], 'relative')) {
+				if (array_key_exists('from', $data['date'])) {
+					$data['date']['from'] = date('Y-m-d H:i', self::$time - $data['date']['from']);
+				}
+
+				if (array_key_exists('to', $data['date']) && is_int($data['date']['to'])) {
+					$data['date']['to'] = date('Y-m-d H:i', self::$time - $data['date']['to']);
+				}
+
+				array_shift($data['date']);
+			}
+
 			$this->zbxTestExpandFilterTab('Time');
 			foreach ($data['date'] as $i => $full_date) {
 				$this->zbxTestInputTypeOverwrite($i, $full_date);

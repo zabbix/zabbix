@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:36:13Z'
+  date: '2022-10-27T12:58:49Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,14 +8,15 @@ zabbix_export:
   templates:
     -
       uuid: 01deb47efa1f4a9092de67fd61820a7d
-      template: 'ZYXEL MGS-3712F SNMP'
-      name: 'ZYXEL MGS-3712F SNMP'
+      template: 'ZYXEL MGS-3712F by SNMP'
+      name: 'ZYXEL MGS-3712F by SNMP'
       description: |
         ZYXEL MGS-3712F
         
         MIBs used:
-        ZYXEL-MGS3712F-MIB
         RFC1213-MIB
+        HOST-RESOURCES-MIB
+        ZYXEL-MGS3712F-MIB
         IF-MIB
         
         Known Issues:
@@ -51,7 +52,7 @@ zabbix_export:
           triggers:
             -
               uuid: c4244d60e8aa4cc380442992c031b2fd
-              expression: 'max(/ZYXEL MGS-3712F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL MGS-3712F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL MGS-3712F: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -105,7 +106,7 @@ zabbix_export:
           triggers:
             -
               uuid: 084cf3c89c9c48eeac9131d831a4f71b
-              expression: 'min(/ZYXEL MGS-3712F SNMP/zyxel.3712f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
               name: 'ZYXEL MGS-3712F: High CPU utilization'
               event_name: 'ZYXEL MGS-3712F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -152,7 +153,7 @@ zabbix_export:
           triggers:
             -
               uuid: fbf62d3f9ce54baab9a16f3e123811ef
-              expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion,#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion,#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion))>0'
+              expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.fwversion,#1)<>last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.fwversion,#2) and length(last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.fwversion))>0'
               name: 'ZYXEL MGS-3712F: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -162,6 +163,37 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: 29bc66a7a2c949549fc2e4c6fa841ab0
+          name: 'ZYXEL MGS-3712F: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.3712f.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: 98c18ebb978448098922d7930e2ed00b
           name: 'ZYXEL MGS-3712F: Location'
@@ -244,7 +276,7 @@ zabbix_export:
           triggers:
             -
               uuid: bf3d28b088db48a59aaa9e88f6b13cb8
-              expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.model)<>"MGS-3712F"'
+              expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.model)<>"MGS-3712F"'
               name: 'ZYXEL MGS-3712F: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MGS-3712F, but connected to {ITEM.VALUE}'
@@ -278,6 +310,30 @@ zabbix_export:
               tag: component
               value: inventory
         -
+          uuid: e5e21fdb6dae4dc49038f0801c87a5c6
+          name: 'ZYXEL MGS-3712F: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.3712f.net.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 97eaf488887c42b89a4e6f6103ceeef6
           name: 'ZYXEL MGS-3712F: Hardware serial number'
           type: SNMP_AGENT
@@ -303,48 +359,11 @@ zabbix_export:
           triggers:
             -
               uuid: ccb3fe676cd742af954b8c5e7898e5f0
-              expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber))>0'
+              expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.serialnumber,#1)<>last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.serialnumber,#2) and length(last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.serialnumber))>0'
               name: 'ZYXEL MGS-3712F: Device has been replaced'
               event_name: 'ZYXEL MGS-3712F: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: e5e21fdb6dae4dc49038f0801c87a5c6
-          name: 'ZYXEL MGS-3712F: Uptime'
-          type: SNMP_AGENT
-          snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.3712f.uptime
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: RFC1213-MIB
-            The time (in hundredths of a second) since the
-            network management portion of the system was last
-            re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 6a31fdd61b9f4aa99c8ad15ff243c6b2
-              expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.uptime)<10m'
-              name: 'ZYXEL MGS-3712F: has been restarted'
-              event_name: 'ZYXEL MGS-3712F: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
               tags:
                 -
@@ -386,7 +405,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4672af40f7434a419d063c6f00f4f9f8
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
                   name: 'ZYXEL MGS-3712F: FAN{#SNMPINDEX} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -403,7 +422,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.fan[{#SNMPINDEX}]'
         -
           uuid: 4e39a7b918fd44a1bd3986380d116e9f
@@ -753,9 +772,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d92c1f55c21e4780ada69269d95c5f45
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL MGS-3712F: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -956,37 +975,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: 337c2059cb87491fbacae5690da55ca7
@@ -995,13 +1014,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.out.traffic[{#SNMPINDEX}]'
             -
               uuid: 3e75d1f6271943eaaf19644716fe4e40
@@ -1012,13 +1031,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
@@ -1036,7 +1055,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: d48eedbbb8ad448da866d11d6f40ce91
@@ -1094,7 +1112,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1ef8b878bd334f1eac9d9c4258d1f4f2
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
                   name: 'ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1105,7 +1123,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 6605455fa4764a578feff4ce12a20883
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1122,7 +1140,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.sfp.ddm[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1282,7 +1300,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8fc46b61f7854893839a307700627d18
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL MGS-3712F: SFP {#SNMPINDEX} has been replaced'
                   event_name: 'ZYXEL MGS-3712F: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
@@ -1413,7 +1431,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b0d3093a36984493a7ffe87c7c4d408e
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL MGS-3712F: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1430,7 +1448,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.temp[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1485,7 +1503,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9a15b78bae564c879a5c95290cde63fe
-                  expression: 'last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  expression: 'last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL MGS-3712F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1502,7 +1520,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL MGS-3712F SNMP'
+                    host: 'ZYXEL MGS-3712F by SNMP'
                     key: 'zyxel.3712f.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1686,6 +1704,19 @@ zabbix_export:
             -
               value: '3'
               newvalue: nonoperational
+  triggers:
+    -
+      uuid: 6a31fdd61b9f4aa99c8ad15ff243c6b2
+      expression: '(last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.hw.uptime)>0 and last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.hw.uptime)<10m) or (last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.hw.uptime)=0 and last(/ZYXEL MGS-3712F by SNMP/zyxel.3712f.net.uptime)<10m)'
+      name: 'ZYXEL MGS-3712F: Host has been restarted'
+      event_name: 'ZYXEL MGS-3712F: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 85bd11f116ef4e3b9695dc783c625f05
@@ -1697,5 +1728,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'ZYXEL MGS-3712F SNMP'
+            host: 'ZYXEL MGS-3712F by SNMP'
             key: zyxel.3712f.cpuusage

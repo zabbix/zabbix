@@ -401,7 +401,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 			if ($simple_interval_parser->parse($trends) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($trends);
-				$trends = convertUnitsS($value);
+				$trends = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($trends, $item_params['trends'])) {
@@ -436,7 +436,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 			if ($simple_interval_parser->parse($history) == CParser::PARSE_SUCCESS) {
 				$value = timeUnitToSeconds($history);
-				$history = convertUnitsS($value);
+				$history = convertSecondsToTimeUnits($value);
 			}
 
 			if (!array_key_exists($history, $item_params['history'])) {
@@ -479,7 +479,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 				// "value" is delay represented in seconds and it is used for sorting the subfilter.
 				if ($delay[0] !== '{') {
 					$value = timeUnitToSeconds($delay);
-					$delay = convertUnitsS($value);
+					$delay = convertSecondsToTimeUnits($value);
 				}
 				else {
 					$value = $delay;
@@ -1816,7 +1816,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {

@@ -78,7 +78,6 @@ static int		db_auto_increment;
 static MYSQL			*conn = NULL;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
-static char			*ZBX_CHARSET = NULL;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -104,7 +103,7 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_TSDB_VERSION = -1;
+int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
@@ -114,6 +113,7 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result_handle(DB_RESULT result);
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
@@ -384,7 +384,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -578,10 +577,17 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
-	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
+	if (ZBX_DB_OK == ret)
+	{
+		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+		/* utf8mb3 is deprecated and it's superset utf8mb4 should be used instead if available */
+		if (0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8) &&
+				0 != mysql_set_character_set(conn, ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set");
+		}
+	}
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
@@ -967,7 +973,7 @@ void	zbx_db_close(void)
 		for (i = 0; i < oracle.db_results.values_num; i++)
 		{
 			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result(oracle.db_results.values[i]);
+			OCI_DBclean_result_handle(oracle.db_results.values[i]);
 		}
 	}
 
@@ -2123,19 +2129,14 @@ int	zbx_db_is_null(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result_handle(DB_RESULT result)
 {
-	if (NULL == result)
-		return;
-
 	if (NULL != result->values)
 	{
 		int	i;
 
 		for (i = 0; i < result->ncolumn; i++)
 		{
-			zbx_free(result->values[i]);
-
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
@@ -2143,16 +2144,31 @@ static void	OCI_DBclean_result(DB_RESULT result)
 				result->clobs[i] = NULL;
 			}
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
 	{
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 		result->stmthp = NULL;
+	}
+}
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result_handle(result);
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+			zbx_free(result->values[i]);
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
 	}
 }
 #endif
@@ -2540,6 +2556,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
+
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2571,6 +2588,9 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 			{
 				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
 			}
+
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY, info->history_compressed_chunks);
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS, info->trends_compressed_chunks);
 		}
 #endif
 		zbx_json_close(json);
@@ -2719,9 +2739,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	zbx_uint32_t major;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	ZBX_PG_SVERSION = PQserverVersion(conn);
+	ZBX_PG_SVERSION = (zbx_uint32_t)PQserverVersion(conn);
 
-	major = RIGHT2(ZBX_PG_SVERSION/10000);
+	major = ZBX_PG_SVERSION/10000;
 
 	version_info->database = "PostgreSQL";
 
@@ -2732,12 +2752,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 
 	if (10 > major)
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", major,
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d.%d", major,
 				RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 	}
 	else
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%d", major, RIGHT2(ZBX_PG_SVERSION));
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d", major,
+				RIGHT2(ZBX_PG_SVERSION));
 	}
 
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
@@ -2998,12 +3019,5 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 int	zbx_tsdb_get_compression_availability(void)
 {
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
-}
-#endif
-
-#if defined(HAVE_MYSQL)
-void zbx_db_set_character_set(const char *char_set)
-{
-	ZBX_CHARSET = zbx_strdup(ZBX_CHARSET, char_set);
 }
 #endif

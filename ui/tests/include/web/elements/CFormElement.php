@@ -107,6 +107,8 @@ class CFormElement extends CElement {
 		parent::invalidate();
 
 		$this->fields = new CElementCollection([]);
+
+		return $this;
 	}
 
 	/**
@@ -524,5 +526,16 @@ class CFormElement extends CElement {
 				$form->waitUntilReloaded();
 			}
 		};
+	}
+
+	/**
+	 * Check if field is marked as required in form.
+	 *
+	 * @param string $label    field label text
+	 *
+	 * @return boolean
+	 */
+	public function isRequired($label) {
+		return $this->getLabel($label)->hasClass('form-label-asterisk');
 	}
 }

@@ -115,7 +115,7 @@ window.service_edit_popup = new class {
 			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
 			if ($panel.attr('id') === 'tags-tab') {
-				const $tags = jQuery('#tags-table');
+				const $tags = $panel.find('.tags-table');
 
 				$tags
 					.dynamicRows({template: '#tag-row-tmpl'})

@@ -1,9 +1,9 @@
 
-# Huawei OceanStor 5300 V5 SNMP
+# Huawei OceanStor 5300 V5 by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template to monitor SAN Huawei OceanStor 5300 V5 by Zabbix SNMP agent.
 
 This template was tested on:
@@ -116,7 +116,8 @@ There are no template links in this template.
 |Huawei |Pool {#NAME}: Capacity free |<p>Available capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolFreeCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Pool {#NAME}: Capacity used |<p>Used capacity of a storage pool.</p> |SNMP |huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p> |
 |Huawei |Pool {#NAME}: Capacity used percentage |<p>Used capacity of a storage pool in percents.</p> |CALCULATED |huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"]<p>**Expression**:</p>`last(//huawei.5300.v5[hwInfoStoragePoolSubscribedCapacity, "{#NAME}"])/last(//huawei.5300.v5[hwInfoStoragePoolTotalCapacity, "{#NAME}"])*100` |
-|Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (network) |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.net.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
 |Status |ICMP ping |<p>-</p> |SIMPLE |icmpping |
 |Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
@@ -126,39 +127,39 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Controller {#ID}: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|Node {#NODE}: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.name,#1)<>last(/Huawei OceanStor 5300 V5 SNMP/system.name,#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
-|OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[version]))>0` |INFO |<p>Manual close: YES</p> |
-|Controller {#ID}: Memory usage is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
-|Controller {#ID}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1` |HIGH | |
-|Controller {#ID}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27` |AVERAGE | |
-|Controller {#ID}: Role has been changed |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2)` |WARNING |<p>Manual close: YES</p> |
-|Enclosure {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1` |HIGH | |
-|Enclosure {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
-|Enclosure {#NAME}: Temperature is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
-|FAN {#ID} on {#LOCATION}: Running status is not Running |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
-|BBU {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
-|BBU {#ID} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1` |HIGH | |
-|Disk {#MODEL} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27` |AVERAGE | |
-|Disk {#MODEL} on {#LOCATION}: Temperature is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
-|Node {#NODE}: Average I/O latency is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
-|LUN {#NAME}: Status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1` |AVERAGE | |
-|LUN {#NAME}: Average I/O response time is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
-|Pool {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1` |HIGH | |
-|Pool {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
-|Pool {#NAME}: Used capacity is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}` |AVERAGE | |
-|has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Huawei OceanStor 5300 V5 SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
-|No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
-|Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Huawei OceanStor 5300 V5 SNMP/icmpping,#3)=0` |HIGH | |
-|High ICMP ping loss |<p>-</p> |`min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
-|High ICMP ping response time |<p>-</p> |`avg(/Huawei OceanStor 5300 V5 SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
+|Controller {#ID}: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerCPUUsage, "{#ID}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|Node {#NODE}: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwPerfNodeCPUUsage, "{#NODE}"],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/system.name,#1)<>last(/Huawei OceanStor 5300 V5 by SNMP/system.name,#2) and length(last(/Huawei OceanStor 5300 V5 by SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
+|OceanStor 5300 V5: Storage version has been changed |<p>OceanStor 5300 V5 version has changed. Ack to close.</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version]))>0` |INFO |<p>Manual close: YES</p> |
+|Controller {#ID}: Memory usage is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerMemoryUsage, "{#ID}"],{$HUAWEI.5300.MEM.MAX.TIME})>{$HUAWEI.5300.MEM.MAX.WARN}` |AVERAGE | |
+|Controller {#ID}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerHealthStatus, "{#ID}"])<>1` |HIGH | |
+|Controller {#ID}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerRunningStatus, "{#ID}"])<>27` |AVERAGE | |
+|Controller {#ID}: Role has been changed |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#1)<>last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoControllerRole, "{#ID}"],#2)` |WARNING |<p>Manual close: YES</p> |
+|Enclosure {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoEnclosureHealthStatus, "{#NAME}"])<>1` |HIGH | |
+|Enclosure {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoEnclosureRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
+|Enclosure {#NAME}: Temperature is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoEnclosureTemperature, "{#NAME}"],{$HUAWEI.5300.TEMP.MAX.TIME})>{$HUAWEI.5300.TEMP.MAX.WARN}` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoFanHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
+|FAN {#ID} on {#LOCATION}: Running status is not Running |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoFanRunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
+|BBU {#ID} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoBBUHealthStatus, "{#ID}:{#LOCATION}"])<>1` |HIGH | |
+|BBU {#ID} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoBBURunningStatus, "{#ID}:{#LOCATION}"])<>2` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoDiskHealthStatus, "{#ID}"])<>1` |HIGH | |
+|Disk {#MODEL} on {#LOCATION}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoDiskRunningStatus, "{#ID}"])<>27` |AVERAGE | |
+|Disk {#MODEL} on {#LOCATION}: Temperature is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoDiskTemperature, "{#ID}"],{$HUAWEI.5300.DISK.TEMP.MAX.TIME})>{$HUAWEI.5300.DISK.TEMP.MAX.WARN:"{#MODEL}"}` |HIGH | |
+|Node {#NODE}: Average I/O latency is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwPerfNodeDelay, "{#NODE}"],{$HUAWEI.5300.NODE.IO.DELAY.MAX.TIME})>{$HUAWEI.5300.NODE.IO.DELAY.MAX.WARN}` |WARNING | |
+|LUN {#NAME}: Status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwStorageLunStatus, "{#NAME}"])<>1` |AVERAGE | |
+|LUN {#NAME}: Average I/O response time is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwPerfLunAverageIOResponseTime, "{#NAME}"],{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}` |WARNING | |
+|Pool {#NAME}: Health status is not Normal |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoStoragePoolHealthStatus, "{#NAME}"])<>1` |HIGH | |
+|Pool {#NAME}: Running status is not Online |<p>-</p> |`last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoStoragePoolRunningStatus, "{#NAME}"])<>27` |AVERAGE | |
+|Pool {#NAME}: Used capacity is too high |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[hwInfoStoragePoolFreeCapacityPct, "{#NAME}"],{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME})>{#THRESHOLD}` |AVERAGE | |
+|Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor 5300 V5 by SNMP/system.net.uptime[sysUpTime.0])<10m)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Huawei OceanStor 5300 V5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0` |HIGH | |
+|High ICMP ping loss |<p>-</p> |`min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
+|High ICMP ping response time |<p>-</p> |`avg(/Huawei OceanStor 5300 V5 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor).
 
