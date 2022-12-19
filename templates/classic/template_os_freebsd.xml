@@ -707,6 +707,30 @@
                             </graph_items>
                         </graph_prototype>
                     </graph_prototypes>
+                    <overrides>
+                        <override>
+                            <name>Skip metadata collection for dynamic FS</name>
+                            <step>1</step>
+                            <filter>
+                                <conditions>
+                                <condition>
+                                    <macro>{#FSTYPE}</macro>
+                                    <value>^(btrfs|zfs)$</value>
+                                    <formulaid>A</formulaid>
+                                </condition>
+                                </conditions>
+                            </filter>
+                            <operations>
+                                <operation>
+                                <operationobject>ITEM_PROTOTYPE</operationobject>
+                                <operator>LIKE</operator>
+                                <value>inode</value>
+                                <status>ENABLED</status>
+                                <discover>NO_DISCOVER</discover>
+                                </operation>
+                            </operations>
+                        </override>
+                    </overrides>
                 </discovery_rule>
             </discovery_rules>
             <screens>
