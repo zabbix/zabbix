@@ -512,11 +512,6 @@ else {
 			$data['filter']['timeline']['to_ts']
 		);
 
-		$url = (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']);
-		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-			$url->setArgument('filter_templateid', $data['filter']['hostids']);
-		}
-
 		$triggerTable->addRow([
 			$trigger['host_name'],
 			$allowed_ui_problems
@@ -533,7 +528,7 @@ else {
 			($availability['false'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
-			new CLink(_('Show'), $url)
+			new CLink(_('Show'), (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']))
 		]);
 	}
 
