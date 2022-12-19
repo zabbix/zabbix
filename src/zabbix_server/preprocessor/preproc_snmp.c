@@ -109,14 +109,13 @@ static int	snmp_hex_to_utf8(unsigned char *value, unsigned char *out, int size)
 
 static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 {
-	unsigned char	*ptr;
 	size_t		len;
 
 	if ('\0' == *value)
 		return FAIL;
 
 	len = strlen(value) / 3 + 2;
-	*out = (char *)(ptr = (unsigned char *)zbx_malloc(NULL, len));
+	*out = (char *)zbx_malloc(NULL, len);
 
 	if (FAIL == snmp_hex_to_utf8((unsigned char *)value, (unsigned char *)*out, (int)len))
 	{
