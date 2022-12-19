@@ -35,13 +35,13 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
-	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
+	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null, _('Interface')],
 	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
 										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
 										'isset({copy})'
 									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
-	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'itemid' =>						[T_ZBX_INT, O_NO, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
 										_('Name')
 									],
@@ -58,13 +58,13 @@ $fields = [
 											' && {type} != '.ITEM_TYPE_DEPENDENT,
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
-	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
-	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'history_mode' =>				[T_ZBX_INT, O_OPT, null, IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
+	'history' =>					[T_ZBX_STR, O_OPT, null, null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
 										_('History storage period')
 									],
-	'status' =>						[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
+	'status' =>						[T_ZBX_INT, O_OPT, null, IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
 	'type' =>						[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
@@ -74,49 +74,49 @@ $fields = [
 										]),
 										'isset({add}) || isset({update})'
 									],
-	'trends_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
-	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,	'(isset({add}) || isset({update}))'.
+	'trends_mode' =>				[T_ZBX_INT, O_OPT, null, IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
+	'trends' =>						[T_ZBX_STR, O_OPT, null, null, '(isset({add}) || isset({update}))'.
 										' && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
 										' && isset({value_type})'.
 										' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 										_('Trend storage period')
 									],
-	'value_type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
-	'valuemapid' =>					[T_ZBX_INT, O_OPT, null,	DB_ID,
+	'value_type' =>					[T_ZBX_INT, O_OPT, null, IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
+	'valuemapid' =>					[T_ZBX_INT, O_OPT, null, DB_ID,
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 									],
-	'authtype' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
+	'authtype' =>					[T_ZBX_INT, O_OPT, null, IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH
 									],
-	'username' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'username' =>					[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type'),
 										_('User name')
 									],
-	'password' =>					[T_ZBX_STR, O_OPT, null,	null,
+	'password' =>					[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type')
 									],
-	'publickey' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'publickey' =>					[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
 									],
-	'privatekey' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'privatekey' =>					[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
 									],
-	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	$paramsFieldName =>				[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
 											' && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED, 'type'
 											),
 										getParamFieldLabelByType(getRequest('type', 0))
 									],
-	'inventory_link' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
+	'inventory_link' =>				[T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535),
 										'(isset({add}) || isset({update})) && {value_type} != '.ITEM_VALUE_TYPE_LOG
 									],
-	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'snmp_oid' =>					[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_SNMP,
 										_('SNMP OID')
@@ -126,45 +126,47 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_IPMI,
 										_('IPMI sensor')
 									],
-	'trapper_hosts' =>				[T_ZBX_STR, O_OPT, null,	null,
+	'trapper_hosts' =>				[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update}))'.
 											' && isset({type}) && {type} == '.ITEM_TYPE_TRAPPER
 									],
-	'units' =>						[T_ZBX_STR, O_OPT, null,	null,
+	'units' =>						[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')
 									],
-	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null,	null,
+	'logtimefmt' =>					[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update})) && isset({value_type})'.
 											' && {value_type} == '.ITEM_VALUE_TYPE_LOG
 									],
 	'preprocessing' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
-	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'new_application' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
-	'applications' =>				[null,      O_OPT, P_ONLY_ARRAY,	null,		null],
+	'group_itemid' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
+	'copy_targetids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,				DB_ID,	null],
+	'new_application' =>			[T_ZBX_STR, O_OPT, null,						null,
+										'isset({add}) || isset({update})'
+									],
+	'visible' =>					[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,				null,	null],
+	'applications' =>				[null,      O_OPT, P_ONLY_ARRAY,				null,	null],
 	'massupdate_app_action' =>		[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
 										null
 									],
-	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO, null,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('Timeout')
 									],
-	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'url' =>						[T_ZBX_STR, O_OPT, null, NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type})'.
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
-	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,			null,	null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 										null
@@ -173,8 +175,8 @@ $fields = [
 										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 										null
 									],
-	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -187,13 +189,13 @@ $fields = [
 										]),
 										null
 									],
-	'output_format' =>				[T_ZBX_INT, O_OPT, null,	IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]), null],
+	'output_format' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]), null],
 	'allow_traps' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), null
 									],
-	'ssl_cert_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'ssl_cert_file' =>				[T_ZBX_STR, O_OPT, null, null, null],
+	'ssl_key_file' =>				[T_ZBX_STR, O_OPT, null, null, null],
+	'ssl_key_password' =>			[T_ZBX_STR, O_OPT, null, null, null],
 	'verify_peer' =>				[T_ZBX_INT, O_OPT, null, IN([HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON]),
 										null
 									],
@@ -206,14 +208,14 @@ $fields = [
 										]),
 										null
 									],
-	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
+	'http_username' =>				[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
 												' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 										_('Username')
 									],
-	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
+	'http_password' =>				[T_ZBX_STR, O_OPT, null, null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
@@ -235,16 +237,16 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'massupdate' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,		null,	null],
 	// filter
-	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'filter_application' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>					[T_ZBX_STR, O_OPT, null,		null,	null],
+	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,		null,	null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_application' =>			[T_ZBX_STR, O_OPT, null,		null,	null],
+	'filter_name' =>				[T_ZBX_STR, O_OPT, null,		null,	null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
@@ -254,25 +256,25 @@ $fields = [
 										]),
 										null
 									],
-	'filter_key' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_oid' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_value_type' =>			[T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null],
+	'filter_key' =>					[T_ZBX_STR, O_OPT, null,		null,	null],
+	'filter_snmp_oid' =>			[T_ZBX_STR, O_OPT, null,		null,	null],
+	'filter_value_type' =>			[T_ZBX_INT, O_OPT, null, IN('-1,0,1,2,3,4'), null],
 	'filter_delay' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
 	'filter_history' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('History')],
 	'filter_trends' =>				[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Trends')],
-	'filter_status' =>				[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+	'filter_status' =>				[T_ZBX_INT, O_OPT, null, IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
 										null
 									],
-	'filter_state' =>				[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+	'filter_state' =>				[T_ZBX_INT, O_OPT, null, IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
 										null
 									],
-	'filter_templated_items' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
-	'filter_with_triggers' =>		[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
+	'filter_templated_items' =>		[T_ZBX_INT, O_OPT, null, IN('-1,0,1'),	null],
+	'filter_with_triggers' =>		[T_ZBX_INT, O_OPT, null, IN('-1,0,1'),	null],
 	'filter_discovery' =>			[T_ZBX_INT, O_OPT, null,
 										IN([-1, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
 										null
 									],
-	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_ipmi_sensor' =>			[T_ZBX_STR, O_OPT, null,		null,	null],
 	// subfilters
 	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'subfilter_apps' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
