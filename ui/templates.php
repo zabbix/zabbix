@@ -45,7 +45,7 @@ $fields = [
 	'description'		=> [T_ZBX_STR, O_OPT, null,		null,	null],
 	'macros'			=> [null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'show_inherited_macros' => [T_ZBX_INT, O_OPT, null,	IN([0,1]), null],
-	'valuemaps'			=> [T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'valuemaps'			=> [null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
