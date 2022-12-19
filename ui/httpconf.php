@@ -48,7 +48,7 @@ $fields = [
 		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
 	],
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
-	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
+	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,
 								IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
 									HTTPTEST_AUTH_DIGEST
