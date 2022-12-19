@@ -45,10 +45,7 @@ validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
  * Filter
  */
 if (hasRequest('filter_set')) {
-	// prepare severity array
-	$severities = hasRequest('severities') ? array_keys(getRequest('severities')) : [];
-
-	CProfile::updateArray('web.toptriggers.filter.severities', $severities, PROFILE_TYPE_STR);
+	CProfile::updateArray('web.toptriggers.filter.severities', getRequest('severities', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
 	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 }
