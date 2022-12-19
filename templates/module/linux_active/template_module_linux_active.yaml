@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-16T12:21:06Z'
+  date: '2022-12-19T09:58:22Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -985,11 +985,6 @@ zabbix_export:
               operations:
                 -
                   operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
-                  value: inode
-                  discover: NO_DISCOVER
-                -
-                  operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: inode
                   discover: NO_DISCOVER
