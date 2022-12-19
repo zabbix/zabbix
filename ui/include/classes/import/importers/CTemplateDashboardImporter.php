@@ -160,7 +160,7 @@ class CTemplateDashboardImporter extends CImporter {
 						$item_key = $field['value']['key'];
 
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-						$field['value'] = $this->referencer->findItemidByKey($hostid, $item_key);
+						$field['value'] = $this->referencer->findItemidByKey($hostid, $item_key, true);
 
 						if ($field['value'] === null) {
 							throw new Exception(_s('Cannot find item "%1$s" used in dashboard "%2$s".',

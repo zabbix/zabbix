@@ -809,7 +809,7 @@ class CConfigurationImport {
 						));
 					}
 
-					$master_itemid = $this->referencer->findItemidByKey($hostid, $item[$master_item_key]['key']);
+					$master_itemid = $this->referencer->findItemidByKey($hostid, $item[$master_item_key]['key'], true);
 
 					if ($master_itemid !== null) {
 						$item['master_itemid'] = $master_itemid;
@@ -895,7 +895,7 @@ class CConfigurationImport {
 			foreach ($items_to_create as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
-						$item[$master_item_key]['key']
+						$item[$master_item_key]['key'], true
 					);
 
 					if ($item['master_itemid'] === null) {
@@ -934,7 +934,7 @@ class CConfigurationImport {
 			foreach ($items_to_update as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
-						$item[$master_item_key]['key']
+						$item[$master_item_key]['key'], true
 					);
 
 					if ($item['master_itemid'] === null) {
@@ -1053,7 +1053,7 @@ class CConfigurationImport {
 					}
 
 					$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
-						$discovery_rule[$master_item_key]['key']
+						$discovery_rule[$master_item_key]['key'], true
 					);
 				}
 
@@ -1220,7 +1220,7 @@ class CConfigurationImport {
 						}
 
 						$master_item_prototypeid = $this->referencer->findItemidByKey($hostid,
-							$item_prototype[$master_item_key]['key']
+							$item_prototype[$master_item_key]['key'], true
 						);
 
 						if ($master_item_prototypeid !== null) {
@@ -1442,7 +1442,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 
 						$itemid = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+							? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'], true)
 							: null;
 
 						if ($itemid === null) {
@@ -1463,7 +1463,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 
 						$itemid = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+							? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'], true)
 							: null;
 
 						if ($itemid === null) {
@@ -1484,7 +1484,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
 
 						$item['itemid'] = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+							? $this->referencer->findItemidByKey($hostid, $item['item']['key'], true)
 							: null;
 
 						if ($item['itemid'] === null) {
@@ -1574,7 +1574,7 @@ class CConfigurationImport {
 
 			foreach ($trigger['dependencies'] as $dependency) {
 				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
-					$dependency['expression'], $dependency['recovery_expression']
+					$dependency['expression'], $dependency['recovery_expression'], true
 				);
 
 				if ($dependent_triggerid === null) {
@@ -1679,7 +1679,7 @@ class CConfigurationImport {
 			if ($graph['ymin_item_1']) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 				$itemid = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+					? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'], true)
 					: null;
 
 				if ($itemid === null) {
@@ -1697,7 +1697,7 @@ class CConfigurationImport {
 			if ($graph['ymax_item_1']) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 				$itemid = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+					? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'], true)
 					: null;
 
 				if ($itemid === null) {
@@ -1717,7 +1717,7 @@ class CConfigurationImport {
 			foreach ($graph['gitems'] as &$item) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
 				$item['itemid'] = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+					? $this->referencer->findItemidByKey($hostid, $item['item']['key'], true)
 					: null;
 
 				if ($item['itemid'] === null) {
@@ -1906,7 +1906,7 @@ class CConfigurationImport {
 
 			foreach ($trigger['dependencies'] as $dependency) {
 				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
-					$dependency['expression'], $dependency['recovery_expression']
+					$dependency['expression'], $dependency['recovery_expression'], true
 				);
 
 				if ($dependent_triggerid === null) {
