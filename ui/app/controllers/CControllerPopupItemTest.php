@@ -699,7 +699,8 @@ abstract class CControllerPopupItemTest extends CController {
 				'privpassphrase' => '',
 				'authprotocol' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
 				'privprotocol' => ITEM_SNMPV3_PRIVPROTOCOL_DES,
-				'contextname' => ''
+				'contextname' => '',
+				'max_repetitions' => '10'
 			]
 		];
 
@@ -1304,6 +1305,33 @@ abstract class CControllerPopupItemTest extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('SNMP community'), _('cannot be empty')));
 
 				return false;
+			}
+
+			if ($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3) {
+				if (!array_key_exists('max_repetitions', $interface['details'])
+						|| $interface['details']['max_repetitions'] === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('cannot be empty')));
+
+					return false;
+				}
+
+				if (!is_numeric($interface['details']['max_repetitions'])) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _('a numeric value is expected')));
+
+					return false;
+				}
+
+				if ($interface['details']['max_repetitions'] < 1) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no less than "%1$s"', 1)));
+
+					return false;
+				}
+
+				if ($interface['details']['max_repetitions'] > ZBX_MAX_INT32) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Max repetition count'), _s('value must be no greater than "%1$s"', ZBX_MAX_INT32)));
+
+					return false;
+				}
 			}
 		}
 

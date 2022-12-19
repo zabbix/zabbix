@@ -6369,6 +6369,8 @@ svg {
   .preprocessing-list .on-fail-options > label,
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
+  .preprocessing-list .preprocessing-step {
+    align-items: baseline; }
   .preprocessing-list .step-name {
     flex: 0 0 295px;
     max-width: 295px; }
@@ -6379,6 +6381,8 @@ svg {
     .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
     .preprocessing-list .step-parameters z-select:not(:last-child) {
       margin-right: 5px; }
+    .preprocessing-list .step-parameters .table-forms-separator {
+      width: 100%; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;
     max-width: 100px;
