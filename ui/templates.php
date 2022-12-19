@@ -36,7 +36,7 @@ $fields = [
 	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'add_templates'		=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'add_templates'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'templateid'		=> [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form}) && {form} == "update"'],
 	'template_name'		=> [T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Template name')],
 	'visiblename'		=> [T_ZBX_STR, O_OPT, null,		null,	'isset({add}) || isset({update})'],
