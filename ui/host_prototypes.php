@@ -49,7 +49,7 @@ $fields = [
 	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
