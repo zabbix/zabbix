@@ -122,6 +122,11 @@ foreach ($tags as $key => $tag) {
 // Remove inherited macros data (actions: 'add', 'update' and 'form').
 $macros = cleanInheritedMacros(getRequest('macros', []));
 
+foreach ($macros as &$macro) {
+	unset($macro['allow_revert']);
+}
+unset($macro);
+
 // Remove empty new macro lines.
 $macros = array_filter($macros, function($macro) {
 	$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
@@ -380,6 +385,13 @@ if (hasRequest('form')) {
 		if ($data['host_prototype']['hostid'] != 0) {
 			// When opening existing host prototype, display all values from database.
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+
+			foreach ($data['host_prototype']['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro['allow_revert'] = true;
+				}
+			}
+			unset($macro);
 
 			$groupids = zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid');
 			$data['groups'] = API::HostGroup()->get([
