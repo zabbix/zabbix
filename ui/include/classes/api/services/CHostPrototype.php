@@ -1143,7 +1143,7 @@ class CHostPrototype extends CHostBase {
 			}
 			elseif (array_key_exists('uuid', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('zInvalid parameter "%1$s": %2$s.', '/' . ($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
+					_s('Invalid parameter "%1$s": %2$s.', '/' . ($i + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);
 			}
 		}
