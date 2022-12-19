@@ -286,16 +286,17 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $key
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findItemidByKey(string $hostid, string $key): ?string {
+	public function findItemidByKey(string $hostid, string $key, bool $inherited = false): ?string {
 		if ($this->db_items === null) {
 			$this->selectItems();
 		}
 
 		foreach ($this->db_items as $itemid => $item) {
-			if ($item['hostid'] === $hostid && $item['key_'] === $key) {
+			if ($item['hostid'] === $hostid && $item['key_'] === $key && ($inherited || $item['templateid'] == 0)) {
 				return $itemid;
 			}
 		}
@@ -392,10 +393,12 @@ class CImportReferencer {
 	 * @param string $name
 	 * @param string $expression
 	 * @param string $recovery_expression
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findTriggeridByName(string $name, string $expression, string $recovery_expression): ?string {
+	public function findTriggeridByName(string $name, string $expression, string $recovery_expression,
+			bool $inherited = false): ?string {
 		if ($this->db_triggers === null) {
 			$this->selectTriggers();
 		}
@@ -403,7 +406,8 @@ class CImportReferencer {
 		foreach ($this->db_triggers as $triggerid => $trigger) {
 			if ($trigger['description'] === $name
 					&& $trigger['expression'] === $expression
-					&& $trigger['recovery_expression'] === $recovery_expression) {
+					&& $trigger['recovery_expression'] === $recovery_expression
+					&& ($inherited || $trigger['templateid'] == 0)) {
 				return $triggerid;
 			}
 		}
@@ -880,7 +884,8 @@ class CImportReferencer {
 			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
-			'recovery_expression' => $trigger['recovery_expression']
+			'recovery_expression' => $trigger['recovery_expression'],
+			'templateid' => 0
 		];
 	}
 
@@ -1125,14 +1130,15 @@ class CImportReferencer {
 
 		if ($sql_where) {
 			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.key_,i.uuid FROM items i WHERE '.implode(' OR ', $sql_where)
+				'SELECT i.itemid,i.hostid,i.key_,i.uuid,i.templateid FROM items i WHERE '.implode(' OR ', $sql_where)
 			);
 
 			while ($db_item = DBfetch($db_items)) {
 				$this->db_items[$db_item['itemid']] = [
 					'uuid' => $db_item['uuid'],
 					'key_' => $db_item['key_'],
-					'hostid' => $db_item['hostid']
+					'hostid' => $db_item['hostid'],
+					'templateid' => $db_item['templateid']
 				];
 			}
 		}
@@ -1203,7 +1209,7 @@ class CImportReferencer {
 		}
 
 		$db_triggers = API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'uuid' => array_keys($uuids),
 				'flags' => [
@@ -1216,7 +1222,7 @@ class CImportReferencer {
 		]);
 
 		$db_triggers += API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression'],
+			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
 			'filter' => [
 				'description' => array_keys($this->triggers),
 				'flags' => [
@@ -1276,13 +1282,14 @@ class CImportReferencer {
 			$graph_names += array_flip(array_keys($graph));
 		}
 
-		$db_graphs =  API::Graph()->get([
+		$db_graphs = API::Graph()->get([
 			'output' => ['uuid', 'name'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'uuid' => array_keys($graph_uuids),
 				'flags' => null
 			],
+			'inherited' => false,
 			'preservekeys' => true
 		]);
 
@@ -1293,6 +1300,7 @@ class CImportReferencer {
 				'name' => array_keys($graph_names),
 				'flags' => null
 			],
+			'inherited' => false,
 			'preservekeys' => true
 		]);
 
@@ -1579,6 +1587,7 @@ class CImportReferencer {
 
 			if ($hostid !== false) {
 				$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid)
+					.' AND ht.templateid IS NULL'
 					.' AND ('
 						.dbConditionString('ht.name', array_keys($httptests))
 						.' OR '.dbConditionString('ht.uuid', array_column($httptests, 'uuid'))
