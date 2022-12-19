@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	NOT_EMPTY,	'isset({add}) || isset({update})'],
-	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'clear_templates'	=> [T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,		DB_ID,	null],
 	'templates'			=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'linked_templates'	=> [T_ZBX_INT, O_OPT, null,		DB_ID,	null],
 	'add_templates'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
@@ -51,8 +51,8 @@ $fields = [
 								IN('"template.export","template.massdelete","template.massdeleteclear"'),
 								null
 							],
-	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'unlink'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
+	'unlink_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
@@ -127,10 +127,10 @@ $macros = array_filter($macros, function($macro) {
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 	$unlinkTemplates = [];
 
-	if (hasRequest('unlink') && is_array(getRequest('unlink'))) {
+	if (hasRequest('unlink')) {
 		$unlinkTemplates = array_keys(getRequest('unlink'));
 	}
-	elseif (hasRequest('unlink_and_clear') && is_array(getRequest('unlink_and_clear'))) {
+	elseif (hasRequest('unlink_and_clear')) {
 		$unlinkTemplates = array_keys(getRequest('unlink_and_clear'));
 		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
 	}
