@@ -166,9 +166,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 		if ($flags & P_ONLY_ARRAY || $type !== null) {
 			foreach ($var as $v) {
-				$err |= check_type($field, $flags, $v, $type);
+				$err = check_type($field, $flags, $v, $type);
 
-				if (!($err & ZBX_VALID_OK)) {
+				if ($err != ZBX_VALID_OK) {
 					break;
 				}
 			}
