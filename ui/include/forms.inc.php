@@ -918,7 +918,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 
-		if ($data['context'] !== 'template') {
+		if ($data['context'] === 'host') {
 			$data['template'] = makeItemTemplateHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
@@ -1757,7 +1757,7 @@ function getTriggerFormData(array $data) {
 			$data['tags'] = $trigger['tags'];
 		}
 
-		if ($data['context'] !== 'template') {
+		if ($data['context'] === 'host') {
 			$data['template'] = makeTriggerTemplateHtml($trigger['triggerid'],
 				getTriggerParentTemplates([$trigger], $flag), $flag,
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)

@@ -501,7 +501,7 @@ if (hasRequest('form')) {
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	if ($data['context'] !== 'template') {
+	if ($data['context'] === 'host') {
 		$data['template'] = makeHostPrototypeTemplateHtml($data['host_prototype']['hostid'],
 			getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
 		);

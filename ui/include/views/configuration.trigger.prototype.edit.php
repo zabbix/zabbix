@@ -67,7 +67,7 @@ if ($data['limited']) {
 $triggersFormList = new CFormList('triggersFormList');
 
 if (array_key_exists('template', $data)) {
-	$triggersFormList->addRow(_('Parent trigger'), $data['template']);
+	$triggersFormList->addRow(_('Parent trigger prototype'), $data['template']);
 }
 
 $triggersFormList

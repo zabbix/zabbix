@@ -498,7 +498,7 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
 
-		if ($data['context'] !== 'template') {
+		if ($data['context'] === 'host') {
 			$data['template'] = makeHttpTestTemplateHtml($db_httptest['httptestid'],
 				getHttpTestParentTemplates($db_httptests),
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)

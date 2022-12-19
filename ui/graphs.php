@@ -528,7 +528,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-		if ($data['context'] !== 'template') {
+		if ($data['context'] === 'host') {
 			$data['template'] = makeGraphTemplateHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
 				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);

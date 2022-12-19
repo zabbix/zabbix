@@ -52,7 +52,7 @@ $item_tab = (new CFormGrid())->setId('itemFormList');
 
 if (array_key_exists('template', $data)) {
 	$item_tab->addItem([
-		new CLabel(_('Parent item')),
+		new CLabel(_('Parent item prototype')),
 		new CFormField($data['template'])
 	]);
 }
