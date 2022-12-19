@@ -1185,6 +1185,7 @@ footer {
   border-color: #333333; }
 
 .dashboard-grid-widget-contents {
+  position: relative;
   flex-grow: 1;
   margin-top: 2rem;
   box-sizing: border-box;
