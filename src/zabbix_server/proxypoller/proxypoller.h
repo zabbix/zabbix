@@ -22,7 +22,7 @@
 
 #include "zbxthreads.h"
 #include "zbxcomms.h"
-#include "../events/events.h"
+#include "zbxdbhigh.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;

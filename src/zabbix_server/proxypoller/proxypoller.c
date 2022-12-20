@@ -18,21 +18,22 @@
 **/
 
 #include "proxypoller.h"
+
+#include "proxyconfigread/proxyconfig_read.h"
+#include "../trapper/proxydata.h"
+
 #include "zbxserver.h"
 #include "zbxdbwrap.h"
-#include "../events/events.h"
+#include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "zbxcrypto.h"
-#include "../trapper/proxydata.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "proxyconfigread/proxyconfig_read.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"

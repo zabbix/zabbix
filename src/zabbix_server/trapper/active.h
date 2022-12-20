@@ -22,7 +22,7 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
-#include "../events/events.h"
+#include "zbxdbhigh.h"
 
 int	send_list_of_active_checks(zbx_socket_t *sock, char *request, zbx_events_funcs_t *events_cbs,
 		int config_timeout);

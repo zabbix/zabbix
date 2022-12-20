@@ -22,6 +22,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);

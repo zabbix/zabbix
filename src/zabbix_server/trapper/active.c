@@ -20,7 +20,6 @@
 #include "active.h"
 
 #include "zbxserver.h"
-#include "../events/events.h"
 #include "log.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
