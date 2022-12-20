@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "modbtype.h"
+#include "../sysinfo.h"
+
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxnum.h"
-
-#include "../sysinfo.h"
-#include "modbtype.h"
 
 #ifdef HAVE_LIBMODBUS
 #include "zbxmutexs.h"
