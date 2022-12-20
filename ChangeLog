@@ -1,4 +1,4 @@
-Changes for 6.4.0rc1
+Changes for 6.4.0beta5
 
 New features:
 ..FG...... [ZBXNEXT-6848] added support for system.sw.os on Windows OS and a new system.sw.os.get key for Zabbix agent and agent 2 items (jfreibergs, kprutkovs)
@@ -8,12 +8,10 @@ A.F....PS. [ZBXNEXT-4428] optimized SNMP discovery and data collection, added Ge
 ..F....... [ZBXNEXT-7963] added a hint box for "Enable HTTP authentication" parameter; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
 ...G...... [ZBXNEXT-2580] implemented new agent and agent 2 key system.sw.packages.get (dimir)
-...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ...G...... [ZBXNEXT-6119] added the option to retrieve all JSON data via the docker.container_info key in Zabbix agent 2 Docker plugin (esneiders)
 A......... [ZBXNEXT-8085] removed the deprecated property "alias" from user.get, user.create, user.update methods and the "user" propertty from the user.login method (kkuzmina)
 .........T [ZBXNEXT-7924] switched templates to use proc.get key for discovery of processes (egordymov)
 .........T [ZBXNEXT-7886] added Cisco Nexus 9000 Series Switches template (atocko)
-........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
 .........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
@@ -53,6 +51,8 @@ A......... [ZBX-22014] fixed fatal error in SCIM authentication (gcalenko)
 .........T [ZBX-21943] fixed loss and latency checks in the Cisco Meraki template (abiba, vkhaliev)
 .........T [ZBX-21601] added optimization for LLD preprocessing by splitting the master item into sub metrics (abiba)
 A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
+...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta4
