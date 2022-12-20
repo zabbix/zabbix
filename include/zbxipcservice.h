@@ -92,6 +92,8 @@ typedef struct
 }
 zbx_ipc_async_socket_t;
 
+void	zbx_init_library_ipcservice(unsigned char program_type);
+
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env(void);
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
@@ -133,7 +135,5 @@ void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
 void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src);
-
-void	zbx_init_library_ipcservice(unsigned char program_type);
 
 #endif

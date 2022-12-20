@@ -23,9 +23,7 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "cfg.h"
 #include "log.h"
-#include "control.h"
 #include "pid.h"
 #include "zbx_rtc_constants.h"
 
@@ -283,16 +281,18 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
  *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
- * Parameters: allow_root - allow root permission for application             *
- *             user       - user on the system to which to drop the           *
- *                          privileges                                        *
- *             flags      - daemon startup flags                              *
- *        get_pid_file_cb - callback function for getting absolute path and   *
- *                          name of PID file                                  *
- *       zbx_on_exit_cb_arg - callback function called when terminating       *
- *                            signal handler                                  *
- *        config_log_type - [IN]                                              *
- *        config_log_file - [IN]                                              *
+ * Parameters: allow_root         - [IN] allow root permission for            *
+ *                     application                                            *
+ *             user               - [IN] user on the system to which to drop  *
+ *                     the privileges                                         *
+ *             flags              - [IN] daemon startup flags                 *
+ *             get_pid_file_cb    - [IN] callback function for getting        *
+ *                     absolute path and name of PID file                     *
+ *             zbx_on_exit_cb_arg - [IN] callback function called when        *
+ *                     terminating signal handler                             *
+ *             config_log_type    - [IN]                                      *
+ *             config_log_file    - [IN]                                      *
+ *             signal_redirect_cb - [IN] USR1 handling callback               *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *

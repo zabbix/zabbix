@@ -55,8 +55,6 @@ int	zbx_db_validate_config_features(unsigned char program_type)
 {
 	int	err = 0;
 
-	ZBX_UNUSED(program_type);
-
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))
 	err |= (FAIL == check_cfg_feature_str("DBTLSConnect", CONFIG_DB_TLS_CONNECT, "PostgreSQL or MySQL library"
 			" version that support TLS"));
@@ -76,6 +74,8 @@ int	zbx_db_validate_config_features(unsigned char program_type)
 			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type));
 		err |= 1;
 	}
+#else
+	ZBX_UNUSED(program_type);
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
@@ -806,7 +806,9 @@ void	zbx_db_flush_version_requirements(const char *version)
  * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
  *          and configuration                                                    *
  *                                                                               *
- * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ * Parameters: info              - [IN] DB version information                   *
+ *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *             program_type      - [IN]                                          *
  *                                                                               *
  *********************************************************************************/
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
