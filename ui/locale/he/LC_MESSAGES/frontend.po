@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-08 14:27+0000\n"
+"PO-Revision-Date: 2022-12-18 09:28+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -930,11 +930,11 @@ msgstr "הוספה מתוך"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "הוספה ממארח"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "הוספה מתבנית"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1238,6 +1238,10 @@ msgstr "מארחים מורשים"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "שיטות מורשות"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -5420,6 +5424,10 @@ msgstr "סקירת נתונים"
 msgid "Data set"
 msgstr "ערכת נתונים"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5844,6 +5852,10 @@ msgstr "למחוק את ה־SLA הנבחר?"
 #: app/views/js/sla.list.js.php:129
 msgid "Delete selected SLAs?"
 msgstr "למחוק את ה־SLAs הנבחרים?"
+
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
@@ -6271,6 +6283,10 @@ msgstr "להשבית את ה־SLA הנבחר?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "להשבית את ה־SLAs הנבחרים?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7068,6 +7084,10 @@ msgstr "להפעיל את ה־SLA הנבחר?"
 msgid "Enable selected SLAs?"
 msgstr "להפעיל את ה־SLAs הנבחרים?"
 
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
 msgstr "להפעיל את המשימות הנבחרות?"
@@ -7746,6 +7766,13 @@ msgstr "השדה „%1$s” אינו מחרוזת."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "השדה „%1$s” ודאי חסר."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -12038,6 +12065,13 @@ msgstr "כתובת MAC א׳"
 msgid "MAC address B"
 msgstr "כתובת MAC ב׳"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12403,6 +12437,19 @@ msgstr "מספר עמודות ושורות מרבי בטבלאות סקירה"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "הטווח המרבי לבורר זמן"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13236,6 +13283,11 @@ msgstr "שרת LDAP חדש"
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
 msgstr "SLA חדש"
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -14168,6 +14220,17 @@ msgstr "מספרי (ללא סימן)"
 msgid "OEM"
 msgstr "יצרן"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14374,6 +14437,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -16820,6 +16887,14 @@ msgstr "מפתח מלכודת ה־SNMP שגויה."
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "גרסת SNMP"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -19913,6 +19988,13 @@ msgstr "לכתובת אמורים להיות שני השדות: „name” ו־�
 msgid "URLs"
 msgstr "כתובות"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -20015,6 +20097,13 @@ msgstr "שחרור"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "לשחרר את המשתמשים הנבחרים?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20382,6 +20471,10 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "שימוש בבקשות קבוצתיות"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -23096,6 +23189,12 @@ msgstr "שגיאת תחביר ליד „%1$s“"
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "שימוש שגוי בפונקציה „%1$s”"
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"

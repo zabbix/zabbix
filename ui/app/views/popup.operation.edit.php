@@ -387,7 +387,7 @@ $form_grid->addItem([
 	(new CFormField([
 		$select_operation_evaltype,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('operation-condition-evaltype-formula'),
+		(new CSpan())->setId('operation-condition-evaltype-formula')
 	]))->setId('operation-condition-row')
 ]);
 

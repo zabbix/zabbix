@@ -256,7 +256,7 @@ $form
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
-				'allowed_operations' => $data['allowedOperations'],
+				'allowed_operations' => $data['allowedOperations']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

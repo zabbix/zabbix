@@ -34,7 +34,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 	public function testFormAdministrationAuthenticationHttp_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('name:form_auth')->asForm()->one();
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('HTTP settings');
 
 		// Check default values.
