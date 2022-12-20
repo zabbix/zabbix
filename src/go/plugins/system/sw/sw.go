@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,6 +21,7 @@ package sw
 
 import (
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Plugin -
@@ -50,11 +48,33 @@ func (p *Plugin) Validate(options interface{}) error { return nil }
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if key == "system.sw.packages" {
+	const (
+		maxSwPackagesParams = 3
+		maxSwOSParams       = 1
+		maxSwOSGetParams    = 0
+	)
+
+	switch key {
+	case "system.sw.packages":
 		result, err = p.systemSwPackages(params)
-	} else if key == "system.sw.packages.get" {
+
+	case "system.sw.packages.get":
 		result, err = p.systemSwPackagesGet(params)
-	} else {
+
+	case "system.sw.os":
+		if len(params) > maxSwOSParams {
+			return nil, zbxerr.ErrorTooManyParameters
+		}
+
+		result, err = p.getOSVersion(params)
+
+	case "system.sw.os.get":
+		if len(params) > maxSwOSGetParams {
+			return nil, zbxerr.ErrorTooManyParameters
+		}
+		result, err = p.getOSVersionJSON()
+
+	default:
 		return nil, plugin.UnsupportedMetricError
 	}
 
@@ -65,5 +85,7 @@ func init() {
 	plugin.RegisterMetrics(&impl, "Sw",
 		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
 		"system.sw.packages.get", "Lists matching installed packages with details in JSON format.",
+		"system.sw.os", "Operating system information.",
+		"system.sw.os.get", "Operating system information in JSON format.",
 	)
 }

@@ -35,6 +35,10 @@ func mustLoadLibrary(name string) Hlib {
 	}
 }
 
+func (h Hlib) getProcAddress(name string) (uintptr, error) {
+	return syscall.GetProcAddress(syscall.Handle(h), name)
+}
+
 func (h Hlib) mustGetProcAddress(name string) uintptr {
 	if addr, err := syscall.GetProcAddress(syscall.Handle(h), name); err != nil {
 		panic(fmt.Sprintf("Failed to get function %s: %s", name, err.Error()))
