@@ -559,6 +559,11 @@ error:
 	return FAIL;
 }
 
+void	zbx_init_library_cfg(unsigned char program_type)
+{
+	program_type_str = get_program_type_string(program_type);
+}
+
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
@@ -703,9 +708,4 @@ fail:
 	zbx_vector_ptr_destroy(&addrs);
 
 	return ret;
-}
-
-void	zbx_init_library_cfg(unsigned char program_type)
-{
-	program_type_str = get_program_type_string(program_type);
 }
