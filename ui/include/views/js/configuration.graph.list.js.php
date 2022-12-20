@@ -26,15 +26,26 @@
 
 <script>
 	const view = {
-		init() {
+		init({checkbox_hash, checkbox_object}) {
+			this.checkbox_hash = checkbox_hash;
+			this.checkbox_object = checkbox_object;
+
+			this._initActions();
+		},
+
+		_initActions() {
 			document.querySelector('.js-copy').addEventListener('click', () => {
 				const overlay = this.openCopyPopup();
 				const dialogue = overlay.$dialogue[0];
 
 				dialogue.addEventListener('dialogue.submit', (e) => {
-					clearMessages();
+					postMessageOk(e.detail.title);
+					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
 
-					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+					location.href = location.href;
 				});
 			});
 		},

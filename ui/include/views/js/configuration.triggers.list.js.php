@@ -30,7 +30,10 @@
 
 <script>
 	const view = {
-		init() {
+		init({checkbox_hash, checkbox_object}) {
+			this.checkbox_hash = checkbox_hash;
+			this.checkbox_object = checkbox_object;
+
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -58,9 +61,13 @@
 				const dialogue = overlay.$dialogue[0];
 
 				dialogue.addEventListener('dialogue.submit', (e) => {
-					clearMessages();
+					postMessageOk(e.detail.title);
+					uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
 
-					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+					location.href = location.href;
 				});
 			});
 		},

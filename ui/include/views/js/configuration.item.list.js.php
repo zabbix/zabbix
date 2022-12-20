@@ -64,9 +64,13 @@
 				const dialogue = overlay.$dialogue[0];
 
 				dialogue.addEventListener('dialogue.submit', (e) => {
-					clearMessages();
+					postMessageOk(e.detail.title);
+					uncheckTableRows('items_' + this.checkbox_hash, [], false);
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
 
-					addMessage(makeMessageBox('good', [], e.detail.title, true, false));
+					location.href = location.href;
 				});
 			});
 

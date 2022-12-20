@@ -385,6 +385,11 @@ $html_page
 	->addItem($triggers_form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'g_triggerid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

@@ -26,7 +26,6 @@
 
 // create form
 $form = (new CForm())
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 switch ($data['element_type']) {

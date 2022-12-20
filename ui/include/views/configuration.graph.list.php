@@ -252,16 +252,16 @@ foreach ($data['graphs'] as $graph) {
 }
 
 // buttons
-$buttonsArray = [];
+$buttons = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = [
+	$buttons['graph.masscopyto'] = [
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeid()
 	];
 }
-$buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
+$buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
 	? _('Delete selected graph prototypes?')
 	: _('Delete selected graphs?')
 ];
@@ -270,14 +270,17 @@ $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->
 $graphForm->addItem([
 	$graphTable,
 	$data['paging'],
-	new CActionButtonList('action', 'group_graphid', $buttonsArray,
-		$data['parent_discoveryid']
-			? $data['parent_discoveryid']
-			: $data['hostid']
+	new CActionButtonList('action', 'group_graphid', $buttons,
+		$data['parent_discoveryid'] ?: $data['hostid'],
 	)
 ]);
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['hostid'],
+		'checkbox_object' => 'group_graphid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();
 

@@ -25,6 +25,7 @@
 ?>
 
 window.copy_popup = new class {
+
 	init({action}) {
 		this.overlay = overlays_stack.getById('copy');
 		this.dialogue = this.overlay.$dialogue[0];
