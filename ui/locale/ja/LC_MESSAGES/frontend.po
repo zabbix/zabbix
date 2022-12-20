@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-30 11:44+0000\n"
+"PO-Revision-Date: 2022-12-19 22:50+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -150,7 +150,7 @@ msgstr[0] "%1$sイベント"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s グループのパターン"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -260,7 +260,7 @@ msgstr "%1$s件選択済"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
@@ -270,7 +270,7 @@ msgstr "%1$s.phpクラスは、%3$sにあるモジュールの%2$sを拡張し�
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -677,7 +677,7 @@ msgstr "アクションを更新しました"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のアクションは使用できません。"
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -906,6 +906,14 @@ msgstr "子サービスの追加"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "他から追加"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "ホストから追加"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "テンプレートから追加"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1209,6 +1217,10 @@ msgstr "許可されたホスト"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "許可されたメソッド"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr "集約されたデータセットの凡例ラベルとしても使用されます。"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -3302,7 +3314,7 @@ msgstr "where句がないため\"%1$s\"テーブルにupdate文を実行でき�
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] ""
+msgstr[0] "ユーザーをプロビジョニングできません"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4488,6 +4500,10 @@ msgstr "データベース接続設定"
 msgid "Configure JIT provisioning"
 msgstr "JITプロビジョニングの設定"
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr "変更の確認"
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "確認テキスト"
@@ -5324,6 +5340,10 @@ msgstr "データの概要"
 msgid "Data set"
 msgstr "データセット"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr "データセットラベル"
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5749,6 +5769,10 @@ msgstr "選択したSLAを削除しますか？"
 msgid "Delete selected SLAs?"
 msgstr "選択したSLAを削除しますか？"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr "選択したアクションを削除しますか？"
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "選択したアクションを削除しますか？"
@@ -6005,20 +6029,20 @@ msgstr "廃止予定のパラメーター\"%1$s\"は、\"%2$s\"と一緒に使�
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループ"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループが削除できません。"
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループを空にできません。"
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーグループを有効にできません。"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6051,6 +6075,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "説明"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr "インストール済みパッケージの詳細リスト。JSONフォーマットのテキストで返す"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6171,6 +6199,10 @@ msgstr "選択したSLAを無効にしますか？"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "選択したSLAを無効にしますか？"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr "選択したアクションを無効にしますか？"
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -6873,6 +6905,10 @@ msgstr "有効"
 msgid "Enable HTTP authentication"
 msgstr "HTTP認証の有効化"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr "すべてのユーザーでHTTP認証を有効にします。"
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
@@ -6960,6 +6996,10 @@ msgstr "選択したSLAを有効にしますか？"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "選択したSLAを有効にしますか？"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr "選択したアクションを有効にしますか？"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7638,6 +7678,13 @@ msgstr "フィールド\"%1$s\"は文字列ではありません。"
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "フィールド\"%1$s\"が入力されていません。"
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr "フィールド名"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9186,6 +9233,10 @@ msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで�
 msgid "Identification of the system. Returns string"
 msgstr "システムの識別文字列。文字列値を返す。"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "HTTP認証が有効になっている場合、すべてのユーザー(WebインターフェースへのアクセスがLDAPや内部DBに設定されている場合でも)は、ZabbixではなくWebサーバーによって認証されます。"
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9451,11 +9502,11 @@ msgstr "アクセスできないウィジェットタイプ"
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "アクセスできないウィジェットはコピーできません。"
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "アクセスできないウィジェットは貼り付けられません。"
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -10517,11 +10568,11 @@ msgstr "JSONデータが正しくありません。JSONテキストのパース�
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "LDAP JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "LDAP JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10532,11 +10583,11 @@ msgstr "LDAPの設定が正しくありません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "SAML JITプロビジョニングメディアタイプのマッピング構成が正しくありません。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "SAML JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10604,7 +10655,7 @@ msgstr "キー\"%1$s\": %2$sが正しくありません。"
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr ""
+msgstr "メディアタイプのマッピング構成が正しくありません。"
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10911,7 +10962,7 @@ msgstr "期間が正しくありません。"
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr ""
+msgstr "ユーザーグループのマッピング構成が正しくありません。"
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11907,6 +11958,13 @@ msgstr "MACアドレスA"
 msgid "MAC address B"
 msgstr "MACアドレスB"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr "16進文字列のMACアドレス"
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12146,11 +12204,11 @@ msgstr "マップの更新に失敗しました。"
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "通知を送信するために、ユーザーのLDAPのメディア属性(電子メールなど)をZabbixのユーザーメディアにマップします。"
 
 #: app/views/administration.authentication.edit.php:508
 msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "通知を送信するために、ユーザーのSAMLのメディア属性(電子メールなど)をZabbixのユーザーメディアにマップします。"
 
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
@@ -12272,6 +12330,19 @@ msgstr "概要テーブル内の列と行の最大数"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "タイムセレクターの最大期間"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr "最大繰り返し回数"
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr "最大繰り返し回数は、検出とsnmp.walkにのみ適用されます。"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -12439,7 +12510,7 @@ msgstr "メニュー項目名"
 #: include/views/configuration.trigger.prototype.edit.php:554
 #: include/views/configuration.triggers.edit.php:576
 msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
-msgstr ""
+msgstr "メニューエントリ名は、イベントコンテキストメニューのトリガーURLのラベルとして使用されます。"
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -13021,7 +13092,7 @@ msgstr "ネームスペース"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "Naming requirements:"
-msgstr ""
+msgstr "命名要件："
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13096,6 +13167,11 @@ msgstr "新規LDAPサーバー"
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
 msgstr "新規SLA"
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr "新規アクション"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -13667,7 +13743,7 @@ msgstr "公開鍵ファイルが設定されていません。"
 #: app/controllers/CControllerActionOperationValidate.php:110
 #: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
-msgstr "アクションメッセージの受信者が指定されていません。"
+msgstr "アクションメッセージの送信先が指定されていません。"
 
 #: include/classes/widgets/CWidgetConfig.php:305 jsLoader.php:167
 msgid "No refresh"
@@ -13798,7 +13874,7 @@ msgstr "\"guest\"ユーザーはテーマを設定できません。"
 #: include/classes/api/services/CUser.php:484
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "プロビジョニングされたユーザーのフィールド\"%1$s\"は更新できせん。"
 
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
@@ -14028,6 +14104,17 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr "OID"
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr "OID接頭辞"
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14161,7 +14248,7 @@ msgstr "管理者だけがマップの所有者を設定できます。"
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "プロビジョニング解除されたユーザーに対して設定できるのは、無効なグループのみです。"
 
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
@@ -14191,7 +14278,7 @@ msgstr "1回の絞り込みのみ使用できます。"
 #: include/classes/api/services/CUserDirectory.php:519
 #, c-format
 msgid "Only one user directory of type \"%1$s\" can exist."
-msgstr ""
+msgstr "タイプ\"%1$s\"のユーザーディレクトリは1つだけ存在できます。"
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -14233,6 +14320,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "OS情報。文字列値を返す。"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr "OSのバージョン情報。JSONで返す"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15426,11 +15517,11 @@ msgstr "プロビジョニングの実行"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
-msgstr ""
+msgstr "選択したLDAPユーザーのプロビジョニングをしますか？"
 
 #: app/views/administration.user.list.php:141
 msgid "Provisioned"
-msgstr ""
+msgstr "プロビジョニング済"
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
@@ -15438,7 +15529,7 @@ msgstr "プロビジョニング間隔"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr ""
+msgstr "プロビジョニングが成功しました。"
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -15704,19 +15795,19 @@ msgstr "送信先がすでに存在しています。"
 
 #: app/views/reports.actionlog.list.csv.php:39
 msgid "Recipient's Zabbix username"
-msgstr ""
+msgstr "送信先のZabbixユーザー名"
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
-msgstr ""
+msgstr "送信先の名"
 
 #: app/views/reports.actionlog.list.csv.php:41
 msgid "Recipient's surname"
-msgstr ""
+msgstr "送信先の姓"
 
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
-msgstr "受信者"
+msgstr "送信先"
 
 #: app/views/reports.auditlog.list.php:73
 #: app/views/reports.auditlog.list.php:96
@@ -16674,6 +16765,14 @@ msgstr "SNMPトラップのキーが正しくありません。"
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "SNMPバージョン"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -19755,6 +19854,13 @@ msgstr "マップ\"%1$s\"のURLには\"name\"と\"url\"の両方のフィール�
 msgid "URLs"
 msgstr "URL"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19857,6 +19963,13 @@ msgstr "ブロックを解除"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "選択したユーザーのブロックを解除しますか？"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20223,6 +20336,10 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "bulkリクエストを使用"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -22930,6 +23047,12 @@ msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "関数\"%1$s\"の使い方が正しくありません"
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
