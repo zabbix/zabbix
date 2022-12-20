@@ -1636,7 +1636,7 @@ class CScript extends CApiService {
 		}
 
 		$dbScripts = DB::select('scripts', [
-			'output' => ['name', 'menu_path'],
+			'output' => ['scriptid', 'name', 'menu_path'],
 		]);
 
 		$duplicateScripts = false;
@@ -1644,7 +1644,7 @@ class CScript extends CApiService {
 		$trim_names = trim($names[0], '/');
 		$trim_menu_paths = trim($menu_paths[0], '/');
 
-		foreach ($dbScripts as $key => $dbScript) {
+		foreach ($dbScripts as $dbScript) {
 			$trim_name = trim($dbScript['name'], '/');
 			$trim_menu_path = trim($dbScript['menu_path'], '/');
 
@@ -1653,9 +1653,10 @@ class CScript extends CApiService {
 				$duplicates['menu_path'] = $trim_menu_path;
 
 				if (array_key_exists('scriptid', $scripts[0])) {
-					$duplicateScripts = !(($key === $scripts[0]['scriptid']));
+					$duplicateScripts = ($dbScript['scriptid'] === $scripts[0]['scriptid']);
 				}
-				else {
+
+				if (!$duplicateScripts) {
 					$duplicateScripts = true;
 				}
 			}
