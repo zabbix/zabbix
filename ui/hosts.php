@@ -73,7 +73,6 @@ $fields = [
 	'macros_remove_all' =>		[T_ZBX_INT, O_OPT, null,			IN([0,1]),	null],
 	'templates' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'add_templates' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
-	'templates_rem' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,		null,		null],
 	'clear_templates' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'ipmi_authtype' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(-1, 6), null],
 	'ipmi_privilege' =>			[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
@@ -271,27 +270,18 @@ $macros = array_filter($macros, function($macro) {
  * Actions
  */
 if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
-	$_REQUEST['clear_templates'] = getRequest('clear_templates', []);
-
 	$unlinkTemplates = [];
 
 	if (isset($_REQUEST['unlink'])) {
-		// templates_rem for old style removal in massupdate form
-		if (isset($_REQUEST['templates_rem'])) {
-			$unlinkTemplates = array_keys($_REQUEST['templates_rem']);
-		}
-		else {
-			$unlinkTemplates = array_keys($_REQUEST['unlink']);
-		}
+		$unlinkTemplates = array_keys($_REQUEST['unlink']);
 	}
 	else {
 		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
-
-		$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
+		$_REQUEST['clear_templates'] = array_merge($unlinkTemplates, getRequest('clear_templates', []));
 	}
 
-	foreach ($unlinkTemplates as $templateId) {
-		unset($_REQUEST['templates'][array_search($templateId, $_REQUEST['templates'])]);
+	foreach ($unlinkTemplates as $id) {
+		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
 elseif (hasRequest('hostid') && (hasRequest('clone') || hasRequest('full_clone'))) {
