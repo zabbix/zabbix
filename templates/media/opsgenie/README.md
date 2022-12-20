@@ -68,7 +68,7 @@ Update operations for the resolved event will not be executed but the status of 
 
 ## Supported Versions
 
-Zabbix 6.4, Opsgenie Alert API.
+Zabbix 6.2, Opsgenie Alert API.
 
 ## Feedback
 Please report any issues with this media type at https://support.zabbix.com.
