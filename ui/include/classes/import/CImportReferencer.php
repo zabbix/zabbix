@@ -774,7 +774,8 @@ class CImportReferencer {
 		$this->db_items[$itemid] = [
 			'hostid' => $item['hostid'],
 			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
-			'key_' => $item['key_']
+			'key_' => $item['key_'],
+			'templateid' => 0
 		];
 	}
 
@@ -816,7 +817,8 @@ class CImportReferencer {
 			'uuid' => array_key_exists('uuid', $trigger) ? $trigger['uuid'] : '',
 			'description' => $trigger['description'],
 			'expression' => $trigger['expression'],
-			'recovery_expression' => $trigger['recovery_expression']
+			'recovery_expression' => $trigger['recovery_expression'],
+			'templateid' => 0
 		];
 	}
 
