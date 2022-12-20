@@ -208,8 +208,34 @@ class CControllerPopupCopyCreate extends CController {
 
 	private function copyItems(array $copy_targetids): bool {
 		$itemids = $this->getInput('itemids');
+		$copy_type = $this->getInput('copy_type');
+		$is_template = $copy_type == COPY_TYPE_TO_TEMPLATE || $copy_type == COPY_TYPE_TO_TEMPLATE_GROUP;
 
-		return copyItemsToHosts($itemids, $copy_targetids);
+		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
+			$options = getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE
+				? ['templateids' => getRequest('copy_targetids')]
+				: ['groupids' => getRequest('copy_targetids')];
+
+			$hostids = array_keys(API::Template()->get([
+					'output' => [],
+					'editable' => true,
+					'preservekeys' => true
+				] + $options));
+		}
+
+		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP])) {
+			$options = getRequest('copy_type') == COPY_TYPE_TO_HOST
+				? ['hostids' => getRequest('copy_targetids')]
+				: ['groupids' => getRequest('copy_targetids')];
+
+			$hostids = array_keys(API::Host()->get([
+					'output' => [],
+					'editable' => true,
+					'preservekeys' => true
+				] + $options));
+		}
+
+		return copyItemsToHosts('itemids', $itemids, $is_template, $copy_targetids);
 	}
 
 	private function copyTriggers(array $copy_targetids): bool {
