@@ -618,6 +618,7 @@ static void	process_rule(ZBX_DB_DRULE *drule, zbx_events_funcs_t *events_cbs, in
 
 				if (NULL != events_cbs->process_events_cb)
 					events_cbs->process_events_cb(NULL, NULL);
+
 				if (NULL != events_cbs->clean_events_cb)
 					events_cbs->clean_events_cb();
 			}
@@ -925,7 +926,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
-
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

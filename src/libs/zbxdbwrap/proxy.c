@@ -2569,6 +2569,7 @@ json_parse_error:
 
 		if (NULL != events_cbs->process_events_cb)
 			events_cbs->process_events_cb(NULL, NULL);
+
 		if (NULL != events_cbs->clean_events_cb)
 			events_cbs->clean_events_cb();
 
@@ -2728,8 +2729,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	{
 		DBbegin();
 		DBregister_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
-
 		DBcommit();
+
 		DCconfig_delete_autoreg_host(&autoreg_hosts);
 	}
 

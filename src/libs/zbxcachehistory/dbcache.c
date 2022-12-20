@@ -1628,11 +1628,10 @@ static int	process_trigger(struct _DC_TRIGGER *trigger, zbx_add_event_func_t add
 		if (NULL != add_event_cb)
 		{
 			add_event_cb(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, new_value, trigger->description,
-					trigger->expression, trigger->recovery_expression,
-					trigger->priority, trigger->type, &trigger->tags,
-					trigger->correlation_mode, trigger->correlation_tag, trigger->value, trigger->opdata,
-					trigger->event_name, NULL);
+					&trigger->timespec, new_value, trigger->description, trigger->expression,
+					trigger->recovery_expression, trigger->priority, trigger->type, &trigger->tags,
+					trigger->correlation_mode, trigger->correlation_tag, trigger->value,
+					trigger->opdata, trigger->event_name, NULL);
 		}
 	}
 
@@ -1660,7 +1659,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: helper function for process_triggers()                       *
+ * Comments: helper function for process_triggers()                           *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
@@ -2081,8 +2080,8 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, ZBX_DC_HIS
  *                                                                            *
  * Purpose: calculates what item fields must be updated                       *
  *                                                                            *
- * Parameters: item         - [IN]     item                                   *
- *             h            - [IN]     historical data to process             *
+ * Parameters: item         - [IN]                                            *
+ *             h            - [IN]                                            *
  *             add_event_cb - [IN]                                            *
  *                                                                            *
  * Return value: The update data. This data must be freed by the caller.      *
@@ -3435,9 +3434,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 			zbx_dc_close_user_macros(um_handle);
 
 			if (NULL != events_cbs.clean_events_cb)
-			{
 				events_cbs.clean_events_cb();
-			}
 
 			zbx_vector_ptr_clear_ext(&inventory_values, (zbx_clean_func_t)DCinventory_value_free);
 			zbx_vector_ptr_clear_ext(&item_diff, (zbx_clean_func_t)zbx_ptr_free);
@@ -3695,13 +3692,9 @@ static void	sync_history_cache_full(zbx_events_funcs_t events_cbs)
 		do
 		{
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			{
 				sync_server_history(&values_num, &triggers_num, events_cbs, &more);
-			}
 			else
-			{
 				sync_proxy_history(&values_num, &more);
-			}
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)values_num / (cache->history_num + values_num) * 100);

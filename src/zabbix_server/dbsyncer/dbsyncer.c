@@ -113,7 +113,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_thread_dbsyncer_args	*dbsyncer_args_in = (zbx_thread_dbsyncer_args *)
-			((((zbx_thread_args_t *)args))->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
 			(process_name = get_process_type_string(process_type)), process_num);
