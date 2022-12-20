@@ -842,7 +842,8 @@ class CImportReferencer {
 		$this->db_items[$itemid] = [
 			'hostid' => $item['hostid'],
 			'uuid' => array_key_exists('uuid', $item) ? $item['uuid'] : '',
-			'key_' => $item['key_']
+			'key_' => $item['key_'],
+			'templateid' => 0
 		];
 	}
 
