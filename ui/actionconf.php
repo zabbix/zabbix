@@ -62,9 +62,9 @@ $fields = [
 	'recovery_operations' =>			[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,			null,		null],
 	'new_recovery_operation' =>			[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
-	'ack_operations' =>					[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
+	'update_operations' =>				[null,		O_OPT,	P_ONLY_TD_ARRAY,	null,		null],
 	'edit_update_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,			null,		null],
-	'new_ack_operation' =>				[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
+	'new_update_operation' =>			[null,		O_OPT,	P_ONLY_ARRAY,		null,		null],
 	'opconditions' =>					[null,		O_OPT,	P_ONLY_ARRAY,	null,		null],
 	// actions
 	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
