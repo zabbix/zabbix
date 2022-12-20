@@ -392,13 +392,33 @@
                     <port>1623</port>
                     <interface_ref>if3</interface_ref>
                 </interface>
+                <interface>
+                    <type>SNMP</type>
+                    <port>20161</port>
+                    <default>NO</default>
+                    <details>
+                        <version>SNMPV3</version>
+                        <max_repetitions>12</max_repetitions>
+                    </details>
+                    <interface_ref>if4</interface_ref>
+                </interface>
+                <interface>
+                    <type>SNMP</type>
+                    <port>21161</port>
+                    <default>NO</default>
+                    <details>
+                        <community>public1</community>
+                        <max_repetitions>12</max_repetitions>
+                    </details>
+                    <interface_ref>if5</interface_ref>
+                </interface>
             </interfaces>
             <items>
                 <item>
                     <name>NormalItemPreproc11</name>
                     <key>agent.hostmetadata</key>
                     <trends>0</trends>
-		    <delay>20s</delay>
+                    <delay>20s</delay>
                     <value_type>CHAR</value_type>
                     <preprocessing>
                         <step>
@@ -753,11 +773,20 @@
                 </item>
                 <item>
                     <name>delay_globmacro11</name>
-		    <key>vfs.file.get[/tmp/{$UU}]</key>
+                    <key>vfs.file.get[/tmp/{$UU}]</key>
                     <delay>{$GLOBDELAY}</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <interface_ref>if1</interface_ref>
+                </item>
+                <item>
+                    <name>snmp.walk</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>snmp.walk[.1.3.6.1.39]</snmp_oid>
+                    <key>snmp.walk</key>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <interface_ref>if5</interface_ref>
                 </item>
             </items>
             <inventory_mode>DISABLED</inventory_mode>

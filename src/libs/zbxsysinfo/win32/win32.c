@@ -48,6 +48,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
+	{"system.sw.os",	CF_HAVEPARAMS,	system_sw_os,		NULL},
+	{"system.sw.os.get",	CF_HAVEPARAMS,	system_sw_os_get,	NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
 	{"vm.vmemory.size",	CF_HAVEPARAMS,	vm_vmemory_size,	"total"},

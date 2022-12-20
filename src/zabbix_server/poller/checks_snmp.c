@@ -1993,7 +1993,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
 		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
 {
-	struct snmp_pdu		*pdu = NULL, *response = NULL;
+	struct snmp_pdu		*pdu, *response = NULL;
 	int			ret, running = 1, vars_num = 0, status;
 	oid			name[MAX_OID_LEN];
 	size_t			name_length = MAX_OID_LEN;
