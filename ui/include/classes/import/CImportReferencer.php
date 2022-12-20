@@ -441,16 +441,19 @@ class CImportReferencer {
 	 *
 	 * @param string $hostid
 	 * @param string $name
+	 * @param bool   $inherited
 	 *
 	 * @return string|null
 	 */
-	public function findGraphidByName(string $hostid, string $name): ?string {
+	public function findGraphidByName(string $hostid, string $name, bool $inherited = false): ?string {
 		if ($this->db_graphs === null) {
 			$this->selectGraphs();
 		}
 
 		foreach ($this->db_graphs as $graphid => $graph) {
-			if ($graph['name'] === $name && in_array($hostid, $graph['hosts'])) {
+			if ($graph['name'] === $name
+					&& in_array($hostid, $graph['hosts'])
+					&& ($inherited || $graph['templateid'] == 0)) {
 				return $graphid;
 			}
 		}
@@ -1284,24 +1287,22 @@ class CImportReferencer {
 		}
 
 		$db_graphs = API::Graph()->get([
-			'output' => ['uuid', 'name'],
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'uuid' => array_keys($graph_uuids),
 				'flags' => null
 			],
-			'inherited' => false,
 			'preservekeys' => true
 		]);
 
 		$db_graphs += API::Graph()->get([
-			'output' => ['uuid', 'name'],
+			'output' => ['uuid', 'name', 'templateid'],
 			'selectHosts' => ['hostid'],
 			'filter' => [
 				'name' => array_keys($graph_names),
 				'flags' => null
 			],
-			'inherited' => false,
 			'preservekeys' => true
 		]);
 
