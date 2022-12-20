@@ -17,12 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
+#include "zbxalgo.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxvariant.h"
 
 extern unsigned char	program_type;
 
@@ -1409,42 +1412,46 @@ static int	DBpatch_6030149(void)
 	return DBmodify_field_type("task_result", &field, &old_field);
 }
 
-typedef struct zbx_db_valuemap_mapping zbx_db_valuemap_mapping_t;
-typedef struct zbx_db_valuemap zbx_db_valuemap_t;
-typedef struct zbx_child_valuemap zbx_child_valuemap_t;
+#undef HOST_STATUS_TEMPLATE
+#define HOST_STATUS_TEMPLATE		3
+
+typedef struct
+{
+	char	*value;
+	char	*newvalue;
+	int	type;
+	int	sortorder;
+}
+zbx_db_valuemap_mapping_t;
 
 ZBX_PTR_VECTOR_DECL(valuemap_mapping_ptr, zbx_db_valuemap_mapping_t *)
 ZBX_PTR_VECTOR_IMPL(valuemap_mapping_ptr, zbx_db_valuemap_mapping_t *)
+
+typedef struct
+{
+	uint64_t				child_templateid;
+	uint64_t				parent_valuemapid;
+	char					*uuid;
+	char					*name;
+
+	zbx_vector_uint64_t			itemids;
+	zbx_vector_valuemap_mapping_ptr_t	mappings;
+	int					uniq;
+}
+zbx_db_valuemap_t;
+
+typedef struct
+{
+	uint64_t	templateid;
+	char		*name;
+}
+zbx_child_valuemap_t;
 
 ZBX_PTR_VECTOR_DECL(valuemap_ptr, zbx_db_valuemap_t *)
 ZBX_PTR_VECTOR_IMPL(valuemap_ptr, zbx_db_valuemap_t *)
 
 ZBX_PTR_VECTOR_DECL(child_valuemap_ptr, zbx_child_valuemap_t *)
 ZBX_PTR_VECTOR_IMPL(child_valuemap_ptr, zbx_child_valuemap_t *)
-
-struct zbx_db_valuemap_mapping
-{
-	char	*value;
-	char	*newvalue;
-	int	type;
-	int	sortorder;
-};
-
-struct zbx_db_valuemap
-{
-	uint64_t				child_templateid;
-	char					*uuid;
-	char					*name;
-
-	zbx_vector_uint64_t			itemids;
-	zbx_vector_valuemap_mapping_ptr_t	mappings;
-};
-
-struct zbx_child_valuemap
-{
-	uint64_t				templateid;
-	char					*name;
-};
 
 static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valuemapid)
 {
@@ -1457,8 +1464,8 @@ static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valu
 	result = DBselect("select i.itemid from items i"
 			" where i.valuemapid=" ZBX_FS_UI64" and i.hostid in "
 			"(" ZBX_FS_UI64", (select h.hostid from hosts h,hosts_templates ht"
-			" where ht.hostid=h.hostid and h.status <>3 and ht.templateid=" ZBX_FS_UI64"))",
-			valuemapid, child_templateid, child_templateid);
+			" where ht.hostid=h.hostid and h.status <>%d and ht.templateid=" ZBX_FS_UI64"))",
+			valuemapid, child_templateid, HOST_STATUS_TEMPLATE, child_templateid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1523,11 +1530,129 @@ static void	child_valuemap_free(zbx_child_valuemap_t *valuemap)
 	zbx_free(valuemap);
 }
 
+static void select_pure_parents(zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select ht.templateid from hosts_templates ht"
+				" join hosts h on h.hostid=ht.templateid"
+				" left join hosts h1 on h1.hostid=ht.hostid"
+				" where h.hostid=ht.templateid and h1.status=%d and ht.templateid not in"
+				" (select hostid from hosts_templates)", HOST_STATUS_TEMPLATE);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t		id;
+
+		ZBX_DBROW2UINT64(id, row[0]);
+		zbx_vector_uint64_append(ids, id);
+	}
+
+	DBfree_result(result);
+
+		if (0 == ids->values_num)
+			return;
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
+		zbx_vector_valuemap_ptr_t *valuemaps, int *mappings_num)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	loc_child_templateids;
+
+	if (0 == parent_ids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&loc_child_templateids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select v.valuemapid,v.name,ht.hostid,h.host,ht.templateid"
+			" from hosts_templates ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" left join valuemap v on v.hostid=ht.templateid where", HOST_STATUS_TEMPLATE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ht.templateid", parent_ids->values,
+			parent_ids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*template_name, *seed = NULL;
+		zbx_db_valuemap_t	*valuemap, *valuemap_copy;
+		zbx_uint64_t		valuemapid, child_templateid, parent_templateid;
+		int			i;
+
+		ZBX_DBROW2UINT64(valuemapid, row[0]);
+		ZBX_DBROW2UINT64(child_templateid, row[2]);
+		ZBX_DBROW2UINT64(parent_templateid, row[4]);
+		template_name = zbx_strdup(NULL, row[3]);
+		template_name = zbx_update_template_name(template_name);
+
+		if (0 != valuemapid)
+		{
+			valuemap = zbx_malloc(NULL, sizeof(zbx_db_valuemap_t));
+			valuemap->child_templateid = child_templateid;
+			valuemap->parent_valuemapid = valuemapid;
+			valuemap->name = zbx_strdup(NULL, row[1]);
+			seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+			valuemap->uuid = zbx_gen_uuid4(seed);
+			zbx_free(seed);
+			valuemap->uniq = 0;
+			zbx_vector_uint64_create(&valuemap->itemids);
+			zbx_vector_valuemap_mapping_ptr_create(&valuemap->mappings);
+
+			mappings_num += DBpatch_propogate_valuemap(valuemap, valuemapid);
+			zbx_vector_valuemap_ptr_append(valuemaps, valuemap);
+		}
+
+		zbx_vector_uint64_append(&loc_child_templateids, child_templateid);
+
+		for (i = 0; i < valuemaps->values_num; i++)
+		{
+			valuemap = valuemaps->values[i];
+
+			if (parent_templateid == valuemap->child_templateid)
+			{
+				valuemap_copy = zbx_malloc(NULL, sizeof(zbx_db_valuemap_t));
+				valuemap_copy->child_templateid = child_templateid;
+				valuemap_copy->parent_valuemapid = valuemap->parent_valuemapid;
+				valuemap_copy->name = zbx_strdup(NULL, valuemap->name);
+				seed = zbx_dsprintf(seed, "%s/%s", template_name, valuemap->name);
+				valuemap_copy->uuid = zbx_gen_uuid4(seed);
+				zbx_free(seed);
+				zbx_vector_uint64_create(&valuemap_copy->itemids);
+				zbx_vector_valuemap_mapping_ptr_create(&valuemap_copy->mappings);
+
+				mappings_num += DBpatch_propogate_valuemap(valuemap_copy, valuemap->parent_valuemapid);
+				valuemap->uniq = 0;
+				zbx_vector_valuemap_ptr_append(valuemaps, valuemap_copy);
+			}
+		}
+
+		zbx_free(template_name);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	collect_valuemaps(&loc_child_templateids, child_templateids, valuemaps, mappings_num);
+
+	zbx_vector_uint64_append_array(child_templateids, loc_child_templateids.values,
+			loc_child_templateids.values_num);
+	zbx_vector_uint64_destroy(&loc_child_templateids);
+}
+
 static int	DBpatch_6030150(void)
 {
 	zbx_vector_valuemap_ptr_t		valuemaps;
 	zbx_vector_child_valuemap_ptr_t		child_valuemaps;
-	zbx_vector_uint64_t			child_templateids;
+	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
 	int					changed, i, j, mappings_num = 0;
@@ -1539,46 +1664,22 @@ static int	DBpatch_6030150(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	zbx_vector_uint64_create(&parent_ids);
+	select_pure_parents(&parent_ids);
+
+	if (0 == parent_ids.values_num)
+		goto out;
+
 	zbx_vector_valuemap_ptr_create(&valuemaps);
 	zbx_vector_child_valuemap_ptr_create(&child_valuemaps);
 	zbx_vector_uint64_create(&child_templateids);
 
-	result = DBselect("select v.valuemapid,v.name,h1.hostid,h1.host from valuemap v,hosts h,hosts h1,hosts_templates ht "
-			"where v.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and "
-			"h1.hostid=ht.hostid and h1.status=3");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		char			*template_name, *seed = NULL;
-		zbx_db_valuemap_t 	*valuemap;
-		zbx_uint64_t		child_templateid;
-
-		ZBX_DBROW2UINT64(valuemapid, row[0]);
-		ZBX_DBROW2UINT64(child_templateid, row[2]);
-
-		valuemap = zbx_malloc(NULL, sizeof(zbx_db_valuemap_t));
-		valuemap->child_templateid = child_templateid;
-		valuemap->name = zbx_strdup(NULL, row[1]);
-		template_name = zbx_strdup(NULL, row[2]);
-		template_name = zbx_update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
-		valuemap->uuid = zbx_gen_uuid4(seed);
-		zbx_free(template_name);
-		zbx_free(seed);
-		zbx_vector_uint64_create(&valuemap->itemids);
-		zbx_vector_valuemap_mapping_ptr_create(&valuemap->mappings);
-
-		mappings_num += DBpatch_propogate_valuemap(valuemap, valuemapid);
-		zbx_vector_valuemap_ptr_append(&valuemaps, valuemap);
-		zbx_vector_uint64_append(&child_templateids, child_templateid);
-	}
-
-
-	DBfree_result(result);
+	collect_valuemaps(&parent_ids, &child_templateids, &valuemaps, &mappings_num);
 
 	if (0 == valuemaps.values_num)
-		goto out;
+		goto clean;
 
+	zbx_vector_uint64_sort(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,hostid from valuemap where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
@@ -1587,7 +1688,7 @@ static int	DBpatch_6030150(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_child_valuemap_t 	*valuemap;
+		zbx_child_valuemap_t	*valuemap;
 		uint64_t		templateid;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
@@ -1606,29 +1707,57 @@ static int	DBpatch_6030150(void)
 
 	do
 	{
+		zbx_db_valuemap_t	*valuemap, *valuemap2;
+
 		changed = 0;
 
 		for (i = 0; i < child_valuemaps.values_num; i++)
 		{
-			zbx_child_valuemap_t 	*child_valuemap;
-			int			uniq = 0;
+			zbx_child_valuemap_t	*child_valuemap;
 
 			child_valuemap = child_valuemaps.values[i];
 
 			for (j = 0; j < valuemaps.values_num; j++)
 			{
-				zbx_db_valuemap_t 	*valuemap;
-
 				valuemap = valuemaps.values[j];
 
 				if (valuemap->child_templateid == child_valuemap->templateid &&
-						0 == strcmp(valuemap->name, child_valuemap->name))
+						0 == strcmp(valuemap->name, child_valuemap->name) &&
+						0 == valuemap->uniq)
 				{
-					uniq++;
 					changed++;
-					valuemap->name = zbx_dsprintf(valuemap->name, "%s %d", child_valuemap->name,
-							uniq);
+					valuemap->uniq++;
 				}
+			}
+		}
+
+		for (i = 0; i < valuemaps.values_num; i++)
+		{
+			valuemap = valuemaps.values[i];
+
+			for (j = i + 1; j < valuemaps.values_num; j++)
+			{
+				valuemap2 = valuemaps.values[j];
+
+				if (valuemap->child_templateid == valuemap2->child_templateid &&
+						0 == strcmp(valuemap->name, valuemap2->name) &&
+						valuemap->uniq == valuemap2->uniq)
+				{
+					//uniq++;
+					changed++;
+					valuemap2->uniq++;
+				}
+			}
+		}
+
+		for (i = 0; i < valuemaps.values_num; i++)
+		{
+			valuemap = valuemaps.values[i];
+
+			if (0 != valuemap->uniq)
+			{
+				valuemap->name = zbx_dsprintf(valuemap->name, "%s %d", valuemap->name, valuemap->uniq);
+				valuemap->uniq = 0;
 			}
 		}
 	}while (0 != changed);
@@ -1644,7 +1773,7 @@ static int	DBpatch_6030150(void)
 
 	for (i = 0; i < valuemaps.values_num; i++)
 	{
-		zbx_db_valuemap_t 	*valuemap;
+		zbx_db_valuemap_t	*valuemap;
 
 		valuemap = valuemaps.values[i];
 		zbx_db_insert_add_values(&db_insert_valuemap, valuemapid, valuemap->child_templateid,
@@ -1661,7 +1790,7 @@ static int	DBpatch_6030150(void)
 
 		for (j = 0; j < valuemap->mappings.values_num; j++)
 		{
-			zbx_db_valuemap_mapping_t 	*valuemap_mapping;
+			zbx_db_valuemap_mapping_t	*valuemap_mapping;
 
 			valuemap_mapping = valuemap->mappings.values[j];
 			zbx_db_insert_add_values(&db_insert_valuemap_mapping, valuemap_mappingid, valuemapid,
@@ -1685,40 +1814,43 @@ static int	DBpatch_6030150(void)
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
-out:
+clean:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_valuemap_ptr_clear_ext(&child_valuemaps, child_valuemap_free);
 	zbx_vector_child_valuemap_ptr_destroy(&child_valuemaps);
 	zbx_vector_valuemap_ptr_clear_ext(&valuemaps, valuemap_free);
 	zbx_vector_valuemap_ptr_destroy(&valuemaps);
+out:
+	zbx_vector_uint64_destroy(&parent_ids);
 
 	return SUCCEED;
 }
 
-typedef struct zbx_db_hostmacro zbx_db_hostmacro_t;
-typedef struct zbx_child_hostmacro zbx_child_hostmacro_t;
+typedef struct
+{
+	uint64_t	child_templateid;
+	uint64_t	parent_hostmacroid;
+	uint64_t	parent_templateid;
+	char		*macro;
+	char		*value;
+	char		*description;
+	int		type;
+	int		automatic;
+}
+zbx_db_hostmacro_t;
+
+typedef struct
+{
+	uint64_t	templateid;
+	char		*macro;
+}
+zbx_child_hostmacro_t;
 
 ZBX_PTR_VECTOR_DECL(hostmacro_ptr, zbx_db_hostmacro_t *)
 ZBX_PTR_VECTOR_IMPL(hostmacro_ptr, zbx_db_hostmacro_t *)
 
 ZBX_PTR_VECTOR_DECL(child_hostmacro_ptr, zbx_child_hostmacro_t *)
 ZBX_PTR_VECTOR_IMPL(child_hostmacro_ptr, zbx_child_hostmacro_t *)
-
-struct zbx_db_hostmacro
-{
-	uint64_t	child_templateid;
-	char		*macro;
-	char		*value;
-	char		*description;
-	int		type;
-	int		automatic;
-};
-
-struct zbx_child_hostmacro
-{
-	uint64_t	templateid;
-	char		*macro;
-};
 
 static void	hostmacro_clear(zbx_db_hostmacro_t *hostmacro)
 {
@@ -1739,9 +1871,25 @@ static void	child_hostmacro_free(zbx_child_hostmacro_t *hostmacro)
 	zbx_free(hostmacro);
 }
 
+static int	hostmacro_sort(const zbx_db_hostmacro_t **hm1, const zbx_db_hostmacro_t **hm2)
+{
+	const zbx_db_hostmacro_t	*m1, *m2;
+
+	m1 = *hm1;
+	m2 = *hm2;
+
+	if (m1->parent_templateid < m2->parent_templateid )
+		return -1;
+
+	if (m1->parent_templateid > m2->parent_templateid )
+			return 1;
+
+	return 0;
+}
+
 static int	hostmacro_compare(const zbx_db_hostmacro_t **hm1, const zbx_db_hostmacro_t **hm2)
 {
-	const zbx_db_hostmacro_t *m1, *m2;
+	const zbx_db_hostmacro_t	*m1, *m2;
 
 	m1 = *hm1;
 	m2 = *hm2;
@@ -1756,24 +1904,109 @@ static void	zbx_vector_hostmacro_ptr_uniq2(zbx_vector_hostmacro_ptr_t *vector, z
 {
 	if (2 <= vector->values_num)
 	{
-		int	i;
+		int	i, j;
 
-		for (i = 1; i < vector->values_num; i++)
+		for (i = 0; i < vector->values_num; i++)
 		{
-			if (0 == compare_func(&vector->values[i - 1], &vector->values[i]))
+			for(j = i + 1; j < vector->values_num; j++)
 			{
-				hostmacro_free(vector->values[i]);
-				zbx_vector_hostmacro_ptr_remove_noorder(vector, i);
+				if (0 == compare_func(&vector->values[i], &vector->values[j]))
+				{
+					hostmacro_free(vector->values[j]);
+					zbx_vector_hostmacro_ptr_remove_noorder(vector, j);
+				}
 			}
 		}
 	}
 }
 
+static void collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
+		zbx_vector_hostmacro_ptr_t *hostmacros)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	loc_child_templateids;
+
+	if (0 == parent_ids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&loc_child_templateids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hm.hostmacroid,hm.macro,hm.value,hm.description,hm.type,hm.automatic,ht.hostid,"
+			"ht.templateid"
+			" from hosts_templates ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" left join hostmacro hm on hm.hostid=ht.templateid where", HOST_STATUS_TEMPLATE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ht.templateid", parent_ids->values,
+			parent_ids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by ht.templateid");
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_db_hostmacro_t	*hostmacro, *hostmacro_copy;
+		zbx_uint64_t		hostmacroid, child_templateid, parent_templateid;
+		int			i;
+
+		ZBX_DBROW2UINT64(hostmacroid, row[0]);
+		ZBX_DBROW2UINT64(child_templateid, row[6]);
+		ZBX_DBROW2UINT64(parent_templateid, row[7]);
+
+		if (0 != hostmacroid)
+		{
+			hostmacro = zbx_malloc(NULL, sizeof(zbx_db_hostmacro_t));
+			hostmacro->child_templateid = child_templateid;
+			hostmacro->parent_hostmacroid = hostmacroid;
+			hostmacro->parent_templateid = parent_templateid;
+			hostmacro->macro = zbx_strdup(NULL, row[1]);
+			hostmacro->value = zbx_strdup(NULL, row[2]);
+			hostmacro->description = zbx_strdup(NULL, row[3]);
+			hostmacro->type = atoi(row[4]);
+			hostmacro->automatic = atoi(row[5]);
+			zbx_vector_hostmacro_ptr_append(hostmacros, hostmacro);
+		}
+
+		zbx_vector_uint64_append(&loc_child_templateids, child_templateid);
+
+		for (i = 0; i < hostmacros->values_num; i++)
+		{
+			hostmacro = hostmacros->values[i];
+
+			if (parent_templateid == hostmacro->child_templateid)
+			{
+				hostmacro_copy = zbx_malloc(NULL, sizeof(zbx_db_hostmacro_t));
+				hostmacro_copy->child_templateid = child_templateid;
+				hostmacro_copy->parent_hostmacroid = hostmacro->parent_hostmacroid;
+				hostmacro->parent_templateid = parent_templateid;
+				hostmacro_copy->macro = zbx_strdup(NULL, hostmacro->macro);
+				hostmacro_copy->value = zbx_strdup(NULL, hostmacro->value);
+				hostmacro_copy->description = zbx_strdup(NULL, hostmacro->description);
+				hostmacro_copy->type = hostmacro->type;
+				hostmacro_copy->automatic = hostmacro->automatic;
+				zbx_vector_hostmacro_ptr_append(hostmacros, hostmacro);
+			}
+		}
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	collect_hostmacros(&loc_child_templateids, child_templateids, hostmacros);
+
+	zbx_vector_uint64_append_array(child_templateids, loc_child_templateids.values,
+			loc_child_templateids.values_num);
+	zbx_vector_uint64_destroy(&loc_child_templateids);
+}
+
+
 static int	DBpatch_6030151(void)
 {
 	zbx_vector_hostmacro_ptr_t		hostmacros;
 	zbx_vector_child_hostmacro_ptr_t	child_hostmacros;
-	zbx_vector_uint64_t			child_templateids;
+	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
 	int					i, j;
@@ -1784,39 +2017,22 @@ static int	DBpatch_6030151(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	zbx_vector_uint64_create(&parent_ids);
+	select_pure_parents(&parent_ids);
+
+	if (0 == parent_ids.values_num)
+		goto out;
+
 	zbx_vector_hostmacro_ptr_create(&hostmacros);
 	zbx_vector_child_hostmacro_ptr_create(&child_hostmacros);
 	zbx_vector_uint64_create(&child_templateids);
 
-	result = DBselect("select hm.macro,hm.value,hm.description,hm.type,hm.automatic,h1.hostid"
-			" from hostmacro hm,hosts h,hosts h1,hosts_templates ht"
-			" where hm.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
-			" and h1.status=3 order by hm.hostid desc");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		zbx_db_hostmacro_t 	*hostmacro;
-		zbx_uint64_t		child_templateid;
-
-		ZBX_DBROW2UINT64(child_templateid, row[5]);
-
-		hostmacro = zbx_malloc(NULL, sizeof(zbx_db_hostmacro_t));
-		hostmacro->child_templateid = child_templateid;
-		hostmacro->macro = zbx_strdup(NULL, row[0]);
-		hostmacro->value = zbx_strdup(NULL, row[1]);
-		hostmacro->description = zbx_strdup(NULL, row[2]);
-		hostmacro->type = atoi(row[3]);
-		hostmacro->automatic = atoi(row[4]);
-
-		zbx_vector_hostmacro_ptr_append(&hostmacros, hostmacro);
-		zbx_vector_uint64_append(&child_templateids, child_templateid);
-	}
-
-	DBfree_result(result);
+	collect_hostmacros(&parent_ids, &child_templateids, &hostmacros);
 
 	if (0 == hostmacros.values_num)
-		goto out;
+		goto clean;
 
+	zbx_vector_uint64_sort(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select macro,hostid from hostmacro where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
@@ -1825,7 +2041,7 @@ static int	DBpatch_6030151(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_child_hostmacro_t 	*hostmacro;
+		zbx_child_hostmacro_t	*hostmacro;
 		uint64_t		templateid;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
@@ -1840,17 +2056,18 @@ static int	DBpatch_6030151(void)
 	DBfree_result(result);
 	zbx_free(sql);
 
+	zbx_vector_hostmacro_ptr_sort(&hostmacros, (zbx_compare_func_t)hostmacro_sort);
 	zbx_vector_hostmacro_ptr_uniq2(&hostmacros, (zbx_compare_func_t)hostmacro_compare);
 
 	for (i = 0; i < child_hostmacros.values_num; i++)
 	{
-		zbx_child_hostmacro_t 	*child_hostmacro;
+		zbx_child_hostmacro_t	*child_hostmacro;
 
 		child_hostmacro = child_hostmacros.values[i];
 
 		for (j = 0; j < hostmacros.values_num; j++)
 		{
-			zbx_db_hostmacro_t 	*hostmacro;
+			zbx_db_hostmacro_t	*hostmacro;
 
 			hostmacro = hostmacros.values[j];
 
@@ -1873,7 +2090,7 @@ static int	DBpatch_6030151(void)
 
 		for (i = 0; i < hostmacros.values_num; i++)
 		{
-			zbx_db_hostmacro_t 	*hostmacro;
+			zbx_db_hostmacro_t	*hostmacro;
 
 			hostmacro = hostmacros.values[i];
 			zbx_db_insert_add_values(&db_insert_hostmacro, hostmacroid, hostmacro->child_templateid,
@@ -1885,232 +2102,156 @@ static int	DBpatch_6030151(void)
 		zbx_db_insert_execute(&db_insert_hostmacro);
 		zbx_db_insert_clean(&db_insert_hostmacro);
 	}
-out:
+
+clean:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_hostmacro_ptr_clear_ext(&child_hostmacros, child_hostmacro_free);
 	zbx_vector_child_hostmacro_ptr_destroy(&child_hostmacros);
 	zbx_vector_hostmacro_ptr_clear_ext(&hostmacros, hostmacro_free);
 	zbx_vector_hostmacro_ptr_destroy(&hostmacros);
+out:
+	zbx_vector_uint64_destroy(&parent_ids);
 
 	return SUCCEED;
 }
 
-typedef struct zbx_db_hosttag zbx_db_hosttag_t;
-typedef struct zbx_child_hosttag zbx_child_hosttag_t;
-
-ZBX_PTR_VECTOR_DECL(hosttag_ptr, zbx_db_hosttag_t *)
-ZBX_PTR_VECTOR_IMPL(hosttag_ptr, zbx_db_hosttag_t *)
-
-ZBX_PTR_VECTOR_DECL(child_hosttag_ptr, zbx_child_hosttag_t *)
-ZBX_PTR_VECTOR_IMPL(child_hosttag_ptr, zbx_child_hosttag_t *)
-
-struct zbx_db_hosttag
+typedef struct zbx_db_patch_tag
 {
-	uint64_t	child_templateid;
-	char		*tag;
-	char		*value;
-	int		automatic;
-};
+	char			*tag;
+	char			*value;
+	zbx_vector_uint64_t	itemids;
+}
+zbx_db_patch_tag_t;
 
-struct zbx_child_hosttag
-{
-	uint64_t	templateid;
-	char		*tag;
-};
+ZBX_PTR_VECTOR_DECL(tag_ptr, zbx_db_patch_tag_t *)
+ZBX_PTR_VECTOR_IMPL(tag_ptr, zbx_db_patch_tag_t *)
 
-static void	hosttag_clear(zbx_db_hosttag_t *hosttag)
+static void	tag_free(zbx_db_patch_tag_t *tag)
 {
-	zbx_free(hosttag->tag);
-	zbx_free(hosttag->value);
+	zbx_vector_uint64_destroy(&tag->itemids);
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
 }
 
-static void	hosttag_free(zbx_db_hosttag_t *hosttag)
+static void	DBpatch_propogate_tag(zbx_db_patch_tag_t *tag, zbx_uint64_t hostid, zbx_uint64_t itemid)
 {
-	hosttag_clear(hosttag);
-	zbx_free(hosttag);
-}
+	DB_RESULT	result;
+	DB_ROW		row;
 
-static void	child_hosttag_free(zbx_child_hosttag_t *hosttag)
-{
-	zbx_free(hosttag->tag);
-	zbx_free(hosttag);
-}
+	result = DBselect("select h.hostid,i.itemid from hosts h,items i,hosts_templates ht"
+			" where h.hostid=ht.hostid and ht.templateid=" ZBX_FS_UI64" and i.hostid=h.hostid and"
+			" i.templateid=" ZBX_FS_UI64, hostid, itemid);
 
-static int	hosttag_compare(const zbx_db_hosttag_t **ht1, const zbx_db_hosttag_t **ht2)
-{
-	const zbx_db_hosttag_t *t1, *t2;
-
-	t1 = *ht1;
-	t2 = *ht2;
-
-	if (t1->child_templateid == t2->child_templateid && 0 == strcmp(t1->tag, t2->tag))
-		return 0;
-
-	return 1;
-}
-
-static void	zbx_vector_hosttag_ptr_uniq2(zbx_vector_hosttag_ptr_t *vector, zbx_compare_func_t compare_func)
-{
-	if (2 <= vector->values_num)
+	while (NULL != (row = DBfetch(result)))
 	{
-		int	i;
+		zbx_uint64_t		child_hostid, child_itemid;
 
-		for (i = 1; i < vector->values_num; i++)
-		{
-			if (0 == compare_func(&vector->values[i - 1], &vector->values[i]))
-			{
-				hosttag_free(vector->values[i]);
-				zbx_vector_hosttag_ptr_remove_noorder(vector, i);
-			}
-		}
+		ZBX_DBROW2UINT64(child_hostid, row[0]);
+		ZBX_DBROW2UINT64(child_itemid, row[1]);
+		zbx_vector_uint64_append(&tag->itemids, child_itemid);
+		DBpatch_propogate_tag(tag, child_hostid, child_itemid);
 	}
+
+	DBfree_result(result);
 }
 
 static int	DBpatch_6030152(void)
 {
-	zbx_vector_hosttag_ptr_t		hosttags;
-	zbx_vector_child_hosttag_ptr_t		child_hosttags;
-	zbx_vector_uint64_t			child_templateids;
-	DB_RESULT				result;
-	DB_ROW					row;
-	int					i, j;
-	char					*sql = NULL;
-	size_t					sql_alloc = 0, sql_offset = 0;
-	zbx_db_insert_t				db_insert_hosttag;
+	zbx_vector_tag_ptr_t	tags;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, j, new_tags = 0;
+	zbx_db_patch_tag_t	*tag;
+	zbx_uint64_t		itemtagid;
+	zbx_db_insert_t		db_insert_itemtag;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_vector_hosttag_ptr_create(&hosttags);
-	zbx_vector_child_hosttag_ptr_create(&child_hosttags);
-	zbx_vector_uint64_create(&child_templateids);
+	zbx_vector_tag_ptr_create(&tags);
 
-	result = DBselect("select t.tag,t.value,t.automatic,h1.hostid"
-			" from host_tag t,hosts h,hosts h1,hosts_templates ht"
-			" where t.hostid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
-			" and h1.status=3 order by t.hostid asc");
+	result = DBselect("select th.tag,th.value,h2.hostid,i.itemid from host_tag th,hosts h2,items i"
+			" where th.hostid=h2.hostid and i.hostid=h2.hostid and i.templateid is null and"
+			" h2.hostid in (select distinct h.hostid from hosts h,hosts h1,hosts_templates ht"
+			" where h.status=%d and ht.templateid=h.hostid and ht.hostid=h1.hostid and h1.status=%d)"
+			" order by h2.hostid asc", HOST_STATUS_TEMPLATE, HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_db_hosttag_t 	*hosttag;
-		zbx_uint64_t		child_templateid;
+		zbx_uint64_t		hostid, itemid;
 
-		ZBX_DBROW2UINT64(child_templateid, row[3]);
+		tag = zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+		tag->tag = zbx_strdup(NULL, row[0]);
+		tag->value = zbx_strdup(NULL, row[1]);
+		ZBX_DBROW2UINT64(hostid, row[2]);
+		ZBX_DBROW2UINT64(itemid, row[3]);
+		zbx_vector_uint64_create(&tag->itemids);
 
-		hosttag = zbx_malloc(NULL, sizeof(zbx_db_hosttag_t));
-		hosttag->child_templateid = child_templateid;
-		hosttag->tag = zbx_strdup(NULL, row[0]);
-		hosttag->value = zbx_strdup(NULL, row[1]);
-		hosttag->automatic = atoi(row[2]);
+		DBpatch_propogate_tag(tag, hostid, itemid);
 
-		zbx_vector_hosttag_ptr_append(&hosttags, hosttag);
-		zbx_vector_uint64_append(&child_templateids, child_templateid);
+		zbx_vector_tag_ptr_append(&tags, tag);
 	}
 
 	DBfree_result(result);
 
-	if (0 == hosttags.values_num)
+	if (0 == tags.values_num)
 		goto out;
 
-	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select tag,hostid from host_tag where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", child_templateids.values,
-			child_templateids.values_num);
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	if (1 < tags.values_num)
 	{
-		zbx_child_hosttag_t 	*hosttag;
-		uint64_t		templateid;
-
-		ZBX_DBROW2UINT64(templateid, row[1]);
-
-		hosttag = zbx_malloc(NULL, sizeof(zbx_child_hosttag_t));
-		hosttag->templateid = templateid;
-		hosttag->tag = zbx_strdup(NULL, row[0]);
-
-		zbx_vector_child_hosttag_ptr_append(&child_hosttags, hosttag);
-	}
-
-	DBfree_result(result);
-	zbx_free(sql);
-
-	zbx_vector_hosttag_ptr_uniq2(&hosttags, (zbx_compare_func_t)hosttag_compare);
-
-	for (i = 0; i < child_hosttags.values_num; i++)
-	{
-		zbx_child_hosttag_t 	*child_hosttag;
-
-		child_hosttag = child_hosttags.values[i];
-
-		for (j = 0; j < hosttags.values_num; j++)
+		for (i = 0; i < tags.values_num; i++)
 		{
-			zbx_db_hosttag_t 	*hosttag;
+			tag = tags.values[i];
 
-			hosttag = hosttags.values[j];
-
-			if (hosttag->child_templateid == child_hosttag->templateid &&
-					0 == strcmp(hosttag->tag, child_hosttag->tag))
+			for (j = i + 1; j < tags.values_num; j++)
 			{
-				hosttag_free(hosttag);
-				zbx_vector_hosttag_ptr_remove_noorder(&hosttags, j);
+				zbx_db_patch_tag_t	*tag2;
+
+				tag2 = tags.values[j];
+
+				if (0 == strcmp(tag->tag, tag2->tag) && 0 == strcmp(tag->value, tag2->value))
+				{
+					zbx_vector_uint64_append_array(&tag->itemids, tag2->itemids.values,
+							tag2->itemids.values_num);
+					tag_free(tag2);
+					zbx_vector_tag_ptr_remove_noorder(&tags, j);
+				}
 			}
+
+			zbx_vector_uint64_sort(&tag->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(&tag->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			new_tags += tag->itemids.values_num;
 		}
 	}
 
-	if (0 != hosttags.values_num)
+	itemtagid = DBget_maxid_num("item_tag", new_tags);
+	zbx_db_insert_prepare(&db_insert_itemtag, "item_tag", "itemtagid", "itemid", "tag", "value",NULL);
+
+	for (i = 0; i < tags.values_num; i++)
 	{
-		zbx_uint64_t	hosttagid;
+		tag = tags.values[i];
 
-		hosttagid = DBget_maxid_num("host_tag", hosttags.values_num);
-		zbx_db_insert_prepare(&db_insert_hosttag, "host_tag", "hosttagid", "hostid", "tag", "value",
-				"automatic", NULL);
-
-		for (i = 0; i < hosttags.values_num; i++)
+		for(j = 0; j < tag->itemids.values_num; j++)
 		{
-			zbx_db_hosttag_t 	*hosttag;
+			zbx_uint64_t	itemid;
 
-			hosttag = hosttags.values[i];
-			zbx_db_insert_add_values(&db_insert_hosttag, hosttagid, hosttag->child_templateid, hosttag->tag,
-					hosttag->value, hosttag->automatic);
-			hosttagid++;
+			itemid = tag->itemids.values[j];
+			zbx_db_insert_add_values(&db_insert_itemtag, itemtagid, itemid, tag->tag, tag->value);
+			itemtagid++;
 		}
-
-		zbx_db_insert_execute(&db_insert_hosttag);
-		zbx_db_insert_clean(&db_insert_hosttag);
 	}
+
+	zbx_db_insert_execute(&db_insert_itemtag);
+	zbx_db_insert_clean(&db_insert_itemtag);
 out:
-	zbx_vector_uint64_destroy(&child_templateids);
-	zbx_vector_child_hosttag_ptr_clear_ext(&child_hosttags, child_hosttag_free);
-	zbx_vector_child_hosttag_ptr_destroy(&child_hosttags);
-	zbx_vector_hosttag_ptr_clear_ext(&hosttags, hosttag_free);
-	zbx_vector_hosttag_ptr_destroy(&hosttags);
+	zbx_vector_tag_ptr_clear_ext(&tags, tag_free);
+	zbx_vector_tag_ptr_destroy(&tags);
 
 	return SUCCEED;
 }
 
-typedef struct zbx_db_widget_field zbx_db_widget_field_t;
-typedef struct zbx_db_widget zbx_db_widget_t;
-typedef struct zbx_db_dashboard_page zbx_db_dashboard_page_t;
-typedef struct zbx_db_dashboard zbx_db_dashboard_t;
-typedef struct zbx_child_dashboard zbx_child_dashboard_t;
-
-ZBX_PTR_VECTOR_DECL(widget_field_ptr, zbx_db_widget_field_t *)
-ZBX_PTR_VECTOR_IMPL(widget_field_ptr, zbx_db_widget_field_t *)
-
-ZBX_PTR_VECTOR_DECL(widget_ptr, zbx_db_widget_t *)
-ZBX_PTR_VECTOR_IMPL(widget_ptr, zbx_db_widget_t *)
-
-ZBX_PTR_VECTOR_DECL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
-ZBX_PTR_VECTOR_IMPL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
-
-ZBX_PTR_VECTOR_DECL(dashboard_ptr, zbx_db_dashboard_t *)
-ZBX_PTR_VECTOR_IMPL(dashboard_ptr, zbx_db_dashboard_t *)
-
-ZBX_PTR_VECTOR_DECL(child_dashboard_ptr, zbx_child_dashboard_t *)
-ZBX_PTR_VECTOR_IMPL(child_dashboard_ptr, zbx_child_dashboard_t *)
-
-struct zbx_db_widget_field
+typedef struct
 {
 	int		type;
 	char		*name;
@@ -2126,9 +2267,12 @@ struct zbx_db_widget_field
 	zbx_uint64_t	value_userid;
 	zbx_uint64_t	value_actionid;
 	zbx_uint64_t	value_mediatypeid;
-};
+} zbx_db_widget_field_t;
 
-struct zbx_db_widget
+ZBX_PTR_VECTOR_DECL(widget_field_ptr, zbx_db_widget_field_t *)
+ZBX_PTR_VECTOR_IMPL(widget_field_ptr, zbx_db_widget_field_t *)
+
+typedef struct
 {
 	char				*type;
 	char				*name;
@@ -2139,35 +2283,54 @@ struct zbx_db_widget
 	int				view_mode;
 
 	zbx_vector_widget_field_ptr_t	fields;
-};
+}
+zbx_db_widget_t;
 
-struct zbx_db_dashboard_page
+ZBX_PTR_VECTOR_DECL(widget_ptr, zbx_db_widget_t *)
+ZBX_PTR_VECTOR_IMPL(widget_ptr, zbx_db_widget_t *)
+
+typedef struct
 {
 	char			*name;
 	int			display_period;
 	int			sortorder;
 
 	zbx_vector_widget_ptr_t	widgets;
-};
+}
+zbx_db_dashboard_page_t;
 
-struct zbx_db_dashboard
+ZBX_PTR_VECTOR_DECL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
+ZBX_PTR_VECTOR_IMPL(dashboard_page_ptr, zbx_db_dashboard_page_t *)
+
+typedef struct
 {
 	uint64_t			child_templateid;
 	char				*uuid;
+	uint64_t			parent_dashboardid;
 	char				*name;
 	int				display_period;
 	int				auto_start;
 
 	zbx_vector_dashboard_page_ptr_t	pages;
-};
+	int				uniq;
+}
+zbx_db_dashboard_t;
 
-struct zbx_child_dashboard
+ZBX_PTR_VECTOR_DECL(dashboard_ptr, zbx_db_dashboard_t *)
+ZBX_PTR_VECTOR_IMPL(dashboard_ptr, zbx_db_dashboard_t *)
+
+typedef struct
 {
 	uint64_t				templateid;
 	char					*name;
-};
+}
+zbx_child_dashboard_t;
 
-static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid)
+ZBX_PTR_VECTOR_DECL(child_dashboard_ptr, zbx_child_dashboard_t *)
+ZBX_PTR_VECTOR_IMPL(child_dashboard_ptr, zbx_child_dashboard_t *)
+
+static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid,
+		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2191,7 +2354,13 @@ static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid)
 		ZBX_DBROW2UINT64(field->value_hostid, row[6]);
 
 		ZBX_DBROW2UINT64(field->value_itemid, row[7]);
+		if (0 != field->value_itemid)
+			zbx_vector_uint64_append(value_itemids, field->value_itemid);
+
 		ZBX_DBROW2UINT64(field->value_graphid, row[8]);
+		if (0 != field->value_graphid)
+			zbx_vector_uint64_append(value_graphids, field->value_graphid);
+
 		ZBX_DBROW2UINT64(field->value_sysmapid, row[9]);
 		ZBX_DBROW2UINT64(field->value_serviceid, row[10]);
 		ZBX_DBROW2UINT64(field->value_slaid, row[11]);
@@ -2207,7 +2376,8 @@ static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid)
 	return widget->fields.values_num;
 }
 
-static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid, int *fields_num)
+static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid, int *fields_num,
+		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2230,7 +2400,7 @@ static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid
 		widget->height = atoi(row[6]);
 		widget->view_mode = atoi(row[7]);
 		zbx_vector_widget_field_ptr_create(&widget->fields);
-		*fields_num += DBpatch_propogate_widget(widget, widgetid);
+		*fields_num += DBpatch_propogate_widget(widget, widgetid, value_itemids, value_graphids);
 		zbx_vector_widget_ptr_append(&page->widgets, widget);
 	}
 
@@ -2240,7 +2410,7 @@ static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid
 }
 
 static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t dashboardid, int *widgets_num,
-		int *fields_num)
+		int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -2259,7 +2429,7 @@ static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t d
 		page->display_period = atoi(row[2]);
 		page->sortorder = atoi(row[3]);
 		zbx_vector_widget_ptr_create(&page->widgets);
-		*widgets_num += DBpatch_propogate_page(page, pageid, fields_num);
+		*widgets_num += DBpatch_propogate_page(page, pageid, fields_num, value_itemids, value_graphids);
 		zbx_vector_dashboard_page_ptr_append(&dashboard->pages, page);
 	}
 
@@ -2312,11 +2482,266 @@ static void	child_dashboard_free(zbx_child_dashboard_t *dashboard)
 	zbx_free(dashboard);
 }
 
+static void	change_item_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t *item_ids)
+{
+	zbx_vector_uint64_pair_t	itemid_pairs;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_pair_t		pair;
+	int				i, j, k;
+
+	if (0 == item_ids->values_num)
+		return;
+
+	zbx_vector_uint64_pair_create(&itemid_pairs);
+
+	zbx_vector_uint64_sort(item_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(item_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select i.templateid,i.itemid from items i,hosts h where"
+			" i.hostid=h.hostid and h.hostid=" ZBX_FS_UI64" and", dashboard->child_templateid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.templateid", item_ids->values, item_ids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(pair.first, row[0]);
+		ZBX_DBROW2UINT64(pair.second, row[1]);
+
+		zbx_vector_uint64_pair_append(&itemid_pairs, pair);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	for (i = 0; i < dashboard->pages.values_num; i++)
+	{
+		zbx_db_dashboard_page_t	*page;
+
+		page = dashboard->pages.values[i];
+
+		for (j = 0; j < page->widgets.values_num; j++)
+		{
+			zbx_db_widget_t	*widget;
+
+			widget = page->widgets.values[j];
+
+			for (k = 0; k < widget->fields.values_num; k++)
+			{
+				zbx_db_widget_field_t *field;
+
+				field = widget->fields.values[k];
+
+				if (0 != field->value_itemid)
+				{
+					int	index;
+
+					pair.first = field->value_itemid;
+
+					if (FAIL != (index = zbx_vector_uint64_pair_search(&itemid_pairs, pair,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						field->value_itemid = itemid_pairs.values[index].second;
+					}
+				}
+			}
+		}
+	}
+
+	zbx_vector_uint64_pair_destroy(&itemid_pairs);
+}
+
+static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t *graph_ids)
+{
+	zbx_vector_uint64_pair_t	graphid_pairs;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	DB_RESULT			result;
+	DB_ROW				row;
+	zbx_uint64_pair_t		pair;
+	int				i, j, k;
+
+	if (0 == graph_ids->values_num)
+		return;
+
+	zbx_vector_uint64_pair_create(&graphid_pairs);
+
+	zbx_vector_uint64_sort(graph_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(graph_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct g.templateid,g.graphid from graphs g,graphs_items gi,items i"
+			" where gi.graphid=g.graphid and i.itemid=gi.itemid and i.hostid=" ZBX_FS_UI64" and",
+			dashboard->child_templateid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.templateid", graph_ids->values, graph_ids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(pair.first, row[0]);
+		ZBX_DBROW2UINT64(pair.second, row[1]);
+
+		zbx_vector_uint64_pair_append(&graphid_pairs, pair);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	for (i = 0; i < dashboard->pages.values_num; i++)
+	{
+		zbx_db_dashboard_page_t	*page;
+
+		page = dashboard->pages.values[i];
+
+		for (j = 0; j < page->widgets.values_num; j++)
+		{
+			zbx_db_widget_t	*widget;
+
+			widget = page->widgets.values[j];
+
+			for (k = 0; k < widget->fields.values_num; k++)
+			{
+				zbx_db_widget_field_t *field;
+
+				field = widget->fields.values[k];
+
+				if (0 != field->value_graphid)
+				{
+					int	index;
+
+					pair.first = field->value_graphid;
+
+					if (FAIL != (index = zbx_vector_uint64_pair_search(&graphid_pairs, pair,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						field->value_graphid = graphid_pairs.values[index].second;
+					}
+				}
+			}
+		}
+	}
+
+	zbx_vector_uint64_pair_destroy(&graphid_pairs);
+}
+
+static void collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
+		zbx_vector_dashboard_ptr_t *dashboards, int *pages_num, int *widgets_num, int *fields_num)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	loc_child_templateids, value_itemids, value_graphids;
+
+	if (0 == parent_ids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&loc_child_templateids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select d.dashboardid,d.name,d.display_period,d.auto_start,ht.hostid,h.host,ht.templateid"
+			" from hosts_templates ht"
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" left join dashboard d on d.templateid=ht.templateid where", HOST_STATUS_TEMPLATE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ht.templateid", parent_ids->values,
+			parent_ids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char			*template_name, *seed = NULL;
+		zbx_db_dashboard_t	*dashboard, *dashboard_copy;
+		zbx_uint64_t		dashboardid, child_templateid, parent_templateid;
+		int			i;
+
+		ZBX_DBROW2UINT64(dashboardid, row[0]);
+		ZBX_DBROW2UINT64(child_templateid, row[4]);
+		ZBX_DBROW2UINT64(parent_templateid, row[6]);
+		template_name = zbx_strdup(NULL, row[5]);
+		template_name = zbx_update_template_name(template_name);
+
+		if (0 != dashboardid)
+		{
+			zbx_vector_uint64_create(&value_itemids);
+			zbx_vector_uint64_create(&value_graphids);
+
+			dashboard = zbx_malloc(NULL, sizeof(zbx_db_dashboard_t));
+			dashboard->child_templateid = child_templateid;
+			dashboard->parent_dashboardid = dashboardid;
+			dashboard->name = zbx_strdup(NULL, row[1]);
+			dashboard->display_period = atoi(row[2]);
+			dashboard->auto_start = atoi(row[3]);
+
+			seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
+			dashboard->uuid = zbx_gen_uuid4(seed);
+			zbx_free(seed);
+			dashboard->uniq = 0;
+			zbx_vector_dashboard_page_ptr_create(&dashboard->pages);
+			pages_num += DBpatch_propogate_dashboard(dashboard, dashboardid, widgets_num, fields_num,
+					&value_itemids, &value_graphids);
+			zbx_vector_dashboard_ptr_append(dashboards, dashboard);
+			change_item_ids(dashboard, &value_itemids);
+			change_graph_ids(dashboard, &value_graphids);
+
+			zbx_vector_uint64_destroy(&value_itemids);
+			zbx_vector_uint64_destroy(&value_graphids);
+		}
+
+		zbx_vector_uint64_append(&loc_child_templateids, child_templateid);
+
+		for (i = 0; i < dashboards->values_num; i++)
+		{
+			dashboard = dashboards->values[i];
+
+			if (parent_templateid == dashboard->child_templateid)
+			{
+				zbx_vector_uint64_create(&value_itemids);
+				zbx_vector_uint64_create(&value_graphids);
+
+				dashboard_copy = zbx_malloc(NULL, sizeof(zbx_db_dashboard_t));
+				dashboard_copy->child_templateid = child_templateid;
+				dashboard_copy->parent_dashboardid = dashboard->parent_dashboardid;
+				dashboard_copy->name = zbx_strdup(NULL, dashboard->name);
+				dashboard_copy->display_period = dashboard->display_period;
+				dashboard_copy->auto_start= dashboard->auto_start;
+				seed = zbx_dsprintf(seed, "%s/%s", template_name, dashboard->name);
+				dashboard_copy->uuid = zbx_gen_uuid4(seed);
+				zbx_free(seed);
+				dashboard->uniq = 0;
+				zbx_vector_dashboard_page_ptr_create(&dashboard_copy->pages);
+				pages_num += DBpatch_propogate_dashboard(dashboard_copy, dashboard->parent_dashboardid,
+						widgets_num, fields_num, &value_itemids, &value_graphids);
+				zbx_vector_dashboard_ptr_append(dashboards, dashboard_copy);
+
+				change_item_ids(dashboard_copy, &value_itemids);
+				change_graph_ids(dashboard_copy, &value_graphids);
+
+				zbx_vector_uint64_destroy(&value_itemids);
+				zbx_vector_uint64_destroy(&value_graphids);
+			}
+		}
+
+		zbx_free(template_name);
+	}
+
+	DBfree_result(result);
+	zbx_free(sql);
+
+	collect_dashboards(&loc_child_templateids, child_templateids, dashboards, pages_num, widgets_num, fields_num);
+
+	zbx_vector_uint64_append_array(child_templateids, loc_child_templateids.values,
+			loc_child_templateids.values_num);
+	zbx_vector_uint64_destroy(&loc_child_templateids);
+}
+
 static int	DBpatch_6030153(void)
 {
 	zbx_vector_dashboard_ptr_t		dashboards;
 	zbx_vector_child_dashboard_ptr_t	child_dashboards;
-	zbx_vector_uint64_t			child_templateids;
+	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
 	int					changed, i, j, k, l, pages_num = 0, widgets_num = 0, fields_num = 0;
@@ -2324,53 +2749,27 @@ static int	DBpatch_6030153(void)
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_dashboard, db_insert_dashboard_page, db_insert_widget,
 						db_insert_widget_field;
-	zbx_uint64_t				dashboardid, dashboard_pageid, widgetid, widget_fieldid ;
+	zbx_uint64_t				dashboardid, dashboard_pageid, widgetid, widget_fieldid;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+	zbx_vector_uint64_create(&parent_ids);
+	select_pure_parents(&parent_ids);
+
+	if (0 == parent_ids.values_num)
+		goto out;
 
 	zbx_vector_dashboard_ptr_create(&dashboards);
 	zbx_vector_child_dashboard_ptr_create(&child_dashboards);
 	zbx_vector_uint64_create(&child_templateids);
 
-	result = DBselect("select d.dashboardid,d.name,d.display_period,d.auto_start,h1.hostid,h1.host"
-			" from dashboard d,hosts h,hosts h1,hosts_templates ht"
-			" where d.templateid=h.hostid and h.status=3 and h.hostid=ht.templateid and h1.hostid=ht.hostid"
-			" and h1.status=3 order by d.templateid asc");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		char			*template_name, *seed = NULL;
-		zbx_db_dashboard_t 	*dashboard;
-		zbx_uint64_t		child_templateid;
-
-		ZBX_DBROW2UINT64(dashboardid, row[0]);
-		ZBX_DBROW2UINT64(child_templateid, row[4]);
-
-		dashboard = zbx_malloc(NULL, sizeof(zbx_db_dashboard_t));
-		dashboard->child_templateid = child_templateid;
-		dashboard->name = zbx_strdup(NULL, row[1]);
-		dashboard->display_period = atoi(row[2]);
-		dashboard->auto_start = atoi(row[3]);
-
-		template_name = zbx_strdup(NULL, row[5]);
-		template_name = zbx_update_template_name(template_name);
-		seed = zbx_dsprintf(seed, "%s/%s", template_name, row[1]);
-		dashboard->uuid = zbx_gen_uuid4(seed);
-		zbx_free(template_name);
-		zbx_free(seed);
-
-		zbx_vector_dashboard_page_ptr_create(&dashboard->pages);
-		pages_num += DBpatch_propogate_dashboard(dashboard, dashboardid, &widgets_num, &fields_num);
-		zbx_vector_dashboard_ptr_append(&dashboards, dashboard);
-		zbx_vector_uint64_append(&child_templateids, child_templateid);
-	}
-
-	DBfree_result(result);
+	collect_dashboards(&parent_ids, &child_templateids, &dashboards, &pages_num, &widgets_num, &fields_num);
 
 	if (0 == dashboards.values_num)
-		goto out;
+		goto clean;
 
+	zbx_vector_uint64_sort(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select name,templateid from dashboard where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid", child_templateids.values,
@@ -2379,7 +2778,7 @@ static int	DBpatch_6030153(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_child_dashboard_t 	*dashboard;
+		zbx_child_dashboard_t	*dashboard;
 		uint64_t		templateid;
 
 		ZBX_DBROW2UINT64(templateid, row[1]);
@@ -2396,29 +2795,57 @@ static int	DBpatch_6030153(void)
 
 	do
 	{
+		zbx_db_dashboard_t	*dashboard, *dashboard2;
+
 		changed = 0;
 
 		for (i = 0; i < child_dashboards.values_num; i++)
 		{
-			zbx_child_dashboard_t 	*child_dashboard;
-			int			uniq = 0;
+			zbx_child_dashboard_t	*child_dashboard;
 
 			child_dashboard = child_dashboards.values[i];
 
 			for (j = 0; j < dashboards.values_num; j++)
 			{
-				zbx_db_dashboard_t 	*dashboard;
-
 				dashboard = dashboards.values[j];
 
 				if (dashboard->child_templateid == child_dashboard->templateid &&
-						0 == strcmp(dashboard->name, child_dashboard->name))
+						0 == strcmp(dashboard->name, child_dashboard->name) &&
+						0 == dashboard->uniq)
 				{
-					uniq++;
 					changed++;
-					dashboard->name = zbx_dsprintf(dashboard->name, "%s %d", child_dashboard->name,
-							uniq);
+					dashboard->uniq++;
 				}
+			}
+		}
+
+		for (i = 0; i < dashboards.values_num; i++)
+		{
+			dashboard = dashboards.values[i];
+
+			for (j = i + 1; j < dashboards.values_num; j++)
+			{
+				dashboard2 = dashboards.values[j];
+
+				if (dashboard->child_templateid == dashboard2->child_templateid &&
+						0 == strcmp(dashboard->name, dashboard2->name) &&
+						dashboard->uniq == dashboard2->uniq)
+				{
+					changed++;
+					dashboard2->uniq++;
+				}
+			}
+		}
+
+		for (i = 0; i < dashboards.values_num; i++)
+		{
+			dashboard = dashboards.values[i];
+
+			if (0 != dashboard->uniq)
+			{
+				dashboard->name = zbx_dsprintf(dashboard->name, "%s %d", dashboard->name,
+						dashboard->uniq);
+				dashboard->uniq = 0;
 			}
 		}
 	}while (0 != changed);
@@ -2441,7 +2868,7 @@ static int	DBpatch_6030153(void)
 
 	for (i = 0; i < dashboards.values_num; i++)
 	{
-		zbx_db_dashboard_t 	*dashboard;
+		zbx_db_dashboard_t	*dashboard;
 
 		dashboard = dashboards.values[i];
 		zbx_db_insert_add_values(&db_insert_dashboard, dashboardid, dashboard->child_templateid,
@@ -2450,7 +2877,7 @@ static int	DBpatch_6030153(void)
 
 		for (j = 0; j < dashboard->pages.values_num; j++)
 		{
-			zbx_db_dashboard_page_t 	*dashboard_page;
+			zbx_db_dashboard_page_t	*dashboard_page;
 
 			dashboard_page = dashboard->pages.values[j];
 			zbx_db_insert_add_values(&db_insert_dashboard_page, dashboard_pageid, dashboardid,
@@ -2459,18 +2886,18 @@ static int	DBpatch_6030153(void)
 
 			for (k = 0; k < dashboard_page->widgets.values_num; k++)
 			{
-				zbx_db_widget_t 	*widget;
+				zbx_db_widget_t	*widget;
 
-				widget = dashboard_page->widgets.values[j];
+				widget = dashboard_page->widgets.values[k];
 				zbx_db_insert_add_values(&db_insert_widget, widgetid, dashboard_pageid,
 						widget->type, widget->name, widget->x, widget->y, widget->width,
 						widget->height, widget->view_mode);
 
-				for (l = 0; l < dashboard_page->widgets.values_num; l++)
+				for (l = 0; l < widget->fields.values_num; l++)
 				{
-					zbx_db_widget_field_t 	*field;
+					zbx_db_widget_field_t	*field;
 
-					field = widget->fields.values[j];
+					field = widget->fields.values[l];
 					zbx_db_insert_add_values(&db_insert_widget_field, widget_fieldid,
 							widgetid, field->type, field->name, field->value_int,
 							field->value_str, field->value_groupid,
@@ -2502,12 +2929,14 @@ static int	DBpatch_6030153(void)
 
 	zbx_db_insert_execute(&db_insert_widget_field);
 	zbx_db_insert_clean(&db_insert_widget_field);
-out:
+clean:
 	zbx_vector_uint64_destroy(&child_templateids);
 	zbx_vector_child_dashboard_ptr_clear_ext(&child_dashboards, child_dashboard_free);
 	zbx_vector_child_dashboard_ptr_destroy(&child_dashboards);
 	zbx_vector_dashboard_ptr_clear_ext(&dashboards, dashboard_free);
 	zbx_vector_dashboard_ptr_destroy(&dashboards);
+out:
+	zbx_vector_uint64_destroy(&parent_ids);
 
 	return SUCCEED;
 }
@@ -2540,7 +2969,7 @@ static int	DBpatch_6030155(void)
 	zbx_vector_str_create(&uuids);
 
 	result = DBselect("select i.itemid,i.key_,h.host from items i left join hosts h on h.hostid=i.hostid"
-			" where h.status=3 and i.templateid is not null");
+			" where h.status=%d and i.templateid is not null", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2607,8 +3036,8 @@ static int	DBpatch_6030156(void)
 			" from triggers t"
 			" join functions f on f.triggerid=t.triggerid"
 			" join items i on i.itemid=f.itemid"
-			" join hosts h on h.hostid=i.hostid and h.status=3"
-			" where t.templateid is not null");
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where t.templateid is not null", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2734,8 +3163,8 @@ static int	DBpatch_6030157(void)
 			" from graphs g"
 			" join graphs_items gi on gi.graphid=g.graphid"
 			" join items i on i.itemid=gi.itemid"
-			" join hosts h on h.hostid=i.hostid and h.status=3"
-			" where g.templateid is not null");
+			" join hosts h on h.hostid=i.hostid and h.status=%d"
+			" where g.templateid is not null", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2801,8 +3230,8 @@ static int	DBpatch_6030158(void)
 	result = DBselect(
 			"select ht.httptestid,ht.name,h.host"
 			" from httptest ht"
-			" join hosts h on h.hostid=ht.hostid and h.status=3"
-			" where ht.templateid is not null");
+			" join hosts h on h.hostid=ht.hostid and h.status=%d"
+			" where ht.templateid is not null", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2836,13 +3265,15 @@ static int	DBpatch_6030159(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			return SUCCEED;
 
-		if (ZBX_DB_OK > DBexecute("delete from hosts_templates where hostid in (select hostid from hosts"
-				" where status=3)"))
-			return FAIL;
+	if (ZBX_DB_OK > DBexecute("delete from hosts_templates where hostid in (select hostid from hosts"
+			" where status=%d)", HOST_STATUS_TEMPLATE))
+	{
+		return FAIL;
+	}
 
-		return SUCCEED;
-
+	return SUCCEED;
 }
+#undef HOST_STATUS_TEMPLATE
 
 #endif
 

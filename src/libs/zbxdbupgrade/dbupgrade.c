@@ -1435,6 +1435,7 @@ char	*zbx_update_template_name(char *old)
 	zbx_free(ptr);
 
 	return ptr_snmp;
+#undef MIN_TEMPLATE_NAME_LEN
 }
 
 char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param)
@@ -1459,7 +1460,4 @@ char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const
 
 	return func;
 }
-
-
-
 #endif

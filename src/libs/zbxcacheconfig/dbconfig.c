@@ -14270,17 +14270,12 @@ static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *ite
 	}
 }
 
-static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+static void	zbx_gather_tags_from_template(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 {
 	ZBX_DC_TEMPLATE_ITEM	*item;
 
 	if (NULL != (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&config->template_items, &itemid)))
-	{
 		zbx_gather_tags_from_host(item->hostid, item_tags);
-
-		if (0 != item->templateid)
-			zbx_gather_tags_from_template_chain(item->templateid, item_tags);
-	}
 }
 
 void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
@@ -14299,7 +14294,7 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 	zbx_gather_tags_from_host(item->hostid, item_tags);
 
 	if (0 != item->templateid)
-		zbx_gather_tags_from_template_chain(item->templateid, item_tags);
+		zbx_gather_tags_from_template(item->templateid, item_tags);
 
 	/* check for discovered item */
 	if (ZBX_FLAG_DISCOVERY_CREATED == item->flags)
@@ -14315,7 +14310,7 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 					&config->prototype_items, &item_discovery->parent_itemid)))
 			{
 				if (0 != prototype_item->templateid)
-					zbx_gather_tags_from_template_chain(prototype_item->templateid, item_tags);
+					zbx_gather_tags_from_template(prototype_item->templateid, item_tags);
 			}
 		}
 	}
