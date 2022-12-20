@@ -1,6 +1,7 @@
 Changes for 6.4.0rc1
 
 New features:
+..FG...... [ZBXNEXT-6848] added support for system.sw.os on Windows OS, and system.sw.os.get key for Zabbix agent and agent2 items (jfreibergs, kprutkovs)
 ..F....... [ZBXNEXT-7835] added modal form for actions in Alerts->Actions (esekace)
 A.F....PS. [ZBXNEXT-4428] optimized SNMP discovery and data collection, added GetBulk support (dgoloscapov, rlataria, wiper)
 .........T [ZBXNEXT-7889] moved to vfs.fs.get key in the filesystem discovery for Zabbix agent based templates (atocko)
@@ -15,6 +16,7 @@ A......... [ZBXNEXT-8085] removed deprecated property "alias" in user.get, user.
 ........S. [ZBX-21761] added HA manager timeout checks and restart in standby mode (wiper)
 
 Bug fixes:
+.........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
 A......... [ZBX-22016] fixed host.get API method not returning any results for hosts with no interfaces when filtering by "hostid" (Ivo)
 .........T [ZBX-21985] fixed lld rules in AWS by HTTP template (abakaldin)
 .......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
