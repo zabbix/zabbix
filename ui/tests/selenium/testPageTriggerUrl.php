@@ -112,7 +112,7 @@ class testPageTriggerUrl extends CWebTest {
 		array_shift($array);
 		$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
 
-		// Remove 'cause ans symptoms' from data provider.
+		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);
 		unset($data['links']['Mark selected as symptoms']);
 
@@ -181,8 +181,8 @@ class testPageTriggerUrl extends CWebTest {
 				$this->assertEquals(array_keys($links), [$item_link->getText()]);
 				$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
 			}
-			// Check 1-level menu links.
 			else {
+				// Check 1-level menu links.
 				if ($links !== '') {
 					$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
 				}
