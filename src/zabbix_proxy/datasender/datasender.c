@@ -82,7 +82,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *                                                                            *
  ******************************************************************************/
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *zbx_config_tls,
-		const zbx_thread_info_t *info)
+		const zbx_thread_info_t *info, int config_timeout)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -185,7 +185,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		/* retry till have a connection */
-		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
 				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, zbx_config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -311,7 +311,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		zbx_update_env(time_now);
+		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, time_diff);
@@ -321,8 +321,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, datasender_args_in->zbx_config_tls,
-					info);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state,
+					datasender_args_in->zbx_config_tls, info, datasender_args_in->config_timeout);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;

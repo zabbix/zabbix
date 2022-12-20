@@ -29,14 +29,16 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *                                                                            *
  * Purpose: retrieve data from script executed on Zabbix server               *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item           - [IN] item we are interested in                *
+ *             config_timeout - [IN]                                          *
+ *             result         - [OUT]                                         *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
@@ -74,7 +76,7 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), config_timeout,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);

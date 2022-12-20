@@ -186,11 +186,11 @@ if ($data['change_password']) {
 else {
 	$user_form_list->addRow(_('Password'),
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
+			->setEnabled(($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
+				&& !$data['readonly'])
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->setEnabled(!$data['readonly'])
 	);
 }
 

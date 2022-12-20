@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-25 16:33+0000\n"
+"PO-Revision-Date: 2022-12-01 13:30+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -153,7 +153,7 @@ msgstr[1] "%1$s eventos"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s padrão de grupo"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -928,6 +928,14 @@ msgstr "Adicionar serviços dependentes"
 msgid "Add from"
 msgstr "Adicionar de"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Adicionar host"
@@ -1164,7 +1172,7 @@ msgstr "Tudo"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr "Todos os dashboards"
+msgstr "Todos os painéis"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
@@ -1230,6 +1238,10 @@ msgstr "Hosts permitidos"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "Métodos permitidos"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -2401,8 +2413,8 @@ msgstr[1] "Não foi possível eliminar as correlações"
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] "Não foi possível eliminar o dashboard"
-msgstr[1] "Não foi possível eliminar os dashboards"
+msgstr[0] "Não é possível eliminar o painel"
+msgstr[1] "Não foi possível eliminar os painéis"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
@@ -4568,6 +4580,10 @@ msgstr "Configura a ligação com o DB"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Texto de confirmação"
@@ -5316,8 +5332,8 @@ msgstr "Dashboard criado"
 #: app/controllers/CControllerTemplateDashboardDelete.php:58
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] "Dashboard eliminado"
-msgstr[1] "Dashboards eliminados"
+msgstr[0] "Painel eliminado"
+msgstr[1] "Painéis eliminados"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -5359,7 +5375,7 @@ msgstr "O painel com o ID \"%1$s\" não está disponível."
 #: include/views/inventory.host.view.php:168
 #: include/views/inventory.host.view.php:172 jsLoader.php:360
 msgid "Dashboards"
-msgstr "Dashboards"
+msgstr "Painéis"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:806
 #: include/views/js/monitoring.sysmaps.js.php:896
@@ -5396,6 +5412,10 @@ msgstr "Vista geral de dados"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "Conjunto de dados"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5822,6 +5842,10 @@ msgstr "Eliminar SLA selecionado?"
 msgid "Delete selected SLAs?"
 msgstr "Eliminar SLAs selecionados?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Eliminar acções seleccionadas?"
@@ -5833,7 +5857,7 @@ msgstr "Eliminar os correlacionamentos selecionados?"
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
-msgstr "Eliminar os dashboards selecionados?"
+msgstr "Eliminar os painéis selecionados?"
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6079,20 +6103,20 @@ msgstr "O parâmetro descontinuado \"%1$s\" não pode ser usado com \"%2$s\"."
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "Grupo de utilizadores desprovisionados"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "O grupo de utilizadores desprovisionados não pode ser eliminado."
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "O grupo de utilizadores desprovisionados não pode estar vazio."
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "O grupo de utilizadores desprovisionados não pode ser ativado."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6125,6 +6149,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Descrição"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6245,6 +6273,10 @@ msgstr "Desativar SLA selecionado?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "Desativar SLAs selecionados?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -6950,10 +6982,14 @@ msgstr "Activar"
 msgid "Enable HTTP authentication"
 msgstr "Ativar autenticação HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "Ativar provisionamento JIT"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6965,7 +7001,7 @@ msgstr "Ativar autenticação SAML"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "Ativar provisionamento SCIM"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -7037,6 +7073,10 @@ msgstr "Ativar SLA selecionado?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "Ativar SLAs selecionados?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7717,6 +7757,13 @@ msgstr "O campo \"%1$s\" não é um texto."
 msgid "Field \"%1$s\" must be missing."
 msgstr "O campo \"%1$s\" não é deve estar faltando."
 
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "O checksum do arquivo, calculada pelo algoritmo cksum do UNIX. Retorna inteiro para crc32 (padrão) e string para md5, sha256"
@@ -8313,11 +8360,11 @@ msgstr "Grupo adicionado"
 
 #: app/views/popup.ldap.edit.php:134
 msgid "Group base DN"
-msgstr ""
+msgstr "DN base do grupo"
 
 #: app/views/popup.ldap.edit.php:122
 msgid "Group configuration"
-msgstr ""
+msgstr "Configuração do grupo"
 
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
@@ -8327,7 +8374,7 @@ msgstr[1] "Grupo eliminado"
 
 #: app/views/popup.ldap.edit.php:182
 msgid "Group filter"
-msgstr ""
+msgstr "Filtro de grupo"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8335,7 +8382,7 @@ msgstr "Grupo para hosts descobertos"
 
 #: app/views/popup.ldap.edit.php:156
 msgid "Group member attribute"
-msgstr ""
+msgstr "Atributo do membro do grupo"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
@@ -8345,7 +8392,7 @@ msgstr "Nome do grupo"
 #: app/views/administration.authentication.edit.php:427
 #: app/views/popup.ldap.edit.php:148
 msgid "Group name attribute"
-msgstr ""
+msgstr "Atributo de nome de grupo"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9063,7 +9110,7 @@ msgstr "Já existe um servidor com nome visível \"%1$s\" ."
 #: include/views/configuration.triggers.list.php:48
 #: include/views/reports.toptriggers.php:57 report2.php:467
 msgid "Hosts"
-msgstr "Hosts"
+msgstr "Servidores"
 
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:84
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:100
@@ -9271,6 +9318,10 @@ msgstr "Um idêntico namespace (%1$s) é usado por módulos localizados em %2$s.
 msgid "Identification of the system. Returns string"
 msgstr "Identificação do sistema. Retorna texto"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9438,7 +9489,7 @@ msgstr "SLA inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:452
 msgid "Inaccessible action"
-msgstr ""
+msgstr "Ação inacessível"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9491,7 +9542,7 @@ msgstr "Mapa inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:453
 msgid "Inaccessible media type"
-msgstr ""
+msgstr "Tipo de mídia inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -10605,11 +10656,11 @@ msgstr "JSON inválido. Ocorreu um erro quando o servidor processava o texto JSO
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de tipo de mídia de provisionamento JIT LDAP inválida."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de grupo de utilizadores de provisionamento JIT LDAP inválida."
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10620,11 +10671,11 @@ msgstr "Configuração de LDAP inválida"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de tipo de mídia de provisionamento SAML JIT inválida."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de grupo de utilizadores de provisionamento SAML JIT inválida."
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10692,7 +10743,7 @@ msgstr "Chave inválida \"%1$s\": %2$s."
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de tipo de mídia inválida."
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10999,7 +11050,7 @@ msgstr "Período de tempo inválido."
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr ""
+msgstr "Configuração de mapeamento de grupo de utilizadores inválida."
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11473,7 +11524,7 @@ msgstr "A autenticação LDAP está desativada."
 
 #: app/views/popup.ldap.edit.php:235
 msgid "LDAP group pattern"
-msgstr ""
+msgstr "Padrão de grupo LDAP"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -12005,6 +12056,13 @@ msgstr "Endereço MAC A"
 msgid "MAC address B"
 msgstr "Endereço MAC B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12371,6 +12429,19 @@ msgstr "Número máximo de colunas e linhas em tabelas de visão geral"
 msgid "Max period for time selector"
 msgstr "Período máximo para o seletor de tempo"
 
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr "Nível máximo de zoom"
@@ -12431,7 +12502,7 @@ msgstr "Tipo de média"
 #: widgets/actionlog/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Media type"
-msgstr ""
+msgstr "Tipo de mídia"
 
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
@@ -12468,7 +12539,7 @@ msgstr[1] "Tipo de média activado"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr ""
+msgstr "Mapeamento de tipo de mídia"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12787,11 +12858,11 @@ msgstr ""
 #: app/views/administration.module.list.php:27
 #: include/classes/helpers/CMenuHelper.php:270 include/html.inc.php:899
 msgid "Modules"
-msgstr ""
+msgstr "Módulos"
 
 #: app/controllers/CControllerModuleScan.php:127
 msgid "Modules updated"
-msgstr ""
+msgstr "Módulos atualizados"
 
 #: include/func.inc.php:213
 msgid "Mon"
@@ -12803,7 +12874,7 @@ msgstr "Segunda-feira"
 
 #: app/views/configuration.host.list.php:129
 msgid "Monitored by"
-msgstr ""
+msgstr "Monitorado por"
 
 #: app/partials/configuration.host.edit.html.php:269
 #: app/views/popup.massupdate.host.php:128
@@ -12820,7 +12891,7 @@ msgstr "Host monitorizado"
 #: include/classes/helpers/CRoleHelper.php:305
 #: include/views/inventory.host.view.php:135
 msgid "Monitoring"
-msgstr "Em monitoria"
+msgstr "Monitoração"
 
 #: include/views/js/monitoring.sysmaps.js.php:70
 msgid "Monospace"
@@ -12835,7 +12906,7 @@ msgstr "Mês"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "Mês"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12867,11 +12938,11 @@ msgstr "Mais de um gráfico com o nome \"%1$s\" no mesmo host."
 
 #: include/classes/helpers/CServiceHelper.php:27
 msgid "Most critical if all children have problems"
-msgstr ""
+msgstr "Mais crítico se todas os processos filho tiverem problemas"
 
 #: include/classes/helpers/CServiceHelper.php:26
 msgid "Most critical of child services"
-msgstr ""
+msgstr "O mais crítico dos serviços descendentes"
 
 #: include/httptest.inc.php:409
 msgid "Mozilla Firefox"
@@ -12892,28 +12963,28 @@ msgstr "Silenciar"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr ""
+msgstr "Meu"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: jsLoader.php:188
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr ""
+msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -13101,7 +13172,7 @@ msgstr "Nome"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13112,11 +13183,11 @@ msgstr "Nome"
 
 #: app/views/administration.authentication.edit.php:520
 msgid "Name "
-msgstr ""
+msgstr "Nome"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
-msgstr ""
+msgstr "ID do nome"
 
 #: include/views/js/configuration.httpconf.edit.js.php:176
 msgid "Name of the form field should not exceed 255 characters."
@@ -13124,19 +13195,19 @@ msgstr "O nome do campo do formulário não pode exceder 255 caracteres."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Namespace"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "Naming requirements:"
-msgstr ""
+msgstr "Requisitos de nomenclatura:"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
-msgstr ""
+msgstr "Navegar para a visualização padrão"
 
 #: jsLoader.php:190
 msgid "Navigate to initial view"
-msgstr ""
+msgstr "Navegar para a visualização inicial"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -13166,23 +13237,23 @@ msgstr "Mapas de rede"
 
 #: app/views/administration.miscconfig.edit.php:135
 msgid "Network timeout"
-msgstr ""
+msgstr "Tempo limite de rede"
 
 #: app/views/administration.miscconfig.edit.php:163
 msgid "Network timeout for item test"
-msgstr ""
+msgstr "Tempo limite de rede para teste de item"
 
 #: app/views/administration.miscconfig.edit.php:149
 msgid "Network timeout for media type test"
-msgstr ""
+msgstr "Tempo limite de rede para teste de tipo de mídia"
 
 #: app/views/administration.miscconfig.edit.php:171
 msgid "Network timeout for scheduled report test"
-msgstr ""
+msgstr "Tempo limite de rede para teste de relatório agendado"
 
 #: app/views/administration.miscconfig.edit.php:157
 msgid "Network timeout for script execution"
-msgstr ""
+msgstr "Tempo limite de rede para execução de script"
 
 #: include/classes/data/CItemData.php:1506
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
@@ -13194,23 +13265,28 @@ msgstr "Nunca"
 
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
-msgstr ""
+msgstr "Novo token de API"
 
 #: app/views/popup.ldap.edit.php:145
 msgid "New LDAP server"
-msgstr ""
+msgstr "Novo servidor LDAP"
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
+msgstr "Novo SLA"
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
-msgstr ""
+msgstr "Nova regra adicional"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr ""
+msgstr "Nova coluna"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -13235,7 +13311,7 @@ msgstr "Novo evento no grupo de hosts"
 #: include/classes/helpers/CCorrelationHelper.php:53
 #: include/classes/helpers/CCorrelationHelper.php:123
 msgid "New event tag name"
-msgstr ""
+msgstr "Novo nome da tag de evento"
 
 #: include/classes/helpers/CCorrelationHelper.php:57
 msgid "New event tag value"
@@ -13243,28 +13319,28 @@ msgstr "Novo valor para a etiqueta de eventos"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "New excluded downtime"
-msgstr ""
+msgstr "Novo tempo de inatividade excluído"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
-msgstr ""
+msgstr "Novo host"
 
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "Novo grupo de hosts"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr ""
+msgstr "Novo mapeamento de tipo de mídia"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
-msgstr ""
+msgstr "Nova operação"
 
 #: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
 msgid "New proxy"
-msgstr ""
+msgstr "Novo proxy"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -13272,16 +13348,16 @@ msgstr "Nova expressão regular"
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
-msgstr ""
+msgstr "Novo serviço"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
-msgstr ""
+msgstr "Nome da nova etiqueta"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "Novo grupo de modelos"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -13289,12 +13365,12 @@ msgstr "Novos triggers"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr ""
+msgstr "Novo mapeamento de grupo de utilizadores"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
 msgid "Next page"
-msgstr ""
+msgstr "Próxima página"
 
 #: include/classes/setup/CSetupWizard.php:343
 #: include/classes/setup/CSetupWizard.php:603
@@ -13374,7 +13450,7 @@ msgstr "Não foi definido um nome de utilizador para autenticação."
 
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
-msgstr ""
+msgstr "Sem alterações."
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -13383,7 +13459,7 @@ msgstr "Sem condições definidas."
 
 #: app/views/monitoring.widget.item.view.php:157
 msgid "No data"
-msgstr ""
+msgstr "Sem dados"
 
 #: include/views/configuration.maintenance.edit.php:107
 #: include/views/configuration.maintenance.list.php:115
@@ -13416,7 +13492,7 @@ msgstr "Não foram fornecidos IDs de regras de descoberta."
 #: app/views/administration.user.edit.php:578
 #: app/views/administration.userrole.edit.php:255
 msgid "No enabled modules found."
-msgstr ""
+msgstr "Não foi encontrado nenhum módulo ativado."
 
 #: app/partials/configuration.host.edit.html.php:431
 #: app/partials/configuration.host.edit.html.php:444
@@ -13439,7 +13515,7 @@ msgstr "Não foi feito upload do ficheiro."
 #: include/graphs.inc.php:153
 #, c-format
 msgid "No graph item with graph ID \"%1$s\"."
-msgstr ""
+msgstr "Nenhum item de gráfico com ID de gráfico \"%1$s\"."
 
 #: app/views/monitoring.widget.favgraphs.view.php:26
 msgid "No graphs added."
@@ -13456,12 +13532,12 @@ msgstr "Nenhum host seleccionado."
 #: include/hosts.inc.php:546
 #, c-format
 msgid "No host with host ID \"%1$s\"."
-msgstr ""
+msgstr "Nenhum servidor com ID de host \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:176
 #, c-format
 msgid "No icon for map element \"\"%1$s\"."
-msgstr ""
+msgstr "Nenhum ícone para o elemento do mapa \"\"%1$s\"."
 
 #: include/views/monitoring.sysmap.edit.php:117
 msgid "No image"
@@ -13480,7 +13556,7 @@ msgstr "Interface não encontrado."
 
 #: jsLoader.php:321
 msgid "No interfaces are defined."
-msgstr ""
+msgstr "Sem interface definida."
 
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
@@ -13488,12 +13564,12 @@ msgstr "A operação da acção não tem um modo de inventário definido."
 
 #: include/classes/widgets/CWidgetHelper.php:1240
 msgid "No item selected."
-msgstr ""
+msgstr "Nenhum item selecionado."
 
 #: include/items.inc.php:742
 #, c-format
 msgid "No item with item ID \"%1$s\"."
-msgstr ""
+msgstr "Nenhum item com ID de item \"%1$s\"."
 
 #: chart3.php:145 chart7.php:56
 msgid "No items defined."
@@ -13514,12 +13590,12 @@ msgstr "Nenhuma correspondência encontrada"
 
 #: app/controllers/CControllerModuleScan.php:128
 msgid "No new modules discovered"
-msgstr ""
+msgstr "Nenhum novo módulo descoberto"
 
 #: include/classes/api/services/CAction.php:2779
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
-msgstr ""
+msgstr "Nenhuma operação definida para a ação \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:1550
 #: include/classes/api/services/CUser.php:2029
@@ -13563,7 +13639,7 @@ msgstr "Sem permissões para acesso ao sistema."
 #: include/classes/api/services/CUser.php:258
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
-msgstr ""
+msgstr "Sem permissão para chamar \"%1$s.%2$s\"."
 
 #: app/controllers/CControllerChartsView.php:119
 #: app/controllers/CControllerDashboardPrint.php:96
@@ -13761,7 +13837,7 @@ msgstr "Não foi especificado o ficheiro de chave privada."
 
 #: jsLoader.php:175
 msgid "No problems"
-msgstr ""
+msgstr "Sem problemas"
 
 #: app/views/configuration.discovery.edit.php:56
 msgid "No proxy"
@@ -13774,7 +13850,7 @@ msgstr "Não foi especificado o ficheiro de chave pública."
 #: app/controllers/CControllerActionOperationValidate.php:110
 #: include/classes/api/services/CAction.php:2836
 msgid "No recipients specified for action operation message."
-msgstr ""
+msgstr "Nenhum destinatário especificado para mensagem de operação de ação."
 
 #: include/classes/widgets/CWidgetConfig.php:305 jsLoader.php:167
 msgid "No refresh"
@@ -13795,12 +13871,12 @@ msgstr "Não foi seleccionado nenhum destino."
 #: app/controllers/CControllerActionOperationValidate.php:142
 #: include/classes/api/services/CAction.php:2847
 msgid "No targets specified for action operation global script."
-msgstr ""
+msgstr "Nenhum alvo especificado para script global de operação de ação."
 
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr ""
+msgstr "Nenhum gatilho com ID de gatilho \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
@@ -13808,7 +13884,7 @@ msgstr "Não existem triggers definidos."
 
 #: app/views/js/popup.itemtestedit.view.js.php:41
 msgid "No value"
-msgstr ""
+msgstr "Sem valor"
 
 #: include/classes/validators/CApiInputValidator.php:1147
 msgid "Non-boolean flags are deprecated."
@@ -13865,7 +13941,7 @@ msgstr "Vista normal"
 
 #: include/locales.inc.php:53
 msgid "Norwegian (nb_NO)"
-msgstr ""
+msgstr "Norueguês (nb_NO)"
 
 #: include/actions.inc.php:161
 msgid "Not Ack"
@@ -13876,23 +13952,23 @@ msgstr "Por Reconher"
 #: app/partials/trigoverview.table.left.php:62
 #: app/partials/trigoverview.table.top.php:61
 msgid "Not all results are displayed. Please provide more specific search criteria."
-msgstr ""
+msgstr "Nem todos os resultados são exibidos. Forneça critérios de pesquisa mais específicos."
 
 #: include/classes/api/services/CTrigger.php:1058
 #: include/classes/api/services/CTriggerPrototype.php:867
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
-msgstr ""
+msgstr "Nem todos os modelos estão vinculados a \"%1$s\"."
 
 #: include/classes/api/services/CHostBase.php:1639
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "Não é permitido modificar a macro automática de utilizador \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
-msgstr ""
+msgstr "Não é permitido definir o idioma do utilizador \"convidado\"."
 
 #: include/classes/api/services/CUser.php:569
 msgid "Not allowed to set password for user \"guest\"."
@@ -13900,18 +13976,18 @@ msgstr "Não é possível definir uma senha para o utilizador \"guest\"."
 
 #: include/classes/api/services/CUser.php:580
 msgid "Not allowed to set theme for user \"guest\"."
-msgstr ""
+msgstr "Não é permitido definir o tema para o utilizador \"convidado\"."
 
 #: include/classes/api/services/CUser.php:484
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "Não é permitido atualizar o campo \"%1$s\" para o utilizador provisionado."
 
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
 msgid "Not authorized."
-msgstr ""
+msgstr "Não autorizado."
 
 #: app/views/monitoring.widget.hostavail.view.php:34
 #: app/views/monitoring.widget.hostavail.view.php:62
@@ -13923,7 +13999,7 @@ msgstr "Não disponível"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr ""
+msgstr "Não disponível"
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
@@ -13931,11 +14007,11 @@ msgstr "Sem classificação"
 
 #: app/controllers/CControllerMediatypeEnable.php:95
 msgid "Not enabled"
-msgstr ""
+msgstr "Não habilitado"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
-msgstr ""
+msgstr "Itens não herdados"
 
 #: app/partials/configuration.filter.items.php:178
 #: app/views/popup.itemtestedit.view.php:279 include/items.inc.php:157
@@ -13963,7 +14039,7 @@ msgstr "Notificações"
 
 #: actionconf.php:87 include/views/configuration.action.edit.php:481
 msgid "Notify about canceled escalations"
-msgstr ""
+msgstr "Notificar sobre escalonamentos cancelados"
 
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
@@ -13988,11 +14064,11 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "Numero de colunas"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
-msgstr ""
+msgstr "Número de descritores de arquivo atualmente abertos. Retorna inteiro"
 
 #: include/classes/data/CItemData.php:1602
 msgid "Number of enabled items on the host."
@@ -14000,7 +14076,7 @@ msgstr "Número de itens activados no host."
 
 #: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Número de servidores (ativado/desativado)"
 
 #: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
@@ -14057,11 +14133,11 @@ msgstr "Número de processadores na máquina virtual VMware, <url> - URL de serv
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:283
 msgid "Number of rows"
-msgstr ""
+msgstr "Numero de linhas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr ""
+msgstr "Número de temporadas"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -14074,7 +14150,7 @@ msgstr "Número de passos"
 
 #: app/partials/administration.system.info.php:50
 msgid "Number of templates"
-msgstr ""
+msgstr "Número de modelos"
 
 #: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -14135,6 +14211,17 @@ msgstr "Numérico (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14184,7 +14271,7 @@ msgstr "SO (Vista sumária)"
 
 #: app/views/popup.lldoperation.php:46
 msgid "Object"
-msgstr ""
+msgstr "Objeto"
 
 #: include/func.inc.php:245
 msgid "Oct"
@@ -14220,12 +14307,12 @@ msgstr "Ok"
 #: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "OK"
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
-msgstr ""
+msgstr "Valor antigo da etiqueta de evento"
 
 #: include/classes/helpers/CCorrelationHelper.php:56
 msgid "Old event tag value"
@@ -14233,7 +14320,7 @@ msgstr "Valor antigo da etiqueta de evento"
 
 #: app/views/popup.condition.common.php:118
 msgid "Old tag name"
-msgstr ""
+msgstr "Nome da etiqueta antiga"
 
 #: app/views/administration.proxy.list.php:167
 #: include/views/monitoring.sysmap.constructor.php:51
@@ -14268,7 +14355,7 @@ msgstr "Apenas administradores podem definir o proprietário de um mapa."
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "Apenas o grupo desabilitado pode ser definido para utilizadores desprovisionados."
 
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
@@ -14276,7 +14363,7 @@ msgstr "Apenas são contabilizados os itens associados a hosts activos"
 
 #: include/classes/api/services/CItemGeneral.php:1480
 msgid "Only one Prometheus step is allowed."
-msgstr ""
+msgstr "Apenas uma etapa do Prometheus é permitida."
 
 #: include/classes/api/services/CItemGeneral.php:1447
 msgid "Only one change step is allowed."
@@ -14288,12 +14375,12 @@ msgstr "Apenas uma verificação pode ser única."
 
 #: include/classes/api/services/CItemGeneral.php:1648
 msgid "Only one not supported value check is allowed."
-msgstr ""
+msgstr "Apenas uma verificação de valor não suportada é permitida."
 
 #: include/classes/api/services/CItemGeneral.php:1421
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
-msgstr ""
+msgstr "Apenas uma etapa de estrangulamento é permitida."
 
 #: include/classes/api/services/CUserDirectory.php:519
 #, c-format
@@ -14308,11 +14395,11 @@ msgstr[1] "Apenas os incidentes selecionados"
 
 #: app/views/service.list.edit.php:86
 msgid "Only services without children"
-msgstr ""
+msgstr "Apenas serviços sem dependentes"
 
 #: app/views/service.list.edit.php:94
 msgid "Only services without problem tags"
-msgstr ""
+msgstr "Somente serviços sem etiquetas de problema"
 
 #: include/classes/api/services/CDashboard.php:414
 msgid "Only super admins can set dashboard owner."
@@ -14320,7 +14407,7 @@ msgstr "Apenas super administradores podem definir o proprietário do dashboard.
 
 #: include/classes/api/services/CReport.php:334
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Somente superadministradores podem definir o proprietário do relatório."
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -14328,11 +14415,11 @@ msgstr "Apenas são contabilizados triggers associados a hosts activos e que dep
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
-msgstr ""
+msgstr "Abrir numa nova janela"
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Registo aberto"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -14342,10 +14429,14 @@ msgstr "Opera"
 msgid "Operating system information. Returns string"
 msgstr "Informação sobre o sistema operativo. Retorna: texto"
 
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
+
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
 msgid "Operation"
-msgstr ""
+msgstr "Operação"
 
 #: include/classes/api/services/CAction.php:2805
 #, c-format
@@ -14381,12 +14472,12 @@ msgstr "A operação não tem nenhum template para operar."
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
 msgid "Operational data"
-msgstr ""
+msgstr "Dados operacionais"
 
 #: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr ""
+msgstr "Dados operacionais"
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -14429,7 +14520,7 @@ msgstr "Operador"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
-msgstr ""
+msgstr "Funções do operador"
 
 #: app/views/administration.mediatype.edit.php:347
 msgid "Options"
@@ -14465,11 +14556,11 @@ msgstr "Ou"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:131
 msgid "Order"
-msgstr ""
+msgstr "Ordem"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Ordenar coluna"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -14551,7 +14642,7 @@ msgstr "Outros"
 
 #: app/views/proxy.list.php:67
 msgid "Outdated"
-msgstr ""
+msgstr "Desatualizado"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14559,7 +14650,7 @@ msgstr "Estatísticas de saída de tráfego na interface de rede. Retorna: núme
 
 #: app/views/popup.scriptexec.php:47
 msgid "Output"
-msgstr ""
+msgstr "Resultado"
 
 #: include/classes/api/services/CDashboardGeneral.php:336
 #, c-format
@@ -14574,7 +14665,7 @@ msgstr "Sobrescrito por"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
-msgstr ""
+msgstr "Sobrepor"
 
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
@@ -14620,7 +14711,7 @@ msgstr "A extenção PHP LDAP está ausente."
 
 #: include/classes/setup/CFrontendSetup.php:547
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP OpenSSL extension missing."
@@ -14660,11 +14751,11 @@ msgstr "Não foi encontrado o suporte ao PHP gd FreeType."
 
 #: include/classes/setup/CFrontendSetup.php:437
 msgid "PHP gd GIF image support missing."
-msgstr ""
+msgstr "Falta suporte à imagem PHP gd GIF."
 
 #: include/classes/setup/CFrontendSetup.php:433
 msgid "PHP gd GIF support"
-msgstr ""
+msgstr "Suporte PHP gd GIF"
 
 #: include/classes/setup/CFrontendSetup.php:420
 msgid "PHP gd JPEG image support missing."
@@ -14824,15 +14915,15 @@ msgstr "Identidade PSK"
 #: jsLoader.php:142
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "Página %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
-msgstr ""
+msgstr "Período de exibição da página"
 
 #: include/classes/core/ZBase.php:565
 msgid "Page not found"
-msgstr ""
+msgstr "Página não encontrada"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -14842,7 +14933,7 @@ msgstr "A página recebeu dados incorrectos"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Pager"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.edit.php:105
@@ -14897,7 +14988,7 @@ msgstr "Gráficos herdados"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Valor do servidor pai"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14907,11 +14998,11 @@ msgstr "Itens pai"
 #: app/partials/service.info.php:111 app/partials/service.list.edit.php:41
 #: app/partials/service.list.php:35 app/views/popup.service.edit.php:55
 msgid "Parent services"
-msgstr ""
+msgstr "Serviços pai"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
-msgstr ""
+msgstr "Modelos pai"
 
 #: include/views/configuration.trigger.prototype.edit.php:69
 #: include/views/configuration.triggers.edit.php:80
@@ -14978,21 +15069,21 @@ msgstr "Senha (novamente)"
 
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
-msgstr ""
+msgstr "A senha não é obrigatória para o tipo de autenticação não interna."
 
 #: app/views/administration.authentication.edit.php:44
 msgid "Password must contain"
-msgstr ""
+msgstr "A senha deve conter"
 
 #: app/views/administration.authentication.edit.php:38
 msgid "Password policy"
-msgstr ""
+msgstr "Política de senha"
 
 #: app/views/administration.authentication.edit.php:46
 #: app/views/administration.authentication.edit.php:95
 #: app/views/administration.user.edit.php:155
 msgid "Password requirements:"
-msgstr ""
+msgstr "Requisitos de senha:"
 
 #: jsLoader.php:168 jsLoader.php:282
 msgid "Paste"
@@ -15001,12 +15092,12 @@ msgstr "Colar"
 #: app/views/js/configuration.dashboard.edit.js.php:217
 #: app/views/js/monitoring.dashboard.view.js.php:305
 msgid "Paste page"
-msgstr ""
+msgstr "Colar página"
 
 #: app/views/js/configuration.dashboard.edit.js.php:210
 #: app/views/js/monitoring.dashboard.view.js.php:298 jsLoader.php:143
 msgid "Paste widget"
-msgstr ""
+msgstr "Colar widget"
 
 #: jsLoader.php:283
 msgid "Paste without external links"
@@ -15014,11 +15105,11 @@ msgstr "Colar sem os links externos"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:909
 msgid "Pattern"
-msgstr ""
+msgstr "Padrão"
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
-msgstr ""
+msgstr "Pausar operações para problemas suprimidos"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15069,7 +15160,7 @@ msgstr "Período"
 #: app/controllers/CControllerPopupTriggerExpr.php:109
 #: app/controllers/CControllerPopupTriggerExpr.php:1096
 msgid "Period shift"
-msgstr ""
+msgstr "Mudança de período"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:47
@@ -15132,11 +15223,11 @@ msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver co
 
 #: app/views/js/popup.massupdate.js.php:414
 msgid "Please confirm that you want to remove all macros."
-msgstr ""
+msgstr "Confirme que deseja remover todas as macros."
 
 #: app/views/js/popup.massupdate.js.php:417
 msgid "Please confirm that you want to remove all value mappings."
-msgstr ""
+msgstr "Confirme se deseja remover todos os mapeamentos de valor."
 
 #: include/classes/setup/CSetupWizard.php:603
 #, c-format
@@ -15145,7 +15236,7 @@ msgstr "Por favor crie a base de dados manualmente e informe os parâmetros de l
 
 #: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
-msgstr ""
+msgstr "Ative a diretiva \"allow_url_fopen\"."
 
 #: jsLoader.php:271
 msgid "Please select two elements"
@@ -15164,7 +15255,7 @@ msgstr "Por favor seleccione dois elementos"
 #: include/classes/widgets/CWidgetHelper.php:1006
 #: include/classes/widgets/CWidgetHelper.php:1231
 msgid "Point size"
-msgstr ""
+msgstr "Tamanho do ponto"
 
 #: include/classes/widgets/CWidgetHelper.php:926
 #: include/classes/widgets/CWidgetHelper.php:969
@@ -15210,11 +15301,11 @@ msgstr "Português (pt_PT)"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:249
 msgid "Position"
-msgstr ""
+msgstr "Posição"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "A posição é ignorada para unidades s, uptime e unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15226,7 +15317,7 @@ msgstr "Tipo do publicação"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "A versão do servidor de banco de dados PostgreSQL é muito antiga."
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -15234,7 +15325,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:864
 msgid "Power value"
-msgstr ""
+msgstr "Valor de potência"
 
 #: include/classes/setup/CSetupWizard.php:70
 #: include/classes/setup/CSetupWizard.php:753
@@ -15243,7 +15334,7 @@ msgstr "Sumário da pré-instalação"
 
 #: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
-msgstr ""
+msgstr "Funções de previsão"
 
 #: app/views/popup.massupdate.item.php:493
 #: include/views/configuration.host.discovery.edit.php:967
@@ -15267,7 +15358,7 @@ msgstr "Passos do pré-processamento"
 #: app/controllers/CControllerPopupItemTestSend.php:196
 #: app/views/popup.itemtestedit.view.php:289
 msgid "Prev. time"
-msgstr ""
+msgstr "Tempo anterior"
 
 #: app/views/administration.iconmap.edit.php:82
 #: app/views/administration.iconmap.edit.php:116
@@ -15279,31 +15370,31 @@ msgstr "Prévisualizar"
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
-msgstr ""
+msgstr "Dia anterior"
 
 #: app/partials/scheduledreport.formgrid.html.php:88
 #: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2470
 msgid "Previous month"
-msgstr ""
+msgstr "Mês anterior"
 
 #: app/views/monitoring.dashboard.view.php:163
 #: app/views/monitoring.host.dashboard.view.php:97 jsLoader.php:194
 msgid "Previous page"
-msgstr ""
+msgstr "Página anterior"
 
 #: app/views/popup.itemtestedit.view.php:282
 msgid "Previous value"
-msgstr ""
+msgstr "Valor anterior"
 
 #: app/partials/scheduledreport.formgrid.html.php:87
 #: app/partials/scheduledreport.table.html.php:57 include/func.inc.php:2469
 msgid "Previous week"
-msgstr ""
+msgstr "Semana anterior"
 
 #: app/partials/scheduledreport.formgrid.html.php:89
 #: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2471
 msgid "Previous year"
-msgstr ""
+msgstr "Ano anterior"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
@@ -15392,11 +15483,11 @@ msgstr "Problema"
 #: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr ""
+msgstr "Problema"
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
-msgstr ""
+msgstr "Problema criado"
 
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:121
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:177
@@ -16643,7 +16734,7 @@ msgstr ""
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "Relatório de SLA"
 
 #: app/controllers/CControllerSlaCreate.php:114
 msgid "SLA created"
@@ -16676,7 +16767,7 @@ msgstr ""
 #: include/classes/helpers/CRoleHelper.php:359
 #: include/classes/widgets/CWidgetConfig.php:69
 msgid "SLA report"
-msgstr ""
+msgstr "Relatório de SLA"
 
 #: app/controllers/CControllerSlaUpdate.php:125
 msgid "SLA updated"
@@ -16786,6 +16877,14 @@ msgstr "A chave do trap SNMP é inválida."
 #: app/partials/configuration.host.interface.row.php:76
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
+msgstr ""
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
 msgstr ""
 
 #: include/items.inc.php:1299
@@ -17189,7 +17288,7 @@ msgstr "Seleccionar"
 
 #: app/views/slareport.list.php:104
 msgid "Select SLA to display SLA report."
-msgstr ""
+msgstr "Selecione SLA para exibir o relatório de SLA."
 
 #: app/views/popup.massupdate.item.php:438 app/views/popup.triggerexpr.php:83
 #: include/views/configuration.graph.edit.php:219
@@ -18634,7 +18733,7 @@ msgstr ""
 
 #: app/views/popup.import.php:33
 msgid "Template dashboards"
-msgstr ""
+msgstr "Todos os painéis"
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Template deleted"
@@ -19078,7 +19177,7 @@ msgstr ""
 
 #: include/items.inc.php:1891 include/items.inc.php:1895
 msgid "Throttling"
-msgstr ""
+msgstr "Estrangulamento"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -19880,6 +19979,13 @@ msgstr "A URL deverá possuir os campos \"name\" e \"url\" no mapa \"%1$s\"."
 msgid "URLs"
 msgstr "URLs"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19982,6 +20088,13 @@ msgstr "Desbloquear"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Desbloquear utilizadores seleccionados?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20349,6 +20462,10 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Usar requisições em lote"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -23056,6 +23173,12 @@ msgstr "sintaxe incorrecta próximo de \"%1$s\""
 #: include/classes/validators/CExpressionValidator.php:197
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665

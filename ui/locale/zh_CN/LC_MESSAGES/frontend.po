@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-29 09:57+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-16 01:16+0000\n"
+"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -153,7 +153,7 @@ msgstr[0] "%1$s 事件"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s 组模式"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -680,7 +680,7 @@ msgstr "动作已更新"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID 为“%1$s”的动作不可用。"
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -909,6 +909,14 @@ msgstr "添加子服务"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "添加自"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "从主机添加"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "从模板添加"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1212,6 +1220,10 @@ msgstr "允许的主机"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "允许的方法"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1522,7 +1534,7 @@ msgstr "尝试次数"
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "属性"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -3305,7 +3317,7 @@ msgstr "没有where条件，无法对表 \"%1$s\" 执行update语句。"
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] ""
+msgstr[0] "无法配置用户"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4489,7 +4501,11 @@ msgstr "配置数据库连接"
 #: app/views/administration.authentication.edit.php:417
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
-msgstr ""
+msgstr "配置准时(JIT)服务开通"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr "确认修改"
 
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
@@ -5327,6 +5343,10 @@ msgstr "数据概览"
 msgid "Data set"
 msgstr "数据集"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5752,6 +5772,10 @@ msgstr "删除选定的 SLA？"
 msgid "Delete selected SLAs?"
 msgstr "删除所选的SLAs?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "删除选定的动作?"
@@ -6008,20 +6032,20 @@ msgstr "将被弃用的参数“%1$s”不能与“%2$s”一起使用。"
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "取消配置的用户组"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "无法删除已取消配置的用户组。"
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "取消配置的用户组不能为空。"
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "无法启用已取消配置的用户组。"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6054,6 +6078,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "描述"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr "已安装包的详细列表。返回JSON格式文本"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6174,6 +6202,10 @@ msgstr "停用所选的SLA?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "禁用所选的SLAs?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -6876,10 +6908,14 @@ msgstr "启用"
 msgid "Enable HTTP authentication"
 msgstr "启用HTTP 验证"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr "所有用户使用HTTP认证方式"
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "启用准时(JIT)服务开通"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6891,7 +6927,7 @@ msgstr "启用SAML身份验证"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "启用 SCIM 配置"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -6963,6 +6999,10 @@ msgstr "启用所选的SLA?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "启用所选的SLAs?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7642,6 +7682,13 @@ msgstr "字段 \"%1$s\"不是字符串"
 msgid "Field \"%1$s\" must be missing."
 msgstr "字段\"%1$s\"不可以填写"
 
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "文件校验，通过UNIX cksum算法进行检测，返回crc32数值(默认)，md5字符串，sha256字符串"
@@ -8237,11 +8284,11 @@ msgstr "群组已添加"
 
 #: app/views/popup.ldap.edit.php:134
 msgid "Group base DN"
-msgstr ""
+msgstr "基准目录(DN)组"
 
 #: app/views/popup.ldap.edit.php:122
 msgid "Group configuration"
-msgstr ""
+msgstr "组配置"
 
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
@@ -8250,7 +8297,7 @@ msgstr[0] "组已删除"
 
 #: app/views/popup.ldap.edit.php:182
 msgid "Group filter"
-msgstr ""
+msgstr "组过滤器"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -8258,7 +8305,7 @@ msgstr "自动发现到的主机的群组"
 
 #: app/views/popup.ldap.edit.php:156
 msgid "Group member attribute"
-msgstr ""
+msgstr "组成员属性"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
@@ -8268,7 +8315,7 @@ msgstr "组名"
 #: app/views/administration.authentication.edit.php:427
 #: app/views/popup.ldap.edit.php:148
 msgid "Group name attribute"
-msgstr ""
+msgstr "组名属性"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9190,6 +9237,10 @@ msgstr "位于 %2$s 的模块使用了相同的命名空间 (%1$s)。"
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "如HTTP认证启用，所有用户(包括设置LDAP/内部方式通过前端访问)将通过web服务器认证，而不过zabbix"
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9355,7 +9406,7 @@ msgstr "无法访问SLA"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:452
 msgid "Inaccessible action"
-msgstr ""
+msgstr "无法访问动作"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9408,7 +9459,7 @@ msgstr "无法访问的拓扑图"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:453
 msgid "Inaccessible media type"
-msgstr ""
+msgstr "无法访问的媒介类型"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
@@ -10521,11 +10572,11 @@ msgstr "无效的JSON. 当解析JSON文字时, 在服务器端发生了一个错
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "无效的 LDAP 准时(JIT)服务开通媒介类型映射配置。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "无效的 LDAP准时(JIT)服务开通用户组映射配置。"
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10536,11 +10587,11 @@ msgstr "LDAP 配置无效"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "SAML准时(JIT)服务开通媒介类型映射配置无效。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "SAML准时(JIT)服务开通用户组映射配置无效。"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10608,7 +10659,7 @@ msgstr "不舍法的关键字 \"%1$s\": %2$s"
 #: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
 #: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
 msgid "Invalid media type mapping configuration."
-msgstr ""
+msgstr "媒介类型映射配置无效。"
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10915,7 +10966,7 @@ msgstr "无效的时间段"
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr ""
+msgstr "无效的用户组映射配置。"
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11385,7 +11436,7 @@ msgstr "LDAP 身份验证已禁用。"
 
 #: app/views/popup.ldap.edit.php:235
 msgid "LDAP group pattern"
-msgstr ""
+msgstr "LDAP 组模式"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -11911,6 +11962,13 @@ msgstr "Mac 地址 A"
 msgid "MAC address B"
 msgstr "Mac 地址 B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12150,11 +12208,11 @@ msgstr "拓扑图更新失败."
 
 #: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "将用户的 LDAP 媒介属性（例如电子邮件）映射到 Zabbix 用户媒介以便发送通知。"
 
 #: app/views/administration.authentication.edit.php:508
 msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr ""
+msgstr "将用户的 SAML 媒介属性（例如email）映射到 Zabbix 用户媒介以便发送通知。"
 
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
@@ -12277,6 +12335,19 @@ msgstr "概览表中的最大列数和行数"
 msgid "Max period for time selector"
 msgstr "时间选择器的最大周期"
 
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr "最大缩放级别"
@@ -12336,7 +12407,7 @@ msgstr "报警媒介类型"
 #: widgets/actionlog/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Media type"
-msgstr ""
+msgstr "媒介类型"
 
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
@@ -12370,7 +12441,7 @@ msgstr[0] "消息介质类型已启用"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr ""
+msgstr "媒体类型映射"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13009,7 +13080,7 @@ msgstr "用户名第一部分"
 
 #: app/views/administration.authentication.edit.php:520
 msgid "Name "
-msgstr ""
+msgstr "名称"
 
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
@@ -13025,7 +13096,7 @@ msgstr "命名空间"
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "Naming requirements:"
-msgstr ""
+msgstr "命名要求："
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13101,6 +13172,11 @@ msgstr "添加LDAP 服务器"
 msgid "New SLA"
 msgstr "添加 SLA"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "添加附加规则"
@@ -13153,7 +13229,7 @@ msgstr "新建主机组"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
-msgstr ""
+msgstr "新媒介类型映射"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -13186,7 +13262,7 @@ msgstr "新触发器"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
-msgstr ""
+msgstr "新用户组映射"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13802,7 +13878,7 @@ msgstr "不允许为用户“guest”设置主题。"
 #: include/classes/api/services/CUser.php:484
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "不允许为配置的用户更新字段“%1$s”。"
 
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
@@ -14032,6 +14108,17 @@ msgstr "数字 (无正负)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14165,7 +14252,7 @@ msgstr "只有管理员才可以设置拓扑图的所有人。"
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "只能为已取消配置的用户设置禁用组。"
 
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
@@ -14195,7 +14282,7 @@ msgstr "只允许一个节流步骤。"
 #: include/classes/api/services/CUserDirectory.php:519
 #, c-format
 msgid "Only one user directory of type \"%1$s\" can exist."
-msgstr ""
+msgstr "只能存在一个“%1$s”类型的用户目录。"
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -14237,6 +14324,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "操作系统信息。返回字符串"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15426,23 +15517,23 @@ msgstr "提供的秘密查询字符串“%1$s”无效。"
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
-msgstr ""
+msgstr "现在开通"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
-msgstr ""
+msgstr "开通选定的 LDAP 用户？"
 
 #: app/views/administration.user.list.php:141
 msgid "Provisioned"
-msgstr ""
+msgstr "已开通"
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
-msgstr ""
+msgstr "开通期限"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr ""
+msgstr "开通成功。"
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -15708,15 +15799,15 @@ msgstr "收件人已经存在。"
 
 #: app/views/reports.actionlog.list.csv.php:39
 msgid "Recipient's Zabbix username"
-msgstr ""
+msgstr "收件人的 Zabbix 用户名"
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
-msgstr ""
+msgstr "收件人的姓名"
 
 #: app/views/reports.actionlog.list.csv.php:41
 msgid "Recipient's surname"
-msgstr ""
+msgstr "收件人姓氏"
 
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
@@ -15773,7 +15864,7 @@ msgstr "矩形"
 
 #: app/views/popup.ldap.edit.php:168
 msgid "Reference attribute"
-msgstr ""
+msgstr "引用属性"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -16504,11 +16595,11 @@ msgstr "S"
 #: app/views/administration.user.list.php:225
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "SAML"
-msgstr ""
+msgstr "SAML"
 
 #: app/views/administration.authentication.edit.php:483
 msgid "SAML group pattern"
-msgstr ""
+msgstr "SAML 组模式"
 
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
@@ -16678,6 +16769,14 @@ msgstr "SNMP采集键值是无效的"
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "SNMP 版本"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -16997,7 +17096,7 @@ msgstr "查找式样为空"
 #: app/views/reports.actionlog.list.php:108
 #: widgets/actionlog/includes/WidgetForm.php:61
 msgid "Search string"
-msgstr ""
+msgstr "搜索字符串"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
@@ -17167,7 +17266,7 @@ msgstr "已送达"
 #: app/controllers/CControllerActionLogList.php:210
 #: widgets/actionlog/includes/WidgetForm.php:56
 msgid "Sent/Executed"
-msgstr ""
+msgstr "发送/执行"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -18755,7 +18854,7 @@ msgstr "文本，支持 {INVENTORY.*}、{HOST.*} 宏"
 #: include/classes/api/clients/CLocalApiClient.php:96
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without authorization header."
-msgstr ""
+msgstr "必须在没有授权请求头的情况下调用“%1$s.%2$s”方法。"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -18893,7 +18992,7 @@ msgstr "该字段由监控项“%1$s”自动填充。"
 
 #: include/classes/scim/API.php:77
 msgid "This filter is not supported"
-msgstr ""
+msgstr "不支持此过滤器"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
@@ -18932,7 +19031,7 @@ msgstr "此类信息可能与密钥不匹配。"
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "此用户已配置 IdP。不允许手动更改已提供的字段。"
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -19759,6 +19858,13 @@ msgstr "拓扑图 \"%1$s\" URL、名称为必填项。"
 msgid "URLs"
 msgstr "URLs"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19786,7 +19892,7 @@ msgstr "无法确定当前 Zabbix 数据库版本：%1$s。"
 #: include/classes/helpers/CAuthenticationHelper.php:88
 #: include/classes/helpers/CAuthenticationHelper.php:107
 msgid "Unable to find SAML userdirectory."
-msgstr ""
+msgstr "无法找到 SAML 用户目录。"
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -19861,6 +19967,13 @@ msgstr "解锁"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "解除锁定所选的用户?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20222,11 +20335,15 @@ msgstr "在线/不在线"
 
 #: app/views/popup.ldap.edit.php:169
 msgid "Use %{ref} in group filter to reference value of this user attribute."
-msgstr ""
+msgstr "在组过滤器中使用 %{ref} 来引用此用户属性的值。"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "使用大量请求"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -20304,7 +20421,7 @@ msgstr "用户“%1$s”是代表其创建报表“%2$s”的用户。"
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr ""
+msgstr "用户“%1$s”已开通。"
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
@@ -20354,15 +20471,15 @@ msgstr "用户目录“%1$s”已存在。"
 #: include/classes/api/services/CUser.php:715
 #, c-format
 msgid "User directory with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID 为“%1$s”的用户目录不可用。"
 
 #: app/views/administration.user.list.php:211
 msgid "User does not have user groups."
-msgstr ""
+msgstr "此用户没有用户组。"
 
 #: app/views/administration.user.list.php:232
 msgid "User does not have user role."
-msgstr ""
+msgstr "此用户没有用户角色。"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20416,11 +20533,11 @@ msgstr "用于资料库断线信息的用户群组"
 #: app/views/popup.ldap.edit.php:226
 #: app/views/popup.usergroupmapping.edit.php:126
 msgid "User group mapping"
-msgstr ""
+msgstr "用户组映射"
 
 #: app/views/popup.ldap.edit.php:196
 msgid "User group membership attribute"
-msgstr ""
+msgstr "用户组成员属性"
 
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
@@ -20460,7 +20577,7 @@ msgstr "用户是不允许删除自己"
 #: app/views/administration.authentication.edit.php:457
 #: app/views/popup.ldap.edit.php:218
 msgid "User last name attribute"
-msgstr ""
+msgstr "用户姓氏属性"
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
@@ -20484,7 +20601,7 @@ msgstr "用户名称"
 #: app/views/administration.authentication.edit.php:443
 #: app/views/popup.ldap.edit.php:210
 msgid "User name attribute"
-msgstr ""
+msgstr "用户名属性"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -22834,7 +22951,7 @@ msgstr "全局管家设置"
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
-msgstr ""
+msgstr "组名必须与 %1$s 组名匹配"
 
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
@@ -22934,6 +23051,12 @@ msgstr "\"%1$s\"附近语法错误"
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "函数“%1$s”使用不正确"
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -23251,7 +23374,7 @@ msgstr "达到最大数量的依赖关系"
 
 #: app/views/popup.ldap.edit.php:123
 msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
-msgstr ""
+msgstr "memberOf 是配置组的首选方法，因为它速度更快。如果您的 LDAP 服务器不支持 memberOf 或需要组过滤，请使用 groupOfNames。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
@@ -23786,7 +23909,7 @@ msgstr "stddevsamp() - 样本标准差"
 
 #: widgets/actionlog/views/widget.edit.php:49
 msgid "subject or body text"
-msgstr ""
+msgstr "标题或正文"
 
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
@@ -24303,7 +24426,7 @@ msgstr "周"
 
 #: app/views/popup.usergroupmapping.edit.php:83
 msgid "wildcard patterns with '*' may be used"
-msgstr ""
+msgstr "可以使用带有“*”的通配符模式"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

@@ -1840,6 +1840,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
 		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
+		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
@@ -1950,7 +1951,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxcrypto/Makefile
-	src/libs/zbxcyberark/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxcacheconfig/Makefile
 	src/libs/zbxcachehistory/Makefile
@@ -1969,7 +1969,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxgetopt/Makefile
 	src/libs/zbxha/Makefile
 	src/libs/zbxhash/Makefile
-	src/libs/zbxhashicorp/Makefile
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
@@ -1981,6 +1980,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile

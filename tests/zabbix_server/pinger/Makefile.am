@@ -25,6 +25,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
@@ -51,8 +52,6 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxcyberark/libzbxcyberark.a \
-	$(top_srcdir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \

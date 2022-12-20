@@ -38,7 +38,7 @@ class CUser extends CApiService {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
-	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
+	protected $sortColumns = ['userid', 'username'];
 
 	protected const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid', 'passwd'];
 
@@ -54,7 +54,7 @@ class CUser extends CApiService {
 	 * @param bool   $options['count']			output only count of objects in result. (result returned in property 'rowscount')
 	 * @param string $options['pattern']		filter by Host name containing only give pattern
 	 * @param int    $options['limit']			output will be limited to given number
-	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username', 'alias']
+	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username']
 	 * @param string $options['sortorder']		output will be sorted in given order ['ASC', 'DESC']
 	 *
 	 * @return array
@@ -181,20 +181,6 @@ class CUser extends CApiService {
 
 		$userIds = [];
 
-		if (is_array($options['output']) && in_array('alias', $options['output'])) {
-			$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/output/alias'));
-			$options['output'][] = 'username';
-		}
-
-		if ($options['sortfield']) {
-			$options['sortfield'] = (array) $options['sortfield'];
-			if (in_array('alias', $options['sortfield'])) {
-				$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/sortfield/alias'));
-				$options['sortfield'][] = 'username';
-				$options['sortfield'] = array_unique(array_diff($options['sortfield'], ['alias']));
-			}
-		}
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -303,8 +289,7 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username'], ['alias']], 'fields' => [
-			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'replacement' => 'username', 'length' => DB::getFieldLength('users', 'username')],
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username']], 'fields' => [
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
@@ -320,13 +305,6 @@ class CUser extends CApiService {
 			'roleid' =>			['type' => API_ID],
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
-				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
-				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
-				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]],
 			'medias' =>			['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
@@ -400,9 +378,8 @@ class CUser extends CApiService {
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias'], ['username']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['username']], 'fields' => [
 			'userid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'alias' =>			['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'replacement' => 'username', 'length' => DB::getFieldLength('users', 'username')],
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'name' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
 			'surname' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')],
@@ -418,13 +395,6 @@ class CUser extends CApiService {
 			'roleid' =>			['type' => API_ID],
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
-				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
-				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
-				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
 			]],
 			'medias' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
@@ -1469,7 +1439,6 @@ class CUser extends CApiService {
 	 */
 	public function login(array $user) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'replacement' => 'username', 'length' => 255],
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'userData' =>	['type' => API_FLAG]

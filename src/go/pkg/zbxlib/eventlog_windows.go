@@ -36,6 +36,7 @@ extern int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
+typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
 void metric_set_refresh(ZBX_ACTIVE_METRIC *metric, int refresh);
@@ -44,9 +45,9 @@ void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric);
 int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last);
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *zbx_config_tls, char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
 
 typedef struct
 {
@@ -211,8 +212,9 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
-		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p, &cerrmsg)
+		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p,
+		(C.int)(agent.Options.Timeout), &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char

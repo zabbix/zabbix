@@ -50,7 +50,7 @@
 #include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../libs/zbxvault/vault.h"
+#include "zbxvault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
@@ -94,25 +94,46 @@ const char	*help_message[] = {
 	"      " ZBX_CONFIG_CACHE_RELOAD "        Reload configuration cache",
 	"      " ZBX_HOUSEKEEPER_EXECUTE "        Execute the housekeeper",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
-	"                                 target is not specified",
+	"                                   target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
-	"                                 target is not specified",
+	"                                   target is not specified",
 	"      " ZBX_SNMP_CACHE_RELOAD "          Reload SNMP cache",
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
 	"                                 section (historycache, preprocessing, locks) or",
 	"                                 everything if section is not specified",
+	"      " ZBX_PROF_ENABLE "=target         Enable profiling, affects all processes if",
+	"                                   target is not specified",
+	"      " ZBX_PROF_DISABLE "=target        Disable profiling, affects all processes if",
+	"                                   target is not specified",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
 	"                                 (configuration syncer, data sender, discoverer,",
 	"                                 history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
-	"                                 java poller, poller,",
-	"                                 self-monitoring, snmp trapper, task manager,",
-	"                                 trapper, unreachable poller, vmware collector,"
+	"                                 java poller, poller, preprocessing manager,",
+	"                                 preprocessing worker, self-monitoring,",
+	"                                 snmp trapper, task manager, trapper,",
+	"                                 unreachable poller, vmware collector,",
 	"                                 availability manager, odbc poller)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
+	"",
+	"      Profiling control targets:",
+	"        process-type             All processes of specified type",
+	"                                 (configuration syncer, data sender, discoverer,",
+	"                                 history syncer, housekeeper, http poller,",
+	"                                 icmp pinger, ipmi manager, ipmi poller,",
+	"                                 java poller, poller, preprocessing manager,",
+	"                                 preprocessing worker, self-monitoring,",
+	"                                 snmp trapper, task manager, trapper,",
+	"                                 unreachable poller, vmware collector,",
+	"                                 availability manager, odbc poller)",
+	"        process-type,N           Process type and number (e.g., history syncer,1)",
+	"        pid                      Process identifier",
+	"        scope                    Profiling scope",
+	"                                 (rwlock, mutex, processing) can be used with process-type",
+	"                                 (e.g., history syncer,1,processing)",
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
@@ -1163,7 +1184,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1254,15 +1275,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
-
-	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
-	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
-	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+	zbx_config_comms_args_t			zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
+								CONFIG_TIMEOUT};
+	zbx_thread_args_t			thread_args;
+	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_taskmanager_args		taskmanager_args = {&zbx_config_comms, get_program_type};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_trapper_args			trapper_args = {&zbx_config_comms, get_program_type, &listen_sock};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_pinger_args			pinger_args = {get_program_type, CONFIG_TIMEOUT};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1493,9 +1516,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
+				thread_args.args = &pinger_args;
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				thread_args.args = &housekeeper_args;
 				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:

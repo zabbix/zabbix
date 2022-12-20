@@ -25,6 +25,7 @@
 #include "zbxeval.h"
 #include "zbxavailability.h"
 #include "zbxversion.h"
+#include "zbxregexp.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -57,8 +58,6 @@ zbx_session_type_t;
 #define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
 #define ZBX_AGENT_UNKNOWN	255
 #define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
-
-extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 
@@ -189,6 +188,7 @@ typedef struct
 	char			*script_params;
 	char			*error;
 	unsigned char		*formula_bin;
+	int			snmp_max_repetitions;
 }
 DC_ITEM;
 
@@ -684,8 +684,8 @@ int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_interface(DC_INTERFACE *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items);
-int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck);
+int	DCconfig_get_poller_items(unsigned char poller_type, int config_timeout, DC_ITEM **items);
+int	DCconfig_get_ipmi_poller_items(int now, int items_num, int config_timeout, DC_ITEM *items, int *nextcheck);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
@@ -781,8 +781,8 @@ void	DCget_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *hosts_not
 		zbx_uint64_t *triggers_enabled_problem, zbx_uint64_t *triggers_disabled,
 		zbx_vector_ptr_t *required_performance);
 
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
-void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
+void	DCget_expressions_by_names(zbx_vector_expression_t *expressions, const char * const *names, int names_num);
+void	DCget_expressions_by_name(zbx_vector_expression_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
