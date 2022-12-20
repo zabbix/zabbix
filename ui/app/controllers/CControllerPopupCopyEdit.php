@@ -23,10 +23,10 @@ class CControllerPopupCopyEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemids' => 'array_id',
-			'triggerids' => 'array_id',
-			'graphids' => 'array_id',
-			'source' => 'required|in '.implode(',', ['items', 'triggers', 'graphs'])
+			'itemids' =>		'array_id',
+			'triggerids' =>		'array_id',
+			'graphids' =>		'array_id',
+			'source' =>			'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 
 		$ret = $this->validateInput($fields);
