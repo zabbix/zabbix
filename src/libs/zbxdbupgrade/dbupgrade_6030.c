@@ -1743,7 +1743,6 @@ static int	DBpatch_6030150(void)
 						0 == strcmp(valuemap->name, valuemap2->name) &&
 						valuemap->uniq == valuemap2->uniq)
 				{
-					//uniq++;
 					changed++;
 					valuemap2->uniq++;
 				}
