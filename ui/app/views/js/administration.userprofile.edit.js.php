@@ -55,16 +55,22 @@
 				elem.value = elem.value.trim();
 			});
 
-			const current_password = document.getElementById('current_password').value;
-			const password1 = document.getElementById('password1').value;
-			const password2 = document.getElementById('password2').value;
+			const elem_current = document.getElementById('current_password');
+			const elem_password1 = document.getElementById('password1');
+			const elem_password2 = document.getElementById('password2');
 
-			if (password1 !== '' && password2 !== '' && current_password !== '') {
-				const warning_msg = <?= json_encode(
-					_('In case of successful password change user will be logged out of all active sessions. Continue?')
-				) ?>;
+			if (elem_current && elem_password1 && elem_password2) {
+				const current_password = elem_current.value;
+				const password1 = elem_password1.value;
+				const password2 = elem_password2.value;
 
-				return confirm(warning_msg);
+				if (password1 !== '' && password2 !== '' && current_password !== '') {
+					const warning_msg = <?= json_encode(
+						_('In case of successful password change user will be logged out of all active sessions. Continue?')
+					) ?>;
+
+					return confirm(warning_msg);
+				}
 			}
 
 			return true;
