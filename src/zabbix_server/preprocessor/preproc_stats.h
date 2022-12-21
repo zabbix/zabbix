@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PREPROCESSING_STATS_H
 #define ZABBIX_PREPROCESSING_STATS_H
 
-#include "zbxcomms.h"
 #include "zbxjson.h"
 
 void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg);

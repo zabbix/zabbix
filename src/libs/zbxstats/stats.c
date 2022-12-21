@@ -22,7 +22,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
-#include "zbxcomms.h"
 #include "zbxjson.h"
 #include "zbxself.h"
 
@@ -45,7 +44,7 @@ void	zbx_init_library_stats(zbx_get_program_type_f get_program_type)
  * Purpose: register callback to add information to main element              *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
- *             arg              - [IN] additional argument passed to calback  *
+ *             arg              - [IN] argument passed to callback            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg)
@@ -64,7 +63,7 @@ void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_c
  * Purpose: register callback to add information to data sub-element          *
  *                                                                            *
  * Parameters: stats_ext_get_cb - [IN] statistics extension callback          *
- *             arg              - [IN] additional argument passed to calback  *
+ *             arg              - [IN] argument passed to callback            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg)
