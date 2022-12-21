@@ -29,6 +29,7 @@
 #include "zbxexport.h"
 #include "zbxnix.h"
 #include "zbxavailability.h"
+#include "zbxconnector.h"
 #include "zbxtrends.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
@@ -1217,7 +1218,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,
-		zbx_hashset_t *items_info)
+		zbx_hashset_t *items_info, unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	const ZBX_DC_HISTORY		*h;
 	const zbx_history_sync_item_t	*item;
@@ -1312,6 +1313,18 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		}
 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
+
+		if (NULL != data)
+		{
+			zbx_connector_object_t	connector_object;
+
+			connector_object.objectid = item->itemid;
+			connector_object.ts = h->ts;
+			connector_object.str = json.buffer;
+
+			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+		}
+
 		zbx_history_export_write(json.buffer, json.buffer_size);
 	}
 
@@ -1335,7 +1348,8 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
  ******************************************************************************/
 static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
-		const ZBX_DC_TREND *trends, int trends_num)
+		const ZBX_DC_TREND *trends, int trends_num, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset)
 {
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
@@ -1424,7 +1438,9 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 	db_get_items_info_by_itemid(&items_info, &item_info_ids);
 
 	if (0 != history_num)
-		DCexport_history(history, history_num, &hosts_info, &items_info);
+	{
+		DCexport_history(history, history_num, &hosts_info, &items_info, data, data_alloc, data_offset);
+	}
 
 	if (0 != trends_num)
 		DCexport_trends(trends, trends_num, &hosts_info, &items_info);
@@ -1473,7 +1489,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, num,
 				ZBX_ITEM_GET_SYNC_EXPORT);
 
-		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num);
+		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, NULL, 0, 0);
 
 		zbx_dc_config_clean_history_sync_items(items, errcodes, num);
 		zbx_vector_uint64_destroy(&itemids);
@@ -3260,6 +3276,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	int				*errcodes = NULL;
 	zbx_vector_uint64_t		itemids;
 	zbx_hashset_t			trigger_info;
+	unsigned char			*data = NULL;
+	size_t				data_alloc = 0, data_offset = 0;
 
 	item_retrieve_mode = 0 == zbx_has_export_dir() ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
@@ -3538,8 +3556,16 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 				if (NULL != phistory || NULL != ptrends)
 				{
+					data_offset = 0;
 					DCexport_history_and_trends(phistory, history_num_loc, &itemids, items,
-							errcodes, ptrends, trends_num_loc);
+							errcodes, ptrends, trends_num_loc, &data, &data_alloc,
+							&data_offset);
+
+					if (NULL != data)
+					{
+						zbx_connector_send(ZBX_IPC_CONNECTOR_REQUEST, data,
+								(zbx_uint32_t)data_offset);
+					}
 				}
 			}
 
@@ -3568,6 +3594,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	zbx_free(items);
 	zbx_free(errcodes);
+	zbx_free(data);
 
 	zbx_vector_ptr_destroy(&trigger_order);
 	zbx_hashset_destroy(&trigger_info);

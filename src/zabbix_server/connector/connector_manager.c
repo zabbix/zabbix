@@ -45,17 +45,18 @@ zbx_active_avail_proxy_t;
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
-	zbx_ipc_service_t		service;
-	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
-	int				ret, processed_num = 0;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
-	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_ipc_service_t			service;
+	char					*error = NULL;
+	zbx_ipc_client_t			*client;
+	zbx_ipc_message_t			*message;
+	int					ret, processed_num = 0;
+	double					time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
+	zbx_timespec_t				timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_vector_connector_object_ptr_t	connector_objects;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -75,6 +76,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	time_flush = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
+	zbx_vector_connector_object_ptr_create(&connector_objects);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -106,8 +108,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					//zbx_availability_deserialize(message->data, message->size,
-					//		&interface_availabilities);
+					zbx_connector_deserialize_object(message->data, message->size, &connector_objects);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -115,6 +116,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 			zbx_ipc_message_free(message);
 		}
+
+		zbx_vector_connector_object_ptr_clear_ext(&connector_objects, zbx_connector_object_free);
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
