@@ -1542,11 +1542,9 @@ static void select_pure_parents(zbx_vector_uint64_t *ids)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select ht.templateid from hosts_templates ht"
-				" join hosts h on h.hostid=ht.templateid"
-				" left join hosts h1 on h1.hostid=ht.hostid"
-				" where h.hostid=ht.templateid and h1.status=%d and ht.templateid not in"
-				" (select hostid from hosts_templates)", HOST_STATUS_TEMPLATE);
+	result = DBselect("select distinct ht.templateid from hosts_templates ht,hosts h"
+			" where ht.hostid=h.hostid and h.status=%d and ht.templateid not in "
+			"(select hostid from hosts_templates)", HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1986,19 +1984,22 @@ static void collect_hostmacros(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 				hostmacro_copy = zbx_malloc(NULL, sizeof(zbx_db_hostmacro_t));
 				hostmacro_copy->child_templateid = child_templateid;
 				hostmacro_copy->parent_hostmacroid = hostmacro->parent_hostmacroid;
-				hostmacro->parent_templateid = parent_templateid;
+				hostmacro_copy->parent_templateid = parent_templateid;
 				hostmacro_copy->macro = zbx_strdup(NULL, hostmacro->macro);
 				hostmacro_copy->value = zbx_strdup(NULL, hostmacro->value);
 				hostmacro_copy->description = zbx_strdup(NULL, hostmacro->description);
 				hostmacro_copy->type = hostmacro->type;
 				hostmacro_copy->automatic = hostmacro->automatic;
-				zbx_vector_hostmacro_ptr_append(hostmacros, hostmacro);
+				zbx_vector_hostmacro_ptr_append(hostmacros, hostmacro_copy);
 			}
 		}
 	}
 
 	DBfree_result(result);
 	zbx_free(sql);
+
+	zbx_vector_uint64_sort(&loc_child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&loc_child_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	collect_hostmacros(&loc_child_templateids, child_templateids, hostmacros);
 
