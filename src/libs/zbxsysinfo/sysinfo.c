@@ -143,6 +143,11 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 	return SUCCEED;
 }
 
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f)
+{
+	get_config_timeout_cb = get_config_timeout_f;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: registers a new item key into the system                          *
@@ -265,11 +270,6 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 int	sysinfo_get_config_timeout(void)
 {
 	return get_config_timeout_cb();
-}
-
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f)
-{
-	get_config_timeout_cb = get_config_timeout_f;
 }
 
 void	zbx_init_metrics(void)
