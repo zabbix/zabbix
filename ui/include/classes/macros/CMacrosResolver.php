@@ -2475,6 +2475,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if ($step['params'] !== '') {
 				$texts[] = $step['params'];
 			}
+
 			if ($step['error_handler_params'] !== '') {
 				$texts[] = $step['error_handler_params'];
 			}

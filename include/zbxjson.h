@@ -148,6 +148,7 @@
 #define ZBX_PROTO_TAG_AUTHPROTOCOL		"authprotocol"
 #define ZBX_PROTO_TAG_PRIVPROTOCOL		"privprotocol"
 #define ZBX_PROTO_TAG_CONTEXTNAME		"contextname"
+#define ZBX_PROTO_TAG_MAX_REPS			"max_repetitions"
 #define ZBX_PROTO_TAG_IPMI_SENSOR		"ipmi_sensor"
 #define ZBX_PROTO_TAG_TIMEOUT			"timeout"
 #define ZBX_PROTO_TAG_URL			"url"
