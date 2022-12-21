@@ -19,7 +19,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
@@ -108,7 +108,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -228,7 +228,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -322,7 +322,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -417,7 +417,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -516,7 +516,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -610,7 +610,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -710,7 +710,7 @@ For Zabbix version: 6.2 and higher.
 
       `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
 
-      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
 3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
@@ -791,5 +791,4 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com.
 
 You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
-
 
