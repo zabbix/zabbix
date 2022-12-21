@@ -194,6 +194,7 @@ class CMenuItem extends CTag {
 					if (!array_key_exists($name, $request_params)
 							|| ($value !== '*' && $value !== $request_params[$name])) {
 						$has_mandatory_params = false;
+						break;
 					}
 				}
 
