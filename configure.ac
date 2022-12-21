@@ -2035,6 +2035,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/availability/Makefile
+	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile

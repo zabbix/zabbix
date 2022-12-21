@@ -23,6 +23,7 @@ SUBDIRS = \
 	stats \
 	preprocessor \
 	availability \
+	connector \
 	lld \
 	reporter \
 	service \
@@ -80,6 +81,7 @@ zabbix_server_LDADD = \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
 	availability/libavailability.a \
+	connector/libconnector.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
