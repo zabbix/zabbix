@@ -74,9 +74,11 @@
 				});
 			});
 
-			document.querySelector('.js-execute-now').addEventListener('click', () => {
-				this.massCheckNow();
-			});
+			if (document.querySelector('.js-execute-now') != null) {
+				document.querySelector('.js-execute-now').addEventListener('click', () => {
+					this.massCheckNow();
+				});
+			}
 		},
 
 		editHost(e, hostid) {

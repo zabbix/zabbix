@@ -34,20 +34,22 @@
 		},
 
 		_initActions() {
-			document.querySelector('.js-copy').addEventListener('click', () => {
-				const overlay = this.openCopyPopup();
-				const dialogue = overlay.$dialogue[0];
+			if (document.querySelector('.js-copy') != null) {
+				document.querySelector('.js-copy').addEventListener('click', () => {
+					const overlay = this.openCopyPopup();
+					const dialogue = overlay.$dialogue[0];
 
-				dialogue.addEventListener('dialogue.submit', (e) => {
-					postMessageOk(e.detail.title);
-					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
-					if ('messages' in e.detail) {
-						postMessageDetails('success', e.detail.messages);
-					}
+					dialogue.addEventListener('dialogue.submit', (e) => {
+						postMessageOk(e.detail.title);
+						uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
+						if ('messages' in e.detail) {
+							postMessageDetails('success', e.detail.messages);
+						}
 
-					location.href = location.href;
+						location.href = location.href;
+					});
 				});
-			});
+			}
 		},
 
 		editHost(e, hostid) {
