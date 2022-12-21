@@ -23,9 +23,9 @@ class CControllerPopupCopyEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemids' =>		'array_id',
-			'triggerids' =>		'array_id',
-			'graphids' =>		'array_id',
+			'itemids' =>		'array_db items.itemid',
+			'triggerids' =>		'array_db triggers.triggerid',
+			'graphids' =>		'array_db graphs.graphid',
 			'source' =>			'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 

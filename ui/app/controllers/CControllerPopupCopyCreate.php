@@ -32,12 +32,13 @@ class CControllerPopupCopyCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'copy_targetids' =>	'required|array|not_empty',
-			'itemids' =>		'array_id',
-			'triggerids' =>		'array_id',
-			'graphids' =>		'array_id',
+			'itemids' =>		'array_db items.itemid',
+			'triggerids' =>		'array_db triggers.triggerid',
+			'graphids' =>		'array_db graphs.graphid',
 			'copy_type' =>		'required|in '.implode(',', [
-				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP
-			]),
+									COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
+									COPY_TYPE_TO_TEMPLATE_GROUP
+								]),
 			'source' => 'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 

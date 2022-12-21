@@ -68,7 +68,7 @@ $url = (new CUrl('items.php'))
 
 // create form
 $itemForm = (new CForm('post', $url))
-	->setName('itemsForm')
+	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->addVar('context', $data['context'], 'form_context');
 
@@ -80,8 +80,7 @@ if (!empty($data['hostid'])) {
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))
-				->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
 		($data['hostid'] == 0)
