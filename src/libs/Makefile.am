@@ -60,6 +60,7 @@ DIST_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxprof \
 	zbxxml
 
 if SERVER
@@ -169,6 +170,7 @@ SUBDIRS = \
 	zbxlog \
 	zbxmodules \
 	zbxmutexs \
+	zbxprof \
 	zbxnix \
 	zbxnum \
 	zbxparam \

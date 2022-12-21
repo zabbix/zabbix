@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-01-28 12:08+0300\n"
-"Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
+"PO-Revision-Date: 2022-12-16 23:54+0000\n"
+"Last-Translator: Danny <danny.ricce@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1643364496.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -153,7 +154,7 @@ msgstr[1] "%1$s eventos"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s patrón de grupo"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -274,22 +275,22 @@ msgstr "%1$s, seleccionado"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "La clase %1$s.php debe extenderse a %2$s para el módulo ubicado en %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s th percentil: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -327,11 +328,11 @@ msgstr "(Sólo los súper administradores pueden crear grupos)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(creado por descubrimiento de host)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(vinculado por descubrimiento de host)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -364,11 +365,11 @@ msgstr "100 disparadores más ocupados"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-horas"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-horas"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -543,7 +544,7 @@ msgstr "Reconocer"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Reconocer"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -641,7 +642,7 @@ msgstr "Acción"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -698,7 +699,7 @@ msgstr "Acción actualizada"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "La acción con ID \"%1$s\" no está disponible."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -720,7 +721,7 @@ msgstr "Acciones"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Acciones"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -737,7 +738,7 @@ msgstr "Activo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Cheques activos"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -914,7 +915,7 @@ msgstr "Agregar un elemento hijo"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Agregar elementos hijos"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -927,6 +928,14 @@ msgstr "Añadir servicios hijos"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "Añadir desde"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "Añadir desde el equipo"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "Añadir desde plantilla"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1230,6 +1239,10 @@ msgstr "Equipos permitidos"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "Métodos permitidos"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -4574,6 +4587,10 @@ msgstr "Configurar la conexión de BD"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Texto de confirmación"
@@ -5393,6 +5410,10 @@ msgstr "Vistado general de los datos"
 msgid "Data set"
 msgstr ""
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5818,6 +5839,10 @@ msgstr ""
 msgid "Delete selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "¿Desea eliminar las acciones seleccionadas?"
@@ -6121,6 +6146,10 @@ msgstr ""
 msgid "Description"
 msgstr "Descripción"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -6239,6 +6268,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:171
@@ -6947,6 +6980,10 @@ msgstr "Activar"
 msgid "Enable HTTP authentication"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
@@ -7033,6 +7070,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:170
@@ -7714,6 +7755,13 @@ msgstr "El campo \"%1$s\" no es una cadena."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "El campo \"%1$s\" debe faltar."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9269,6 +9317,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
 msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
@@ -12006,6 +12058,13 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr ""
@@ -12370,6 +12429,19 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -13203,6 +13275,11 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
+msgstr ""
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
@@ -14136,6 +14213,17 @@ msgstr "Numérico (entero de 64 bits)"
 msgid "OEM"
 msgstr ""
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14342,6 +14430,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "Información del sistema operativo. Devuelve una cadena"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -16787,6 +16879,14 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:76
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
+msgstr ""
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
 msgstr ""
 
 #: include/items.inc.php:1299
@@ -19882,6 +19982,13 @@ msgstr ""
 msgid "URLs"
 msgstr "URLs"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19983,6 +20090,13 @@ msgstr ""
 
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
+msgstr ""
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
@@ -20350,6 +20464,10 @@ msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
 msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
@@ -23058,6 +23176,12 @@ msgstr ""
 #: include/classes/validators/CExpressionValidator.php:197
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665

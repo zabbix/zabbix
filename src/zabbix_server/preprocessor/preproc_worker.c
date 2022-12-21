@@ -28,6 +28,7 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
+#include "preproc_snmp.h"
 #include "zbxtime.h"
 
 extern unsigned char			program_type;
@@ -705,7 +706,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		switch (message.code)
 		{
@@ -733,4 +734,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_sleep(SEC_PER_MIN);
 
 	zbx_es_destroy(&es_engine);
+#ifdef HAVE_NETSNMP
+	zbx_preproc_shutdown_snmp();
+#endif
 }

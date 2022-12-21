@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0rc1');
+define('ZABBIX_VERSION',		'6.4.0beta5');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030148);
+define('ZABBIX_DB_VERSION',		6030150);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -660,6 +660,8 @@ define('ZBX_PREPROC_CSV_TO_JSON',				24);
 define('ZBX_PREPROC_STR_REPLACE',				25);
 define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 define('ZBX_PREPROC_XML_TO_JSON',				27);
+define('ZBX_PREPROC_SNMP_WALK_VALUE',			28);
+define('ZBX_PREPROC_SNMP_WALK_TO_JSON',			29);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -679,6 +681,10 @@ define('ZBX_PREPROC_PROMETHEUS_MIN',   'min');
 define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
 define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
 define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
+
+define('ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED', 0);
+define('ZBX_PREPROC_SNMP_WALK_TREAT_UTF8', 1);
+define('ZBX_PREPROC_SNMP_WALK_TREAT_MAC', 2);
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
@@ -1607,6 +1613,7 @@ define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
+define('ZBX_TEXTAREA_PREPROC_TREAT_SELECT',		120);
 
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
