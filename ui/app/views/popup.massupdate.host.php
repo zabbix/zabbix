@@ -26,6 +26,7 @@
 // create form
 $form = (new CForm())
 	->setId('massupdate-form')
+	->addCsrfToken('popup.massupdate.host')
 	->addVar('action', 'popup.massupdate.host')
 	->addVar('hostids', $data['hostids'], 'ids')
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)

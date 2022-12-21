@@ -192,7 +192,8 @@ class CControllerHostEdit extends CController {
 			'warning' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'csrf_token_delete' => CController::generateCsrfToken('host.massdelete')
 		];
 
 		// Rename fields according names of host edit form.

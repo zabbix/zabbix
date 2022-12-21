@@ -29,7 +29,8 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warning}) {
+	init({popup_url, form_name, host_interfaces, host_is_discovered, warning, csrf_token_delete}) {
+		this.csrf_token_delete = csrf_token_delete;
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -116,6 +117,7 @@ window.host_edit_popup = {
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'host.massdelete');
+		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delete);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

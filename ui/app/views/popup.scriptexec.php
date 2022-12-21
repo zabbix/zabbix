@@ -49,7 +49,7 @@ if ($data['success']) {
 	);
 }
 
-$form = (new CForm())->addItem($form_items);
+$form = (new CForm())->addCsrfToken('popup.scriptexec')->addItem($form_items);
 
 $output = [
 	'header' => $data['title'],

@@ -983,7 +983,8 @@ else {
 		'paging' => $paging,
 		'dep_triggers' => $dep_triggers,
 		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
-		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+		'csrf_token_massupdate' => CController::generateCsrfToken('popup.massupdate.trigger')
 	];
 
 	// render view

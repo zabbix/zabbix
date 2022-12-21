@@ -42,7 +42,9 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "host"}, {dialogue_class: "modal-popup-generic"});'
+						'return PopUp("popup.import", {rules_preset: "host", '.
+						CController::CSRF_TOKEN_NAME . ' : "' . $data['csrf_token_import'] .
+						'"}, {dialogue_class: "modal-popup-generic"});'
 					)
 					->removeId()
 			)
@@ -284,7 +286,7 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
 			->addConfirmation(_('Disable host?'))
-			->addSID();
+			->addCsrfToken('popup.massupdate.host');
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
@@ -292,7 +294,7 @@ foreach ($data['hosts'] as $host) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
 			->addConfirmation(_('Enable host?'))
-			->addSID();
+			->addCsrfToken('popup.massupdate.host');
 	}
 
 	if ($maintenance_icon) {
@@ -526,7 +528,10 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
 				->onClick(
-					"openMassupdatePopup('popup.massupdate.host', {}, {
+					"openMassupdatePopup('popup.massupdate.host', {" .
+							CController::CSRF_TOKEN_NAME . " : " .
+								"'" . $data['csrf_token_massupdate'] . "'" .
+						"}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this
 					});"
@@ -541,6 +546,7 @@ $form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->removeAttribute('id')
+				->setAttributeCsrfToken('host.massdelete')
 		]
 	], 'hosts')
 ]);

@@ -164,7 +164,9 @@ $output = [
 	'body' => $token_form->toString(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
-		'token_edit_popup.init();',
+		'token_edit_popup.init("'.
+			$data['csrf_token_delete'].
+		'");',
 	'buttons' => $buttons
 ];
 

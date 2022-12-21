@@ -102,13 +102,13 @@ foreach ($data['modules'] as $moduleid => $module) {
 		$status = (new CLink(_('Enabled'), $status_url))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addSID();
+			->addCsrfToken('module.disable');
 	}
 	else {
 		$status = (new CLink(_('Disabled'), $status_url))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addSID();
+			->addCsrfToken('module.enable');
 	}
 
 	// append table row

@@ -129,6 +129,21 @@ class CUrl {
 		return $this;
 	}
 
+	/**
+	 * Adds CSRF token argument to Url.
+	 *
+	 * @param string $action  action, if it is not set as argument before.
+	 *
+	 * @return $this
+	 */
+	public function setArgumentCsrfToken(string $action = ''): self {
+		$action = array_key_exists('action', $this->arguments) ? $this->arguments['action'] : $action;
+
+		$this->arguments[CController::CSRF_TOKEN_NAME] = CController::generateCsrfToken($action);
+
+		return $this;
+	}
+
 	public function toString() {
 		return $this->getUrl();
 	}

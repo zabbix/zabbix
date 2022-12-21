@@ -21,6 +21,8 @@
 
 class CControllerPopupMaintenancePeriod extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function checkInput() {
 		$fields = [
 			'update' =>				'in 0,1',

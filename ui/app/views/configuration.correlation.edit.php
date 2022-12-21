@@ -188,7 +188,7 @@ else {
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'correlation.delete')
 			->setArgument('correlationids', (array) $data['correlationid'])
-			->setArgumentSID(),
+			->setArgumentCsrfToken(),
 		_('Delete current correlation?')
 	))->setId('delete');
 

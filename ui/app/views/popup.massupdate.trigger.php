@@ -24,10 +24,13 @@
  * @var array $data
  */
 
+$action = $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger';
+
 // Create form.
 $form = (new CForm())
 	->setId('massupdate-form')
-	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')
+	->addCsrfToken($action)
+	->addVar('action', $action)
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])

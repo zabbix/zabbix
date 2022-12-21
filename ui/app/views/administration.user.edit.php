@@ -821,8 +821,10 @@ if ($data['action'] === 'user.edit') {
 		$tabs->setFooter(makeFormFooter(
 			(new CSubmitButton(_('Update'), 'action', 'user.update'))->setId('update'),
 			[
-				(new CRedirectButton(_('Delete'),
-					'zabbix.php?action=user.delete&sid='.$data['sid'].'&userids[]='.$data['userid'],
+				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'user.delete')
+					->setArgument('userids', [$data['userid']])
+					->setArgumentCsrfToken(),
 					_('Delete selected user?')
 				))
 					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)

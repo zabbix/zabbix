@@ -27,7 +27,6 @@
 $form = (new CForm('post'))
 	->setId('service-form')
 	->setName('service_form')
-	->addCsrfToken($data['serviceid'] == null ? 'service.create' : 'service.update')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -340,7 +339,10 @@ $form
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
+				'csrf_token_create' => $data['csrf_token_create'],
+				'csrf_token_update' => $data['csrf_token_update'],
+				'csrf_token_delete' => $data['csrf_token_delete']
 			]).');
 		'))->setOnDocumentReady()
 	);

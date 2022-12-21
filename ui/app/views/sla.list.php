@@ -104,11 +104,13 @@ foreach ($data['slas'] as $slaid => $sla) {
 				->addClass(ZBX_STYLE_GREEN)
 				->addClass('js-disable-sla')
 				->setAttribute('data-slaid', $slaid)
+				->setAttributeCsrfToken('sla.disable')
 			: (new CLink(_('Disabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addClass('js-enable-sla')
-				->setAttribute('data-slaid', $slaid);
+				->setAttribute('data-slaid', $slaid)
+				->setAttributeCsrfToken('sla.enable');
 	}
 	else {
 		$status_tag = $sla['status'] == ZBX_SLA_STATUS_ENABLED
@@ -164,18 +166,21 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-sla')
 					->addClass('no-chkbxrange')
+					->setAttributeCsrfToken('sla.enable')
 			],
 			'sla.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-sla')
 					->addClass('no-chkbxrange')
+					->setAttributeCsrfToken('sla.disable')
 			],
 			'sla.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-sla')
 					->addClass('no-chkbxrange')
+					->setAttributeCsrfToken('sla.delete')
 			]
 		], 'sla')
 	);

@@ -160,6 +160,7 @@ $form_list = (new CFormList())
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')
+	->addCsrfToken('popup.import')
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($form_list);

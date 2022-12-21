@@ -370,8 +370,10 @@ if ($data['mediatypeid'] == 0) {
 else {
 	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
 	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
-	$deleteButton = (new CRedirectButton(_('Delete'),
-		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
+	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'mediatype.delete')
+			->setArgument('mediatypeids', [$data['mediatypeid']])
+			->setArgumentCsrfToken('mediatype.delete'),
 		_('Delete media type?')
 	))
 		->setId('delete');

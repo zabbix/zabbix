@@ -27,7 +27,6 @@
 $form = (new CForm('post'))
 	->setId('sla-form')
 	->setName('sla_form')
-	->addCsrfToken($data['slaid'] == null ? 'sla.create' : 'sla.update')
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -223,7 +222,10 @@ $form
 			sla_edit_popup.init('.json_encode([
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes']
+				'excluded_downtimes' => $data['form']['excluded_downtimes'],
+				'csrf_token_create' => $data['csrf_token_create'],
+				'csrf_token_update' => $data['csrf_token_update'],
+				'csrf_token_delete' => $data['csrf_token_delete']
 			]).');
 		'))->setOnDocumentReady()
 	);

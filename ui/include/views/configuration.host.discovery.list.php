@@ -245,22 +245,22 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('context', $data['context'])
 	);
 
+	$status_action = ($discovery['status'] == ITEM_STATUS_DISABLED)
+		? 'discoveryrule.massenable'
+		: 'discoveryrule.massdisable';
 	// status
 	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		(new CUrl('host_discovery.php'))
 			->setArgument('hostid', $discovery['hostid'])
 			->setArgument('g_hostdruleid[]', $discovery['itemid'])
-			->setArgument('action', ($discovery['status'] == ITEM_STATUS_DISABLED)
-				? 'discoveryrule.massenable'
-				: 'discoveryrule.massdisable'
-			)
+			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
-			->addSID();
+			->addCsrfToken($status_action);
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP

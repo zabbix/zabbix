@@ -112,6 +112,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.config.refresh');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME?>', target.dataset.csrfToken);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -127,6 +128,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.enable');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME?>', target.dataset.csrfToken);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -142,6 +144,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.disable');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME?>', target.dataset.csrfToken);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -157,6 +160,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.delete');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
 
 			this._post(target, proxyids, curl.getUrl());
 		}

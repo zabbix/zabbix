@@ -934,7 +934,9 @@ else {
 		'config' => [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		],
-		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+		'csrf_token_import' => CController::generateCsrfToken('popup.import'),
+		'csrf_token_massupdate' => CController::generateCsrfToken('popup.massupdate.template')
 	];
 
 	$view = new CView('configuration.template.list', $data);

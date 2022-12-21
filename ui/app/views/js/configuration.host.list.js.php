@@ -104,6 +104,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.massdelete');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', button.dataset.csrfToken);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

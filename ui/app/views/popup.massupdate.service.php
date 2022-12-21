@@ -26,6 +26,7 @@
 // create form
 $form = (new CForm())
 	->setId('massupdate-form')
+	->addCsrfToken('popup.massupdate.service')
 	->addVar('action', 'popup.massupdate.service')
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')

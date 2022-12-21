@@ -56,6 +56,7 @@ if ($data['support_custom_time']) {
 $form = (new CForm())
 	->cleanItems()
 	->setName('tabfilter_form')
+	->addCsrfToken('popup.tabfilter.update')
 	->addVar('action', 'popup.tabfilter.update')
 	->addItem([
 		$form_list,
@@ -74,7 +75,7 @@ $output = [
 			'enabled' => !$data['create'],
 			'class' => 'float-left',
 			'confirmation' => _('Are you sure you want to delete this filter?'),
-			'action' => 'return tabFilterDelete(overlay)'
+			'action' => 'return tabFilterDelete(overlay, "'. $data['csrf_token_delete'] .'")'
 		],
 		[
 			'title' => _('Save'),

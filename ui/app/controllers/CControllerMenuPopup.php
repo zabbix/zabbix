@@ -21,6 +21,8 @@
 
 class CControllerMenuPopup extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function checkInput() {
 		$fields = [
 			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',

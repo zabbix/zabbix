@@ -93,10 +93,14 @@
 					this._delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup('popup.massupdate.service', {location_url: this.back_url}, {
-						dialogue_class: 'modal-popup-static',
-						trigger_element: e.target
-					});
+					openMassupdatePopup('popup.massupdate.service', {
+							location_url: this.back_url,
+							<?= CController::CSRF_TOKEN_NAME ?> : e.target.dataset.csrfToken
+						}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: e.target
+						}
+					);
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
 					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -158,6 +162,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'service.delete');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken)
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',

@@ -230,7 +230,7 @@ if ($data['source'] === 'reports') {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.delete')
 					->setArgument('reportids', [$data['reportid']])
-					->setArgumentSID(),
+					->setArgumentCsrfToken('scheduledreport.delete'),
 				_('Delete selected scheduled report?')
 			))
 				->setId('delete')
@@ -245,9 +245,11 @@ if ($data['source'] === 'reports') {
 				? (new CSubmitButton(_('Update'), 'action', 'scheduledreport.update'))
 					->setId('update')
 					->setEnabled($data['allowed_edit'])
+					->setAttributeCsrfToken('scheduledreport.update')
 				: (new CSubmitButton(_('Add'), 'action', 'scheduledreport.create'))
 					->setId('add')
-					->setEnabled($data['allowed_edit']),
+					->setEnabled($data['allowed_edit'])
+					->setAttributeCsrfToken('scheduledreport.create'),
 			$buttons
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);

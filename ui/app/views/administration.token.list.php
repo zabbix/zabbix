@@ -181,7 +181,7 @@ foreach ($data['tokens'] as $token) {
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID()
+				->addCsrfToken('token.disable')
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 					->setArgument('action_src', 'token.list')
 					->setArgument('action', 'token.enable')
@@ -190,7 +190,7 @@ foreach ($data['tokens'] as $token) {
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addSID()
+				->addCsrfToken('token.enable')
 	]);
 }
 
@@ -206,6 +206,7 @@ $token_form->addItem([
 				->addClass('js-massdelete-token')
 				->addClass('no-chkbxrange')
 				->removeid()
+				->setAttributeCsrfToken('token.delete')
 		]
 	], 'token')
 ]);

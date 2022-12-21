@@ -135,38 +135,36 @@ foreach ($data['triggers'] as $trigger) {
 		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
 
+	$status_action = ($trigger['status'] == TRIGGER_STATUS_DISABLED)
+		? 'triggerprototype.massenable'
+		: 'triggerprototype.massdisable';
 	// status
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('trigger_prototypes.php'))
 			->setArgument('g_triggerid', $triggerid)
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-				? 'triggerprototype.massenable'
-				: 'triggerprototype.massdisable'
-			)
+			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']))
-		->addSID();
+		->addCsrfToken($status_action);
 
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover_action = $nodiscover ? 'triggerprototype.discover.enable' : 'triggerprototype.discover.disable';
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('g_triggerid[]', $triggerid)
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', $nodiscover
-					? 'triggerprototype.discover.enable'
-					: 'triggerprototype.discover.disable'
-				)
+				->setArgument('action', $discover_action)
 				->setArgument('context', $data['context'])
-				->setArgumentSID()
+				->setArgumentCsrfToken()
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($discover_action)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -210,7 +208,9 @@ $triggersForm->addItem([
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.triggerprototype', {}, {
+						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
+							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"

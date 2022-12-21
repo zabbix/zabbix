@@ -292,21 +292,19 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
+	$status_action = ($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'trigger.massenable' : 'trigger.massdisable';
 	// status
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
 			->setArgument('g_triggerid', $triggerid)
-			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-				? 'trigger.massenable'
-				: 'trigger.massdisable'
-			)
+			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
-		->addSID();
+		->addCsrfToken($status_action);
 
 	// hosts
 	$hosts = null;
@@ -362,7 +360,9 @@ $triggers_form->addItem([
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.trigger', {}, {
+						"openMassupdatePopup('popup.massupdate.trigger', {".
+							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
 						});"

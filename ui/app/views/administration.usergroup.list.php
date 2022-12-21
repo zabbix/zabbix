@@ -90,7 +90,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
-			->addSID()
+			->addCsrfToken('usergroup.massupdate')
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
@@ -99,7 +99,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addSID();
+			->addCsrfToken('usergroup.massupdate');
 
 	$gui_access = user_auth_type2str($usergroup['gui_access']);
 
@@ -117,7 +117,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->getUrl()
 			))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addSID();
+			->addCsrfToken('usergroup.massupdate');
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
@@ -128,7 +128,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID()
+				->addCsrfToken('usergroup.massupdate')
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
@@ -137,7 +137,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addSID();
+				->addCsrfToken('usergroup.massupdate');
 	}
 	else {
 		$gui_access = new CSpan($gui_access);

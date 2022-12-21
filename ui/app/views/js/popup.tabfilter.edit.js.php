@@ -30,7 +30,7 @@ $('.overlay-dialogue-body #filter_custom_time').on('change', function() {
 	$('input,button', $calendars).prop('disabled', !$(this).is(':checked'));
 });
 
-function tabFilterDelete(overlay) {
+function tabFilterDelete(overlay, csrf_token_delete) {
 	var $form = overlay.$dialogue.find('form'),
 		url = new Curl($form.attr('action')),
 		form_data = $form.serializeJSON();
@@ -38,6 +38,7 @@ function tabFilterDelete(overlay) {
 	url.setArgument('action', 'popup.tabfilter.delete');
 	url.setArgument('idx', form_data['idx']);
 	url.setArgument('idx2', form_data['idx2']);
+	url.setArgument('<?= CController::CSRF_TOKEN_NAME?>', csrf_token_delete);
 
 	overlay.setLoading();
 	overlay.xhr = $.post(url.getUrl(), null, 'json')

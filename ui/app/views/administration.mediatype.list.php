@@ -149,11 +149,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 		? (new CLink(_('Enabled'), $statusLink))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addSID()
+			->addCsrfToken('mediatype.disable')
 		: (new CLink(_('Disabled'), $statusLink))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addSID();
+			->addCsrfToken('mediatype.enable');
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)

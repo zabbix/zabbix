@@ -106,23 +106,21 @@ if ($data['correlations']) {
 			$status = (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 				->setArgument('correlationids', (array) $correlation['correlationid'])
 				->setArgument('action', 'correlation.enable')
-				->setArgumentSID()
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addSID();
+				->addCsrfToken('correlation.enable');
 		}
 		else {
 			$status = (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
 				->setArgument('correlationids', (array) $correlation['correlationid'])
 				->setArgument('action', 'correlation.disable')
-				->setArgumentSID()
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID();
+				->addCsrfToken('correlation.disable');
 		}
 
 		$table->addRow([

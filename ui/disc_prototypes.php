@@ -695,6 +695,8 @@ else {
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
 
+	$data['csrf_token_massupdate'] = CController::generateCsrfToken('popup.massupdate.itemprototype');
+
 	// render view
 	echo (new CView('configuration.item.prototype.list', $data))->getOutput();
 }

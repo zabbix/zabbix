@@ -118,6 +118,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.enable');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -133,6 +134,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.disable');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -148,6 +150,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.delete');
+			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}

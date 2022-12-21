@@ -34,7 +34,8 @@ window.token_edit_popup = {
 	expires_at: null,
 	expires_state: null,
 
-	init() {
+	init(csrf_token_delete) {
+		this.csrf_token_delte = csrf_token_delete;
 		this.overlay = overlays_stack.getById('token_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -116,6 +117,7 @@ window.token_edit_popup = {
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'token.delete');
+		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delte);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

@@ -154,11 +154,11 @@ if ($data['druleid'] == 0) {
 }
 else {
 	$update_button = (new CSubmitButton(_('Update'), 'action', 'discovery.update'))->setId('update');
-	$clone_button = (new CSimpleButton(_('Clone')))->setId('clone');
+	$clone_button = (new CSimpleButton(_('Clone')))->setAttributeCsrfToken('discovery.create')->setId('clone');
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'discovery.delete')
 			->setArgument('druleids', (array) $data['druleid'])
-			->setArgumentSID(),
+			->setArgumentCsrfToken('discovery.delete'),
 		_('Delete discovery rule?')
 	))
 		->setId('delete');

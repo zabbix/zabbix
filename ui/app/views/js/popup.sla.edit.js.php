@@ -26,10 +26,13 @@
 
 window.sla_edit_popup = new class {
 
-	init({slaid, service_tags, excluded_downtimes}) {
+	init({slaid, service_tags, excluded_downtimes, csrf_token_create, csrf_token_update, csrf_token_delete}) {
 		this._initTemplates();
 
 		this.slaid = slaid;
+		this.csrf_token_create = csrf_token_create;
+		this.csrf_token_update = csrf_token_update;
+		this.csrf_token_delete = csrf_token_delete;
 
 		this.overlay = overlays_stack.getById('sla_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -172,6 +175,7 @@ window.sla_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'sla.delete');
+		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delete);
 
 		this._post(curl.getUrl(), {slaids: [this.slaid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -201,6 +205,9 @@ window.sla_edit_popup = new class {
 
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
+		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>',
+			this.slaid !== null ? this.csrf_token_update : this.csrf_token_create
+		);
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

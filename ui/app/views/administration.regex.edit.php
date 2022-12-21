@@ -151,7 +151,7 @@ if ($data['regexid'] != 0) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'regex.delete')
 						->setArgument('regexids', (array) $data['regexid'])
-						->setArgumentSID(),
+						->setArgumentCsrfToken(),
 				_('Delete regular expression?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

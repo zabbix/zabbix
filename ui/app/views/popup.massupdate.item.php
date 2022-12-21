@@ -27,6 +27,7 @@
 $form = (new CForm())
 	->setId('massupdate-form')
 	->setName('massupdate-form')
+	->addCsrfToken($data['action'])
 	->addVar('ids', $data['ids'])
 	->addVar('action', $data['action'])
 	->addVar('prototype', $data['prototype'])

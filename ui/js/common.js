@@ -1129,3 +1129,17 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 		sessionStorage.removeItem(key);
 	}
 }
+
+function addCsrfTokenInput(form, csrf_token_name, csrf_token_value) {
+	let csrf_token = form.querySelector('input[name=\"' + csrf_token_name + '\"]');
+
+	if (csrf_token === null) {
+		csrf_token = document.createElement("input");
+		csrf_token.type = "hidden";
+		csrf_token.name = csrf_token_name;
+
+		form.appendChild(csrf_token);
+	}
+
+	csrf_token.value = csrf_token_value;
+}

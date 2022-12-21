@@ -121,21 +121,22 @@ foreach ($data['items'] as $item) {
 			->getUrl()
 	);
 
+	$status_action = ($item['status'] == ITEM_STATUS_DISABLED)
+		? 'itemprototype.massenable'
+		: 'itemprototype.massdisable';
+
 	$status = (new CLink(
 		($item['status'] == ITEM_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('disc_prototypes.php'))
 			->setArgument('group_itemid[]', $item['itemid'])
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('action', ($item['status'] == ITEM_STATUS_DISABLED)
-				? 'itemprototype.massenable'
-				: 'itemprototype.massdisable'
-			)
+			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status']))
-		->addSID();
+		->addCsrfToken($status_action);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -165,18 +166,16 @@ foreach ($data['items'] as $item) {
 		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover_action = $nodiscover ? 'itemprototype.massdiscover.enable' : 'itemprototype.massdiscover.disable';
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('group_itemid[]', $item['itemid'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action', $nodiscover
-					? 'itemprototype.massdiscover.enable'
-					: 'itemprototype.massdiscover.disable'
-				)
+				->setArgument('action', $discover_action)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
+			->addCsrfToken($discover_action)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -210,7 +209,9 @@ $itemForm->addItem([
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
-						"openMassupdatePopup('popup.massupdate.itemprototype', {}, {
+						"openMassupdatePopup('popup.massupdate.itemprototype', {".
+							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+						"'}, {
 							dialogue_class: 'modal-popup-preprocessing',
 							trigger_element: this
 						});"

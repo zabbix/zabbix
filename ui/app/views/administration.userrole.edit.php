@@ -384,7 +384,7 @@ if ($data['roleid'] !== null) {
 		(new CRedirectButton(_('Delete'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
-				->setArgumentSID(),
+				->setArgumentCsrfToken(),
 			_('Delete selected role?')
 		))
 			->setId('delete')

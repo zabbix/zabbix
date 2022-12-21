@@ -79,10 +79,10 @@ else {
 				->setEnabled($data['enabled'])
 		);
 }
-
 $form = (new CForm())
 	->cleanItems()
 	->setName('mediatypetest_form')
+	->addCsrfToken('popup.mediatypetest.send')
 	->addVar('action', 'popup.mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem([

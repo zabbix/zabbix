@@ -21,7 +21,8 @@
 
 class CLink extends CTag {
 
-	private	$use_sid = false;
+	private	$use_csrf_token = false;
+	private $csrf_token;
 	private	$confirm_message = '';
 	private $url;
 
@@ -35,11 +36,13 @@ class CLink extends CTag {
 	}
 
 	/*
-	 * Add a "sid" argument into the URL.
-	 * POST method will be used for the "sid" argument.
+	 * Add a CSRF token argument into the URL.
+	 * POST method will be used for the "_csrf_token" argument.
 	 */
-	public function addSID() {
-		$this->use_sid = true;
+	public function addCsrfToken(string $action) {
+		$this->use_csrf_token = true;
+		$this->csrf_token = CController::generateCsrfToken($action);
+
 		return $this;
 	}
 
@@ -76,15 +79,17 @@ class CLink extends CTag {
 			$this->setAttribute('role', 'button');
 		}
 
-		if ($this->use_sid) {
+		if ($this->use_csrf_token) {
 			if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
-				$url .= 'sid='.substr(CSessionHelper::getId(), 16, 16);
+				$url .= CController::CSRF_TOKEN_NAME .'='. $this->csrf_token;
 			}
 			$confirm_script = ($this->confirm_message !== '')
 				? 'Confirm('.CHtml::encode(json_encode($this->confirm_message)).') && '
 				: '';
-			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
+			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', '"
+				.CController::CSRF_TOKEN_NAME."', true)"
+			);
 			$this->setAttribute('href', 'javascript:void(0)');
 		}
 		else {
