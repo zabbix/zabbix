@@ -3638,6 +3638,10 @@ msgstr "关闭表达式构造器"
 msgid "Close new event"
 msgstr "关闭新的事件"
 
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"

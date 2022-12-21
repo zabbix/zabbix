@@ -120,6 +120,11 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 * @return array Macros for assigning to host.
 	 */
 	protected function processUserMacros(array $macros): array {
+		foreach ($macros as &$macro) {
+			unset($macro['allow_revert']);
+		}
+		unset($macro);
+
 		return array_filter(cleanInheritedMacros($macros),
 			function (array $macro): bool {
 				return (bool) array_filter(

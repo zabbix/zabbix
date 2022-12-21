@@ -1397,7 +1397,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 #endif
 
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if ((now = time(NULL)) >= nextsend)
 		{

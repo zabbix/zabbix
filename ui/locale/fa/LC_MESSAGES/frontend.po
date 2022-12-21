@@ -3636,6 +3636,10 @@ msgstr "بستن عبارت سازنده"
 msgid "Close new event"
 msgstr ""
 
+#: app/views/configuration.correlation.edit.php:154
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"

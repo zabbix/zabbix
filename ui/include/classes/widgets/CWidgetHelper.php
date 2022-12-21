@@ -538,13 +538,16 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldSeverities $field
 	 *
-	 * @return CSeverityCheckBoxList
+	 * @return CCheckBoxList
 	 */
 	public static function getSeverities($field) {
-		return (new CSeverityCheckBoxList($field->getName()))
+		return (new CCheckBoxList($field->getName()))
+			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($field->getValue())
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setColumns(3)
+			->setVertical();
 	}
 
 	/**
@@ -618,7 +621,10 @@ class CWidgetHelper {
 			}
 
 			$table->addRow((new CRow([
-				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+				(new CCol((new CDiv)
+					->addClass(ZBX_STYLE_DRAG_ICON)
+					->addStyle('top: 0px;')
+				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
 				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
