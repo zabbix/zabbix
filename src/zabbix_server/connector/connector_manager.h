@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_AVAIL_MANAGER_H
-#define ZABBIX_AVAIL_MANAGER_H
+#ifndef ZABBIX_CONNECTOR_MANAGER_H
+#define ZABBIX_CONNECTOR_MANAGER_H
 
 #include "zbxthreads.h"
 
-ZBX_THREAD_ENTRY(availability_manager_thread, args);
+ZBX_THREAD_ENTRY(connector_manager_thread, args);
 
 #endif

@@ -55,6 +55,7 @@
 #include "preprocessor/preproc_manager.h"
 #include "preprocessor/preproc_worker.h"
 #include "availability/avail_manager.h"
+#include "connector/connector_manager.h"
 #include "service/service_manager.h"
 #include "housekeeper/trigger_housekeeper.h"
 #include "lld/lld_manager.h"
@@ -269,7 +270,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_REPORTWRITER */
 	1, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	1, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
-	1 /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	1, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	1, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -591,6 +593,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_ODBCPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CONNECTORMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORMANAGER];
 	}
 	else
 		return FAIL;
@@ -1613,6 +1620,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_AVAILMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				zbx_thread_start(connector_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);

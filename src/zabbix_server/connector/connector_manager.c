@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "connector.h"
+#include "connector_manager.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -43,7 +43,7 @@ zbx_active_avail_proxy_t;
 #define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
 #define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
 
-ZBX_THREAD_ENTRY(availability_manager_thread, args)
+ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
 	char				*error = NULL;
