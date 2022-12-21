@@ -3,29 +3,29 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
-The template is developed for monitoring DBMS PostgreSQL and its forks.
+For Zabbix version: 6.4 and higher.
+The template is developed to monitor DBMS PostgreSQL and its forks.
 
 
 
-This template was tested on:
+This template has been tested on:
 
-- PostgreSQL, version 10, 11, 12
+- PostgreSQL, version 10-15
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
+1. Deploy Zabbix agent2 with Postgres plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 postgres metrics moved to a loadable plugin and requires separate package installation or [compilation of a plugin from sources](https://www.zabbix.com/documentation/6.4/manual/extensions/plugins/build).
+
+2. Create PostgreSQL user to monitor (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 
 ```bash
 CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
-GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
-GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
-GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
+GRANT pg_monitor TO zbx_monitor;
 ```
 
-2\. Edit pg_hba.conf to allow connections from Zabbix agent:
+3. Edit `pg_hba.conf` to allow connections from Zabbix agent:
   
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -34,9 +34,9 @@ GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation https://www.postgresql.org/docs/current/auth-pg-hba-conf.html.
 
-3\. Set in the {$PG.URI} macro the system data source name of the PostgreSQL instance such as <protocol(host:port)>.
+4. Set in the `{$PG.URI}` macro the system data source name of the PostgreSQL instance such as `<protocol(host:port)>`.
 
-4\. Set the user name and password in host macros ({$PG.USER} and {$PG.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
+5. Set the user name and password in host macros (`{$PG.USER}` and `{$PG.PASSWORD}`) if you want to override parameters from the Zabbix agent configuration file.
 
 
 
@@ -198,7 +198,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql).
 

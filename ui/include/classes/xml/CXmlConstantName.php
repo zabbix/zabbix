@@ -278,6 +278,8 @@ class CXmlConstantName {
 	const CSV_TO_JSON = 'CSV_TO_JSON';
 	const STR_REPLACE = 'STR_REPLACE';
 	const XML_TO_JSON = 'XML_TO_JSON';
+	const SNMP_WALK_VALUE = 'SNMP_WALK_VALUE';
+	const SNMP_WALK_TO_JSON = 'SNMP_WALK_TO_JSON';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';

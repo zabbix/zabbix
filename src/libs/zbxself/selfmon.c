@@ -567,7 +567,7 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 	{
 		double	sec = zbx_time();
 
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(info->process_type), sec);
 
 		zbx_setproctitle("%s [processing data]", process_type_str);
 

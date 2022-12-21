@@ -1691,6 +1691,79 @@ abstract class CItemGeneralOld extends CApiService {
 							);
 						}
 						break;
+
+					case ZBX_PREPROC_SNMP_WALK_VALUE:
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						$params = explode("\n", $preprocessing['params']);
+
+						if ($params[0] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('first parameter is expected')
+							));
+						}
+
+						if (!array_key_exists(1, $params) || $params[1] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('second parameter is expected')
+							));
+						}
+
+						if (!in_array($params[1], [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED,
+									ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC
+								])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
+							);
+						}
+						break;
+
+					case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+						$params = explode("\n", $preprocessing['params']);
+
+						$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE,
+							'length' => 255
+						];
+
+						if (!CApiInputValidator::validate($api_input_rules, $params, '/params', $error)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+						}
+
+						if (count($params) % 3 !== 0) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						for ($n = 1; $n <= count($params); $n++) {
+							$param = $params[$n - 1];
+
+							if ($param === '') {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+								);
+							}
+
+							// Field "Treat as" every 3rd value. Check that field is correct.
+							if ($n % 3 === 0) {
+								if (!in_array($param, [ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED,
+											ZBX_PREPROC_SNMP_WALK_TREAT_UTF8, ZBX_PREPROC_SNMP_WALK_TREAT_MAC
+										])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect value for field "%1$s": %2$s.', 'params', _('incorrect value'))
+									);
+								}
+							}
+						}
+						break;
 				}
 
 				switch ($preprocessing['type']) {
@@ -1835,6 +1908,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
@@ -1871,6 +1945,7 @@ abstract class CItemGeneralOld extends CApiService {
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 				$item_preprocs[$item['itemid']] = [];
 				$step = 1;
 
@@ -1949,7 +2024,7 @@ abstract class CItemGeneralOld extends CApiService {
 		}
 
 		if ($ins_item_preprocs) {
-			DB::insertBatch('item_preproc', $ins_item_preprocs);
+			DB::insert('item_preproc', $ins_item_preprocs);
 		}
 	}
 

@@ -32,7 +32,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p> |
+|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 |Network interface discovery |<p>The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".</p> |ZABBIX_PASSIVE |net.if.discovery<p>**Filter**:</p> <p>- {#IFNAME} MATCHES_REGEX `@Network interfaces for discovery`</p> |
 
 ## Items collected
@@ -49,11 +49,12 @@ There are no template links in this template.
 |CPU |CPU nice time |<p>The time the CPU has spent running users' processes that have been niced.</p> |ZABBIX_PASSIVE |system.cpu.util[,nice] |
 |CPU |CPU system time |<p>The time the CPU has spent running the kernel and its processes.</p> |ZABBIX_PASSIVE |system.cpu.util[,system] |
 |CPU |CPU user time |<p>The time the CPU has spent running users' processes that are not niced.</p> |ZABBIX_PASSIVE |system.cpu.util[,user] |
-|Filesystems |Filesystems: Free inodes on {#FSNAME} (percentage) |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.inode[{#FSNAME},pfree] |
-|Filesystems |Filesystems: Free disk space on {#FSNAME} |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},free] |
-|Filesystems |Filesystems: Free disk space on {#FSNAME} (percentage) |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},pfree] |
-|Filesystems |Filesystems: Total disk space on {#FSNAME} |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},total] |
-|Filesystems |Filesystems: Used disk space on {#FSNAME} |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},used] |
+|Filesystems |{#FSNAME}: Filesystem is read-only |<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},readonly]<p>**Preprocessing**:</p><p>- JSONPATH: `$.options`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- REGEX: `(?:^|,)ro\b 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|Filesystems |{#FSNAME}: Free inodes, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.inode[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inodes.pfree`</p> |
+|Filesystems |{#FSNAME}: Free disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},free]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.free`</p> |
+|Filesystems |{#FSNAME}: Free disk space, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.pfree`</p> |
+|Filesystems |{#FSNAME}: Total disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.total`</p> |
+|Filesystems |{#FSNAME}: Used disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.used`</p> |
 |General |Host boot time |<p>-</p> |ZABBIX_PASSIVE |system.boottime |
 |General |Host name |<p>A host name of the system.</p> |ZABBIX_PASSIVE |system.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Host local time |<p>-</p> |ZABBIX_PASSIVE |system.localtime |
@@ -76,14 +77,17 @@ There are no template links in this template.
 |Processes |Number of processes |<p>The total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |
 |Security |Checksum of /etc/passwd |<p>-</p> |ZABBIX_PASSIVE |vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |Zabbix agent availability |<p>Monitoring the availability status of the agent.</p> |INTERNAL |zabbix[host,agent,available] |
+|Zabbix raw items |Get filesystems |<p>The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.</p> |ZABBIX_PASSIVE |vfs.fs.get |
+|Zabbix raw items |{#FSNAME}: Get filesystem data |<p>-</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.fsname=='{#FSNAME}')].first()`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Processor load is too high on {HOST.NAME} |<p>-</p> |`avg(/OpenBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5` |WARNING | |
-|Filesystems: Free inodes is less than 20% on volume {#FSNAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
-|Filesystems: Free disk space is less than 20% on volume {#FSNAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
+|{#FSNAME}: Filesystem became read-only |<p>The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.</p> |`last(/OpenBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/OpenBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1`<p>Recovery expression:</p>`last(/OpenBSD by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0` |AVERAGE |<p>Manual close: YES</p> |
+|{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20` |WARNING | |
+|{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/OpenBSD by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20` |WARNING | |
 |Hostname was changed on {HOST.NAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/system.hostname,#1)<>last(/OpenBSD by Zabbix agent/system.hostname,#2)` |INFO | |
 |Host information was changed on {HOST.NAME} |<p>-</p> |`last(/OpenBSD by Zabbix agent/system.uname,#1)<>last(/OpenBSD by Zabbix agent/system.uname,#2)` |INFO | |
 |{HOST.NAME} has just been restarted |<p>-</p> |`change(/OpenBSD by Zabbix agent/system.uptime)<0` |INFO | |
