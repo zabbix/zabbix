@@ -739,8 +739,6 @@ else {
 		: ZBX_FLAG_DISCOVERY_PROTOTYPE
 	);
 
-	$checkbox_hash = crc32(implode('', $filter_hostids));
-	$data['checkbox_hash'] = $checkbox_hash;
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
