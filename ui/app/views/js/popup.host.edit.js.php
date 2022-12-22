@@ -116,8 +116,7 @@ window.host_edit_popup = {
 		this.removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'host.massdelete');
-		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delete);
+		curl.setAction('host.massdelete', this.csrf_token_delete);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

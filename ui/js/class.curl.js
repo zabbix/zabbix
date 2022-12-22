@@ -196,6 +196,19 @@ Curl.prototype = {
 		}
 	},
 
+	/**
+	 * Sets Curl action and CSRF token for the action.
+	 * CSRF token name is taken from PHP constant CController::CSRF_TOKEN_NAME.
+	 *
+	 * @param action      action that should be performed.
+	 * @param csrf_token  CSRF token for the action.
+	 */
+	setAction: function(action, csrf_token) {
+		this.args['action'] = action;
+		this.args['_csrf_token'] = csrf_token;
+		this.formatQuery();
+	},
+
 	setArgument: function(key, value) {
 		this.args[key] = value;
 		this.formatQuery();

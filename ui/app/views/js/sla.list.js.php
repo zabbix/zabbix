@@ -117,8 +117,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'sla.enable');
-			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
+			curl.setAction('sla.enable', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -133,8 +132,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'sla.disable');
-			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
+			curl.setAction('sla.disable', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -149,8 +147,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'sla.delete');
-			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
+			curl.setAction('sla.delete', target.dataset.csrfToken);
 
 			this._post(target, slaids, curl.getUrl());
 		}

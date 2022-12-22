@@ -82,8 +82,7 @@
 
 		_delete() {
 			const curl = new Curl('zabbix.php', false);
-			curl.setArgument('action', 'templategroup.delete');
-			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delete);
+			curl.setAction('templategroup.delete', this.csrf_token_delete);
 
 			this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 				postMessageOk(response.success.title);

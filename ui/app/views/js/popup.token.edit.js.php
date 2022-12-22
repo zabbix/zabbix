@@ -116,8 +116,7 @@ window.token_edit_popup = {
 		this.removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'token.delete');
-		curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_token_delte);
+		curl.setAction('token.delete', this.csrf_token_delte);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

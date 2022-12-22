@@ -85,8 +85,7 @@
 			target.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'token.delete');
-			curl.setArgument('<?= CController::CSRF_TOKEN_NAME ?>', target.dataset.csrfToken);
+			curl.setAction('token.delete', target.dataset.csrfToken);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
