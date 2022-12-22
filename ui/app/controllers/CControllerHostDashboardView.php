@@ -22,10 +22,7 @@
 class CControllerHostDashboardView extends CController {
 
 	private $host;
-
-	protected function init() {
-		$this->validate_csrf_token = false;
-	}
+	protected $validate_csrf_token = false;
 
 	protected function checkInput() {
 		$fields = [

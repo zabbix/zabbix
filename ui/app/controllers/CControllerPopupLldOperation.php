@@ -23,9 +23,7 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupLldOperation extends CController {
 
-	protected function init() {
-		$this->validate_csrf_token = false;
-	}
+	protected $validate_csrf_token = false;
 
 	protected function checkInput() {
 		$fields = [

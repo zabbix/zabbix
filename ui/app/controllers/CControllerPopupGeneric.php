@@ -141,9 +141,9 @@ class CControllerPopupGeneric extends CController {
 	 */
 	protected $disableids = [];
 
-	protected function init() {
-		$this->validate_csrf_token = false;
+	protected $validate_csrf_token = false;
 
+	protected function init() {
 		$this->popup_properties = [
 			'hosts' => [
 				'title' => _('Hosts'),

@@ -29,9 +29,9 @@ class CControllerPopupMediatypeMessage extends CController {
 	 */
 	protected $message_types = [];
 
-	protected function init() {
-		$this->validate_csrf_token = false;
+	protected $validate_csrf_token = false;
 
+	protected function init() {
 		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 

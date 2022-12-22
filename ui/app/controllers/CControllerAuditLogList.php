@@ -21,6 +21,8 @@
 
 class CControllerAuditLogList extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -173,10 +175,6 @@ class CControllerAuditLogList extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Audit log'));
 		$this->setResponse($response);
-	}
-
-	protected function init(): void {
-		$this->validate_csrf_token = false;
 	}
 
 	/**

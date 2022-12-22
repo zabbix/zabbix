@@ -42,9 +42,9 @@ class CControllerSearch extends CController {
 	 */
 	private $limit;
 
-	protected function init() {
-		$this->validate_csrf_token = false;
+	protected $validate_csrf_token = false;
 
+	protected function init() {
 		$this->admin = in_array($this->getUserType(), [
 			USER_TYPE_ZABBIX_ADMIN,
 			USER_TYPE_SUPER_ADMIN

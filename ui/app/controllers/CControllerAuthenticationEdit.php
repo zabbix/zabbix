@@ -21,9 +21,7 @@
 
 class CControllerAuthenticationEdit extends CController {
 
-	protected function init() {
-		$this->validate_csrf_token = false;
-	}
+	protected $validate_csrf_token = false;
 
 	/**
 	 * Validate user input.

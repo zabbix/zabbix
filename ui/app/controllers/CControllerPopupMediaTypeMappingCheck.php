@@ -21,8 +21,9 @@
 
 class CControllerPopupMediaTypeMappingCheck extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function init(): void {
-		$this->validate_csrf_token = false;
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 

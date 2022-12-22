@@ -25,9 +25,7 @@
  */
 class CControllerHostViewRefresh extends CControllerHostView {
 
-	protected function init(): void {
-		$this->validate_csrf_token =  false;
-	}
+	protected $validate_csrf_token = false;
 
 	protected function doAction(): void {
 		$filter = static::FILTER_FIELDS_DEFAULT;

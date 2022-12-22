@@ -22,9 +22,7 @@
 
 class CControllerSlaReportList extends CController {
 
-	protected function init(): void {
-		$this->validate_csrf_token = false;
-	}
+	protected $validate_csrf_token = false;
 
 	/**
 	 * @throws Exception

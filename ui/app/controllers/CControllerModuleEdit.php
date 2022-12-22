@@ -28,10 +28,7 @@ class CControllerModuleEdit extends CController {
 	 * Current module data.
 	 */
 	private array $module = [];
-
-	protected function init(): void {
-		$this->validate_csrf_token = false;
-	}
+	protected $validate_csrf_token = false;
 
 	protected function checkInput(): bool {
 		$fields = [
