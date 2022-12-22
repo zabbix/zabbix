@@ -1284,6 +1284,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			exit(EXIT_FAILURE);
 		}
 
+		thread_info->program_type = program_type;
 		thread_info->server_num = i + 1;
 		thread_args->args = NULL;
 

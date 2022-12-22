@@ -3,13 +3,16 @@
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -22,14 +25,14 @@ No specific Zabbix configuration is required.
 |{$CPU.QUEUE.CRIT.MAX} |<p>The threshold of the Processor Queue Length counter.</p> |`3` |
 |{$CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -42,7 +45,7 @@ There are no template links in this template.
 |CPU |Number of cores |<p>The number of logical processors available on the computer.</p> |ZABBIX_ACTIVE |wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"] |
 |CPU |CPU queue length |<p>The Processor Queue Length shows the number of threads that are observed as delayed in the processor Ready Queue</p><p>and are waiting to be executed.</p> |ZABBIX_ACTIVE |perf_counter_en["\System\Processor Queue Length"] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -59,13 +62,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -78,14 +84,14 @@ No specific Zabbix configuration is required.
 |{$MEMORY.UTIL.MAX} |<p>The warning threshold of the Memory util item.</p> |`90` |
 |{$SWAP.PFREE.MIN.WARN} |<p>The warning threshold of the minimum free swap.</p> |`20` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -102,7 +108,7 @@ There are no template links in this template.
 |Memory |Memory pages per second |<p>This measures the rate at which pages are read from or written to disk to resolve hard page faults.</p><p>If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p> |ZABBIX_ACTIVE |perf_counter_en["\Memory\Pages/sec"] |
 |Memory |Memory pool non-paged |<p>This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects</p><p>that cannot be written to disk but instead must remain in physical memory as long as they are allocated.</p><p>There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch).</p><p>A typical Event ID 2019 is recorded in the system event log.</p> |ZABBIX_ACTIVE |perf_counter_en["\Memory\Pool Nonpaged Bytes"] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -119,13 +125,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -144,17 +153,17 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>The critical threshold of the filesystem utilization in percent.</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>The warning threshold of the filesystem utilization in percent.</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Mounted filesystem discovery |<p>Discovery of file systems of different types.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>- {#FSDRIVETYPE} MATCHES_REGEX `{$VFS.FS.FSDRIVETYPE.MATCHES}`</p><p>- {#FSDRIVETYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -164,7 +173,7 @@ There are no template links in this template.
 |Zabbix raw items |Get filesystems |<p>The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.</p> |ZABBIX_ACTIVE |vfs.fs.get |
 |Zabbix raw items |{#FSLABEL}({#FSNAME}): Get filesystem data |<p>-</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.fsname=='{#FSNAME}')].first()`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -179,13 +188,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -199,17 +211,17 @@ No specific Zabbix configuration is required.
 |{$VFS.DEV.UTIL.MAX.WARN} |<p>The warning threshold of disk time utilization in percent.</p> |`95` |
 |{$VFS.DEV.WRITE.AWAIT.WARN} |<p>Disk write average response time (in s) before the trigger would fire.</p> |`0.02` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Physical disks discovery |<p>Discovery of installed physical disks.</p> |ZABBIX_ACTIVE |perf_instance_en.discovery[PhysicalDisk]<p>**Preprocessing**:</p><p>- STR_REPLACE: `{#INSTANCE} {#DEVNAME}`</p><p>**Filter**:</p>AND <p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -222,7 +234,7 @@ There are no template links in this template.
 |Storage |{#DEVNAME}: Average disk read queue length |<p>Average disk read queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Read Queue Length",60] |
 |Storage |{#DEVNAME}: Average disk write queue length |<p>Average disk write queue, the number of requests outstanding on the disk at the time the performance data is collected.</p> |ZABBIX_ACTIVE |perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk Write Queue Length",60] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -238,13 +250,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -254,14 +269,14 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$SYSTEM.FUZZYTIME.MAX} |<p>The threshold for difference of system time in seconds.</p> |`60` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -270,15 +285,17 @@ There are no template links in this template.
 |General |System description |<p>System description of the host.</p> |ZABBIX_ACTIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Number of processes |<p>The number of processes.</p> |ZABBIX_ACTIVE |proc.num[] |
 |General |Number of threads |<p>The number of threads used by all running processes.</p> |ZABBIX_ACTIVE |perf_counter_en["\System\Threads"] |
+|Inventory |Operating system |<p>-</p> |ZABBIX_ACTIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the operating system.</p> |ZABBIX_ACTIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Status |Uptime |<p>The system uptime expressed in the following format:"N days, hh:mm:ss".</p> |ZABBIX_ACTIVE |system.uptime |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |System time is out of sync |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
-|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|System name has changed |<p>System name has changed. Ack to close.</p> |`change(/Windows generic by Zabbix agent active/system.hostname) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`change(/Windows generic by Zabbix agent active/system.sw.os) and length(last(/Windows generic by Zabbix agent active/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
 |Host has been restarted |<p>The device uptime is less than 10 minutes.</p> |`last(/Windows generic by Zabbix agent active/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
@@ -289,13 +306,16 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
+
+## Requirements
+
 For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -313,17 +333,17 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFNAME.MATCHES} |<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$NET.IF.IFNAME.NOT_MATCHES} |<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p> |`Miniport|Virtual|Teredo|Kernel|Loopback|Bluetooth|HTTPS|6to4|QoS|Layer` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Network interfaces discovery |<p>Discovery of installed network interfaces.</p> |DEPENDENT |net.if.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFALIAS} MATCHES_REGEX `{$NET.IF.IFALIAS.MATCHES}`</p><p>- {#IFALIAS} NOT_MATCHES_REGEX `{$NET.IF.IFALIAS.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -338,7 +358,7 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}({#IFALIAS}): Operational status |<p>The operational status of the network interface.</p> |DEPENDENT |net.if.status["{#IFGUID}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.GUID == "{#IFGUID}")].NetConnectionStatus.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Zabbix raw items |Network interfaces WMI get |<p>Raw data of win32_networkadapter.</p> |ZABBIX_ACTIVE |wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -355,14 +375,17 @@ Please report any issues with the template at https://support.zabbix.com.
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 Special version of services template that is required for Windows OS.
+
+## Requirements
+
+For Zabbix version: 6.4 and higher.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -375,23 +398,23 @@ No specific Zabbix configuration is required.
 |{$SERVICE.STARTUPNAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:automatic|automatic delayed)$` |
 |{$SERVICE.STARTUPNAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:manual|disabled)$` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Windows services discovery |<p>Discovery of Windows services of different types as defined in template's macros.</p> |ZABBIX_ACTIVE |service.discovery<p>**Filter**:</p>AND <p>- {#SERVICE.NAME} MATCHES_REGEX `{$SERVICE.NAME.MATCHES}`</p><p>- {#SERVICE.NAME} NOT_MATCHES_REGEX `{$SERVICE.NAME.NOT_MATCHES}`</p><p>- {#SERVICE.STARTUPNAME} MATCHES_REGEX `{$SERVICE.STARTUPNAME.MATCHES}`</p><p>- {#SERVICE.STARTUPNAME} NOT_MATCHES_REGEX `{$SERVICE.STARTUPNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Services |State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME}) |<p>-</p> |ZABBIX_ACTIVE |service.info["{#SERVICE.NAME}",state] |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|

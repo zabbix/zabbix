@@ -3,7 +3,6 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
 New official Windows template. Requires agent of Zabbix 4.4 and newer.
 
 
@@ -12,12 +11,16 @@ This template has been tested on:
 - Windows, version 7 and newer.
 - Windows Server, version 2008 R2 and newer.
 
+## Requirements
+
+For Zabbix version: 6.4 and higher.
+
 ## Setup
 
 Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -64,11 +67,11 @@ No specific Zabbix configuration is required.
 |{$VFS.FS.PUSED.MAX.CRIT} |<p>The critical threshold of the filesystem utilization in percent.</p> |`90` |
 |{$VFS.FS.PUSED.MAX.WARN} |<p>The warning threshold of the filesystem utilization in percent.</p> |`80` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -77,7 +80,7 @@ There are no template links in this template.
 |Physical disks discovery |<p>Discovery of installed physical disks.</p> |ZABBIX_PASSIVE |perf_instance_en.discovery[PhysicalDisk]<p>**Preprocessing**:</p><p>- STR_REPLACE: `{#INSTANCE} {#DEVNAME}`</p><p>**Filter**:</p>AND <p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
 |Windows services discovery |<p>Discovery of Windows services of different types as defined in template's macros.</p> |ZABBIX_PASSIVE |service.discovery<p>**Filter**:</p>AND <p>- {#SERVICE.NAME} MATCHES_REGEX `{$SERVICE.NAME.MATCHES}`</p><p>- {#SERVICE.NAME} NOT_MATCHES_REGEX `{$SERVICE.NAME.NOT_MATCHES}`</p><p>- {#SERVICE.STARTUPNAME} MATCHES_REGEX `{$SERVICE.STARTUPNAME.MATCHES}`</p><p>- {#SERVICE.STARTUPNAME} NOT_MATCHES_REGEX `{$SERVICE.STARTUPNAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -97,6 +100,7 @@ There are no template links in this template.
 |General |System description |<p>System description of the host.</p> |ZABBIX_PASSIVE |system.uname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |General |Number of processes |<p>The number of processes.</p> |ZABBIX_PASSIVE |proc.num[] |
 |General |Number of threads |<p>The number of threads used by all running processes.</p> |ZABBIX_PASSIVE |perf_counter_en["\System\Threads"] |
+|Inventory |Operating system |<p>-</p> |ZABBIX_PASSIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the operating system.</p> |ZABBIX_PASSIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Memory |Used memory |<p>Used memory in Bytes.</p> |ZABBIX_PASSIVE |vm.memory.size[used] |
 |Memory |Total memory |<p>The total memory expressed in Bytes.</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
@@ -137,7 +141,7 @@ There are no template links in this template.
 |Zabbix raw items |Network interfaces WMI get |<p>Raw data of win32_networkadapter.</p> |ZABBIX_PASSIVE |wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |{#FSLABEL}({#FSNAME}): Get filesystem data |<p>-</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.fsname=='{#FSNAME}')].first()`</p> |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
@@ -148,7 +152,8 @@ There are no template links in this template.
 |{#FSLABEL}({#FSNAME}): Disk space is critically low |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.</p><p> - The disk will be full in less than 24 hours.</p> |`last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d) ` |AVERAGE |<p>Manual close: YES</p> |
 |{#FSLABEL}({#FSNAME}): Disk space is low |<p>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.</p><p> Second condition should be one of the following:</p><p> - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.</p><p> - The disk will be full in less than 24 hours.</p> |`last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d) ` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- {#FSLABEL}({#FSNAME}): Disk space is critically low</p> |
 |System time is out of sync |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
-|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Windows by Zabbix agent/system.hostname,#1)<>last(/Windows by Zabbix agent/system.hostname,#2) and length(last(/Windows by Zabbix agent/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|System name has changed |<p>System name has changed. Ack to close.</p> |`change(/Windows by Zabbix agent/system.hostname) and length(last(/Windows by Zabbix agent/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
+|Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`change(/Windows by Zabbix agent/system.sw.os) and length(last(/Windows by Zabbix agent/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
 |High memory utilization |<p>The system is running out of free memory.</p> |`min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
 |High swap space usage |<p>This trigger is ignored, if there is no swap configured</p> |`max(/Windows by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows by Zabbix agent/system.swap.size[,total])>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
 |Number of free system page table entries is too low |<p>The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.</p> |`max(/Windows by Zabbix agent/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}` |WARNING |<p>**Depends on**:</p><p>- High memory utilization</p> |
