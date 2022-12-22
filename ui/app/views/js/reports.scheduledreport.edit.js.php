@@ -120,6 +120,10 @@
 						}]);
 				}
 
+				document
+					.querySelector('input[name="<?= CController::CSRF_TOKEN_NAME ?>"]')
+					.value = document.getElementById('clone').dataset.csrfToken;
+
 				document.querySelector('#name').focus();
 
 				if (dashboard_inaccessible) {

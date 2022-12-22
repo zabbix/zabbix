@@ -201,6 +201,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'serviceids' => array_column($data['rules']['service_write_list'], 'serviceid')
 		]);
 
+		$data['csrf_token_create'] = self::generateCsrfToken('userrole.create');
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);

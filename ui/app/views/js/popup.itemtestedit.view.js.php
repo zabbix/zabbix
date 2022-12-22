@@ -148,7 +148,7 @@ function itemGetValueTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
-	url.setArgument('action', 'popup.itemtest.getvalue');
+	url.setAction('popup.itemtest.getvalue', jQuery('#get_value_btn').data('csrfToken'))
 
 	post_data = jQuery.extend(post_data, {
 		interface: {
@@ -224,7 +224,7 @@ function itemGetValueTest(overlay) {
  *
  * @param {object} overlay  Overlay dialog object.
  */
-function itemCompleteTest(overlay) {
+function itemCompleteTest(overlay, csrf_token_test) {
 	var $body = overlay.$dialogue.$body,
 		$form = overlay.$dialogue.find('form'),
 		form_data = $form.serializeJSON(),
@@ -232,7 +232,7 @@ function itemCompleteTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
-	url.setArgument('action', 'popup.itemtest.send');
+	url.setAction('popup.itemtest.send', csrf_token_test);
 
 	post_data = jQuery.extend(post_data, {
 		get_value: form_data['get_value'] || 0,

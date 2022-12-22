@@ -36,6 +36,8 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	private $data = [];
 
+	protected $validate_csrf_token = false;
+
 	public function init() {
 		$this->range_time_parser = new CRangeTimeParser();
 	}

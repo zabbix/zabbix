@@ -250,6 +250,7 @@ if ($data['is_item_testable']) {
 		(new CFormField(
 			(new CSimpleButton(_('Get value')))
 				->setId('get_value_btn')
+				->setAttributeCsrfToken('popup.itemtest.getvalue')
 				->addClass(ZBX_STYLE_BTN_ALT)
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_3)
@@ -434,7 +435,7 @@ $output = [
 			'keepOpen' => true,
 			'enabled' => true,
 			'isSubmit' => true,
-			'action' => 'return itemCompleteTest(overlay);'
+			'action' => 'return itemCompleteTest(overlay, "'. $data['csrf_token_test'] .'");'
 		]
 	]
 ];

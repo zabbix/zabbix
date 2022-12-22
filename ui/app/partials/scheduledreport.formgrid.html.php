@@ -223,6 +223,7 @@ if ($data['source'] === 'reports') {
 	if ($data['reportid'] != 0) {
 		$buttons = [
 			(new CSimpleButton(_('Clone')))
+				->setAttributeCsrfToken('scheduledreport.create')
 				->setId('clone')
 				->setEnabled($data['allowed_edit']),
 			$test_button,
