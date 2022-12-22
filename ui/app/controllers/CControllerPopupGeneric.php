@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../include/users.inc.php';
 require_once dirname(__FILE__).'/../../include/js.inc.php';
 require_once dirname(__FILE__).'/../../include/discovery.inc.php';
+
 class CControllerPopupGeneric extends CController {
 
 	/**
@@ -32,8 +33,8 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @var array
 	 */
-	const ALLOWED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-		ITEM_TYPE_IPMI, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX
+	const ALLOWED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPTRAP,
+		ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_JMX
 	];
 
 	/**
@@ -1254,7 +1255,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'users':
 				$options += [
-					'output' => ['username', 'name', 'surname', 'type', 'theme', 'lang']
+					'output' => ['userid', 'username', 'name', 'surname', 'type', 'theme', 'lang']
 				];
 
 				$records = API::User()->get($options);

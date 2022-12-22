@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-14 15:20+0000\n"
+"PO-Revision-Date: 2022-12-16 15:07+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1261,6 +1261,10 @@ msgstr "Dopuszczalne hosty"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "Dopuszczalne metody"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -3458,9 +3462,9 @@ msgstr "Nie można wykonać zapytania UPDATE na tabeli \"%1$s\" bez warunku WHER
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] "Nie można utworzyć użytkownika"
-msgstr[1] "Nie można utworzyć użytkowników"
-msgstr[2] ""
+msgstr[0] "Nie można przydzielić dostępu użytkownikowi"
+msgstr[1] "Nie można przydzielić dostępu użytkownikom"
+msgstr[2] "Nie można przydzielić dostępu użytkownikom"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -4656,7 +4660,7 @@ msgstr "Konfiguruj połączenie DB"
 #: app/views/administration.authentication.edit.php:417
 #: app/views/popup.ldap.edit.php:115
 msgid "Configure JIT provisioning"
-msgstr ""
+msgstr "Konfiguruj dostępy JIT"
 
 #: app/views/js/administration.authentication.edit.js.php:137
 msgid "Confirm changes"
@@ -5506,6 +5510,10 @@ msgstr "Przegląd danych"
 msgid "Data set"
 msgstr "Dane zapisane"
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -5931,6 +5939,10 @@ msgstr "Usunąć wybrane SLA?"
 msgid "Delete selected SLAs?"
 msgstr "Usunąć wybrane SLA?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Usunąć wybrane akcje?"
@@ -6187,20 +6199,20 @@ msgstr "Przestarzałego parametru \"%1$s\" nie można używać z \"%2$s\"."
 
 #: app/views/administration.authentication.edit.php:50
 msgid "Deprovisioned users group"
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu"
 
 #: include/classes/api/services/CUserGroup.php:1011
 msgid "Deprovisioned users group cannot be deleted."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być usunięta."
 
 #: include/classes/api/services/CAuthentication.php:183
 msgid "Deprovisioned users group cannot be empty."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być pusta."
 
 #: include/classes/api/services/CAuthentication.php:178
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr ""
+msgstr "Grupa użytkowników z brakiem dostępu nie może być włączona."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6357,6 +6369,10 @@ msgstr "Wyłączyć wybrane SLA?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "Wyłączyć wybrane SLA?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7072,7 +7088,7 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
-msgstr ""
+msgstr "Włącz przydzielanie dostępów JIT"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -7084,7 +7100,7 @@ msgstr "Włącz autentykację SAML"
 
 #: app/views/administration.authentication.edit.php:543
 msgid "Enable SCIM provisioning"
-msgstr ""
+msgstr "Włącz przydzielanie dostępów SCIM"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -7156,6 +7172,10 @@ msgstr "Włączyć wybrane SLA?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "Włączyć wybrane SLA?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7836,6 +7856,13 @@ msgstr "Pole \"%1$s\" nie zawiera ciągu znaków."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musi być puste."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -10737,11 +10764,11 @@ msgstr "Nieprawidłowe dane JSON. Wystąpił błąd serwera podczas przetwarzani
 
 #: app/controllers/CControllerAuthenticationUpdate.php:171
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP JIT dla mapowania typów mediów."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:164
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP JIT dla mapowania grup użytkowników."
 
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
@@ -10752,11 +10779,11 @@ msgstr "Nieprawidłowa konfiguracja LDAP"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:214
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP SAML dla mapowania typów mediów."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr ""
+msgstr "Nieprawidłowa konfiguracja przydzielania dostępów LDAP SAML dla mapowania grup użytkowników."
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -12147,6 +12174,13 @@ msgstr "MAC adres A"
 msgid "MAC address B"
 msgstr "MAC adres B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12512,6 +12546,19 @@ msgstr "Maksymalna liczba kolumn i wierszy w przeglądzie tabel"
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Maksymalny okres dla wyboru czasu"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13355,6 +13402,11 @@ msgstr "Nowy serwer LDAP"
 msgid "New SLA"
 msgstr "Nowe SLA"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr ""
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "Nowa dodatkowa reguła"
@@ -14056,7 +14108,7 @@ msgstr "Nie zezwolno ustawienia motywu dla użytkownika \"guest\"."
 #: include/classes/api/services/CUser.php:484
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "Nie można zaktualizować pola „%1$s” dla użytkownika z przydzielonym dostępem."
 
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
@@ -14286,6 +14338,17 @@ msgstr "Liczba (całkowita bez znaku)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14419,7 +14482,7 @@ msgstr "Tylko administrator może ustawić właściciela mapy."
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "Tylko dla użytkowników z nieprzydzielonym dostępem można ustawić wyłączoną grupę."
 
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
@@ -14493,6 +14556,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "Informacje o systemie operacyjnym. Zwraca ciąg znaków"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15682,23 +15749,23 @@ msgstr "Podane zapytanie do sekretu \"%1$s\" jest nieprawidłowe."
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
-msgstr ""
+msgstr "Przydziel dostęp teraz"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
-msgstr ""
+msgstr "Przydzielić dostęp dla wybranych użytkowników LDAP?"
 
 #: app/views/administration.user.list.php:141
 msgid "Provisioned"
-msgstr ""
+msgstr "Przydzielono dostęp"
 
 #: app/views/administration.authentication.edit.php:251
 msgid "Provisioning period"
-msgstr ""
+msgstr "Okres przydzielania dostępu"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr ""
+msgstr "Pomyślnie przydzielono dostępy."
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -16944,6 +17011,14 @@ msgstr "Nieprawidłowy klucz pułapki SNMP."
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "Wersja SNMP"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
 
 #: include/items.inc.php:1299
 #, c-format
@@ -19214,7 +19289,7 @@ msgstr "Ten typ informacji może być nieodpowiedni dla tego klucza."
 
 #: app/views/administration.user.edit.php:59
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr ""
+msgstr "Ten użytkownik ma przydzielony dostęp przez IdP. Ręczne zmiany dla pól z przydzielonego dostępu nie są dozwolone."
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -20049,6 +20124,13 @@ msgstr "URL powinien mieć oba pola \"name\" (nazwa) i \"url\" dla mapy \"%1$s\"
 msgid "URLs"
 msgstr "Adresy URL"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -20151,6 +20233,13 @@ msgstr "Odblokuj"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Odblokować wybranych użytkowników?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20520,6 +20609,10 @@ msgstr ""
 msgid "Use bulk requests"
 msgstr "Użyj żądań zbiorowych"
 
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
 msgstr "Użyj własnych kolorów dla stanów zdarzeń"
@@ -20596,7 +20689,7 @@ msgstr "Raport \"%2$s\" został stworzony w imieniu użytkownika \"%1$s\"."
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr ""
+msgstr "Przydzielono dostęp użytkownikowi \"%1$s\"."
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
@@ -23240,6 +23333,12 @@ msgstr "niepoprawna składnia przy \"%1$s\""
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "niewłaściwe wykorzystanie funkcji \"%1$s\""
+
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"

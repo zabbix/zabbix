@@ -1,1 +1,0 @@
-...G...... [ZBX-21300] fixed high CPU usage when using net.tcp.socket.count key on Windows (vso)

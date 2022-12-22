@@ -28,7 +28,6 @@
 #include "zbxprof.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
-extern unsigned char			program_type;
 static sigset_t				orig_mask;
 
 static zbx_export_file_t	*problems_export = NULL;
@@ -112,8 +111,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
-			(process_name = get_process_type_string(process_type)), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, (process_name = get_process_type_string(process_type)), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -178,7 +177,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			stats_offset = 0;
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values", total_values_num);
 
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, ", %d triggers",
 						total_triggers_num);

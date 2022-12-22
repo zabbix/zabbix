@@ -221,7 +221,7 @@ class CControllerItemMassCheckNow extends CController {
 
 			foreach ($itemids as $itemid) {
 				$create_tasks[] = [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => $itemid
 					]
@@ -238,7 +238,7 @@ class CControllerItemMassCheckNow extends CController {
 				];
 			}
 			else {
-				// If task API failed, return will full error message from API.
+				// If task API failed, return with full error message from API.
 				$output['error'] = [
 					'title' => _('Cannot execute operation'),
 					'messages' => array_column(get_and_clear_messages(), 'message')

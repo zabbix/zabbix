@@ -108,7 +108,7 @@ class testFormHost extends CWebTest {
 			'port' => 161,
 			'SNMP version' => 'SNMPv2',
 			'SNMP community' => '{$SNMP_COMMUNITY}',
-			'Use bulk requests' => true
+			'Use combined requests' => true
 		],
 		'JMX' => [
 			'ip' => '127.0.0.1',
@@ -278,9 +278,9 @@ class testFormHost extends CWebTest {
 				->asForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
-			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level'],
+			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
 				'Authentication protocol', 'Authentication passphrase'
 			]
 		];
@@ -292,7 +292,7 @@ class testFormHost extends CWebTest {
 			$this->assertEquals($labels, array_values($snmp_form->getLabels()
 					->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
 			);
-			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use bulk requests"]')->one()
+			$this->assertFalse($snmp_form->query('xpath:.//label[text()="Use combined requests"]')->one()
 					->asCheckbox()->isChecked()
 			);
 		}
@@ -761,7 +761,7 @@ class testFormHost extends CWebTest {
 							'Authentication passphrase' => 'ccc',
 							'Privacy protocol' => 'AES128',
 							'Privacy passphrase' => 'ddd',
-							'Use bulk requests' => false
+							'Use combined requests' => false
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -771,7 +771,7 @@ class testFormHost extends CWebTest {
 							'port' => '500',
 							'SNMP version' => 'SNMPv1',
 							'SNMP community' => 'test',
-							'Use bulk requests' => true
+							'Use combined requests' => true
 						],
 						[
 							'action' => USER_ACTION_ADD,
@@ -1310,7 +1310,8 @@ class testFormHost extends CWebTest {
 							'Security level' => 'authNoPriv',
 							'Authentication protocol' => 'SHA384',
 							'Authentication passphrase' => 'new-test123',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1411,7 +1412,8 @@ class testFormHost extends CWebTest {
 							'Context name' => 'new-zabbix',
 							'Security name' => 'new-selenium',
 							'Security level' => 'noAuthNoPriv',
-							'Use bulk requests' => true
+							'Use combined requests' => true,
+							'Max repetition count' => 10
 						],
 						[
 							'action' => USER_ACTION_REMOVE,
@@ -1461,7 +1463,7 @@ class testFormHost extends CWebTest {
 						'port' => '122',
 						'SNMP version' => 'SNMPv1',
 						'SNMP community' => '🙃zabbix🙃',
-						'Use bulk requests' => false
+						'Use combined requests' => false
 					]
 				],
 				'JMX' => [
@@ -1671,7 +1673,7 @@ class testFormHost extends CWebTest {
 								'Authentication passphrase' => 'test123',
 								'Privacy protocol' => 'AES256',
 								'Privacy passphrase' => '456test',
-								'Use bulk requests' => false
+								'Use combined requests' => false
 							]
 						]
 					]
@@ -1807,7 +1809,7 @@ class testFormHost extends CWebTest {
 				'port' => '500',
 				'SNMP version' => 'SNMPv1',
 				'SNMP community' => 'test',
-				'Use bulk requests' => false
+				'Use combined requests' => false
 			]
 		];
 

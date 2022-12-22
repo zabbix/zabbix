@@ -3499,7 +3499,8 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled,"
+					"pause_symptoms"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -3525,6 +3526,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
 		ZBX_STR2UCHAR(action->notify_if_canceled, row[6]);
+		ZBX_STR2UCHAR(action->pause_symptoms, row[7]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 

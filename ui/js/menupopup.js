@@ -697,7 +697,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for Acknowledge section.
+ * @param {string} options['eventid']                 (optional) Required for Acknowledge section and event rank change.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
@@ -705,7 +705,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
- * @param {object} trigger_element                      UI element which triggered opening of overlay dialogue.
+ * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
@@ -807,6 +807,122 @@ function getMenuPopupTrigger(options, trigger_element) {
 			label: t('Configuration'),
 			items: config_urls
 		});
+	}
+
+	// Check if user role allows to change event rank and if one of the options to show individual menu are true.
+	if (options.allowed_actions_change_problem_ranking
+			&& ((typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause)
+				|| (typeof options.show_rank_change_symptom !== 'undefined' && options.show_rank_change_symptom))) {
+		let items = [];
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'popup.acknowledge.create');
+
+		/*
+		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
+		 * displayed.
+		 */
+		if (typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause) {
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.
+			const ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE = 0x80;
+
+			items[items.length] = {
+				label: t('Mark as cause'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+						body: urlEncodeData({
+							eventids: [options.eventid],
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+						})
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							clearMessages();
+
+							// Show message directly that comes from controller.
+							if ('error' in response) {
+								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
+									true
+								));
+							}
+							else if ('success' in response) {
+								addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+								$.publish('event.rank_change');
+							}
+						})
+						.catch(() => {
+							const title = t('Unexpected server error.');
+							const message_box = makeMessageBox('bad', [], title)[0];
+
+							clearMessages();
+							addMessage(message_box);
+						});
+				},
+				disabled: !options.mark_as_cause
+			};
+		}
+
+		// Dashboard does not have checkboxes. So it is not possible to mark problems and change rank to symptom.
+		if (typeof options.show_rank_change_symptom !== 'undefined' && options.show_rank_change_symptom) {
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM.
+			const ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM = 0x100;
+
+			items[items.length] = {
+				label: t('Mark selected as symptoms'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+						body: urlEncodeData({
+							eventids: options.eventids,
+							cause_eventid: options.eventid,
+							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
+						})
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							clearMessages();
+
+							// Show message directly that comes from controller.
+							if ('error' in response) {
+								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
+									true
+								));
+							}
+							else if ('success' in response) {
+								addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+								const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+								uncheckTableRows('problem', []);
+								chkbxRange.checkObjects('eventids', uncheckids, false);
+								chkbxRange.update('eventids');
+
+								$.publish('event.rank_change');
+							}
+						})
+						.catch(() => {
+							const title = t('Unexpected server error.');
+							const message_box = makeMessageBox('bad', [], title)[0];
+
+							clearMessages();
+							addMessage(message_box);
+						});
+				},
+				disabled: !options.mark_selected_as_symptoms
+			};
+		}
+
+		sections[sections.length] = {
+			label: t('Problem'),
+			items: items
+		};
 	}
 
 	// urls
