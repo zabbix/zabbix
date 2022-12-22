@@ -25,7 +25,6 @@
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_config_vault_t	*config_vault;
 	int			config_timeout;
 }

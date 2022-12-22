@@ -1162,6 +1162,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
+	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1278,8 +1279,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&listen_sock};
-	zbx_thread_proxy_housekeeper_args	housekeeper_args = {get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_pinger_args			pinger_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {CONFIG_TIMEOUT};
+	zbx_thread_pinger_args			pinger_args = {CONFIG_TIMEOUT};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1470,6 +1471,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
+
+	thread_args.info.program_type = program_type;
 
 	for (i = 0; i < threads_num; i++)
 	{

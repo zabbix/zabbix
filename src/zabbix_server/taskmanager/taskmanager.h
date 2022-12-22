@@ -29,7 +29,6 @@ void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hos
 
 typedef struct
 {
-	zbx_get_program_type_f  zbx_get_program_type_cb_arg;
 	int                     config_timeout;
 }
 zbx_thread_taskmanager_args;

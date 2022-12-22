@@ -130,6 +130,13 @@ if ($data['has_ack_events']) {
 }
 
 $form_list
+	->addRow(
+		(new CLabel([_('Convert to cause'),
+			makeHelpIcon(_('Converts a symptom event back to cause event'))
+		])),
+		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
+			->setEnabled($data['allowed_change_problem_ranking'])
+	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
 			->setChecked($data['close_problem'])
