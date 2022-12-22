@@ -144,7 +144,7 @@ zabbix_export:
           key: jenkins.executor.count
           delay: '0'
           history: 7d
-          description: 'The number of executors available to Jenkins. This is corresponds to the sum of all the executors of all the on-line nodes.'
+          description: 'The number of executors available to Jenkins. This is corresponds to the sum of all the executors of all the online nodes.'
           preprocessing:
             -
               type: JSONPATH
@@ -289,7 +289,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/400 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/400 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -317,7 +317,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/201 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/201 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -345,7 +345,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/403 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/403 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -373,7 +373,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/404 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/404 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -401,7 +401,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/304 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/304 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -429,7 +429,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/204 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/204 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -457,7 +457,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/200 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/200 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -580,7 +580,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/500 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/500 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -608,7 +608,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The rate at which the Jenkins master Web UI is responding to requests with a HTTP/503 status code.'
+          description: 'The rate at which the Jenkins master Web UI is responding to requests with an HTTP/503 status code.'
           preprocessing:
             -
               type: JSONPATH
@@ -1239,7 +1239,7 @@ zabbix_export:
           key: jenkins.node.count
           delay: '0'
           history: 7d
-          description: 'The number of build nodes available to Jenkins, both on-line and off-line.'
+          description: 'The number of build nodes available to Jenkins, both online and off-line.'
           preprocessing:
             -
               type: JSONPATH
@@ -1285,7 +1285,7 @@ zabbix_export:
           key: jenkins.node.online
           delay: '0'
           history: 7d
-          description: 'The number of build nodes available to Jenkins and currently on-line.'
+          description: 'The number of build nodes available to Jenkins and currently online.'
           preprocessing:
             -
               type: JSONPATH
@@ -1484,7 +1484,7 @@ zabbix_export:
           key: jenkins.plugins.with_update
           delay: '0'
           history: 7d
-          description: 'The number of plugins in the Jenkins instance that have an newer version reported as available in the current Jenkins update center metadata held by Jenkins. This value is not indicative of an issue with Jenkins but high values can be used as a trigger to review the plugins with updates with a view to seeing whether those updates potentially contain fixes for issues that could be affecting your Jenkins instance.'
+          description: 'The number of plugins in the Jenkins instance that have a newer version reported as available in the current Jenkins update center metadata held by Jenkins. This value is not indicative of an issue with Jenkins but high values can be used as a trigger to review the plugins with updates with a view to seeing whether those updates potentially contain fixes for issues that could be affecting your Jenkins instance.'
           preprocessing:
             -
               type: JSONPATH
