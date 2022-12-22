@@ -6160,7 +6160,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'csrf_token' => [
+			'csrf_token_salt' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,

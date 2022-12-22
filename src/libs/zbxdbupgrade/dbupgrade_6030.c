@@ -1409,7 +1409,7 @@ static int	DBpatch_6030149(void)
 
 static int DBpatch_6030150(void)
 {
-	const ZBX_FIELD field = {"csrf_token", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"csrf_token_salt", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sessions", &field);
 }
