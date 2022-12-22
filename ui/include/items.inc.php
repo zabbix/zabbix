@@ -599,6 +599,10 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	do {
 		$dst_items = [];
 
+		if(count($dst_hostids) === 0) {
+			return true;
+		}
+
 		foreach ($dst_hostids as $dst_hostid) {
 			foreach ($src_items as $src_item) {
 				$dst_item = array_diff_key($src_item, array_flip(['itemid']));
