@@ -872,11 +872,14 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age)
 {
-	static int	last_trend_discard = 0;
-	zbx_timespec_t	ts;
-	int		trends_alloc = 0, i, hour, seconds;
+	static int		last_trend_discard = 0;
+	zbx_timespec_t		ts;
+	int			trends_alloc = 0, i, hour, seconds;
+	zbx_vector_uint64_t	del_itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&del_itemids);
 
 	zbx_timespec(&ts);
 	seconds = ts.sec % SEC_PER_HOUR;
@@ -915,11 +918,11 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 							" compressed history period");
 					last_trend_discard = ts.sec;
 				}
-			}
-			else if (SUCCEED == zbx_history_requires_trends(trend->value_type))
-				DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-			zbx_hashset_iter_remove(&iter);
+				zbx_hashset_iter_remove(&iter);
+			}
+			else
+				zbx_vector_uint64_append(&del_itemids, trend->itemid);
 		}
 
 		cache->trends_last_cleanup_hour = hour;
@@ -927,6 +930,29 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 
 	UNLOCK_TRENDS;
 
+	if (0 != del_itemids.values_num)
+	{
+		DCconfig_unset_existing_itemids(&del_itemids);
+
+		LOCK_TRENDS;
+
+		for (i = 0; i < del_itemids.values_num; i++)
+		{
+			ZBX_DC_TREND	*trend;
+
+			if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends, &del_itemids.values[i])))
+				continue;
+
+			if (SUCCEED == zbx_history_requires_trends(trend->value_type))
+				DCflush_trend(trend, trends, &trends_alloc, trends_num);
+
+			zbx_hashset_remove_direct(&cache->trends, trend);
+		}
+
+		UNLOCK_TRENDS;
+	}
+
+	zbx_vector_uint64_destroy(&del_itemids);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

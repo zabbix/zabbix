@@ -7370,6 +7370,21 @@ int	DCconfig_trigger_exists(zbx_uint64_t triggerid)
 	return ret;
 }
 
+void	DCconfig_unset_existing_itemids(zbx_vector_uint64_t *itemids)
+{
+	int	i;
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+			zbx_vector_uint64_remove_noorder(itemids, i--);
+	}
+
+	UNLOCK_CACHE;
+}
+
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num)
 {
