@@ -372,7 +372,7 @@ class testTaskCreate extends CAPITest {
 			// One basic item and LLD rule.
 			'Test one master item' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '1_item_111'
 					]
@@ -384,7 +384,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test one master LLD rule' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '1_lld_111'
 					]
@@ -399,13 +399,13 @@ class testTaskCreate extends CAPITest {
 			'Test LLD rule and item' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_lld_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_item_111'
 						]
@@ -421,7 +421,7 @@ class testTaskCreate extends CAPITest {
 			// Check dependent items and LLD rules.
 			'Test one dependent item' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '1_1_item_111'
 					]
@@ -434,19 +434,19 @@ class testTaskCreate extends CAPITest {
 			'Test two dependent items and dependent LLD rule' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_1_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_3_lld_111'
 						]
@@ -462,13 +462,13 @@ class testTaskCreate extends CAPITest {
 			'Test dependent item and master item together' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_1_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_item_111'
 						]
@@ -483,13 +483,13 @@ class testTaskCreate extends CAPITest {
 			'Test dependent item lvl3 and dependent item lvl2 of same branch' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
@@ -504,13 +504,13 @@ class testTaskCreate extends CAPITest {
 			'Test dependent item lvl3 and master item of different branch' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
@@ -553,7 +553,7 @@ class testTaskCreate extends CAPITest {
 			'Test check now and diagnostic info (repeating)' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
@@ -569,19 +569,19 @@ class testTaskCreate extends CAPITest {
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
@@ -617,7 +617,7 @@ class testTaskCreate extends CAPITest {
 			'Test check now and diagnostic info (first)' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
@@ -633,19 +633,19 @@ class testTaskCreate extends CAPITest {
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
@@ -671,7 +671,7 @@ class testTaskCreate extends CAPITest {
 			'Test check now and diagnostic info (second)' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
@@ -687,19 +687,19 @@ class testTaskCreate extends CAPITest {
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '2_item_111'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_2_1_item_111'
 						]
@@ -754,7 +754,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test missing request' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW
+					'type' => ZBX_TM_TASK_CHECK_NOW
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1": the parameter "request" is missing.'
@@ -799,14 +799,14 @@ class testTaskCreate extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
-					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_DATA_TYPE_CHECK_NOW
+					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_TASK_CHECK_NOW
 				])).'.'
 			],
 
 			// Check "itemid" field.
 			'Test missing itemid' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => []
 				],
 				'expected_results' => [],
@@ -814,7 +814,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test invalid itemid (empty)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => ''
 					]
@@ -824,7 +824,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test invalid itemid (array)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => ['']
 					]
@@ -943,7 +943,7 @@ class testTaskCreate extends CAPITest {
 			// Test non-existent items.
 			'Test one invalid item' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => 'not_exists'
 					]
@@ -954,13 +954,13 @@ class testTaskCreate extends CAPITest {
 			'Test one valid and one invalid item' => [
 				'task' => [
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => 'not_exists'
 						]
 					],
 					[
-						'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
 						'request' => [
 							'itemid' => '1_item_111'
 						]
@@ -973,7 +973,7 @@ class testTaskCreate extends CAPITest {
 			// Test master items and LLD rules.
 			'Test item (not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '3_item_101'
 					]
@@ -983,7 +983,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test item (type not allowed)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '4_item_110'
 					]
@@ -993,7 +993,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test item (host not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '5_item_011'
 					]
@@ -1003,7 +1003,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test item (host is template)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '6_item_t_011'
 					]
@@ -1013,7 +1013,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test LLD rule (not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '2_lld_101'
 					]
@@ -1023,7 +1023,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test LLD rule (type not allowed)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '3_lld_110'
 					]
@@ -1033,7 +1033,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test LLD rule (host not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '4_lld_011'
 					]
@@ -1043,7 +1043,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test LLD rule (host is template)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '5_lld_t_011'
 					]
@@ -1055,7 +1055,7 @@ class testTaskCreate extends CAPITest {
 			// Test dependent items and LLD rules.
 			'Test dependent item (master item is not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '3_1_item_111'
 					]
@@ -1065,7 +1065,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test dependent item (master item type is allowed)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '4_1_item_111'
 					]
@@ -1075,7 +1075,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test dependent LLD rule (master item is not monitored)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '3_2_lld_111'
 					]
@@ -1085,7 +1085,7 @@ class testTaskCreate extends CAPITest {
 			],
 			'Test dependent LLD rule (master item type is allowed)' => [
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => '4_2_lld_111'
 					]
@@ -1112,7 +1112,7 @@ class testTaskCreate extends CAPITest {
 		// Replace ID placeholders with real IDs for "check now" tasks.
 		foreach ($tasks as &$task) {
 			// Some tests that should fail may not have the required fields or they may be damaged.
-			if (array_key_exists('type', $task) && $task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW
+			if (array_key_exists('type', $task) && $task['type'] == ZBX_TM_TASK_CHECK_NOW
 					&& array_key_exists('request', $task) && array_key_exists('itemid', $task['request'])
 					&& !is_array($task['request']['itemid']) && $task['request']['itemid'] !== '') {
 				$task['request']['itemid'] = self::$data['itemids'][$task['request']['itemid']];
@@ -1204,7 +1204,7 @@ class testTaskCreate extends CAPITest {
 
 		// Replace ID placeholders with real IDs for "check now" tasks.
 		foreach ($tasks as &$task) {
-			if ($task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW) {
+			if ($task['type'] == ZBX_TM_TASK_CHECK_NOW) {
 				$task['request']['itemid'] = self::$data['itemids'][$task['request']['itemid']];
 			}
 		}
@@ -1275,7 +1275,7 @@ class testTaskCreate extends CAPITest {
 			'Test check now (admin)' => [
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => $itemid
 					]
@@ -1285,7 +1285,7 @@ class testTaskCreate extends CAPITest {
 			'Test check now (user)' => [
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'task' => [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => $itemid
 					]
