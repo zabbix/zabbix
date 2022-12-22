@@ -1,0 +1,1 @@
+.........T [ZBX-21288] renamed LLD marco 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle agent 2 template (knaglis)
