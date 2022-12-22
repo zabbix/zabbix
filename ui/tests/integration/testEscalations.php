@@ -691,9 +691,7 @@ class testEscalations extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, $trapper_keys[2], 7);
 
 		$response = $this->callUntilDataIsPresent('problem.get', [
-			'output' => [
-				'eventid'
-			],
+			'output' => ['eventid'],
 			'objectids' => [self::$triggerid, $symptom_triggerids[1], $symptom_triggerids[2]]
 		]);
 
