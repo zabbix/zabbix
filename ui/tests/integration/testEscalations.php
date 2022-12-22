@@ -692,9 +692,9 @@ class testEscalations extends CIntegrationTest {
 
 		$response = $this->callUntilDataIsPresent('problem.get', [
 			'output' => [
-				'eventid',
-				],
-			'objectids' => [self::$triggerid, $symptom_triggerids[1], $symptom_triggerids[2]],
+				'eventid'
+			],
+			'objectids' => [self::$triggerid, $symptom_triggerids[1], $symptom_triggerids[2]]
 		]);
 
 		$this->assertCount(3, $response['result']);
@@ -718,7 +718,7 @@ class testEscalations extends CIntegrationTest {
 		$response = $this->call('event.acknowledge', [
 			'eventids' => $symptom_eventids,
 			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-			'cause_eventid' => $cause_eventid,
+			'cause_eventid' => $cause_eventid
 		]);
 
 		$this->assertArrayHasKey('result', $response);
