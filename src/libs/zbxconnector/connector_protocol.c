@@ -51,23 +51,20 @@ void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, si
 }
 
 void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_connector_object_ptr_t *connector_objects)
+		zbx_vector_connector_object_t *connector_objects)
 {
 	const unsigned char	*end = data + size;
 
 	while (data < end)
 	{
-		zbx_connector_object_t	*connector_object;
+		zbx_connector_object_t	connector_object;
 		zbx_uint32_t		deserialize_str_len;
 
-		connector_object = (zbx_connector_object_t *)zbx_malloc(NULL,
-				sizeof(zbx_connector_object_t));
+		data += zbx_deserialize_value(data, &connector_object.objectid);
+		data += zbx_deserialize_value(data, &connector_object.ts.sec);
+		data += zbx_deserialize_value(data, &connector_object.ts.ns);
+		data += zbx_deserialize_str(data, &connector_object.str, deserialize_str_len);
 
-		zbx_vector_connector_object_ptr_append(connector_objects, connector_object);
-
-		data += zbx_deserialize_value(data, &connector_object->objectid);
-		data += zbx_deserialize_value(data, &connector_object->ts.sec);
-		data += zbx_deserialize_value(data, &connector_object->ts.ns);
-		data += zbx_deserialize_str(data, &connector_object->str, deserialize_str_len);
+		zbx_vector_connector_object_append(connector_objects, connector_object);
 	}
 }

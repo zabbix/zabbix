@@ -129,7 +129,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_connector_object_ptr_t	connector_objects;
+	zbx_vector_connector_object_t		connector_objects;
 	zbx_connector_manager_t			manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -152,7 +152,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	time_flush = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
-	zbx_vector_connector_object_ptr_create(&connector_objects);
+	zbx_vector_connector_object_create(&connector_objects);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -196,7 +196,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			zbx_ipc_message_free(message);
 		}
 
-		zbx_vector_connector_object_ptr_clear_ext(&connector_objects, zbx_connector_object_free);
+		zbx_vector_connector_object_clear_ext(&connector_objects, zbx_connector_object_free);
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);

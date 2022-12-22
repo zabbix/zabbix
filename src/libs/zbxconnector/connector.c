@@ -55,8 +55,7 @@ void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t siz
 void	zbx_connector_object_free(zbx_connector_object_t *connector_object)
 {
 	zbx_free(connector_object->str);
-	zbx_free(connector_object);
 }
 
-ZBX_PTR_VECTOR_IMPL(connector_object_ptr, zbx_connector_object_t *)
+ZBX_PTR_VECTOR_IMPL(connector_object, zbx_connector_object_t )
 

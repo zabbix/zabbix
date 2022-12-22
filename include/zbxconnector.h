@@ -36,12 +36,12 @@ typedef struct
 }
 zbx_connector_object_t;
 
-ZBX_PTR_VECTOR_DECL(connector_object_ptr, zbx_connector_object_t *)
+ZBX_PTR_VECTOR_DECL(connector_object, zbx_connector_object_t)
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object);
 void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_connector_object_ptr_t *connector_objects);
+		zbx_vector_connector_object_t *connector_objects);
 void	zbx_connector_object_free(zbx_connector_object_t *connector_object);
 
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
