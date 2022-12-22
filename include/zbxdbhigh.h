@@ -268,6 +268,10 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
 #define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
 #define ZBX_FLAGS_DB_EVENT_RECOVER		0x0004
+/* flags to indicate data retrieved from DB, used for cause event macros */
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE	0x0008
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS	0x0010
+#define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
 ZBX_DB_EVENT;
@@ -440,6 +444,7 @@ typedef struct
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	pause_suppressed;
+	unsigned char	pause_symptoms;
 	unsigned char	recovery;
 	unsigned char	status;
 	unsigned char	notify_if_canceled;
@@ -619,6 +624,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
 int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
 
 #define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
+#define DBlock_triggerid(id)			DBlock_record("triggers", id, NULL, 0)
 #define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
 #define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
 #define DBlock_graphid(id)			DBlock_record("graphs", id, NULL, 0)

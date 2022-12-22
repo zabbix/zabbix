@@ -25,8 +25,6 @@
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 
-extern unsigned char	program_type;
-
 /*
  * 6.0 development database patches
  */
@@ -321,7 +319,7 @@ static int	DBpatch_5050024(void)
 
 static int	DBpatch_5050030(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog_details' and field_name='auditdetailid'"))
@@ -346,7 +344,7 @@ static int	DBpatch_5050034(void)
 
 static int	DBpatch_5050040(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from ids where table_name='auditlog' and field_name='auditid'"))
@@ -458,7 +456,7 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	size_t		sql_alloc = 4096, sql_offset = 0;
 	int		ret = SUCCEED;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
@@ -681,7 +679,7 @@ static int	DBpatch_5050068(void)
 	zbx_db_insert_t	db_insert;
 	int		ret = FAIL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_int", NULL);
@@ -745,7 +743,7 @@ static int	DBpatch_5050072(void)
 
 static int	DBpatch_5050073(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.overview.%%'"))
@@ -756,7 +754,7 @@ static int	DBpatch_5050073(void)
 
 static int	DBpatch_5050074(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from role_rule where name='ui.monitoring.overview'"))
@@ -767,7 +765,7 @@ static int	DBpatch_5050074(void)
 
 static int	DBpatch_5050075(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sort' where idx='web.hosts.php.sort'"))
@@ -778,7 +776,7 @@ static int	DBpatch_5050075(void)
 
 static int	DBpatch_5050076(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.hosts.sortorder' where idx='web.hosts.php.sortorder'"))
@@ -789,7 +787,7 @@ static int	DBpatch_5050076(void)
 
 static int	DBpatch_5050077(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update profiles set value_str='host.list'"
@@ -913,7 +911,7 @@ static int	DBpatch_5050091(void)
 
 static int	DBpatch_5050092(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update config set geomaps_tile_provider='OpenStreetMap.Mapnik'"))
@@ -949,7 +947,7 @@ static int	DBpatch_5050093(void)
 
 static int	DBpatch_5050094(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBdrop_table("history");
@@ -969,7 +967,7 @@ static int	DBpatch_5050095(void)
 				NULL
 			};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -977,7 +975,7 @@ static int	DBpatch_5050095(void)
 
 static int	DBpatch_5050096(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBdrop_table("history_uint");
@@ -997,7 +995,7 @@ static int	DBpatch_5050097(void)
 				NULL
 			};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -1005,7 +1003,7 @@ static int	DBpatch_5050097(void)
 
 static int	DBpatch_5050098(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBdrop_table("history_str");
@@ -1025,7 +1023,7 @@ static int	DBpatch_5050099(void)
 				NULL
 			};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -1033,7 +1031,7 @@ static int	DBpatch_5050099(void)
 
 static int	DBpatch_5050100(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBdrop_table("history_log");
@@ -1057,7 +1055,7 @@ static int	DBpatch_5050101(void)
 				NULL
 			};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -1065,7 +1063,7 @@ static int	DBpatch_5050101(void)
 
 static int	DBpatch_5050102(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBdrop_table("history_text");
@@ -1085,7 +1083,7 @@ static int	DBpatch_5050103(void)
 				NULL
 			};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_PROXY))
 		return SUCCEED;
 
 	return DBcreate_table(&table);
@@ -1657,7 +1655,7 @@ static int	DBpatch_5050128(void)
 	char			*default_timezone;
 	sla_t			*sla;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	zbx_vector_sla_create(&slas);
@@ -1864,7 +1862,7 @@ static int	DBpatch_5050141(void)
 
 static int	DBpatch_5050142(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx like 'web.latest.filter.%%'"))
@@ -1883,7 +1881,7 @@ static int	DBpatch_5050143(void)
 
 static int	DBpatch_5050144(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.search_type'"))
@@ -1894,7 +1892,7 @@ static int	DBpatch_5050144(void)
 
 static int	DBpatch_5050145(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.graphids'"))
@@ -1905,7 +1903,7 @@ static int	DBpatch_5050145(void)
 
 static int	DBpatch_5050146(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.charts.filter.graph_patterns'"))
@@ -1916,7 +1914,7 @@ static int	DBpatch_5050146(void)
 
 static int	DBpatch_5050147(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.favorite.graphids' and source='graphid'"))
@@ -1927,7 +1925,7 @@ static int	DBpatch_5050147(void)
 
 static int	DBpatch_5050148(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update services set algorithm=case algorithm when 1 then 2 when 2 then 1 else 0 end"))
