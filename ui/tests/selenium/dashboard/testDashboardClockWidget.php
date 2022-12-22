@@ -28,16 +28,14 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  * @dataSource ClockWidgets
  */
 
-class testDashboardClockWidget extends CWebTest
-{
+class testDashboardClockWidget extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
-	public function getBehaviors()
-	{
+	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
 	}
 
@@ -56,8 +54,7 @@ class testDashboardClockWidget extends CWebTest
 	/**
 	 * Check clock widgets layout.
 	 */
-	public function testDashboardClockWidget_CheckLayout()
-	{
+	public function testDashboardClockWidget_CheckLayout() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -116,8 +113,7 @@ class testDashboardClockWidget extends CWebTest
 		$dashboard->save();
 	}
 
-	public static function getCreateData()
-	{
+	public static function getCreateData() {
 		return [
 			[
 				[
@@ -224,8 +220,7 @@ class testDashboardClockWidget extends CWebTest
 	 *
 	 * @dataProvider getCreateData
 	 */
-	public function testDashboardClockWidget_Create($data)
-	{
+	public function testDashboardClockWidget_Create($data) {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -254,8 +249,7 @@ class testDashboardClockWidget extends CWebTest
 	/**
 	 * Check clock widgets successful simple update.
 	 */
-	public function testDashboardClockWidget_SimpleUpdate()
-	{
+	public function testDashboardClockWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for updating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
@@ -267,8 +261,7 @@ class testDashboardClockWidget extends CWebTest
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public static function getUpdateData()
-	{
+	public static function getUpdateData() {
 		return [
 			// #0 name and show header change.
 			[
@@ -393,8 +386,7 @@ class testDashboardClockWidget extends CWebTest
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testDashboardClockWidget_Update($data)
-	{
+	public function testDashboardClockWidget_Update($data) {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for updating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -424,8 +416,7 @@ class testDashboardClockWidget extends CWebTest
 	/**
 	 * Check clock widget deletion.
 	 */
-	public function testDashboardClockWidget_Delete()
-	{
+	public function testDashboardClockWidget_Delete() {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -441,8 +432,7 @@ class testDashboardClockWidget extends CWebTest
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
-	public static function getCancelData()
-	{
+	public static function getCancelData() {
 		return [
 			// Cancel update widget.
 			[
@@ -480,8 +470,7 @@ class testDashboardClockWidget extends CWebTest
 	 *
 	 * @dataProvider getCancelData
 	 */
-	public function testDashboardClockWidget_Cancel($data)
-	{
+	public function testDashboardClockWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.Dashboard for creating clock widgets');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' . $dashboardid);
