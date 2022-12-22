@@ -832,7 +832,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_sleep_loop(sleeptime);
 
 		sec1 = zbx_time();
-		zbx_update_env(sec1);
+		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 

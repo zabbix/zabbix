@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-09T11:12:55Z'
+  date: '2022-12-19T09:46:25Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -1199,12 +1199,12 @@ zabbix_export:
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           item_prototypes:
             -
               uuid: 9a0448cf8a184d52a7872df410f25d6b
@@ -1710,6 +1710,22 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.fs.size[{#FSNAME},used]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

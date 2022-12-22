@@ -171,6 +171,13 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
+	$save_macros = $macros;
+
+	foreach ($save_macros as &$macro) {
+		unset($macro['allow_revert']);
+	}
+	unset($macro);
+
 	if ($hostid == 0 || $hostPrototype['templateid'] == 0) {
 		$newHostPrototype = [
 			'host' => getRequest('host', ''),
@@ -180,7 +187,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'groupLinks' => [],
 			'groupPrototypes' => [],
 			'tags' => $tags,
-			'macros' => $macros,
+			'macros' => $save_macros,
 			'templates' => array_merge(getRequest('templates', []), getRequest('add_templates', [])),
 			'custom_interfaces' => getRequest('custom_interfaces', DB::getDefault('hosts', 'custom_interfaces'))
 		];
@@ -459,6 +466,13 @@ if (hasRequest('form')) {
 		if ($data['host_prototype']['hostid'] != 0) {
 			// When opening existing host prototype, display all values from database.
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+
+			foreach ($data['host_prototype']['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro['allow_revert'] = true;
+				}
+			}
+			unset($macro);
 
 			$groupids = zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid');
 			$data['groups'] = API::HostGroup()->get([

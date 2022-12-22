@@ -24,6 +24,7 @@
 #include "duktape.h"
 #include "base64.h"
 #include "sha256crypt.h"
+#include "zbxcrypto.h"
 
 /******************************************************************************
  *                                                                            *
@@ -163,6 +164,44 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: compute hmac using specified hash type                            *
+ *                                                                            *
+ * Parameters: ctx - [IN] pointer to duk_context                              *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is not a string        *
+ *               - if the value stack is empty                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_hmac(duk_context *ctx)
+{
+	char			*out = NULL;
+	const char		*type, *key, *text;
+	duk_size_t		key_len, text_len;
+	zbx_crypto_hash_t	hash_type;
+
+	type = duk_require_string(ctx, 0);
+	if (0 == strcmp(type, "md5"))
+		hash_type = ZBX_HASH_MD5;
+	else if (0 == strcmp(type, "sha256"))
+		hash_type = ZBX_HASH_SHA256;
+	else
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function");
+
+	key = duk_require_lstring(ctx, 1, &key_len);
+	text = duk_require_lstring(ctx, 2, &text_len);
+
+	if (FAIL == zbx_hmac(hash_type, key, key_len, text, text_len, &out))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot calculate HMAC");
+
+	duk_push_string(ctx, out);
+	zbx_free(out);
+	return 1;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: initializes additional global functions                           *
  *                                                                            *
  * Parameters: es - [IN] the embedded scripting engine                        *
@@ -181,4 +220,8 @@ void	es_init_global_functions(zbx_es_t *es)
 
 	duk_push_c_function(es->env->ctx, es_sha256, 1);
 	duk_put_global_string(es->env->ctx, "sha256");
+
+	duk_push_c_function(es->env->ctx, es_hmac, 3);
+	duk_put_global_string(es->env->ctx, "hmac");
+
 }

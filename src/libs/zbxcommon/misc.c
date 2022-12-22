@@ -93,6 +93,10 @@ double	ZBX_DOUBLE_EPSILON = 2.22e-16;
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 
+#endif
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+
 int	__zbx_stat(const char *path, zbx_stat_t *buf)
 {
 	int	ret, fd;
@@ -3612,7 +3616,7 @@ static void	update_resolver_conf(void)
  * Parameters: time_now - [IN] the time for compare in seconds                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_env(double time_now)
+void	__zbx_update_env(double time_now)
 {
 	static double	time_update = 0;
 
@@ -3757,53 +3761,4 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
 	}
 
 	*p = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose:                                                                   *
- *     convert ASCII hex digit string to a binary representation (byte        *
- *     string)                                                                *
- *                                                                            *
- * Parameters:                                                                *
- *     p_hex   - [IN] null-terminated input string                            *
- *     buf     - [OUT] output buffer                                          *
- *     buf_len - [IN] output buffer size                                      *
- *                                                                            *
- * Return value:                                                              *
- *     Number of bytes written into 'buf' on successful conversion.           *
- *     -1 - an error occurred.                                                *
- *                                                                            *
- * Comments:                                                                  *
- *     In case of error incomplete useless data may be written into 'buf'.    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
-{
-	unsigned char	*q = buf;
-	int		len = 0;
-
-	while ('\0' != *p_hex)
-	{
-		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
-		{
-			unsigned char	hi = *p_hex & 0x0f;
-			unsigned char	lo;
-
-			if ('9' < *p_hex++)
-				hi = (unsigned char)(hi + 9u);
-
-			lo = *p_hex & 0x0f;
-
-			if ('9' < *p_hex++)
-				lo = (unsigned char)(lo + 9u);
-
-			*q++ = (unsigned char)(hi << 4 | lo);
-			len++;
-		}
-		else
-			return -1;
-	}
-
-	return len;
 }
