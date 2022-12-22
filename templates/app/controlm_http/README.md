@@ -50,7 +50,7 @@ However, if you wish to monitor a Control-M server separately with this template
 |Control-M: Jobs statistics|Get jobs statistics.|Dependent|controlm.jobs.statistics<p>**Preprocessing**</p><ul><li>Jsonpath: `$.['returned', 'total']`</li></ul>
 |Control-M: Jobs returned|Get returned jobs count.|Dependent|controlm.jobs.statistics.returned<p>**Preprocessing**</p><ul><li>Jsonpath: `$.[0]`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Control-M: Jobs total|Get total jobs count.|Dependent|controlm.jobs.statistics.total<p>**Preprocessing**</p><ul><li>Jsonpath: `$.[1]`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
-|Control-M: Server state|Get server state metric.|Dependent|server.state<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server State.</li><li>Javascript: `{'include': './scripts/server-state_item_validator.js'}`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Control-M: Server state|Get server state metric.|Dependent|server.state<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server State.</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Control-M: Server message|Get server message metric.|Dependent|server.message<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Message.</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Control-M: Server version|Get server version metric.|Dependent|server.version<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Server Version.</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ## Triggers
@@ -65,7 +65,7 @@ However, if you wish to monitor a Control-M server separately with this template
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Jobs discovery|Discovers jobs on server.|Dependent|controlm.jobs.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `{'include': './scripts/jobs_discovery_preproc.js'}`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Jobs discovery|Discovers jobs on server.|Dependent|controlm.jobs.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for Jobs discovery
 
 |Name|Description|Type|Key and additional info|
@@ -84,7 +84,7 @@ However, if you wish to monitor a Control-M server separately with this template
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Agent discovery|Discovers agents on server.|Dependent|controlm.agent.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `{'include': './scripts/agent_discovery_preproc.js'}`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Agent discovery|Discovers agents on server.|Dependent|controlm.agent.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for Agent discovery
 
 |Name|Description|Type|Key and additional info|
@@ -152,12 +152,12 @@ You must set the **{$API.TOKEN}** and **{$API.URI.ENDPOINT}** macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Server discovery|Discovers Control-M servers.|Dependent|controlm.server.discovery<p>**Preprocessing**</p><ul><li>Javascript: `{'include': './scripts/servers_discovery_preproc.js'}`</li><li>Discard_Unchanged_Heartbeat: `2h`</li></ul>
+|Server discovery|Discovers Control-M servers.|Dependent|controlm.server.discovery<p>**Preprocessing**</p><ul><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `2h`</li></ul>
 ## LLD rule SLA services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SLA services discovery|Discovers SLA services in Control-M environment.|Dependent|controlm.services.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `{'include': './scripts/services_discovery_preproc.js'}`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|SLA services discovery|Discovers SLA services in Control-M environment.|Dependent|controlm.services.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for SLA services discovery
 
 |Name|Description|Type|Key and additional info|
