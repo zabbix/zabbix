@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,7 +24,10 @@
  */
 abstract class CControllerPopupConditionCommon extends CController {
 
-	protected $validate_csrf_token = false;
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableSIDvalidation();
+	}
 
 	protected function checkInput() {
 		$fields = $this->getCheckInputs();
@@ -49,7 +52,7 @@ abstract class CControllerPopupConditionCommon extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
+		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
 	}
 
 	protected function doAction() {

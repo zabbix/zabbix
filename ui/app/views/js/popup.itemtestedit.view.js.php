@@ -510,10 +510,11 @@ jQuery(document).ready(function($) {
 
 				<?php if ($data['show_snmp_form']): ?>
 					$('#interface_details_version').on('change', function (e) {
-						$(`.js-popup-row-snmp-community, .js-popup-row-snmpv3-contextname,
-							.js-popup-row-snmpv3-securityname, .js-popup-row-snmpv3-securitylevel,
-							.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,
-							.js-popup-row-snmpv3-privprotocol, .js-popup-row-snmpv3-privpassphrase`).hide();
+						$(`.js-popup-row-snmp-community, .js-popup-row-snmp-max-repetition,
+							.js-popup-row-snmpv3-contextname, .js-popup-row-snmpv3-securityname,
+							.js-popup-row-snmpv3-securitylevel, .js-popup-row-snmpv3-authprotocol,
+							.js-popup-row-snmpv3-authpassphrase, .js-popup-row-snmpv3-privprotocol,
+							.js-popup-row-snmpv3-privpassphrase`).hide();
 
 						switch (e.target.value) {
 							case '<?= SNMP_V1 ?>':
@@ -523,10 +524,11 @@ jQuery(document).ready(function($) {
 							case '<?= SNMP_V2C ?>':
 								$('#interface_details_securitylevel').off('change');
 								$('.js-popup-row-snmp-community').show();
+								$('.js-popup-row-snmp-max-repetition').show();
 								break;
 							case '<?= SNMP_V3 ?>':
 								$(`.js-popup-row-snmpv3-contextname, .js-popup-row-snmpv3-securityname,
-									.js-popup-row-snmpv3-securitylevel`).show();
+									.js-popup-row-snmpv3-securitylevel, .js-popup-row-snmp-max-repetition`).show();
 
 								$('#interface_details_securitylevel').on('change', function (e) {
 									$(`.js-popup-row-snmpv3-authprotocol, .js-popup-row-snmpv3-authpassphrase,

@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('administration.mediatype.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
@@ -121,13 +123,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionLinks = [];
 	if (!empty($mediaType['listOfActions'])) {
 		foreach ($mediaType['listOfActions'] as $action) {
-			$actionLinks[] = new CLink($action['name'],
-				(new CUrl('actionconf.php'))
-					->setArgument('eventsource', $action['eventsource'])
-					->setArgument('form', 'update')
-					->setArgument('actionid', $action['actionid'])
-					->getUrl()
-			);
+			$actionLinks[] = (new CLink($action['name']))
+				->addClass('js-action-edit')
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-eventsource', $action['eventsource']);
+
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
@@ -203,4 +203,8 @@ $mediaTypeForm->addItem([
 // append form to widget
 $html_page
 	->addItem($mediaTypeForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

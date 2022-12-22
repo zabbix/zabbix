@@ -23,13 +23,16 @@
 package sw
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
@@ -62,6 +65,26 @@ type PackageDetails struct {
 	Buildtime   TimeDetails `json:"buildtime"`
 	Installtime TimeDetails `json:"installtime"`
 }
+
+type systemInfo struct {
+	OSType        string `json:"os_type"`
+	ProductName   string `json:"product_name,omitempty"`
+	Architecture  string `json:"architecture,omitempty"`
+	Major         string `json:"kernel_major,omitempty"`
+	Minor         string `json:"kernel_minor,omitempty"`
+	Patch         string `json:"kernel_patch,omitempty"`
+	Kernel        string `json:"kernel,omitempty"`
+	VersionPretty string `json:"version_pretty,omitempty"`
+	VersionFull   string `json:"version_full"`
+}
+
+const (
+	swOSFull             = "/proc/version"
+	swOSShort            = "/proc/version_signature"
+	swOSName             = "/etc/issue.net"
+	swOSNameRelease      = "/etc/os-release"
+	swOSOptionPrettyName = "PRETTY_NAME"
+)
 
 func getManagers() []manager {
 	return []manager{
@@ -637,6 +660,155 @@ func (p *Plugin) systemSwPackagesGet(params []string) (result string, err error)
 
 	if !manager_found {
 		err = errors.New("Cannot obtain package information.")
+	}
+
+	return
+}
+
+func charArray2String(chArr []int8) (result string) {
+	var bin []byte
+
+	for _, v := range chArr {
+		if v == int8(0) {
+			break
+		}
+		bin = append(bin, byte(v))
+	}
+
+	result = string(bin)
+
+	return
+}
+
+func readOsInfoFile(path string) (contents string, err error) {
+	var bin []byte
+
+	bin, err = os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("Cannot open "+path+": %s", err)
+	}
+
+	return strings.TrimSpace(string(bin)), nil
+}
+
+func findFirstMatch(src string, reg *regexp.Regexp) (res string) {
+	match := reg.FindStringSubmatch(src)
+	if len(match) > 1 {
+		return match[1]
+	}
+
+	return ""
+}
+
+func getName() (name string, err error) {
+	if readFile, err := os.Open(swOSNameRelease); err == nil {
+		defer readFile.Close()
+
+		fileScanner := bufio.NewScanner(readFile)
+		fileScanner.Split(bufio.ScanLines)
+
+		regexQuoted := regexp.MustCompile(swOSOptionPrettyName + "=\"([^\"]+)\"")
+		regexUnquoted := regexp.MustCompile(swOSOptionPrettyName + "=(\\S+)\\s*$")
+		var tmpStr string
+
+		for fileScanner.Scan() {
+			tmpStr = fileScanner.Text()
+			name = findFirstMatch(tmpStr, regexQuoted)
+
+			if len(name) == 0 {
+				name = findFirstMatch(tmpStr, regexUnquoted)
+			}
+
+			if len(name) > 0 {
+				return name, nil
+			}
+		}
+	}
+
+	return readOsInfoFile(swOSName)
+}
+
+func (p *Plugin) getOSVersion(params []string) (result interface{}, err error) {
+	var info string
+
+	if len(params) > 0 && params[0] != "" {
+		info = params[0]
+	} else {
+		info = "full"
+	}
+
+	switch info {
+	case "full":
+		if result, err = readOsInfoFile(swOSFull); err == nil {
+			return result, nil
+		}
+
+	case "short":
+		return readOsInfoFile(swOSShort)
+
+	case "name":
+		if result, err = getName(); err == nil {
+			return result, nil
+		}
+
+	default:
+		return nil, errors.New("Invalid first parameter.")
+	}
+
+	return
+}
+
+func parseKernelVersion(info *systemInfo) {
+	const (
+		gotMajor = 1
+		gotMinor = 2
+		gotPatch = 3
+	)
+
+	var major, minor, patch int
+	read, _ := fmt.Sscanf((*info).Kernel, "%d.%d.%d", &major, &minor, &patch)
+
+	if read >= gotMajor {
+		(*info).Major = strconv.Itoa(major)
+	}
+	if read >= gotMinor {
+		(*info).Minor = strconv.Itoa(minor)
+	}
+	if read >= gotPatch {
+		(*info).Patch = strconv.Itoa(patch)
+	}
+}
+
+func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
+	var info systemInfo
+	var jsonArray []byte
+
+	info.OSType = "linux"
+
+	info.ProductName, _ = getName()
+	info.VersionFull, _ = readOsInfoFile(swOSFull)
+
+	u := syscall.Utsname{}
+	if syscall.Uname(&u) == nil {
+		info.Kernel = charArray2String(u.Release[:])
+		info.Architecture = charArray2String(u.Machine[:])
+
+		if len(info.ProductName) > 0 {
+			info.VersionPretty += info.ProductName
+		}
+		if len(info.Architecture) > 0 {
+			info.VersionPretty += " " + info.Architecture
+		}
+		if len(info.Kernel) > 0 {
+			info.VersionPretty += " " + info.Kernel
+
+			parseKernelVersion(&info)
+		}
+	}
+
+	jsonArray, err = json.Marshal(info)
+	if err == nil {
+		result = string(jsonArray)
 	}
 
 	return
