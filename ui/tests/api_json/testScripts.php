@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once dirname(__FILE__).'/../../include/triggers.inc.php';
+require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 
 /**
  * @onBefore prepareScriptsData
@@ -57,7 +58,9 @@ class testScripts extends CAPITest {
 			'inherit_a_rw' => null,
 			'inherit_b_r' => null,
 			'inherit_c_rw' => null,
-			'inherit_d_rw' => null
+			'inherit_d_rw' => null,
+			'cause_d' => null,
+			'symptom_rw' => null
 		],
 
 		// One item per host with same index. Inherited hosts do not need items. They are only for permission checks.
@@ -71,7 +74,9 @@ class testScripts extends CAPITest {
 			'interface_rw_1' => null,
 			'interface_rw_2' => null,
 			'inventory_rw_1' => null,
-			'inventory_rw_2' => null
+			'inventory_rw_2' => null,
+			'macros_d_cause' => null,
+			'macros_rw_symptom' => null
 		],
 
 		// Some triggers will have multiple items.
@@ -84,7 +89,9 @@ class testScripts extends CAPITest {
 			'macros_rw_r_dual_1_2_h' => null,
 			'macros_rw_dual_1_3_h' => null,
 			'interface_rw_dual_a' => null,
-			'inventory_rw_dual_a' => null
+			'inventory_rw_dual_a' => null,
+			'macros_d_cause' => null,
+			'macros_rw_symptom' => null
 		],
 
 		// Each trigger will generate one event. Index equal to triggers.
@@ -97,7 +104,9 @@ class testScripts extends CAPITest {
 			'macros_rw_r_dual_1_2_h' => null,
 			'macros_rw_dual_1_3_h' => null,
 			'interface_rw_dual_a' => null,
-			'inventory_rw_dual_a' => null
+			'inventory_rw_dual_a' => null,
+			'macros_d_cause' => null,
+			'macros_rw_symptom' => null
 		],
 
 		// One global macro.
@@ -139,7 +148,9 @@ class testScripts extends CAPITest {
 			'get_hosts_webhook' => null,
 			'get_events_url' => null,
 			'get_events_ipmi' => null,
-			'get_events_webhook' => null
+			'get_events_webhook' => null,
+			'get_events_ssh' => null,
+			'get_events_url_cause' => null
 		],
 		'actionids' => [
 			'update' => null,
@@ -382,6 +393,26 @@ class testScripts extends CAPITest {
 						'groupid' => self::$data['groupids']['inherit_d_rw']
 					]
 				]
+			],
+
+			// Hosts for cause and symptoms there symptoms is read write, but cause is denied for other users.
+			[
+				'host' => 'api_test_host_cause_d',
+				'name' => 'API test host - cause, deny',
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids']['d']
+					]
+				]
+			],
+			[
+				'host' => 'api_test_host_symptom_rw',
+				'name' => 'API test host - symptom, read-write',
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids']['rw']
+					]
+				]
 			]
 		];
 		$hosts = CDataHelper::call('host.create', $hosts_data);
@@ -400,7 +431,9 @@ class testScripts extends CAPITest {
 			'inherit_a_rw' => $hosts['hostids'][10],
 			'inherit_b_r' => $hosts['hostids'][11],
 			'inherit_c_rw' => $hosts['hostids'][12],
-			'inherit_d_rw' => $hosts['hostids'][13]
+			'inherit_d_rw' => $hosts['hostids'][13],
+			'cause_d' => $hosts['hostids'][14],
+			'symptom_rw' => $hosts['hostids'][15]
 		];
 
 		// Create an item on each host.
@@ -474,6 +507,20 @@ class testScripts extends CAPITest {
 				'key_' => 'api_test_item_inventory_rw_2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			[
+				'hostid' => self::$data['hostids']['cause_d'],
+				'name' => 'API test item - macros cause, deny',
+				'key_' => 'api_test_item_macros_cause_d',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			[
+				'hostid' => self::$data['hostids']['symptom_rw'],
+				'name' => 'API test item - macros symptom, read-write',
+				'key_' => 'api_test_item_macros_symptom_rw',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			]
 		];
 		$items = CDataHelper::call('item.create', $items_data);
@@ -488,7 +535,9 @@ class testScripts extends CAPITest {
 			'interface_rw_1' => $items['itemids'][6],
 			'interface_rw_2' => $items['itemids'][7],
 			'inventory_rw_1' => $items['itemids'][8],
-			'inventory_rw_2' => $items['itemids'][9]
+			'inventory_rw_2' => $items['itemids'][9],
+			'macros_d_cause' => $items['itemids'][10],
+			'macros_rw_symptom' => $items['itemids'][11]
 		];
 
 		// Create triggers. We already know the host names and item keys. Some belong to multiple hosts.
@@ -552,6 +601,18 @@ class testScripts extends CAPITest {
 				'expression' => 'last(/api_test_host_inventory_rw_1/api_test_item_inventory_rw_1)<>0'.
 					' and last(/api_test_host_inventory_rw_2/api_test_item_inventory_rw_2)<>0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+
+			// Cause and symptom triggers for different hosts.
+			[
+				'description' => 'API test trigger - macros, cause, disaster',
+				'expression' => 'last(/api_test_host_cause_d/api_test_item_macros_cause_d)<>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'API test trigger - macros, symptom, high',
+				'expression' => 'last(/api_test_host_symptom_rw/api_test_item_macros_symptom_rw)<>0',
+				'priority' => TRIGGER_SEVERITY_HIGH
 			]
 		];
 		$triggers = CDataHelper::call('trigger.create', $triggers_data);
@@ -565,7 +626,9 @@ class testScripts extends CAPITest {
 			'macros_rw_r_dual_1_2_h' => $triggers['triggerids'][5],
 			'macros_rw_dual_1_3_h' => $triggers['triggerids'][6],
 			'interface_rw_dual_a' => $triggers['triggerids'][7],
-			'inventory_rw_dual_a' => $triggers['triggerids'][8]
+			'inventory_rw_dual_a' => $triggers['triggerids'][8],
+			'macros_d_cause' => $triggers['triggerids'][9],
+			'macros_rw_symptom' => $triggers['triggerids'][10]
 		];
 
 		// Generate events for all triggers. History is not used. Problems table is also not required.
@@ -623,8 +686,20 @@ class testScripts extends CAPITest {
 			'macros_rw_r_dual_1_2_h' => $eventids[5],
 			'macros_rw_dual_1_3_h' => $eventids[6],
 			'interface_rw_dual_a' => $eventids[7],
-			'inventory_rw_dual_a' => $eventids[8]
+			'inventory_rw_dual_a' => $eventids[8],
+			'macros_d_cause' => $eventids[9],
+			'macros_rw_symptom' => $eventids[10]
 		];
+
+		/*
+		 * Simulate server creating hierarchy of cause and symptoms. Skip making acknowledges, since those are not
+		 * required for scripts, only the link. And the user who changed the event rank is also unimportant.
+		 */
+		$event_symptom_data = [[
+			'eventid' => self::$data['eventids']['macros_rw_symptom'],
+			'cause_eventid' => self::$data['eventids']['macros_d_cause']
+		]];
+		DB::insertBatch('event_symptom', $event_symptom_data, false);
 
 		// Create global macro to later use it in scripts.
 		$usermacros_data = [
@@ -1075,7 +1150,15 @@ class testScripts extends CAPITest {
 				'username' => 'user',
 				'confirmation' => 'Confirmation macros: {$GLOBAL_MACRO}, {HOST.HOST}, {USER.FULLNAME}, {HOST.CONN},'.
 					' {HOST.IP}, {HOST.DNS}, {HOST.PORT}, {INVENTORY.ALIAS}, {INVENTORY.OS}, {INVENTORY.TYPE}'
-			]
+			],
+			[
+				'name' => 'API test script.getScriptsByEvents - URL cause',
+				'type' => ZBX_SCRIPT_TYPE_URL,
+				'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
+				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
+					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
+			],
 		];
 		$scripts = CDataHelper::call('script.create', $scripts_data);
 		$this->assertArrayHasKey('scriptids', $scripts, 'prepareScriptsData() failed: Could not create scripts.');
@@ -1112,6 +1195,7 @@ class testScripts extends CAPITest {
 		self::$data['scriptids']['get_events_ipmi'] = $scripts['scriptids'][30];
 		self::$data['scriptids']['get_events_webhook'] = $scripts['scriptids'][31];
 		self::$data['scriptids']['get_events_ssh'] = $scripts['scriptids'][32];
+		self::$data['scriptids']['get_events_url_cause'] = $scripts['scriptids'][33];
 
 		// Create actions that use scripts to test script.delete.
 		$actions_data = [
@@ -1158,10 +1242,8 @@ class testScripts extends CAPITest {
 				]
 			]
 		];
-		$actions = CDataHelper::call('action.create', $actions_data,
-			'prepareScriptsData() failed: Could not create actions.'
-		);
-		$this->assertArrayHasKey('actionids', $actions);
+		$actions = CDataHelper::call('action.create', $actions_data);
+		$this->assertArrayHasKey('actionids', $actions, 'prepareScriptsData() failed: Could not create actions.');
 		self::$data['actionids']['update'] = $actions['actionids'][0];
 		self::$data['actionids']['delete'] = $actions['actionids'][1];
 	}
@@ -3759,7 +3841,7 @@ class testScripts extends CAPITest {
 					'selectActions' => ['abc']
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectActions/1": value must be one of "actionid", "name", "eventsource", "status", "esc_period", "pause_suppressed", "notify_if_canceled".'
+				'expected_error' => 'Invalid parameter "/selectActions/1": value must be one of "actionid", "name", "eventsource", "status", "esc_period", "pause_suppressed", "notify_if_canceled", "pause_symptoms".'
 			],
 
 			// Check common fields that are not flags, but require strict validation.
@@ -3949,6 +4031,10 @@ class testScripts extends CAPITest {
 					[
 						'name' => 'API test script.getScriptsByEvents - URL',
 						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
+					],
+					[
+						'name' => 'API test script.getScriptsByEvents - URL cause',
+						'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}'
 					]
 				],
 				'expected_error' => null
@@ -8152,38 +8238,44 @@ class testScripts extends CAPITest {
 					'eventids' => [
 						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
 						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a'
+						'inventory_rw_dual_a', 'macros_d_cause', 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
 						// Superadmin has all scripts available.
 						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
+						],
+						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
+							'get_events_ssh', 'get_events_url_cause'
+						],
+						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
+							'get_events_ssh', 'get_events_url_cause'
 						]
 					],
 					'scripts' => [
@@ -8287,6 +8379,31 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+						],
+						[
+							'scriptid' => 'get_events_url_cause',
+							'name' => 'API test script.getScriptsByEvents - URL cause',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME},'.
+								' {EVENT.CAUSE.NSEVERITY}, {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS},'.
+								' {EVENT.CAUSE.VALUE}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
 						]
 					],
 					'event_macros' => [
@@ -8320,7 +8437,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8352,7 +8475,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_d_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8384,7 +8513,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8416,7 +8551,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8448,7 +8589,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8480,7 +8627,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8512,7 +8665,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8544,7 +8703,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8576,7 +8741,89 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+						],
+						'macros_d_cause' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'cause_d',
+							'{HOST.HOST}' => 'api_test_host_cause_d',
+							'{HOST.NAME}' => 'API test host - cause, deny',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - cause, deny',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'macros_d_cause',
+							'{EVENT.NAME}' => 'API test trigger - macros, cause, disaster',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.SEVERITY}' => 'Disaster',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+						],
+						'macros_rw_symptom' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'symptom_rw',
+							'{HOST.HOST}' => 'api_test_host_symptom_rw',
+							'{HOST.NAME}' => 'API test host - symptom, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - symptom, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'macros_rw_symptom',
+							'{EVENT.NAME}' => 'API test trigger - macros, symptom, high',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_HIGH,
+							'{EVENT.SEVERITY}' => 'High',
+							'{USER.FULLNAME}' => 'Zabbix Administrator (Admin)',
+							'{USER.NAME}' => 'Zabbix',
+							'{USER.SURNAME}' => 'Administrator',
+							'{USER.USERNAME}' => 'Admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => 'macros_d_cause',
+							'{EVENT.CAUSE.NAME}' => 'API test trigger - macros, cause, disaster',
+							'{EVENT.CAUSE.NSEVERITY}' => (string) TRIGGER_SEVERITY_DISASTER,
+							'{EVENT.CAUSE.SEVERITY}' => 'Disaster',
+							'{EVENT.CAUSE.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.CAUSE.VALUE}' => (string) TRIGGER_VALUE_TRUE
 						]
 					]
 				],
@@ -8588,26 +8835,44 @@ class testScripts extends CAPITest {
 					'eventids' => [
 						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
 						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a'
+						'inventory_rw_dual_a', 'macros_d_cause', 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
 						// Regular admin does not have all scripts available.
-						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
+						'plain_rw_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
 						'plain_d_single_d' => [],
-						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi'],
-						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
-						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
-						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
-						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
-						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh'],
-						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh']
+						'plain_r_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_url_cause'],
+						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_single_1_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'interface_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'inventory_rw_dual_a' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_d_cause' => [],
+						'macros_rw_symptom' => ['get_events_url', 'get_events_ipmi', 'get_events_ssh',
+							'get_events_url_cause'
+						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_webhook'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'plain_r_single_d' => ['get_events_webhook', 'get_events_ssh'],
 						'plain_rw_r_dual_d' => ['get_events_webhook'],
@@ -8615,7 +8880,11 @@ class testScripts extends CAPITest {
 						'macros_rw_r_dual_1_2_h' => ['get_events_webhook'],
 						'macros_rw_dual_1_3_h' => ['get_events_webhook'],
 						'interface_rw_dual_a' => ['get_events_webhook'],
-						'inventory_rw_dual_a' => ['get_events_webhook']
+						'inventory_rw_dual_a' => ['get_events_webhook'],
+						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
+							'get_events_ssh', 'get_events_url_cause'
+						],
+						'macros_rw_symptom' => ['get_events_webhook']
 					],
 					'scripts' => [
 						[
@@ -8694,6 +8963,31 @@ class testScripts extends CAPITest {
 							'menu_path' => '',
 							'url' => '',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+						],
+						[
+							'scriptid' => 'get_events_url_cause',
+							'name' => 'API test script.getScriptsByEvents - URL cause',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME},'.
+								' {EVENT.CAUSE.NSEVERITY}, {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS},'.
+								' {EVENT.CAUSE.VALUE}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
 						]
 					],
 					'event_macros' => [
@@ -8727,7 +9021,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8759,7 +9059,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8791,7 +9097,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8823,7 +9135,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8855,7 +9173,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -8887,7 +9211,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8919,7 +9249,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -8951,7 +9287,52 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+						],
+						// Cause event is restricted, so macros resolve to empty string.
+						'macros_rw_symptom' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'symptom_rw',
+							'{HOST.HOST}' => 'api_test_host_symptom_rw',
+							'{HOST.NAME}' => 'API test host - symptom, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - symptom, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'macros_rw_symptom',
+							'{EVENT.NAME}' => 'API test trigger - macros, symptom, high',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_HIGH,
+							'{EVENT.SEVERITY}' => 'High',
+							'{USER.FULLNAME}' => 'API One Tester One (api_test_admin)',
+							'{USER.NAME}' => 'API One',
+							'{USER.SURNAME}' => 'Tester One',
+							'{USER.USERNAME}' => 'api_test_admin',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => 'macros_d_cause',
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
@@ -8963,26 +9344,44 @@ class testScripts extends CAPITest {
 					'eventids' => [
 						'plain_rw_single_d', 'plain_r_single_d', 'plain_d_single_d', 'plain_rw_r_dual_d',
 						'macros_rw_single_1_h', 'macros_rw_r_dual_1_2_h', 'macros_rw_dual_1_3_h', 'interface_rw_dual_a',
-						'inventory_rw_dual_a'
+						'inventory_rw_dual_a',  'macros_d_cause', 'macros_rw_symptom'
 					]
 				],
 				'expected_result' => [
 					'has.eventid:scriptid' => [
 						// Regular user does not have all scripts available.
-						'plain_rw_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
+						'plain_rw_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
 						'plain_d_single_d' => [],
-						'plain_r_single_d' => ['get_events_url', 'get_events_webhook'],
-						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
-						'macros_rw_single_1_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
-						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
-						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
-						'interface_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh'],
-						'inventory_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh']
+						'plain_r_single_d' => ['get_events_url', 'get_events_webhook', 'get_events_url_cause'],
+						'plain_rw_r_dual_d' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_single_1_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_r_dual_1_2_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_rw_dual_1_3_h' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'interface_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'inventory_rw_dual_a' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						],
+						'macros_d_cause' => [],
+						'macros_rw_symptom' => ['get_events_url', 'get_events_webhook', 'get_events_ssh',
+							'get_events_url_cause'
+						]
 					],
 					'!has.eventid:scriptid' => [
 						'plain_rw_single_d' => ['get_events_ipmi'],
 						'plain_d_single_d' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
-							'get_events_ssh'
+							'get_events_ssh', 'get_events_url_cause'
 						],
 						'plain_r_single_d' => ['get_events_ipmi', 'get_events_ssh'],
 						'plain_rw_r_dual_d' => ['get_events_ipmi'],
@@ -8990,7 +9389,11 @@ class testScripts extends CAPITest {
 						'macros_rw_r_dual_1_2_h' => ['get_events_ipmi'],
 						'macros_rw_dual_1_3_h' => ['get_events_ipmi'],
 						'interface_rw_dual_a' => ['get_events_ipmi'],
-						'inventory_rw_dual_a' => ['get_events_ipmi']
+						'inventory_rw_dual_a' => ['get_events_ipmi'],
+						'macros_d_cause' => ['get_events_url', 'get_events_ipmi', 'get_events_webhook',
+							'get_events_ssh', 'get_events_url_cause'
+						],
+						'macros_rw_symptom' => ['get_events_ipmi']
 					],
 					'scripts' => [
 						[
@@ -9066,6 +9469,31 @@ class testScripts extends CAPITest {
 							'privatekey' => '',
 							'menu_path' => '',
 							'url' => '',
+							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
+						],
+						[
+							'scriptid' => 'get_events_url_cause',
+							'name' => 'API test script.getScriptsByEvents - URL cause',
+							'command' => '',
+							'host_access' => (string) PERM_READ,
+							'usrgrpid' => '0',
+							'groupid' => '0',
+							'description' => '',
+							'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME},'.
+								' {EVENT.CAUSE.NSEVERITY}, {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS},'.
+								' {EVENT.CAUSE.VALUE}',
+							'type' => (string) ZBX_SCRIPT_TYPE_URL,
+							'execute_on' => (string) ZBX_SCRIPT_EXECUTE_ON_PROXY,
+							'timeout' => '30s',
+							'scope' => (string) ZBX_SCRIPT_SCOPE_EVENT,
+							'port' => '',
+							'authtype' => (string) ITEM_AUTHTYPE_PASSWORD,
+							'username' => '',
+							'password' => '',
+							'publickey' => '',
+							'privatekey' => '',
+							'menu_path' => '',
+							'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 							'new_window' => (string) ZBX_SCRIPT_URL_NEW_WINDOW_YES
 						]
 					],
@@ -9101,7 +9529,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_r_single_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9133,7 +9567,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'plain_rw_r_dual_d' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9165,7 +9605,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_single_1_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9197,7 +9643,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_r_dual_1_2_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9229,7 +9681,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'macros_rw_dual_1_3_h' => [
 							'{$HOST_MACRO}' => 'host macro value - 1',
@@ -9261,7 +9719,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'interface_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9293,7 +9757,13 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '*UNKNOWN*',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						],
 						'inventory_rw_dual_a' => [
 							'{$HOST_MACRO}' => '{$HOST_MACRO}',
@@ -9325,7 +9795,52 @@ class testScripts extends CAPITest {
 							'{INVENTORY.OS2}' => '',
 							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
 							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
-							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}'
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
+						],
+						// Cause event is restricted, so macros resolve to empty string.
+						'macros_rw_symptom' => [
+							'{$HOST_MACRO}' => '{$HOST_MACRO}',
+							'{$HOST_MACRO_OTHER}' => '{$HOST_MACRO_OTHER}',
+							'{$GLOBAL_MACRO}' => 'Global Macro Value',
+							'{$DOESNOTEXIST}' => '{$DOESNOTEXIST}',
+							'{HOST.ID}' => 'symptom_rw',
+							'{HOST.HOST}' => 'api_test_host_symptom_rw',
+							'{HOST.NAME}' => 'API test host - symptom, read-write',
+							'{HOST.CONN}' => '*UNKNOWN*',
+							'{HOST.IP}' => '*UNKNOWN*',
+							'{HOST.DNS}' => '*UNKNOWN*',
+							'{HOST.PORT}' => '{HOST.PORT}',
+							'{HOST.NAME1}' => 'API test host - symptom, read-write',
+							'{HOST.NAME2}' => '*UNKNOWN*',
+							'{EVENT.ID}' => 'macros_rw_symptom',
+							'{EVENT.NAME}' => 'API test trigger - macros, symptom, high',
+							'{EVENT.NSEVERITY}' => (string) TRIGGER_SEVERITY_HIGH,
+							'{EVENT.SEVERITY}' => 'High',
+							'{USER.FULLNAME}' => 'API Two Tester Two (api_test_user)',
+							'{USER.NAME}' => 'API Two',
+							'{USER.SURNAME}' => 'Tester Two',
+							'{USER.USERNAME}' => 'api_test_user',
+							'{INVENTORY.ALIAS}' => '*UNKNOWN*',
+							'{INVENTORY.OS}' => '*UNKNOWN*',
+							'{INVENTORY.TYPE}' => '*UNKNOWN*',
+							'{INVENTORY.CONTACT}' => '*UNKNOWN*',
+							'{INVENTORY.OS1}' => '*UNKNOWN*',
+							'{INVENTORY.OS2}' => '*UNKNOWN*',
+							'{EVENT.STATUS}' => trigger_value2str(TRIGGER_VALUE_TRUE),
+							'{EVENT.VALUE}' => (string) TRIGGER_VALUE_TRUE,
+							'{HOSTGROUP.ID}' => '{HOSTGROUP.ID}',
+							'{EVENT.CAUSE.ID}' => 'macros_d_cause',
+							'{EVENT.CAUSE.NAME}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.NSEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.SEVERITY}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.STATUS}' => UNRESOLVED_MACRO_STRING,
+							'{EVENT.CAUSE.VALUE}' => UNRESOLVED_MACRO_STRING
 						]
 					]
 				],
@@ -9507,6 +10022,8 @@ class testScripts extends CAPITest {
 		// Events have to be deleted manually.
 		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
 
+		// Data from 'event_symptom' table should be cascade deleted.
+
 		// If "ids" table did not have any records about events before, make sure there are no when tests are complete.
 		if (self::$clear_ids) {
 			DBexecute("DELETE FROM ids WHERE table_name='events' AND field_name='eventid'");
@@ -9586,7 +10103,7 @@ class testScripts extends CAPITest {
 
 					// Currently only two ID types are supported.
 					foreach ($macros as $macro => &$id) {
-						if (preg_match('/^\{(HOST|EVENT)\.ID[1-9]?\}$/', $macro, $match) && $id !== ''
+						if (preg_match('/^\{(HOST|EVENT)\.(CAUSE\.)?ID[1-9]?\}$/', $macro, $match) && $id !== ''
 								&& $id !== '*UNKNOWN*' && $id !== $macro) {
 							$id = self::$data[strtolower($match[1]).'ids'][$id];
 						}

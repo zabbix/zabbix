@@ -188,6 +188,7 @@ typedef struct
 	char			*script_params;
 	char			*error;
 	unsigned char		*formula_bin;
+	int			snmp_max_repetitions;
 }
 DC_ITEM;
 

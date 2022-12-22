@@ -86,13 +86,6 @@ zbx_alerter_dispatch_t;
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-}
-zbx_thread_alert_args;
-
-typedef struct
-{
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_get_config_forks_f	get_process_forks_cb_arg;
 	zbx_get_config_str_f	get_scripts_path_cb_arg;
 }
@@ -100,7 +93,6 @@ zbx_thread_alert_manager_args;
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			confsyncer_frequency;
 }
 zbx_thread_alert_syncer_args;

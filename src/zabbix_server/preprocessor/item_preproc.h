@@ -49,6 +49,8 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
 
+int	zbx_item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
+
 int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error);

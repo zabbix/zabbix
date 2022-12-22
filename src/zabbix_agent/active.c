@@ -1442,14 +1442,14 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
 	zbx_uint32_t			config_revision_local = 0;
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(activechks_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_vector_ptr_create(&activechk_args.addrs);

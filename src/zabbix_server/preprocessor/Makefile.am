@@ -13,7 +13,9 @@ libpreprocessor_a_SOURCES = \
 	preproc_worker.h \
 	preprocessing.c \
 	preprocessing.h \
-	preproc_cache.c
+	preproc_cache.c \
+	preproc_snmp.c \
+	preproc_snmp.h
 
 libpreprocessor_a_CFLAGS = \
 	 $(LIBXML2_CFLAGS)

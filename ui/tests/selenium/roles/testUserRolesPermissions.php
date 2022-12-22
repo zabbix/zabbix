@@ -394,7 +394,8 @@ class testUserRolesPermissions extends CWebTest {
 			'Change severity' => false,
 			'Acknowledge problems' => false,
 			'Suppress problems' => false,
-			'Close problems' => false
+			'Close problems' => false,
+			'Change problem ranking' => false
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
@@ -812,7 +813,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=0']
+					'link' => ['zabbix.php?action=action.list&eventsource=0']
 				]
 			],
 			[
@@ -828,7 +829,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=4']
+					'link' => ['zabbix.php?action=action.list&eventsource=4']
 				]
 			],
 			[
@@ -844,7 +845,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=1']
+					'link' => ['zabbix.php?action=action.list&eventsource=1']
 				]
 			],
 			[
@@ -860,7 +861,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=2']
+					'link' => ['zabbix.php?action=action.list&eventsource=2']
 				]
 			],
 			[
@@ -876,7 +877,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Media types',
 						'Scripts'
 					],
-					'link' => ['actionconf.php?eventsource=3']
+					'link' => ['zabbix.php?action=action.list&eventsource=3']
 				]
 			],
 			[
@@ -888,11 +889,11 @@ class testUserRolesPermissions extends CWebTest {
 						'Scripts'
 					],
 					'link' => [
-						'actionconf.php?eventsource=0',
-						'actionconf.php?eventsource=1',
-						'actionconf.php?eventsource=2',
-						'actionconf.php?eventsource=3',
-						'actionconf.php?eventsource=4'
+						'zabbix.php?action=action.list&eventsource=0',
+						'zabbix.php?action=action.list&eventsource=1',
+						'zabbix.php?action=action.list&eventsource=2',
+						'zabbix.php?action=action.list&eventsource=3',
+						'zabbix.php?action=action.list&eventsource=4'
 					]
 				]
 			],
@@ -1243,7 +1244,8 @@ class testUserRolesPermissions extends CWebTest {
 
 				if (array_key_exists('actions', $data)) {
 					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
-					$this->page->open('actionconf.php'.(($data['page'] === 'Trigger actions') ? '?eventsource=1' : ''))->waitUntilReady();
+					$this->page->open('zabbix.php?action=action.list'.(($data['page'] === 'Trigger actions') ?
+							'&eventsource=1' : '&eventsource=0'))->waitUntilReady();
 					$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 					$this->assertNotContains($data['page'], $popup_menu->getItems()->asText());
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
