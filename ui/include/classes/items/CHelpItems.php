@@ -257,7 +257,7 @@ class CHelpItems {
 					'description' => _('Operating system information. Returns string')
 				],
 				[
-					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
+					'key' => 'system.sw.packages[<regexp>,<manager>,<format>]',
 					'description' => _('Listing of installed packages. Returns text')
 				],
 				[
@@ -607,7 +607,7 @@ class CHelpItems {
 					'description' => _('Operating system information. Returns string')
 				],
 				[
-					'key' => 'system.sw.packages[<package>,<manager>,<format>]',
+					'key' => 'system.sw.packages[<regexp>,<manager>,<format>]',
 					'description' => _('Listing of installed packages. Returns text')
 				],
 				[
