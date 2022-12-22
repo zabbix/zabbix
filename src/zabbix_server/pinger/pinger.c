@@ -39,8 +39,6 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-extern unsigned char			program_type;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process new item value                                            *
@@ -550,7 +548,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_thread_pinger_args	*pinger_args_in = (zbx_thread_pinger_args *)(((zbx_thread_args_t *)args)->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

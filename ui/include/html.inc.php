@@ -1025,6 +1025,10 @@ function makeActionIcon(array $icon_data): CTag {
 		$icon->setTitle($icon_data['title']);
 	}
 
+	if (array_key_exists('style', $icon_data)) {
+		$icon->addStyle($icon_data['style']);
+	}
+
 	if (array_key_exists('aria-label', $icon_data)) {
 		$icon
 			->addItem($icon_data['aria-label'])

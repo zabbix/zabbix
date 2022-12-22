@@ -28,4 +28,13 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Problems');
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Collapse' => _('Collapse'),
+				'Expand' => _('Expand')
+			]
+		];
+	}
 }

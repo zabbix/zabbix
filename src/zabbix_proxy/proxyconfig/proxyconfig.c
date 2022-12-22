@@ -34,8 +34,6 @@
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
-extern unsigned char			program_type;
-
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
@@ -249,8 +247,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(proxyconfig_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -268,7 +265,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
-	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : 0);
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -289,7 +286,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type)
+		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{
 			if (0 != config_cache_reload)
 			{

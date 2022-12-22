@@ -45,6 +45,7 @@ class CControllerActionUpdate extends CController {
 										]),
 			'formula' =>				'db actions.formula',
 			'notify_if_canceled' =>		'db actions.notify_if_canceled|in '.ACTION_NOTIFY_IF_CANCELED_TRUE,
+			'pause_symptoms' =>			'db actions.pause_symptoms|in '.ACTION_PAUSE_SYMPTOMS_TRUE,
 			'pause_suppressed' =>		'db actions.pause_suppressed|in '.ACTION_PAUSE_SUPPRESSED_TRUE
 		];
 
@@ -242,6 +243,7 @@ class CControllerActionUpdate extends CController {
 		}
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+			$action['pause_symptoms'] = $this->getInput('pause_symptoms', ACTION_PAUSE_SYMPTOMS_FALSE);
 			$action['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
 		}
