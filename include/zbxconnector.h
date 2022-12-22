@@ -24,7 +24,9 @@
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_CONNECTOR		"connector"
-#define ZBX_IPC_CONNECTOR_REQUEST		1
+
+#define ZBX_IPC_CONNECTOR_WORKER		1
+#define ZBX_IPC_CONNECTOR_REQUEST		2
 
 typedef struct
 {

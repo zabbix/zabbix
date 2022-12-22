@@ -28,20 +28,93 @@
 #include "zbxtime.h"
 
 extern unsigned char			program_type;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
+#define ZBX_CONNECTOR_MANAGER_DELAY	1
+
 static sigset_t				orig_mask;
 
+/* preprocessing worker data */
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	int		lastaccess;
+	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
+	void			*task;		/* the current task data */
 }
-zbx_active_avail_proxy_t;
+zbx_connector_worker_t;
 
-#define ZBX_AVAILABILITY_MANAGER_DELAY				1
-#define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
-#define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY	(SEC_PER_MIN * 5)
+/* preprocessing manager data */
+typedef struct
+{
+	zbx_connector_worker_t		*workers;	/* preprocessing worker array */
+	int				worker_count;	/* preprocessing worker count */
+	zbx_list_t			queue;		/* queue of item values */
+	zbx_hashset_t			linked_items;	/* linked items placed in queue */
+	zbx_uint64_t			revision;	/* the configuration revision */
+	zbx_uint64_t			processed_num;	/* processed value counter */
+	zbx_uint64_t			queued_num;	/* queued value counter */
+	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
+}
+zbx_connector_manager_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes preprocessing manager                                 *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager to initialize                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_init_manager(zbx_connector_manager_t *manager)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER]);
+
+	memset(manager, 0, sizeof(zbx_connector_manager_t));
+
+	manager->workers = (zbx_connector_worker_t *)zbx_calloc(NULL,
+			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER], sizeof(zbx_connector_worker_t));
+	zbx_list_create(&manager->queue);
+	zbx_hashset_create(&manager->linked_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: registers preprocessing worker                                    *
+ *                                                                            *
+ * Parameters: manager - [IN] the manager                                     *
+ *             client  - [IN] the connected preprocessing worker              *
+ *             message - [IN] message received by preprocessing manager       *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message)
+{
+	zbx_connector_worker_t	*worker = NULL;
+	pid_t			ppid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&ppid, message->data, sizeof(ppid));
+
+	if (ppid != getppid())
+	{
+		zbx_ipc_client_close(client);
+		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
+	}
+	else
+	{
+		if (CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER] == manager->worker_count)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
+		worker->client = client;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
@@ -51,12 +124,13 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	zbx_ipc_message_t			*message;
 	int					ret, processed_num = 0;
 	double					time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
-	zbx_timespec_t				timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
+	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_connector_object_ptr_t	connector_objects;
+	zbx_connector_manager_t			manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -70,6 +144,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	connector_init_manager(&manager);
 
 	/* initialize statistics */
 	time_stat = last_proxy_flush = zbx_time();
@@ -109,6 +185,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_connector_deserialize_object(message->data, message->size, &connector_objects);
+					break;
+				case ZBX_IPC_CONNECTOR_WORKER:
+					connector_register_worker(&manager, client, message);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
