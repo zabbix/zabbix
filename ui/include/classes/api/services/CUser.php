@@ -1670,7 +1670,7 @@ class CUser extends CApiService {
 		$time = time();
 
 		$db_sessions = DB::select('sessions', [
-			'output' => ['userid', 'lastaccess'],
+			'output' => ['userid', 'lastaccess', 'csrf_token_salt'],
 			'sessionids' => $sessionid,
 			'filter' => ['status' => ZBX_SESSION_ACTIVE]
 		]);
@@ -1696,6 +1696,7 @@ class CUser extends CApiService {
 
 		$db_user = $db_users[0];
 		$db_user['sessionid'] = $sessionid;
+		$db_user['csrf_token_salt'] = $db_session['csrf_token_salt'];
 
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
@@ -2160,7 +2161,7 @@ class CUser extends CApiService {
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
 			'status' => ZBX_SESSION_ACTIVE,
-			'csrf_token_salt' => $db_user['csrf_token']
+			'csrf_token_salt' => $db_user['csrf_token_salt']
 		]], false);
 
 		self::$userData = $db_user;

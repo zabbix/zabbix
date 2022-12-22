@@ -197,17 +197,11 @@ abstract class CController {
 	 * @return string  Returns CSRF token in string format or null if session id is not set.
 	 */
 	public static function generateCsrfToken(string $action): ?string {
-		$csrf_token = DB::select('sessions', [
-			'output' => ['csrf_token'],
-			'filter' => ['sessionid' => CSessionHelper::getId()],
-			'limit' => 1
-		]);
-
-		if (!$csrf_token || !$csrf_token[0]['csrf_token']) {
+		if (!CWebUser::$data['csrf_token_salt']) {
 			return null;
 		}
 
-		return CEncryptHelper::sign($csrf_token[0]['csrf_token'] . $action);
+		return CEncryptHelper::sign(CWebUser::$data['csrf_token_salt'] . $action);
 	}
 
 	/**
