@@ -350,7 +350,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                          Value: ZBX_SEND_RESPONSE or                       *
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
  *     req            - [IN] request, included into error message             *
- *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *     config_tls     - [IN] configured requirements to allow access          *
  *     config_timeout - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
@@ -359,7 +359,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout)
 {
 	char	*msg = NULL;
 
@@ -374,7 +374,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		return FAIL;
 	}
 
-	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
+	if (0 == (config_tls->accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
@@ -392,8 +392,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
-				zbx_config_tls->server_cert_subject, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, config_tls->server_cert_issuer,
+				config_tls->server_cert_subject, &msg))
 		{
 			return SUCCEED;
 		}
