@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-08-29 12:12+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-20 21:20+0000\n"
+"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -3956,6 +3956,10 @@ msgstr "配置已更新"
 msgid "Configure DB connection"
 msgstr "配置DB连接"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "确认文字"
@@ -6178,6 +6182,10 @@ msgstr "启用"
 msgid "Enable HTTP authentication"
 msgstr "开启 HTTP 验证"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "开启 LDAP 验证"
@@ -8388,6 +8396,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "识别系统。返回 字符串"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -15135,7 +15147,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:454
 #: include/views/configuration.item.prototype.edit.php:432
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/data/CItemData.php:1161
 msgid "Retrieving contents of a file. Returns text"
