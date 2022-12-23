@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-22T07:39:33Z'
+  date: '2022-12-23T09:08:10Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -39,6 +39,10 @@ zabbix_export:
               parameters:
                 - '$.[*].name'
               error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 2h
           url: '{$API.URI.ENDPOINT}/config/servers'
           headers:
             -
@@ -109,10 +113,6 @@ zabbix_export:
                       dict.push({"{#SERVER.NAME}": value[i]});
                   }
                   return JSON.stringify(dict);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 2h
         -
           uuid: 567e5e0553c84ce2a9200d14dfc76593
           name: 'SLA services discovery'
@@ -503,29 +503,19 @@ zabbix_export:
                     key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',error]'
           master_item:
             key: controlm.services
+          lld_macro_paths:
+            -
+              lld_macro: '{#SERVICE.JOB}'
+              path: $.serviceJob
+            -
+              lld_macro: '{#SERVICE.NAME}'
+              path: $.serviceName
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.activeServices
               error_handler: DISCARD_VALUE
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  value = JSON.parse(value)
-                  var dict = [];
-                  for (var i = 0; i < value.length; i++) {
-                      dict.push(
-                          {
-                              "{#SERVICE.NAME}": value[i]['serviceName'],
-                              "{#SERVICE.JOB}": value[i]['serviceJob']
-                          }
-                      );
-                  }
-                  return JSON.stringify(dict);
-                  
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -951,7 +941,7 @@ zabbix_export:
                     last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=2 or
                     last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=3
                     
-                  name: 'Agent [{#AGENT.NAME}}: status [{ITEM.VALUE}]'
+                  name: 'Agent [{#AGENT.NAME}}: status disabled'
                   priority: INFO
                   description: 'Agent is disabled.'
                   manual_close: 'YES'
@@ -1007,36 +997,31 @@ zabbix_export:
                     -
                       tag: scope
                       value: notice
+                -
+                  uuid: 7c494429411b4ede997a7881e52d9b46
+                  expression: |
+                    last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)
+                    
+                  name: 'Agent [{#AGENT.NAME}]: version unknown'
+                  priority: INFO
+                  description: 'Agent version is unknown.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           master_item:
             key: controlm.agents
+          lld_macro_paths:
+            -
+              lld_macro: '{#AGENT.NAME}'
+              path: $.nodeid
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - '$.agents.[*].nodeid'
+                - $.agents
               error_handler: DISCARD_VALUE
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  value = JSON.parse(value)
-                  var dict = [];
-                  for (var i = 0; i < value.length; i++) {
-                      dict.push({"{#AGENT.NAME}": value[i]});
-                  }
-                  return JSON.stringify(dict);
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1246,22 +1231,16 @@ zabbix_export:
                   value: '{#JOB.ID}'
           master_item:
             key: controlm.jobs
+          lld_macro_paths:
+            -
+              lld_macro: '{#JOB.ID}'
+              path: $.jobId
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - '$.statuses.[*].jobId'
+                - $.statuses
               error_handler: DISCARD_VALUE
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  value = JSON.parse(value)
-                  var dict = [];
-                  for (var i = 0; i < value.length; i++) {
-                      dict.push({"{#JOB.ID}": value[i]})
-                  }
-                  return JSON.stringify(dict);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
