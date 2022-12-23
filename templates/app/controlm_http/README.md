@@ -99,7 +99,7 @@ However, if you wish to monitor a Control-M server separately with this template
 |Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|-|last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=1 or last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=10|Average| - 
 |Agent [{#AGENT.NAME}}: status disabled|-|last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=2 or last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: status,#1)=3|Info| - 
 |Agent [{#AGENT.NAME}]: version has changed|-|last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)<>last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#2)|Info| - 
-|Agent [{#AGENT.NAME}]: version unknown|-|last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)="Unknown"|Info| - 
+|Agent [{#AGENT.NAME}]: unknown version|-|last(/Control-M server by HTTP/Agent [{#AGENT.NAME}]: version,#1)="Unknown"|Warning| - 
 
 # Control-M enterprise manager by HTTP
 
@@ -143,7 +143,7 @@ You must set the **{$API.TOKEN}** and **{$API.URI.ENDPOINT}** macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Control-M: Get Control-M servers|Get servers.|Http Agent|controlm.servers<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Discard_Unchanged_Heartbeat: `2h`</li></ul>
+|Control-M: Get Control-M servers|Get servers.|Http Agent|controlm.servers
 |Control-M: Get SLA services|Get all Service Level Agreement (SLA) active services.|Http Agent|controlm.services
 ## Triggers
 
@@ -153,7 +153,7 @@ You must set the **{$API.TOKEN}** and **{$API.URI.ENDPOINT}** macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Server discovery|Discovers Control-M servers.|Dependent|controlm.server.discovery<p>**Preprocessing**</p><ul><li>Javascript: `The text is too long. Please see the template.`</li></ul>
+|Server discovery|Discovers Control-M servers.|Dependent|controlm.server.discovery<p>**Preprocessing**</p><ul><li>Discard_Unchanged_Heartbeat: `2h`</li></ul>
 ## LLD rule SLA services discovery
 
 |Name|Description|Type|Key and additional info|

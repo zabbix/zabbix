@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-23T09:08:10Z'
+  date: '2022-12-23T13:40:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -33,16 +33,6 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get servers.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[*].name'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 2h
           url: '{$API.URI.ENDPOINT}/config/servers'
           headers:
             -
@@ -102,17 +92,15 @@ zabbix_export:
                 - {  }
           master_item:
             key: controlm.servers
+          lld_macro_paths:
+            -
+              lld_macro: '{#SERVER.NAME}'
+              path: $.name
           preprocessing:
             -
-              type: JAVASCRIPT
+              type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - |
-                  value = JSON.parse(value)
-                  var dict = [];
-                  for (var i = 0; i < value.length; i++) {
-                      dict.push({"{#SERVER.NAME}": value[i]});
-                  }
-                  return JSON.stringify(dict);
+                - 2h
         -
           uuid: 567e5e0553c84ce2a9200d14dfc76593
           name: 'SLA services discovery'
@@ -983,6 +971,19 @@ zabbix_export:
                   value: agent
               trigger_prototypes:
                 -
+                  uuid: 7c494429411b4ede997a7881e52d9b46
+                  expression: |
+                    last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)="Unknown"
+                    
+                  name: 'Agent [{#AGENT.NAME}]: unknown version'
+                  priority: WARNING
+                  description: 'Agent version is unknown.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
                   uuid: e67a46b5c61c43e6b42a966f3d68a581
                   expression: |
                     last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)
@@ -992,19 +993,6 @@ zabbix_export:
                   opdata: 'Old version: {ITEM.VALUE}, Current version: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Agent version has changed.'
-                  manual_close: 'YES'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-                -
-                  uuid: 7c494429411b4ede997a7881e52d9b46
-                  expression: |
-                    last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)
-                    
-                  name: 'Agent [{#AGENT.NAME}]: version unknown'
-                  priority: INFO
-                  description: 'Agent version is unknown.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1285,19 +1273,6 @@ zabbix_export:
             -
               value: '4'
               newvalue: Discovering
-            -
-              value: '10'
-              newvalue: Unknown
-        -
-          uuid: 7d3757a596a44f00bede74fe2c55a3e4
-          name: 'Control-M gateway status'
-          mappings:
-            -
-              value: '0'
-              newvalue: OK
-            -
-              value: '1'
-              newvalue: ERROR
             -
               value: '10'
               newvalue: Unknown
