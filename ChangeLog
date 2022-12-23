@@ -1,8 +1,15 @@
 Changes for 6.4.0beta6
 
 New features:
+A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
+.........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
 Bug fixes:
+.........T [ZBX-21587] added metrics for optimizing dependent items preprocessing in Jenkins template (abiba)
+.......PS. [ZBX-22110] fixed memory leak in Zabbix server in case of monitoring VMware (MVekslers)
+.........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
+.........T [ZBX-22071] extended description for OPSGenie media type (atocko)
+.......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta5
