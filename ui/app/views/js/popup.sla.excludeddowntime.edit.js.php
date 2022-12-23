@@ -35,7 +35,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'sla.excludeddowntime.validate');
 
 		this._post(curl.getUrl(), fields, (response) => {

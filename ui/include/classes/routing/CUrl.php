@@ -123,12 +123,6 @@ class CUrl {
 		return $this;
 	}
 
-	public function setArgumentSID() {
-		$this->arguments['sid'] = substr(CSessionHelper::getId(), 16, 16);
-
-		return $this;
-	}
-
 	/**
 	 * Adds CSRF token argument to Url.
 	 *

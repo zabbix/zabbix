@@ -660,7 +660,7 @@ class CTabFilter extends CBaseComponent {
 			 */
 			buttonResetAction: () => {
 				let current_url = new Curl(),
-					url = new Curl('zabbix.php', false);
+					url = new Curl('zabbix.php');
 
 				url.setArgument('action', current_url.getArgument('action'));
 				url.setArgument('filter_reset', 1);

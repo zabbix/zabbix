@@ -202,7 +202,7 @@ window.sla_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		this.slaid === null
 			? curl.setAction('sla.create', this.csrf_token_create)
 			: curl.setAction('sla.update', this.csrf_token_update);

@@ -25,7 +25,7 @@ jQuery(function($) {
 		$layout_mode_btn.on('click', function(e) {
 			e.stopPropagation();
 			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
-				var url = new Curl('', false);
+				var url = new Curl('');
 				url.unsetArgument('kiosk');
 				history.replaceState(history.state, '', url.getUrl());
 				location.reload();

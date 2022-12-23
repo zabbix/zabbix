@@ -75,7 +75,6 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
 			'scope' => (int) $this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED),

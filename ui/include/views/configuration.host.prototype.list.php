@@ -159,8 +159,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
-		->addSID();
+		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
 	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -172,7 +171,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
-			->addSID()
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 

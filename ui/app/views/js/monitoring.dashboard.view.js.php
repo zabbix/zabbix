@@ -224,7 +224,7 @@
 
 					this.disableNavigationWarning();
 
-					const curl = new Curl('zabbix.php', false);
+					const curl = new Curl('zabbix.php');
 
 					curl.setArgument('action', 'dashboard.view');
 					curl.setArgument('dashboardid', response.dashboardid);
@@ -262,7 +262,7 @@
 		},
 
 		cancelEditing() {
-			const curl = new Curl('zabbix.php', false);
+			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
 
@@ -371,7 +371,7 @@
 			dynamicHostChange() {
 				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 
 				curl.setArgument('action', 'dashboard.view');
 

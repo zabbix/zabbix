@@ -28,7 +28,7 @@
  */
 function getMenuPopupHistory(options) {
 	var items = [],
-		url = new Curl('history.php', false);
+		url = new Curl('history.php');
 
 	if (!options.allowed_ui_latest_data) {
 		return [];
@@ -117,7 +117,7 @@ function getMenuPopupHost(options, trigger_element) {
 	if (options.hasGoTo) {
 		// dashboard
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.dashboard.view')
 			url.setArgument('hostid', options.hostid)
 
@@ -130,7 +130,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// problems
 		if (options.allowed_ui_problems) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
@@ -157,7 +157,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// latest data
 		if (options.allowed_ui_latest_data) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view');
 
 			if ('tags' in options) {
@@ -176,7 +176,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// graphs
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'charts.view')
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
@@ -190,7 +190,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// web
 		if (options.allowed_ui_hosts) {
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'web.view');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('filter_set', '1');
@@ -204,7 +204,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 		// inventory link
 		if (options.allowed_ui_inventory) {
-			url = new Curl('hostinventories.php', false);
+			url = new Curl('hostinventories.php');
 			url.setArgument('hostid', options.hostid);
 
 			items.push({
@@ -223,7 +223,7 @@ function getMenuPopupHost(options, trigger_element) {
 		// Configuration
 		if (options.allowed_ui_conf_hosts) {
 			// host
-			url = new Curl('zabbix.php', false);
+			url = new Curl('zabbix.php');
 			url.setArgument('action', 'host.edit');
 			url.setArgument('hostid', options.hostid);
 
@@ -240,7 +240,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// items
-			url = new Curl('items.php', false);
+			url = new Curl('items.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -252,7 +252,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// triggers
-			url = new Curl('triggers.php', false);
+			url = new Curl('triggers.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -264,7 +264,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// graphs
-			url = new Curl('graphs.php', false);
+			url = new Curl('graphs.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -276,7 +276,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// discovery
-			url = new Curl('host_discovery.php', false);
+			url = new Curl('host_discovery.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -288,7 +288,7 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// web scenario
-			url = new Curl('httpconf.php', false);
+			url = new Curl('httpconf.php');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -358,7 +358,7 @@ function getMenuPopupMapElementSubmap(options) {
 			return [];
 		}
 
-		const submap_url = new Curl('zabbix.php', false);
+		const submap_url = new Curl('zabbix.php');
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
 		if (typeof options.severity_min !== 'undefined') {
@@ -406,7 +406,7 @@ function getMenuPopupMapElementGroup(options) {
 	}
 
 	var sections = [],
-		problems_url = new Curl('zabbix.php', false);
+		problems_url = new Curl('zabbix.php');
 
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_name', '');
@@ -459,7 +459,7 @@ function getMenuPopupMapElementTrigger(options) {
 	let url;
 
 	if (options.allowed_ui_problems) {
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
@@ -484,7 +484,7 @@ function getMenuPopupMapElementTrigger(options) {
 		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
+			url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
@@ -514,7 +514,7 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
-			url = new Curl('triggers.php', false);
+			url = new Curl('triggers.php');
 			url.setArgument('form', 'update');
 			url.setArgument('triggerid', value.triggerid);
 			url.setArgument('context', 'host');
@@ -532,7 +532,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php', false);
+				url = new Curl('items.php');
 				url.setArgument('form', 'update');
 				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
@@ -607,16 +607,16 @@ function getMenuPopupDashboard(options, trigger_element) {
 
 	// Dashboard actions.
 	if (options.can_edit_dashboards) {
-		const url_create = new Curl('zabbix.php', false);
+		const url_create = new Curl('zabbix.php');
 		url_create.setArgument('action', 'dashboard.view');
 		url_create.setArgument('new', '1');
 
-		const url_clone = new Curl('zabbix.php', false);
+		const url_clone = new Curl('zabbix.php');
 		url_clone.setArgument('action', 'dashboard.view');
 		url_clone.setArgument('dashboardid', options.dashboardid);
 		url_clone.setArgument('clone', '1');
 
-		const url_delete = new Curl('zabbix.php', false);
+		const url_delete = new Curl('zabbix.php');
 		url_delete.setArgument('action', 'dashboard.delete');
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
@@ -718,7 +718,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	if (options.allowed_ui_problems) {
 		// events
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
@@ -747,7 +747,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
+			url = new Curl('history.php');
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
@@ -775,7 +775,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
-		url = new Curl('triggers.php', false);
+		url = new Curl('triggers.php');
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
 		url.setArgument('context', 'host');
@@ -787,7 +787,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('items.php', false);
+				url = new Curl('items.php');
 				url.setArgument('form', 'update');
 				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
@@ -968,7 +968,7 @@ function getMenuPopupItem(options) {
 
 	// latest data link
 	if (options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php');
 		url.setArgument('action', 'latest.view');
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
@@ -980,7 +980,7 @@ function getMenuPopupItem(options) {
 		});
 	}
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showgraph');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -990,7 +990,7 @@ function getMenuPopupItem(options) {
 		disabled: !options.showGraph
 	});
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showvalues');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -1000,7 +1000,7 @@ function getMenuPopupItem(options) {
 		disabled: !options.history && !options.trends
 	});
 
-	url = new Curl('history.php', false);
+	url = new Curl('history.php');
 	url.setArgument('action', 'showlatest');
 	url.setArgument('itemids[]', options.itemid);
 
@@ -1023,7 +1023,7 @@ function getMenuPopupItem(options) {
 		};
 
 		if (options.isWriteable) {
-			url = new Curl('items.php', false);
+			url = new Curl('items.php');
 			url.setArgument('form', 'update');
 			url.setArgument('hostid', options.hostid);
 			url.setArgument('itemid', options.itemid);
@@ -1040,7 +1040,7 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
-				url = new Curl('triggers.php', false);
+				url = new Curl('triggers.php');
 				url.setArgument('form', 'update');
 				url.setArgument('triggerid', value.triggerid);
 				url.setArgument('backurl', options.backurl);
@@ -1057,7 +1057,7 @@ function getMenuPopupItem(options) {
 
 		config_urls.push(config_triggers);
 
-		url = new Curl('triggers.php', false);
+		url = new Curl('triggers.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('description', options.name);
@@ -1070,7 +1070,7 @@ function getMenuPopupItem(options) {
 			url: url.getUrl()
 		});
 
-		url = new Curl('items.php', false);
+		url = new Curl('items.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
@@ -1084,7 +1084,7 @@ function getMenuPopupItem(options) {
 			disabled: options.isDiscovery
 		});
 
-		url = new Curl('host_discovery.php', false);
+		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
@@ -1153,7 +1153,7 @@ function getMenuPopupItemPrototype(options) {
 
 	let url;
 
-	url = new Curl('disc_prototypes.php', false);
+	url = new Curl('disc_prototypes.php');
 	url.setArgument('form', 'update');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('itemid', options.itemid);
@@ -1168,7 +1168,7 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('trigger_prototypes.php', false);
+			url = new Curl('trigger_prototypes.php');
 			url.setArgument('form', 'update');
 			url.setArgument('parent_discoveryid', options.parent_discoveryid);
 			url.setArgument('triggerid', value.triggerid)
@@ -1188,7 +1188,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('trigger_prototypes.php', false);
+	url = new Curl('trigger_prototypes.php');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('form', 'create');
 	url.setArgument('description', options.name);
@@ -1201,7 +1201,7 @@ function getMenuPopupItemPrototype(options) {
 		url: url.getUrl()
 	});
 
-	url = new Curl('disc_prototypes.php', false);
+	url = new Curl('disc_prototypes.php');
 	url.setArgument('form', 'create');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT

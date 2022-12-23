@@ -174,22 +174,6 @@ abstract class CController {
 	}
 
 	/**
-	 * Return user SID, first 16 bytes of session ID.
-	 *
-	 * @return string
-	 */
-	protected function getUserSID() {
-		$sessionid = CSessionHelper::getId();
-
-		if ($sessionid === null || strlen($sessionid) < 16) {
-			return null;
-		}
-
-		return substr($sessionid, 16, 16);
-	}
-
-
-	/**
 	 * Generates CSRF token that is used in forms.
 	 *
 	 * @param string $action  action that controller should perform.

@@ -57,7 +57,6 @@ class CControllerTemplateGroupEdit extends CController{
 
 	protected function doAction(): void {
 		$data = [
-			'sid' => $this->getUserSID(),
 			'groupid' => null,
 			'name' => '',
 			'subgroups' => 0

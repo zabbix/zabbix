@@ -119,7 +119,6 @@ class CControllerDiscoveryEdit extends CController {
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
 
 		$data = [
-			'sid' => $this->getUserSID(),
 			'druleid' => $this->getInput('druleid', 0),
 			'drule' => $this->drule,
 			'form_refresh' => $this->getInput('form_refresh', 0)

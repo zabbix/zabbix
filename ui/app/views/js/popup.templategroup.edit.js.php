@@ -40,7 +40,7 @@ window.templategroup_edit_popup = new class {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.groupid !== null ? 'templategroup.update' : 'templategroup.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
@@ -66,7 +66,7 @@ window.templategroup_edit_popup = new class {
 	}
 
 	delete() {
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setAction('templategroup.delete', this.csrf_token_delete);
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {

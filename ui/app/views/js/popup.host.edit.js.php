@@ -50,7 +50,7 @@ window.host_edit_popup = {
 		this.removePopupMessages();
 
 		const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
-		const curl = new Curl(this.form.getAttribute('action'), false);
+		const curl = new Curl(this.form.getAttribute('action'));
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

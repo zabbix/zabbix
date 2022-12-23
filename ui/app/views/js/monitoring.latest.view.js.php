@@ -42,12 +42,12 @@
 		checkbox_object: null,
 
 		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
-			this.refresh_url = new Curl(refresh_url, false);
+			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
 
-			const url = new Curl('zabbix.php', false);
+			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
@@ -136,7 +136,7 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			this.refresh_url = new Curl('', false);
+			this.refresh_url = new Curl('');
 
 			this.unscheduleRefresh();
 			this.refresh();

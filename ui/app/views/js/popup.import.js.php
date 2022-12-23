@@ -73,7 +73,7 @@ function confirmSubmit(import_overlay, compare_overlay) {
 function openImportComparePopup(overlay) {
 	const form = document.getElementById('import-form');
 
-	const url = new Curl('zabbix.php', false);
+	const url = new Curl('zabbix.php');
 	url.setArgument('action', 'popup.import.compare');
 	url.setArgument('import_overlayid', overlay.dialogueid);
 
@@ -125,7 +125,7 @@ function openImportComparePopup(overlay) {
 function submitImportPopup(overlay) {
 	const form = document.getElementById('import-form');
 
-	const url = new Curl('zabbix.php', false);
+	const url = new Curl('zabbix.php');
 	url.setArgument('action', 'popup.import');
 
 	overlay.setLoading();

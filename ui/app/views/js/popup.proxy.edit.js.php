@@ -212,7 +212,7 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		this.proxyid === null
 			? curl.setAction('proxy.create', this.csrf_token_create)
 			: curl.setAction('proxy.update', this.csrf_token_update);

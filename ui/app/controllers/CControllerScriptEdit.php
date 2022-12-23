@@ -83,7 +83,6 @@ class CControllerScriptEdit extends CController {
 	protected function doAction() {
 		// Default values.
 		$data = [
-			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',
 			'scope' => ZBX_SCRIPT_SCOPE_ACTION,

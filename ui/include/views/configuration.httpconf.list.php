@@ -207,8 +207,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($httpTest['status']))
-			->addSID(),
+			->addClass(httptest_status2style($httpTest['status'])),
 		$data['tags'][$httpTest['httptestid']],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);

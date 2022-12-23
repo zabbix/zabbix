@@ -166,7 +166,6 @@ foreach ($data['items'] as $item) {
 				)
 				->setArgument('context', $data['context'])
 				->setArgument('checkbox_hash', $data['checkbox_hash'])
-				->setArgumentSID()
 				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)

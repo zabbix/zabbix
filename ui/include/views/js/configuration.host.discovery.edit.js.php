@@ -267,7 +267,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
 
 			// Append overrides to main form.
@@ -311,7 +311,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

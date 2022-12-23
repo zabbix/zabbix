@@ -664,7 +664,7 @@ var hintBox = {
  * @returns {Promise<any>}
  */
 function ApiCall(method, params, id = 1) {
-	return fetch(new Curl('api_jsonrpc.php', false).getUrl(), {
+	return fetch(new Curl('api_jsonrpc.php').getUrl(), {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'

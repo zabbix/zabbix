@@ -132,7 +132,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 		},
 
 		refresh() {
-			const url = new Curl('', false);
+			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
 			const fields = getFormFields(form);
 
@@ -165,7 +165,7 @@ include dirname(__FILE__).'/itemtest.js.php';
 					}
 				}
 
-				const curl = new Curl('zabbix.php', false);
+				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
 
 				location.href = curl.getUrl();

@@ -69,7 +69,7 @@ window.action_edit_popup = new class {
 
 		const fields = getFormFields(this.form);
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'popup.action.operations.list');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
@@ -364,7 +364,7 @@ window.action_edit_popup = new class {
 			fields.esc_period = fields.esc_period.trim();
 		}
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		this.actionid !== 0
 			? curl.setAction('action.update', this.csrf_token_update)
 			: curl.setAction('action.create', this.csrf_token_create);

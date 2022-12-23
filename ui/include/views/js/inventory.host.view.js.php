@@ -86,7 +86,7 @@
 						}
 					}
 
-					location.href = new Curl('hostinventories.php', false).getUrl();
+					location.href = new Curl('hostinventories.php').getUrl();
 				}
 			};
 		}

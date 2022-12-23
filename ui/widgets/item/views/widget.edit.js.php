@@ -137,7 +137,7 @@ window.widget_item_form = new class {
 		thresholds_warning.style.display = 'none';
 
 		if (ms_item_data.length > 0) {
-			const curl = new Curl('jsrpc.php', false);
+			const curl = new Curl('jsrpc.php');
 			curl.setArgument('method', 'item_value_type.get');
 			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 			curl.setArgument('itemid', ms_item_data[0].id);

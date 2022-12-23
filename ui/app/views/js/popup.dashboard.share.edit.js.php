@@ -44,7 +44,7 @@ window.dashboard_share_edit_popup = new class {
 
 		overlay.setLoading();
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'dashboard.share.update');
 
 		fetch(curl.getUrl(), {

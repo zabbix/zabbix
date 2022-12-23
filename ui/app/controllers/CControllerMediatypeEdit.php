@@ -114,7 +114,6 @@ class CControllerMediatypeEdit extends CController {
 		$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
 
 		$data = [
-			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
 			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
