@@ -81,6 +81,7 @@
 
 typedef struct
 {
+	unsigned char	program_type;
 	int		server_num;
 	int		process_num;
 	unsigned char	process_type;

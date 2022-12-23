@@ -24,7 +24,6 @@
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 }
 zbx_thread_pinger_args;

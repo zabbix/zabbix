@@ -2245,4 +2245,1008 @@ in:
 out:
   return: SUCCEED
   value: "O K"
+---
+test case: SNMP walk to value - bad data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      aaa
+      bbb
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - bad param
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "AAA"
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 'AAA'
+---
+test case: SNMP walk to value - Arbitrary number
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 123
+---
+test case: SNMP walk to value - INTEGER
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = INTEGER: 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 123
+---
+test case: SNMP walk to value - IpAddress
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = IpAddress: 127.0.0.1
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '127.0.0.1'
+---
+test case: SNMP walk to value - Hex-STRING
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 AA
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '71 71 AA'
+---
+test case: SNMP walk to value - Hex-STRING (multiline)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '71 71 AA BB CC DD'
+---
+test case: SNMP walk to value - Hex-STRING (multiline) - space on the last line
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD 
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '71 71 AA BB CC DD'
+---
+test case: SNMP walk to value - Hex-STRING (multiline) - with succeeding string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD
+      .1.3.6.1.2 = Hex-STRING: 74 65 73 74 20 D1 91
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: '71 71 AA BB CC DD'
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 91
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: SUCCEED
+  value: 'test ё'
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8 (null terminated)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 91 00
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: SUCCEED
+  value: 'test ё'
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8 - invalid hex string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 X3 74 20 D1 91
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8 - invalid hex string (2)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 74 20 D1 9
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - Hex-STRING - to UTF8 - invalid sequence
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 91 FF
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      1
+out:
+  return: SUCCEED
+  value: 'test ё?'
+---
+test case: SNMP walk to value - Hex-STRING - to MAC
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      2
+out:
+  return: SUCCEED
+  value: '74:65:73:74:20:D1'
+---
+test case: SNMP walk to value - Hex-STRING - to MAC - invalid hex string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 XX
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      2
+out:
+  return: FAIL
+---
+test case: SNMP walk to value - Opaque wrapped type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Opaque: Float: 0.460000
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 0.460000
+---
+test case: SNMP walk to value - Counter32
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Counter32: 12345678
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 12345678
+---
+test case: SNMP walk to value - STRING with newline
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "line1
+      line2"
+      .1.3.6.2.1 = STRING: "line2
+      line3"
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: |-
+    line1
+    line2
+---
+test case: SNMP walk to value - Empty type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = ""
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      .1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: ''
+---
+test case: SNMP walk to value - OID without prepending dot
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      1.3.6.1.1
+      0
+out:
+  return: SUCCEED
+  value: 123
+---
+test case: SNMP walk to value - MIB translation 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.2.1.2.2.1.2 = 20
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      IF-MIB::ifDescr
+      1
+  netsnmp_required: y
+out:
+  return: SUCCEED
+  value: 20
+---
+test case: SNMP walk to value - MIB translation 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.2.1.1.1 = 20
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_VALUE
+    params: |-
+      SNMPv2-MIB::sysDescr
+      0
+  netsnmp_required: y
+out:
+  return: SUCCEED
+  value: 20
+---
+test case: SNMP walk to JSON - bad data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      bad data
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      AAA
+      .1.3.6.1
+      0
+      BBB
+      .1.3.6.2
+      0
+out:
+  return: FAIL
+---
+test case: SNMP walk to JSON - bad params
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      bad param
+out:
+  return: FAIL
+---
+test case: SNMP walk to JSON - no data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      BBB
+      .1.3.6.2
+      0
+out:
+  return: FAIL
+---
+test case: SNMP walk to JSON - STRING type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "xxx"
+      .1.3.6.1.2 = STRING: "yyy"
+      .1.3.6.2.1 = STRING: "aaa"
+      .1.3.6.2.2 = STRING: "bbb"
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"yyy","MACRO2":"bbb"},{"{#SNMPINDEX}":"1","MACRO1":"xxx","MACRO2":"aaa"}]'
+---
+test case: SNMP walk to JSON - Counter/Gauge types
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Counter32: 32
+      .1.3.6.1.2 = Counter64: 64
+      .1.3.6.2.1 = Gauge32: 32
+      .1.3.6.2.2 = Counter64: 64
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"64","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"32","MACRO2":"32"}]'
+---
+test case: SNMP walk to JSON - Empty type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "aaa"
+      .1.3.6.1.2 = Counter64: 64
+      .1.3.6.2.1 = ""
+      .1.3.6.2.2 = Counter64: 64
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"64","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"aaa","MACRO2":""}]'
+---
+test case: SNMP walk to JSON - Empty type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+      .1.3.6.1.2 = 456
+      .1.3.6.2.1 = ""
+      .1.3.6.2.2 = Counter64: 64
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":""}]'
+---
+test case: SNMP walk to JSON - Integer/Timetick
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 1000
+      .1.3.6.1.2 = 2000
+      .1.3.6.2.1 = 3000
+      .1.3.6.2.2 = 4000
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
+---
+test case: SNMP walk to JSON - IpAddress
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = IpAddress: 10.0.0.0
+      .1.3.6.1.2 = IpAddress: 172.16.0.0
+      .1.3.6.2.1 = IpAddress: 10.255.255.255
+      .1.3.6.2.2 = IpAddress: 172.31.255.255
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"172.16.0.0","MACRO2":"172.31.255.255"},{"{#SNMPINDEX}":"1","MACRO1":"10.0.0.0","MACRO2":"10.255.255.255"}]'
+---
+test case: SNMP walk to JSON - STRING type with newline
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = STRING: "x
+      xx
+      "
+      .1.3.6.1.2 = STRING: "y
+      yy"
+      .1.3.6.2.1 = STRING: "
+      aaa"
+      .1.3.6.2.2 = STRING: "bbb
+      "
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"y\nyy","MACRO2":"bbb\n"},{"{#SNMPINDEX}":"1","MACRO1":"x\nxx\n","MACRO2":"\naaa"}]'
+---
+test case: SNMP walk to JSON - Opaque wrapped type
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Opaque: Float: 0.110000
+      .1.3.6.1.2 = Opaque: STRING: "hello1.2"
+      .1.3.6.2.1 = Opaque: Float: 0.210000
+      .1.3.6.2.2 = Opaque: Unsigned32: 220000
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"hello1.2","MACRO2":"220000"},{"{#SNMPINDEX}":"1","MACRO1":"0.110000","MACRO2":"0.210000"}]'
+---
+test case: SNMP walk to JSON - OID is wanted without prepending dot - 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 1000
+      .1.3.6.1.2 = 2000
+      .1.3.6.2.1 = 3000
+      .1.3.6.2.2 = 4000
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      1.3.6.1
+      0
+      MACRO2
+      1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
+---
+test case: SNMP walk to JSON - OID is wanted without prepending dot - 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 1000
+      .1.3.6.1.2 = 2000
+      .1.3.6.2.1 = 3000
+      .1.3.6.2.2 = 4000
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"2000","MACRO2":"4000"},{"{#SNMPINDEX}":"1","MACRO1":"1000","MACRO2":"3000"}]'
+---
+test case: SNMP walk to JSON - MIB translation 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.2.1.2.2.1.2.1 = 20
+      .1.3.6.1.2.1.2.2.1.2.2 = 30
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      IFDESCR
+      IF-MIB::ifDescr
+      0
+  netsnmp_required: y
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","IFDESCR":"30"},{"{#SNMPINDEX}":"1","IFDESCR":"20"}]'
+---
+test case: SNMP walk to JSON - No more variables 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+      .1.3.6.1.2 = 456
+      .1.3.6.2.1 = STRING: "TEST"
+      .1.3.6.2.2 = Counter64: 64
+      .1.3.6.3.1 = No more variables left in this MIB View (It is past the end of the MIB tree)
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":"TEST"}]'
+---
+test case: SNMP walk to JSON - No more variables 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 123
+      .1.3.6.1.2 = 456
+      .1.3.6.2.1 = STRING: "TEST"
+      .1.3.6.2.2 = Counter64: 64
+      .1.3.6.3.1 = No more variables left in this MIB View (It is past the end of the MIB tree)
+      .1.3.7.1.1 = 123
+      .1.3.7.1.2 = 456
+      .1.3.7.2.1 = STRING: "TEST"
+      .1.3.7.2.2 = Counter64: 64
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"456","MACRO2":"64"},{"{#SNMPINDEX}":"1","MACRO1":"123","MACRO2":"TEST"}]'
+---
+test case: SNMP walk to JSON - Duplicate OIDs
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = 11
+      .1.3.6.1.2 = 12
+      .1.3.6.2.1 = 21
+      .1.3.6.2.2 = 22
+      .1.3.6.1.1 = 11
+      .1.3.6.1.2 = 12
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"12","MACRO2":"22"},{"{#SNMPINDEX}":"1","MACRO1":"11","MACRO2":"21"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - unchanged
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: AA BE FF
+      .1.3.6.1.2 = Hex-STRING: FF FF
+      .1.3.6.2.1 = Hex-STRING: DD CD
+      .1.3.6.2.2 = Hex-STRING: 99 A5 F1
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"FF FF","MACRO2":"99 A5 F1"},{"{#SNMPINDEX}":"1","MACRO1":"AA BE FF","MACRO2":"DD CD"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - to UTF8
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 8B
+      .1.3.6.1.2 = Hex-STRING: 74 65 73 74 20 D1 84
+      .1.3.6.2.1 = Hex-STRING: D1 91
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      1
+      MACRO2
+      .1.3.6.2
+      1
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"test ф","MACRO2":"ꚅ"},{"{#SNMPINDEX}":"1","MACRO1":"test ы","MACRO2":"ё"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - to UTF8 - invalid sequence
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 FF FF
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      1
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"1","MACRO1":"test ??"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - to UTF8 - invalid hex string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1 8B XX
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      1
+out:
+  return: FAIL
+---
+test case: SNMP walk to JSON - Hex-STRING type - to UTF8 - null terminated
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 00
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      1
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"1","MACRO1":"test"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - to MAC
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 D1
+      .1.3.6.1.2 = Hex-STRING: FF FF FF FF FF FF
+      .1.3.6.2.1 = Hex-STRING: 00 00 00 00 00 00
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85 11 22 33
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      2
+      MACRO2
+      .1.3.6.2
+      2
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"FF:FF:FF:FF:FF:FF","MACRO2":"EA:9A:85:11:22:33"},{"{#SNMPINDEX}":"1","MACRO1":"74:65:73:74:20:D1","MACRO2":"00:00:00:00:00:00"}]'
+---
+test case: SNMP walk to JSON - Hex-STRING type - to MAC - invalid MAC, invalid hex string
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 74 65 73 74 20 XX
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      2
+out:
+  return: FAIL
+---
+test case: SNMP walk to JSON - Hex-STRING type - mixed 'treat-as' values
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: D1 8B
+      .1.3.6.1.2 = Hex-STRING: D1 91
+      .1.3.6.2.1 = Hex-STRING: 00 00 00 00 00 00
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85 11 22 33
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      1
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"ё","MACRO2":"EA 9A 85 11 22 33"},{"{#SNMPINDEX}":"1","MACRO1":"ы","MACRO2":"00 00 00 00 00 00"}]'
+---
+test case: SNMP walk to value - Hex-STRING (multiline)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD
+      .1.3.6.1.2 = Hex-STRING: D1 91
+      .1.3.6.2.1 = Hex-STRING: 00 00 00 00 00 00
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85 11 22 33
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"D1 91","MACRO2":"EA 9A 85 11 22 33"},{"{#SNMPINDEX}":"1","MACRO1":"71 71 AA BB CC DD","MACRO2":"00 00 00 00 00 00"}]'
+---
+test case: SNMP walk to value - Hex-STRING (multiline) - to MAC
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD
+      .1.3.6.1.2 = Hex-STRING: D1 91
+      .1.3.6.2.1 = Hex-STRING: 00 00 00 00 00 00
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85 11 22 33
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      2
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"D1:91","MACRO2":"EA 9A 85 11 22 33"},{"{#SNMPINDEX}":"1","MACRO1":"71:71:AA:BB:CC:DD","MACRO2":"00 00 00 00 00 00"}]'
+---
+test case: SNMP walk to value - Hex-STRING (multiline) - space on the last line
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      .1.3.6.1.1 = Hex-STRING: 71 71 
+      AA BB CC 
+      DD 
+      .1.3.6.1.2 = Hex-STRING: D1 91
+      .1.3.6.2.1 = Hex-STRING: 00 00 00 00 00 00
+      .1.3.6.2.2 = Hex-STRING: EA 9A 85 11 22 33
+  step:
+    type: ZBX_PREPROC_SNMP_WALK_TO_JSON
+    params: |-
+      MACRO1
+      .1.3.6.1
+      0
+      MACRO2
+      .1.3.6.2
+      0
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","MACRO1":"D1 91","MACRO2":"EA 9A 85 11 22 33"},{"{#SNMPINDEX}":"1","MACRO1":"71 71 AA BB CC DD","MACRO2":"00 00 00 00 00 00"}]'
 ...
