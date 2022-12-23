@@ -31,6 +31,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
+	"github.com/natefinch/npipe"
 )
 
 const queSize = 100
@@ -85,7 +86,7 @@ func (b *pluginBroker) handleConnection() {
 	for {
 		t, data, err := comms.Read(b.conn)
 		if err != nil {
-			if errors.Is(err, net.ErrClosed) {
+			if errors.Is(err, net.ErrClosed) || errors.Is(err, npipe.ErrClosed) {
 				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
 
 				return
