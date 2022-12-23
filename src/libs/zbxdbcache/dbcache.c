@@ -64,7 +64,7 @@ extern char		*CONFIG_EXPORT_DIR;
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
-#define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
+#define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
 /* the maximum time spent synchronizing history */
 #define ZBX_HC_SYNC_TIME_MAX	10
@@ -923,7 +923,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 			}
 			else
 			{
-				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 < trend->num)
+				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 				zbx_vector_uint64_append(&del_itemids, trend->itemid);
@@ -955,6 +955,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 	}
 
 	zbx_vector_uint64_destroy(&del_itemids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
