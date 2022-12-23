@@ -142,5 +142,6 @@ class CPopupMenuElement extends CElement {
 	 */
 	public function close() {
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+		(new CElementQuery('xpath://ul['.CXPathHelper::fromClass('menu-popup-top').']'))->waitUntilNotVisible();
 	}
 }

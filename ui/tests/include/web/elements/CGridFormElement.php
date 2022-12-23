@@ -38,15 +38,7 @@ class CGridFormElement extends CFormElement {
 				"/label|./div/div/div/div/".self::TABLE_FORM."/label"
 		)->all();
 
-		if ($this->filter !== null) {
-			$labels = $labels->filter($this->filter);
-		}
-
-		if ($filter !== null) {
-			$labels = $labels->filter($filter, $filter_params);
-		}
-
-		return $labels;
+		return $this->filterCollection($labels, $filter, $filter_params);
 	}
 
 	/**

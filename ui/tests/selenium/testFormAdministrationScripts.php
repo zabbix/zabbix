@@ -1012,8 +1012,8 @@ class testFormAdministrationScripts extends CWebTest {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		$this->page->login()->open($link)->waitUntilReady();
-		$form = $this->query('id:script-form')->asForm()->one();
+		$this->page->login()->open($link);
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Parameters')) {
@@ -1114,8 +1114,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update'])->waitUntilReady();
-		$form = $this->query('id:script-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill([
 			'Name' => 'Cancelled script',
 			'Type' => 'Script',
@@ -1142,7 +1142,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
-		$this->query('id:script-form')->waitUntilVisible()->asForm()->one()->submit();
+		$this->query('id:script-form')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -1153,8 +1153,8 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		foreach (self::$clone_scriptids as $scriptid) {
-			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid)->waitUntilReady();
-			$form = $this->query('id:script-form')->asForm()->one();
+			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
+			$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 			$values = $form->getFields()->asValues();
 			$script_name = $values['Name'];
 			$this->query('button:Clone')->waitUntilClickable()->one()->click();
@@ -1199,7 +1199,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Layout() {
 		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
 		$default_values = ['Scope' => 'Action operation', 'Type' => 'Webhook', 'Host group' => 'All',
 			'User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false, 'Timeout' => '30s',
@@ -1318,7 +1318,7 @@ class testFormAdministrationScripts extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=script.edit');
-		$form = $this->query('id:script-form')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
 
 		foreach (['Action operation', 'Manual host action', 'Manual event action'] as $scope) {
@@ -1393,16 +1393,16 @@ class testFormAdministrationScripts extends CWebTest {
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
 		];
 
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
-		$form = $this->query('id:script-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes']);
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 
 		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
 		$this->assertUriScheme($form, $default_valid_schemes);
 		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
 
 		// Change valid URI schemes on "Other configuration parameters" page.
-		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-		$config_form = $this->query('name:otherForm')->asForm()->one();
+		$this->page->open('zabbix.php?action=miscconfig.edit');
+		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
 		$config_form->fill(['Valid URI schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
@@ -1550,8 +1550,8 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @dataProvider getContextMenuData
 	 */
 	public function testFormAdministrationScripts_ContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=script.edit')->waitUntilReady();
-		$form = $this->query('id:script-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit');
+		$form = $this->query('id:script-form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Script added');

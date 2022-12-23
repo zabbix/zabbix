@@ -46,6 +46,13 @@ class CFormElement extends CElement {
 	protected $filter = null;
 
 	/**
+	 * Class for required label.
+	 *
+	 * @var string
+	 */
+	protected $required_label = 'form-label-asterisk';
+
+	/**
 	 * @inheritdoc
 	 */
 	public static function createInstance(RemoteWebElement $element, $options = []) {
@@ -73,14 +80,44 @@ class CFormElement extends CElement {
 	/**
 	 * Set filter conditions.
 	 *
-	 * @param mixed $filter		conditions to be filtered by
+	 * @param mixed $filter				conditions to be filtered by
+	 * @param array	$filter_params		filter parameters
 	 *
 	 * @return $this
 	 */
-	public function setFilter($filter) {
-		$this->filter = $filter;
+	public function setFilter($filter, $filter_params = []) {
+		if ($filter === null) {
+			$this->filter = null;
+		}
+		elseif ($filter instanceof CElementFilter) {
+			$this->filter = $filter;
+		}
+		else {
+			$this->filter = new CElementFilter($filter, $filter_params);
+		}
 
 		return $this;
+	}
+
+	/**
+	 * Set filter for element collection.
+	 *
+	 * @param CElementCollection $elements		collection of elements
+	 * @param CElementFilter	 $filter		condition to be filtered
+	 * @param array				 $filter_params	filter parameters
+	 *
+	 * @return CElementCollection
+	 */
+	protected function filterCollection($elements, $filter, $filter_params = []) {
+		if ($this->filter !== null) {
+			$elements = $elements->filter($this->filter);
+		}
+
+		if ($filter !== null) {
+			$elements = $elements->filter($filter, $filter_params);
+		}
+
+		return $elements;
 	}
 
 	/**
@@ -131,15 +168,7 @@ class CFormElement extends CElement {
 			}
 		}
 
-		if ($this->filter !== null) {
-			$labels = $labels->filter($this->filter);
-		}
-
-		if ($filter !== null) {
-			$labels = $labels->filter($filter, $filter_params);
-		}
-
-		return $labels;
+		return $this->filterCollection($labels, $filter, $filter_params);
 	}
 
 	/**
@@ -212,17 +241,17 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of element fields indexed by label name.
 	 *
-	 * @param CElementFilter $filter    condition to be filtered by
-	 * @param array			 $params	condition parameters to be set
+	 * @param CElementFilter $filter			condition to be filtered by
+	 * @param array			 $filter_params		condition parameters to be set
 	 *
 	 * @return CElementCollection
 	 */
-	public function getFields($filter = null, $params = []) {
+	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $label) {
+		foreach ($this->getLabels() as $key => $label) {
 			$element = $this->getFieldByLabelElement($label);
-			if ($this->filter !== null && !$this->filter->match($element)) {
+			if ($this->filter !== null && !$this->filter->match($element, $key)) {
 				$element = new CNullElement();
 			}
 
@@ -234,7 +263,7 @@ class CFormElement extends CElement {
 		$this->fields = new CElementCollection($fields);
 
 		if ($filter !== null) {
-			$this->fields = $this->fields->filter(new CElementFilter($filter, $params));
+			$this->fields = $this->fields->filter(new CElementFilter($filter, $filter_params));
 		}
 
 		return $this->fields;
@@ -550,7 +579,7 @@ class CFormElement extends CElement {
 	 * @return boolean
 	 */
 	public function isRequired($label) {
-		return $this->getLabel($label)->hasClass('form-label-asterisk');
+		return $this->getLabel($label)->hasClass($this->required_label);
 	}
 
 	/**
@@ -559,18 +588,19 @@ class CFormElement extends CElement {
 	 * @return array
 	 */
 	public function getRequiredLabels() {
-		return $this->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
+		return $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
 				->filter(CElementFilter::VISIBLE)->asText();
 	}
 
 	/**
 	 * Get form fields values.
 	 *
-	 * @param CElementFilter $filter    condition to be filtered by
+	 * @param CElementFilter $filter			condition to be filtered by
+	 * @param array			 $filter_params		condition parameters to be set
 	 *
 	 * @return array
 	 */
-	public function getValues($filter = null) {
-		return $this->getFields($filter)->asValues();
+	public function getValues($filter = null, $filter_params = []) {
+		return $this->getFields($filter, $filter_params)->asValues();
 	}
 }
