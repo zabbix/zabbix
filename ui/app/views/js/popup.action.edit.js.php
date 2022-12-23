@@ -22,7 +22,8 @@
 
 window.action_edit_popup = new class {
 
-	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
+	init({condition_operators, condition_types, conditions, actionid, eventsource, csrf_token_create, csrf_token_update,
+			csrf_token_delete}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -30,6 +31,9 @@ window.action_edit_popup = new class {
 		this.condition_types = condition_types;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
+		this.csrf_token_create = csrf_token_create;
+		this.csrf_token_update = csrf_token_update;
+		this.csrf_token_delete = csrf_token_delete;
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
@@ -361,7 +365,9 @@ window.action_edit_popup = new class {
 		}
 
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
+		this.actionid !== 0
+			? curl.setAction('action.update', this.csrf_token_update)
+			: curl.setAction('action.create', this.csrf_token_create);
 
 		this._post(curl.getUrl(), fields);
 	}
@@ -433,7 +439,7 @@ window.action_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'action.delete');
+		curl.setAction('action.delete', this.csrf_token_delete);
 
 		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

@@ -21,6 +21,8 @@
 
 class CControllerPopupActionEdit extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
@@ -198,6 +200,11 @@ class CControllerPopupActionEdit extends CController {
 			];
 		}
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data += [
+			'csrf_token_create' => self::generateCsrfToken('action.create'),
+			'csrf_token_update' => self::generateCsrfToken('action.update'),
+			'csrf_token_delete' => self::generateCsrfToken('action.delete')
+		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

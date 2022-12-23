@@ -24,9 +24,10 @@
  */
 abstract class CControllerPopupConditionCommon extends CController {
 
+	protected $validate_csrf_token = false;
+
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->disableSIDvalidation();
 	}
 
 	protected function checkInput() {

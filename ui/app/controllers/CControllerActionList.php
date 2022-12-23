@@ -21,9 +21,7 @@
 
 class CControllerActionList extends CController {
 
-	protected function init(): void {
-		$this->disableSIDValidation();
-	}
+	protected $validate_csrf_token = false;
 
 	protected function checkInput(): bool {
 		$fields = [

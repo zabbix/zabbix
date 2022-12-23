@@ -98,7 +98,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'action.enable');
+			curl.setAction('action.enable', target.dataset.csrfToken);
 
 			this._post(target, actionids, curl.getUrl());
 		}
@@ -113,7 +113,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'action.disable');
+			curl.setAction('action.disable', target.dataset.csrfToken);
 
 			this._post(target, actionids, curl.getUrl());
 		}
@@ -128,7 +128,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'action.delete');
+			curl.setAction('action.delete', target.dataset.csrfToken);
 
 			this._post(target, actionids, curl.getUrl());
 		}

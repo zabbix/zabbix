@@ -262,7 +262,10 @@ $form
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
-				'allowed_operations' => $data['allowedOperations']
+				'allowed_operations' => $data['allowedOperations'],
+				'csrf_token_create' => $data['csrf_token_create'],
+				'csrf_token_update' => $data['csrf_token_update'],
+				'csrf_token_delete' => $data['csrf_token_delete']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
