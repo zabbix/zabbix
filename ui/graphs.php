@@ -57,7 +57,7 @@ $fields = [
 	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
-	'checkbox_hash' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'checkbox_hash' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],

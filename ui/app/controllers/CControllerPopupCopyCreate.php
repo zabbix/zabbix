@@ -19,10 +19,6 @@
 **/
 
 
-/**
- * @var array
- */
-
 class CControllerPopupCopyCreate extends CController {
 
 	protected function init(): void {

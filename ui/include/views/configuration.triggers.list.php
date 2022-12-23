@@ -362,7 +362,7 @@ $triggers_form->addItem([
 				'content' => (new CSimpleButton(_('Copy')))
 					->addClass('js-copy')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeid()
+					->removeId()
 			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))

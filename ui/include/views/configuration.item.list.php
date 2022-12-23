@@ -327,7 +327,7 @@ $button_list += [
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeid()
+			->removeId()
 	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))

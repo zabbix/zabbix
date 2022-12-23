@@ -65,7 +65,6 @@
 
 				dialogue.addEventListener('dialogue.submit', (e) => {
 					postMessageOk(e.detail.title);
-					//uncheckTableRows('items_' + this.checkbox_hash, [], false);
 
 					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 					uncheckTableRows('items_' + this.checkbox_hash, [], false);
@@ -80,8 +79,10 @@
 				});
 			});
 
-			if (document.querySelector('.js-execute-now') != null) {
-				document.querySelector('.js-execute-now').addEventListener('click', () => {
+			const execute_now = document.querySelector('.js-execute-now');
+
+			if (execute_now !== null) {
+				execute_now.addEventListener('click', () => {
 					this.massCheckNow();
 				});
 			}
@@ -160,6 +161,7 @@
 					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
 					document.activeElement.blur();
 				});
+
 			document.activeElement.classList.remove('is-loading');
 		},
 

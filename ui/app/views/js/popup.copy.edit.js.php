@@ -38,15 +38,16 @@ window.copy_popup = new class {
 	}
 
 	changeTargetType() {
-		let $multiselect = $('<div>', {
+		const $multiselect = $('<div>', {
 			id: 'copy_targetids',
 			class: 'multiselect',
 			css: {
 				width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
 			},
 			'aria-required': true
-		}),
-		helper_options = {
+		});
+
+		const helper_options = {
 			id: 'copy_targetids',
 			name: 'copy_targetids[]',
 			objectOptions: {

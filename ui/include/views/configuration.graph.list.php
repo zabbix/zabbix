@@ -258,7 +258,7 @@ if (!$this->data['parent_discoveryid']) {
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeid()
+			->removeId()
 	];
 }
 $buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']

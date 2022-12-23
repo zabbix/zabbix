@@ -34,8 +34,10 @@
 		},
 
 		_initActions() {
-			if (document.querySelector('.js-copy') != null) {
-				document.querySelector('.js-copy').addEventListener('click', () => {
+			const copy = document.querySelector('.js-copy');
+
+			if (copy !== null) {
+				copy.addEventListener('click', () => {
 					const overlay = this.openCopyPopup();
 					const dialogue = overlay.$dialogue[0];
 

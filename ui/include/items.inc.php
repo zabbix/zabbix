@@ -599,7 +599,7 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	do {
 		$dst_items = [];
 
-		if(count($dst_hostids) === 0) {
+		if (!$dst_hostids) {
 			return true;
 		}
 
