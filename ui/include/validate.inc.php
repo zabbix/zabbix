@@ -398,6 +398,10 @@ function invalid_url($msg = null) {
 	$messages_backup = CMessageHelper::getMessages();
 	CMessageHelper::clear();
 
+	if (!CWebUser::isLoggedIn()) {
+		define('ZBX_PAGE_NO_MENU', true);
+	}
+
 	require_once dirname(__FILE__).'/page_header.php';
 
 	// Rollback reset messages.
