@@ -76,12 +76,12 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				],
 				'selectMediatypes' => ['name', 'maxattempts'],
 				'eventsource' => $eventsource['source'],
-				'eventobject' => $eventsource['object'],
-				'sortfield' => $sortfield,
-				'sortorder' => $sortorder,
-				'limit' => $show_lines
+				'eventobject' => $eventsource['object']
 			]));
 		}
+
+		CArrayHelper::sort($alerts, [['field' => $sortfield, 'order' => $sortorder]]);
+		$alerts = array_slice($alerts, 0, $show_lines, true);
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
