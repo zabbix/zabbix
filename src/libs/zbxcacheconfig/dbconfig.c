@@ -6473,6 +6473,93 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Updates maintenances in configuration cache                       *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenanceid                                                *
+ *           1 - maintenance_type                                             *
+ *           2 - active_since                                                 *
+ *           3 - active_till                                                  *
+ *           4 - tags_evaltype                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_connectors(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	zbx_uint64_t		connectorid;
+	zbx_dc_connector_t	*connector;
+	int			found, ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(connectorid, row[0]);
+
+		connector = (zbx_dc_connector_t *)DCfind_id(&config->connectors, connectorid,
+				sizeof(zbx_dc_connector_t), &found);
+
+		if (0 == found)
+		{
+			zbx_vector_ptr_create_ext(&connector->tags, config->connectors.mem_malloc_func,
+					config->connectors.mem_realloc_func, config->connectors.mem_free_func);
+		}
+
+		ZBX_STR2UCHAR(connector->protocol, row[1]);
+		ZBX_STR2UCHAR(connector->data_type, row[2]);
+		dc_strpool_replace(found, &connector->url, row[3]);
+		connector->max_records = atoi(row[4]);
+		connector->max_senders = atoi(row[5]);
+		dc_strpool_replace(found, &connector->timeout, row[6]);
+		ZBX_STR2UCHAR(connector->retries, row[7]);
+		dc_strpool_replace(found, &connector->token, row[8]);
+		dc_strpool_replace(found, &connector->http_proxy, row[9]);
+		ZBX_STR2UCHAR(connector->authtype, row[10]);
+		dc_strpool_replace(found, &connector->username, row[11]);
+		dc_strpool_replace(found, &connector->password, row[12]);
+		ZBX_STR2UCHAR(connector->verify_peer, row[13]);
+		ZBX_STR2UCHAR(connector->verify_host, row[14]);
+		dc_strpool_replace(found, &connector->ssl_cert_file, row[15]);
+		dc_strpool_replace(found, &connector->ssl_key_file, row[16]);
+		dc_strpool_replace(found, &connector->ssl_key_password, row[17]);
+		ZBX_STR2UCHAR(connector->status, row[18]);
+		ZBX_STR2UCHAR(connector->tags_evaltype, row[19]);
+	}
+
+	/* remove deleted connectors */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (connector = (zbx_dc_connector_t *)zbx_hashset_search(&config->connectors, &rowid)))
+			continue;
+
+		zbx_vector_ptr_destroy(&connector->tags);
+		dc_strpool_release(connector->url);
+		dc_strpool_release(connector->timeout);
+		dc_strpool_release(connector->token);
+		dc_strpool_release(connector->http_proxy);
+		dc_strpool_release(connector->username);
+		dc_strpool_release(connector->password);
+		dc_strpool_release(connector->ssl_cert_file);
+		dc_strpool_release(connector->ssl_key_file);
+		dc_strpool_release(connector->ssl_key_password);
+
+		zbx_hashset_remove_direct(&config->connectors, connector);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
@@ -6489,7 +6576,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
 			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2, httptest_sec,
-			httptest_sec2;
+			httptest_sec2, connector_sec, connector_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -6498,7 +6585,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
-			httpstep_field_sync, autoreg_host_sync;
+			httpstep_field_sync, autoreg_host_sync, connector_sync;
 
 	double		autoreg_csec, autoreg_csec2, autoreg_host_csec, autoreg_host_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -6578,6 +6665,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	zbx_dbsync_init(&httpstep_sync, changelog_sync_mode);
 	zbx_dbsync_init(&httpstep_field_sync, changelog_sync_mode);
 
+	zbx_dbsync_init(&connector_sync, mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -6708,6 +6796,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	httptest_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_connectors(&connector_sync))
+		goto out;
+	connector_sec = zbx_time() - sec;
+
 	START_SYNC;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
@@ -6745,6 +6838,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	/* during host maintenance update calculations                     */
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
 		dc_maintenance_precache_nested_groups();
+
+	sec = zbx_time();
+	DCsync_connectors(&connector_sync);
+	connector_sec2 = zbx_time() - sec;
 
 	FINISH_SYNC;
 
@@ -7161,6 +7258,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpstepfld : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, httpstep_field_sync.add_num, httpstep_field_sync.update_num,
 				httpstep_field_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, connector_sec, connector_sec2, connector_sync.add_num,
+				connector_sync.update_num, connector_sync.remove_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
@@ -7285,6 +7386,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpstepfld: %d (%d slots)", __func__,
 				config->httpstep_fields.num_data, config->httpstep_fields.num_slots);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector: %d (%d slots)", __func__,
+				config->connectors.num_data, config->connectors.num_slots);
+
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __func__,
@@ -7397,6 +7501,7 @@ clean:
 	zbx_dbsync_clear(&httptest_field_sync);
 	zbx_dbsync_clear(&httpstep_sync);
 	zbx_dbsync_clear(&httpstep_field_sync);
+	zbx_dbsync_clear(&connector_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -7828,6 +7933,8 @@ int	init_configuration_cache(char **error)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, 0, __config_psk_hash, __config_psk_compare);
 #endif
+
+	CREATE_HASHSET(config->connectors, 0);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{

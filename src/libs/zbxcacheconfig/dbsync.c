@@ -3990,3 +3990,146 @@ void	zbx_dbsync_clear_user_macros(void)
 {
 	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares maintenance table row with cached configuration data     *
+ *                                                                            *
+ * Parameter: maintenance - [IN] the cached maintenance data                  *
+ *            dbrow       - [IN] the database row                             *
+ *                                                                            *
+ * Return value: SUCCEED - the row matches configuration data                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_connector(const zbx_dc_connector_t *connector, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_uchar(dbrow[1], connector->protocol))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[2], connector->data_type))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[3], connector->url))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_int(dbrow[4], connector->max_records))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_int(dbrow[5], connector->max_senders))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[6], connector->timeout))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[7], connector->retries))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[8], connector->token))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[9], connector->http_proxy))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[10], connector->authtype))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[11], connector->username))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[12], connector->password))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[13], connector->verify_peer))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[14], connector->verify_host))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[15], connector->ssl_cert_file))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[16], connector->ssl_key_file))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[17], connector->ssl_key_password))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[18], connector->status))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_uchar(dbrow[19], connector->tags_evaltype))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares connector table with cached configuration data           *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_hashset_t		ids;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		rowid;
+	zbx_dc_connector_t	*connector;
+
+	if (NULL == (result = DBselect("select connectorid,protocol,data_type,url,max_records,max_senders,timeout,"
+				"retries,token,http_proxy,authtype,username,password,verify_peer,"
+				"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
+				"tags_evaltype"
+			" from connector")))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 20, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->connectors.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		connector = (zbx_dc_connector_t *)zbx_hashset_search(&dbsync_env.cache->connectors, &rowid);
+
+		if (NULL == connector)
+			tag = ZBX_DBSYNC_ROW_ADD;
+		else if (FAIL == dbsync_compare_connector(connector, dbrow))
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, dbrow);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->connectors, &iter);
+	while (NULL != (connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &connector->connectorid))
+			dbsync_add_row(sync, connector->connectorid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
+
+	return SUCCEED;
+}
