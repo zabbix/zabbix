@@ -241,8 +241,8 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of element fields indexed by label name.
 	 *
-	 * @param CElementFilter $filter			condition to be filtered by
-	 * @param array			 $filter_params		condition parameters to be set
+	 * @param CElementFilter $filter            condition to be filtered by
+	 * @param array          $filter_params     condition parameters to be set
 	 *
 	 * @return CElementCollection
 	 */
@@ -251,20 +251,13 @@ class CFormElement extends CElement {
 
 		foreach ($this->getLabels() as $key => $label) {
 			$element = $this->getFieldByLabelElement($label);
-			if ($this->filter !== null && !$this->filter->match($element, $key)) {
-				$element = new CNullElement();
-			}
 
 			if ($element->isValid()) {
 				$fields[$label->getText()] = $element;
 			}
 		}
 
-		$this->fields = new CElementCollection($fields);
-
-		if ($filter !== null) {
-			$this->fields = $this->fields->filter(new CElementFilter($filter, $filter_params));
-		}
+		$this->fields = $this->filterCollection(new CElementCollection($fields), $filter, $filter_params);
 
 		return $this->fields;
 	}
