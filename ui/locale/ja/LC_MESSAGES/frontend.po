@@ -3632,6 +3632,10 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "イベントを更新できません"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "グラフを更新できません"
@@ -3868,6 +3872,11 @@ msgstr "正規表現に一致するすべてのSNMPトラップをキャッチ�
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMPトラップをキャッチする。"
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -3924,6 +3933,10 @@ msgstr "パスワード変更"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "1秒あたりの差分"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4750,6 +4763,14 @@ msgstr "契約番号"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "JSONへの変換"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -12246,6 +12267,10 @@ msgstr "3月"
 msgid "March"
 msgstr "3月"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "トリガーの状態が変化した要素をマーク"
@@ -12257,6 +12282,10 @@ msgstr "その他をマーク"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "選択をマーク"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15003,6 +15032,10 @@ msgstr "パターン"
 msgid "Pause operations for suppressed problems"
 msgstr "メンテナンス中の場合に実行を保留"
 
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:163
 #, c-format
 msgid "Peak memory usage: %1$s"
@@ -15692,6 +15725,10 @@ msgstr "解決済"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17677,6 +17714,11 @@ msgstr "サイドバーを表示"
 msgid "Show suppressed problems"
 msgstr "メンテナンス中の障害を表示"
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18345,6 +18387,11 @@ msgstr "スウェーデン語 (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "認証方式の変更を行うと現在のセッション以外はリセットされます実行しますか？"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19792,6 +19839,10 @@ msgstr "ユーザーの役割\"%1$s\"にはUI要素\"%2$s\"は使用できませ
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "不明"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -23532,6 +23583,14 @@ msgstr "深刻度の変更の権限がありません"
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "障害のクローズの権限がありません"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"
