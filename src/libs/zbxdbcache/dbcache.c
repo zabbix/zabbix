@@ -922,7 +922,12 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 				zbx_hashset_iter_remove(&iter);
 			}
 			else
+			{
+				if (SUCCEED == zbx_history_requires_trends(trend->value_type))
+					DCflush_trend(trend, trends, &trends_alloc, trends_num);
+
 				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+			}
 		}
 
 		cache->trends_last_cleanup_hour = hour;
@@ -942,9 +947,6 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 
 			if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends, &del_itemids.values[i])))
 				continue;
-
-			if (SUCCEED == zbx_history_requires_trends(trend->value_type))
-				DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 			zbx_hashset_remove_direct(&cache->trends, trend);
 		}
