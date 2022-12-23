@@ -923,7 +923,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 			}
 			else
 			{
-				if (SUCCEED == zbx_history_requires_trends(trend->value_type))
+				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 < trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 				zbx_vector_uint64_append(&del_itemids, trend->itemid);
