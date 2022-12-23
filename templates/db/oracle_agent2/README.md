@@ -165,11 +165,11 @@ There are no template links in this template.
 |Zabbix_raw_items |Oracle: Get PGA stats |<p>Get PGA statistics.</p> |ZABBIX_PASSIVE |oracle.pga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix_raw_items |Oracle: Get FRA stats |<p>Get FRA statistics.</p> |ZABBIX_PASSIVE |oracle.fra.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix_raw_items |Oracle: Get SGA stats |<p>Get SGA statistics.</p> |ZABBIX_PASSIVE |oracle.sga.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix_raw_items |Oracle: Get tablespaces stats |<p>It gets the statistics of the tablespaces.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix_raw_items |Oracle: Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB databases on an instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix_raw_items |Oracle: Get PDB info |<p>It gets the information about the PDB databases on an instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix_raw_items |Oracle: Get archive log info | |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix_raw_items |Oracle: Get ASM stats |<p>It gets the ASM disk groups statistics.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix_raw_items |Oracle Database '{#DBNAME}': Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB database on an instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"] |
+|Zabbix_raw_items |Oracle Database '{#DBNAME}': Get PDB info |<p>It gets the information about the PDB database on an instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"] |
+|Zabbix_raw_items |Oracle TBS '{#TABLESPACE}': Get tablespace stats |<p>It gets the statistics of the tablespace.</p> |ZABBIX_PASSIVE |oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"] |
+|Zabbix_raw_items |Archivelog '{#DEST_NAME}': Get archive log info |<p>It gets the archivelog statistics.</p> |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"] |
+|Zabbix_raw_items |ASM '{#DGNAME}': Get ASM stats |<p>It gets the ASM disk group statistics.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"] |
 
 ## Triggers
 
