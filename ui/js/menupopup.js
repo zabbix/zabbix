@@ -79,6 +79,7 @@ function getMenuPopupHistory(options) {
  *
  * @param {string} options['hostid']                  Host ID.
  * @param {array}  options['scripts']                 Host scripts (optional).
+ * @param {string} options['csrf_token_script']       CSRF token for script execution.
  * @param {string} options[]['name']                  Script name.
  * @param {string} options[]['scriptid']              Script ID.
  * @param {string} options[]['confirmation']          Confirmation text.
@@ -317,7 +318,8 @@ function getMenuPopupHost(options, trigger_element) {
 	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid, options.eventid,
+				options.csrf_token_script)
 		});
 	}
 
@@ -937,7 +939,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid, csrf_token_script)
 		});
 	}
 
@@ -954,6 +956,7 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @param bool   options['trends']                      Are trends available.
  * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
  * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
+ * @param string options['csrf_token_execute']          CSRF token for item execution.
  *
  * @return array
  */
@@ -1110,7 +1113,7 @@ function getMenuPopupItem(options) {
 		execute.clickCallback = function () {
 			jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-			view.checkNow(options.itemid);
+			view.checkNow(options.itemid, options.csrf_token_execute);
 		};
 	}
 
@@ -1362,14 +1365,15 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param {array} scripts          Script names and nenu paths.
- * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
- * @param {array} hostid           Host ID.
- * @param {array} eventid          Event ID.
+ * @param {array}  scripts            Script names and nenu paths.
+ * @param {Node}   trigger_element    UI element which triggered opening of overlay dialogue.
+ * @param {array}  hostid             Host ID.
+ * @param {array}  eventid            Event ID.
+ * @param {string} csrf_token_script  CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
+function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_token_script) {
 	let tree = {};
 
 	// Parse scripts and create tree.
@@ -1388,7 +1392,7 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 		}
 	}
 
-	return getMenuPopupScriptItems(tree, trigger_element);
+	return getMenuPopupScriptItems(tree, trigger_element, csrf_token_script);
 }
 
 /**
@@ -1492,12 +1496,13 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 /**
  * Build script menu items from tree.
  *
- * @param {object} tree        Menu tree object to where menu items are.
- * @param {Node}   trigger_elm UI element which triggered opening of overlay dialogue.
+ * @param {object} tree              Menu tree object to where menu items are.
+ * @param {Node}   trigger_elm       UI element which triggered opening of overlay dialogue.
+ * @param {string} csrf_token_script CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptItems(tree, trigger_elm) {
+function getMenuPopupScriptItems(tree, trigger_elm, csrf_token_script) {
 	let items = [];
 
 	if (objectSize(tree) > 0) {
@@ -1505,7 +1510,7 @@ function getMenuPopupScriptItems(tree, trigger_elm) {
 			const item = {label: data.name};
 
 			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-				item.items = getMenuPopupScriptItems(data.items, trigger_elm);
+				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token_script);
 			}
 
 			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
@@ -1514,7 +1519,7 @@ function getMenuPopupScriptItems(tree, trigger_elm) {
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
 					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-						data.params.eventid
+						data.params.eventid, csrf_token_script
 					);
 					cancelEvent(e);
 				};

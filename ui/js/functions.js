@@ -552,10 +552,12 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
+ * @param string csrf_token_script	Event ID.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null,
+		csrf_token_script) {
 	var execute = function() {
-		var popup_options = {scriptid: scriptid};
+		var popup_options = {scriptid: scriptid, _csrf_token: csrf_token_script};
 
 		if (hostid !== null) {
 			popup_options.hostid = hostid;
@@ -565,7 +567,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			popup_options.eventid = eventid;
 		}
 
-		if (Object.keys(popup_options).length === 2) {
+		if (Object.keys(popup_options).length === 3) {
 			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};

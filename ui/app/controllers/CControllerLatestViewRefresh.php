@@ -24,6 +24,8 @@
  */
 class CControllerLatestViewRefresh extends CControllerLatestView {
 
+	protected $validate_csrf_token = false;
+
 	protected function doAction(): void {
 		if ($this->getInput('filter_counters', 0) != 0) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();

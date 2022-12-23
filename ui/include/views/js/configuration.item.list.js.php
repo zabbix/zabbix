@@ -122,9 +122,9 @@
 				});
 		},
 
-		checkNow(itemid) {
+		checkNow(itemid, csrf_token_execute) {
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
+			curl.setAction('item.masscheck_now', csrf_token_execute);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

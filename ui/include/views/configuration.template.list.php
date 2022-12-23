@@ -107,7 +107,7 @@ $html_page = (new CHtmlPage())
 	)
 	->addItem($filter);
 
-$form = (new CForm())->setName('templates');
+$form = (new CForm())->setName('templates')->addCsrfToken('templates.php');
 
 // create table
 $table = (new CTableInfo())
