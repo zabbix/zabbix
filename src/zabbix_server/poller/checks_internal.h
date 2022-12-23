@@ -20,12 +20,12 @@
 #ifndef ZABBIX_CHECKS_INTERNAL_H
 #define ZABBIX_CHECKS_INTERNAL_H
 
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxcomms.h"
 
 extern int	CONFIG_SERVER_STARTUP_TIME;
 
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config);
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms);
 
 int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 

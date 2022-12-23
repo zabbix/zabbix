@@ -431,7 +431,7 @@ class testFormUserMedia extends CWebTest {
 			['email' => '2@zabbix.com'],
 			['email' => '3@zabbix.com']
 		];
-		$this->page->login()->open('zabbix.php?action=user.edit&userid=5');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=50');
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
 		$user_form->selectTab('Media');
 

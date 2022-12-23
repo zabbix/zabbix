@@ -92,7 +92,9 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * @return CApiClientResponse
 	 */
 	protected function callClientMethod($method, $params) {
-		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
+		$auth = ($this->requiresAuthentication($this->api, $method))
+			? $this->auth
+			: ['type' => CJsonRpc::AUTH_TYPE_PARAM, 'auth' => null];
 
 		return $this->client->callMethod($this->api, $method, $params, $auth);
 	}

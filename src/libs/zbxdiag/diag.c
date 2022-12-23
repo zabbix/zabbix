@@ -22,7 +22,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxshmem.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "preproc.h"
 #include "log.h"
 #include "zbxmutexs.h"
@@ -548,6 +548,11 @@ void	zbx_diag_add_locks_info(struct zbx_json *json)
 	zbx_json_addobject(json, NULL);
 	zbx_json_addhex(json, "ZBX_RWLOCK_CONFIG", (zbx_uint64_t)zbx_rwlock_addr_get(ZBX_RWLOCK_CONFIG));
 	zbx_json_close(json);
+
+	zbx_json_addobject(json, NULL);
+	zbx_json_addhex(json, "ZBX_RWLOCK_CONFIG_HISTORY", (zbx_uint64_t)zbx_rwlock_addr_get(ZBX_RWLOCK_CONFIG_HISTORY));
+	zbx_json_close(json);
+
 	zbx_json_addobject(json, NULL);
 	zbx_json_addhex(json, "ZBX_RWLOCK_VALUECACHE", (zbx_uint64_t)zbx_rwlock_addr_get(ZBX_RWLOCK_VALUECACHE));
 	zbx_json_close(json);

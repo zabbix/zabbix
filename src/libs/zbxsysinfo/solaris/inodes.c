@@ -21,8 +21,6 @@
 #include "inodes.h"
 #include "../sysinfo.h"
 
-#include "log.h"
-
 int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
 		double *pused, const char *mode, char **error)
 {
@@ -56,8 +54,8 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 	}
 	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-		return SYSINFO_RET_FAIL;
+		*pfree = 100.0;
+		*pused = 0.0;
 	}
 
 	return SYSINFO_RET_OK;

@@ -48,6 +48,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
+	{"system.sw.os",	CF_HAVEPARAMS,	system_sw_os,		NULL},
+	{"system.sw.os.get",	CF_HAVEPARAMS,	system_sw_os_get,	NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
 	{"vm.vmemory.size",	CF_HAVEPARAMS,	vm_vmemory_size,	"total"},
@@ -56,10 +58,10 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uname",	0,		system_uname,		NULL},
 
-	{"service.discovery",	0,		service_discovery,	NULL},
-	{"service.info",	CF_HAVEPARAMS,	service_info,		ZABBIX_SERVICE_NAME},
-	{"service_state",	CF_HAVEPARAMS,	service_state,		ZABBIX_SERVICE_NAME},
-	{"services",		CF_HAVEPARAMS,	services,		NULL},
+	{"service.discovery",	0,		discover_services,	NULL},
+	{"service.info",	CF_HAVEPARAMS,	get_service_info,	ZABBIX_SERVICE_NAME},
+	{"service_state",	CF_HAVEPARAMS,	get_service_state,	ZABBIX_SERVICE_NAME},
+	{"services",		CF_HAVEPARAMS,	get_list_of_services,	NULL},
 	{"perf_counter",	CF_HAVEPARAMS,	perf_counter,		"\\System\\Processes"},
 	{"perf_counter_en",	CF_HAVEPARAMS,	perf_counter_en,	"\\System\\Processes"},
 	{"perf_instance.discovery",	CF_HAVEPARAMS,	perf_instance_discovery,	"Processor"},

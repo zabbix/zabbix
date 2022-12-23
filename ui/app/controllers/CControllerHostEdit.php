@@ -246,6 +246,10 @@ class CControllerHostEdit extends CController {
 				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
 			}
 
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				$macro['allow_revert'] = true;
+			}
+
 			unset($macro['automatic']);
 		}
 		unset($macro);

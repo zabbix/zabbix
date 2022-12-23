@@ -191,12 +191,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Right trim',
-						'Key' => 'empty-right-trim'
+						'Key' => 'empty-right-trim[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Right trim']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -204,12 +204,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Left trim',
-						'Key' => 'empty-left-trim'
+						'Key' => 'empty-left-trim[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Left trim']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -217,12 +217,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Trim',
-						'Key' => 'empty-trim'
+						'Key' => 'empty-trim[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Trim']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			// Arithmetic. Custom multiplier.
@@ -231,12 +231,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty multiplier',
-						'Key' => 'empty-multiplier'
+						'Key' => 'empty-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -244,12 +244,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'String multiplier',
-						'Key' => 'string-multiplier'
+						'Key' => 'string-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -257,12 +257,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Multiplier comma',
-						'Key' => 'comma-multiplier'
+						'Key' => 'comma-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => '0,0']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -270,12 +270,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Multiplier symbols',
-						'Key' => 'symbols-multiplier'
+						'Key' => 'symbols-multiplier[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => '1a!@#$%^&*()-=']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			// Change. Simple change, Change per second
@@ -284,13 +284,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two delta',
-						'Key' => 'two-delta'
+						'Key' => 'two-delta[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Simple change'],
 						['type' => 'Simple change']
 					],
-					'error' => 'Only one change step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			[
@@ -298,13 +299,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two delta per second',
-						'Key' => 'two-delta-per-second'
+						'Key' => 'two-delta-per-second[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Change per second'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Only one change step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			[
@@ -312,13 +314,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two different delta',
-						'Key' => 'two-different-delta'
+						'Key' => 'two-different-delta[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Simple change'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Only one change step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			// Validation. In range.
@@ -327,12 +330,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'In range empty',
-						'Key' => 'in-range-empty'
+						'Key' => 'in-range-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params": cannot be empty.'
 				]
 			],
 			[
@@ -340,12 +343,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'In range letters string',
-						'Key' => 'in-range-letters-string'
+						'Key' => 'in-range-letters-string[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => 'abc', 'parameter_2' => 'def']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -353,12 +356,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'In range symbols',
-						'Key' => 'in-range-symbols'
+						'Key' => 'in-range-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-=']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -366,12 +369,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'In range comma',
-						'Key' => 'in-range-comma'
+						'Key' => 'in-range-comma[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '1,5', 'parameter_2' => '-3,5']
 					],
-					'error' => 'Incorrect value for field "params": a numeric value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -379,12 +382,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'In range wrong interval',
-						'Key' => 'in-range-wrong-interval'
+						'Key' => 'in-range-wrong-interval[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
 					],
-					'error' => 'Incorrect value for field "params": "min" value must be less than or equal to "max" value.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal '.
+							'to the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
 			// Validation. Matches regular expression.
@@ -393,12 +397,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Matches regular expression empty',
-						'Key' => 'matches-regular-expression-empty'
+						'Key' => 'matches-regular-expression-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Matches regular expression']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			// Validation. Check for error in XML.
@@ -407,12 +411,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item error XML empty',
-						'Key' => 'item-error-xml-empty'
+						'Key' => 'item-error-xml-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in XML']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			// Validation. Check for error using regular expression.
@@ -421,12 +425,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item error REGEXP both params empty',
-						'Key' => 'item-error-regexp-both-empty'
+						'Key' => 'item-error-regexp-both-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -434,12 +438,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item error REGEXP first parameter empty',
-						'Key' => 'item-error-regexp-first-empty'
+						'Key' => 'item-error-regexp-first-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression', 'parameter_2' => 'test']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -447,12 +451,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item error REGEXP second parameter empty',
-						'Key' => 'item-error-regexp-second-empty'
+						'Key' => 'item-error-regexp-second-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
 					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
 			// Throttling. Discard unchanged.
@@ -461,13 +465,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item two discard unchanged',
-						'Key' => 'item-two-discard-unchanged'
+						'Key' => 'item-two-discard-unchanged[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged']
 					],
-					'error' => 'Only one throttling step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((19, 20)).'
 				]
 			],
 			[
@@ -475,13 +480,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item two different throttlings',
-						'Key' => 'item-two-different-throttlings'
+						'Key' => 'item-two-different-throttlings[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'error' => 'Only one throttling step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((19, 20)).'
 				]
 			]
 		]);
@@ -498,12 +504,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty regular expression',
-						'Key' => 'Empty-both-parameters'
+						'Key' => 'Empty-both-parameters[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": first parameter is expected.'
 				]
 			],
 			[
@@ -511,12 +518,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty pattern of regular expression',
-						'Key' => 'empty-first-parameter'
+						'Key' => 'empty-first-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_2' => 'test output']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": first parameter is expected.'
 				]
 			],
 			[
@@ -524,12 +532,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty output of regular expression',
-						'Key' => 'empty-second-parameter'
+						'Key' => 'empty-second-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression']
 					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
 			// Structured data. XML XPath.
@@ -538,12 +547,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'XML XPath',
-						'Key' => 'empty-xpath'
+						'Key' => 'empty-xpath[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'XML XPath']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			// Structured data. JSONPath.
@@ -552,12 +562,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'JSONPath empty',
-						'Key' => 'empty-jsonpath'
+						'Key' => 'empty-jsonpath[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'JSONPath']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			// Custom scripts. JavaScript.
@@ -566,12 +577,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty JavaScript',
-						'Key' => 'item-empty-javascript'
+						'Key' => 'item-empty-javascript[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'JavaScript']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			// Validation. Does not match regular expression
@@ -580,12 +592,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Does not match regular expression empty',
-						'Key' => 'does-not-match-regular-expression-empty'
+						'Key' => 'does-not-match-regular-expression-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Does not match regular expression']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			// Validation. Check for error in JSON.
@@ -594,12 +607,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Error JSON empty',
-						'Key' => 'error-json-empty'
+						'Key' => 'error-json-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in JSON']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			// Throttling. Discard unchanged with heartbeat
@@ -608,13 +622,15 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two equal discard unchanged with heartbeat',
-						'Key' => 'two-equal-discard-unchanged-with-heartbeat'
+						'Key' => 'two-equal-discard-unchanged-with-heartbeat[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'error' => 'Only one throttling step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
+							'within the combinations of (type)=((19, 20)).',
+					'lld_error' => 'Only one throttling step is allowed'
 				]
 			],
 			[
@@ -622,13 +638,15 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Two different discard unchanged with heartbeat',
-						'Key' => 'two-different-discard-unchanged-with-heartbeat'
+						'Key' => 'two-different-discard-unchanged-with-heartbeat[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
 					],
-					'error' => 'Only one throttling step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
+							'within the combinations of (type)=((19, 20)).',
+					'lld_error' => 'Only one throttling step is allowed'
 				]
 			],
 			[
@@ -636,12 +654,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat empty',
-						'Key' => 'discard-unchanged-with-heartbeat-empty'
+						'Key' => 'discard-unchanged-with-heartbeat-empty[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat']
 					],
-					'error' => 'Invalid parameter "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.',
+					'lld_error' => 'Invalid parameter "params": cannot be empty.'
 				]
 			],
 			[
@@ -649,12 +668,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat symbols',
-						'Key' => 'discard-unchanged-with-heartbeat-symbols'
+						'Key' => 'discard-unchanged-with-heartbeat-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=']
 					],
-					'error' => 'Invalid parameter "params": a time unit is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.',
+					'lld_error' => 'Invalid parameter "params": a time unit is expected.'
 				]
 			],
 			[
@@ -662,12 +682,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discardunchanged with heartbeat letters string',
-						'Key' => 'discard-unchanged-with-heartbeat-letters-string'
+						'Key' => 'discard-unchanged-with-heartbeat-letters-string[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
 					],
-					'error' => 'Invalid parameter "params": a time unit is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.',
+					'lld_error' => 'Invalid parameter "params": a time unit is expected.'
 				]
 			],
 			[
@@ -675,12 +696,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat comma',
-						'Key' => 'discard-unchanged-with-heartbeat-comma'
+						'Key' => 'discard-unchanged-with-heartbeat-comma[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
 					],
-					'error' => 'Invalid parameter "params": a time unit is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.',
+					'lld_error' => 'Invalid parameter "params": a time unit is expected.'
 				]
 			],
 			[
@@ -688,12 +710,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-unchanged-with-heartbeat-dot'
+						'Key' => 'discard-unchanged-with-heartbeat-dot[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
 					],
-					'error' => 'Invalid parameter "params": a time unit is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.',
+					'lld_error' => 'Invalid parameter "params": a time unit is expected.'
 				]
 			],
 			[
@@ -701,12 +724,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat negative',
-						'Key' => 'discard-unchanged-with-heartbeat-negative'
+						'Key' => 'discard-unchanged-with-heartbeat-negative[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
 					],
-					'error' => 'Invalid parameter "params": value must be one of 1-788400000.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.',
+					'lld_error' => 'Invalid parameter "params": value must be one of 1-788400000.'
 				]
 			],
 			[
@@ -714,12 +738,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat zero',
-						'Key' => 'discard-unchanged-with-heartbeat-zero'
+						'Key' => 'discard-unchanged-with-heartbeat-zero[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
 					],
-					'error' => 'Invalid parameter "params": value must be one of 1-788400000.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.',
+					'lld_error' => 'Invalid parameter "params": value must be one of 1-788400000.'
 				]
 			],
 			[
@@ -727,12 +752,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat maximum',
-						'Key' => 'unchanged-with-heartbeat-max'
+						'Key' => 'unchanged-with-heartbeat-max[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
 					],
-					'error' => 'Invalid parameter "params": value must be one of 1-788400000.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.',
+					'lld_error' => 'Invalid parameter "params": value must be one of 1-788400000.'
 				]
 			]
 		];
@@ -749,7 +775,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'CSV to JSON empty parameters',
-						'Key' => 'csv-to-json-empty-parameters'
+						'Key' => 'csv-to-json-empty-parameters[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'CSV to JSON']
@@ -761,7 +787,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'CSV to JSON with default parameters',
-						'Key' => 'csv-to-json-with-default-parameters'
+						'Key' => 'csv-to-json-with-default-parameters[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'CSV to JSON', 'parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => true]
@@ -773,7 +799,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'CSV to JSON custom parameters',
-						'Key' => 'csv-to-json-custom-parameters'
+						'Key' => 'csv-to-json-custom-parameters[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'CSV to JSON', 'parameter_1' => ' ', 'parameter_2' => "'", 'parameter_3' => false]
@@ -786,7 +812,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'In range negative float',
-						'Key' => 'in-range-negative-float'
+						'Key' => 'in-range-negative-float[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '-3.5', 'parameter_2' => '-1.5']
@@ -799,7 +825,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Not supported step',
-						'Key' => 'check-for-not-supported'
+						'Key' => 'check-for-not-supported[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for not supported value']
@@ -811,10 +837,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'In range zero',
-						'Key' => 'in-range-zero'
+						'Key' => 'in-range-zero[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => '0', 'parameter_2' => '0']
+						['type' => 'In range', 'parameter_1' => '0', 'parameter_2' => '1']
 					]
 				]
 			],
@@ -823,7 +849,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Add all preprocessing',
-						'Key' => 'item.all.preprocessing'
+						'Key' => 'item.all.preprocessing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for not supported value'],
@@ -852,7 +878,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Add symbols preprocessing',
-						'Key' => 'item.symbols.preprocessing'
+						'Key' => 'item.symbols.preprocessing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '1a!@#$%^&*()-='],
@@ -861,7 +887,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'Custom multiplier', 'parameter_1' => '4e+10'],
+						['type' => 'Custom multiplier', 'parameter_1' => '4.0E+14'],
 						['type' => 'Regular expression', 'parameter_1' => '5d!@#$%^&*()-=', 'parameter_2' => '6e!@#$%^&*()-='],
 						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
 						['type' => 'Matches regular expression', 'parameter_1' => '7f!@#$%^&*()-='],
@@ -877,7 +903,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Add the same preprocessing',
-						'Key' => 'item.theSamePpreprocessing'
+						'Key' => 'item.theSamePpreprocessing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
@@ -929,7 +955,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item with preprocessing rule with user macro',
-						'Key' => 'item-user-macro'
+						'Key' => 'item-user-macro[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => '{$TEST1}', 'parameter_2' => '{$MACRO2}'],
@@ -957,7 +983,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item with spaces in preprocessing',
-						'Key' => 'item-spaces-preprocessing'
+						'Key' => 'item-spaces-preprocessing[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
@@ -990,12 +1016,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter starts with digits',
-						'Key' => 'json-prometeus-digits-first-parameter'
+						'Key' => 'json-prometeus-digits-first-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '1name_of_metric']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1003,12 +1030,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON wrong equals operator',
-						'Key' => 'json-prometeus-wrong-equals-operator'
+						'Key' => 'json-prometeus-wrong-equals-operator[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}=1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1016,12 +1044,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported operator >',
-						'Key' => 'json-prometeus-unsupported-operator-1'
+						'Key' => 'json-prometeus-unsupported-operator-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}>1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1029,12 +1058,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported operator <',
-						'Key' => 'json-prometeus-unsupported-operator-2'
+						'Key' => 'json-prometeus-unsupported-operator-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}<1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1042,12 +1072,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported operator !==',
-						'Key' => 'json-prometeus-unsupported-operator-3'
+						'Key' => 'json-prometeus-unsupported-operator-3[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}!==1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1055,12 +1086,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported operator >=',
-						'Key' => 'json-prometeus-unsupported-operator-4'
+						'Key' => 'json-prometeus-unsupported-operator-4[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}>=1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1068,12 +1100,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported operator =<',
-						'Key' => 'json-prometeus-unsupported-operator-5'
+						'Key' => 'json-prometeus-unsupported-operator-5[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}=<1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1081,12 +1114,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON duplicate metric condition',
-						'Key' => 'json-duplicate-metric-condition'
+						'Key' => 'json-duplicate-metric-condition[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_system{__name__="metric_name"}']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1094,12 +1128,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON wrong parameter - space',
-						'Key' => 'json-wrong-parameter-space'
+						'Key' => 'json-wrong-parameter-space[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu usage_system']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1107,13 +1142,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON wrong parameter - slash',
-						'Key' => 'json-wrong-parameter-slash'
+						'Key' => 'json-wrong-parameter-slash[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu\\']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1121,13 +1157,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometheus to JSON wrong parameter - digits',
-						'Key' => 'json-wrong-parameter-digits'
+						'Key' => 'json-wrong-parameter-digits[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON',  'parameter_1' => '123']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1135,13 +1172,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometheus to JSON wrong first parameter - pipe',
-						'Key' => 'json-wrong-parameter-pipe'
+						'Key' => 'json-wrong-parameter-pipe[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'metric==1e|5']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1149,13 +1187,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometheus to JSON wrong first parameter - slash',
-						'Key' => 'json-wrong-parameter-slash'
+						'Key' => 'json-wrong-parameter-slash[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label="value\"}']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
+					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1163,27 +1202,28 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item duplicate Prometeus to JSON steps',
-						'Key' => 'duplicate-prometheus-to-json-steps'
+						'Key' => 'duplicate-prometheus-to-json-steps[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system_1'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system_1']
 					],
-					'error' => 'Only one Prometheus step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((22, 23)).',
+					'lld_error' => 'Only one Prometheus step is allowed.'
 				]
 			],
-			// Successful Prometheus to JSON creation.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON empty first parameter',
-						'Key' => 'json-prometeus-empty-first-parameter'
+						'Key' => 'json-prometeus-empty-first-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1191,7 +1231,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter +inf',
-						'Key' => 'json-prometeus-plus-inf'
+						'Key' => 'json-prometeus-plus-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system==+inf']
@@ -1203,7 +1243,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter inf',
-						'Key' => 'json-prometeus-inf'
+						'Key' => 'json-prometeus-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==inf']
@@ -1215,7 +1255,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter -inf',
-						'Key' => 'json-prometeus-negative-inf'
+						'Key' => 'json-prometeus-negative-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__=~"<regex>"}==-inf']
@@ -1227,7 +1267,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter nan',
-						'Key' => 'json-prometeus-nan'
+						'Key' => 'json-prometeus-nan[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==nan']
@@ -1239,7 +1279,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter exp',
-						'Key' => 'json-prometeus-exp'
+						'Key' => 'json-prometeus-exp[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu_usage_system==3.5180e+11']
@@ -1251,7 +1291,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameter ==1',
-						'Key' => 'json-prometeus-neutral-digit'
+						'Key' => 'json-prometeus-neutral-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==1']
@@ -1263,7 +1303,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameters ==+1',
-						'Key' => 'json-prometeus-positive-digit'
+						'Key' => 'json-prometeus-positive-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==+1']
@@ -1275,7 +1315,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON first parameters ==-1',
-						'Key' => 'json-prometeus-negative-digit'
+						'Key' => 'json-prometeus-negative-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="metric_name"}==-1']
@@ -1287,7 +1327,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON label operator =',
-						'Key' => 'json-prometeus-label-operator-equal-strong'
+						'Key' => 'json-prometeus-label-operator-equal-strong[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="name"}']
@@ -1299,7 +1339,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON label operator =~',
-						'Key' => 'json-prometeus-label-operator-contains'
+						'Key' => 'json-prometeus-label-operator-contains[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name=~"name"}']
@@ -1311,7 +1351,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON slashes in pattern',
-						'Key' => 'json-prometeus-slashes-pattern'
+						'Key' => 'json-prometeus-slashes-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label="value\\\\"}']
@@ -1323,7 +1363,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON user macros in parameter',
-						'Key' => 'json-prometeus-macros-1'
+						'Key' => 'json-prometeus-macros-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{$METRIC_NAME}==1']
@@ -1335,7 +1375,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON user macros in parameter',
-						'Key' => 'json-prometeus-macros-2'
+						'Key' => 'json-prometeus-macros-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{__name__="{$METRIC_NAME}"}']
@@ -1347,7 +1387,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON user macros in parameters',
-						'Key' => 'json-prometeus-macros-3'
+						'Key' => 'json-prometeus-macros-3[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{{$LABEL_NAME}="<label value>"}']
@@ -1359,7 +1399,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON user macros in parameters',
-						'Key' => 'json-prometeus-macros-4'
+						'Key' => 'json-prometeus-macros-4[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="{$LABEL_VALUE}"}']
@@ -1371,7 +1411,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported label operator !=',
-						'Key' => 'json-prometeus-unsupported-label-operator-1'
+						'Key' => 'json-prometeus-unsupported-label-operator-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!="regex_pattern"}']
@@ -1383,7 +1423,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus to JSON unsupported label operator !~',
-						'Key' => 'json-prometeus-unsupported-label-operator-2'
+						'Key' => 'json-prometeus-unsupported-label-operator-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"<regex>"}']
@@ -1404,12 +1444,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus empty first parameter',
-						'Key' => 'prometeus-empty-first-parameter'
+						'Key' => 'prometeus-empty-first-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -1417,12 +1457,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Prometheus space in pattern',
-						'Key' => 'prometheus-space-in-pattern'
+						'Key' => 'prometheus-space-in-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu usage_metric']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1430,12 +1470,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Prometheus only digits in pattern',
-						'Key' => 'prometheus-digits-in-pattern'
+						'Key' => 'prometheus-digits-in-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '1223']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1443,12 +1483,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter starts with digits',
-						'Key' => 'prometeus-digits-first-parameter'
+						'Key' => 'prometeus-digits-first-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '1name_of_metric']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1456,12 +1496,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong equals operator',
-						'Key' => 'rometeus-wrong-equals-operator'
+						'Key' => 'rometeus-wrong-equals-operator[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1469,12 +1509,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported operator >',
-						'Key' => 'prometeus-unsupported-operator-1'
+						'Key' => 'prometeus-unsupported-operator-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}>1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1482,12 +1522,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported operator <',
-						'Key' => 'prometeus-unsupported-operator-2'
+						'Key' => 'prometeus-unsupported-operator-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}<1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1495,12 +1535,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported operator !==',
-						'Key' => 'prometeus-unsupported-operator-3'
+						'Key' => 'prometeus-unsupported-operator-3[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}!==1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1508,12 +1548,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported operator >=',
-						'Key' => 'prometeus-unsupported-operator-4'
+						'Key' => 'prometeus-unsupported-operator-4[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}>=1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1521,12 +1561,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported operator =<',
-						'Key' => 'prometeus-unsupported-operator-5'
+						'Key' => 'prometeus-unsupported-operator-5[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=<1']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1534,12 +1574,12 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus duplicate metric condition',
-						'Key' => 'duplicate-metric-condition'
+						'Key' => 'duplicate-metric-condition[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_system{__name__="metric_name"}']
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1547,13 +1587,14 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item duplicate Prometeus steps',
-						'Key' => 'duplicate-prometheus-steps'
+						'Key' => 'duplicate-prometheus-steps[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system']
 					],
-					'error' => 'Only one Prometheus step is allowed.'
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((22, 23)).'
 				]
 			],
 			[
@@ -1561,7 +1602,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong second parameter - space',
-						'Key' => 'wrong-second-parameter-space'
+						'Key' => 'wrong-second-parameter-space[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1571,7 +1612,7 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_3' => 'label name'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -1579,7 +1620,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong second parameter - quotes',
-						'Key' => 'wrong-second-parameter-quotes'
+						'Key' => 'wrong-second-parameter-quotes[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1589,7 +1630,7 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_3' => '"label_name"'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -1597,7 +1638,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong second parameter - triangle quotes',
-						'Key' => 'wrong-second-parameter-triangle-quotes'
+						'Key' => 'wrong-second-parameter-triangle-quotes[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1607,7 +1648,7 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_3' => '<label_name>'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -1615,7 +1656,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong second parameter - slash',
-						'Key' => 'wrong-second-parameter-slash'
+						'Key' => 'wrong-second-parameter-slash[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1625,7 +1666,7 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_3' => '\0'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -1633,7 +1674,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong second parameter - digits',
-						'Key' => 'wrong-second-parameter-digits'
+						'Key' => 'wrong-second-parameter-digits[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1643,7 +1684,7 @@ abstract class testFormPreprocessing extends CWebTest {
 							'parameter_3' => '123'
 						]
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/3": invalid Prometheus label.'
 				]
 			],
 			[
@@ -1651,13 +1692,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter - pipe',
-						'Key' => 'wrong-second-parameter-pipe'
+						'Key' => 'wrong-second-parameter-pipe[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'metric==1e|5']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1665,13 +1706,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter - slash',
-						'Key' => 'wrong-second-parameter-slash'
+						'Key' => 'wrong-second-parameter-slash[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label="value\"}']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1679,13 +1720,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter =!',
-						'Key' => 'wrong-second-parameter-equals-exlamation'
+						'Key' => 'wrong-second-parameter-equals-exlamation[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			[
@@ -1693,13 +1734,13 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter ~!',
-						'Key' => 'wrong-second-parameter-tilda-exclamation'
+						'Key' => 'wrong-second-parameter-tilda-exclamation[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name~!"name"}']
 
 					],
-					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.'
 				]
 			],
 			// Successful Prometheus pattern creation.
@@ -1708,7 +1749,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus empty second parameter',
-						'Key' => 'prometeus-empty-second-parameter'
+						'Key' => 'prometeus-empty-second-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system']
@@ -1720,7 +1761,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus both parameters present',
-						'Key' => 'prometeus-both-parameters-present'
+						'Key' => 'prometeus-both-parameters-present[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1737,7 +1778,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter +inf',
-						'Key' => 'prometeus-plus-inf'
+						'Key' => 'prometeus-plus-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system==+inf']
@@ -1749,7 +1790,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter inf',
-						'Key' => 'prometeus-inf'
+						'Key' => 'prometeus-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="metric_name"}==inf']
@@ -1761,7 +1802,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter -inf',
-						'Key' => 'prometeus-negative-inf'
+						'Key' => 'prometeus-negative-inf[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}==-inf']
@@ -1773,7 +1814,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter nan',
-						'Key' => 'prometeus-nan'
+						'Key' => 'prometeus-nan[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="metric_name"}==nan']
@@ -1785,7 +1826,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter exp',
-						'Key' => 'prometeus-exp'
+						'Key' => 'prometeus-exp[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system==3.5180e+11']
@@ -1797,7 +1838,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameter ==1',
-						'Key' => 'prometeus-neutral-digit'
+						'Key' => 'prometeus-neutral-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="metric_name"}==1']
@@ -1809,7 +1850,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameters ==+1',
-						'Key' => 'prometeus-positive-digit'
+						'Key' => 'prometeus-positive-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="metric_name"}==+1']
@@ -1821,7 +1862,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus first parameters ==-1',
-						'Key' => 'prometeus-negative-digit'
+						'Key' => 'prometeus-negative-digit[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="metric_name"}==-1']
@@ -1833,7 +1874,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus label operator =',
-						'Key' => 'prometeus-label-operator-equal-strong'
+						'Key' => 'prometeus-label-operator-equal-strong[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name="name"}']
@@ -1845,7 +1886,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus label operator =~',
-						'Key' => 'prometeus-label-operator-contains'
+						'Key' => 'prometeus-label-operator-contains[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=~"name"}']
@@ -1857,7 +1898,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus label operator !=',
-						'Key' => 'prometeus-label-operator-exclamation-equals'
+						'Key' => 'prometeus-label-operator-exclamation-equals[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="name"}']
@@ -1869,7 +1910,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus label operator !~',
-						'Key' => 'prometeus-label-operator-exclamation-tilda'
+						'Key' => 'prometeus-label-operator-exclamation-tilda[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"name"}']
@@ -1881,7 +1922,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus slashes in pattern',
-						'Key' => 'prometeus-slashes-pattern'
+						'Key' => 'prometeus-slashes-pattern[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label="value\\\\"}']
@@ -1893,7 +1934,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus user macros in parameters',
-						'Key' => 'prometeus-macros-1'
+						'Key' => 'prometeus-macros-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1909,7 +1950,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus user macros in parameters',
-						'Key' => 'prometeus-macros-2'
+						'Key' => 'prometeus-macros-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__="{$METRIC_NAME}"}']
@@ -1921,7 +1962,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus user macros in parameters',
-						'Key' => 'prometeus-macros-3'
+						'Key' => 'prometeus-macros-3[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{{$LABEL_NAME}="<label value>"}']
@@ -1933,7 +1974,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus user macros in parameters',
-						'Key' => 'prometeus-macros-4'
+						'Key' => 'prometeus-macros-4[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name="{$LABEL_VALUE}"}']
@@ -1945,7 +1986,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported label operator !=',
-						'Key' => 'prometeus-unsupported-label-operator-1'
+						'Key' => 'prometeus-unsupported-label-operator-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="regex_pattern"}']
@@ -1957,7 +1998,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus unsupported label operator !~',
-						'Key' => 'prometeus-unsupported-label-operator-2'
+						'Key' => 'prometeus-unsupported-label-operator-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
@@ -1969,7 +2010,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus function sum',
-						'Key' => 'prometeus-function-sum'
+						'Key' => 'prometeus-function-sum[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -1985,7 +2026,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus function min',
-						'Key' => 'prometeus-function-min'
+						'Key' => 'prometeus-function-min[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2001,7 +2042,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus function max',
-						'Key' => 'prometeus-function-max'
+						'Key' => 'prometeus-function-max[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2017,7 +2058,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus function avg',
-						'Key' => 'prometeus-function-avg'
+						'Key' => 'prometeus-function-avg[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2033,7 +2074,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Item Prometeus function count',
-						'Key' => 'prometeus-function-count'
+						'Key' => 'prometeus-function-count[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2090,23 +2131,21 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->assertMessage(TEST_GOOD, $this->success_message);
+		if ($data['expected'] === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, $this->success_message);
 
-				// Check result in frontend form.
-				$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
-				$this->page->open($this->ready_link.$id);
-				$form->selectTab('Preprocessing');
-				$this->assertPreprocessingSteps($data['preprocessing']);
-				break;
+			// Check result in frontend form.
+			$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['fields']['Key']));
+			$this->page->open($this->ready_link.$id);
+			$form->selectTab('Preprocessing');
+			$this->assertPreprocessingSteps($data['preprocessing']);
+		}
+		else {
+			$error_message = ($lld) ? $data['lld_error'] : $data['error'];
+			$this->assertMessage(TEST_BAD, $this->fail_message, $error_message);
 
-			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $this->fail_message, $data['error']);
-
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
-				break;
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
 		}
 	}
 
@@ -2119,7 +2158,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Prometheus to JSON trailing spaces',
-						'Key' => 'json-prometeus-space-in-parameter'
+						'Key' => 'json-prometeus-space-in-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '  metric  ']
@@ -2138,7 +2177,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Prometheus pattern trailing spaces',
-						'Key' => 'prometeus-space-in-parameters'
+						'Key' => 'prometeus-space-in-parameters[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2154,7 +2193,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Custom multiplier trailing spaces',
-						'Key' => 'Custom-multiplier-spaces-in-parameter'
+						'Key' => 'Custom-multiplier-spaces-in-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Custom multiplier', 'parameter_1' => '  2  ']
@@ -2165,7 +2204,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'In range trailing spaces',
-						'Key' => 'in-range-spaces-in-parameter'
+						'Key' => 'in-range-spaces-in-parameter[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '  5  ', 'parameter_2' => '  10  ']
@@ -2242,7 +2281,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$case = [
 				'fields' => [
 					'Name' => 'Preprocessing '.$label,
-					'Key' => 'preprocessing-steps-discard-on-fail'.$value
+					'Key' => 'preprocessing-steps-discard-on-fail'.$value.'[{#KEY}]'
 				],
 				'preprocessing' => [
 					[
@@ -2461,7 +2500,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set value empty',
-					'Key' => 'set-value-empty'
+					'Key' => 'set-value-empty[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set value to',
@@ -2472,7 +2511,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set value number',
-					'Key' => 'set-value-number'
+					'Key' => 'set-value-number[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set value to',
@@ -2483,7 +2522,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set value string',
-					'Key' => 'set-value-string'
+					'Key' => 'set-value-string[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set error to',
@@ -2494,7 +2533,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set value special-symbols',
-					'Key' => 'set-value-special-symbols'
+					'Key' => 'set-value-special-symbols[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set value to',
@@ -2506,19 +2545,20 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_BAD,
 				'fields' => [
 					'Name' => 'Set error empty',
-					'Key' => 'set-error-empty'
+					'Key' => 'set-error-empty[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set error to',
 					'error_handler_params' => ''
 				],
-				'error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.',
+				'lld_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 			],
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set error string',
-					'Key' => 'set-error-string'
+					'Key' => 'set-error-string[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set error to',
@@ -2529,7 +2569,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set error number',
-					'Key' => 'set-error-number'
+					'Key' => 'set-error-number[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set error to',
@@ -2540,7 +2580,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				'expected' => TEST_GOOD,
 				'fields' => [
 					'Name' => 'Set error special symbols',
-					'Key' => 'set-error-special-symbols'
+					'Key' => 'set-error-special-symbols[{#KEY}]'
 				],
 				'custom_on_fail' => [
 					'error_handler' => 'Set error to',
@@ -2590,7 +2630,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Templated Preprocessing steps',
-						'Key' => 'templated-preprocessing-steps'
+						'Key' => 'templated-preprocessing-steps[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -2776,7 +2816,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	protected function checkCloneItem($link, $item, $templated = false) {
 		$cloned_values = [
 			'Name'	=> 'Cloned_testInheritancePreprocessingSteps'.time(),
-			'Key' => 'cloned-preprocessing'.time()
+			'Key' => 'cloned-preprocessing'.time().'[{#KEY}]'
 		];
 
 		// Open original item on host and get its' preprocessing steps.

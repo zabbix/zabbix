@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxtasks.h"
-#include "zbxnum.h"
+#include "taskmanager.h"
 #include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxtasks.h"
 #include "zbxversion.h"
 
 /******************************************************************************
@@ -34,7 +35,7 @@
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
 		zbx_proxy_compatibility_t compatibility)
 {
 	DB_RESULT	result;
@@ -105,7 +106,7 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
 				break;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 
 	DBfree_result(result);

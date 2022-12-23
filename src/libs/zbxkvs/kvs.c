@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "kvs.h"
+#include "zbxkvs.h"
+
 #include "log.h"
 
 static zbx_hash_t	zbx_kv_hash(const void *data)

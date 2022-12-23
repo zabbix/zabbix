@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,29 +19,34 @@
 **/
 
 
+namespace Zabbix\Widgets\Fields;
+
+use CArrayHelper,
+	CNumberParser,
+	CParser;
+
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldThresholds extends CWidgetField {
 
-	public const THRESHOLDS_TABLE_ID = '%s-table';
-	public const THRESHOLDS_ROW_TMPL_ID = '%s-row-tmpl';
+	public const DEFAULT_VALUE = [];
 
 	/**
 	 * Create widget field for Thresholds selection.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
 	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
-			'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'threshold'	=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
-		]]);
-		$this->setDefault([]);
+		$this
+			->setDefault(self::DEFAULT_VALUE)
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
+				'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'threshold'	=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
+			]]);
 	}
 
-	public function setValue($value) {
+	public function setValue($value): self {
 		$thresholds = [];
 
 		foreach ($value as $threshold) {
@@ -81,29 +86,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 		return [];
 	}
 
-	public function getJavascript() {
-		return 'var thresholds_table = jQuery("#'.sprintf(self::THRESHOLDS_TABLE_ID, $this->getName()).'");'.
-				'thresholds_table'.
-					'.dynamicRows({template: "#'.sprintf(self::THRESHOLDS_ROW_TMPL_ID, $this->getName()).'"})'.
-					'.on("afteradd.dynamicRows", function(opt) {'.
-						'const rows = this.querySelectorAll(".form_row");'.
-						'const colors = jQuery("#widget-dialogue-form")[0]'.
-							'.querySelectorAll(".'.ZBX_STYLE_COLOR_PICKER.' input");'.
-						'const used_colors = [];'.
-						'for (const color of colors) {'.
-							'if (color.value !== "" && color.name.includes("thresholds")) {'.
-								'used_colors.push(color.value);'.
-							'}'.
-						'}'.
-				'jQuery(".color-picker input", rows[rows.length - 1])'.
-					'.val(colorPalette.getNextColor(used_colors))'.
-					'.colorpicker({'.
-						'appendTo: ".overlay-dialogue-body"'.
-					'});'.
-				'});';
-	}
-
-	public function toApi(array &$widget_fields = []) {
+	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
 		foreach ($value as $index => $val) {

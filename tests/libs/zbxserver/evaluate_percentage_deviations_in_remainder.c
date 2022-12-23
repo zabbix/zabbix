@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxserver.h"
 #include "zbxtrends.h"
 #include "zbxparam.h"

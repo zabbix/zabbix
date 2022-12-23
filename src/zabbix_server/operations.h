@@ -20,9 +20,7 @@
 #ifndef ZABBIX_OPERATIONS_H
 #define ZABBIX_OPERATIONS_H
 
-#include "dbcache.h"
-
-extern int	CONFIG_TIMEOUT;
+#include "zbxcacheconfig.h"
 
 void	op_template_add(const ZBX_DB_EVENT *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const ZBX_DB_EVENT *event, zbx_vector_uint64_t *del_templateids);

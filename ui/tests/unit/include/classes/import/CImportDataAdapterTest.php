@@ -249,6 +249,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => '{$SNMP_COMMUNITY}',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -980,7 +981,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1030,7 +1030,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1080,7 +1079,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [
 								[
 									'tag' => 'Application',
@@ -1385,7 +1383,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1435,7 +1432,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -1485,7 +1481,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [
 								[
 									'tag' => 'Application',
@@ -3196,7 +3191,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3298,7 +3292,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3400,7 +3393,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -3513,6 +3505,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3534,6 +3527,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '1',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3555,6 +3549,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3576,6 +3571,7 @@ class CImportDataAdapterTest extends TestCase {
 							'bulk' => '1',
 							'version' => '2',
 							'community' => 'public',
+							'max_repetitions' => '10',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -3603,7 +3599,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3624,7 +3621,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3645,7 +3643,8 @@ class CImportDataAdapterTest extends TestCase {
 							'authpassphrase' => 'test',
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
-							'community' => ''
+							'community' => '',
+							'max_repetitions' => '10'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -3994,7 +3993,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4096,7 +4094,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4198,7 +4195,6 @@ class CImportDataAdapterTest extends TestCase {
 							'publickey' => '',
 							'privatekey' => '',
 							'description' => '',
-							'inventory_link' => '0',
 							'tags' => [],
 							'valuemap' => [],
 							'logtimefmt' => '',
@@ -4291,9 +4287,7 @@ class CImportDataAdapterTest extends TestCase {
 			->setStrict(true)
 			->validate($source, '/');
 
-		$versions = ['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2', '4.4', '5.0', '5.2', '5.4', '6.0', '6.2'];
-
-		foreach ($versions as $version) {
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($source['zabbix_export']['version'] !== $version) {
 				continue;
 			}

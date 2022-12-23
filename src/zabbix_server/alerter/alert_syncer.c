@@ -18,6 +18,7 @@
 **/
 
 #include "alert_syncer.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"
@@ -25,7 +26,7 @@
 #include "log.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
@@ -34,8 +35,6 @@
 
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
-
-extern unsigned char			program_type;
 
 extern int	CONFIG_CONFSYNCER_FREQUENCY;
 
@@ -920,7 +919,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (SUCCEED != am_db_init(&amdb, &error))
@@ -945,7 +944,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 		zbx_sleep_loop(info, sleeptime);
 
 		sec1 = zbx_time();
-		zbx_update_env(sec1);
+		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 

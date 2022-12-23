@@ -24,7 +24,7 @@
  * @var array $data
  */
 ?>
-<?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
+<?= (new CTemplateTag('valuemap-rename-row-tmpl'))->addItem(
 	(new CRow([
 		(new CTextBox('valuemap_rename[#{rowNum}][from]', '', false, DB::getFieldLength('valuemap', 'name')))
 			->addStyle('width: 100%;'),

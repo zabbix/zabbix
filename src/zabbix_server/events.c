@@ -27,6 +27,9 @@
 #include "zbxservice.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
+#include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /* event recovery data */
 typedef struct
@@ -161,7 +164,7 @@ static void	get_item_tags_by_expression(const ZBX_DB_TRIGGER *trigger, zbx_vecto
 
 	zbx_vector_uint64_create(&functionids);
 	zbx_db_trigger_get_functionids(trigger, &functionids);
-	zbx_dc_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
+	zbx_dc_config_history_sync_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
 	zbx_vector_uint64_destroy(&functionids);
 }
 
@@ -838,6 +841,8 @@ out:
 	return ret;
 }
 
+#define ZBX_CORR_OPERATION_CLOSE_OLD	0
+#define ZBX_CORR_OPERATION_CLOSE_NEW	1
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if correlation has operations to change old events         *
@@ -1135,6 +1140,8 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, ZBX_D
 		}
 	}
 }
+#undef ZBX_CORR_OPERATION_CLOSE_OLD
+#undef ZBX_CORR_OPERATION_CLOSE_NEW
 
 /* specifies correlation execution scope */
 typedef enum

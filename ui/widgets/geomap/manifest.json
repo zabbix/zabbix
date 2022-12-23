@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2.0,
+	"id": "geomap",
+	"type": "widget",
+	"name": "Geomap",
+	"namespace": "Geomap",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetGeoMap"
+	},
+	"actions": {
+		"widget.geomap.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

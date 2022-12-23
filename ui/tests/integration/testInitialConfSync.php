@@ -25,7 +25,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup actions, config, functions, globalmacro
+ * @backup actions, config, config_autoreg_tls, functions, globalmacro
  * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
  * @backup host_tag, hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup item_tag, lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
@@ -101,7 +101,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'interfaces' =>
 			[
-				'insert' => '14',
+				'insert' => '16',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -109,7 +109,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'items' =>
 			[
-				'insert' => '93',
+				'insert' => '95',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -117,7 +117,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'template_items' =>
 			[
-				'insert' => '53',
+				'insert' => '54',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -385,7 +385,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"8",
+				"10",
 				"delete" =>
 				"0"
 			]
@@ -594,7 +594,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"10",
+				"12",
 				"delete" =>
 				"0"
 			]
@@ -739,7 +739,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"14"
+				"16"
 			]
 		],
 		[
@@ -750,7 +750,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"149"
+				"152"
 			]
 		],
 		[
@@ -761,7 +761,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"53"
+				"54"
 			]
 		],
 		[
@@ -772,7 +772,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"149"
+				"152"
 			]
 		],
 		[

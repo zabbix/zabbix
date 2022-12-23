@@ -43,6 +43,15 @@
 #define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
 extern int	zbx_log_level;
+
+typedef struct
+{
+	char	*log_file_name;
+	char	*log_type_str;
+	int	log_type;
+	int	log_file_size;
+} zbx_config_log_t;
+
 #define ZBX_CHECK_LOG_LEVEL(level)			\
 		((LOG_LEVEL_INFORMATION != (level) &&	\
 		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
@@ -61,9 +70,9 @@ extern int	zbx_log_level;
 #	define zabbix_log __zbx_zabbix_log
 #endif
 
-int		zabbix_open_log(int type, int level, const char *filename, char **error);
-void		__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
-void		zabbix_close_log(void);
+int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
+void	__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
+void	zabbix_close_log(void);
 
 #ifndef _WINDOWS
 int		zabbix_increase_log_level(void);
@@ -71,7 +80,6 @@ int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
 #endif
 
-char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
 
 #ifdef _WINDOWS
@@ -83,7 +91,7 @@ int		zbx_redirect_stdio(const char *filename);
 void		zbx_handle_log(void);
 
 int		zbx_get_log_type(const char *logtype);
-int		zbx_validate_log_parameters(ZBX_TASK_EX *task);
+int		zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_file_cfg);
 
 void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offset, const char *format,
 		...) __zbx_attr_format_printf(5, 6);

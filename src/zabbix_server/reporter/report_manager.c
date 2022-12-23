@@ -19,6 +19,7 @@
 
 #include "report_manager.h"
 #include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxself.h"
@@ -46,8 +47,7 @@
 #define ZBX_REPORT_STATE_ERROR		2
 #define ZBX_REPORT_STATE_SUCCESS_INFO	3
 
-extern unsigned char			program_type;
-extern int				CONFIG_REPORTWRITER_FORKS;
+extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /* report manager data */
 typedef struct
@@ -249,7 +249,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	int		i, ret;
 	zbx_rm_writer_t	*writer;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_REPORTWRITER_FORKS);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() writers:%d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]);
 
 	if (FAIL == (ret = zbx_ipc_service_start(&manager->ipc, ZBX_IPC_SERVICE_REPORTER, error)))
 		goto out;
@@ -270,7 +270,7 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 	manager->zabbix_url = NULL;
 	manager->last_batchid = 0;
 
-	for (i = 0; i < CONFIG_REPORTWRITER_FORKS; i++)
+	for (i = 0; i < CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER]; i++)
 	{
 		writer = (zbx_rm_writer_t *)zbx_malloc(NULL, sizeof(zbx_rm_writer_t));
 		writer->client = NULL;
@@ -2306,7 +2306,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -2387,7 +2387,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

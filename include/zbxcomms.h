@@ -87,14 +87,15 @@ typedef struct
 } zbx_config_tls_t;
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
-void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
+void	zbx_config_tls_free(zbx_config_tls_t *config_tls);
 
 
 typedef struct
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
 	const char		*hostname;
 	const int		proxymode;
+	const int		config_timeout;
 }
 zbx_config_comms_args_t;
 
@@ -190,7 +191,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int config_timeout);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
@@ -300,12 +301,12 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks,
+void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_forks,
 		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
-void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);

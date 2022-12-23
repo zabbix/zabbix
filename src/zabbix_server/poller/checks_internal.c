@@ -29,8 +29,10 @@
 #include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
 
 extern unsigned char	program_type;
+extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -173,15 +175,16 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item       - [IN] item we are interested in                    *
- *             result     - [OUT] value of the requested item                 *
- *             zbx_config - [IN] Zabbix server/proxy config                   *
+ * Parameters: item             - [IN] item we are interested in              *
+ *             result           - [OUT] value of the requested item           *
+ *             zbx_config_comms - [IN] Zabbix server/proxy configuration for  *
+ *                                     communication                          *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -427,8 +430,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	{
 		int	res;
 
-		zbx_alarm_on(CONFIG_TIMEOUT);
-		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
+		zbx_alarm_on(zbx_config_comms->config_timeout);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
+				zbx_config_comms->config_timeout);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
@@ -476,7 +480,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		process_forks = get_process_type_forks(process_type);
+		process_forks = ZBX_PROCESS_TYPE_COUNT > process_type ? CONFIG_FORKS[process_type] : 0;
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";
@@ -765,7 +769,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_zabbix_stats_get(&json, zbx_config);
+				zbx_zabbix_stats_get(&json, zbx_config_comms);
 
 				zbx_json_close(&json);
 

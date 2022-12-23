@@ -25,15 +25,13 @@
 #include "zbxself.h"
 #include "zbxexec.h"
 #include "zbxipcservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
 #include "zbxhash.h"
 #include "zbxtime.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
-
-extern unsigned char			program_type;
 
 static zbx_es_t	es_engine;
 
@@ -113,7 +111,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
 	zbx_md5_finish(&state, hash);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".", eventid);
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 ".", eventid);
 
 	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
@@ -121,7 +119,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
 	}
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com", mediatypeid,
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com>", mediatypeid,
 			zbx_dc_get_instanceid());
 
 	return str;
@@ -294,7 +292,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -348,7 +346,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
-		zbx_update_env(time_read);
+		zbx_update_env(get_process_type_string(process_type), time_read);
 
 		switch (message.code)
 		{

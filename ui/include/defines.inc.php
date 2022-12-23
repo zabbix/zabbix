@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0beta3');
+define('ZABBIX_VERSION',		'6.4.0beta6');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030061);
+define('ZABBIX_DB_VERSION',		6030158);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -98,6 +98,12 @@ define('ZBX_UNITS_ROUNDOFF_UNSUFFIXED',		4);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
+define('IDP_TYPE_LDAP',	1);
+define('IDP_TYPE_SAML',	2);
+
+define('JIT_PROVISIONING_DISABLED',	0);
+define('JIT_PROVISIONING_ENABLED',	1);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
@@ -134,15 +140,13 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
-define('WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS',	0);
-define('WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS',	1);
-
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
+define('ZBX_AUTH_NONE',		-1);
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
 define('ZBX_AUTH_HTTP_DISABLED',	0);
@@ -151,6 +155,8 @@ define('ZBX_AUTH_LDAP_DISABLED',	0);
 define('ZBX_AUTH_LDAP_ENABLED',		1);
 define('ZBX_AUTH_SAML_DISABLED',	0);
 define('ZBX_AUTH_SAML_ENABLED',		1);
+define('ZBX_AUTH_SCIM_PROVISIONING_DISABLED',	0);
+define('ZBX_AUTH_SCIM_PROVISIONING_ENABLED',	1);
 define('ZBX_AUTH_FORM_ZABBIX',	0);
 define('ZBX_AUTH_FORM_HTTP',	1);
 define('ZBX_AUTH_CASE_INSENSITIVE',	0);
@@ -654,6 +660,8 @@ define('ZBX_PREPROC_CSV_TO_JSON',				24);
 define('ZBX_PREPROC_STR_REPLACE',				25);
 define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 define('ZBX_PREPROC_XML_TO_JSON',				27);
+define('ZBX_PREPROC_SNMP_WALK_VALUE',			28);
+define('ZBX_PREPROC_SNMP_WALK_TO_JSON',			29);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
@@ -673,6 +681,10 @@ define('ZBX_PREPROC_PROMETHEUS_MIN',   'min');
 define('ZBX_PREPROC_PROMETHEUS_MAX',   'max');
 define('ZBX_PREPROC_PROMETHEUS_AVG',   'avg');
 define('ZBX_PREPROC_PROMETHEUS_COUNT', 'count');
+
+define('ZBX_PREPROC_SNMP_WALK_TREAT_UNCHANGED', 0);
+define('ZBX_PREPROC_SNMP_WALK_TREAT_UTF8', 1);
+define('ZBX_PREPROC_SNMP_WALK_TREAT_MAC', 2);
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
@@ -804,6 +816,9 @@ define('SMTP_MESSAGE_FORMAT_HTML',			1);
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
 
+define('ACTION_PAUSE_SYMPTOMS_FALSE',		0);
+define('ACTION_PAUSE_SYMPTOMS_TRUE',		1);
+
 define('ACTION_PAUSE_SUPPRESSED_FALSE',		0);
 define('ACTION_PAUSE_SUPPRESSED_TRUE',		1);
 
@@ -847,8 +862,8 @@ define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',		2);
 define('SCREEN_SORT_TRIGGERS_TIME_ASC',				3);
 define('SCREEN_SORT_TRIGGERS_TIME_DESC',			4);
-define('SCREEN_SORT_TRIGGERS_TYPE_ASC',				5);
-define('SCREEN_SORT_TRIGGERS_TYPE_DESC',			6);
+define('SCREEN_SORT_TRIGGERS_MEDIA_TYPE_ASC',				5);
+define('SCREEN_SORT_TRIGGERS_MEDIA_TYPE_DESC',			6);
 define('SCREEN_SORT_TRIGGERS_STATUS_ASC',			7);
 define('SCREEN_SORT_TRIGGERS_STATUS_DESC',			8);
 define('SCREEN_SORT_TRIGGERS_RECIPIENT_ASC',		11);
@@ -860,7 +875,7 @@ define('SCREEN_SORT_TRIGGERS_NAME_DESC',			16);
 
 define('SCREEN_MODE_PREVIEW',	0);
 define('SCREEN_MODE_EDIT',		1);
-define('SCREEN_MODE_SLIDESHOW',		2);
+define('SCREEN_MODE_SLIDESHOW',	2);
 define('SCREEN_MODE_JS',		3);
 
 define('SCREEN_REFRESH_RESPONSIVENESS',	10);
@@ -1044,14 +1059,18 @@ define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
 define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
 
-define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
-define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
-define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
-define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
-define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
-define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',	0x10);
-define('ZBX_PROBLEM_UPDATE_SUPPRESS',	    0x20);
-define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',	    0x40);
+define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
+define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
+define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',		0x02);
+define('ZBX_PROBLEM_UPDATE_MESSAGE',			0x04);
+define('ZBX_PROBLEM_UPDATE_SEVERITY',			0x08);
+define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',		0x10);
+define('ZBX_PROBLEM_UPDATE_SUPPRESS',			0x20);
+define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',			0x40);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',		0x80);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',	0x100);
+
+define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
 
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
@@ -1072,7 +1091,7 @@ define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
 define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
 define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
-define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
+define('ZBX_TM_DATA_TYPE_RANK_EVENT',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1177,7 +1196,8 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_CUSTOM_TIME', 1);
+define('SVG_GRAPH_CUSTOM_TIME_OFF',	0);
+define('SVG_GRAPH_CUSTOM_TIME_ON',	1);
 
 define('SVG_GRAPH_LEGEND_OFF',	0);
 define('SVG_GRAPH_LEGEND_ON',	1);
@@ -1191,11 +1211,13 @@ define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
 define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
 define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
 
-define('SVG_GRAPH_PROBLEMS_SHOW', 1);
+define('SVG_GRAPH_PROBLEMS_OFF',	0);
+define('SVG_GRAPH_PROBLEMS_ON',		1);
 
 define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
-define('SVG_GRAPH_AXIS_SHOW', 1);
+define('SVG_GRAPH_AXIS_OFF',	0);
+define('SVG_GRAPH_AXIS_ON',		1);
 
 define('SVG_GRAPH_AXIS_UNITS_AUTO',		0);
 define('SVG_GRAPH_AXIS_UNITS_STATIC',	1);
@@ -1291,6 +1313,9 @@ define('ZBX_FUNCTION_TYPE_MATH',		4);
 define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
+
+define('ZBX_TIMELINE_OFF',	0);
+define('ZBX_TIMELINE_ON',	1);
 
 /**
  * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
@@ -1436,6 +1461,10 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 define('API_FILTER_VALUES',			59);
+
+// any type
+define('API_ANY',					61);
+
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1478,6 +1507,13 @@ define('API_TIMESTAMP',				55);
 define('API_TG_NAME',				56);
 define('API_COLORS',				57);
 define('API_FILTER',				58);
+define('API_ITEM_KEY',				62);
+define('API_ITEM_DELAY',			63);
+define('API_JSON',					64);
+define('API_XML',					65);
+define('API_PREPROC_PARAMS',		66);
+define('API_PROMETHEUS_PATTERN',	67);
+define('API_PROMETHEUS_LABEL',		68);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1522,6 +1558,8 @@ define('API_OUTPUT_COUNT',		'count');
 
 define('ZBX_AUTH_TOKEN_ENABLED', 0);
 define('ZBX_AUTH_TOKEN_DISABLED', 1);
+
+define('ZBX_API_HEADER_AUTHENTICATE_PREFIX', 'Bearer ');
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -1582,6 +1620,7 @@ define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
 define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
 define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
 define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
+define('ZBX_TEXTAREA_PREPROC_TREAT_SELECT',		120);
 
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
@@ -1598,94 +1637,28 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
-// dashboard widgets
-define('WIDGET_ACTION_LOG',			'actionlog');
+// Dashboard widget types supported in templates (used only in import converters).
 define('WIDGET_CLOCK',				'clock');
-define('WIDGET_DISCOVERY',			'discovery');
-define('WIDGET_FAV_GRAPHS',			'favgraphs');
-define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_GEOMAP',				'geomap');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
-define('WIDGET_HOST_AVAIL',			'hostavail');
-define('WIDGET_MAP',				'map');
-define('WIDGET_NAV_TREE',			'navtree');
-define('WIDGET_PLAIN_TEXT',			'plaintext');
-define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
-define('WIDGET_PROBLEMS',			'problems');
-define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
-define('WIDGET_SLA_REPORT',			'slareport');
-define('WIDGET_SVG_GRAPH',			'svggraph');
-define('WIDGET_SYSTEM_INFO',		'systeminfo');
-define('WIDGET_TOP_HOSTS',			'tophosts');
-define('WIDGET_TRIG_OVER',			'trigover');
-define('WIDGET_URL',				'url');
-define('WIDGET_WEB',				'web');
 define('WIDGET_ITEM',				'item');
-// Deprecated widgets
-define('WIDGET_DATA_OVER',			'dataover');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_URL',				'url');
 
-// Clock widget type
-define('WIDGET_CLOCK_TYPE_ANALOG',	0);
-define('WIDGET_CLOCK_TYPE_DIGITAL',	1);
+// Inaccessible widget type.
+define('ZBX_WIDGET_INACCESSIBLE',	'inaccessible');
 
-// Clock time zone format
-define('WIDGET_CLOCK_TIMEZONE_SHORT',	0);
-define('WIDGET_CLOCK_TIMEZONE_FULL',	1);
+// event details sections
+define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');
+define('SECTION_HAT_EVENTDETAILS',		'hat_eventdetails');
+define('SECTION_HAT_EVENTACTIONS',		'hat_eventactions');
+define('SECTION_HAT_EVENTLIST',			'hat_eventlist');
 
-// Clock widget time format
-define('WIDGET_CLOCK_HOUR_TWENTY_FOUR',	0);
-define('WIDGET_CLOCK_HOUR_TWELVE',		1);
-
-// Item widget object positions.
-define('WIDGET_ITEM_POS_LEFT',		0);
-define('WIDGET_ITEM_POS_CENTER',	1);
-define('WIDGET_ITEM_POS_RIGHT',		2);
-
-define('WIDGET_ITEM_POS_TOP',		0);
-define('WIDGET_ITEM_POS_MIDDLE',	1);
-define('WIDGET_ITEM_POS_BOTTOM',	2);
-
-define('WIDGET_ITEM_POS_BEFORE',	0);
-define('WIDGET_ITEM_POS_ABOVE',		1);
-define('WIDGET_ITEM_POS_AFTER',		2);
-define('WIDGET_ITEM_POS_BELOW',		3);
-
-// sysmap widget source types
-define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
-define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
-
-// widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
-
-// max depth of navigation tree
-define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
-
-// event details widgets
-define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
-define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
-define('WIDGET_HAT_EVENTACTIONS',		'hat_eventactions');
-define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
-// search widget
-define('WIDGET_SEARCH_HOSTS',			'search_hosts');
-define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
-define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
-define('WIDGET_SEARCH_TEMPLATEGROUP',	'search_templategroup');
-
-// dashboard widget dynamic state
-define('WIDGET_SIMPLE_ITEM',	0);
-define('WIDGET_DYNAMIC_ITEM',	1);
-
-// clock widget blocks
-define('WIDGET_CLOCK_SHOW_DATE', 1);
-define('WIDGET_CLOCK_SHOW_TIME', 2);
-define('WIDGET_CLOCK_SHOW_TIMEZONE', 3);
-
-// item widget blocks
-define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
-define('WIDGET_ITEM_SHOW_VALUE',			2);
-define('WIDGET_ITEM_SHOW_TIME',				3);
-define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
+// search sections
+define('SECTION_SEARCH_HOSTS',			'search_hosts');
+define('SECTION_SEARCH_HOSTGROUP',		'search_hostgroup');
+define('SECTION_SEARCH_TEMPLATES',		'search_templates');
+define('SECTION_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);
@@ -1702,6 +1675,9 @@ define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 define('ZBX_WIDGET_FIELD_TYPE_SERVICE',			9);
 define('ZBX_WIDGET_FIELD_TYPE_SLA',				10);
+define('ZBX_WIDGET_FIELD_TYPE_USER',			11);
+define('ZBX_WIDGET_FIELD_TYPE_ACTION',			12);
+define('ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE',		13);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',					0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',			1);
@@ -1711,9 +1687,6 @@ define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
-
-// top hosts widget
-define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1910,7 +1883,6 @@ define('ZBX_STYLE_DASHBOARD_NEXT_PAGE', 'dashboard-next-page');
 define('ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW', 'dashboard-toggle-slideshow');
 define('ZBX_STYLE_DASHBOARD_WIDGET', 'dashboard-widget');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FORM', 'dashboard-widget-form');
-define('ZBX_STYLE_DASHBOARD_WIDGET_FLUID', 'dashboard-widget-fluid');
 define('ZBX_STYLE_DASHBOARD_WIDGET_HEAD', 'dashboard-widget-head');
 define('ZBX_STYLE_DASHBOARD_WIDGET_FOOT', 'dashboard-widget-foot');
 define('ZBX_STYLE_DASHBOARD_EDIT', 'dashboard-edit');
@@ -1992,6 +1964,8 @@ define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
+define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
+define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
@@ -2053,7 +2027,6 @@ define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_PAGING_BTN_CONTAINER', 'paging-btn-container');
 define('ZBX_STYLE_PAGING_SELECTED', 'paging-selected');
-define('ZBX_STYLE_PAGE_TITLE', 'page-title-general');
 define('ZBX_STYLE_PAGE_TITLE_SUBMENU', 'page-title-submenu');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_RED_BG', 'red-bg');
@@ -2134,6 +2107,13 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
+define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
+define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
+define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
+define('ZBX_STYLE_SYMPTOM_LIMIT_TD', 'symptom-limit-td');
+define('ZBX_STYLE_SECOND_COL', 'second-col');
+define('ZBX_STYLE_THIRD_COL', 'third-col');
 define('ZBX_STYLE_TOC', 'toc');
 define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
 define('ZBX_STYLE_TOC_ITEM', 'toc-item');

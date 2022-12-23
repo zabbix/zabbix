@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:36:38Z'
   template_groups:
     -
@@ -1981,7 +1981,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '12'
                   height: '5'
                   fields:
@@ -2004,7 +2004,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Tuples'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2028,7 +2028,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Events'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2052,7 +2052,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Block hit/read'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2077,7 +2077,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Temp files'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -2101,7 +2101,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Locks'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -2126,7 +2126,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Database size'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '12'
                   height: '5'
@@ -2150,7 +2150,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB {#DBNAME}: Queries'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '15'
                   width: '12'
@@ -2181,7 +2181,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2196,7 +2196,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL connections'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -2212,7 +2212,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL transactions'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2228,7 +2228,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL ping'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -2245,7 +2245,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL uptime'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -2261,7 +2261,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL replication lag'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -2278,7 +2278,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL WAL'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '12'
                   height: '5'
@@ -2294,7 +2294,7 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL bgwriter'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '15'
                   width: '12'

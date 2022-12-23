@@ -27,8 +27,6 @@
 #include "report_protocol.h"
 #include "zbxtime.h"
 
-extern unsigned char			program_type;
-
 extern char	*CONFIG_WEBSERVICE_URL;
 
 typedef struct
@@ -432,9 +430,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_REPORTER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
-			get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -471,7 +468,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_wake = zbx_time();
-		zbx_update_env(time_wake);
+		zbx_update_env(get_process_type_string(process_type), time_wake);
 		time_idle += time_wake - time_now;
 
 		switch (message.code)

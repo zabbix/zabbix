@@ -790,6 +790,21 @@ a.link-action {
 		border-color: lighten($table-border-color, 3%);
 	}
 
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: $ui-bg-color;
+
+		td {
+			border-bottom-color: $table-border-color !important;
+		}
+
+		.timeline-axis,
+		.timeline-td,
+		.timeline-date,
+		.problem-expand-td {
+			border-bottom-color: transparent !important;
+		}
+	}
+
 	&.compact-view {
 		.flh-na-bg,
 		.flh-info-bg,
@@ -1224,6 +1239,14 @@ td.inactive-bg {
 	background-position: -249px -836px;
 }
 
+.icon-action-cause::before {
+	background-position: -283px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -282px -656px;
+}
+
 .icon-invisible::before {
 	background-position: -249px -803px;
 }
@@ -1314,18 +1337,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-.overrides-options-list {
-	> li > div {
-		background-color: $ui-bg-selected-color !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;
@@ -1344,6 +1355,7 @@ td.inactive-bg {
 }
 
 // Widget "Host availability".
+
 .host-avail-widget {
 	td:not(:first-child) {
 		border-left: 1px solid $ui-border-color;
@@ -1357,7 +1369,8 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Navigation tree"
+// Widget "Navigation tree".
+
 .navtree {
 	.tree .tree-item > .tree-row {
 		min-width: 410px;
@@ -1365,6 +1378,7 @@ td.inactive-bg {
 }
 
 // Widget "Problems by severity".
+
 .by-severity-widget {
 	> div {
 		min-width: 65px;
@@ -1377,7 +1391,7 @@ td.inactive-bg {
 	}
 }
 
-// InputSecret and ButtonDropdown
+// InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
 	box-shadow: 0 1px 0px $blue, 0 -1px 0px $blue;
@@ -1403,7 +1417,7 @@ td.inactive-bg {
 	}
 }
 
-// HOST INTERFACES
+// Host interfaces.
 
 .interfaces {
 	.interface-row {
@@ -1417,6 +1431,20 @@ td.inactive-bg {
 					background-position: -165px -655px;
 				}
 			}
+		}
+	}
+}
+
+// Section (components/_section.scss).
+
+section {
+	.section-toggle {
+		background-position: -165px -654px;
+	}
+
+	&.section-collapsed {
+		.section-toggle {
+			background-position: -165px -690px;
 		}
 	}
 }

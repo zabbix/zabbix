@@ -212,7 +212,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for unsigned'],
 					// If problem is Aknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
-							'Unsuppress', 'Unacknowledge', 'Close problem', ''
+							'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
@@ -237,7 +237,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char'],
 					// If more than one problems selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Close problem', ''
+							'Acknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'close_enabled' => true,
 					'Acknowledge' => true,
@@ -255,7 +255,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
 					// If more than one problem selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-							'Acknowledge', 'Unacknowledge', 'Close problem', ''
+							'Acknowledge', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
@@ -290,7 +290,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check form labels.
 		$count = count($data['problems']);
 		$default_labels = ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
-				'Acknowledge', 'Close problem', ''];
+				'Acknowledge', 'Convert to cause', 'Close problem', ''];
 		$this->assertEquals(CTestArrayHelper::get($data, 'labels', $default_labels), $form->getLabels()->asText());
 
 		// Check "Problem" field value.
@@ -936,12 +936,12 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Event details page.
 		$row->getColumn('Time')->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->assertHeader('Event details');
-		$this->checkHistoryTable($this->query("xpath://div[@id=\"hat_eventactions_widget\"]//table")->asTable()->one(),
+		$this->checkHistoryTable($this->query("xpath://section[@id=\"hat_eventactions\"]//table")->asTable()->one(),
 				'User/Recipient', 'Action'
 		);
 
 		// Check Actions hint in Event list.
-		$event_list_table = $this->query('xpath://div[@id="hat_eventlist_widget"]//table')->asTable()->one();
+		$event_list_table = $this->query('xpath://section[@id="hat_eventlist"]//table')->asTable()->one();
 		$event_list_table->getRow(0)->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 		$hint->invalidate();
 		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');

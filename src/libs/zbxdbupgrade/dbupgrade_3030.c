@@ -29,8 +29,6 @@
 
 #ifndef HAVE_SQLITE3
 
-extern unsigned char program_type;
-
 static int	DBpatch_3030000(void)
 {
 	const ZBX_FIELD	field = {"ipmi_authtype", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -179,6 +177,16 @@ static int	DBpatch_3030017(void)
 
 	return DBadd_foreign_key("item_preproc", 1, &field);
 }
+
+/* item data types */
+typedef enum
+{
+	ITEM_DATA_TYPE_DECIMAL = 0,
+	ITEM_DATA_TYPE_OCTAL,
+	ITEM_DATA_TYPE_HEXADECIMAL,
+	ITEM_DATA_TYPE_BOOLEAN
+}
+zbx_item_data_type_t;
 
 static void	DBpatch_3030018_add_numeric_preproc_steps(zbx_db_insert_t *db_insert, zbx_uint64_t itemid,
 		unsigned char data_type, const char *formula, unsigned char delta)
@@ -2029,7 +2037,7 @@ static int	DBpatch_3030173(void)
 
 static int	DBpatch_3030174(void)
 {
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
 		if (ZBX_DB_OK > DBexecute(
@@ -2058,7 +2066,7 @@ static int	DBpatch_3030175(void)
 		NULL
 	};
 
-	if (ZBX_PROGRAM_TYPE_SERVER == program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER == DBget_program_type())
 	{
 		for (i = 0; NULL != values[i]; i++)
 		{

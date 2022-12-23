@@ -3,7 +3,7 @@ noinst_PROGRAMS = \
 	zbx_json_decodevalue \
 	zbx_json_decodevalue_dyn \
 	zbx_jsonpath_compile \
-	zbx_jsonpath_query
+	zbx_jsonobj_query
 
 JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -18,6 +18,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
@@ -104,22 +105,22 @@ endif
 
 zbx_jsonpath_compile_CFLAGS = -I@top_srcdir@/tests
 
-# zbx_jsonpath_query
+# zbx_jsonobj_query
 
-zbx_jsonpath_query_SOURCES = \
-	zbx_jsonpath_query.c \
+zbx_jsonobj_query_SOURCES = \
+	zbx_jsonobj_query.c \
 	../../zbxmocktest.h
 
-zbx_jsonpath_query_LDADD = $(JSON_LIBS)
+zbx_jsonobj_query_LDADD = $(JSON_LIBS)
 
 if SERVER
-zbx_jsonpath_query_LDADD += @SERVER_LIBS@
-zbx_jsonpath_query_LDFLAGS = @SERVER_LDFLAGS@
+zbx_jsonobj_query_LDADD += @SERVER_LIBS@
+zbx_jsonobj_query_LDFLAGS = @SERVER_LDFLAGS@
 else
 if PROXY
-zbx_jsonpath_query_LDADD += @PROXY_LIBS@
-zbx_jsonpath_query_LDFLAGS = @PROXY_LDFLAGS@
+zbx_jsonobj_query_LDADD += @PROXY_LIBS@
+zbx_jsonobj_query_LDFLAGS = @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_jsonpath_query_CFLAGS = -I@top_srcdir@/tests
+zbx_jsonobj_query_CFLAGS = -I@top_srcdir@/tests

@@ -191,6 +191,7 @@
                     <name>Hostname</name>
                     <key>agent.hostname</key>
                     <trends>0</trends>
+		    <delay>15s</delay>
                     <value_type>CHAR</value_type>
                     <inventory_link>NAME</inventory_link>
                     <interface_ref>if1</interface_ref>
@@ -271,11 +272,11 @@
                         <item_prototype>
                             <name>ItemProto</name>
                             <type>CALCULATED</type>
-                            <key>proto</key>
+                            <key>proto[{#X}]</key>
                             <params>1</params>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>last(/HostWithDiscovery/proto)=1</expression>
+                                    <expression>last(/HostWithDiscovery/proto[{#X}])=1</expression>
                                     <name>TriggerPrototype</name>
                                     <priority>DISASTER</priority>
                                     <manual_close>YES</manual_close>
@@ -364,6 +365,26 @@
                     <type>IPMI</type>
                     <port>623</port>
                     <interface_ref>if3</interface_ref>
+                </interface>
+                <interface>
+                    <type>SNMP</type>
+                    <port>20161</port>
+                    <default>NO</default>
+                    <details>
+                        <version>SNMPV3</version>
+                        <max_repetitions>11</max_repetitions>
+                    </details>
+                    <interface_ref>if4</interface_ref>
+                </interface>
+                <interface>
+                    <type>SNMP</type>
+                    <port>21161</port>
+                    <default>NO</default>
+                    <details>
+                        <community>public</community>
+                        <max_repetitions>11</max_repetitions>
+                    </details>
+                    <interface_ref>if5</interface_ref>
                 </interface>
             </interfaces>
             <items>
@@ -723,6 +744,15 @@
                     <name>Zabbix internal</name>
                     <type>INTERNAL</type>
                     <key>zabbix[boottime]</key>
+                </item>
+                <item>
+                    <name>snmp.walk</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>snmp.walk[.1.3.6.1.2.1.1.9.1.3]</snmp_oid>
+                    <key>snmp.walk</key>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <interface_ref>if4</interface_ref>
                 </item>
             </items>
             <inventory_mode>DISABLED</inventory_mode>

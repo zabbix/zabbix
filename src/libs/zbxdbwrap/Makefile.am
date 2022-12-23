@@ -7,6 +7,7 @@ libzbxdbwrap_a_SOURCES = \
 	event.c \
 	template_item.c \
 	template.h \
+	trigger.c \
 	trigger_dep_linking.c \
 	trigger_dep_linking.h \
 	trigger_linking.c \
