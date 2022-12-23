@@ -130,12 +130,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 				'searchByAny' => true,
 				'time_from' => $time_from - 1,
-				'time_till' => $time_to + 1,
-				'sortfield' => $sortfield,
-				'sortorder' => $sortorder,
-				'limit' => $this->fields_values['show_lines']
+				'time_till' => $time_to + 1
 			]));
 		}
+
+		CArrayHelper::sort($alerts, [['field' => $sortfield, 'order' => $sortorder]]);
+		$alerts = array_slice($alerts, 0, $this->fields_values['show_lines'], true);
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
