@@ -65,7 +65,13 @@
 
 				dialogue.addEventListener('dialogue.submit', (e) => {
 					postMessageOk(e.detail.title);
+					//uncheckTableRows('items_' + this.checkbox_hash, [], false);
+
+					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 					uncheckTableRows('items_' + this.checkbox_hash, [], false);
+					chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+					chkbxRange.update(this.checkbox_object);
+
 					if ('messages' in e.detail) {
 						postMessageDetails('success', e.detail.messages);
 					}
