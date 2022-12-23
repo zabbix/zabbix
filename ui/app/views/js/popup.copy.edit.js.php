@@ -32,13 +32,19 @@ window.copy_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.curl = new Curl('zabbix.php');
 		this.curl.setArgument('action', action);
+		let copy_type = <?= COPY_TYPE_TO_HOST_GROUP ?>;
 
-		$('[name="copy_type"]').on('change', this.changeTargetType);
-		this.changeTargetType();
+		document.querySelectorAll('input[name="copy_type"]').forEach(element => {
+			element.addEventListener('change', () => {
+				this.changeTargetType(parseInt(element.value));
+			})
+		});
+
+		this.changeTargetType(copy_type);
 	}
 
-	changeTargetType() {
-		const $multiselect = $('<div>', {
+	changeTargetType(copy_type) {
+		let $multiselect = $('<div>', {
 			id: 'copy_targetids',
 			class: 'multiselect',
 			css: {
@@ -62,27 +68,28 @@ window.copy_popup = new class {
 			}
 		};
 
-		switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
-			case '<?= COPY_TYPE_TO_HOST_GROUP ?>':
+		switch (copy_type) {
+			case <?= COPY_TYPE_TO_HOST_GROUP ?>:
 				helper_options.object_name = 'hostGroup';
 				helper_options.popup.parameters.srctbl = 'host_groups';
 				helper_options.popup.parameters.srcfld1 = 'groupid';
+
 				break;
 
-			case '<?= COPY_TYPE_TO_HOST ?>':
+			case <?= COPY_TYPE_TO_HOST ?>:
 				helper_options.object_name = 'hosts';
 				helper_options.popup.parameters.srctbl = 'hosts';
 				helper_options.popup.parameters.srcfld1 = 'hostid';
 				break;
 
-			case '<?= COPY_TYPE_TO_TEMPLATE ?>':
+			case <?= COPY_TYPE_TO_TEMPLATE ?>:
 				helper_options.object_name = 'templates';
 				helper_options.popup.parameters.srctbl = 'templates';
 				helper_options.popup.parameters.srcfld1 = 'hostid';
 				helper_options.popup.parameters.srcfld2 = 'host';
 				break;
 
-			case '<?= COPY_TYPE_TO_TEMPLATE_GROUP ?>':
+			case <?= COPY_TYPE_TO_TEMPLATE_GROUP ?>:
 				helper_options.object_name = 'templateGroup';
 				helper_options.popup.parameters.srctbl = 'template_groups';
 				helper_options.popup.parameters.srcfld1 = 'groupid';
@@ -90,7 +97,6 @@ window.copy_popup = new class {
 		}
 
 		$('#copy_targets').html($multiselect);
-
 		$multiselect.multiSelectHelper(helper_options);
 	}
 
