@@ -258,7 +258,9 @@ $html_page
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],
 		'web_layout_mode' => $web_layout_mode,
-		'clone' => $data['clone']
+		'clone' => $data['clone'],
+		'csrf_token_update' => $data['csrf_token_update'],
+		'csrf_token_widget_rfrate' => $data['csrf_token_widget_rfrate']
 	]).');
 '))
 	->setOnDocumentReady()

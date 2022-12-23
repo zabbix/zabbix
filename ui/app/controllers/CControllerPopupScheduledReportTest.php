@@ -72,7 +72,7 @@ class CControllerPopupScheduledReportTest extends CController {
 			ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$result = $server->testReport($params, CSessionHelper::getId());
+		$result = $server->testReport($params, self::generateCsrfToken('report.test'));
 
 		$data = [
 			'title' => _('Test report generating'),

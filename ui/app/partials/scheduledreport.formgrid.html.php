@@ -210,6 +210,7 @@ $form_grid
 if ($data['source'] === 'reports') {
 	$test_button = (new CSimpleButton(_('Test')))
 		->setId('test')
+		->setAttributeCsrfToken('popup.scheduledreport.test')
 		->setEnabled($data['allowed_edit']);
 
 	$cancel_button = (new CRedirectButton(_('Cancel'),

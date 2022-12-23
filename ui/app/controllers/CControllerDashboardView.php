@@ -133,7 +133,9 @@ class CControllerDashboardView extends CController {
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'clone' => $this->hasInput('clone'),
-			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
+			'active_tab' => CProfile::get('web.dashboard.filter.active', 1),
+			'csrf_token_update' => self::generateCsrfToken('dashboard.update'),
+			'csrf_token_widget_rfrate' => CController::generateCsrfToken('dashboard.widget.rfrate')
 		];
 
 		if (self::hasDynamicWidgets($dashboard['pages'])) {

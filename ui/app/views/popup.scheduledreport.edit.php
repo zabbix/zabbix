@@ -26,6 +26,7 @@
 $form = (new CForm())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
+	->addCsrfToken('popup.scheduledreport.create')
 	->addVar('action', 'popup.scheduledreport.create')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 

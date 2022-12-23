@@ -148,7 +148,8 @@
 				const form = event.target.closest('form');
 				const parameters = {
 					period: form.elements['period'].value,
-					now: Math.floor(Date.now() / 1000)
+					now: Math.floor(Date.now() / 1000),
+					_csrf_token: event.target.dataset.csrfToken
 				};
 
 				if (typeof form.elements['dashboardid'] !== 'undefined') {

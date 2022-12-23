@@ -44,6 +44,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
+	protected $validate_csrf_token = false;
+
 	protected function checkInput(): bool {
 		$fields = [
 			'type' =>						'string|required',

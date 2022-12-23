@@ -52,6 +52,7 @@ class CDashboardPage extends CBaseComponent {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
+		csrf_token_widget_rfrate = null,
 		unique_id
 	}) {
 		super(document.createElement('div'));
@@ -81,6 +82,7 @@ class CDashboardPage extends CBaseComponent {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
+		this._csrf_token_widget_rfrate = csrf_token_widget_rfrate;
 		this._unique_id = unique_id;
 
 		this._init();
@@ -439,6 +441,7 @@ class CDashboardPage extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
+			csrf_token_widget_rfrate: this._csrf_token_widget_rfrate,
 			unique_id
 		});
 	}

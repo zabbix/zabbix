@@ -26,7 +26,15 @@
 
 <script>
 	const view = {
-		init({host, dashboard, widget_defaults, configuration_hash, time_period, web_layout_mode}) {
+		init({
+			host,
+			dashboard,
+			widget_defaults,
+			configuration_hash,
+			time_period,
+			web_layout_mode,
+			csrf_token_widget_rfrate
+		}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -69,6 +77,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period: time_period,
 				dynamic_hostid: host.hostid,
+				csrf_token_widget_rfrate
 			});
 
 			for (const page of dashboard.pages) {

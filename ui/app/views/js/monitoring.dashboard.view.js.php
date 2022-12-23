@@ -38,13 +38,16 @@
 			time_period,
 			dynamic,
 			web_layout_mode,
-			clone
+			clone,
+			csrf_token_update,
+			csrf_token_widget_rfrate
 		}) {
 			this.dashboard = dashboard;
 			this.has_time_selector = has_time_selector;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
 			this.clone = clone;
+			this.csrf_token_update = csrf_token_update;
 
 			timeControl.refreshPage = false;
 
@@ -89,7 +92,8 @@
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
-				dynamic_hostid: dynamic.host ? dynamic.host.id : null
+				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
+				csrf_token_widget_rfrate
 			});
 
 			for (const page of dashboard.pages) {
@@ -199,7 +203,7 @@
 
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'dashboard.update');
+			curl.setAction('dashboard.update', this.csrf_token_update);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
