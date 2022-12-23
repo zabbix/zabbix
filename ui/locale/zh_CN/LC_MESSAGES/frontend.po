@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-25 09:19+0000\n"
+"PO-Revision-Date: 2022-12-20 21:23+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -15725,7 +15725,7 @@ msgstr "结果已使用值映射"
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/data/CItemData.php:1154
 msgid "Retrieving contents of a file. Returns text"
