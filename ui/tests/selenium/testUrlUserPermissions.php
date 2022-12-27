@@ -693,7 +693,8 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestOpen($data['url']);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'You are not logged in');
 		$this->zbxTestAssertElementText("//ul/li[1]", 'You must login to view this page.');
-		$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+		$this->zbxTestAssertElementText("//ul/li[2]", 'Possibly the session has expired or the password was changed.');
+		$this->zbxTestAssertElementText("//ul/li[3]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 	}
 
 	/**

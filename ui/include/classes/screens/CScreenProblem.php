@@ -857,7 +857,7 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['cause_eventid'] == 0) {
 					$options = [
 						'countOutput' => true,
-						'filter' => ['cause_eventid' => $problem['eventid']],
+						'filter' => ['cause_eventid' => $problem['eventid']]
 					];
 
 					$problem['symptom_count'] = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)

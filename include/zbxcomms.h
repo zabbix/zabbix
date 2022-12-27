@@ -87,12 +87,12 @@ typedef struct
 } zbx_config_tls_t;
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
-void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
+void	zbx_config_tls_free(zbx_config_tls_t *config_tls);
 
 
 typedef struct
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
 	const char		*hostname;
 	const int		proxymode;
 	const int		config_timeout;
@@ -301,12 +301,12 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks,
+void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_forks,
 		int config_passive_forks, zbx_get_program_type_f zbx_get_program_type_cb);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
-void	zbx_tls_init_child(const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);

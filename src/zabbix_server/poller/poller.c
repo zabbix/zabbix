@@ -974,7 +974,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(poller_args_in->zbx_config_comms->zbx_config_tls,
+	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
 			poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
@@ -987,7 +987,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	zbx_rtc_subscribe(process_type, process_num, poller_args_in->zbx_config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, poller_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -1004,7 +1004,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		processed += get_values(poller_type, &nextcheck, poller_args_in->zbx_config_comms);
+		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
