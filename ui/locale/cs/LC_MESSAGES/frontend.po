@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-12-05 08:06+0000\n"
+"PO-Revision-Date: 2022-12-23 10:54+0000\n"
 "Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -2860,12 +2860,12 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:755
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nelze připojit šablonu \"%1$s\" k hostu \"%2$s\" kvůli závislosti na triggeru \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:805
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nelze připojit šablonu \"%1$s\" k hostu \"%2$s\" kvůli výrazu v triggeru \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3074,7 +3074,7 @@ msgstr "Nelze nastavit cookie."
 #: include/classes/api/services/CService.php:1403
 #, c-format
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
-msgstr ""
+msgstr "Nelze specifikovat parametr \"propagation_rule\" bez zadání parametru \"propagation_value\" pro službu \"%1$s\"."
 
 #: jsLoader.php:295
 msgid "Cannot support notification audio for this device."
@@ -3108,7 +3108,7 @@ msgstr "Nelze odpojit šablonu"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nelze odpojit Šablonu \"%1$s\" od hosta \"%2$s\" kvůli závislosti na spouštěči \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
@@ -3251,7 +3251,7 @@ msgstr "Nelze aktualizovat korelaci"
 #: include/classes/api/services/CTrigger.php:836
 #, c-format
 msgid "Cannot update dependencies of inherited trigger \"%1$s\"."
-msgstr ""
+msgstr "Nelze aktualizovat závislosti zděděného spouštěče \"%1$s\"."
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:102 host_discovery.php:734
@@ -3849,7 +3849,7 @@ msgstr "Kombinovaný výsledek"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:68
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "Středové souřadnice oddělené čárkami a úroveň přiblížení, které se zobrazí při prvním načtení widgetu."
 
 #: app/views/administration.script.edit.php:173 include/actions.inc.php:1943
 #: include/views/administration.auditacts.list.php:103
@@ -3917,7 +3917,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro pravidlo nálezu  \
 #: include/classes/api/services/CDiscoveryRule.php:1605
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr ""
+msgstr "Podmínka \"%2$s\" není použita ve vzorci \"%3$s\" pro přepsání \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1812
 #, c-format
@@ -3927,7 +3927,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro  pravidlo nálezu \
 #: include/classes/api/services/CDiscoveryRule.php:1604
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr ""
+msgstr "Podmínka \"%2$s\" použitá ve vzorci \"%3$s\" pro přepsání \"%1$s\" není definována."
 
 #: app/partials/popup.operations.php:254
 #: app/views/configuration.correlation.edit.php:129
@@ -4106,6 +4106,10 @@ msgstr "Nastavení bylo aktualizováno"
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
 msgstr "Nastavení DB připojení"
+
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -4467,7 +4471,7 @@ msgstr "Vytvořit pravidlo objevování (nejprve vyberte hostitele)"
 
 #: include/views/configuration.host.discovery.list.php:44
 msgid "Create discovery rule (select template first)"
-msgstr ""
+msgstr "Vytvořit pravidlo zjišťování (nejprve vyberte šablonu)"
 
 #: app/views/popup.lldoperation.php:80 app/views/popup.massupdate.item.php:324
 #: include/views/configuration.host.prototype.edit.php:288
@@ -4804,7 +4808,7 @@ msgstr "Dashbord \"%1$s\" již existuje."
 #: include/classes/api/services/CDashboardGeneral.php:91
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
-msgstr ""
+msgstr "Nástěnka \"%1$s\" je použita v reportu \"%2$s\"."
 
 #: app/controllers/CControllerDashboardUpdate.php:145
 #: app/controllers/CControllerTemplateDashboardUpdate.php:139
@@ -5027,7 +5031,7 @@ msgstr "Den v měsíci"
 
 #: include/classes/api/services/CMaintenance.php:689
 msgid "Day of the week and day of the month cannot be specified simultaneously."
-msgstr ""
+msgstr "Den v týdnu a den v měsíci nelze zadat současně."
 
 #: app/views/popup.maintenance.period.php:96
 #: app/views/popup.maintenance.period.php:115
@@ -5585,7 +5589,7 @@ msgstr "Detaily web scénáře"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Detekovaná licence TimescaleDB nepodporuje kompresi. Komprese je podporována v TimescaleDB Komunitní edici."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6142,7 +6146,7 @@ msgstr "Duplicitní \"name\" hodnota \"%1$s\" pro mapu."
 #: include/classes/api/services/CMap.php:1285
 #, c-format
 msgid "Duplicate \"usrgrpid\" \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Duplicitní \"usrgrpid\" \"%1$s\" v uživatelských skupinách v mapě \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:1155
 #, c-format
@@ -6261,7 +6265,7 @@ msgstr "Efektivní hodnota"
 #: include/classes/api/managers/CHistoryManager.php:1385
 #, c-format
 msgid "Elasticsearch URL is not set for type: %1$s."
-msgstr ""
+msgstr "Elasticsearch URL není nastaven pro typ: %1$s."
 
 #: include/classes/helpers/CElasticsearchHelper.php:86
 #: include/classes/helpers/CElasticsearchHelper.php:185
@@ -6353,6 +6357,10 @@ msgstr "Povolit"
 #: app/views/administration.authentication.edit.php:110
 msgid "Enable HTTP authentication"
 msgstr "Zapnout HTTP ověření"
+
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -6577,7 +6585,7 @@ msgstr "Anglicky (en_US)"
 #: include/classes/api/services/CValueMap.php:451
 #, c-format
 msgid "Entry with UUID \"%1$s\" already exists."
-msgstr ""
+msgstr "Záznam s UUID \"%1$s\" již existuje."
 
 #: app/partials/monitoring.host.filter.php:47
 #: app/partials/monitoring.host.filter.php:196
@@ -6924,7 +6932,7 @@ msgstr "Typ výrazu"
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
-msgstr ""
+msgstr "Proměnné výrazu"
 
 #: app/views/administration.regex.edit.php:112
 #: app/views/administration.regex.edit.php:139
@@ -6958,7 +6966,7 @@ msgstr "Selhalo"
 #: app/partials/administration.system.info.php:182
 #, c-format
 msgid "Fail-over delay: %1$s"
-msgstr ""
+msgstr "Prodleva selhání: %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:88
@@ -8251,7 +8259,7 @@ msgstr "Prototyp hosta s názvem hosta \"%1$s\" již existuje v pravidle zjišť
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "Prototyp hosta s názvem hosta \"%1$s\" již existuje v pravidle zjišťování \"%2$s\" v šabloně \"%3$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8324,7 +8332,7 @@ msgstr "Host se stejným viditelným jménem \"%1$s\" již existuje."
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Host se stejným zobrazovacím jménem \"%1$s\" již existuje."
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -8567,35 +8575,39 @@ msgstr "Identické ID (%1$s) používají moduly umístěné na %2$s."
 #: include/classes/core/CModuleManager.php:173
 #, c-format
 msgid "Identical actions are used by modules located at %1$s."
-msgstr ""
+msgstr "Identické akce používají moduly umístěné na %1$s."
 
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "Identický jmenný prostor (%1$s) používají moduly umístěné na %2$s."
 
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identifikace systému. Vrací řetězec"
 
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Pokud alespoň %2$s podřízená služba má stav %1$s nebo vyšší"
+msgstr[1] "Pokud alespoň %2$s podřízené služby májí stav %1$s nebo vyšší"
+msgstr[2] "Pokud alespoň %2$s podřízené služby májí stav %1$s nebo vyšší"
 
 #: include/classes/helpers/CServiceHelper.php:35
 #, c-format
 msgid "If at least %2$s child services have %1$s status or above"
-msgstr ""
+msgstr "Pokud alespoň %2$s podřízené služby má stav %1$s nebo vyšší"
 
 #: include/classes/helpers/CServiceHelper.php:40
 #: include/classes/helpers/CServiceHelper.php:89
 #, c-format
 msgid "If at least %2$s of child services have %1$s status or above"
-msgstr ""
+msgstr "Pokud alespoň %2$s z podřízených služeb mají stav %1$s nebo vyšší"
 
 #: app/views/popup.lldoverride.php:54
 msgid "If filter matches"
@@ -8646,7 +8658,7 @@ msgstr "Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vaš
 
 #: app/views/administration.miscconfig.edit.php:124
 msgid "Iframe sandboxing exceptions"
-msgstr ""
+msgstr "Výjimky odděleného prostředí iframe"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
@@ -8726,7 +8738,7 @@ msgstr "Import úspěšný"
 #: hostinventories.php:192
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr ""
+msgstr "Nelze filtrovat podle pole inventáře \"%1$s\", které neexistuje."
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -8907,11 +8919,11 @@ msgstr "Nesprávná SNMP komunita."
 
 #: include/classes/helpers/CVaultHelper.php:137
 msgid "Incorrect Vault API endpoint."
-msgstr ""
+msgstr "Nesprávný koncový bod Vault API."
 
 #: include/classes/helpers/CVaultHelper.php:61
 msgid "Incorrect Vault token."
-msgstr ""
+msgstr "Nesprávný token trezoru."
 
 #: include/classes/validators/CActionCondValidator.php:122
 msgid "Incorrect action condition discovery check."
@@ -8939,7 +8951,7 @@ msgstr "Neplatná podmínka akce pro typ události."
 
 #: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "Neplatná podmínka akce nebo operace pro skupinu hostů. Skupina hostů neexistuje nebo k ní nemáte přístup."
 
 #: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
@@ -9076,7 +9088,7 @@ msgstr "Nesprávně nastavený výraz \"%2$s\" pro pravidlo nálezu \"%1$s\": %3
 #: include/classes/api/services/CDiscoveryRule.php:1602
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "Nesprávný vlastní výraz \"%2$s\" pro pravidlo přepisu \"%1$s\": %3$s."
 
 #: include/classes/db/MysqlDbBackend.php:69
 #: include/classes/db/PostgresqlDbBackend.php:95
@@ -9116,7 +9128,7 @@ msgstr "Neplatné pole pro sysmap."
 #: include/classes/setup/CSetupWizard.php:984
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nesprávná cesta k souboru pro \"%1$s\": %2$s."
 
 #: include/classes/helpers/CUploadFile.php:162
 msgid "Incorrect file upload."
@@ -9135,7 +9147,7 @@ msgstr "Nesprávné nastavení filtru makra pravidlo nálezu \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:1637
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "Nesprávné makro podmínky filtru pro přepsání \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1847
 #, c-format
@@ -9162,18 +9174,18 @@ msgstr "Nesprávné vstupní parametry."
 #: include/classes/api/services/CHostInterface.php:801
 #, c-format
 msgid "Incorrect interface DNS parameter \"%1$s\" provided."
-msgstr ""
+msgstr "Byl zadán nesprávný parametr DNS rozhraní \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:846
 #, c-format
 msgid "Incorrect interface port \"%1$s\" provided."
-msgstr ""
+msgstr "Neplatný parametr port pro rozhraní \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:2021
 #: include/classes/api/services/CHost.php:2224
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
-msgstr ""
+msgstr "Nesprávné pole inventáře \"%1$s\"."
 
 #: app/controllers/CControllerActionOperationValidate.php:176
 msgid "Incorrect inventory mode in action operation."
@@ -9252,7 +9264,7 @@ msgstr "Neplatná odpověď přijatá od Zabbix serveru \"%1$s\"."
 #: app/controllers/CControllerSlaCreateUpdate.php:111
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "Neplatný plán: %1$s."
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -9317,7 +9329,7 @@ msgstr "Neplatná uživatelská skupina ID specifikovaná pro mapu \"%1$s\"."
 #: include/classes/api/services/CUser.php:2043
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:79
 msgid "Incorrect user name or password or account is temporarily blocked."
-msgstr ""
+msgstr "Nesprávné uživatelské jméno nebo heslo nebo účet je dočasně zablokován."
 
 #: app/controllers/CControllerActionOperationValidate.php:121
 #: app/controllers/CControllerPopupGeneric.php:478
@@ -9347,7 +9359,7 @@ msgstr "Neplatná hodnota \"%1$s\" pro pole \"%2$s\"."
 #: include/validate.inc.php:336
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr ""
+msgstr "Nesprávná hodnota \"%1$s\" pro pole \"%2$s\": musí být mezi %3$s a %4$s a nesmí obsahovat víc jak %5$s číslic za desetinnou čárkou."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:153
 #: include/validate.inc.php:341
@@ -9698,15 +9710,15 @@ msgstr "Makra zděděná a makra hosta"
 
 #: include/views/configuration.host.prototype.edit.php:337
 msgid "Inherited and host prototype macros"
-msgstr ""
+msgstr "Zděděná a hostitelská prototypová makra"
 
 #: app/partials/configuration.tags.tab.php:140
 msgid "Inherited and item tags"
-msgstr ""
+msgstr "Zděděné tagy itemů"
 
 #: app/partials/configuration.tags.tab.php:135
 msgid "Inherited and scenario tags"
-msgstr ""
+msgstr "Zděděné tagy scénářů"
 
 #: include/views/configuration.template.edit.php:193
 msgid "Inherited and template macros"
@@ -9722,11 +9734,11 @@ msgstr "Zděděné položky"
 
 #: include/classes/widgets/forms/CWidgetFormGeoMap.php:75
 msgid "Initial view"
-msgstr ""
+msgstr "Počáteční pohled"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:78
 msgid "Initial view is ignored if the default view is set."
-msgstr ""
+msgstr "Prvotní pohled je ignorován pokud je nastaven výchozí pohled."
 
 #: app/views/popup.triggerexpr.php:258
 msgid "Insert"
@@ -9753,7 +9765,7 @@ msgstr "Jméno technika"
 
 #: include/classes/helpers/CMenuHelper.php:361
 msgid "Integrations"
-msgstr ""
+msgstr "Integrace"
 
 #: app/partials/monitoring.host.view.html.php:35
 #: app/views/administration.proxy.edit.php:76
@@ -9770,7 +9782,7 @@ msgstr "Rozhraní je připojené na položku \"%1$s\" na \"%2$s\"."
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:39
 msgid "Interface type"
-msgstr ""
+msgstr "Typ rozhraní"
 
 #: include/classes/api/services/CHostInterface.php:337
 #, c-format
@@ -10321,7 +10333,7 @@ msgstr "Položka byla přidána"
 
 #: app/views/popup.itemtestedit.view.php:421
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
-msgstr ""
+msgstr "Item obsahuje uživatelem definované makra s tajnými hodnotami. Hodnoty těchto maker by se měly zadávat manuálně."
 
 #: items.php:964
 msgid "Item copied"
@@ -10428,11 +10440,11 @@ msgstr "Položka prototypu aktualizována"
 
 #: app/partials/configuration.tags.tab.php:140
 msgid "Item tags"
-msgstr ""
+msgstr "Tagy položek"
 
 #: jsLoader.php:397
 msgid "Item type does not use interface"
-msgstr ""
+msgstr "Typ položky nepoužívá rozhraní"
 
 #: items.php:879
 msgid "Item updated"
@@ -10449,7 +10461,7 @@ msgstr "Položka používá neplatný typ rozhraní."
 #: app/views/popup.tophosts.column.edit.php:63
 #: include/classes/widgets/CWidgetConfig.php:59
 msgid "Item value"
-msgstr ""
+msgstr "Hodnota položky"
 
 #: chart.php:101 chart.php:104
 msgid "Item values"
@@ -10952,13 +10964,13 @@ msgstr "Spojnice"
 #: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link \"selementid1\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Pole spojnice \"selementid1\" odkazuje na neexistující mapový element s ID \"%1$s\" pro mapu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:1014
 #: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link \"selementid2\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Pole spojnice \"selementid2\" odkazuje na neexistující mapový element s ID \"%1$s\" pro mapu \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:736
 #: include/views/js/monitoring.sysmaps.js.php:747
@@ -10991,7 +11003,7 @@ msgstr "Připojené šablony"
 
 #: include/views/configuration.template.list.php:127
 msgid "Linked to templates"
-msgstr ""
+msgstr "Připojeno k šablonám"
 
 #: include/views/js/monitoring.sysmaps.js.php:733
 #: include/views/js/monitoring.sysmaps.js.php:744
@@ -11012,15 +11024,15 @@ msgstr "Seznam detekovaných CPU/CPU jader. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1149
 msgid "List of directory entries, recursively. Returns JSON"
-msgstr ""
+msgstr "Seznam položek adresáře, rekurzivně. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1201
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr ""
+msgstr "Seznam připojených souborových systémů a jejich typů. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:1205
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr ""
+msgstr "Seznam připojených souborových systémů, jejich typů, místa na disku a statistiky inodů. Vrátí JSON"
 
 #: include/classes/data/CItemData.php:929
 msgid "List of network interfaces. Returns JSON"
@@ -11784,17 +11796,17 @@ msgstr "Minimální požadovaná verze TimescaleDB je %1$s."
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
-msgstr ""
+msgstr "Minimální požadovaný limit zpracování PHP skriptu je %s (Nastavení \"max_execution_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:216
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
-msgstr ""
+msgstr "Minimální požadovaný limit vstupního zpracování PHP skriptu je %1$s (Nastavení \"max_input_time\")."
 
 #: include/classes/setup/CFrontendSetup.php:143
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
-msgstr ""
+msgstr "Minimální požadovaná velkost PHP post je %1$s (Nastavení \"post_max_size\")."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:267
@@ -12026,19 +12038,19 @@ msgstr "Moje"
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: jsLoader.php:188
 msgctxt "abbreviation of severity level"
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: include/classes/helpers/CServiceHelper.php:42
 #: include/classes/helpers/CServiceHelper.php:52
 #: include/classes/helpers/CServiceHelper.php:62
 #: include/classes/helpers/CServiceHelper.php:72
 msgid "N%"
-msgstr ""
+msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
@@ -12885,7 +12897,7 @@ msgstr ""
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr ""
+msgstr "Žádný trigger s trigger ID \"%1$s\"."
 
 #: chart4.php:42
 msgid "No triggers defined."
@@ -12961,13 +12973,13 @@ msgstr "Nepotvrzeno"
 #: app/partials/trigoverview.table.left.php:62
 #: app/partials/trigoverview.table.top.php:61
 msgid "Not all results are displayed. Please provide more specific search criteria."
-msgstr ""
+msgstr "Nejsou zobrazeny všechny výsledky. Uveďte prosím konkrétnější kritéria vyhledávání."
 
 #: include/classes/api/services/CTrigger.php:1058
 #: include/classes/api/services/CTriggerPrototype.php:867
 #, c-format
 msgid "Not all templates are linked to \"%1$s\"."
-msgstr ""
+msgstr "Ne všechny šablony jsou propojeny s \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -13053,7 +13065,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:889
 msgid "Number of currently open file descriptors. Returns integer"
-msgstr ""
+msgstr "Počet aktuálně otevřených desktiptorů souborů. Vrátí číslo"
 
 #: include/classes/data/CItemData.php:1629
 msgid "Number of enabled items on the host."
@@ -13061,7 +13073,7 @@ msgstr "Počet povolených položek na hostitele."
 
 #: app/partials/administration.system.info.php:40
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Počet zařízení (povolených/zakázáných)"
 
 #: app/partials/administration.system.info.php:55
 msgid "Number of items (enabled/disabled/not supported)"
@@ -13077,7 +13089,7 @@ msgstr "Počet položek v historii proxy, které ještě nebyli odeslané server
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Počet položek ve frontě, které jsou zpožděné od do sekund včetně."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13122,7 +13134,7 @@ msgstr "Počet řádek"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr ""
+msgstr "Počet sezón"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -13388,7 +13400,7 @@ msgstr "Pouze služby bez podřízených"
 
 #: app/views/service.list.edit.php:94
 msgid "Only services without problem tags"
-msgstr ""
+msgstr "Pouze služby bez problémových tagů"
 
 #: include/classes/api/services/CDashboard.php:414
 msgid "Only super admins can set dashboard owner."
@@ -13396,7 +13408,7 @@ msgstr "Pouze super administrátoři mohou ustanovit vlastníka dashboardu."
 
 #: include/classes/api/services/CReport.php:334
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Vlastníka přehledu mohou nastavit pouze super administrátoři."
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -13417,17 +13429,17 @@ msgstr "Informace operačního systému. Návratová hodnota řetězec"
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
 msgid "Operation"
-msgstr ""
+msgstr "Operace"
 
 #: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
-msgstr ""
+msgstr "Operace \"%1$s\" už pro akci \"%2$s\" existuje."
 
 #: actionconf.php:400
 #, c-format
 msgid "Operation \"%1$s\" already exists."
-msgstr ""
+msgstr "Operace \"%1$s\" již existuje."
 
 #: include/classes/mvc/CController.php:209 include/validate.inc.php:308
 msgid "Operation cannot be performed due to unauthorized request."
@@ -13536,7 +13548,7 @@ msgstr "Pořadí"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Pořadí sloupců"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -13637,7 +13649,7 @@ msgstr "Přepsané"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
-msgstr ""
+msgstr "Přepisování"
 
 #: app/views/administration.housekeeping.edit.php:127
 msgid "Override item history period"
@@ -13650,7 +13662,7 @@ msgstr "Přepsaná položka trendové periody"
 #: app/controllers/CControllerPopupLldOverride.php:91
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
-msgstr ""
+msgstr "Přepis s názvem \"%1$s\" již existuje."
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:408
 #: include/classes/widgets/views/widget.svggraph.form.view.php:310
@@ -13683,11 +13695,11 @@ msgstr "Chybí rozšíření PHP LDAP."
 
 #: include/classes/setup/CFrontendSetup.php:547
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "Chybí rozšíření PHP OpenSSL."
 
 #: include/classes/setup/CFrontendSetup.php:290
 msgid "PHP bcmath"
@@ -13887,7 +13899,7 @@ msgstr "PSK identita"
 #: jsLoader.php:142
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "Stránka %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
@@ -14040,13 +14052,13 @@ msgstr "Heslo musí obsahovat"
 
 #: app/views/administration.authentication.edit.php:38
 msgid "Password policy"
-msgstr ""
+msgstr "Zásady hesel"
 
 #: app/views/administration.authentication.edit.php:46
 #: app/views/administration.authentication.edit.php:95
 #: app/views/administration.user.edit.php:151
 msgid "Password requirements:"
-msgstr ""
+msgstr "Požadavky na heslo:"
 
 #: jsLoader.php:168 jsLoader.php:282
 msgid "Paste"
@@ -14284,7 +14296,7 @@ msgstr "Verze databázového serveru PostgreSQL je příliš stará."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
-msgstr ""
+msgstr "Spotřeba energie , <url> – URL služby VMware, <uuid> – název hostitele hypervisoru VMware, <max> – maximální povolená spotřeba energie"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:864
 msgid "Power value"
@@ -14755,16 +14767,16 @@ msgstr "Čtení a zápis"
 #: app/views/administration.user.edit.php:501
 #: app/views/administration.userrole.edit.php:138
 msgid "Read-write access to services"
-msgstr ""
+msgstr "Přístup ke službám pro čtení a zápis"
 
 #: app/views/administration.user.edit.php:510
 #: app/views/administration.userrole.edit.php:162
 msgid "Read-write access to services with tag"
-msgstr ""
+msgstr "Přístup ke službám dle značky pro čtení a zápis"
 
 #: include/classes/data/CItemData.php:909
 msgid "Reads modbus data. Returns various types"
-msgstr ""
+msgstr "Načte data modbus. Vrátí různé typy"
 
 #: include/actions.inc.php:60
 msgid "Received value"
@@ -14792,7 +14804,7 @@ msgstr "Příjemce"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
-msgstr ""
+msgstr "Příjemce již existuje."
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
@@ -15066,7 +15078,7 @@ msgstr "Přesunout jméno domény"
 
 #: app/controllers/CControllerFavouriteCreate.php:63 include/html.inc.php:147
 msgid "Remove from favorites"
-msgstr ""
+msgstr "Odstranit z oblíbených"
 
 #: include/actions.inc.php:1034
 msgid "Remove from host group"
@@ -15144,35 +15156,35 @@ msgstr "Report \"%1$s\" již existuje."
 
 #: app/views/js/reports.scheduledreport.edit.js.php:75
 msgid "Report generated by other users will be changed to the current user."
-msgstr ""
+msgstr "Report generovaný ostatními uživateli bude změněn pro aktuálního uživatele."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:97
 msgid "Report generating test failed."
-msgstr ""
+msgstr "Test generování reportu se nezdařil."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:94
 msgid "Report generating test successful."
-msgstr ""
+msgstr "Test generování reportu byl úspěšný."
 
 #: app/views/popup.scheduledreport.subscription.php:107
 #, c-format
 msgid "Report is currently generated by \"%1$s\"."
-msgstr ""
+msgstr "Report je aktuálně generován od \"%1$s\"."
 
 #: app/views/popup.scheduledreport.test.php:52
 #, c-format
 msgid "Report sending failed for: %1$s."
-msgstr ""
+msgstr "Odeslání reportu pro: %1$s se nezdařilo."
 
 #: app/views/popup.scheduledreport.test.php:44
 #, c-format
 msgid "Report was successfully sent to: %1$s."
-msgstr ""
+msgstr "Report byl úspěšně odeslán pro: %1$s."
 
 #: app/partials/service.info.php:61 app/views/popup.sla.edit.php:71
 #: app/views/sla.list.php:90
 msgid "Reporting period"
-msgstr ""
+msgstr "Období reportu"
 
 #: include/classes/helpers/CMenuHelper.php:161
 #: include/classes/helpers/CRoleHelper.php:308
@@ -15297,7 +15309,7 @@ msgstr "Vyřešená korelační pravidla."
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
-msgstr ""
+msgstr "Vyřešeno nepřístupným uživatelem."
 
 #: app/views/monitoring.widget.problems.view.php:163
 #: include/classes/screens/CScreenProblem.php:994
@@ -15316,7 +15328,7 @@ msgstr "ID zdroje"
 
 #: app/views/popup.mediatypetest.edit.php:46 app/views/popup.scriptexec.php:47
 msgid "Response"
-msgstr ""
+msgstr "Odpověd'"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:84
 msgid "Response code"
@@ -15384,11 +15396,11 @@ msgstr "Znovu zkusit"
 
 #: include/classes/data/CItemData.php:869
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr ""
+msgstr "Vrátí pole JSON s makry LLD popisujícími objekty MBean nebo jejich atributy. Lze použít pro LLD."
 
 #: include/classes/data/CItemData.php:873
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
-msgstr ""
+msgstr "Vrátí pole JSON s objekty MBean nebo jejich atributy. Ve srovnání s jmx.discovery nedefinuje LLD makra. Lze použít pro LLD."
 
 #: include/classes/data/CItemData.php:845
 msgid "Return first column of the first row of the SQL query result."
@@ -15400,7 +15412,7 @@ msgstr "Navrať hodnotu atributu objektu MBean."
 
 #: include/classes/data/CItemData.php:1181
 msgid "Returns 4-digit string containing octal number with Unix permissions"
-msgstr ""
+msgstr "Vrátí 4-číselný řezězec obsahující oktalové číslo s Unix právy"
 
 #: include/classes/data/CItemData.php:861
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -15408,7 +15420,7 @@ msgstr "Vráti ICMP ping čas v sekundách. Příklad: 0.02"
 
 #: include/classes/data/CItemData.php:1645
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr ""
+msgstr "Vrátí pole JSON popisující hostovská síťová rozhraní nakonfigurovaná v Zabbix. Lze použít pro LLD."
 
 #: include/classes/data/CItemData.php:1601
 #: include/classes/data/CItemData.php:1701
@@ -15429,11 +15441,11 @@ msgstr "Vrátí informace příslušné k Zabbix Java gateway. Platné parametry
 
 #: include/classes/data/CItemData.php:965
 msgid "Returns number of TCP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "Vrátí počet TCP socketů které odpovídají parametrům. Vrátí celé číslo"
 
 #: include/classes/data/CItemData.php:981
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
-msgstr ""
+msgstr "Vrátí počet UDP socketů které odpovídají parametrům. Vrátí celé číslo"
 
 #: include/classes/data/CItemData.php:857
 msgid "Returns percentage of lost ICMP ping packets."
@@ -15502,17 +15514,17 @@ msgstr "Spusťit skript \"%1$s\" na Zabbix serveru"
 #: include/actions.inc.php:648 include/actions.inc.php:826
 #, c-format
 msgid "Run script \"%1$s\" on current host"
-msgstr ""
+msgstr "Spusť skript \"%1$s\" na aktuálním hostovi"
 
 #: include/actions.inc.php:679 include/actions.inc.php:857
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
-msgstr ""
+msgstr "Spusť skript \"%1$s\" na aktuální skupině hostů"
 
 #: include/actions.inc.php:661 include/actions.inc.php:839
 #, c-format
 msgid "Run script \"%1$s\" on hosts"
-msgstr ""
+msgstr "Spusť skript \"%1$s\" na hosty"
 
 #: include/classes/data/CItemData.php:1089
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
@@ -15534,7 +15546,7 @@ msgstr "Ne"
 
 #: app/views/administration.authentication.edit.php:336
 msgid "SAML settings"
-msgstr ""
+msgstr "Nastavení SAML"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/controllers/CControllerPopupGeneric.php:382
@@ -15555,7 +15567,7 @@ msgstr ""
 #: include/classes/api/services/CSla.php:539
 #, c-format
 msgid "SLA \"%1$s\" already exists."
-msgstr ""
+msgstr "SLA \"%1$s\" již existuje."
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
@@ -15622,7 +15634,7 @@ msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
-msgstr ""
+msgstr "URL služby SLO"
 
 #: include/media.inc.php:26
 msgid "SMS"
@@ -15730,11 +15742,11 @@ msgstr "SNMPv3 agent"
 
 #: app/views/administration.authentication.edit.php:249
 msgid "SP entity ID"
-msgstr ""
+msgstr "ID subjektu SP"
 
 #: app/views/administration.authentication.edit.php:257
 msgid "SP name ID format"
-msgstr ""
+msgstr "Formát ID názvu SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -15810,7 +15822,7 @@ msgstr "SSL/TLS"
 
 #: app/views/administration.authentication.edit.php:230
 msgid "SSO service URL"
-msgstr ""
+msgstr "URL služby jednotného přihlášení"
 
 #: app/views/administration.mediatype.edit.php:82
 msgid "STARTTLS"
@@ -15882,32 +15894,32 @@ msgstr "Naplánovaný report přidán"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:129
 msgid "Scheduled report created"
-msgstr ""
+msgstr "Naplánovaný report vytvořen"
 
 #: app/controllers/CControllerScheduledReportDelete.php:67
 msgid "Scheduled report deleted"
 msgid_plural "Scheduled reports deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Naplánovaný report odstraněn"
+msgstr[1] "Naplánované reporty odstraněny"
+msgstr[2] "Naplánované reporty odstraněny"
 
 #: app/controllers/CControllerScheduledReportDisable.php:74
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Naplánovaný report zakázán"
+msgstr[1] "Naplánované reporty odstraněny"
+msgstr[2] "Naplánované reporty odstraněny"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Naplánovaný report povolen"
+msgstr[1] "Naplánované reporty povoleny"
+msgstr[2] "Naplánované reporty povoleny"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
-msgstr ""
+msgstr "Naplánovaný report aktualizován"
 
 #: app/controllers/CControllerScheduledReportEdit.php:309
 #: app/controllers/CControllerScheduledReportList.php:148
@@ -15916,7 +15928,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:135
 #: include/classes/helpers/CRoleHelper.php:390
 msgid "Scheduled reports"
-msgstr ""
+msgstr "Naplánovaný report"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
 #: app/views/popup.lldoperation.php:125 app/views/popup.massupdate.item.php:234
@@ -15933,7 +15945,7 @@ msgstr "Plánování"
 #: app/views/administration.script.list.php:48
 #: app/views/administration.script.list.php:75
 msgid "Scope"
-msgstr ""
+msgstr "Rozsah"
 
 #: app/views/popup.acknowledge.edit.php:53
 msgctxt "selected problems"
@@ -15971,11 +15983,11 @@ msgstr[2] "Skript byl smazán"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
-msgstr ""
+msgstr "Záznam spuštění skriptu"
 
 #: app/controllers/CControllerPopupScriptExec.php:116
 msgid "Script execution successful."
-msgstr ""
+msgstr "Spuštění skriptu bylo úspěšné."
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.list.php:100
@@ -16018,11 +16030,11 @@ msgstr "Vyhledávací vzor je prázdný"
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
-msgstr ""
+msgstr "Sezóna"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1121
 msgid "Season deviation window"
-msgstr ""
+msgstr "Okno odchylky sezóny"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
@@ -16054,11 +16066,11 @@ msgstr "Sekundární POC jméno obrazovky"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
-msgstr ""
+msgstr "Tajný text"
 
 #: app/views/administration.miscconfig.edit.php:98
 msgid "Security"
-msgstr ""
+msgstr "Bezpečnost"
 
 #: app/partials/configuration.host.interface.row.php:127
 #: app/views/popup.discovery.check.php:92
@@ -16088,7 +16100,7 @@ msgstr "Vybrat"
 
 #: app/views/slareport.list.php:103
 msgid "Select SLA to display SLA report."
-msgstr ""
+msgstr "Vyberte SLA pro zobrazení SLA reportu."
 
 #: app/views/popup.massupdate.item.php:438 app/views/popup.triggerexpr.php:83
 #: include/views/configuration.graph.edit.php:217
@@ -16165,11 +16177,11 @@ msgstr "Odeslat nazpátek"
 
 #: app/partials/popup.operations.php:82
 msgid "Send to user groups"
-msgstr ""
+msgstr "Odeslat skupině uživatelů"
 
 #: app/partials/popup.operations.php:102
 msgid "Send to users"
-msgstr ""
+msgstr "Odeslat uživatelům"
 
 #: include/actions.inc.php:2128
 #: include/views/administration.auditacts.list.php:77
@@ -16190,7 +16202,7 @@ msgstr "Odděleně"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:141
 #: include/classes/widgets/forms/CWidgetFormProblems.php:161
 msgid "Separately"
-msgstr ""
+msgstr "Odděleně"
 
 #: include/func.inc.php:108 include/func.inc.php:261 jsLoader.php:241
 msgid "September"
@@ -16241,13 +16253,13 @@ msgstr "Služba"
 #: include/classes/api/services/CService.php:1519
 #, c-format
 msgid "Service \"%1$s\" cannot have problem tags and children at the same time."
-msgstr ""
+msgstr "Služba \"%1$s\" nemůže mít problémové tagy a současně stejné tagy v podřízených službách."
 
 #: include/classes/helpers/CMenuHelper.php:83
 #: include/classes/helpers/CRoleHelper.php:352
 #: include/views/configuration.action.list.php:28
 msgid "Service actions"
-msgstr ""
+msgstr "Servisní akce"
 
 #: app/controllers/CControllerServiceCreate.php:171
 msgid "Service created"
@@ -16255,7 +16267,7 @@ msgstr "Služba vytvořená"
 
 #: app/views/administration.housekeeping.edit.php:58
 msgid "Service data storage period"
-msgstr ""
+msgstr "Perioda služeb úložiště dat"
 
 #: app/controllers/CControllerServiceDelete.php:63
 msgid "Service deleted"
@@ -16267,11 +16279,11 @@ msgstr[2] "Služby byla smazány"
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
 msgid "Service list"
-msgstr ""
+msgstr "Seznam služeb"
 
 #: include/actions.inc.php:68
 msgid "Service name"
-msgstr ""
+msgstr "Název služby"
 
 #: include/actions.inc.php:57
 msgid "Service port"
@@ -16280,19 +16292,19 @@ msgstr "Port služby"
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:121
 msgid "Service recovery"
-msgstr ""
+msgstr "Obnovení služby"
 
 #: app/views/popup.condition.common.php:153
 msgid "Service tag name"
-msgstr ""
+msgstr "Název tagu služby"
 
 #: app/views/popup.condition.common.php:156
 msgid "Service tag value"
-msgstr ""
+msgstr "Hodnota tagu služby"
 
 #: app/views/popup.sla.edit.php:122 app/views/sla.list.php:60
 msgid "Service tags"
-msgstr ""
+msgstr "Servisní štítky"
 
 #: app/views/popup.condition.common.php:564 include/actions.inc.php:56
 msgid "Service type"
@@ -16301,7 +16313,7 @@ msgstr "Typ služby"
 #: app/views/popup.mediatype.message.php:64
 #: include/classes/helpers/CMediatypeHelper.php:144
 msgid "Service update"
-msgstr ""
+msgstr "Aktualizace služby"
 
 #: app/controllers/CControllerServiceUpdate.php:187
 msgid "Service updated"
@@ -16310,12 +16322,12 @@ msgstr "Služba byla aktualizována"
 #: include/classes/api/services/CDashboardGeneral.php:612
 #, c-format
 msgid "Service with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Služba s ID \"%1$s\" není dostupná."
 
 #: include/classes/api/services/CRole.php:536
 #, c-format
 msgid "Service with ID \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Služba s ID \"%2$s\" není k dispozici pro uživatelskou roli \"%1$s\"."
 
 #: app/controllers/CControllerServiceListEdit.php:179
 #: app/controllers/CControllerServiceListEditRefresh.php:152
@@ -16336,12 +16348,12 @@ msgstr "Služby tvoří kruhovou závislost."
 
 #: app/controllers/CControllerPopupMassupdateService.php:150
 msgid "Services updated"
-msgstr ""
+msgstr "Služby aktualizovány"
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
 msgid "Session initialization error."
-msgstr ""
+msgstr "Chyba při inicializaci session."
 
 #: include/classes/api/services/CUser.php:1696
 #: include/classes/api/services/CUser.php:1710
@@ -16363,7 +16375,7 @@ msgstr "Nastavit chybu na"
 #: app/views/administration.token.edit.php:76
 #: app/views/administration.user.token.edit.php:58
 msgid "Set expiration date and time"
-msgstr ""
+msgstr "Nastavte datum a čas expirace"
 
 #: include/actions.inc.php:1037
 msgid "Set host inventory mode"
@@ -16371,19 +16383,19 @@ msgstr "Nastavení hostitelského inventáře"
 
 #: include/classes/html/CInputSecret.php:80 jsLoader.php:416
 msgid "Set new value"
-msgstr ""
+msgstr "Nastavit novou hodnotu"
 
 #: app/views/popup.service.statusrule.edit.php:39
 msgid "Set status to"
-msgstr ""
+msgstr "Nastavit status na"
 
 #: include/classes/helpers/CServiceHelper.php:28
 msgid "Set status to OK"
-msgstr ""
+msgstr "Nastavit status na OK"
 
 #: jsLoader.php:173
 msgid "Set this view as default"
-msgstr ""
+msgstr "Nastavit toto zobrazení jako výchozí"
 
 #: app/views/js/popup.itemtestedit.view.js.php:365 include/forms.inc.php:1482
 #: include/views/js/item.preprocessing.js.php:67
@@ -16406,7 +16418,7 @@ msgstr "Nastavení LDAP doporučení na \"Off\" selhalo."
 #: include/classes/setup/CSetupWizard.php:66
 #: include/classes/setup/CSetupWizard.php:638
 msgid "Settings"
-msgstr ""
+msgstr "Nastavení"
 
 #: app/controllers/CControllerPopupGeneric.php:178
 #: app/controllers/CControllerPopupGeneric.php:192
@@ -16454,7 +16466,7 @@ msgstr "Závažnost byla snížena"
 
 #: jsLoader.php:154
 msgid "Severity filter"
-msgstr ""
+msgstr "Filtr závažnosti"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -16469,7 +16481,7 @@ msgstr "Tvar"
 
 #: app/views/monitoring.dashboard.list.php:99
 msgid "Shared"
-msgstr ""
+msgstr "Sdíleno"
 
 #: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:366
 msgid "Sharing"
@@ -16511,7 +16523,7 @@ msgstr "Zobrazit detaily"
 
 #: include/classes/widgets/CWidgetHelper.php:76
 msgid "Show header"
-msgstr ""
+msgstr "Zobrazit záhlaví"
 
 #: app/partials/monitoring.host.filter.php:134
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:62
@@ -16534,17 +16546,17 @@ msgstr "Zobrazit řádků"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
-msgstr ""
+msgstr "Zobrazit počet záznamů"
 
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
 msgid "Show operational data"
-msgstr ""
+msgstr "Zobrazit provozní data"
 
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:49
 msgid "Show periods"
-msgstr ""
+msgstr "Zobrazit období"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:305
 msgid "Show problems"
@@ -16559,7 +16571,7 @@ msgstr "Zobrazit vybrané"
 #: include/classes/html/widget/CWidget.php:153
 #: include/classes/html/widget/CWidget.php:156
 msgid "Show sidebar"
-msgstr ""
+msgstr "Zobrazit postranní panel"
 
 #: app/partials/monitoring.host.filter.php:140
 #: app/partials/monitoring.problem.filter.php:249
@@ -16581,7 +16593,7 @@ msgstr "Ukaž značky"
 
 #: app/views/administration.gui.edit.php:119
 msgid "Show technical errors"
-msgstr ""
+msgstr "Zobrazit technické chyby"
 
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:68
 msgid "Show text as HTML"
@@ -16620,11 +16632,11 @@ msgstr "Sobraz"
 
 #: include/classes/html/widget/CWidget.php:160
 msgid "Sidebar control"
-msgstr ""
+msgstr "Ovládání postranní lišty"
 
 #: app/views/administration.authentication.edit.php:265
 msgid "Sign"
-msgstr ""
+msgstr "Podepsat"
 
 #: include/views/general.login.php:65 include/views/general.login.php:80
 msgid "Sign in"
@@ -16636,7 +16648,7 @@ msgstr "Přihlásit se přes HTTP"
 
 #: include/views/general.login.php:50
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Přihlásit se pomocí jednotného přihlášení (SAML)"
 
 #: include/classes/helpers/CMenuHelper.php:413
 #: include/classes/helpers/CMenuHelper.php:416
@@ -16666,7 +16678,7 @@ msgstr "Prototyp jednoduchého grafu"
 
 #: app/views/monitoring.charts.view.php:84
 msgid "Simple graphs"
-msgstr ""
+msgstr "Jednoduché grafy"
 
 #: include/views/configuration.trigger.prototype.edit.php:506
 #: include/views/configuration.triggers.edit.php:534
@@ -16770,7 +16782,7 @@ msgstr "Software architektura. Vrátí řetězec"
 
 #: include/classes/api/managers/CHistoryManager.php:1272
 msgid "Some of the history for this item may be compressed, deletion is not available."
-msgstr ""
+msgstr "Část historie této položky může být komprimována, odstranění není možné."
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:30
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
@@ -16802,7 +16814,7 @@ msgstr "Španělsky (es_ES)"
 
 #: include/classes/helpers/CRoleHelper.php:176
 msgid "Specified role was not found."
-msgstr ""
+msgstr "Zadaná role nebyla nalezena."
 
 #: include/classes/api/services/CAction.php:2942
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -16810,7 +16822,7 @@ msgstr "Specifikovaný skript neexistuje nebo nemáte práva na jeho vykonání.
 
 #: app/views/monitoring.charts.view.php:94
 msgid "Specify host to see the graphs."
-msgstr ""
+msgstr "Chcete-li zobrazit grafy, zadejte hosta."
 
 #: app/views/popup.generic.php:143 include/views/monitoring.history.php:295
 msgid "Specify some filter condition to see the values."
@@ -16837,16 +16849,16 @@ msgstr "Standardní položky"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Vypni"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:787
 msgid "Start"
-msgstr ""
+msgstr "Start"
 
 #: app/partials/scheduledreport.formgrid.html.php:151
 msgid "Start date"
-msgstr ""
+msgstr "Počáteční datum"
 
 #: include/views/configuration.action.edit.php:172
 msgid "Start in"
@@ -16857,22 +16869,22 @@ msgstr "Začátek v"
 #: app/views/monitoring.host.dashboard.view.php:102
 #: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:145
 msgid "Start slideshow"
-msgstr ""
+msgstr "Spustit prezentaci"
 
 #: app/views/dashboard.properties.edit.php:81
 msgid "Start slideshow automatically"
-msgstr ""
+msgstr "Spustit prezentaci automaticky"
 
 #: app/partials/scheduledreport.formgrid.html.php:107
 #: app/views/popup.sla.edit.php:185
 #: app/views/popup.sla.excludeddowntime.edit.php:49
 msgid "Start time"
-msgstr ""
+msgstr "Počáteční stav"
 
 #: include/classes/api/services/CSla.php:578
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr ""
+msgstr "Počáteční čas musí být menší než koncový čas pro SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:605
 #, c-format
@@ -16903,7 +16915,7 @@ msgstr "Statický"
 
 #: include/classes/data/CItemData.php:1741
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "Statistiky a dostupnost mezipaměti pro zápis Zabbix. Cache - jedna z hodnot (typu: all, float, uint, str, log, text, nepodporováno), historie (typ: pfree, free, total, used, pussed), index (typ: pfree, free, total, used , pussed), trend (typ: pfree, free, total, used, pussed)."
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -16977,11 +16989,11 @@ msgstr "Stav"
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
-msgstr ""
+msgstr "Výpočet stavu pravidla"
 
 #: app/views/popup.service.edit.php:121
 msgid "Status calculation rule and additional rules are only applicable if child services exist."
-msgstr ""
+msgstr "Výpočet stavu pravidla a další pravidla jsou možná jen pokud existují podřízené služby."
 
 #: include/views/configuration.httpconf.edit.php:206
 msgid "Status codes"
@@ -17014,7 +17026,7 @@ msgstr "Problém stavu"
 
 #: app/views/popup.service.edit.php:194
 msgid "Status propagation rule"
-msgstr ""
+msgstr "Pravidlo propagace stavu"
 
 #: include/actions.inc.php:1921
 #: include/classes/screens/CScreenHttpTestDetails.php:81
@@ -17056,18 +17068,18 @@ msgstr "Zastavit"
 #: app/views/popup.lldoverride.php:57
 #: include/views/configuration.host.discovery.edit.php:940
 msgid "Stop processing"
-msgstr ""
+msgstr "Zastavit zpracování"
 
 #: app/views/monitoring.dashboard.view.php:168
 #: app/views/monitoring.dashboard.view.php:238
 #: app/views/monitoring.host.dashboard.view.php:101
 #: app/views/monitoring.host.dashboard.view.php:167 jsLoader.php:146
 msgid "Stop slideshow"
-msgstr ""
+msgstr "Zastavit prezentaci"
 
 #: app/partials/administration.ha.nodes.php:40
 msgid "Stopped"
-msgstr ""
+msgstr "Zastavil"
 
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
@@ -17077,16 +17089,16 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:786
 #: include/views/configuration.item.prototype.edit.php:801
 msgid "Storage period"
-msgstr ""
+msgstr "Doba uložení"
 
 #: include/classes/setup/CSetupWizard.php:510
 msgid "Store credentials in"
-msgstr ""
+msgstr "Uložit přihlašovací údaje do"
 
 #: include/classes/setup/CSetupWizard.php:656
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
-msgstr ""
+msgstr "Uloženo v HashiCorp trezoru"
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -17095,11 +17107,11 @@ msgstr "Přímý"
 #: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1593
 msgid "String"
-msgstr ""
+msgstr "Řetězec"
 
 #: app/views/popup.triggerexpr.php:116
 msgid "String functions"
-msgstr ""
+msgstr "Řetězcové funkce"
 
 #: include/items.inc.php:1820 include/items.inc.php:1824
 #: include/items.inc.php:1828 include/items.inc.php:1832
@@ -17133,11 +17145,11 @@ msgstr "Podmapa"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:168
 msgid "Subscription"
-msgstr ""
+msgstr "Odběr"
 
 #: app/partials/scheduledreport.formgrid.html.php:187
 msgid "Subscriptions"
-msgstr ""
+msgstr "Odběry"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
@@ -17161,7 +17173,7 @@ msgstr "Neděle"
 
 #: include/users.inc.php:54
 msgid "Super admin"
-msgstr ""
+msgstr "Super admin"
 
 #: include/classes/helpers/CMenuHelper.php:354
 #: include/views/general.login.php:94
@@ -17170,11 +17182,11 @@ msgstr "Podpora"
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:70
 msgid "Supported formats:"
-msgstr ""
+msgstr "Podporované formáty:"
 
 #: include/classes/widgets/views/widget.item.form.view.php:59
 msgid "Supported macros:"
-msgstr ""
+msgstr "Podporovaná makra:"
 
 #: include/html.inc.php:975
 #, c-format
@@ -17204,7 +17216,7 @@ msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mim
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
 msgid "System"
-msgstr ""
+msgstr "Systém"
 
 #: include/classes/data/CItemData.php:1037
 msgid "System boot time. Returns integer (Unix timestamp)"
@@ -17242,11 +17254,11 @@ msgstr "Systémové statistiky. Návratová hodnota celé číslo nebo plovoucí
 
 #: include/classes/widgets/forms/CWidgetFormSystemInfo.php:31
 msgid "System stats"
-msgstr ""
+msgstr "Statistiky systému"
 
 #: include/classes/data/CItemData.php:1085
 msgid "System time. Returns integer with type as UTC; string - with type as local"
-msgstr ""
+msgstr "Systémový čas. Návratová hodnota celé číslo s typem jako UTC; řetězec - s typem jako lokální"
 
 #: include/classes/data/CItemData.php:1125
 msgid "System uptime in seconds. Returns integer"
@@ -17327,7 +17339,7 @@ msgstr "Hodnota značky"
 #: app/partials/monitoring.charts.subfilter.php:199
 #: app/partials/monitoring.latest.subfilter.php:178
 msgid "Tag values"
-msgstr ""
+msgstr "Hodnoty značek"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -17448,7 +17460,7 @@ msgstr "Šablona přidána"
 
 #: app/views/popup.import.php:90
 msgid "Template and host properties that are inherited through template linkage will be unlinked and cleared."
-msgstr ""
+msgstr "Vlastnosti šablony a hostitele, které jsou zděděny propojením šablon, budou odpojeny a vymazány."
 
 #: include/classes/api/services/CHostBase.php:1386
 msgid "Template cannot be linked to another template more than once even through other templates."
@@ -17456,11 +17468,11 @@ msgstr "Šablona nemůže být připojená k jiné šabloně víc jak jednou, v�
 
 #: app/controllers/CControllerAuditLogList.php:241
 msgid "Template dashboard"
-msgstr ""
+msgstr "Šablona dashboardu"
 
 #: app/views/popup.import.php:33
 msgid "Template dashboards"
-msgstr ""
+msgstr "Šablony dashboardu"
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Template deleted"
@@ -17497,7 +17509,7 @@ msgstr "Šablona hodnota"
 #: include/classes/api/services/CHostGeneral.php:126
 #, c-format
 msgid "Template with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "Šablona se jménem hosta \"%1$s\" již existuje."
 
 #: include/classes/api/services/CHost.php:2067
 #: include/classes/api/services/CHost.php:2353
@@ -17514,7 +17526,7 @@ msgstr "Šablona se stejným viditelným jménem \"%1$s\" již existuje."
 #: include/classes/api/services/CHostGeneral.php:146
 #, c-format
 msgid "Template with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Šablona se zobrazovaným jménem hosta \"%1$s\" již existuje."
 
 #: app/controllers/CControllerPopupGeneric.php:121
 #: app/controllers/CControllerPopupImportCompare.php:132
@@ -17603,23 +17615,23 @@ msgstr "Testovací výrazy"
 
 #: app/controllers/CControllerPopupItemTestEdit.php:354
 msgid "Test item"
-msgstr ""
+msgstr "Testovací položka"
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:77
 #, c-format
 msgid "Test media type \"%1$s\""
-msgstr ""
+msgstr "Testovací typ média \"%1$s\""
 
 #: app/controllers/CControllerPopupItemTestEdit.php:110
 #: app/controllers/CControllerPopupItemTestGetValue.php:84
 #: app/controllers/CControllerPopupItemTestSend.php:151
 #, c-format
 msgid "Test of \"%1$s\" items is not supported."
-msgstr ""
+msgstr "Test položek \"%1$s\" není podporován."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:79
 msgid "Test report generating"
-msgstr ""
+msgstr "Vygenerování zkušebního reportu"
 
 #: app/views/administration.regex.edit.php:119
 msgid "Test string"
@@ -17659,7 +17671,7 @@ msgstr ""
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "Verze databáze Zabbix neodpovídá aktuálním požadavkům. Verze vaší databáze: %1$s. Požadovaná verze: %2$s. Kontaktujte svého správce systému."
 
 #: include/classes/data/CItemData.php:1533
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -17671,15 +17683,15 @@ msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:240
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "Klonovaný hostitel obsahuje uživatelem definovaná makra typu \"Secret text\". Hodnota a typ těchto maker byly resetovány."
 
 #: host_prototypes.php:162
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "Prototyp klonovaného hosta obsahuje uživatelsky definovaná makra typu \"Tajný text\". Hodnota a typ těchto maker byly resetovány."
 
 #: templates.php:180
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr ""
+msgstr "Klonovaná šablona obsahuje uživatelem definovaná makra typu \"Tajný text\". Hodnota a typ těchto maker byly resetovány."
 
 #: include/classes/api/services/CTriggerGeneral.php:2245
 #, c-format
@@ -17698,16 +17710,16 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
-msgstr ""
+msgstr "Jsou podporovány následující zástupné symboly:"
 
 #: include/html.inc.php:691
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Graf již nebyl detekován a bude smazán za %1$s (dne %2$s v %3$s)."
 
 #: include/html.inc.php:686
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Graf již není detekován a bude smazán při příštím zpracování pravidla zjišťování."
 
 #: include/html.inc.php:637
 #, c-format
@@ -17755,7 +17767,7 @@ msgstr "Položka již není objevovaná a bude smazána při dalším objevován
 #: include/classes/widgets/views/widget.geomap.form.view.php:76
 #, c-format
 msgid "The maximum zoom level is \"%1$s\"."
-msgstr ""
+msgstr "Maximální úroveň přiblížení je \"%1$s\"."
 
 #: include/classes/data/CItemData.php:1009
 msgid "The number of processes. Returns integer"
@@ -17764,11 +17776,11 @@ msgstr "Počet procesů. Vráti celé číslo"
 #: index_sso.php:193
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
-msgstr ""
+msgstr "V uživatelských atributech chybí parametr \"%1$s\"."
 
 #: include/classes/core/CJsonRpc.php:177
 msgid "The received JSON is not a valid JSON-RPC request."
-msgstr ""
+msgstr "Přijatý JSON není platný JSON-RPC požadavek."
 
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
@@ -17777,12 +17789,12 @@ msgstr "Požadovaná vzdálená procedura neexistuje / není dostupná"
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr ""
+msgstr "Platnost tokenu vypršela. Prosím aktualitujte datum platnosti abyste jej mohli nadále používat."
 
 #: include/html.inc.php:718
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Spouštěč již nebyl detekován a bude smazán za %1$s (dne %2$s v %3$s)."
 
 #: include/html.inc.php:713
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -17799,7 +17811,7 @@ msgstr "Tento den v minulém týdnu"
 #: app/partials/configuration.host.edit.html.php:398
 #, c-format
 msgid "This field is automatically populated by item \"%1$s\"."
-msgstr ""
+msgstr "Toto pole je automaticky vyplněné položkou \"%1$s\"."
 
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
@@ -17855,7 +17867,7 @@ msgstr "Prahová hodnota"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "Prahové hodnoty"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -17915,11 +17927,11 @@ msgstr "Podíl doby konkrétního procesu či skupiny procesů Zabbixu (identifi
 #: app/views/js/popup.mediatypetest.edit.js.php:103
 #: app/views/js/popup.scriptexec.js.php:44
 msgid "Time elapsed:"
-msgstr ""
+msgstr "Uplynulý čas:"
 
 #: app/views/administration.gui.edit.php:131
 msgid "Time filter default period"
-msgstr ""
+msgstr "Výchozí období pro filtrování času"
 
 #: include/classes/data/CItemData.php:1677
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
@@ -17950,7 +17962,7 @@ msgstr "Druh času"
 
 #: app/views/administration.user.edit.php:250 app/views/popup.sla.edit.php:83
 msgid "Time zone"
-msgstr ""
+msgstr "Časové pásmo"
 
 #: app/views/administration.mediatype.edit.php:230
 #: app/views/administration.script.edit.php:197
@@ -17973,7 +17985,7 @@ msgstr "Časové razítko"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "Časové pásmo"
 
 #: app/controllers/CControllerSlaReportList.php:162
 #: app/controllers/CControllerSlaReportList.php:170
@@ -18016,7 +18028,7 @@ msgstr "Nahoře"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "Prvních N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -18051,11 +18063,11 @@ msgstr "Celkový čas: %1$s"
 
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:104
 msgid "Totals"
-msgstr ""
+msgstr "Celkem"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 msgid "Trace"
-msgstr ""
+msgstr "Stopa"
 
 #: include/page_footer.php:40
 msgid "Transaction has not been closed. Aborting..."
@@ -18200,12 +18212,12 @@ msgstr "Spouštěč \"%1$s\" závisí na jiném spouštěči \"%2$s\", který ne
 
 #: app/controllers/CControllerMenuPopup.php:644
 msgid "Trigger URL"
-msgstr ""
+msgstr "Spouštěcí adresa URL"
 
 #: include/classes/helpers/CMenuHelper.php:199
 #: include/views/configuration.action.list.php:33
 msgid "Trigger actions"
-msgstr ""
+msgstr "Trigger akce"
 
 #: triggers.php:303
 msgid "Trigger added"
@@ -18641,7 +18653,7 @@ msgstr "URL"
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
-msgstr ""
+msgstr "Očekává se UUIDv4"
 
 #: include/locales.inc.php:64
 msgid "Ukrainian (uk_UA)"
@@ -18649,7 +18661,7 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:252
 msgid "Unable to change configuration file permissions to 0600."
-msgstr ""
+msgstr "Nelze změnit oprávnění konfiguračního souboru na 0600."
 
 #: include/classes/core/CConfigFile.php:261
 msgid "Unable to create the configuration file."
@@ -18660,7 +18672,7 @@ msgstr "Nelze vytvořit konfigurační soubor."
 #: include/classes/db/PostgresqlDbBackend.php:61
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "Nelze zjistit aktuální verzi databáze Zabbix: %1$s."
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-18 16:34+0000\n"
+"PO-Revision-Date: 2022-12-23 15:31+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -3951,6 +3951,10 @@ msgstr "設定を更新しました"
 msgid "Configure DB connection"
 msgstr "データベース接続設定"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr "変更の確認"
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "確認テキスト"
@@ -6184,6 +6188,10 @@ msgstr "有効"
 msgid "Enable HTTP authentication"
 msgstr "HTTP認証の有効化"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr "すべてのユーザーでHTTP認証を有効にします。"
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "LDAP認証の有効化"
@@ -8393,6 +8401,10 @@ msgstr "同一のネームスペース(%1$s)は%2$sにあるモジュールで�
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "システムの識別文字列。文字列値を返す。"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr "HTTP認証が有効になっている場合、すべてのユーザー(WebインターフェースへのアクセスがLDAPや内部DBに設定されている場合でも)は、ZabbixではなくWebサーバーによって認証されます。"
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

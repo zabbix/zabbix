@@ -4108,6 +4108,10 @@ msgstr "Nastavenie bolo aktulizované"
 msgid "Configure DB connection"
 msgstr "Konfigurovať DB spojenie"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "Potvrdzujúci text"
@@ -6355,6 +6359,10 @@ msgstr "Povoliť"
 msgid "Enable HTTP authentication"
 msgstr "Povoliť overenie HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Povoliť overenie LDAP"
@@ -8578,6 +8586,10 @@ msgstr "Identický menný priestor (%1$s) používajú moduly umiestnené na %2$
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identifikácia systému. Vráti reťazec"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
