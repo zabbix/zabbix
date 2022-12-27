@@ -23,7 +23,7 @@
 #include "zbxself.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxalert.h"
+#include "../alerter/alerter.h"
 #include "report_protocol.h"
 #include "zbxtime.h"
 

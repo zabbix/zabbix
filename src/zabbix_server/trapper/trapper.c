@@ -1070,7 +1070,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 }
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
+		int config_startup_time)
 {
 	int	ret = SUCCEED;
 
@@ -1169,7 +1170,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->zbx_config_tls,
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
 				zbx_get_program_type_cb, config_comms->config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
@@ -1256,14 +1257,15 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 }
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
+		int config_startup_time)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_startup_time);
+	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1292,7 +1294,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(trapper_args_in->zbx_config_comms->zbx_config_tls, zbx_get_program_type_cb);
+	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb);
 	find_psk_in_cache = DCget_psk_by_identity;
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
@@ -1300,7 +1302,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->zbx_config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, trapper_args_in->config_comms->config_timeout, &rtc);
 #endif
 
 	while (ZBX_IS_RUNNING())
@@ -1320,7 +1322,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
 		/* the data. */
 		ret = zbx_tcp_accept(&s, ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK | ZBX_TCP_SEC_UNENCRYPTED,
-				trapper_args_in->zbx_config_comms->config_timeout);
+				trapper_args_in->config_comms->config_timeout);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		if (SUCCEED == ret)
@@ -1352,7 +1354,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			}
 #endif
 			sec = zbx_time();
-			process_trapper_child(&s, &ts, trapper_args_in->zbx_config_comms,
+			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time);
 			sec = zbx_time() - sec;
 

@@ -4000,6 +4000,7 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	*jstr = zbx_strdup(NULL, json_data.buffer);
 out:
 	zbx_free(latestdate);
+	zbx_free(oldestdate);
 	zbx_vector_uint64_destroy(&disks_used);
 	zbx_json_free(&json_data);
 
@@ -5193,7 +5194,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	hvid_esc = zbx_xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter, ZBX_NULL2EMPTY_STR(scsi_req), hvid_esc);
+	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_DISK_INFO, pcollecter, ZBX_NULL2EMPTY_STR(scsi_req), hvid_esc);
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
@@ -5221,7 +5222,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	zbx_property_collection_free(iter);
 	iter = NULL;
 	hvid_esc = zbx_xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter ,
+	tmp = zbx_dsprintf(tmp, ZBX_POST_HV_DISK_INFO, pcollecter,
 			"<ns0:pathSet>config.vsanHostConfig.storageInfo.diskMapping</ns0:pathSet>", hvid_esc);
 	zbx_free(hvid_esc);
 

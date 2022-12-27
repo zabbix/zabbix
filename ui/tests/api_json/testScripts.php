@@ -1158,7 +1158,7 @@ class testScripts extends CAPITest {
 				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
 					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
-			],
+			]
 		];
 		$scripts = CDataHelper::call('script.create', $scripts_data);
 		$this->assertArrayHasKey('scriptids', $scripts, 'prepareScriptsData() failed: Could not create scripts.');

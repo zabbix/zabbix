@@ -44,12 +44,12 @@ void	zbx_proxy_stats_ext_get(struct zbx_json *json, const void *arg)
 	if (ZBX_PROXYMODE_PASSIVE == config_comms->proxymode)
 	{
 		zbx_json_addstring(json, "passive", "true", ZBX_JSON_TYPE_INT);
-		encryption = config_comms->zbx_config_tls->accept_modes;
+		encryption = config_comms->config_tls->accept_modes;
 	}
 	else
 	{
 		zbx_json_addstring(json, "passive", "false", ZBX_JSON_TYPE_INT);
-		encryption = config_comms->zbx_config_tls->connect_mode;
+		encryption = config_comms->config_tls->connect_mode;
 	}
 
 	zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT,

@@ -861,7 +861,7 @@ out:
  *             rate             - [IN] threshold of records count at a time   *
  *             process_value_cb - [IN] callback function for sending data to  *
  *                                     the server                             *
- *             zbx_config_tls   - [IN]                                        *
+ *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
@@ -876,7 +876,7 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 		EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
 		zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate,
-		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
+		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
 		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 #	define EVT_ARRAY_SIZE	100
@@ -1052,7 +1052,7 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
-						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls,
+						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
 						config_timeout);
 
 				if (SUCCEED == send_err)
@@ -1390,7 +1390,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *             rate             - [IN] threshold of records count at a time   *
  *             process_value_cb - [IN] callback function for sending data to  *
  *                                     the server                             *
- *             zbx_config_tls   - [IN]                                        *
+ *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
@@ -1404,7 +1404,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
 static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
 		zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
 		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout, ZBX_ACTIVE_METRIC *metric,
+		const zbx_config_tls_t *config_tls, int config_timeout, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int		ret = FAIL;
@@ -1644,7 +1644,7 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
 							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &timestamp, source, &severity, &logeventid,
-							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls,
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
 							config_timeout);
 
 					if (SUCCEED == send_err)
@@ -1698,8 +1698,7 @@ out:
 
 int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
-		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout,
-		char **error)
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout, char **error)
 {
 	int 		ret = FAIL;
 	AGENT_REQUEST	request;
@@ -1817,7 +1816,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
-					zbx_config_tls, config_timeout, metric, lastlogsize_sent, error);
+					config_tls, config_timeout, metric, lastlogsize_sent, error);
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -1829,7 +1828,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
-				key_logeventid, rate, process_value_cb, zbx_config_tls, config_timeout, metric,
+				key_logeventid, rate, process_value_cb, config_tls, config_timeout, metric,
 				lastlogsize_sent, error);
 	}
 out:
