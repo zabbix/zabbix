@@ -946,7 +946,7 @@ class testFormUser extends CWebTest {
 
 		$form->submit();
 
-		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields']) ) {
+		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
 			$this->assertTrue($this->page->isAlertPresent());
 			$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
 					$this->page->getAlertText()

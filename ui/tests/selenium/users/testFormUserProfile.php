@@ -82,6 +82,13 @@ class testFormUserProfile extends CLegacyWebTest {
 			]],
 			[[
 				'expected' => TEST_BAD,
+				'old_password' => 'test_123',
+				'password1' => "test_123",
+				'password2' => "test_123",
+				'error_msg' => 'Incorrect current password.'
+			]],
+			[[
+				'expected' => TEST_BAD,
 				'old_password' => '',
 				'password1' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
 				'password2' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
@@ -109,17 +116,16 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 
-		$form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
+		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->query('button:Change password')->waitUntilClickable()->one()->click();
-		$form->query('id:current_password')->waitUntilPresent()->one();
-		$form->query('id:password1')->waitUntilPresent()->one();
-		$form->query('id:password2')->waitUntilPresent()->one();
+		foreach (['current_password', 'password1', 'password2'] as $id) {
+			$form->query('id', $id)->waitUntilVisible()->one();
+		}
 		$form->fill([
 				'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
 				'Password' => $data['password1'],
 				'Password (once again)' => $data['password2']
 		]);
-
 		$form->submit();
 
 		if ($this->page->isAlertPresent()) {
