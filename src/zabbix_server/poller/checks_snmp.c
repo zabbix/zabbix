@@ -459,16 +459,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
 
-		switch (ss->s_snmp_errno)
-		{
-			case SNMPERR_UNKNOWN_USER_NAME:
-			case SNMPERR_UNSUPPORTED_SEC_LEVEL:
-			case SNMPERR_AUTHENTICATION_FAILURE:
-				ret = NOTSUPPORTED;
-				break;
-			default:
-				ret = NETWORK_ERROR;
-		}
+		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
@@ -1993,7 +1984,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
 		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
 {
-	struct snmp_pdu		*pdu = NULL, *response = NULL;
+	struct snmp_pdu		*pdu, *response = NULL;
 	int			ret, running = 1, vars_num = 0, status;
 	oid			name[MAX_OID_LEN];
 	size_t			name_length = MAX_OID_LEN;

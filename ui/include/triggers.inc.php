@@ -676,6 +676,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
 			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'symptom' => false,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
@@ -782,7 +783,9 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 		$acknowledge = false;
 	}
 
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
+	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+		['acknowledge' => $acknowledge]
+	));
 
 	return $column;
 }
@@ -960,8 +963,8 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 /**
  * Make trigger info block.
  *
- * @param array $trigger  Trigger described in info block.
- * @param array $eventid  Associated eventid.
+ * @param array  $trigger  Trigger described in info block.
+ * @param string $eventid  Associated event ID.
  *
  * @return object
  */
@@ -994,7 +997,9 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
+					['show_rank_change_cause' => true]
+				))
 			)
 		])
 		->addRow([

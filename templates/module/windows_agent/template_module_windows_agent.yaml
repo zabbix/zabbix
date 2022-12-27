@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-15T14:05:21Z'
+  date: '2022-12-20T11:02:24Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -528,7 +528,7 @@ zabbix_export:
           triggers:
             -
               uuid: 13c5f9c0f7f645cc9dde522ff20a1860
-              expression: 'last(/Windows generic by Zabbix agent/system.hostname,#1)<>last(/Windows generic by Zabbix agent/system.hostname,#2) and length(last(/Windows generic by Zabbix agent/system.hostname))>0'
+              expression: 'change(/Windows generic by Zabbix agent/system.hostname) and length(last(/Windows generic by Zabbix agent/system.hostname))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -580,6 +580,40 @@ zabbix_export:
             -
               tag: component
               value: os
+        -
+          uuid: 4dafd987a910490283af4c437475b8b7
+          name: 'Operating system'
+          key: system.sw.os
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: ffd53b8e4fc84642aaf2630244844448
+              expression: 'change(/Windows generic by Zabbix agent/system.sw.os) and length(last(/Windows generic by Zabbix agent/system.sw.os))>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'System name has changed'
+                  expression: 'change(/Windows generic by Zabbix agent/system.hostname) and length(last(/Windows generic by Zabbix agent/system.hostname))>0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 76ef3297b4b740bfaf891e039f7d4dff
           name: 'System description'

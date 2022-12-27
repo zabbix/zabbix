@@ -3788,6 +3788,10 @@ msgstr[0] "Nevar atjaunināt notikumu"
 msgstr[1] "Nevar atjaunināt notikumus"
 msgstr[2] "Nevar atjaunināt notikumus"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Grafiku nav iespējams atjaunot"
@@ -4032,6 +4036,11 @@ msgstr "Notver visus SNMP trapus, kas atbilst regulārai izteiksmei. Ja regexp n
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Notver visus SNMP trapus, kurus neuztvēra neviens no snmptrap[] vienumiem."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4088,6 +4097,10 @@ msgstr "Mainīt paroli"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Izmaiņas sekundē"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4898,6 +4911,14 @@ msgstr "Līguma numurs"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "Konvertēt uz JSON"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -12448,6 +12469,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Marts"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr ""
@@ -12459,6 +12484,10 @@ msgstr "Atzīmēt pārējos"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Iekrāsot izvēlētās"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15225,6 +15254,10 @@ msgstr ""
 msgid "Pause operations for suppressed problems"
 msgstr ""
 
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:163
 #, c-format
 msgid "Peak memory usage: %1$s"
@@ -15916,6 +15949,10 @@ msgstr ""
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17919,6 +17956,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18586,6 +18628,11 @@ msgstr "Zviedru (sv_SE)"
 
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
+msgstr ""
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
 msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
@@ -20048,6 +20095,10 @@ msgstr ""
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "NEZINĀMS"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -23803,6 +23854,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

@@ -31,8 +31,6 @@
 #include "preproc_snmp.h"
 #include "zbxtime.h"
 
-extern unsigned char			program_type;
-
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
 
 typedef struct
@@ -685,7 +683,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_PREPROCESSOR_WORKER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

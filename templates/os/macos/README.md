@@ -32,7 +32,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p><p>**Overrides:**</p><p>Exclude dmg<br> - {#FSOPTIONS} EXISTS  - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)noowners\b` - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)read-only\b` - {#FSTYPE} MATCHES_REGEX `hfs`<br>  - ITEM_PROTOTYPE REGEXP `.+`<br>  - NO_DISCOVER</p> |
+|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p><p>**Overrides:**</p><p>Exclude dmg<br> - {#FSOPTIONS} EXISTS  - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)noowners\b` - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)read-only\b` - {#FSTYPE} MATCHES_REGEX `hfs`<br>  - ITEM_PROTOTYPE REGEXP `.+`<br>  - NO_DISCOVER</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 
 ## Items collected
 
