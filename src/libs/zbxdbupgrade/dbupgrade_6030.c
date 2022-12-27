@@ -1635,7 +1635,7 @@ static void collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64
 				zbx_vector_valuemap_mapping_ptr_create(&valuemap_copy->mappings);
 
 				mappings_num += DBpatch_propogate_valuemap(valuemap_copy, valuemap->parent_valuemapid);
-				valuemap->uniq = 0;
+				valuemap_copy->uniq = 0;
 				zbx_vector_valuemap_ptr_append(valuemaps, valuemap_copy);
 			}
 		}
@@ -2717,7 +2717,7 @@ static void collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 				seed = zbx_dsprintf(seed, "%s/%s", template_name, dashboard->name);
 				dashboard_copy->uuid = zbx_gen_uuid4(seed);
 				zbx_free(seed);
-				dashboard->uniq = 0;
+				dashboard_copy->uniq = 0;
 				zbx_vector_dashboard_page_ptr_create(&dashboard_copy->pages);
 				pages_num += DBpatch_propogate_dashboard(dashboard_copy, dashboard->parent_dashboardid,
 						widgets_num, fields_num, &value_itemids, &value_graphids);
