@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-12-07T09:47:34Z</date>
+   <date>2022-12-21T12:49:19Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -96,19 +96,6 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get archive log info</name>
-               <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <delay>5m</delay>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: Archiver state</name>
                <type>DEPENDENT</type>
                <key>oracle.archiver_state</key>
@@ -200,19 +187,6 @@
                <master_item>
                   <key>oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </master_item>
-            </item>
-            <item>
-               <name>Oracle: Get CDB and No-CDB info</name>
-               <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>It gets the information about the container database (CDB) and non-CDB databases on an instance.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
             </item>
             <item>
                <name>Oracle: Cursor cache hit ratio</name>
@@ -348,19 +322,6 @@
                <master_item>
                   <key>oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </master_item>
-            </item>
-            <item>
-               <name>Oracle: Get ASM stats</name>
-               <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>It gets the ASM disk groups statistics.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
             </item>
             <item>
                <name>Oracle: Enqueue timeouts per second</name>
@@ -783,19 +744,6 @@
                <master_item>
                   <key>oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
                </master_item>
-            </item>
-            <item>
-               <name>Oracle: Get PDB info</name>
-               <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>It gets the information about the PDB databases on an instance.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
             </item>
             <item>
                <name>Oracle: PGA, Global memory bound</name>
@@ -1650,19 +1598,6 @@
                </master_item>
             </item>
             <item>
-               <name>Oracle: Get tablespaces stats</name>
-               <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
-               <history>0</history>
-               <trends>0</trends>
-               <value_type>TEXT</value_type>
-               <description>It gets the statistics of the tablespaces.</description>
-               <applications>
-                  <application>
-                     <name>Zabbix raw items</name>
-                  </application>
-               </applications>
-            </item>
-            <item>
                <name>Oracle: Uptime</name>
                <type>DEPENDENT</type>
                <key>oracle.uptime</key>
@@ -1798,6 +1733,20 @@
                <description>Destinations of the log archive.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Archivelog '{#DEST_NAME}': Get archive log info</name>
+                     <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
+                     <delay>5m</delay>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the archivelog statistics.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Archivelog '{#DEST_NAME}': Error</name>
                      <type>DEPENDENT</type>
                      <key>oracle.archivelog_error["{#DEST_NAME}"]</key>
@@ -1822,7 +1771,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1844,7 +1793,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1877,7 +1826,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -1915,6 +1864,19 @@
                <description>Scanning databases in the database management system (DBMS).</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Get CDB and No-CDB info</name>
+                     <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the information about the container database (CDB) and non-CDB database on an instance.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Oracle Database '{#DBNAME}': Force logging</name>
                      <type>DEPENDENT</type>
                      <key>oracle.db_force_logging["{#DBNAME}"]</key>
@@ -1940,7 +1902,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -1972,7 +1934,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2004,7 +1966,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2059,7 +2021,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2107,7 +2069,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2130,7 +2092,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2154,7 +2116,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2176,6 +2138,19 @@
                            </dependencies>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>ASM '{#DGNAME}': Get ASM stats</name>
+                     <key>oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the ASM disk group statistics.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                   </item_prototype>
                </item_prototypes>
                <graph_prototypes>
@@ -2252,7 +2227,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2269,6 +2244,19 @@
                            <description>The Oracle DB is in a mounted state.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle Database '{#DBNAME}': Get PDB info</name>
+                     <key>oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the information about the PDB database on an instance.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                   </item_prototype>
                </item_prototypes>
             </discovery_rule>
@@ -2314,7 +2302,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2337,7 +2325,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2360,7 +2348,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2388,7 +2376,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2432,7 +2420,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
@@ -2456,7 +2444,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2498,7 +2486,7 @@
                         </step>
                      </preprocessing>
                      <master_item>
-                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]</key>
+                        <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
@@ -2518,6 +2506,19 @@
                            <priority>HIGH</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Oracle TBS '{#TABLESPACE}': Get tablespace stats</name>
+                     <key>oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]</key>
+                     <history>0</history>
+                     <trends>0</trends>
+                     <value_type>TEXT</value_type>
+                     <description>It gets the statistics of the tablespace.</description>
+                     <applications>
+                        <application>
+                           <name>Zabbix raw items</name>
+                        </application>
+                     </applications>
                   </item_prototype>
                </item_prototypes>
                <graph_prototypes>
