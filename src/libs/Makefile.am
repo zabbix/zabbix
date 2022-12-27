@@ -55,6 +55,7 @@ DIST_SUBDIRS = \
 	zbxtasks \
 	zbxthreads \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -99,6 +100,7 @@ SERVER_SUBDIRS = \
 	zbxstr \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
@@ -138,6 +140,7 @@ PROXY_SUBDIRS = \
 	zbxstr \
 	zbxtasks \
 	zbxtime \
+	zbxtimekeeper \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
