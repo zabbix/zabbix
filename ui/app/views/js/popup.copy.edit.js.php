@@ -98,6 +98,12 @@ window.copy_popup = new class {
 
 		$('#copy_targets').html($multiselect);
 		$multiselect.multiSelectHelper(helper_options);
+
+		$multiselect.on('change', () => {
+			$('#copy_targetids').multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="copy_targetids["]')].map((input) => input.value)
+			);
+		});
 	}
 
 	submit() {
