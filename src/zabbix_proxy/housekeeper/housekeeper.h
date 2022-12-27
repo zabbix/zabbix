@@ -28,7 +28,6 @@ extern int	CONFIG_PROXY_OFFLINE_BUFFER;
 
 typedef struct
 {
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 }
 zbx_thread_proxy_housekeeper_args;

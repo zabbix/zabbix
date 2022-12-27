@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0rc1');
+define('ZABBIX_VERSION',		'6.4.0beta6');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030150);
+define('ZABBIX_DB_VERSION',		6030158);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -816,6 +816,9 @@ define('SMTP_MESSAGE_FORMAT_HTML',			1);
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
 
+define('ACTION_PAUSE_SYMPTOMS_FALSE',		0);
+define('ACTION_PAUSE_SYMPTOMS_TRUE',		1);
+
 define('ACTION_PAUSE_SUPPRESSED_FALSE',		0);
 define('ACTION_PAUSE_SUPPRESSED_TRUE',		1);
 
@@ -1056,14 +1059,18 @@ define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
 define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
 
-define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
-define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
-define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
-define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
-define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
-define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',	0x10);
-define('ZBX_PROBLEM_UPDATE_SUPPRESS',	    0x20);
-define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',	    0x40);
+define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
+define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
+define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',		0x02);
+define('ZBX_PROBLEM_UPDATE_MESSAGE',			0x04);
+define('ZBX_PROBLEM_UPDATE_SEVERITY',			0x08);
+define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',		0x10);
+define('ZBX_PROBLEM_UPDATE_SUPPRESS',			0x20);
+define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',			0x40);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE',		0x80);
+define('ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM',	0x100);
+
+define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
 
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
@@ -1084,7 +1091,7 @@ define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
 define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
 define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
-define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
+define('ZBX_TM_DATA_TYPE_RANK_EVENT',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -1957,6 +1964,8 @@ define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
+define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
+define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
@@ -2098,6 +2107,13 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
+define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
+define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
+define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
+define('ZBX_STYLE_SYMPTOM_LIMIT_TD', 'symptom-limit-td');
+define('ZBX_STYLE_SECOND_COL', 'second-col');
+define('ZBX_STYLE_THIRD_COL', 'third-col');
 define('ZBX_STYLE_TOC', 'toc');
 define('ZBX_STYLE_TOC_ARROW', 'toc-arrow');
 define('ZBX_STYLE_TOC_ITEM', 'toc-item');

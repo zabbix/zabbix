@@ -25,10 +25,15 @@
 #include "zbxsysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 
+FILE	*custom_fopen_mock(const char *__filename, const char *__modes);
+int	__wrap_uname(struct utsname *buf);
+
 FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 {
 	const char	*str;
 	size_t		f_size;
+
+	ZBX_UNUSED(__modes);
 
 	if (0 == strcmp(__filename, "/proc/version"))
 		str = zbx_mock_get_parameter_string("in.proc_version");
@@ -48,7 +53,6 @@ FILE	*custom_fopen_mock(const char *__filename, const char *__modes)
 
 int	__wrap_uname(struct utsname *buf)
 {
-	const char	*str;
 	const char	*release, *machine;
 	int		ret;
 

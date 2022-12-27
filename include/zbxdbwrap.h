@@ -38,7 +38,7 @@ typedef enum
 zbx_host_template_link_type;
 
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout);
 
 int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
@@ -94,10 +94,17 @@ void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char ve
 		const zbx_uint64_t hostid);
 
 /* event support */
-void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void	zbx_db_free_event(ZBX_DB_EVENT *event);
-void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
+void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void		zbx_db_free_event(ZBX_DB_EVENT *event);
+void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
+void		zbx_db_prepare_empty_event(zbx_uint64_t eventid, ZBX_DB_EVENT **event);
+void		zbx_db_get_event_data_core(ZBX_DB_EVENT *event);
+void		zbx_db_get_event_data_tags(ZBX_DB_EVENT *event);
+void		zbx_db_get_event_data_triggers(ZBX_DB_EVENT *event);
+void		zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids);
+zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid);
+zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid);
 
 void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
 void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);

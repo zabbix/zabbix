@@ -23,13 +23,15 @@
 #include "zbxthreads.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
+#include "zbxvault.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
+	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_events_funcs_t	*events_cbs;
 	int			config_timeout;

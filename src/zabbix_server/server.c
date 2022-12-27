@@ -341,12 +341,6 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULT			= NULL;
-char	*CONFIG_VAULTURL		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
-char	*CONFIG_VAULTTLSCERTFILE	= NULL;
-char	*CONFIG_VAULTTLSKEYFILE		= NULL;
-char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -387,6 +381,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
+static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
 char	*CONFIG_NODE_ADDRESS	= NULL;
@@ -666,8 +661,8 @@ static void	zbx_set_defaults(void)
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
-	if (NULL == CONFIG_VAULTURL)
-		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+	if (NULL == zbx_config_vault.url)
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER] = 1;
@@ -756,9 +751,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
-	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
 
 	err |= (FAIL == check_cfg_feature_int("StartReportWriters", CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],
 			"cURL library"));
@@ -922,17 +917,17 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+		{"VaultToken",			&(zbx_config_vault.token),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
+		{"Vault",			&(zbx_config_vault.name),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
+		{"VaultTLSCertFile",		&(zbx_config_vault.tls_cert_file),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSKeyFile",		&CONFIG_VAULTTLSKEYFILE,		TYPE_STRING,
+		{"VaultTLSKeyFile",		&(zbx_config_vault.tls_key_file),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+		{"VaultURL",			&(zbx_config_vault.url),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
+		{"VaultDBPath",			&(zbx_config_vault.db_path),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1018,9 +1013,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"ExportDir",			&(zbx_config_export.dir),		TYPE_STRING,
+		{"ExportDir",			&(zbx_config_export.dir),			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExportType",			&(zbx_config_export.type),		TYPE_STRING_LIST,
+		{"ExportType",			&(zbx_config_export.type),			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"ExportFileSize",		&(zbx_config_export.file_size),		TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
@@ -1261,6 +1256,7 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 	zbx_load_config(&t);
 
+	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1385,27 +1381,27 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0, CONFIG_TIMEOUT};
+	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, 0, CONFIG_TIMEOUT};
 
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config_comms, get_program_type, &events_cbs, listen_sock};
+	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
+							&events_cbs, listen_sock};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type, &events_cbs,
-							CONFIG_TIMEOUT};
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
+							&events_cbs, CONFIG_TIMEOUT};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, &events_cbs,
 							CONFIG_TIMEOUT};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
-	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info, CONFIG_TIMEOUT};
+							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
+	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, CONFIG_TIMEOUT};
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {CONFIG_TIMEOUT};
+	zbx_thread_taskmanager_args	taskmanager_args = {CONFIG_TIMEOUT};
+	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, CONFIG_TIMEOUT};
+	zbx_thread_pinger_args		pinger_args = {CONFIG_TIMEOUT};
 
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {get_program_type,
-							CONFIG_TIMEOUT};
-	zbx_thread_taskmanager_args	taskmanager_args = {get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_dbconfig_args	dbconfig_args = {get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_pinger_args		pinger_args = {get_program_type, CONFIG_TIMEOUT};
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args	ipmi_manager_args = {get_program_type, CONFIG_TIMEOUT};
+	zbx_thread_ipmi_manager_args	ipmi_manager_args = {CONFIG_TIMEOUT};
 #endif
 
 	zbx_thread_dbsyncer_args	dbsyncer_args = {events_cbs};
@@ -1470,6 +1466,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
 	zbx_set_exit_on_terminate();
+
+	thread_args.info.program_type = program_type;
 
 	for (i = 0; i < threads_num; i++)
 	{
@@ -1925,21 +1923,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&error))
+	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
+	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

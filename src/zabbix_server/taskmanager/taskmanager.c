@@ -39,6 +39,8 @@
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxdbwrap.h"
+#include "zbxserver.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -47,8 +49,6 @@
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
-
-extern unsigned char			program_type;
 
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -315,6 +315,224 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event/problem as cause                                       *
+ *                                                                            *
+ * Parameters: eventid     - [IN] the event/problem, which should be ranked   *
+ *                           as cause                                         *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no database errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid: " ZBX_FS_UI64, __func__, eventid);
+
+	if (ZBX_DB_OK > DBexecute("update problem set cause_eventid=null where eventid=" ZBX_FS_UI64, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert problem (eventid:" ZBX_FS_UI64 ") from symptom to"
+				" cause", eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (ZBX_DB_OK > DBexecute("delete from event_symptom where eventid=" ZBX_FS_UI64, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert event (id:" ZBX_FS_UI64 ") from symptom to cause",
+				eventid);
+		ret = FAIL;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event/problem as symptom                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     eventid           - [IN] event id of the new symptom                   *
+ *     cause_eventid     - [IN] event id of the new cause                     *
+ *     old_cause_eventid - [IN] event id of the old cause before the ranking  *
+ *                                                                            *
+ * Return value: SUCCEED - if there are no database errors                    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ *****************************************************************************/
+static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eventid,
+		zbx_uint64_t old_cause_eventid)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid: " ZBX_FS_UI64 ", cause_eventid: " ZBX_FS_UI64,  __func__, eventid,
+			cause_eventid);
+
+	if (ZBX_DB_OK > DBexecute(
+			"update problem"
+			" set cause_eventid=" ZBX_FS_UI64
+			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
+			cause_eventid, eventid, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for problem"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (ZBX_DB_OK > DBexecute(
+			"update event_symptom"
+			" set cause_eventid=" ZBX_FS_UI64
+			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
+			cause_eventid, eventid, eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause (eventid:" ZBX_FS_UI64 ") for event"
+				" (eventid:" ZBX_FS_UI64 ")", cause_eventid, eventid);
+		ret = FAIL;
+		goto out;
+	}
+
+	if (0 == old_cause_eventid && ZBX_DB_OK > DBexecute(
+			"insert into event_symptom (eventid,cause_eventid)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			eventid, cause_eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to convert cause event " ZBX_FS_UI64 " to symptom of "
+				ZBX_FS_UI64, eventid, cause_eventid);
+		ret = FAIL;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: rank event task                                                   *
+ *                                                                            *
+ * Parameters: taskid - [IN]                                                  *
+ *             data   - [IN] JSON with with acknowledge id, action, event id  *
+ *                      for all actions and cause_eventid for rank to symptom *
+ *                      action                                                *
+ *                                                                            *
+ * Comments: Logic of this function is described in comments to test cases in *
+ *           the integration test testEventsCauseAndSymptoms                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
+{
+	zbx_uint64_t		acknowledgeid, eventid, action;
+	struct zbx_json_parse	jp;
+	char			tmp[MAX_ID_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid: " ZBX_FS_UI64 ", data: '%s'",  __func__, taskid, data);
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data");
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACKNOWLEDGEID, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &acknowledgeid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_ACKNOWLEDGEID);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &action))
+	{
+
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp, sizeof(tmp), NULL) ||
+			FAIL == zbx_is_uint64(tmp, &eventid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
+		goto fail;
+	}
+
+	if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
+	{
+		if (SUCCEED != tm_rank_event_as_cause(eventid))
+			goto fail;
+	}
+	else if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
+	{
+		int		should_swap;
+		zbx_uint64_t	requested_cause_eventid, target_cause_eventid, old_cause_eventid,
+				target_cause_triggerid;
+
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_CAUSE_EVENTID, tmp, sizeof(tmp), NULL) ||
+				FAIL == zbx_is_uint64(tmp, &requested_cause_eventid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
+					" \"%s\" tag", ZBX_PROTO_TAG_CAUSE_EVENTID);
+			goto fail;
+		}
+
+		/* the event specified in task data by cause_eventid might be a symptom, find the actual target cause */
+		if (0 == (target_cause_eventid = zbx_db_get_cause_eventid(requested_cause_eventid)))
+			target_cause_eventid = requested_cause_eventid;
+
+		if (target_cause_eventid == eventid)
+		{
+			/* cause and its symptom should be swapped */
+			should_swap = 1;
+			target_cause_eventid = requested_cause_eventid;
+			old_cause_eventid = 0;
+		}
+		else
+		{
+			should_swap = 0;
+			old_cause_eventid = zbx_db_get_cause_eventid(eventid);
+		}
+
+		if (0 == (target_cause_triggerid = zbx_get_objectid_by_eventid(target_cause_eventid)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "trigger id should never be '0' for target cause event (eventid: "
+					ZBX_FS_UI64 ")", target_cause_eventid);
+			goto fail;
+		}
+		else if (SUCCEED != DBlock_triggerid(target_cause_triggerid))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "the trigger (triggerid: " ZBX_FS_UI64 "), which generated the"
+					" target cause event (eventid: " ZBX_FS_UI64 ") was deleted, skip ranking"
+					" events as symptoms", target_cause_triggerid, target_cause_eventid);
+			goto skip;
+		}
+
+		/* start swap by turning the symptom into a cause */
+		if (1 == should_swap && SUCCEED != tm_rank_event_as_cause(requested_cause_eventid))
+			goto fail;
+
+		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid))
+			goto fail;
+	}
+skip:
+	if (ZBX_DB_OK > DBexecute("update acknowledges set taskid=null where acknowledgeid=" ZBX_FS_UI64,
+			acknowledgeid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to change taskid from " ZBX_FS_UI64 " to null in table"
+				" acknowledges where acknowledgeid is " ZBX_FS_UI64, taskid, acknowledgeid);
+	}
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: notify service manager about problem severity changes             *
@@ -380,7 +598,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity"
+			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity,a.action"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -401,6 +619,10 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 					" was removed");
 			continue;
 		}
+
+		/* do not notify about rank changes */
+		if (0 != (atoi(row[5]) & (ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)))
+			continue;
 
 		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));
 
@@ -968,6 +1190,10 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				tm_process_temp_suppression(row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
+			case ZBX_TM_DATA_TYPE_RANK_EVENT:
+				tm_process_rank_event(taskid, row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
+				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
@@ -1025,8 +1251,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 
 	if (0 < proxy_hostid)
 	{
-		DB_ROW				row;
-		DB_RESULT			result;
+		DB_ROW		row;
+		DB_RESULT	result;
 
 		result = DBselect(
 				"select compatibility"
@@ -1131,30 +1357,27 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-			case ZBX_TM_PROXYDATA:
-				if (ZBX_TM_TASK_DATA == type)
+				compatibility = tm_get_proxy_compatibility(proxy_hostid);
+
+				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
+						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
-					compatibility = tm_get_proxy_compatibility(proxy_hostid);
+					zbx_tm_task_t	*task;
+					const char	*error = "The requested task is disabled. Proxy major"
+							" version does not match server major version.";
 
-					if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
-							ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
-					{
-						zbx_tm_task_t	*task;
-						const char	*error = "The requested task is disabled. Proxy major"
-								" version does not match server major version.";
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
+							zbx_time(), 0, 0);
+					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
+					zbx_tm_save_task(task);
+					zbx_tm_task_free(task);
 
-						zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-						task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-								zbx_time(), 0, 0);
-						task->data = zbx_tm_data_result_create(taskid, FAIL, error);
-						zbx_tm_save_task(task);
-						zbx_tm_task_free(task);
-
-						zbx_vector_uint64_append(&expire_taskids, taskid);
-						break;
-					}
+					zbx_vector_uint64_append(&expire_taskids, taskid);
+					break;
 				}
-
+				ZBX_FALLTHROUGH;
+			case ZBX_TM_PROXYDATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
@@ -1398,7 +1621,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

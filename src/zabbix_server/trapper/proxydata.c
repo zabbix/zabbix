@@ -260,11 +260,11 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *                                                                            *
  * Parameters: sock             - [IN] connection socket                      *
  *             ts               - [IN] connection timestamp                   *
- *             zbx_config_comms - [IN] proxy configuration for communication  *
+ *             config_comms     - [IN] proxy configuration for communication  *
  *                                     with server                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms)
+void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms)
 {
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
@@ -277,7 +277,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			zbx_config_comms->zbx_config_tls, zbx_config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -321,7 +321,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, zbx_config_comms->config_timeout,
+	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
 			&error))
 	{
 		zbx_set_availability_diff_ts(availability_ts);
@@ -390,13 +390,13 @@ out:
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock             - [IN] connection socket                      *
- *             ts               - [IN] connection timestamp                   *
- *             zbx_config_comms - [IN] proxy configuration for communication  *
- *                                     with server                            *
+ * Parameters: sock         - [IN] connection socket                          *
+ *             ts           - [IN] connection timestamp                       *
+ *             config_comms - [IN] proxy configuration for communication      *
+ *                                 with server                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *zbx_config_comms)
+void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms)
 {
 	struct zbx_json		j;
 	char			*error = NULL, *buffer = NULL;
@@ -407,7 +407,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			zbx_config_comms->zbx_config_tls, zbx_config_comms->config_timeout))
+			config_comms->config_tls, config_comms->config_timeout))
 	{
 		/* do not send any reply to server in this case as the server expects proxy data */
 		goto out;
@@ -434,7 +434,7 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, zbx_config_comms->config_timeout,
+	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
 			&error))
 	{
 		DBbegin();

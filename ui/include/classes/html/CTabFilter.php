@@ -363,7 +363,7 @@ class CTabFilter extends CDiv {
 		$nav_list = new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
-				->addClass('btn-widget-expand'),
+				->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next')
