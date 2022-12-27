@@ -33,10 +33,10 @@
 #include "zbxsysinfo.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
-extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command, char **result,
-		char *error, size_t max_error_len)
+		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -77,7 +77,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 
 	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
 	{
@@ -103,7 +103,7 @@ fail:
 }
 
 static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_t *script, char **result,
-		char *error, size_t max_error_len)
+		int config_timeout, char *error, size_t max_error_len)
 {
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
@@ -169,7 +169,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	zbx_init_agent_result(&agent_result);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 
 	if (SUCCEED != (ret = function(&item, &agent_result)))
 	{
@@ -431,6 +431,7 @@ out:
  * Parameters:  script         - [IN] the script to be executed               *
  *              host           - [IN] the host the script will be executed on *
  *              params         - [IN] parameters for the script               *
+ *              config_timeout - [IN]                                         *
  *              result         - [OUT] the result of a script execution       *
  *              error          - [OUT] the error reported by the script       *
  *              max_error_len  - [IN] the maximum error length                *
@@ -441,8 +442,8 @@ out:
  *                TIMEOUT_ERROR - a timeout occurred                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, char **result,
-		char *error, size_t max_error_len, char **debug)
+int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const char *params, int config_timeout,
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -460,8 +461,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-					ret = zbx_execute_script_on_agent(host, script->command, result, error,
-							max_error_len);
+					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
+							error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
@@ -478,7 +479,7 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				zbx_strlcpy(error, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.", max_error_len);
@@ -500,7 +501,8 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, error, max_error_len);
+			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, error,
+					max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);

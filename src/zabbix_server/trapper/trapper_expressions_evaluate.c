@@ -21,9 +21,12 @@
 
 #include "zbxalgo.h"
 #include "zbxnum.h"
-#include "zbxcacheconfig.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_ptr_t *expressions,
 				char **error)
@@ -144,7 +147,7 @@ out:
 	return ret;
 }
 
-int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char		*error = NULL;
 	int		ret;
@@ -154,11 +157,11 @@ int	zbx_trapper_expressions_evaluate(zbx_socket_t *sock, const struct zbx_json_p
 
 	if (SUCCEED == (ret = trapper_expressions_evaluate_run(jp, &json, &error)))
 	{
-		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
+		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_timeout);
 	}
 	else
 	{
-		zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, error, config_timeout);
 		zbx_free(error);
 	}
 

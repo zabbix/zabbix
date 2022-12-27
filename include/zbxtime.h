@@ -78,9 +78,18 @@ int	zbx_get_week_number(const struct tm *tm);
 int	zbx_is_time_suffix(const char *str, int *value, int length);
 int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime);
 
-char	*zbx_age2str(int age);
+char	*zbx_age2str(time_t age);
 char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
 int	zbx_iso8601_utc(const char *str, time_t *time);
 
+typedef enum
+{
+	TIMEPERIOD_TYPE_ONETIME = 0,
+/*	TIMEPERIOD_TYPE_HOURLY,*/
+	TIMEPERIOD_TYPE_DAILY = 2,
+	TIMEPERIOD_TYPE_WEEKLY,
+	TIMEPERIOD_TYPE_MONTHLY
+}
+zbx_timeperiod_type_t;
 #endif /* ZABBIX_TIME_H */

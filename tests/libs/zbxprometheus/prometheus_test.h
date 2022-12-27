@@ -21,6 +21,7 @@
 #ifndef PROMETHEUS_TEST_H
 #define PROMETHEUS_TEST_H
 
+#include "zbxalgo.h"
 #include "zbxexpr.h"
 
 typedef struct
@@ -31,8 +32,10 @@ typedef struct
 }
 zbx_prometheus_condition_test_t;
 
+ZBX_PTR_VECTOR_DECL(prometheus_condition_test, zbx_prometheus_condition_test_t *)
+
 int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_t **metric,
-		zbx_vector_ptr_t *labels, zbx_prometheus_condition_test_t **value, char **error);
+		zbx_vector_prometheus_condition_test_t *labels, zbx_prometheus_condition_test_t **value, char **error);
 
 int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
 		zbx_strloc_t *loc, char **error);

@@ -75,14 +75,12 @@ class testFormUser extends CWebTest {
 			// Empty 'Group' field.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Username' => 'Negative_Test1',
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
-					],
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					]
 				]
 			],
 			// 'Password' fields not specified.
@@ -645,10 +643,10 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => ''
+						'Username' => ''
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
 			// Empty 'Password (once again)' field.
@@ -908,9 +906,7 @@ class testFormUser extends CWebTest {
 						'Username' => 'Updated_user',
 						'Name' => 'Road',
 						'Last name' => 'Runner',
-						'Groups' => [
-							'Selenium user group in configuration'
-						],
+						'Groups' => [],
 						'Language' => 'English (en_US)',
 						'Theme' => 'High-contrast light',
 						'Auto-login' => true,
@@ -938,15 +934,26 @@ class testFormUser extends CWebTest {
 
 		// Update user parameters.
 		$form = $this->query('name:user_form')->asForm()->one();
+
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
 		$form->fill($data['fields']);
+
 		if (array_key_exists('auto_logout', $data)) {
 			$this->setAutoLogout($data['auto_logout']);
 		}
 
 		$form->submit();
+
+		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
+			$this->assertTrue($this->page->isAlertPresent());
+			$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
+					$this->page->getAlertText()
+			);
+			$this->page->acceptAlert();
+		}
+
 		$this->page->waitUntilReady();
 
 		// Verify if the user was updated.
@@ -1006,6 +1013,12 @@ class testFormUser extends CWebTest {
 			'Password (once again)' => $data['new_password']
 		]);
 		$form_update->submit();
+
+		$this->assertTrue($this->page->isAlertPresent());
+		$this->assertEquals('In case of successful password change user will be logged out of all active sessions. Continue?',
+				$this->page->getAlertText()
+		);
+		$this->page->acceptAlert();
 
 		try {
 			$this->page->logout();

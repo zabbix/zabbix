@@ -26,10 +26,13 @@ use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\{
+use Zabbix\Widgets\Fields\{CWidgetFieldCheckBoxList,
 	CWidgetFieldIntegerBox,
-	CWidgetFieldSelect
-};
+	CWidgetFieldMultiSelectUser,
+	CWidgetFieldMultiSelectAction,
+	CWidgetFieldMultiSelectMediaType,
+	CWidgetFieldSelect,
+	CWidgetFieldTextBox};
 
 /**
  * Action log widget form.
@@ -39,11 +42,30 @@ class WidgetForm extends CWidgetForm {
 	public function addFields(): self {
 		return $this
 			->addField(
+				new CWidgetFieldMultiSelectUser('userids', _('Recipients'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectAction('actionids', _('Actions'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectMediaType('mediatypeids', _('Media types'))
+			)
+			->addField(
+				new CWidgetFieldCheckBoxList('statuses', _('Status'), [
+					ALERT_STATUS_NOT_SENT => _('In progress'),
+					ALERT_STATUS_SENT => _('Sent/Executed'),
+					ALERT_STATUS_FAILED => _('Failed')
+				])
+			)
+			->addField(
+				new CWidgetFieldTextBox('message', _('Search string'))
+			)
+			->addField(
 				(new CWidgetFieldSelect('sort_triggers', _('Sort entries by'), [
 					SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time').' ('._('descending').')',
 					SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time').' ('._('ascending').')',
-					SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type').' ('._('descending').')',
-					SCREEN_SORT_TRIGGERS_TYPE_ASC => _('Type').' ('._('ascending').')',
+					SCREEN_SORT_TRIGGERS_MEDIA_TYPE_DESC => _('Media type').' ('._('descending').')',
+					SCREEN_SORT_TRIGGERS_MEDIA_TYPE_ASC => _('Media type').' ('._('ascending').')',
 					SCREEN_SORT_TRIGGERS_STATUS_DESC => _('Status').' ('._('descending').')',
 					SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status').' ('._('ascending').')',
 					SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient').' ('._('descending').')',

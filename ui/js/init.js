@@ -105,9 +105,9 @@ jQuery(function($) {
 		var $this = $(this);
 
 		uncheckedHandler($this);
-		$this.on('change enable disable', function() {
-			uncheckedHandler($(this));
-		});
+		$this.on('change enable disable', function () {
+			uncheckedHandler($(this))
+		})
 	});
 
 	function showMenuPopup($obj, data, event, options) {
@@ -285,6 +285,11 @@ jQuery(function($) {
 		}, data.options || {});
 
 		if (isServerRequestRequired(data.type)) {
+			if (data.type === 'trigger') {
+				// Add additional IDs from checkboxes and pass them to popup menu.
+				data.data.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
+
 			var url = new Curl('zabbix.php');
 
 			url.setArgument('action', 'menu.popup');

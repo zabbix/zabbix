@@ -81,6 +81,7 @@ class CRoleHelper {
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
 	public const ACTIONS_MANAGE_SLA = 'actions.manage_sla';
 	public const ACTIONS_INVOKE_EXECUTE_NOW = 'actions.invoke_execute_now';
+	public const ACTIONS_CHANGE_PROBLEM_RANKING = 'actions.change_problem_ranking';
 
 	public const UI_SECTION_DASHBOARDS = 'ui.dashboards';
 	public const UI_SECTION_MONITORING = 'ui.monitoring';
@@ -174,6 +175,15 @@ class CRoleHelper {
 	 */
 	private static function loadRoleRules(string $roleid): void {
 		if (array_key_exists($roleid, self::$roles)) {
+			return;
+		}
+
+		if (!$roleid) {
+			self::$roles[0] = [
+				'type'	=> USER_TYPE_ZABBIX_USER,
+				'rules' => ['api' => []]
+			];
+
 			return;
 		}
 
@@ -309,7 +319,7 @@ class CRoleHelper {
 			$rules[] = self::ACTIONS_MANAGE_SLA;
 		}
 
-		$rules[] = self::ACTIONS_INVOKE_EXECUTE_NOW;
+		$rules = array_merge($rules, [self::ACTIONS_INVOKE_EXECUTE_NOW, self::ACTIONS_CHANGE_PROBLEM_RANKING]);
 
 		return $rules;
 	}
@@ -547,7 +557,8 @@ class CRoleHelper {
 		}
 
 		$labels += [
-			self::ACTIONS_INVOKE_EXECUTE_NOW => _('Invoke "Execute now" on read-only hosts')
+			self::ACTIONS_INVOKE_EXECUTE_NOW => _('Invoke "Execute now" on read-only hosts'),
+			self::ACTIONS_CHANGE_PROBLEM_RANKING => _('Change problem ranking')
 		];
 
 		return $labels;

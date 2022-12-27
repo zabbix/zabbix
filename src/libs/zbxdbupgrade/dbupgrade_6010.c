@@ -22,8 +22,8 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
-
-extern unsigned char	program_type;
+#include "zbxavailability.h"
+#include "zbx_host_constants.h"
 
 /*
  * 6.2 development database patches
@@ -34,7 +34,7 @@ extern unsigned char	program_type;
 static int	DBpatch_6010000(void)
 {
 #define ZBX_MD5_SIZE	32
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update users set passwd='' where length(passwd)=%d", ZBX_MD5_SIZE))
@@ -349,7 +349,7 @@ static int	DBpatch_6010024(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -416,7 +416,7 @@ static int	DBpatch_6010025(void)
 	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
 	char		*out = NULL;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -484,7 +484,7 @@ static int	DBpatch_6010025(void)
 
 static int	DBpatch_6010026(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
@@ -495,7 +495,7 @@ static int	DBpatch_6010026(void)
 
 static int	DBpatch_6010028(void)
 {
-	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & DBget_program_type()))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -840,7 +840,7 @@ out:
 
 static int	DBpatch_6010033(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBpatch_6010033_split_groups();
@@ -857,7 +857,7 @@ static int	DBpatch_6010034(void)
 			"web.groups.filter.active", "web.hostgroups.filter.active",
 		};
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
@@ -871,7 +871,7 @@ static int	DBpatch_6010034(void)
 
 static int	DBpatch_6010035(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
@@ -890,7 +890,7 @@ static int	DBpatch_6010035(void)
 
 static int	DBpatch_6010036(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute(
