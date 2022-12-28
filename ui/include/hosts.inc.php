@@ -554,172 +554,70 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
 }
 
 /**
- * Get parent templates for each given host prototype.
+ * Get the necessary data to display the parent host prototypes of the given host prototypes.
  *
- * @param array  $host_prototypes                  An array of host prototypes.
- * @param string $host_prototypes[]['hostid']      ID of host prototype.
- * @param string $host_prototypes[]['templateid']  ID of parent template host prototype.
+ * @param array  $host_prototypes
+ * @param string $host_prototypes['templateid']
+ * @param bool   $allowed_ui_edit_templates
  *
  * @return array
  */
-function getHostPrototypeParentTemplates(array $host_prototypes) {
-	$parent_host_prototypeids = [];
-	$data = [
-		'links' => [],
-		'templates' => []
-	];
+function getParentHostPrototypes(array $host_prototypes, bool $allowed_ui_edit_templates): array {
+	$parent_host_prototypes = [];
 
 	foreach ($host_prototypes as $host_prototype) {
 		if ($host_prototype['templateid'] != 0) {
-			$parent_host_prototypeids[$host_prototype['templateid']] = true;
-			$data['links'][$host_prototype['hostid']] = ['hostid' => $host_prototype['templateid']];
+			$parent_host_prototypes[$host_prototype['templateid']] = [];
 		}
 	}
 
-	if (!$parent_host_prototypeids) {
-		return $data;
+	if (!$parent_host_prototypes) {
+		return [];
 	}
 
-	$all_parent_host_prototypeids = [];
-	$hostids = [];
-	$lld_ruleids = [];
+	$db_host_prototypes = API::HostPrototype()->get([
+		'output' => [],
+		'selectParentHost' => ['name'],
+		'hostids' => array_keys($parent_host_prototypes),
+		'preservekeys' => true
+	]);
 
-	do {
-		$db_host_prototypes = API::HostPrototype()->get([
-			'output' => ['hostid', 'templateid'],
+	if ($allowed_ui_edit_templates) {
+		$editable_host_prototypes = API::HostPrototype()->get([
+			'output' => [],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectParentHost' => ['hostid'],
-			'hostids' => array_keys($parent_host_prototypeids)
+			'editable' => true,
+			'hostids' => array_keys($parent_host_prototypes),
+			'preservekeys' => true
 		]);
+	}
 
-		$all_parent_host_prototypeids += $parent_host_prototypeids;
-		$parent_host_prototypeids = [];
-
-		foreach ($db_host_prototypes as $db_host_prototype) {
-			$data['templates'][$db_host_prototype['parentHost']['hostid']] = [];
-			$hostids[$db_host_prototype['hostid']] = $db_host_prototype['parentHost']['hostid'];
-			$lld_ruleids[$db_host_prototype['hostid']] = $db_host_prototype['discoveryRule']['itemid'];
-
-			if ($db_host_prototype['templateid'] != 0) {
-				if (!array_key_exists($db_host_prototype['templateid'], $all_parent_host_prototypeids)) {
-					$parent_host_prototypeids[$db_host_prototype['templateid']] = true;
-				}
-
-				$data['links'][$db_host_prototype['hostid']] = ['hostid' => $db_host_prototype['templateid']];
+	foreach ($parent_host_prototypes as $hostid => &$parent_host_prototype) {
+		if (array_key_exists($hostid, $db_host_prototypes)) {
+			if ($allowed_ui_edit_templates && array_key_exists($hostid, $editable_host_prototypes)) {
+				$parent_host_prototype = [
+					'editable' => true,
+					'template_name' => $db_host_prototypes[$hostid]['parentHost']['name'],
+					'ruleid' => $editable_host_prototypes[$hostid]['discoveryRule']['itemid']
+				];
+			}
+			else {
+				$parent_host_prototype = [
+					'editable' => false,
+					'template_name' => $db_host_prototypes[$hostid]['parentHost']['name']
+				];
 			}
 		}
-	}
-	while ($parent_host_prototypeids);
-
-	foreach ($data['links'] as &$parent_host_prototype) {
-		$parent_host_prototype['parent_hostid'] = array_key_exists($parent_host_prototype['hostid'], $hostids)
-			? $hostids[$parent_host_prototype['hostid']]
-			: 0;
-
-		$parent_host_prototype['lld_ruleid'] = array_key_exists($parent_host_prototype['hostid'], $lld_ruleids)
-			? $lld_ruleids[$parent_host_prototype['hostid']]
-			: 0;
+		else {
+			$parent_host_prototype = [
+				'editable' => false,
+				'template_name' => _('Inaccessible template')
+			];
+		}
 	}
 	unset($parent_host_prototype);
 
-	$db_templates = $data['templates']
-		? API::Template()->get([
-			'output' => ['name'],
-			'templateids' => array_keys($data['templates']),
-			'preservekeys' => true
-		])
-		: [];
-
-	$rw_templates = $db_templates
-		? API::Template()->get([
-			'output' => [],
-			'templateids' => array_keys($db_templates),
-			'editable' => true,
-			'preservekeys' => true
-		])
-		: [];
-
-	$data['templates'][0] = [];
-
-	foreach ($data['templates'] as $hostid => &$template) {
-		$template = array_key_exists($hostid, $db_templates)
-			? [
-				'hostid' => $hostid,
-				'name' => $db_templates[$hostid]['name'],
-				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
-			]
-			: [
-				'hostid' => $hostid,
-				'name' => _('Inaccessible template'),
-				'permission' => PERM_DENY
-			];
-	}
-	unset($template);
-
-	return $data;
-}
-
-/**
- * Returns a template prefix for selected host prototype.
- *
- * @param string $host_prototypeid
- * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return array|null
- */
-function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templates, bool $provide_links) {
-	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
-		return null;
-	}
-
-	while (array_key_exists($parent_templates['links'][$host_prototypeid]['hostid'], $parent_templates['links'])) {
-		$host_prototypeid = $parent_templates['links'][$host_prototypeid]['hostid'];
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
-
-	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
-			(new CUrl('host_prototypes.php'))
-				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
-				->setArgument('context', 'template')
-		))->addClass(ZBX_STYLE_LINK_ALT);
-	}
-	else {
-		$name = new CSpan(CHtml::encode($template['name']));
-	}
-
-	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-}
-
-/**
- * Returns host prototype template.
- *
- * @param string $host_prototypeid
- * @param array  $parent_templates  The list of the templates, prepared by getHostPrototypeParentTemplates() function.
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return CTag|null
- */
-function makeHostPrototypeTemplateHtml(string $host_prototypeid, array $parent_templates, bool $provide_links): ?CTag {
-	if (!array_key_exists($host_prototypeid, $parent_templates['links'])) {
-		return null;
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$host_prototypeid]['parent_hostid']];
-
-	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		return new CLink(CHtml::encode($template['name']),
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
-				->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
-				->setArgument('context', 'template')
-		);
-	}
-
-	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+	return $parent_host_prototypes;
 }
 
 function isTemplate($hostId) {

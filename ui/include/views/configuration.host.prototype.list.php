@@ -71,31 +71,45 @@ $hostTable = (new CTableInfo())
 		_('Tags')
 	]);
 
-foreach ($this->data['hostPrototypes'] as $hostPrototype) {
+foreach ($this->data['hostPrototypes'] as $host_prototype) {
 	// name
 	$name = [];
-	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
-		$data['allowed_ui_conf_templates']
-	);
-	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+
+	if (array_key_exists($host_prototype['templateid'], $data['parent_host_prototypes'])) {
+		$parent_host_prototype = $data['parent_host_prototypes'][$host_prototype['templateid']];
+
+		if ($parent_host_prototype['editable']) {
+			$parent_template_name = (new CLink(CHtml::encode($parent_host_prototype['template_name']),
+				(new CUrl('host_prototypes.php'))
+					->setArgument('parent_discoveryid', $parent_host_prototype['ruleid'])
+					->setArgument('context', 'template')
+			))->addClass(ZBX_STYLE_LINK_ALT);
+		}
+		else {
+			$parent_template_name = new CSpan(CHtml::encode($parent_host_prototype['template_name']));
+		}
+
+		$name[] = [$parent_template_name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
+	}
+
+	$name[] = new CLink(CHtml::encode($host_prototype['name']),
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('hostid', $hostPrototype['hostid'])
+			->setArgument('hostid', $host_prototype['hostid'])
 			->setArgument('context', $data['context'])
 	);
 
 	// template list
-	if (!$hostPrototype['templates']) {
+	if (!$host_prototype['templates']) {
 		$host_templates = '';
 	}
 	else {
 		$host_templates = [];
-		order_result($hostPrototype['templates'], 'name');
+		order_result($host_prototype['templates'], 'name');
 
-		foreach ($hostPrototype['templates'] as $template) {
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
+		foreach ($host_prototype['templates'] as $template) {
+			if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 				$host_templates[] = (new CLink($template['name'],
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
@@ -118,11 +132,11 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = (new CLink(
-		($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
+		($host_prototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
-			->setArgument('group_hostid', $hostPrototype['hostid'])
+			->setArgument('group_hostid', $host_prototype['hostid'])
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('action', ($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
+			->setArgument('action', ($host_prototype['status'] == HOST_STATUS_NOT_MONITORED)
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
 			)
@@ -130,13 +144,13 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']))
+		->addClass(itemIndicatorStyle($host_prototype['status']))
 		->addSID();
 
-	$nodiscover = ($hostPrototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$nodiscover = ($host_prototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
-				->setArgument('hostid', $hostPrototype['hostid'])
+				->setArgument('hostid', $host_prototype['hostid'])
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 				->setArgument('action', 'hostprototype.updatediscover')
 				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
@@ -148,12 +162,12 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
 	$hostTable->addRow([
-		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
+		new CCheckBox('group_hostid['.$host_prototype['hostid'].']', $host_prototype['hostid']),
 		$name,
 		$host_templates,
 		$status,
 		$discover,
-		$data['tags'][$hostPrototype['hostid']]
+		$data['tags'][$host_prototype['hostid']]
 	]);
 }
 

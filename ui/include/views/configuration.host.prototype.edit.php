@@ -61,13 +61,27 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
-if (array_key_exists('template', $data)) {
-	$host_tab->addRow(_('Parent host prototype'), $data['template']);
+if (array_key_exists('parent_host_prototype', $data)) {
+	if ($data['parent_host_prototype']['editable']) {
+		$parent_host_prototype = new CLink(CHtml::encode($data['parent_host_prototype']['template_name']),
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['parent_host_prototype']['ruleid'])
+				->setArgument('hostid', $host_prototype['templateid'])
+				->setArgument('context', 'template')
+		);
+	}
+	else {
+		$parent_host_prototype = (new CSpan(CHtml::encode($data['parent_host_prototype']['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$host_tab->addRow(_('Parent host prototype'), $parent_host_prototype);
 }
 
 $host_tab->addRow(
 	(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
-	(new CTextBox('host', $host_prototype['host'], (bool) $host_prototype['templateid']))
+	(new CTextBox('host', $host_prototype['host'], $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 		->setAriaRequired()
@@ -78,83 +92,56 @@ $name = ($host_prototype['name'] != $host_prototype['host']) ? $host_prototype['
 
 $host_tab->addRow(
 	_('Visible name'),
-	(new CTextBox('name', $name, (bool) $host_prototype['templateid']))
+	(new CTextBox('name', $name, $data['readonly']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', 128)
 );
 
 $templates_field_items = [];
 
-if ($host_prototype['templateid']) {
-	if ($host_prototype['templates']) {
-		$linked_templates = (new CTable())
-			->setHeader([_('Name')])
-			->setId('linked-templates')
-			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+if ($host_prototype['templates']) {
+	$header = $data['readonly'] ? [_('Name')] : [_('Name'), _('Action')];
 
-		foreach ($host_prototype['templates'] as $template) {
-			$host_tab->addItem(
-				(new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId()
-			);
+	$linked_templates = (new CTable())
+		->setHeader([$header])
+		->setId('linked-templates')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
-			}
-			else {
-				$template_link = new CSpan($template['name']);
-			}
+	foreach ($host_prototype['templates'] as $template) {
+		$host_tab->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-			$linked_templates->addRow([$template_link->addClass(ZBX_STYLE_WORDWRAP)]);
+		if (array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $template['templateid'])
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
 		}
 
-		$templates_field_items[] = $linked_templates;
+		$row = [$template_link->addClass(ZBX_STYLE_WORDWRAP)];
+
+		if (!$data['readonly']) {
+			$row[] = (new CCol(
+				(new CSimpleButton(_('Unlink')))
+					->setAttribute('data-templateid', $template['templateid'])
+					->onClick('
+						submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+					')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP);
+		}
+
+		$linked_templates->addRow($row);
 	}
+
+	$templates_field_items[] = $linked_templates;
 }
-else {
-	if ($host_prototype['templates']) {
-		$linked_templates = (new CTable())
-			->setHeader([_('Name'), _('Action')])
-			->setId('linked-templates')
-			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
-		foreach ($host_prototype['templates'] as $template) {
-			$host_tab->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
-
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
-			}
-			else {
-				$template_link = new CSpan($template['name']);
-			}
-
-			$linked_templates->addRow([
-				$template_link->addClass(ZBX_STYLE_WORDWRAP),
-				(new CCol(
-					(new CSimpleButton(_('Unlink')))
-						->setAttribute('data-templateid', $template['templateid'])
-						->onClick('
-							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
-						')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]);
-		}
-
-		$templates_field_items[] = $linked_templates;
-	}
-
+if (!$data['readonly']) {
 	$templates_field_items[] = (new CMultiSelect([
 		'name' => 'add_templates[]',
 		'object_name' => 'templates',
@@ -185,7 +172,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'disabled' => (bool) $host_prototype['templateid'],
+		'disabled' => $data['readonly'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -250,7 +237,7 @@ $host_tab->addRow(
 			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
 			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
 			->setModern(true)
-			->setReadonly($host_prototype['templateid'] != 0),
+			->setReadonly($data['readonly']),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table')
 			->addClass(ZBX_STYLE_HOST_INTERFACES),
@@ -268,7 +255,7 @@ $host_tab->addRow(
 					? null
 					: 'display: none'
 				)
-				->setEnabled($host_prototype['templateid'] == 0)
+				->setEnabled(!$data['readonly'])
 		)
 	]
 );
@@ -360,7 +347,7 @@ $tabs->addTab('macroTab', _('Macros'),
 					: 'hostmacros.list.html',
 				[
 					'macros' => $data['macros'],
-					'readonly' => array_key_exists('template', $data),
+					'readonly' => $data['readonly'],
 					'source' => 'host_prototype'
 				]
 			),
@@ -377,7 +364,7 @@ $tabs->addTab('inventoryTab', _('Inventory'),
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setReadonly($host_prototype['templateid'] != 0)
+				->setReadonly($data['readonly'])
 				->setModern(true)
 		),
 	TAB_INDICATOR_INVENTORY
@@ -437,7 +424,7 @@ if ($host_prototype['hostid'] != 0) {
 			(new CButtonDelete(
 				_('Delete selected host prototype?'),
 				url_params(['form', 'hostid', 'parent_discoveryid', 'context']), 'context'
-			))->setEnabled($host_prototype['templateid'] == 0),
+			))->setEnabled(!$data['readonly']),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));

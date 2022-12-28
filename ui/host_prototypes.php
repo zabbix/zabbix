@@ -398,7 +398,7 @@ if (hasRequest('form')) {
 			'main_interfaces' => getRequest('mainInterfaces', [])
 		],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
-		'readonly' => ($hostid != 0 && $hostPrototype['templateid']),
+		'readonly' => ($hostid != 0 && $hostPrototype['templateid'] != 0),
 		'groups' => [],
 		'tags' => $tags,
 		'context' => getRequest('context')
@@ -499,22 +499,20 @@ if (hasRequest('form')) {
 		$data['host_prototype']['interfaces'] = array_values($data['host_prototype']['interfaces']);
 	}
 
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	if ($data['context'] === 'host') {
-		$data['template'] = makeHostPrototypeTemplateHtml($data['host_prototype']['hostid'],
-			getHostPrototypeParentTemplates([$data['host_prototype']]), $data['allowed_ui_conf_templates']
-		);
+		$parent_host_prototypes = getParentHostPrototypes([$data['host_prototype']], $allowed_ui_conf_templates);
+		$data['parent_host_prototype'] = reset($parent_host_prototypes);
 	}
 
 	// Select writable templates
-	$templateids = zbx_objectValues($data['host_prototype']['templates'], 'templateid');
 	$data['host_prototype']['writable_templates'] = [];
 
-	if ($templateids) {
+	if ($allowed_ui_conf_templates && $data['host_prototype']['templates']) {
 		$data['host_prototype']['writable_templates'] = API::Template()->get([
 			'output' => ['templateid'],
-			'templateids' => $templateids,
+			'templateids' => array_column($data['host_prototype']['templates'], 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -616,28 +614,32 @@ else {
 			->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getHostPrototypeParentTemplates($data['hostPrototypes']);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	// Fetch templates linked to the prototypes.
-	$templateids = [];
-
-	foreach ($data['hostPrototypes'] as $host_prototype) {
-		$templateids += array_flip(array_column($host_prototype['templates'], 'templateid'));
-	}
+	$data['parent_host_prototypes'] = $data['context'] === 'host'
+		? getParentHostPrototypes($data['hostPrototypes'], $allowed_ui_conf_templates)
+		: [];
 
 	$data['writable_templates'] = [];
 
-	if ($templateids) {
-		$data['writable_templates'] = API::Template()->get([
-			'output' => [],
-			'templateids' => array_keys($templateids),
-			'editable' => true,
-			'preservekeys' => true
-		]);
+	if ($allowed_ui_conf_templates) {
+		$templateids = [];
+
+		foreach ($data['hostPrototypes'] as $host_prototype) {
+			$templateids += array_flip(array_column($host_prototype['templates'], 'templateid'));
+		}
+
+		if ($templateids) {
+			$data['writable_templates'] = API::Template()->get([
+				'output' => [],
+				'templateids' => array_keys($templateids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+		}
 	}
 
 	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view
 	echo (new CView('configuration.host.prototype.list', $data))->getOutput();
