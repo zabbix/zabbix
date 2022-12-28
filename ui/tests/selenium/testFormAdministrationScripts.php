@@ -188,8 +188,8 @@ class testFormAdministrationScripts extends CWebTest {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		$this->page->login()->open($link)->waitUntilReady();
-		$form = $this->query('id:scriptForm')->asForm()->one();
+		$this->page->login()->open($link);
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		// Check testing confirmation while configuring.
@@ -253,8 +253,8 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete'])->waitUntilReady();
-		$form = $this->query('id:scriptForm')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$form->fill([
 			'Name' => 'Cancelled cript',
 			'Type' => 'Script',
@@ -281,7 +281,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
-		$this->query('id:scriptForm')->waitUntilVisible()->asForm()->one()->submit();
+		$this->query('id:scriptForm')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -292,8 +292,8 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		$name = 'Cloned Script for Clone';
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Clone'])->waitUntilReady();
-		$form = $this->query('id:scriptForm')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Clone']);
+		$form = $this->query('id:scriptForm')->asForm()->waitUntilVisible()->one();
 		$values = $form->getFields()->asValues();
 		$values['Name'] = $name;
 		$this->query('button:Clone')->waitUntilClickable()->one()->click();
