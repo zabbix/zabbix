@@ -1,6 +1,8 @@
 Changes for 6.0.13rc1
 
 New features:
+.......PS. [ZBXNEXT-7615] added hmac function for javascript (wiper)
+.........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 .......PS. [ZBXNEXT-8076] added prof_enable and prof_disable commands for profiling (vso)
 ...G...... [ZBX-21373] fixed the agent sometimes crashing when enumerating system processes on OpenBSD (jxl)
 ..F....... [ZBXNEXT-7963] added hint box for "Enable HTTP authentication"; added confirmation dialog box for enabling HTTP authentication (kkuzmina)
@@ -10,6 +12,10 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.......PS. [ZBX-21073] added support of Int8Array(), Buffer() and also duktape plain buffers in md5, sha256 and hmac function parameters (wiper)
+.........T [ZBX-22071] extended description for OPSGenie media type (atocko)
+.......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
+.........T [ZBX-21587] added metrics for optimizing dependent items preprocessing in Jenkins template (abiba)
 .........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
 A......... [ZBX-22016] fixed host.get API method not returning any results for hosts with no interfaces when filtering by "hostid" (Ivo)
 .......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
@@ -2300,6 +2306,8 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.........T [ZBX-22071] extended description for OPSGenie media type (atocko)
+.......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
 .........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
 .......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
 ...G...... [ZBX-21696] fixed windows Agent 2 unicode path support for log* items (MVekslers)
