@@ -224,6 +224,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operations_tab
 		->addItem([
+			new CLabel(_('Pause operations for symptom problems'), 'pause_symptoms'),
+			new CFormField((new CCheckBox('pause_symptoms', ACTION_PAUSE_SYMPTOMS_TRUE))
+				->setChecked($data['action']['pause_symptoms'] == ACTION_PAUSE_SYMPTOMS_TRUE)
+			)
+		])
+		->addItem([
 			new CLabel(_('Pause operations for suppressed problems'), 'pause_suppressed'),
 			new CFormField((new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
 				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)

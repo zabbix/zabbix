@@ -91,5 +91,8 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 char	*zbx_update_template_name(char *old);
 char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param);
 
-#endif
+#endif /* !HAVE_SQLITE3 */
+
+unsigned char	DBget_program_type(void);
+
 #endif

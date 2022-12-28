@@ -394,7 +394,8 @@ class testUserRolesPermissions extends CWebTest {
 			'Change severity' => false,
 			'Acknowledge problems' => false,
 			'Suppress problems' => false,
-			'Close problems' => false
+			'Close problems' => false,
+			'Change problem ranking' => false
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 

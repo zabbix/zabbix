@@ -19,8 +19,6 @@
 
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
 /*
  * 5.0 maintenance database patches
  */

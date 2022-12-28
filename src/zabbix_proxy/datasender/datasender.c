@@ -81,7 +81,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *zbx_config_tls,
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_config_tls_t *config_tls,
 		const zbx_thread_info_t *info, int config_timeout)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
@@ -186,7 +186,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, zbx_config_tls))
+				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, config_tls))
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -295,8 +295,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(datasender_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

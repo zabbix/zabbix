@@ -972,7 +972,7 @@ int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime)
 	return sleeptime;
 }
 
-char	*zbx_age2str(int age)
+char	*zbx_age2str(time_t age)
 {
 	size_t		offset = 0;
 	int		days, hours, minutes, seconds;

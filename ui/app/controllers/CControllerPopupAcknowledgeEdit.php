@@ -36,7 +36,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
 			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
 			'suppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SUPPRESS,
-			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS
+			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS,
+			'change_rank' => 			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.','.ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,7 +60,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				&& !$this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 				&& !$this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 				&& !$this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
-				&& !$this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)) {
 			return false;
 		}
 
@@ -96,6 +98,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+			'allowed_change_problem_ranking' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING),
 			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d')
 		];
 

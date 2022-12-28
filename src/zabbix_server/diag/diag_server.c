@@ -22,7 +22,7 @@
 
 #include "zbxcachevalue.h"
 #include "zbxlld.h"
-#include "zbxalert.h"
+#include "../alerter/alerter.h"
 #include "zbxtime.h"
 
 #define ZBX_DIAG_LLD_RULES		0x00000001
