@@ -980,7 +980,7 @@ class testFormAdministrationScripts extends CWebTest {
 						'URL' => 'zabbix.php?action=script.list'
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -1298,7 +1298,7 @@ class testFormAdministrationScripts extends CWebTest {
 				'fields_public_key' => ['Authentication method', 'Username', 'Public key file', 'Private key file',
 					'Key passphrase', 'Port', 'Commands'
 				],
-				'required_public_key' => ['Username', 'Public key file', 'Private key file', 'Commands'],
+				'required_public_key' => ['Username', 'Public key file', 'Private key file', 'Commands']
 			],
 			'Telnet' => [
 				'fields' => ['Username', 'Password', 'Port', 'Commands'],
