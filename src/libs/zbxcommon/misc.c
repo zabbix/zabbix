@@ -527,7 +527,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 			return INTERFACE_TYPE_OPT;
-		case ITEM_TYPE_SCRIPT:
 		default:
 			return INTERFACE_TYPE_UNKNOWN;
 	}
