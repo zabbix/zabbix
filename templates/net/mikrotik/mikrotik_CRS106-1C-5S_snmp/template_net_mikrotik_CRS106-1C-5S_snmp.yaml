@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:11:44Z'
+  date: '2022-10-27T11:48:45Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 20ea139663264c21bca0dcecf2e95589
-      template: 'MikroTik CRS106-1C-5S SNMP'
-      name: 'MikroTik CRS106-1C-5S SNMP'
+      template: 'MikroTik CRS106-1C-5S by SNMP'
+      name: 'MikroTik CRS106-1C-5S by SNMP'
       description: |
         The template for monitoring Switch MikroTik CRS106-1C-5S.
         Smart Switch, 5x SFP cages, 1x Combo port (SFP or Gigabit Ethernet), 400MHz CPU, 128MB RAM, desktop case, RouterOS L5
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: 93236f96ce364b1ab95c603503c6984f
-              expression: 'max(/MikroTik CRS106-1C-5S SNMP/icmpping,#3)=0'
+              expression: 'max(/MikroTik CRS106-1C-5S by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: e7c3d84b4e3f4faabd28f36984116925
-              expression: 'min(/MikroTik CRS106-1C-5S SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik CRS106-1C-5S SNMP/icmppingloss,5m)<100'
+              expression: 'min(/MikroTik CRS106-1C-5S by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik CRS106-1C-5S by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: 4219929d04dd4367bf82c0c97f85eae7
-              expression: 'avg(/MikroTik CRS106-1C-5S SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/MikroTik CRS106-1C-5S SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik CRS106-1C-5S SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/MikroTik CRS106-1C-5S by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik CRS106-1C-5S by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6739b5af597443449dcfb946d2b89393
-              expression: 'last(/MikroTik CRS106-1C-5S SNMP/system.hw.firmware,#1)<>last(/MikroTik CRS106-1C-5S SNMP/system.hw.firmware,#2) and length(last(/MikroTik CRS106-1C-5S SNMP/system.hw.firmware))>0'
+              expression: 'last(/MikroTik CRS106-1C-5S by SNMP/system.hw.firmware,#1)<>last(/MikroTik CRS106-1C-5S by SNMP/system.hw.firmware,#2) and length(last(/MikroTik CRS106-1C-5S by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -262,7 +262,7 @@ zabbix_export:
           triggers:
             -
               uuid: dfc2b8c7f27049a6bd51c283cc6a29ce
-              expression: 'last(/MikroTik CRS106-1C-5S SNMP/system.hw.serialnumber,#1)<>last(/MikroTik CRS106-1C-5S SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik CRS106-1C-5S SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/MikroTik CRS106-1C-5S by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik CRS106-1C-5S by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik CRS106-1C-5S by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -349,7 +349,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3bbc3dcf8127414abb426c830e8fddee
-              expression: 'last(/MikroTik CRS106-1C-5S SNMP/system.name,#1)<>last(/MikroTik CRS106-1C-5S SNMP/system.name,#2) and length(last(/MikroTik CRS106-1C-5S SNMP/system.name))>0'
+              expression: 'last(/MikroTik CRS106-1C-5S by SNMP/system.name,#1)<>last(/MikroTik CRS106-1C-5S by SNMP/system.name,#2) and length(last(/MikroTik CRS106-1C-5S by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             -
               uuid: dc48fc089a314b7ebae646f2dfb925c5
-              expression: 'last(/MikroTik CRS106-1C-5S SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik CRS106-1C-5S SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik CRS106-1C-5S SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              expression: 'last(/MikroTik CRS106-1C-5S by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik CRS106-1C-5S by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik CRS106-1C-5S by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -440,7 +440,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/MikroTik CRS106-1C-5S SNMP/system.name,#1)<>last(/MikroTik CRS106-1C-5S SNMP/system.name,#2) and length(last(/MikroTik CRS106-1C-5S SNMP/system.name))>0'
+                  expression: 'last(/MikroTik CRS106-1C-5S by SNMP/system.name,#1)<>last(/MikroTik CRS106-1C-5S by SNMP/system.name,#2) and length(last(/MikroTik CRS106-1C-5S by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -510,7 +510,7 @@ zabbix_export:
           triggers:
             -
               uuid: fdcc98f2475247f29fdf48c3a4a69058
-              expression: 'min(/MikroTik CRS106-1C-5S SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/MikroTik CRS106-1C-5S by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -546,7 +546,7 @@ zabbix_export:
           triggers:
             -
               uuid: e38ee3ff9c5a438fa7785db98162b84a
-              expression: 'max(/MikroTik CRS106-1C-5S SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/MikroTik CRS106-1C-5S by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -554,7 +554,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -588,7 +588,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 08ca4ad1230144488299a8f4eaacef7f
-                  expression: 'min(/MikroTik CRS106-1C-5S SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/MikroTik CRS106-1C-5S by SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -609,7 +609,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
         -
           uuid: a3099e04128b4ff7abbd6ac772306bc5
@@ -647,9 +647,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3f1ce913660a493387485d5dab3ebfc4
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold'
                   event_name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -664,9 +664,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: e7a78d2798b44c438a81c308d1a1c0ed
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold'
                   event_name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -675,8 +675,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'CPU: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                      expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   tags:
                     -
                       tag: scope
@@ -686,9 +686,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 890865ebc7ea41ef8e9d3c794395092b
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low'
                   event_name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -738,9 +738,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0c035a51301746588e0bc01bb0bf425a
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   name: 'Device: Temperature is above critical threshold'
                   event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -755,9 +755,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: efc19507ca614ef487d0a9a637a8f7a6
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
                   name: 'Device: Temperature is above warning threshold'
                   event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -766,8 +766,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: 'max(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                      expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   tags:
                     -
                       tag: scope
@@ -777,9 +777,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 54b7d721900742acbb1548714c34c7c2
-                  expression: 'avg(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  expression: 'avg(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik CRS106-1C-5S SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  recovery_expression: 'min(/MikroTik CRS106-1C-5S by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
                   name: 'Device: Temperature is too low'
                   event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -836,7 +836,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9c9bab7ccb354d478ae1d5f7ab66f5ea
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -872,7 +872,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f44e31574a68494cbcefbc961662063b
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -908,7 +908,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9ebee838e00c46bba067094ea9732f6d
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -944,7 +944,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 90fc1e486dd9409aacf0f68f86caf80c
-                  expression: 'max(/MikroTik CRS106-1C-5S SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  expression: 'max(/MikroTik CRS106-1C-5S by SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -963,25 +963,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
         -
           uuid: 2319b534a79449108a419e8c866e66bd
@@ -1240,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2e15eff553614e51a59590c6e3df4a42
-                  expression: 'last(/MikroTik CRS106-1C-5S SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  expression: 'last(/MikroTik CRS106-1C-5S by SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
@@ -1555,9 +1555,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b9f20adf207c43d192921831fd5c882c
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1608,21 +1608,21 @@ zabbix_export:
             -
               uuid: b88f9f6974434f6ab26fbb747feb66e6
               expression: |
-                change(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1631,8 +1631,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1640,13 +1640,13 @@ zabbix_export:
             -
               uuid: 7dd2c3c0a76649f097999376f6bd4bfc
               expression: |
-                (avg(/MikroTik CRS106-1C-5S SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/MikroTik CRS106-1C-5S SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/MikroTik CRS106-1C-5S by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/MikroTik CRS106-1C-5S by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/MikroTik CRS106-1C-5S SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/MikroTik CRS106-1C-5S SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik CRS106-1C-5S SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/MikroTik CRS106-1C-5S by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/MikroTik CRS106-1C-5S by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik CRS106-1C-5S by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1656,8 +1656,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1665,12 +1665,12 @@ zabbix_export:
             -
               uuid: 53652249393a485dab8db23696953e31
               expression: |
-                min(/MikroTik CRS106-1C-5S SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/MikroTik CRS106-1C-5S SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/MikroTik CRS106-1C-5S by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/MikroTik CRS106-1C-5S by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/MikroTik CRS106-1C-5S SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/MikroTik CRS106-1C-5S SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/MikroTik CRS106-1C-5S by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/MikroTik CRS106-1C-5S by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1680,8 +1680,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik CRS106-1C-5S SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik CRS106-1C-5S by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1698,42 +1698,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 6378383173b54dd4add56b5b8b3a6e49
@@ -1830,8 +1830,8 @@ zabbix_export:
             -
               uuid: 6a2a5c6ce51b4f6b912a01e45d1a5409
               expression: |
-                last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1852,8 +1852,8 @@ zabbix_export:
             -
               uuid: 0df7d927286d47998fcf15c41bce944f
               expression: |
-                last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1868,8 +1868,8 @@ zabbix_export:
                 -
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
                   expression: |
-                    last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik CRS106-1C-5S by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1891,14 +1891,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'MikroTik CRS106-1C-5S SNMP'
+                    host: 'MikroTik CRS106-1C-5S by SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
       tags:
         -
@@ -2048,7 +2048,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'MikroTik CRS106-1C-5S SNMP'
+                        host: 'MikroTik CRS106-1C-5S by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2961,7 +2961,7 @@ zabbix_export:
   triggers:
     -
       uuid: f445d5e35c2b4296a670165e332be78c
-      expression: '(last(/MikroTik CRS106-1C-5S SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik CRS106-1C-5S SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik CRS106-1C-5S SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik CRS106-1C-5S SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/MikroTik CRS106-1C-5S by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik CRS106-1C-5S by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik CRS106-1C-5S by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik CRS106-1C-5S by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2970,7 +2970,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/MikroTik CRS106-1C-5S SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/MikroTik CRS106-1C-5S by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2986,5 +2986,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'MikroTik CRS106-1C-5S SNMP'
+            host: 'MikroTik CRS106-1C-5S by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.Memory]'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:57:05Z'
+  date: '2022-10-27T11:34:30Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 3645654baaf04f11927b171bcb048349
-      template: 'ZYXEL IES-6000 SNMP'
-      name: 'ZYXEL IES-6000 SNMP'
+      template: 'ZYXEL IES-6000 by SNMP'
+      name: 'ZYXEL IES-6000 by SNMP'
       description: |
         ZYXEL IES-6000
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 41eb76d6be3e47b8b0ca1296470372aa
-              expression: 'max(/ZYXEL IES-6000 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL IES-6000 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL IES-6000: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -200,7 +200,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7f6f8bdde2644182a892792ff2bb7c68
-              expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.model)<>"IES-6000"'
+              expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.model)<>"IES-6000"'
               name: 'ZYXEL IES-6000: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel IES-6000, but connected to {ITEM.VALUE}'
@@ -290,7 +290,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1173ae0cf9f440f595366a6da7a4c672
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.buffer[{#SNMPINDEX}],5m)>{#ZYXEL.BUFFERHIGHTHRESH}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.buffer[{#SNMPINDEX}],5m)>{#ZYXEL.BUFFERHIGHTHRESH}'
                   name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID}'
                   event_name: 'ZYXEL IES-6000: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID} (>{#ZYXEL.BUFFERHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
@@ -307,7 +307,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.buffer[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -356,7 +356,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0d882e8f017e46c78727437bd55759d4
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.cpu[{#SNMPINDEX}],5m)>{#ZYXEL.CPU.THRESH.HIGH}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.cpu[{#SNMPINDEX}],5m)>{#ZYXEL.CPU.THRESH.HIGH}'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization'
                   event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} high CPU utilization (over {#ZYXEL.CPU.THRESH.HIGH}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -374,7 +374,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.cpu[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -424,7 +424,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d5f65aebabf741798dcd0b452302aefb
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW} or last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.fan[{#SNMPINDEX}])>{#ZYXEL.FANRPM.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW} or last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.fan[{#SNMPINDEX}])>{#ZYXEL.FANRPM.THRESH.HIGH}'
                   name: 'ZYXEL IES-6000: FAN{#SNMPINDEX} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -441,7 +441,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.fan[{#SNMPINDEX}]'
         -
           uuid: 691c50d10ae342e0b9825c9d72a4cff9
@@ -475,7 +475,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 64108d56dc6d43148f67503383fc6705
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.memory[{#SNMPINDEX}],5m)>{#ZYXEL.MEMORYHIGHTHRESH}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.memory[{#SNMPINDEX}],5m)>{#ZYXEL.MEMORYHIGHTHRESH}'
                   name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool'
                   event_name: 'ZYXEL IES-6000: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool (>{#ZYXEL.MEMORYHIGHTHRESH}% for 5m)'
                   priority: AVERAGE
@@ -492,7 +492,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.memory[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -605,7 +605,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e1233b29eb764b0bb5a2ce35f79060bf
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
                   name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
                   event_name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
@@ -682,7 +682,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d7392fd0c372459bb21b9a85a47ccb8c
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
                   name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
                   event_name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
@@ -727,7 +727,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2ef5b800bb4148ce82bed8c4bf977a35
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
                   name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
                   event_name: 'ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
@@ -804,7 +804,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ba6eb4b3b6904b5dac4c057d3f6f3c17
-                  expression: 'min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
+                  expression: 'min(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
                   name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}'
                   event_name: 'ZYXEL IES-6000: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
@@ -1015,9 +1015,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3fbe4b16a94648089df78829ee7e683f
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.adsl.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1160,37 +1160,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: 60c44917db2045c19efd64718a9f37cf
@@ -1199,13 +1199,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.adsl.out.traffic[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1236,7 +1236,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 8f9073a53cee4e6fb8c36feda5185900
@@ -1563,9 +1562,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a9aac7e6c66a4a69a77f8c165f9a9d5c
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#2))=1'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])=2 and (last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}],#2))=1'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL IES-6000: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1739,37 +1738,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: 6c545945185743b2929edf1b81fe0872
@@ -1778,13 +1777,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.out.traffic[{#SNMPINDEX}]'
             -
               uuid: b7085154d7694b9aba49b56bc412d458
@@ -1795,13 +1794,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
@@ -1819,7 +1818,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 10a176c3da924a95939cd35c0d0be862
@@ -1915,7 +1913,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c3f610ab856e42c7bb6460f552779e12
-                  expression: 'find(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.alarm[{#SNMPINDEX}],,"like","moduleNoDefect")=0'
+                  expression: 'find(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.alarm[{#SNMPINDEX}],,"like","moduleNoDefect")=0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} alarm'
                   priority: AVERAGE
                   description: 'The slot reported an error.'
@@ -1954,7 +1952,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c62327e51d27445b893e80bf77c9696c
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -2019,7 +2017,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 63a4bdc73f8c49a7abb914f47e162dec
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Driver has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -2060,7 +2058,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7a2ef454d9624fd78416d2e1345be9a5
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -2101,7 +2099,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 537f28be56984664822b574a2064453b
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID}: Hardware version has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -2186,7 +2184,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 3fbbcffe1c46497d89fe0d987a5f6eff
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.serial[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced'
                   event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been replaced (new serial number received)'
                   priority: INFO
@@ -2265,7 +2263,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 50e43c41d0e241238b65da25c12d1616
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.slot.uptime[{#SNMPINDEX}])<10m'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.slot.uptime[{#SNMPINDEX}])<10m'
                   name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted'
                   event_name: 'ZYXEL IES-6000: Slot {#ZYXEL.SLOT.ID} has been restarted (uptime < 10m)'
                   priority: INFO
@@ -2310,7 +2308,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c517b703b5084e9b8053fb139e3350ae
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH} or last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])<{#ZYXEL.TEMP.THRESH.LOW}'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH} or last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])<{#ZYXEL.TEMP.THRESH.LOW}'
                   name: 'ZYXEL IES-6000: Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -2327,7 +2325,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.temp[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -2382,7 +2380,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 14c98fc8b4864a3c87062510a079d948
-                  expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW} or last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])>{#ZYXEL.VOLT.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW} or last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])>{#ZYXEL.VOLT.THRESH.HIGH}'
                   name: 'ZYXEL IES-6000: Voltage Slot {#ZYXEL.SLOT.ID} {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -2399,7 +2397,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL IES-6000 SNMP'
+                    host: 'ZYXEL IES-6000 by SNMP'
                     key: 'zyxel.ies6000.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -2624,7 +2622,7 @@ zabbix_export:
   triggers:
     -
       uuid: 7a52520cc3dc4350bd7aa14260899f1c
-      expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)>0 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)<10m) or (last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)=0 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.uptime)<10m)'
+      expression: '(last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.hw.uptime)>0 and last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.hw.uptime)<10m) or (last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.hw.uptime)=0 and last(/ZYXEL IES-6000 by SNMP/zyxel.ies6000.net.uptime)<10m)'
       name: 'ZYXEL IES-6000: Host has been restarted'
       event_name: 'ZYXEL IES-6000: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO

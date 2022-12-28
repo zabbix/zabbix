@@ -29,6 +29,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220519';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-clock";
@@ -454,8 +455,6 @@ form {
 			white-space: nowrap;
 
 			[class*='icon-'] {
-				vertical-align: middle;
-
 				&::after {
 					margin: 0;
 					line-height: 14px;
@@ -4863,14 +4862,6 @@ svg {
 	visibility: hidden;
 }
 
-.checkbox-list {
-	li {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 24px;
-	}
-}
-
 .columns-wrapper {
 	$column-count: (2, 3);
 	$column-size: (
@@ -5177,6 +5168,7 @@ svg {
 				> .content {
 					display: flex;
 					height: 20px;
+					align-items: center;
 
 					> .arrow {
 						flex: 0 0 15px;
@@ -6217,7 +6209,7 @@ button {
 
 // Table column styles
 #itemsTable {
-	.table-col-handle { width: 26px; }
+	.table-col-handle { width: 10px; }
 	.table-col-no { width: 20px; }
 	.table-col-name-normal { width: 285px; }
 	.table-col-name { width: 365px; }

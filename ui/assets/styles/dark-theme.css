@@ -823,6 +823,18 @@ footer {
   .subfilter-disable-btn:focus, .subfilter-disable-btn:active {
     color: #d9d9d9; }
 
+.checkbox-list {
+  display: grid;
+  grid-column-gap: 10px;
+  grid-template-columns: repeat(var(--columns), minmax(max-content, 1fr)); }
+  .checkbox-list.vertical {
+    grid-template-rows: repeat(var(--rows), 1fr);
+    grid-auto-flow: column; }
+  .checkbox-list li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 24px; }
+
 .color-picker .color-picker-preview,
 .color-picker-dialogue .color-picker-preview {
   position: relative;
@@ -3236,14 +3248,12 @@ form.is-loading {
     height: 22px;
     vertical-align: middle;
     white-space: nowrap; }
-    .list-table.compact-view td [class*='icon-'] {
-      vertical-align: middle; }
-      .list-table.compact-view td [class*='icon-']::after {
-        margin: 0;
-        line-height: 14px;
-        top: 0; }
-      .list-table.compact-view td [class*='icon-']:last-of-type {
-        margin-right: 0; }
+    .list-table.compact-view td [class*='icon-']::after {
+      margin: 0;
+      line-height: 14px;
+      top: 0; }
+    .list-table.compact-view td [class*='icon-']:last-of-type {
+      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag, .list-table.compact-view td .btn-tag {
@@ -6163,11 +6173,6 @@ svg {
 .visibility-hidden {
   visibility: hidden; }
 
-.checkbox-list li {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 24px; }
-
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -6433,7 +6438,8 @@ svg {
         box-shadow: none; }
     .navtree .tree .tree-item > .tree-row > .content {
       display: flex;
-      height: 20px; }
+      height: 20px;
+      align-items: center; }
       .navtree .tree .tree-item > .tree-row > .content > .arrow {
         flex: 0 0 15px;
         text-align: center;
@@ -7064,7 +7070,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 26px; }
+  width: 10px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {

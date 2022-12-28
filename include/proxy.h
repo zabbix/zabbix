@@ -58,8 +58,8 @@ int	proxy_get_host_active_availability(struct zbx_json *j);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
-int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win);
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
 

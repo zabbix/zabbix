@@ -378,6 +378,10 @@ class CRoleHelper {
 					$labels += [self::UI_REPORTS_SYSTEM_INFO => _('System information')];
 				}
 
+				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
+					$labels += [self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')];
+				}
+
 				$labels += [
 					self::UI_REPORTS_AVAILABILITY_REPORT => _('Availability report'),
 					self::UI_REPORTS_TOP_TRIGGERS => _('Triggers top 100')
@@ -391,10 +395,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [
-						self::UI_REPORTS_NOTIFICATIONS => _('Notifications'),
-						self::UI_REPORTS_SCHEDULED_REPORTS => _('Scheduled reports')
-					];
+					$labels += [self::UI_REPORTS_NOTIFICATIONS => _('Notifications')];
 				}
 
 				return $labels;

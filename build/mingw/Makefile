@@ -24,6 +24,7 @@ OBJS = \
 	$(OUTPUTDIR)\md5.o \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
+	$(OUTPUTDIR)\hashset.o \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
@@ -32,6 +33,7 @@ OBJS = \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
 	$(OUTPUTDIR)\jsonpath.o \
+	$(OUTPUTDIR)\jsonobj.o \
 	$(OUTPUTDIR)\sha256crypt.o \
 	$(OUTPUTDIR)\variant.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
@@ -142,6 +144,9 @@ $(OUTPUTDIR)\jsonpath.o: $(TOPDIR)\src\libs\zbxjson\jsonpath.c
 $(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxhash\sha256crypt.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
+$(OUTPUTDIR)\jsonobj.o: $(TOPDIR)\src\libs\zbxjson\jsonobj.c
+	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
+
 $(OUTPUTDIR)\variant.o: $(TOPDIR)\src\libs\zbxvariant\variant.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
@@ -167,6 +172,12 @@ $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\vector.o: $(TOPDIR)\src\libs\zbxalgo\vector.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\hashset.o: $(TOPDIR)\src\libs\zbxalgo\hashset.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\version.o: $(TOPDIR)\src\libs\zbxversion\version.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c

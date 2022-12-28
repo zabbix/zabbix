@@ -184,18 +184,6 @@ void	zbx_audit_host_update_json_update_host_status(zbx_uint64_t hostid, int host
 	zbx_audit_update_json_update_int(hostid, AUDIT_HOST_ID, "host.status", host_status_old, host_status_new);
 }
 
-void	zbx_audit_host_prototype_update_json_update_interface_details_create_entry(zbx_uint64_t hostid,
-		zbx_uint64_t interfaceid)
-{
-	char	buf[AUDIT_DETAILS_KEY_LEN];
-
-	RETURN_IF_AUDIT_OFF();
-
-	zbx_snprintf(buf, sizeof(buf), "hostprototype.interfaces[" ZBX_FS_UI64 "].details", interfaceid);
-
-	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_UPDATE, buf);
-}
-
 #define PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, interface_resource, type1, type2)			\
 void	zbx_audit_##funcname##_update_json_update_interface_##interface_resource(zbx_uint64_t hostid,		\
 		zbx_uint64_t interfaceid, type1 interface_resource##_old, type1 interface_resource##_new)	\

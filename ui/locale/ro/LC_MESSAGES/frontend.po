@@ -926,6 +926,14 @@ msgstr ""
 msgid "Add from"
 msgstr ""
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Adaugă server"
@@ -3961,6 +3969,10 @@ msgstr "Închide constructorul de expresii"
 msgid "Close new event"
 msgstr ""
 
+#: app/views/configuration.correlation.edit.php:156
+msgid "Close new events"
+msgstr ""
+
 #: app/views/configuration.correlation.edit.php:151
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"
@@ -4289,6 +4301,10 @@ msgstr "Configuraţie actualizată"
 #: include/classes/setup/CSetupWizard.php:62
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
+msgstr ""
+
+#: app/views/js/administration.authentication.edit.js.php:90
+msgid "Confirm changes"
 msgstr ""
 
 #: app/views/administration.script.edit.php:256
@@ -6635,6 +6651,10 @@ msgstr "Activare"
 msgid "Enable HTTP authentication"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:93
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr ""
@@ -8928,6 +8948,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1114
 msgid "Identification of the system. Returns string"
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:120
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
 msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
