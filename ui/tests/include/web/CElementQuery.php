@@ -522,12 +522,7 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $classes) {
-			$element = $target->one(false);
-			if (!$element->isValid()) {
-				return false;
-			}
-
-			return $element->hasClass($classes);
+			return $target->one(false)->hasClass($classes);
 		};
 	}
 

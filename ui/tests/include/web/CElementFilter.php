@@ -31,16 +31,16 @@ class CElementFilter {
 	 * Possible filter conditions.
 	 */
 	const PRESENT = 'present';
-	const TEXT_PRESENT = 'text_present';
-	const ATTRIBUTES_PRESENT = 'attributes_present';
-	const CLASSES_PRESENT = 'classes_present';
+	const TEXT_PRESENT = 'text present';
+	const ATTRIBUTES_PRESENT = 'attributes present';
+	const CLASSES_PRESENT = 'classes present';
 	const VISIBLE = 'visible';
 	const CLICKABLE = 'clickable';
 	const READY = 'ready';
 	const NOT_PRESENT = 'not present';
 	const TEXT_NOT_PRESENT = 'text not present';
-	const ATTRIBUTES_NOT_PRESENT = 'attributes_not_present';
-	const CLASSES_NOT_PRESENT = 'classes_not_present';
+	const ATTRIBUTES_NOT_PRESENT = 'attributes not present';
+	const CLASSES_NOT_PRESENT = 'classes not present';
 	const NOT_VISIBLE = 'not visible';
 	const NOT_CLICKABLE = 'not clickable';
 	const SELECTED = 'selected';
@@ -145,6 +145,7 @@ class CElementFilter {
 
 		$method = self::getConditionCallable($this->type);
 
+		// A reflection-based implementation of callbacks will be required once filters have more than one attribute.
 		$callable = call_user_func_array([$element, $method], [$this->params]);
 		try {
 			if (call_user_func($callable) === true) {
