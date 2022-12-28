@@ -156,8 +156,10 @@ class CTableRowElement extends CElement {
 		}
 
 		foreach ($expected as $column => $value) {
-			if ($value !== $this->getColumn($column)->getText()) {
-				throw new \Exception('Column "'.$column.'" value "'.$this->getColumn($column)->getText().
+			$column_value = $this->getColumn($column)->getText();
+
+			if ($value !== $column_value) {
+				throw new \Exception('Column "'.$column.'" value "'.$column_value.
 						'" is not equal to "'.$value.'".'
 				);
 			}

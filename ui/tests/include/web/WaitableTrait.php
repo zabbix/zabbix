@@ -136,7 +136,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object attribute is not present.
 	 *
-	 * @param string|array $attributes    attributes not be present
+	 * @param string|array $attributes    attributes not to be present
 	 *
 	 * @return $this
 	 */
@@ -162,7 +162,7 @@ trait WaitableTrait {
 	/**
 	 * Wait until object class is not present.
 	 *
-	 * @param string|array $classes    classes not be present
+	 * @param string|array $classes    classes not to be present
 	 *
 	 * @return $this
 	 */
