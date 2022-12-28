@@ -3330,7 +3330,7 @@ out:
 static int	DBpatch_6030168(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-			return SUCCEED;
+		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("delete from hosts_templates where hostid in (select hostid from hosts"
 			" where status=%d)", HOST_STATUS_TEMPLATE))
