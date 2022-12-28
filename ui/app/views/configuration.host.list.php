@@ -126,6 +126,16 @@ $filter = (new CFilter())
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([
+				new CLabel(_('Status'), 'filter_status'),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+						->addValue(_('Any'), HOST_STATUS_ANY)
+						->addValue(_('Enabled'), HOST_STATUS_MONITORED)
+						->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
+						->setModern(true)
+				)
+			])
+			->addItem([
 				new CLabel(_('Monitored by'), 'filter_monitored_by'),
 				new CFormField(
 					(new CRadioButtonList('filter_monitored_by', (int) $data['filter']['monitored_by']))

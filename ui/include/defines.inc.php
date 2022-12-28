@@ -327,6 +327,7 @@ define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
 define('ZBX_TAG_MANUAL',	0);
 define('ZBX_TAG_AUTOMATIC',	1);
 
+define('HOST_STATUS_ANY',			-1);
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
