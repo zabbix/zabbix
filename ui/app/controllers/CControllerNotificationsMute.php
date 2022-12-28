@@ -47,7 +47,7 @@ class CControllerNotificationsMute extends CController {
 
 	protected function doAction() {
 		$msg_settings = getMessageSettings();
-		$msg_settings['sounds.mute'] = $this->input['muted'];
+		$msg_settings['sounds.mute'] = $this->getInput('muted');
 
 		updateMessageSettings($msg_settings);
 

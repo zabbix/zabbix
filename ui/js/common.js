@@ -756,9 +756,8 @@ function validate_trigger_expression(overlay) {
 	});
 }
 
-function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
+function redirect(uri, method, needle, invert_needle, allow_empty) {
 	method = (method || 'get').toLowerCase();
-	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
 
 	var url = new Curl(uri);
 

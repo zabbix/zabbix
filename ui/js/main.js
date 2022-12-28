@@ -682,11 +682,12 @@ function ApiCall(method, params, id = 1) {
 /**
  * Add object to the list of favorites.
  */
-function add2favorites(object, objectid) {
+function add2favorites(object, objectid, csrf_token) {
 	sendAjaxData('zabbix.php?action=favorite.create', {
 		data: {
 			object: object,
-			objectid: objectid
+			objectid: objectid,
+			_csrf_token: csrf_token
 		}
 	});
 }
@@ -694,11 +695,12 @@ function add2favorites(object, objectid) {
 /**
  * Remove object from the list of favorites. Remove all favorites if objectid==0.
  */
-function rm4favorites(object, objectid) {
+function rm4favorites(object, objectid, csrf_token) {
 	sendAjaxData('zabbix.php?action=favorite.delete', {
 		data: {
 			object: object,
-			objectid: objectid
+			objectid: objectid,
+			_csrf_token: csrf_token
 		}
 	});
 }

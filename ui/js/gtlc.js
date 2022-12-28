@@ -297,8 +297,6 @@ jQuery(function($) {
 				url.unsetArgument('page');
 			}
 
-			url.unsetArgument('sid');
-
 			history.replaceState(history.state, '', url.getUrl());
 		}
 	}

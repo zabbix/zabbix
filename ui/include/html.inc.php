@@ -142,16 +142,20 @@ function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
+				$csrf_token = CController::generateCsrfToken('favorite.delete');
+
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)
 					->setTitle(_('Remove from favorites'))
-					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", "'. $csrf_token .'");');
 			}
 			else {
+				$csrf_token = CController::generateCsrfToken('favorite.create');
+
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_ADD_FAV)
 					->setTitle(_('Add to favorites'))
-					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
+					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'", "'. $csrf_token .'");');
 			}
 			$icon->setId('addrm_fav');
 

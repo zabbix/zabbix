@@ -597,6 +597,7 @@ function getMenuPopupMapElementImage(options) {
  * @param {bool}   options['can_edit_dashboards']
  * @param {bool}   options['can_view_reports']
  * @param {bool}   options['can_create_reports']
+ * @param {string} options['csrf_token_delete']
  * @param {object} trigger_element                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -617,7 +618,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 		url_clone.setArgument('clone', '1');
 
 		const url_delete = new Curl('zabbix.php');
-		url_delete.setArgument('action', 'dashboard.delete');
+		url_delete.setAction('dashboard.delete', options.csrf_token_delete);
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
 		sections.push({
@@ -653,7 +654,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 							return false;
 						}
 
-						redirect(url_delete.getUrl(), 'post', 'sid', true, true);
+						redirect(url_delete.getUrl(), 'post', 'sid', true);
 					},
 					disabled: !options.editable
 				}
@@ -708,6 +709,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
+ * @param {string} csrf_token_script                  CSRF token for script execution.
  *
  * @return array
  */

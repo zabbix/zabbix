@@ -303,12 +303,12 @@ function check_field(&$fields, &$field, $checks) {
 		if (!isset($_REQUEST[$field])) {
 			return ZBX_VALID_OK;
 		}
-		elseif ($flags & P_ACT) {
-			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-				return ZBX_VALID_ERROR;
-			}
-		}
+//		elseif ($flags & P_ACT) {
+//			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
+//				info(_('Operation cannot be performed due to unauthorized request.'));
+//				return ZBX_VALID_ERROR;
+//			}
+//		}
 	}
 
 	if ($flags & P_CRLF) {

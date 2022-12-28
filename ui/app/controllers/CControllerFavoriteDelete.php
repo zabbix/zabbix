@@ -67,12 +67,13 @@ class CControllerFavoriteDelete extends CController {
 		$result = DBend($result);
 
 		if ($result) {
+			$csrf_token = self::generateCsrfToken('favorite.create');
 			$data['main_block'] = '
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
 					addrm_fav.title = "'._('Add to favorites').'";
-					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
+					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'", "'.$csrf_token.'");
 					addrm_fav.classList.add("btn-add-fav");
 					addrm_fav.classList.remove("btn-remove-fav");
 				}
