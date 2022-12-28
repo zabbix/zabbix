@@ -1,0 +1,1 @@
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
