@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 if ($data['readonly'] && !$data['macros']) {
@@ -58,19 +59,22 @@ else {
 
 	foreach ($data['macros'] as $i => $macro) {
 		$readonly = ($data['readonly'] || !($macro['inherited_type'] & ZBX_PROPERTY_OWN));
+		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($readonly);
+
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 				->setReadonly($data['readonly'] || $macro['inherited_type'] & ZBX_PROPERTY_INHERITED)
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->setAttribute('placeholder', '{$MACRO}'),
-			new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type'])
+				->setAttribute('placeholder', '{$MACRO}')
 		];
 
 		if (!$data['readonly']) {
 			if (array_key_exists('hostmacroid', $macro)) {
 				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
 			}
+
+			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 
 			if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
 				$inherited_macro = $macro[$macro['inherited_level']];
@@ -80,14 +84,13 @@ else {
 			}
 		}
 
-		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly($readonly);
-
-		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+		if (array_key_exists('allow_revert', $macro)) {
 			$macro_value->addRevertButton();
-			$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
-				&& array_key_exists('hostmacroid', $macro)
+			$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+				|| array_key_exists('value', $macro)
 			);
-			$macro_value->setReadonly($readonly || ($macro['inherited_type'] & ZBX_PROPERTY_BOTH));
+
+			$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
 		}
 
 		if (array_key_exists('value', $macro)) {
@@ -171,7 +174,7 @@ else {
 						->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($readonly || (
-							($macro['type'] == ZBX_MACRO_TYPE_SECRET) && ($macro['inherited_type'] & ZBX_PROPERTY_BOTH)
+							($macro['type'] == ZBX_MACRO_TYPE_SECRET) && !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
 						))
 				))
 					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
