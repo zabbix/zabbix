@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-10-11 12:59+0000\n"
-"Last-Translator: Maurizio <marchiororomano@gmail.com>\n"
+"PO-Revision-Date: 2022-11-04 13:34+0000\n"
+"Last-Translator: Juan Riveriego <tharok@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -8214,11 +8214,11 @@ msgstr ""
 
 #: include/classes/api/services/CAction.php:3258
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr ""
+msgstr "Proxy indicado como condición de acción incorrecto. El proxy no existe o no tiene acceso a él."
 
 #: include/classes/api/services/CAction.php:3246
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "Plantilla indicada como condición de acción incorrecta. La plantilla no existe o no tienes acceso a ella."
 
 #: include/classes/validators/CActionCondValidator.php:154
 msgid "Incorrect action condition trigger severity."
@@ -8226,7 +8226,7 @@ msgstr "Severidad del trigger en la condición de la acción es incorrecta."
 
 #: include/classes/api/services/CAction.php:3249
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr ""
+msgstr "Iniciador indicado como condición de acción incorrecto. El iniciador no existe o no tiene acceso a él."
 
 #: include/classes/validators/CActionCondValidator.php:196
 msgid "Incorrect action condition type."
@@ -8379,31 +8379,31 @@ msgstr "Valor masivo incorrecto para la interfaz."
 #: include/classes/api/services/CService.php:882
 #, c-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Cálculo incorrecto del valor de SLA para el servicio \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1089
 #: include/classes/api/services/CHost.php:1988
 #: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr ""
+msgstr "Caracteres incorrectos en el nombre del host \"%1$s\"."
 
 #: include/classes/api/services/CProxy.php:624
 #: include/classes/api/services/CProxy.php:740
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
-msgstr ""
+msgstr "Caracteres incorrectos en el nombre del proxy \"%1$s\"."
 
 #: include/classes/api/services/CTemplate.php:475
 #: include/classes/api/services/CTemplate.php:1167
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "Caracteres incorrectos en el nombre de la plantilla \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:2717
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
-msgstr ""
+msgstr "Condiciones incorrectas para la acción \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1757
 #, c-format
@@ -8831,23 +8831,23 @@ msgstr ""
 #: include/classes/api/services/CAction.php:2710
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
-msgstr ""
+msgstr "Tipo de cálculo incorrecto para la acción \"%1$s\"."
 
 #: include/classes/api/services/CCorrelation.php:621
 #, c-format
 msgid "Incorrect type of calculation for correlation \"%1$s\"."
-msgstr ""
+msgstr "Tipo de cálculo incorrecto para la correlación \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1750
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Tipo de cálculo incorrecto para la regla de detección \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:756
 #: include/classes/api/services/CMap.php:1220
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "ID de usuario incorrecto para el mapa \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:563
 #: include/classes/api/services/CScreen.php:903
@@ -9524,17 +9524,17 @@ msgstr ""
 #: items.php:546 items.php:933 items.php:938 items.php:951
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "Intervalo inválido \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Clave no válida \"%1$s\" para la regla de descubrimiento \"%2$s\" en \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItem.php:64
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Clave inválida \"%1$s\" para el artículo \"%2$s\" en \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemPrototype.php:53
 #, c-format
@@ -9550,7 +9550,7 @@ msgstr "Clave no válida \"%1$s\":%2$s"
 #: include/classes/api/services/CUserMacro.php:741
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Macro inválida \"%1$s\": %2$s."
 
 #: include/classes/api/services/CScreenItem.php:157
 #: include/classes/api/services/CScreenItem.php:280
@@ -9707,7 +9707,7 @@ msgstr "Actualización incorrecta de monitores no soportados: %1$s"
 #: include/classes/api/services/CHttpTest.php:784
 #, c-format
 msgid "Invalid response code \"%1$s\"."
-msgstr ""
+msgstr "Código de respuesta inválido \"%1$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:313
 msgid "Invalid second parameter."
