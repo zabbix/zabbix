@@ -631,7 +631,7 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_not_present' => 'Overview',
 						'text_present' => [
 							'Zabbix has received an incorrect request.',
-							'Field "type" is not correct: invalid data type.',
+							'Field "type" is not correct: invalid data type.'
 						]
 					],
 					[
