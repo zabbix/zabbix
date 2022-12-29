@@ -97,7 +97,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'service_write_tag_tag' => 					'string',
 			'service_write_tag_value' => 				'string',
 			'form_refresh' => 							'int32',
-			'super_admin_role_clone' =>					'in 0,1'
+			'super_admin_role_clone' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -140,7 +140,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('role');
 
-		if ($this->hasInput('super_admin_role_clone') && $this->getInput('super_admin_role_clone')) {
+		if ($this->hasInput('super_admin_role_clone')) {
 			$data = [
 				'roleid' => null,
 				'name' => $this->getInput('name'),
@@ -169,7 +169,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 			else {
 				$data += [
-					'name' => ($this->getInput('name') === '') ? $db_defaults['name'] : $this->getInput('name'),
+					'name' => $this->getInput('name') === '' ? $db_defaults['name'] : $this->getInput('name'),
 					'type' => $this->getInput('type'),
 					'rules' => array_merge(
 						$this->getRulesDefaults((int) $this->getInput('type')),
@@ -197,7 +197,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 			else {
 				$data += [
-					'name' => ($this->getInput('name') === '') ? $this->role['name'] : $this->getInput('name'),
+					'name' => $this->getInput('name') === '' ? $this->role['name'] : $this->getInput('name'),
 					'type' => $this->getInput('type'),
 					'rules' => array_merge(
 						$this->getRulesDefaults((int) $this->getInput('type')),
