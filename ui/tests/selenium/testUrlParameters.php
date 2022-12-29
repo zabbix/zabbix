@@ -461,18 +461,6 @@ class testUrlParameters extends CLegacyWebTest {
 							'Zabbix has received an incorrect request.',
 							'Field "sysmapid" is mandatory.'
 						]
-					],
-					[
-						'url' => 'actionconf.php?eventsource=1',
-						'text_present' => 'Discovery actions'
-					],
-					[
-						'url' => 'actionconf.php?eventsource[]=1',
-						'text_not_present' => 'Discovery actions',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "eventsource" is not correct: invalid data type.'
-						]
 					]
 				]
 			],
