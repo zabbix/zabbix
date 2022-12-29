@@ -1104,26 +1104,20 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (hosts or templates) for which the scenario is executed.
 	 */
 	public function checkMassValuemappingScreenshot($source) {
-
-		if ($source === 'hosts') {
-			$this->page->login()->open('zabbix.php?action=host.list');
-		}
-		else {
-			$this->page->login()->open('templates.php');
-		}
-
-		$form = $this->query('name:'.$source)->asForm()->waitUntilVisible()->one();
-		$form->query('id:all_'.$source)->asCheckbox()->one()->check();
-		$form->query('button:Mass update')->one()->click();
+		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'templates.php')->waitUntilReady();
+		$this->selectTableRows();
+		$this->query('button:Mass update')->one()->click();
 		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$update_form->selectTab('Value mapping');
 		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
 		$update_form->query('id:valuemap_add')->one()->click();
 		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+
 		// Take a screenshot to test draggable object position of value mapping field.
 		$this->page->removeFocus();
+
 		// It is necessary because of unexpected viewport shift.
 		$this->page->updateViewport();
-		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilPresent()->one(), 'Value mapping mass update');
+		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilVisible()->one(), 'Value mapping mass update');
 	}
 }
