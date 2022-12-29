@@ -96,7 +96,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'service_write_list' => 					'array_db services.serviceid',
 			'service_write_tag_tag' => 					'string',
 			'service_write_tag_value' => 				'string',
-			'form_refresh' => 							'int32'
+			'form_refresh' => 							'int32',
+			'super_admin_role_clone' =>					'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -139,14 +140,55 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('role');
 
-		if (!$this->hasInput('form_refresh')) {
-			if ($this->role !== null) {
-				$data = [
-					'roleid' => $this->role['roleid'],
+		if ($this->hasInput('super_admin_role_clone') && $this->getInput('super_admin_role_clone')) {
+			$data = [
+				'roleid' => null,
+				'name' => $this->getInput('name'),
+				'type' => $this->getInput('type'),
+				'readonly' => (bool) $db_defaults['readonly'],
+				'is_own_role' => false,
+				'rules' => array_merge(
+					$this->getRulesDefaults((int) $this->getInput('type')),
+					$this->getRulesByRoleid(USER_TYPE_SUPER_ADMIN)
+				)
+			];
+		}
+		elseif ($this->role === null) {
+			$data = [
+					'roleid' => null,
+					'readonly' => (bool) $db_defaults['readonly'],
+					'is_own_role' => false
+			];
+
+			if (!$this->hasInput('form_refresh')) {
+				$data += [
+					'name' => $db_defaults['name'],
+					'type' => $db_defaults['type'],
+					'rules' => $this->getRulesDefaults((int) $db_defaults['type'])
+				];
+			}
+			else {
+				$data += [
+					'name' => ($this->getInput('name') === '') ? $db_defaults['name'] : $this->getInput('name'),
+					'type' => $this->getInput('type'),
+					'rules' => array_merge(
+						$this->getRulesDefaults((int) $this->getInput('type')),
+						$this->getRules($this->getRulesInput($this->getInput('type')))
+					)
+				];
+			}
+		}
+		else {
+			$data = [
+				'roleid' => $this->role['roleid'],
+				'readonly' => (bool) $this->role['readonly'],
+				'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid']
+			];
+
+			if (!$this->hasInput('form_refresh')) {
+				$data += [
 					'name' => $this->role['name'],
 					'type' => $this->role['type'],
-					'readonly' => (bool) $this->role['readonly'],
-					'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid'],
 					'rules' => array_merge(
 						$this->getRulesDefaults((int) $this->role['type']),
 						$this->getRulesByRoleid($this->role['roleid'])
@@ -154,37 +196,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 				];
 			}
 			else {
-				$data = [
-					'roleid' => null,
-					'name' => $db_defaults['name'],
-					'type' => $db_defaults['type'],
-					'readonly' => (bool) $db_defaults['readonly'],
-					'is_own_role' => false,
-					'rules' => $this->getRulesDefaults((int) $db_defaults['type'])
-				];
-			}
-		}
-		else {
-			if ($this->role !== null) {
-				$data = [
-					'roleid' => $this->role['roleid'],
-					'name' => $this->getInput('name') === '' ? $this->role['name'] : $this->getInput('name'),
+				$data += [
+					'name' => ($this->getInput('name') === '') ? $this->role['name'] : $this->getInput('name'),
 					'type' => $this->getInput('type'),
-					'readonly' => (bool) $this->role['readonly'],
-					'is_own_role' => $this->role['roleid'] == CWebUser::$data['roleid'],
-					'rules' => array_merge(
-						$this->getRulesDefaults((int) $this->getInput('type')),
-						$this->getRules($this->getRulesInput($this->getInput('type')))
-					)
-				];
-			}
-			else {
-				$data = [
-					'roleid' => null,
-					'name' => $this->getInput('name') === '' ? $db_defaults['name'] : $this->getInput('name'),
-					'type' => $this->getInput('type'),
-					'readonly' => (bool) $db_defaults['readonly'],
-					'is_own_role' => false,
 					'rules' => array_merge(
 						$this->getRulesDefaults((int) $this->getInput('type')),
 						$this->getRules($this->getRulesInput($this->getInput('type')))
