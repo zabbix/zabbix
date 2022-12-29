@@ -61,19 +61,36 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form=update&groupid[]=1',
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid[]=1',
 						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not correct: invalid data type.'
+							'Incorrect value for "groupid" field.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'groupid: array'
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form[]=update&groupid=1',
+						'url' => 'zabbix.php?action=hostgroup.edit&name[]=name',
 						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "form" is not correct: invalid data type.'
+							'Incorrect value for field "name": a character string is expected.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'name: array'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=hostgroup.edit&subgroups[]=1',
+						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value for "subgroups" field.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'subgroups: array'
 						]
 					],
 					[
