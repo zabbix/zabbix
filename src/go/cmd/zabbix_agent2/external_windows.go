@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"net"
 
-	winio "github.com/Microsoft/go-winio"
+	"github.com/Microsoft/go-winio"
 	"zabbix.com/plugins/external"
 )
 

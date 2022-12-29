@@ -31,7 +31,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	winio "github.com/Microsoft/go-winio"
+	"github.com/Microsoft/go-winio"
 )
 
 const queSize = 100
