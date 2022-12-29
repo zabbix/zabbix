@@ -1972,13 +1972,17 @@ static void	zbx_vector_hostmacro_ptr_uniq2(zbx_vector_hostmacro_ptr_t *vector, z
 
 		for (i = 0; i < vector->values_num; i++)
 		{
-			for(j = i + 1; j < vector->values_num; j++)
+			j = i + 1;
+
+			while (j < vector->values_num)
 			{
 				if (0 == compare_func(&vector->values[i], &vector->values[j]))
 				{
 					hostmacro_free(vector->values[j]);
-					zbx_vector_hostmacro_ptr_remove_noorder(vector, j);
+					zbx_vector_hostmacro_ptr_remove(vector, j);
 				}
+				else
+					j++;
 			}
 		}
 	}
@@ -2142,7 +2146,7 @@ static int	DBpatch_6030160(void)
 					0 == strcmp(hostmacro->macro, child_hostmacro->macro))
 			{
 				hostmacro_free(hostmacro);
-				zbx_vector_hostmacro_ptr_remove_noorder(&hostmacros, j);
+				zbx_vector_hostmacro_ptr_remove(&hostmacros, j);
 			}
 		}
 	}
