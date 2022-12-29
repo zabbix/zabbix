@@ -1946,7 +1946,7 @@ static int	hostmacro_sort(const zbx_db_hostmacro_t **hm1, const zbx_db_hostmacro
 		return -1;
 
 	if (m1->parent_templateid > m2->parent_templateid )
-			return 1;
+		return 1;
 
 	return 0;
 }
