@@ -455,6 +455,14 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'sysmap.php?sysmapid[]=1',
+						'text_not_present' => 'Network maps',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "sysmapid" is not correct: invalid data type.'
+						]
+					],
+					[
 						'url' => 'sysmap.php',
 						'text_not_present' => 'Network maps',
 						'text_present' => [
@@ -501,14 +509,6 @@ class testUrlParameters extends CLegacyWebTest {
 							'Controller: discovery.edit',
 							'action: discovery.edit',
 							'druleid:'
-						]
-					],
-					[
-						'url' => 'sysmap.php?sysmapid[]=1',
-						'text_not_present' => 'Network maps',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "sysmapid" is not correct: invalid data type.'
 						]
 					],
 					[
