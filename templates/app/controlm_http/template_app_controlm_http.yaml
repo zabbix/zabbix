@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-23T13:40:14Z'
+  date: '2022-12-29T09:52:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -107,6 +107,7 @@ zabbix_export:
           type: DEPENDENT
           key: controlm.services.discovery
           delay: '0'
+          lifetime: 1d
           description: 'Discovers SLA services in Control-M environment.'
           item_prototypes:
             -
@@ -503,7 +504,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.activeServices
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -857,8 +859,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.agents.[?(@.nodeid == ''{#AGENT.NAME}'')].first()'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Could not get agent data.'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: controlm.agents
               tags:
@@ -1009,7 +1010,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.agents
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1020,6 +1022,7 @@ zabbix_export:
           type: DEPENDENT
           key: controlm.jobs.discovery
           delay: '0'
+          lifetime: 1d
           description: 'Discovers jobs on server.'
           item_prototypes:
             -
@@ -1101,8 +1104,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.statuses.[?(@.jobId == ''{#JOB.ID}'')].first()'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Could not find job data.'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: controlm.jobs
               tags:
@@ -1228,7 +1230,8 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.statuses
-              error_handler: DISCARD_VALUE
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '[]'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

@@ -65,12 +65,12 @@ However, if you wish to monitor a Control-M server separately with this template
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Jobs discovery|Discovers jobs on server.|Dependent|controlm.jobs.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Jobs discovery|Discovers jobs on server.|Dependent|controlm.jobs.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> []</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for Jobs discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job [{#JOB.ID}]: stats|Get job statistics.|Dependent|job.stats['{#JOB.ID}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Find Job Data.</li></ul>
+|Job [{#JOB.ID}]: stats|Get job statistics.|Dependent|job.stats['{#JOB.ID}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li></ul>
 |Job [{#JOB.ID}]: status|Get job status.|Dependent|job.status['{#JOB.ID}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.status`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Job [{#JOB.ID}]: number of runs|Get number of runs for a job.|Dependent|job.numberOfRuns['{#JOB.ID}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.numberOfRuns`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Job [{#JOB.ID}]: type|Get job type.|Dependent|job.type['{#JOB.ID}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.type`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
@@ -84,12 +84,12 @@ However, if you wish to monitor a Control-M server separately with this template
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Agent discovery|Discovers agents on server.|Dependent|controlm.agent.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|Agent discovery|Discovers agents on server.|Dependent|controlm.agent.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> []</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for Agent discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Agent [{#AGENT.NAME}]: stats|Get agent statistics.|Dependent|agent.stats['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Error -> Could Not Get Agent Data.</li></ul>
+|Agent [{#AGENT.NAME}]: stats|Get agent statistics.|Dependent|agent.stats['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li></ul>
 |Agent [{#AGENT.NAME}]: status|Get agent status.|Dependent|agent.status['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.status`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Agent [{#AGENT.NAME}]: version|Get agent version.|Dependent|agent.version['{#AGENT.NAME}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> Unknown</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Triggers for Agent discovery
@@ -158,12 +158,12 @@ You must set the **{$API.TOKEN}** and **{$API.URI.ENDPOINT}** macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SLA services discovery|Discovers SLA services in Control-M environment.|Dependent|controlm.services.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
+|SLA services discovery|Discovers SLA services in Control-M environment.|Dependent|controlm.services.discovery<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Custom_Value -> []</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 ### Items for SLA services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: stats|Get service statistics.|Dependent|service.stats['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Jsonpath: `$.[?(@.serviceJob == '{#SERVICE.JOB}')].first()`</li></ul>
+|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: stats|Get service statistics.|Dependent|service.stats['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li><li>Jsonpath</p><p>⛔️On fail: Discard_Value</li></ul>
 |Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status|Get service status.|Dependent|service.status['{#SERVICE.NAME}','{#SERVICE.JOB}']<p>**Preprocessing**</p><ul><li>Jsonpath: `$.status`</li><li>Javascript: `The text is too long. Please see the template.`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'executed'|Get number of jobs in state 'executed'.|Dependent|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',executed]<p>**Preprocessing**</p><ul><li>Jsonpath: `$.statusByJobs.executed`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
 |Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs 'waitCondition'|Get number of jobs in state 'waitCondition'.|Dependent|service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',waitCondition]<p>**Preprocessing**</p><ul><li>Jsonpath: `$.statusByJobs.waitCondition`</li><li>Discard_Unchanged_Heartbeat: `1h`</li></ul>
