@@ -23,7 +23,7 @@
 #include "daemon.h"
 #include "base64.h"
 #include "zbxreport.h"
-#include "../../libs/zbxcrypto/hmac_sha256.h"
+#include "zbxcrypto.h"
 #include "sha256crypt.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "zbxalert.h"
@@ -392,26 +392,28 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 {
 	struct zbx_json	j;
-	char		*cookie = NULL, *out_str_raw = NULL;
-	size_t		i;
-	char		out_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	uint8_t		out[ZBX_SHA256_DIGEST_SIZE];
+	char		*cookie = NULL, *out_str = NULL, *out;
 
 	zbx_json_init(&j, 512);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSIONID, sessionid, ZBX_JSON_TYPE_STRING);
 
-	hmac_sha256(manager->session_key, strlen(manager->session_key), j.buffer, j.buffer_size, &out, sizeof(out));
-	memset(&out_str, 0, sizeof(out_str));
+	if (SUCCEED != zbx_hmac(ZBX_HASH_SHA256, manager->session_key, strlen(manager->session_key), j.buffer,
+			j.buffer_size, &out))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		out_str = zbx_strdup(NULL, "");
+	}
+	else
+	{
+		out_str = zbx_dsprintf(NULL, "\"%s\"", out);
+		zbx_free(out);
+	}
 
-	for (i = 0; i < sizeof(out); i++)
-		zbx_snprintf(&out_str[i*2], 3, "%02x", out[i]);
-
-	out_str_raw = zbx_dsprintf(NULL, "\"%s\"", out_str);
-	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str_raw);
+	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
-	zbx_free(out_str_raw);
+	zbx_free(out_str);
 
 	return cookie;
 }
@@ -2366,7 +2368,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

@@ -4033,6 +4033,10 @@ msgstr "Konfiguration geändert"
 msgid "Configure DB connection"
 msgstr "Konfiguration Datenbankverbindung"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "Bestätigungstext"
@@ -6282,6 +6286,10 @@ msgstr "Aktiviere"
 msgid "Enable HTTP authentication"
 msgstr "Aktiviere HTTP Authentifizierung"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "Aktiviere LDAP Authentifizierung"
@@ -8504,6 +8512,10 @@ msgstr "Identischer Namespace (%1$s) wird von Modulen verwendet, die sich unter 
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identifikation des Systems. Rückgabewert Zeichenfolge"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
