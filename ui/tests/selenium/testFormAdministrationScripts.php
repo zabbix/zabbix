@@ -1224,7 +1224,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->assertEquals('<sub-menu/sub-menu/...>', $form->getField('Menu path')->getAttribute('placeholder'));
 
 		// Check dropdown options.
-		$user_groups = CDBHelper::getColumn('SELECT name FROM usrgrp', 'name');
+		$user_groups = CDBHelper::getColumn('SELECT name FROM usrgrp ORDER BY name', 'name');
 		$dropdowns = [
 			'Host group' => ['All', 'Selected'],
 			'User group' => array_merge(['All'], $user_groups),
