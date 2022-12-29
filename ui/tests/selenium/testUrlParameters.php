@@ -424,14 +424,6 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => 'Network maps'
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid[]=1',
-						'text_not_present' => 'Actions',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "actionid" is not correct: invalid data type.'
-						]
-					],
-					[
 						'url' => 'sysmap.php?sysmapid=9999999',
 						'text_not_present' => 'Network maps',
 						'text_present' => [
