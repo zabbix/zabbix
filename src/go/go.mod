@@ -3,7 +3,7 @@ module zabbix.com
 go 1.16
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20221208095623-2412f1a5c1c0
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20221229105226-e7e46bf69288
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.0
 	github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3
