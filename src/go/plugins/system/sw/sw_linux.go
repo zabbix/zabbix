@@ -779,6 +779,20 @@ func parseKernelVersion(info *systemInfo) {
 	}
 }
 
+// this is is required because linux can have different implementations of char type
+// and Go language lacks ability to cast array to a different type
+func charArrayToString[T ~int8 | ~uint8](str []T) (result string) {
+	for i := range str {
+		if (byte)(str[i]) == 0 {
+			return
+		}
+
+		result += string((byte)(str[i]))
+	}
+
+	return
+}
+
 func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 	var info systemInfo
 	var jsonArray []byte
@@ -790,8 +804,8 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 
 	u := syscall.Utsname{}
 	if syscall.Uname(&u) == nil {
-		info.Kernel = charArray2String(u.Release[:])
-		info.Architecture = charArray2String(u.Machine[:])
+		info.Kernel += charArrayToString(u.Release[:])
+		info.Architecture += charArrayToString(u.Machine[:])
 
 		if len(info.ProductName) > 0 {
 			info.VersionPretty += info.ProductName
