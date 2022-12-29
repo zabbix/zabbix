@@ -141,17 +141,14 @@ class testFormMap extends CLegacyWebTest {
 	}
 
 	/**
-	 * Test screenshot of a Map Element with trigger type.
+	 * Check the screenshot of the trigger container in trigger map element.
 	 */
 	public function testFormMap_MapElementScreenshot() {
+		// Open map "Test map 1" in edit mode.
+		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
 
-		// Check the screenshot of the trigger container in trigger map element.
-		$this->page->login()->open('sysmaps.php');
-		$this->query('class:list-table')->one()->query('link:Test map 1')->one()->click();
-		$this->query('button:Edit map')->one()->click();
-
-		// Click on the Trigger element (CPU load).
-		$this->query('xpath://div[@data-id="5"]')->one()->click();
+		// Click on map element "Trigger element (CPU load)".
+		$this->query('xpath://div[@data-id="5"]')->waitUntilVisible()->one()->click();
 
 		$form = $this->query('id:map-window')->asForm()->one()->waitUntilVisible();
 		$form->getField('New triggers')->selectMultiple([
@@ -164,6 +161,6 @@ class testFormMap extends CLegacyWebTest {
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
 		$this->page->removeFocus();
-		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilPresent()->one(), 'Map element');
+		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}
 }
