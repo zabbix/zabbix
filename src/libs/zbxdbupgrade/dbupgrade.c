@@ -24,6 +24,7 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxregexp.h"
+#include "zbxeval.h"
 
 typedef struct
 {
@@ -1471,4 +1472,81 @@ char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const
 
 	return func;
 }
-#endif
+
+int zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr)
+{
+	char		*trigger_expr;
+	int		i;
+	DB_ROW		row2;
+	DB_RESULT	result2;
+
+	for (i = 0; i < 2; i++)
+	{
+		int			j;
+		char			*error = NULL;
+		zbx_eval_context_t	ctx;
+
+		trigger_expr = row[i + 2];
+
+		if ('\0' == *trigger_expr)
+		{
+			if (0 == i)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
+						__func__, row[0]);
+			}
+			continue;
+		}
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
+					__func__, row[0], error);
+			zbx_free(error);
+			return FAIL;
+		}
+
+		for (j = 0; j < ctx.stack.values_num; j++)
+		{
+			zbx_eval_token_t	*token = &ctx.stack.values[j];
+			zbx_uint64_t		functionid;
+
+			if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+				continue;
+
+			if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
+					token->loc.r - token->loc.l - 1, &functionid))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
+						" zbx_is_uint64_n error", __func__, row[0]);
+				return FAIL;
+			}
+
+			result2 = DBselect(
+					"select h.host,i.key_,f.name,f.parameter"
+					" from functions f"
+					" join items i on i.itemid=f.itemid"
+					" join hosts h on h.hostid=i.hostid"
+					" where f.functionid=" ZBX_FS_UI64,
+					functionid);
+
+			if (NULL != (row2 = DBfetch(result2)))
+			{
+				char	*func;
+
+				func = zbx_dbpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
+				zbx_variant_clear(&token->value);
+				zbx_variant_set_str(&token->value, func);
+			}
+
+			DBfree_result(result2);
+		}
+
+		zbx_eval_compose_expression(&ctx, &composed_expr[i]);
+		zbx_eval_clear(&ctx);
+	}
+
+	return SUCCEED;
+}
+
+#endif /*HAVE_SQLITE3*/

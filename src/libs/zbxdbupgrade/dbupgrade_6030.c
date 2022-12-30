@@ -2336,7 +2336,7 @@ static int	DBpatch_6030161(void)
 	}
 
 	itemtagid = DBget_maxid_num("item_tag", new_tags);
-	zbx_db_insert_prepare(&db_insert_itemtag, "item_tag", "itemtagid", "itemid", "tag", "value",NULL);
+	zbx_db_insert_prepare(&db_insert_itemtag, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
 
 	for (i = 0; i < tags.values_num; i++)
 	{
@@ -3013,7 +3013,7 @@ static int	DBpatch_6030162(void)
 	zbx_db_insert_prepare(&db_insert_widget_field, "widget_field", "widget_fieldid", "widgetid", "type",
 			"name", "value_int", "value_str", "value_groupid", "value_hostid", "value_itemid",
 			"value_graphid", "value_sysmapid", "value_serviceid", "value_slaid", "value_userid",
-			"value_actionid", "value_mediatypeid",NULL);
+			"value_actionid", "value_mediatypeid", NULL);
 
 	for (i = 0; i < dashboards.values_num; i++)
 	{
@@ -3190,80 +3190,15 @@ static int	DBpatch_6030165(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		char		*trigger_expr, *uuid, *seed = NULL;
+		char		*uuid, *seed = NULL;
 		char		*composed_expr[] = { NULL, NULL };
-		int		i;
 		size_t		seed_alloc = 0, seed_offset = 0;
-		DB_ROW		row2;
-		DB_RESULT	result2;
 
-		for (i = 0; i < 2; i++)
+		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, composed_expr))
 		{
-			int			j;
-			char			*error = NULL;
-			zbx_eval_context_t	ctx;
+			DBfree_result(result);
 
-			trigger_expr = row[i + 2];
-
-			if ('\0' == *trigger_expr)
-			{
-				if (0 == i)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "%s: empty expression for trigger %s",
-							__func__, row[0]);
-				}
-				continue;
-			}
-
-			if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION,
-					&error))
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
-						__func__, row[0], error);
-				zbx_free(error);
-				DBfree_result(result);
-				return FAIL;
-			}
-
-			for (j = 0; j < ctx.stack.values_num; j++)
-			{
-				zbx_eval_token_t	*token = &ctx.stack.values[j];
-				zbx_uint64_t		functionid;
-
-				if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
-					continue;
-
-				if (SUCCEED != zbx_is_uint64_n(ctx.expression + token->loc.l + 1,
-						token->loc.r - token->loc.l - 1, &functionid))
-				{
-					zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression %s,"
-							" zbx_is_uint64_n error", __func__, row[0]);
-					DBfree_result(result);
-					return FAIL;
-				}
-
-				result2 = DBselect(
-						"select h.host,i.key_,f.name,f.parameter"
-						" from functions f"
-						" join items i on i.itemid=f.itemid"
-						" join hosts h on h.hostid=i.hostid"
-						" where f.functionid=" ZBX_FS_UI64,
-						functionid);
-
-				if (NULL != (row2 = DBfetch(result2)))
-				{
-					char	*func;
-
-					func = zbx_dbpatch_make_trigger_function(row2[2], row2[0], row2[1], row2[3]);
-					zbx_variant_clear(&token->value);
-					zbx_variant_set_str(&token->value, func);
-				}
-
-				DBfree_result(result2);
-			}
-
-			zbx_eval_compose_expression(&ctx, &composed_expr[i]);
-			zbx_eval_clear(&ctx);
+			return FAIL;
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);

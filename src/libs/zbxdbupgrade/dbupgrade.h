@@ -22,6 +22,7 @@
 
 #include "zbxcommon.h"
 #include "zbxdbschema.h"
+#include "zbxdb.h"
 
 typedef struct
 {
@@ -90,6 +91,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 
 char	*zbx_update_template_name(char *old);
 char	*zbx_dbpatch_make_trigger_function(const char *name, const char *tpl, const char *key, const char *param);
+int	zbx_compose_trigger_expression(DB_ROW row, zbx_uint64_t rules, char **composed_expr);
 
 #endif /* !HAVE_SQLITE3 */
 
