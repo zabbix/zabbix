@@ -1623,6 +1623,43 @@ static void	select_pure_parents(zbx_vector_uint64_t *ids)
 	zbx_vector_uint64_uniq(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static int	valuemap_compare(const zbx_db_valuemap_t **vm1, const zbx_db_valuemap_t **vm2)
+{
+	const zbx_db_valuemap_t	*v1, *v2;
+
+	v1 = *vm1;
+	v2 = *vm2;
+
+	if (v1->child_templateid == v2->child_templateid && v1->parent_valuemapid == v2->parent_valuemapid)
+		return 0;
+
+	return 1;
+}
+
+static void	zbx_vector_valuemap_ptr_uniq2(zbx_vector_valuemap_ptr_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i, j;
+
+		for (i = 0; i < vector->values_num; i++)
+		{
+			j = i + 1;
+
+			while (j < vector->values_num)
+			{
+				if (0 == compare_func(&vector->values[i], &vector->values[j]))
+				{
+					valuemap_free(vector->values[j]);
+					zbx_vector_valuemap_ptr_remove(vector, j);
+				}
+				else
+					j++;
+			}
+		}
+	}
+}
+
 static void	collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
 		zbx_vector_valuemap_ptr_t *valuemaps, int *mappings_num)
 {
@@ -1769,6 +1806,8 @@ static int	DBpatch_6030159(void)
 	zbx_free(sql);
 	sql_alloc = 0;
 	sql_offset = 0;
+
+	zbx_vector_valuemap_ptr_uniq2(&valuemaps, (zbx_compare_func_t)valuemap_compare);
 
 	do
 	{
@@ -2698,6 +2737,43 @@ static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t 
 	zbx_vector_uint64_pair_destroy(&graphid_pairs);
 }
 
+static int	dashboard_compare(const zbx_db_dashboard_t **pd1, const zbx_db_dashboard_t **pd2)
+{
+	const zbx_db_dashboard_t	*d1, *d2;
+
+	d1 = *pd1;
+	d2 = *pd2;
+
+	if (d1->child_templateid == d2->child_templateid && d1->parent_dashboardid == d2->parent_dashboardid)
+		return 0;
+
+	return 1;
+}
+
+static void	zbx_vector_dashboard_ptr_uniq2(zbx_vector_dashboard_ptr_t *vector, zbx_compare_func_t compare_func)
+{
+	if (2 <= vector->values_num)
+	{
+		int	i, j;
+
+		for (i = 0; i < vector->values_num; i++)
+		{
+			j = i + 1;
+
+			while (j < vector->values_num)
+			{
+				if (0 == compare_func(&vector->values[i], &vector->values[j]))
+				{
+					dashboard_free(vector->values[j]);
+					zbx_vector_dashboard_ptr_remove(vector, j);
+				}
+				else
+					j++;
+			}
+		}
+	}
+}
+
 static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *child_templateids,
 		zbx_vector_dashboard_ptr_t *dashboards, int *pages_num, int *widgets_num, int *fields_num)
 {
@@ -2863,6 +2939,8 @@ static int	DBpatch_6030162(void)
 
 	DBfree_result(result);
 	zbx_free(sql);
+
+	zbx_vector_dashboard_ptr_uniq2(&dashboards, (zbx_compare_func_t)dashboard_compare);
 
 	do
 	{
