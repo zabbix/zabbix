@@ -1529,8 +1529,8 @@ static int	DBpatch_propogate_valuemap(zbx_db_valuemap_t *valuemap, uint64_t valu
 	child_templateid = valuemap->child_templateid;
 
 	result = DBselect("select i.itemid from items i"
-			" where i.valuemapid=" ZBX_FS_UI64" and i.hostid in "
-			"(" ZBX_FS_UI64", (select h.hostid from hosts h,hosts_templates ht"
+			" where i.valuemapid=" ZBX_FS_UI64" and (i.hostid=" ZBX_FS_UI64" or i.hostid in"
+			" (select h.hostid from hosts h,hosts_templates ht"
 			" where ht.hostid=h.hostid and h.status <>%d and ht.templateid=" ZBX_FS_UI64"))",
 			valuemapid, child_templateid, HOST_STATUS_TEMPLATE, child_templateid);
 
