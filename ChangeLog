@@ -224,6 +224,10 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
+........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
 .......PS. [ZBX-22110] fixed memory leak in Zabbix server in case of monitoring VMware (MVekslers)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
