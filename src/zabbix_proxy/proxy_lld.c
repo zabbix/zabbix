@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#include "../zabbix_server/lld/lld_protocol.h"
 
 #include "module.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error)
+void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
+		zbx_timespec_t *ts, char *error)
 {
 	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(hostid);

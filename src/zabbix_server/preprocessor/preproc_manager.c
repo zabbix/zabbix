@@ -22,7 +22,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxlld.h"
+#include "../lld/lld_protocol.h"
 #include "preprocessing.h"
 #include "preproc_history.h"
 #include "preproc_manager.h"

@@ -21,7 +21,7 @@
 #include "diag_server.h"
 
 #include "zbxcachevalue.h"
-#include "zbxlld.h"
+#include "../lld/lld_protocol.h"
 #include "../alerter/alerter.h"
 #include "zbxtime.h"
 

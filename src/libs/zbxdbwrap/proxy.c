@@ -28,7 +28,6 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "zbxcrypto.h"
-#include "zbxlld.h"
 #include "events.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
@@ -39,6 +38,7 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "../zabbix_server/lld/lld_protocol.h"
 
 extern char	*CONFIG_SERVER;
 
