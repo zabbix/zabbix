@@ -192,7 +192,8 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	}
 
 	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])
-			&& $data[CHousekeepingHelper::HK_HISTORY_MODE] == 1 && $data[CHousekeepingHelper::HK_HISTORY_GLOBAL] == 0) {
+			&& $data['system_info'][CHousekeepingHelper::HK_HISTORY_MODE] == 1
+			&& $data['system_info'][CHousekeepingHelper::HK_HISTORY_GLOBAL] == 0) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),
 			_('Override item history period'),
@@ -207,7 +208,8 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 	}
 
 	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data['system_info'])
-			&& $data[CHousekeepingHelper::HK_TRENDS_MODE] == 1 && $data[CHousekeepingHelper::HK_TRENDS_GLOBAL] == 0) {
+			&& $data['system_info'][CHousekeepingHelper::HK_TRENDS_MODE] == 1
+			&& $data['system_info'][CHousekeepingHelper::HK_TRENDS_GLOBAL] == 0) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),
 			_('Override item trend period'),
