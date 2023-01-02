@@ -23,9 +23,7 @@
 #include "zbxcrypto.h"
 #include "zbxeval.h"
 #include "zbxalgo.h"
-#include "zbxexpr.h"
 #include "zbxstr.h"
-#include "zbxvariant.h"
 
 /*
  * 6.4 development database patches
