@@ -40,7 +40,7 @@ unsigned char	program_type;
 
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
-#define JS_TIMEOUT_DEF		10
+#define JS_TIMEOUT_DEF		ZBX_ES_TIMEOUT
 #define JS_TIMEOUT_MIN_STR	ZBX_STR(JS_TIMEOUT_MIN)
 #define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
 #define JS_TIMEOUT_DEF_STR	ZBX_STR(JS_TIMEOUT_DEF)
@@ -170,7 +170,8 @@ static char	*execute_script(const char *script, const char *param, int timeout, 
 		return NULL;
 	}
 
-	zbx_es_set_timeout(&es, timeout);
+	if (0 != timeout)
+		zbx_es_set_timeout(&es, timeout);
 
 	if (FAIL == zbx_es_compile(&es, script, &code, &size, &errmsg))
 	{
@@ -200,7 +201,7 @@ out:
 
 int	main(int argc, char **argv)
 {
-	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = JS_TIMEOUT_DEF;
+	int	ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
 		*result = NULL;
 
