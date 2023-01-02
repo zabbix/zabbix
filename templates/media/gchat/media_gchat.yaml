@@ -288,15 +288,15 @@ zabbix_export:
                 }
             }
 
-            request.AddHeader('Content-Type: application/json');
+            request.addHeader('Content-Type: application/json');
 
             if (typeof params.HTTPProxy === 'string' && params.HTTPProxy !== '') {
-                request.SetProxy(params.HTTPProxy);
+                request.setProxy(params.HTTPProxy);
             }
 
             Zabbix.Log(4, '[ Google Chat Webhook ] JSON: ' + JSON.stringify(body));
 
-            var response = request.Post(params.gchat_endpoint, JSON.stringify(body));
+            var response = request.post(params.gchat_endpoint, JSON.stringify(body));
 
             Zabbix.Log(4, '[ Google Chat Webhook ] Response: ' + response);
 
