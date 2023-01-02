@@ -30,6 +30,8 @@ $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js',
 ];
 $page['type'] = detect_page_type();
 
+CWebUser::setRegisteredCsrfTokens('update');
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {

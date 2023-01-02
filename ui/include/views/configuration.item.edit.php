@@ -42,6 +42,7 @@ $url = (new CUrl('items.php'))
 $form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
+	->addCsrfToken($data['itemid'] ? 'items.php update' : 'items.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
@@ -1089,8 +1090,7 @@ if ($data['itemid'] != 0) {
 			);
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
-		->setEnabled(!$data['limited']);
+	$buttons[] = (new CButtonQMessage('delete', _('Delete'), _('Delete item?')))->setEnabled(!$data['limited']);
 	$buttons[] = $cancel_button;
 
 	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

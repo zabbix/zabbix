@@ -46,6 +46,7 @@ $url = (new CUrl('graphs.php'))
 // Create form.
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
+	->addCsrfToken(($data['graphid'] != 0) ? 'graphs.php update' : 'graphs.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
@@ -495,10 +496,11 @@ $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 // Append buttons to form.
 if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
-	$deleteButton = new CButtonDelete(
-		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
-	);
+	$deleteButton = new CSubmit('delete', _('Delete'));
+//	$deleteButton = new CButtonDelete(
+//		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
+//		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
+//	);
 
 	if ($readonly) {
 		$updateButton->setEnabled(false);

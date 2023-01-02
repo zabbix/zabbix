@@ -27,6 +27,11 @@ $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
+if (hasRequest('form')) {
+	CWebUser::setRegisteredCsrfTokens('sysmaps.php add');
+	CWebUser::setRegisteredCsrfTokens('sysmaps.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

@@ -38,6 +38,7 @@ $url = (new CUrl('host_discovery.php'))
 $form = (new CForm('post', $url))
 	->setId('host-discovery-form')
 	->setName('itemForm')
+	->addCsrfToken((!empty($data['itemid'])) ? 'host_discovery.php update' : 'host_discovery.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
@@ -996,10 +997,8 @@ if (!empty($data['itemid'])) {
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
+	$buttons[] = (new CSubmit('delete', _('Delete')))->setEnabled(!$data['limited']);
 
-	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid', 'context']),
-		'context'
-	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);

@@ -28,6 +28,12 @@ $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
+if (isset($_REQUEST['form'])) {
+	CWebUser::setRegisteredCsrfTokens('httpconf.php clone');
+	CWebUser::setRegisteredCsrfTokens('httpconf.php delete');
+	CWebUser::setRegisteredCsrfTokens('httpconf.php del_history');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

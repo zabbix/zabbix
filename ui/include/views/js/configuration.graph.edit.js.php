@@ -481,6 +481,22 @@
 			});
 
 			!this.graphs.readonly && this.initSortable();
+
+			let csrf_token = document.graphForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+			document.addEventListener('click', (e) => {
+				if (e.target.id === 'clone') {
+					csrf_token.value = CSRF_TOKENS['graphs.php clone'];
+				}
+				else if (e.target.id === 'delete') {
+					if (!window.confirm('<?= _('Delete graph?') ?>')) {
+						e.preventDefault();
+						return;
+					}
+					console.log()
+					csrf_token.value = CSRF_TOKENS['graphs.php delete'];
+				}
+			})
 		},
 
 		loadItem(item) {

@@ -300,15 +300,28 @@ function check_field(&$fields, &$field, $checks) {
 		return ($flags & P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 	elseif ($opt == O_OPT) {
-		if (!isset($_REQUEST[$field])) {
+		if (!isset($_REQUEST[$field]) || $_REQUEST[$field] == '') {
 			return ZBX_VALID_OK;
 		}
-//		elseif ($flags & P_ACT) {
-//			if (!hasRequest('sid') || getRequest('sid') != substr(CSessionHelper::getId(), 16, 16)) {
-//				info(_('Operation cannot be performed due to unauthorized request.'));
-//				return ZBX_VALID_ERROR;
-//			}
-//		}
+		elseif ($flags & P_ACT) {
+			if (array_key_exists('action', $_REQUEST) && ($_REQUEST['action'] != '')) {
+				$action = $_REQUEST['action'];
+			}
+			else {
+				$action = APP::Component()->router->getAction() . ' ' . $field;
+			}
+
+			$csrf_token_correct = CController::generateCsrfToken($action);
+			$csrf_token_form = array_key_exists(CController::CSRF_TOKEN_NAME, $_REQUEST)
+				? $_REQUEST[CController::CSRF_TOKEN_NAME]
+				: '';
+
+			if (!CEncryptHelper::checkSign($csrf_token_correct, $csrf_token_form)) {
+				info(_('Operation cannot be performed due to unauthorized request.'));
+				return ZBX_VALID_ERROR;
+			}
+
+		}
 	}
 
 	if ($flags & P_CRLF) {

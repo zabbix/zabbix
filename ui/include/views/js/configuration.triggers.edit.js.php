@@ -60,6 +60,40 @@
 					triggers_initialized = true;
 				}
 			});
+
+			let csrf_token = document.triggersForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+			const triggers_form = document.getElementById('triggers-form');
+			const triggers_prototype_form = document.getElementById('triggers-prototype-form');
+
+			if (triggers_form !== null) {
+				triggers_form.addEventListener('click', (e) => {
+					if (e.target.id === 'clone') {
+						csrf_token.value = CSRF_TOKENS['triggers.php clone'];
+					}
+					else if (e.target.id === 'delete') {
+						if (!window.confirm('<?= _('Delete trigger?') ?>')) {
+							e.preventDefault();
+							return;
+						}
+						csrf_token.value = CSRF_TOKENS['triggers.php delete'];
+					}
+				})
+			}
+			else if (triggers_prototype_form !== null) {
+				triggers_prototype_form.addEventListener('click', (e) => {
+					if (e.target.id === 'clone') {
+						csrf_token.value = CSRF_TOKENS['trigger_prototypes.php clone'];
+					}
+					else if (e.target.id === 'delete') {
+						if (!window.confirm('<?= _('Delete trigger prototype?') ?>')) {
+							e.preventDefault();
+							return;
+						}
+						csrf_token.value = CSRF_TOKENS['trigger_prototypes.php delete'];
+					}
+				})
+			}
 		},
 
 		changeRecoveryMode() {

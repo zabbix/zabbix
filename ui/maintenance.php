@@ -28,6 +28,11 @@ $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
 $page['scripts'] = ['class.calendar.js'];
 
+if (getRequest('form')) {
+	CWebUser::setRegisteredCsrfTokens('maintenance.php clone');
+	CWebUser::setRegisteredCsrfTokens('maintenance.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

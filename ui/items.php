@@ -28,6 +28,19 @@ $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = ['multilineinput.js', 'items.js', 'class.tagfilteritem.js'];
 
+if (getRequest('form') === 'create' || getRequest('form') === 'update'
+	|| (hasRequest('clone') && getRequest('itemid') != 0)) {
+	CWebUser::setRegisteredCsrfTokens('items.php clone');
+	CWebUser::setRegisteredCsrfTokens('items.php del_history');
+	CWebUser::setRegisteredCsrfTokens('items.php delete');
+}
+else {
+	CWebUser::setRegisteredCsrfTokens('item.massclearhistory');
+	CWebUser::setRegisteredCsrfTokens('popup.massupdate.item');
+}
+
+CWebUser::setRegisteredCsrfTokens('item.masscheck_now');
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));

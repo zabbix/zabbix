@@ -129,6 +129,9 @@ class CControllerMapView extends CController {
 			'allowed_edit' => $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
 		]);
 
+		CWebUser::setRegisteredCsrfTokens('favorite.create');
+		CWebUser::setRegisteredCsrfTokens('favorite.delete');
+
 		$response->setTitle(_('Network maps'));
 		$this->setResponse($response);
 	}

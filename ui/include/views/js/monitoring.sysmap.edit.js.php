@@ -146,6 +146,8 @@
 				$('#sysmapid').remove();
 			}
 
+			$('input[name=<?= CController::CSRF_TOKEN_NAME ?>]').val(CSRF_TOKENS['sysmaps.php add']);
+
 			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
 
 			$('#update')
@@ -164,6 +166,20 @@
 		});
 
 		$('#label_format').triggerHandler('click');
+
+		let csrf_token = document
+			.getElementById('sysmap-form')
+			.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+		document.addEventListener('click', (e) => {
+			if (e.target.id === 'delete') {
+				if (!window.confirm('<?= _('Delete selected map?') ?>')) {
+					e.preventDefault();
+					return;
+				}
+				csrf_token.value = CSRF_TOKENS['sysmaps.php delete'];
+			}
+		})
 	});
 
 	/**

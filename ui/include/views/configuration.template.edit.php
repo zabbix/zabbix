@@ -42,6 +42,10 @@ if (!hasRequest('form_refresh')) {
 $form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
+	->addCsrfToken(($data['templateid'] != 0 && $data['form'] !== 'full_clone')
+		? 'templates.php update'
+		: 'templates.php add'
+	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
@@ -217,13 +221,8 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid')),
-			new CButtonQMessage(
-				'delete_and_clear',
-				_('Delete and clear'),
-				_('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-				url_param('form').url_param('templateid')
-			),
+			new CSubmit('delete', _('Delete')),
+			new CSubmit('delete_and_clear', _('Delete and clear')),
 			new CButtonCancel()
 		]
 	));

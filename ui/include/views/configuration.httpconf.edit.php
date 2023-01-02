@@ -40,6 +40,7 @@ $url = (new CUrl('httpconf.php'))
 $http_form = (new CForm('post', $url))
 	->setId('http-form')
 	->setName('httpForm')
+	->addCsrfToken(!empty($this->data['httptestid']) ? 'httpconf.php update' : 'httpconf.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])
@@ -259,16 +260,10 @@ if (!empty($this->data['httptestid'])) {
 	if ($this->data['host']['status'] == HOST_STATUS_MONITORED
 			|| $this->data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 
-		$buttons[] = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
-		);
+		$buttons[] = new CSubmit('del_history', _('Clear history and trends'));
 	}
 
-	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']),
-		'context'
-	))->setEnabled(!$data['templated']);
+	$buttons[] = (new CSubmit('delete', _('Delete')))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
 	$http_tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));

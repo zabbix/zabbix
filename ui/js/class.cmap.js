@@ -244,11 +244,12 @@ ZABBIX.apps.map = (function($) {
 				var url = new Curl();
 
 				$.ajax({
-					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+					url: url.getPath() + '?output=ajax',
 					type: 'post',
 					data: {
 						favobj: 'sysmap',
 						action: 'update',
+						_csrf_token: CSRF_TOKENS['update'],
 						sysmapid: this.sysmapid,
 						sysmap: JSON.stringify(this.data)
 					},

@@ -32,6 +32,10 @@ $html_page = (new CHtmlPage())
 $maintenance_form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
+	->addCsrfToken((array_key_exists('maintenanceid', $data) && $data['maintenanceid'])
+		? 'maintenance.php update'
+		: 'maintenance.php add'
+	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 
@@ -266,8 +270,7 @@ if (array_key_exists('maintenanceid', $data) && $data['maintenanceid']) {
 		(new CSubmit('update', _('Update')))->setEnabled($data['allowed_edit']),
 		[
 			(new CSubmit('clone', _('Clone')))->setEnabled($data['allowed_edit']),
-			(new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')))
-				->setEnabled($data['allowed_edit']),
+			(new CSubmit('delete', _('Delete')))->setEnabled($data['allowed_edit']),
 			new CButtonCancel()
 		]
 	));

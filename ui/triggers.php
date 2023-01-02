@@ -28,6 +28,11 @@ $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
+if (isset($_REQUEST['form'])) {
+	CWebUser::setRegisteredCsrfTokens('triggers.php clone');
+	CWebUser::setRegisteredCsrfTokens('triggers.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR											TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION

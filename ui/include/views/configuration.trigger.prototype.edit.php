@@ -39,6 +39,7 @@ $url = (new CUrl('trigger_prototypes.php'))
 $triggersForm = (new CForm('post', $url))
 	->setId('triggers-prototype-form')
 	->setName('triggersForm')
+	->addCsrfToken(($data['triggerid'] !== null) ? 'trigger_prototypes.php update' : 'trigger_prototypes.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
@@ -724,9 +725,7 @@ $cancelButton = $data['backurl'] !== null
 
 // append buttons to form
 if (!empty($data['triggerid'])) {
-	$deleteButton = new CButtonDelete(_('Delete trigger prototype?'),
-		url_params(['form', 'triggerid', 'parent_discoveryid', 'context', 'backurl']), 'context'
-	);
+	$deleteButton = new CSubmit('delete', _('Delete'));
 
 	if ($data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');

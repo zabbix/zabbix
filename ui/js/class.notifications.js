@@ -565,8 +565,11 @@ ZBX_Notifications.prototype.renderAudio = function() {
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
 	return new Promise(function(resolve, reject) {
-		sendAjaxData('zabbix.php?action=' + resource, {
-			data: params || {},
+		let data = params || {};
+		data.action = resource;
+
+		sendAjaxData('zabbix.php', {
+			data: data,
 			success: resolve,
 			error: reject
 		});

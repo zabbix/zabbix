@@ -92,6 +92,24 @@ include __DIR__.'/itemtest.js.php';
 					}
 				})
 				.trigger('change');
+
+			let csrf_token = document.itemForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+			document.addEventListener('click', (e) => {
+				if (e.target.id === 'del_history') {
+					document.addEventListener('submit', (e) => {
+						csrf_token.value = CSRF_TOKENS['items.php del_history'];
+					})
+				}
+				else if (e.target.id === 'clone') {
+					csrf_token.value = CSRF_TOKENS['items.php clone'];
+				}
+				else if (e.target.id === 'delete') {
+					document.addEventListener('submit', (e) => {
+						csrf_token.value = CSRF_TOKENS['items.php delete'];
+					})
+				}
+			})
 		},
 
 		typeChangeHandler() {
@@ -118,7 +136,7 @@ include __DIR__.'/itemtest.js.php';
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
+			curl.setAction('item.masscheck_now', CSRF_TOKENS['item.masscheck_now']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

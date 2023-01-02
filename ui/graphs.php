@@ -28,6 +28,11 @@ $page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph pr
 $page['file'] = 'graphs.php';
 $page['scripts'] = ['colorpicker.js', 'multiselect.js'];
 
+if (isset($_REQUEST['form'])) {
+	CWebUser::setRegisteredCsrfTokens('graphs.php clone');
+	CWebUser::setRegisteredCsrfTokens('graphs.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

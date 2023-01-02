@@ -84,7 +84,7 @@
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', button.dataset.csrfToken);
+			curl.setAction('item.masscheck_now', CSRF_TOKENS['item.masscheck_now']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

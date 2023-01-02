@@ -27,6 +27,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
 
+if (isset($_REQUEST['form'])) {
+	CWebUser::setRegisteredCsrfTokens('trigger_prototypes.php clone');
+	CWebUser::setRegisteredCsrfTokens('trigger_prototypes.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR											TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

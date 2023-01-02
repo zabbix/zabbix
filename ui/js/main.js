@@ -682,12 +682,12 @@ function ApiCall(method, params, id = 1) {
 /**
  * Add object to the list of favorites.
  */
-function add2favorites(object, objectid, csrf_token) {
-	sendAjaxData('zabbix.php?action=favorite.create', {
+function add2favorites(object, objectid) {
+	sendAjaxData('zabbix.php', {
 		data: {
 			object: object,
 			objectid: objectid,
-			_csrf_token: csrf_token
+			action: 'favorite.create'
 		}
 	});
 }
@@ -695,12 +695,12 @@ function add2favorites(object, objectid, csrf_token) {
 /**
  * Remove object from the list of favorites. Remove all favorites if objectid==0.
  */
-function rm4favorites(object, objectid, csrf_token) {
-	sendAjaxData('zabbix.php?action=favorite.delete', {
+function rm4favorites(object, objectid) {
+	sendAjaxData('zabbix.php', {
 		data: {
 			object: object,
 			objectid: objectid,
-			_csrf_token: csrf_token
+			action: 'favorite.delete'
 		}
 	});
 }
@@ -755,11 +755,16 @@ function toggleSection(id, profile_idx) {
  * @param object options
  */
 function sendAjaxData(url, options) {
-	var url = new Curl(url);
-	url.setArgument('output', 'ajax');
+	let curl = new Curl(url);
+
+	if (options.data.action in CSRF_TOKENS) {
+		curl.setAction(options.data.action, CSRF_TOKENS[options.data.action]);
+	}
+
+	curl.setArgument('output', 'ajax');
 
 	options.type = 'post';
-	options.url = url.getUrl();
+	options.url = curl.getUrl();
 
 	return jQuery.ajax(options);
 }

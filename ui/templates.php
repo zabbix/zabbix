@@ -28,6 +28,17 @@ $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
+if (hasRequest('form')) {
+	CWebUser::setRegisteredCsrfTokens('templates.php clone');
+	CWebUser::setRegisteredCsrfTokens('templates.php full_clone');
+	CWebUser::setRegisteredCsrfTokens('templates.php delete');
+	CWebUser::setRegisteredCsrfTokens('templates.php delete_and_clear');
+}
+else {
+	CWebUser::setRegisteredCsrfTokens('template.massdelete');
+	CWebUser::setRegisteredCsrfTokens('template.massdeleteclear');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
@@ -936,7 +947,8 @@ else {
 		],
 		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 		'csrf_token_import' => CController::generateCsrfToken('popup.import'),
-		'csrf_token_massupdate' => CController::generateCsrfToken('popup.massupdate.template')
+		'csrf_token_massupdate' => CController::generateCsrfToken('popup.massupdate.template'),
+		'csrf_token_export' => CController::generateCsrfToken('export.templates')
 	];
 
 	$view = new CView('configuration.template.list', $data);

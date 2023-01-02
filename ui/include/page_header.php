@@ -158,10 +158,16 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$page_header->addCssFile('imgstore.php?css=1&output=css');
 	}
 
+	if (!defined('ZBX_PAGE_NO_JSLOADER') && $is_standard_page && !CWebUser::isGuest()) {
+		CWebUser::setRegisteredCsrfTokens('notifications.mute');
+		CWebUser::setRegisteredCsrfTokens('notifications.read');
+	}
+
 	$page_header
 		->addJavaScript('
 			const PHP_TZ_OFFSET = '.date('Z').';
 			const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+			const CSRF_TOKENS = '.json_encode(CWebUser::getRegisteredCsrfTokens()).';
 		')
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl());
 

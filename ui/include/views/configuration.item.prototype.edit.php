@@ -40,6 +40,7 @@ $url = (new CUrl('disc_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
+	->addCsrfToken((!empty($data['itemid'])) ? 'disc_prototypes.php update' : 'disc_prototypes.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
@@ -927,9 +928,7 @@ if ($data['itemid'] != 0) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			(new CSimpleButton(_('Test')))->setId('test_item'),
-			(new CButtonDelete(_('Delete item prototype?'),
-				url_params(['form', 'itemid', 'parent_discoveryid', 'context']), 'context'
-			))->setEnabled(!$readonly),
+			(new CSubmit('delete', _('Delete')))->setEnabled(!$readonly),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));

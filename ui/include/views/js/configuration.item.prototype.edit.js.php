@@ -86,6 +86,21 @@ include dirname(__FILE__).'/itemtest.js.php';
 					}
 				})
 				.trigger('change');
+
+			let csrf_token = document.itemForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+			document.addEventListener('click', (e) => {
+				if (e.target.id === 'clone') {
+					csrf_token.value = CSRF_TOKENS['disc_prototypes.php clone'];
+				}
+				else if (e.target.id === 'delete') {
+					if (!window.confirm('<?= _('Delete item prototype?') ?>')) {
+						e.preventDefault();
+						return;
+					}
+					csrf_token.value = CSRF_TOKENS['disc_prototypes.php delete'];
+				}
+			})
 		},
 
 		typeChangeHandler() {

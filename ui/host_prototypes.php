@@ -28,6 +28,11 @@ $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
 $page['scripts'] = ['effects.js'];
 
+if (hasRequest('form')) {
+	CWebUser::setRegisteredCsrfTokens('host_prototypes.php clone');
+	CWebUser::setRegisteredCsrfTokens('host_prototypes.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

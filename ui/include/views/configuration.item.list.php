@@ -313,7 +313,6 @@ if ($data['context'] === 'host') {
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
 				->onClick('view.massCheckNow(this);')
-				->setAttributeCsrfToken('item.masscheck_now')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')

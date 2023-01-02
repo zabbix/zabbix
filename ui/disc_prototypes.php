@@ -28,6 +28,11 @@ $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = ['effects.js', 'multilineinput.js', 'items.js'];
 
+if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
+	CWebUser::setRegisteredCsrfTokens('disc_prototypes.php clone');
+	CWebUser::setRegisteredCsrfTokens('disc_prototypes.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));

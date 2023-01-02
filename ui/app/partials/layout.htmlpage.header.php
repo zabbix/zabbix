@@ -65,10 +65,16 @@ foreach ($modules_assets as $module_id => $assets) {
 	}
 }
 
+if ($show_gui_messaging) {
+	CWebUser::setRegisteredCsrfTokens('notifications.mute');
+	CWebUser::setRegisteredCsrfTokens('notifications.read');
+}
+
 $page_header
 	->addJavaScript('
 		const PHP_TZ_OFFSET = '.date('Z').';
 		const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+		const CSRF_TOKENS = '.json_encode(CWebUser::getRegisteredCsrfTokens()).';
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))

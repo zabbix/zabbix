@@ -28,6 +28,11 @@ $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = ['multilineinput.js', 'items.js'];
 
+if (hasRequest('form')) {
+	CWebUser::setRegisteredCsrfTokens('host_discovery.php clone');
+	CWebUser::setRegisteredCsrfTokens('host_discovery.php delete');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));

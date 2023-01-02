@@ -94,6 +94,28 @@
 
 		init({form_name}) {
 			this.form_name = form_name;
+
+			let csrf_token = document.httpForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
+
+			document.addEventListener('click', (e) => {
+				if (e.target.id === 'clone') {
+					csrf_token.value = CSRF_TOKENS['httpconf.php clone'];
+				}
+				else if (e.target.id === 'del_history') {
+					if (!window.confirm('<?= _('History clearing can take a long time. Continue?') ?>')) {
+						e.preventDefault();
+						return;
+					}
+					csrf_token.value = CSRF_TOKENS['httpconf.php del_history'];
+				}
+				else if (e.target.id === 'delete') {
+					if (!window.confirm('<?= _('Delete web scenario?') ?>')) {
+						e.preventDefault();
+						return;
+					}
+					csrf_token.value = CSRF_TOKENS['httpconf.php delete'];
+				}
+			})
 		},
 
 		editHost(e, hostid) {

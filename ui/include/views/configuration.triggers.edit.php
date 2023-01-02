@@ -42,6 +42,7 @@ $url = (new CUrl('triggers.php'))
 $triggersForm = (new CForm('post', $url))
 	->setid('triggers-form')
 	->setName('triggersForm')
+	->addCsrfToken(($data['triggerid'] !== null) ? 'triggers.php update' : 'triggers.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
@@ -711,11 +712,7 @@ if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(
-				_('Delete trigger?'),
-				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
-				'context'
-			))->setEnabled(!$data['limited']),
+			(new CSubmit('delete', _('Delete')))->setEnabled(!$data['limited']),
 			$cancelButton
 		]
 	));

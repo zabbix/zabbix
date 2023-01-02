@@ -39,6 +39,10 @@ if (!$data['form_refresh']) {
 $form = (new CForm())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
+	->addCsrfToken((array_key_exists('sysmapid', $data['sysmap']) && $data['sysmap']['sysmapid'] != '')
+		? 'sysmaps.php update'
+		: 'sysmaps.php add'
+	)
 	->addVar('form', getRequest('form', 1))
 	->addVar('current_user_userid', $data['current_user_userid'])
 	->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));
@@ -422,7 +426,7 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 		[
 			new	CButton('clone', _('Clone')),
 			new CButton('full_clone', _('Full clone')),
-			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid'])),
+			new CSubmit('delete', _('Delete')),
 			new CButtonCancel()
 		]
 	));

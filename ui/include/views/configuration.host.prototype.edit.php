@@ -48,6 +48,7 @@ $url = (new CUrl('host_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
+	->addCsrfToken(($host_prototype['hostid'] != 0) ? 'host_prototypes.php update' : 'host_prototypes.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
@@ -433,10 +434,7 @@ if ($host_prototype['hostid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(
-				_('Delete selected host prototype?'),
-				url_params(['form', 'hostid', 'parent_discoveryid', 'context']), 'context'
-			))->setEnabled($host_prototype['templateid'] == 0),
+			(new CSubmit('delete', _('Delete')))->setEnabled($host_prototype['templateid'] == 0),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))
 		]
 	));
