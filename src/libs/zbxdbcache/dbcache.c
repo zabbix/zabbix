@@ -949,7 +949,9 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 
 				if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends,
 						&del_itemids.values[i])))
+				{
 					continue;
+				}
 
 				zbx_hashset_remove_direct(&cache->trends, trend);
 			}
