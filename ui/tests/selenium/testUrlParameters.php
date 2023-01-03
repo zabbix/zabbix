@@ -164,6 +164,17 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'zabbix.php?action=templategroup.edit&groupid[]=1',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value for "groupid" field.',
+							'Controller: templategroup.edit',
+							'action: templategroup.edit',
+							'groupid: array'
+						]
+					],
+					[
 						'url' => 'zabbix.php?action=templategroup.edit&groupid=-1',
 						'text_not_present' => 'Template groups',
 						'fatal_error' => true,
