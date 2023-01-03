@@ -1903,17 +1903,21 @@ static int	DBpatch_6030159(void)
 		valuemapid++;
 	}
 
-	zbx_db_insert_execute(&db_insert_valuemap);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_valuemap)))
+		goto clean_sql;
+
 	zbx_db_insert_clean(&db_insert_valuemap);
 
-	zbx_db_insert_execute(&db_insert_valuemap_mapping);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_valuemap_mapping)))
+		goto clean_sql;
+
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
-
+clean_sql:
 	zbx_free(sql);
 clean:
 	zbx_vector_uint64_destroy(&child_templateids);
@@ -2121,9 +2125,10 @@ static int	DBpatch_6030160(void)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_hostmacro;
+	int					ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
+		return ret;
 
 	zbx_vector_uint64_create(&parent_ids);
 	select_pure_parents(&parent_ids);
@@ -2207,7 +2212,9 @@ static int	DBpatch_6030160(void)
 			hostmacroid++;
 		}
 
-		zbx_db_insert_execute(&db_insert_hostmacro);
+		if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_hostmacro)))
+			goto clean;
+
 		zbx_db_insert_clean(&db_insert_hostmacro);
 	}
 
@@ -2220,7 +2227,7 @@ clean:
 out:
 	zbx_vector_uint64_destroy(&parent_ids);
 
-	return SUCCEED;
+	return ret;
 }
 
 typedef struct zbx_db_patch_tag
@@ -2269,13 +2276,13 @@ static int	DBpatch_6030161(void)
 	zbx_vector_tag_ptr_t	tags;
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			i, j, new_tags = 0;
+	int			i, j, new_tags = 0, ret = SUCCEED;
 	zbx_db_patch_tag_t	*tag;
 	zbx_uint64_t		itemtagid;
 	zbx_db_insert_t		db_insert_itemtag;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
+		return ret;
 
 	zbx_vector_tag_ptr_create(&tags);
 
@@ -2350,13 +2357,15 @@ static int	DBpatch_6030161(void)
 		}
 	}
 
-	zbx_db_insert_execute(&db_insert_itemtag);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_itemtag)))
+		goto out;
+
 	zbx_db_insert_clean(&db_insert_itemtag);
 out:
 	zbx_vector_tag_ptr_clear_ext(&tags, tag_free);
 	zbx_vector_tag_ptr_destroy(&tags);
 
-	return SUCCEED;
+	return ret;
 }
 
 typedef struct
@@ -2724,7 +2733,7 @@ static void	change_item_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t *
 
 			for (k = 0; k < widget->fields.values_num; k++)
 			{
-				zbx_db_widget_field_t *field;
+				zbx_db_widget_field_t	*field;
 
 				field = widget->fields.values[k];
 
@@ -2765,7 +2774,6 @@ static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t 
 	zbx_vector_uint64_sort(graph_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(graph_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.templateid,g.graphid from graphs g,graphs_items gi,items i"
 			" where gi.graphid=g.graphid and i.itemid=gi.itemid and i.hostid=" ZBX_FS_UI64" and",
@@ -2798,7 +2806,7 @@ static void	change_graph_ids(zbx_db_dashboard_t *dashboard, zbx_vector_uint64_t 
 
 			for (k = 0; k < widget->fields.values_num; k++)
 			{
-				zbx_db_widget_field_t *field;
+				zbx_db_widget_field_t	*field;
 
 				field = widget->fields.values[k];
 
@@ -2975,7 +2983,8 @@ static int	DBpatch_6030162(void)
 	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
-	int					changed, i, j, k, l, pages_num = 0, widgets_num = 0, fields_num = 0;
+	int					changed, i, j, k, l, pages_num = 0, widgets_num = 0, fields_num = 0,
+						ret = SUCCEED;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_dashboard, db_insert_dashboard_page, db_insert_widget,
@@ -2983,7 +2992,7 @@ static int	DBpatch_6030162(void)
 	zbx_uint64_t				dashboardid, dashboard_pageid, widgetid, widget_fieldid;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
+		return ret;
 
 	zbx_vector_uint64_create(&parent_ids);
 	select_pure_parents(&parent_ids);
@@ -3151,16 +3160,24 @@ static int	DBpatch_6030162(void)
 		dashboardid++;
 	}
 
-	zbx_db_insert_execute(&db_insert_dashboard);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_dashboard)))
+		goto clean;
+
 	zbx_db_insert_clean(&db_insert_dashboard);
 
-	zbx_db_insert_execute(&db_insert_dashboard_page);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_dashboard_page)))
+		goto clean;
+
 	zbx_db_insert_clean(&db_insert_dashboard_page);
 
-	zbx_db_insert_execute(&db_insert_widget);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_widget)))
+		goto clean;
+
 	zbx_db_insert_clean(&db_insert_widget);
 
-	zbx_db_insert_execute(&db_insert_widget_field);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert_widget_field)))
+		goto clean;
+
 	zbx_db_insert_clean(&db_insert_widget_field);
 clean:
 	zbx_vector_uint64_destroy(&child_templateids);
@@ -3171,7 +3188,7 @@ clean:
 out:
 	zbx_vector_uint64_destroy(&parent_ids);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_6030163(void)
@@ -3280,9 +3297,8 @@ static int	DBpatch_6030165(void)
 
 		if (FAIL == zbx_compose_trigger_expression(row, ZBX_EVAL_PARSE_TRIGGER_EXPRESSION, composed_expr))
 		{
-			DBfree_result(result);
-
-			return FAIL;
+			ret = FAIL;
+			goto out;
 		}
 
 		zbx_snprintf_alloc(&seed, &seed_alloc, &seed_offset, "%s/", row[1]);
