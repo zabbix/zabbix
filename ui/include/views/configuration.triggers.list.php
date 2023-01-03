@@ -295,11 +295,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
-			->setArgument('g_triggerid', $triggerid)
 			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
 			)
+			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
 			->getUrl()
 		))
