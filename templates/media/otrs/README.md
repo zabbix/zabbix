@@ -1,15 +1,15 @@
 
-# OTRS webhook
+# ((OTRS)) Community Edition webhook
 ![](images/otrs_logo.png?raw=true)
 
-This guide describes how to integrate your Zabbix 5.0 installation with OTRS using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 6.0 installation with ((OTRS)) Community Edition using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
-- OTRS version 6
-- Zabbix version 5.0 or higher
+- ((OTRS)) Community Edition version 6
+- Zabbix version 6.0 or higher
 
-## Setting up a OTRS
+## Setting up a ((OTRS)) Community Edition
 
 1\. Import [ZabbixTicketConnector.yml](ZabbixTicketConnector.yml) in Admin > Web Services.
 
@@ -32,34 +32,34 @@ This guide describes how to integrate your Zabbix 5.0 installation with OTRS usi
 
 2\. In the **Administration** > **Media types** section, import the [media_otrs.yaml](media_otrs.yaml)
 
-3\. Open the added **OTRS** media type and set:
+3\. Open the added **OTRS CE** media type and set:
 
 - **otrs_auth_user** to the your **Agent username**
 - **otrs_auth_password** to the your **Agent password**
-- **otrs_customer** to your **OTRS customer email**
-- **otrs_queue** to your **OTRS ticket queue**
-- **otrs_url** to the **frontend URL** of your **OTRS** installation
+- **otrs_customer** to your **OTRS CE customer email**
+- **otrs_queue** to your **OTRS CE ticket queue**
+- **otrs_url** to the **frontend URL** of your **OTRS CE** installation
 
 [![](images/thumb.07.png?raw=true)](images/07.png)
 
 4\. If you want to prioritize issues according to **severity** values in Zabbix, you can define mapping parameters:
 
-- **severity_\<name\>**: OTRS priority ID
+- **severity_\<name\>**: OTRS CE priority ID
 
 [![](images/thumb.08.png?raw=true)](images/08.png)
 
-5\. If you have **dynamic fields** in **OTRS** and you want them to be filled with values from Zabbix, add parameters in the form **dynamicfield_\<OTRS dynamic field name\>**. Dynamic fields can only be of the **text**, **textarea**, **checkbox**, or **date** types.
+5\. If you have **dynamic fields** in **((OTRS)) Community Edition** and you want them to be filled with values from Zabbix, add parameters in the form **dynamicfield_\<OTRS CE dynamic field name\>**. Dynamic fields can only be of the **text**, **textarea**, **checkbox**, or **date** types.
 
 6\. Click the **Update** button to save the **Webhook** settings.
 
-7\. To receive notifications in **OTRS**, you need to create a **Zabbix user** and add **Media** with the **OTRS** type.
+7\. To receive notifications in **((OTRS)) Community Edition**, you need to create a **Zabbix user** and add **Media** with the **OTRS CE** type.
 
 For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.09.png?raw=true)](images/09.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [OTRS](https://doc.otrs.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [((OTRS)) Community Edition](https://doc.otrs.com) documentations.
 
 ## Supported Versions
 
-Zabbix 5.0
+Zabbix 6.0
