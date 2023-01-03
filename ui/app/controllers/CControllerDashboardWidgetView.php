@@ -35,10 +35,9 @@ class CControllerDashboardWidgetView extends CController {
 	protected array $fields_values = [];
 
 	protected $validate_csrf_token = false;
+	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	protected function init(): void {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'array'

@@ -35,7 +35,7 @@ abstract class CController {
 	 *
 	 * @var int
 	 */
-	private $post_content_type = self::POST_CONTENT_TYPE_FORM;
+	protected $post_content_type = self::POST_CONTENT_TYPE_FORM;
 
 	/**
 	 * Action name, so that controller knows what action he is executing.
@@ -88,24 +88,6 @@ abstract class CController {
 	 * Initialization function that can be overridden later.
 	 */
 	protected function init() {
-	}
-
-	/**
-	 * Get content type of the POST request.
-	 *
-	 * @return int
-	 */
-	protected function getPostContentType(): int {
-		return $this->post_content_type;
-	}
-
-	/**
-	 * Set content type of the POST request.
-	 *
-	 * @param int $post_content_type
-	 */
-	protected function setPostContentType(int $post_content_type): void {
-		$this->post_content_type = $post_content_type;
 	}
 
 	/**
@@ -432,7 +414,7 @@ abstract class CController {
 	abstract protected function doAction();
 
 	private function populateRawInput(): void {
-		switch ($this->getPostContentType()) {
+		switch ($this->post_content_type) {
 			case self::POST_CONTENT_TYPE_FORM:
 				$this->raw_input = self::getFormInput();
 				break;

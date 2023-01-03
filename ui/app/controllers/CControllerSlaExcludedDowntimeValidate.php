@@ -23,9 +23,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 
 	protected $validate_csrf_token = false;
 
-	protected function init(): void {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-	}
+	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	/**
 	 * @throws Exception

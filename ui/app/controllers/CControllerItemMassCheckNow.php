@@ -31,9 +31,7 @@ class CControllerItemMassCheckNow extends CController {
 	 */
 	private $is_discovery_rule;
 
-	protected function init(): void {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-	}
+	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	protected function checkInput(): bool {
 		$fields = [
