@@ -937,21 +937,25 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 
 	if (0 != del_itemids.values_num)
 	{
-		DCconfig_unset_existing_itemids(&del_itemids);
+		zbx_dc_config_history_sync_unset_existing_itemids(&del_itemids);
 
-		LOCK_TRENDS;
-
-		for (i = 0; i < del_itemids.values_num; i++)
+		if (0 != del_itemids.values_num)
 		{
-			ZBX_DC_TREND	*trend;
+			LOCK_TRENDS;
 
-			if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends, &del_itemids.values[i])))
-				continue;
+			for (i = 0; i < del_itemids.values_num; i++)
+			{
+				ZBX_DC_TREND	*trend;
 
-			zbx_hashset_remove_direct(&cache->trends, trend);
+				if (NULL == (trend = (ZBX_DC_TREND *)zbx_hashset_search(&cache->trends,
+						&del_itemids.values[i])))
+					continue;
+
+				zbx_hashset_remove_direct(&cache->trends, trend);
+			}
+
+			UNLOCK_TRENDS;
 		}
-
-		UNLOCK_TRENDS;
 	}
 
 	zbx_vector_uint64_destroy(&del_itemids);
