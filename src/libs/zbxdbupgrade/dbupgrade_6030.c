@@ -2271,7 +2271,8 @@ static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t
 
 		while (NULL != (row2 = DBfetch(result2)))
 		{
-			zbx_db_patch_tag_t *tag2;
+			zbx_db_patch_tag_t	*tag2;
+
 			tag2 = zbx_malloc(NULL, sizeof(zbx_db_tag_t));
 			tag2->tag = zbx_strdup(NULL, row2[0]);
 			tag2->value = zbx_strdup(NULL, row2[1]);
