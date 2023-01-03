@@ -1572,8 +1572,11 @@ static void	DCsync_trends(void)
 
 	while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age)
+		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age &&
+				0 != trend->num)
+		{
 			DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
+		}
 	}
 
 	UNLOCK_TRENDS;
