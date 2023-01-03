@@ -19,8 +19,6 @@
 **/
 
 
-require_once 'vendor/autoload.php';
-
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';

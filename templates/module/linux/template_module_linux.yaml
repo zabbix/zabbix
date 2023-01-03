@@ -1227,21 +1227,34 @@ zabbix_export:
                   value: notice
         -
           uuid: 1097f843e7324a1fa0508544ddddd556
-          name: 'Software installed'
-          key: system.sw.packages
+          name: 'Number of installed packages'
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: 22ec957907a9481b931b098262672164
+              expression: 'change(/Linux generic by Zabbix agent/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b3a8feced15d4a09a8a2d8d1d8c9a546
           name: 'System description'
