@@ -221,6 +221,7 @@ tests/libs/zbxsysinfo/linux/system_boottime
 tests/libs/zbxsysinfo/linux/system_cpu_intr
 tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
+tests/libs/zbxsysinfo/linux/system_sw_software
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
