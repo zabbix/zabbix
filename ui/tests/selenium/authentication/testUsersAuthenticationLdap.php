@@ -39,9 +39,39 @@ class testUsersAuthenticationLdap extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
+		return [CMessageBehavior::class];
+	}
+
+	public function testUsersAuthenticationLdap_Layout() {
+		$form = $this->openLdapForm();
+		$this->page->assertHeader('Authentication');
+		$this->assertTrue($form->getField('Enable LDAP authentication')->isEnabled());
+
+		$form->checkValue([
+			'Enable LDAP authentication' => false,
+			'Enable JIT provisioning' => false,
+			'Case-sensitive login' => true,
+			'Provisioning period' => '1h'
+		]);
+
+		foreach ([false, true] as $status) {
+			$form->fill(['Enable LDAP authentication' => $status]);
+
+			foreach (['Enable JIT provisioning', 'Servers', 'Case-sensitive login'] as $label) {
+				$this->assertTrue($form->getField($label)->isEnabled($status));
+			}
+		}
+
+		foreach ([false, true] as $jit_status) {
+			$form->fill(['Enable JIT provisioning' => $jit_status]);
+			$this->assertTrue($form->getField('Provisioning period')->isEnabled($jit_status));
+		}
+
+		$form->getFieldContainer('Servers')->query('button:Add')->waitUntilClickable()->one()->click();
+		$server_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$server_form = $server_dialog->asForm();
+
+
 	}
 
 	public function getTestData() {
@@ -368,6 +398,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'Name' => '',
 							'Host' => '',
 							'Base DN' => '',
+							'Port' => '',
 							'Search attribute' => ''
 						]
 					],
@@ -445,7 +476,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'Description' => 'updated_description',
 							'Advanced configuration' => true,
 							'StartTLS' => true,
-							'Search filter' => 'updated_filter'
+							'Search filter' => 'search_filter'
 						]
 					],
 					'db_check' => [
@@ -459,6 +490,73 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'search_filter' => 'updated_filter',
 							'start_tls' => '1'
 						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => 'ldap_with_jit',
+							'Host' => '111.222.333',
+							'Port' => '',
+							'Base DN' => 'base dn',
+							'Search attribute' => 'search attribute',
+							'Bind DN' => 'bin dn test',
+//							'Bind password' => 'password',
+							'Description' => 'test description with jit',
+							'Configure JIT provisioning' => CFormElement::RELOADABLE_FILL(true),
+							'Group configuration' => CFormElement::RELOADABLE_FILL('groupOfNames'),
+							'Group base DN' => 'test group base dn',
+							'Group name attribute' => 'test group name attribute',
+							'User group membership attribute' => 'memberOf',
+							'Reference attribute' => 'test reference attribute',
+							'Group filter' => 'test group filter',
+							'User name attribute' => 'user name attribute',
+							'User last name attribute' => 'User last name'
+						]
+					],
+					'User group mapping' => [
+						[
+							'LDAP group pattern' => 'NEW group pattern',
+							'User groups' => 'Test timezone',
+							'User role' => 'User role'
+						]
+					],
+					'Media type mapping' => [
+						[
+							'Name' => 'Test Discord mapping',
+							'Media type' => 'Discord',
+							'Attribute' => 'test discord'
+						],
+						[
+							'Name' => 'Test iLert mapping',
+							'Media type' => 'iLert',
+							'Attribute' => 'test iLert'
+						]
+					],
+					'db_check' => [
+						'userdirectory' => ['name' => 'ldap_with_jit', 'description' => 'test description with jit'],
+						'config' => ['ldap_jit_status' => true],
+						'userdirectory_ldap' => [
+							'host' => '111.222.333',
+							'port' => '0',
+							'base_dn' => 'base dn',
+							'bind_dn' => 'bin dn test',
+							'search_attribute' => 'search attribute',
+							'group_basedn' => 'test group base dn',
+							'group_name' => 'test group name attribute',
+							'group_member' => 'memberOf',
+							'user_ref_attr' => 'test reference attribute',
+							'group_filter' => 'test group filter',
+							'user_username' => 'user name attribute',
+							'user_lastname' => 'User last name'
+						]
+//						'userdirectory_idpgroup' => [
+//							'name' => 'NEW group pattern',
+//							'userdirectoryid' => 20
+//						]
 					]
 				]
 			]
@@ -858,7 +956,32 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$form->query($query)->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$ldap_form = $dialog->asForm();
-			$ldap_form->fill($ldap)->submit();
+			$ldap_form->fill($ldap);
+
+			if (array_key_exists('User group mapping', $data)) {
+				foreach ($data['User group mapping'] as $user_group_mapping) {
+					$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+					$usergroup_mapping_form = $dialog->asForm();
+					$usergroup_mapping_form->fill($user_group_mapping);
+					$usergroup_mapping_form->submit();
+					$dialog->waitUntilNotVisible();
+				}
+			}
+
+			if (array_key_exists('Media type mapping', $data)) {
+				foreach ($data['Media type mapping'] as $media_mapping) {
+					$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+					$usergroup_mapping_form = $dialog->asForm();
+					$usergroup_mapping_form->fill($media_mapping);
+					$usergroup_mapping_form->submit();
+					$dialog->waitUntilNotVisible();
+				}
+			}
+
+			$ldap_form->submit();
+
 			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD || CTestArrayHelper::get($data, 'dialog_submit')) {
 				$dialog->ensureNotPresent();
 			}
