@@ -211,6 +211,8 @@ class CControllerLatestView extends CControllerLatest {
 			)
 		] + $prepared_data;
 
+		CWebUser::setRegisteredCsrfTokens('item.masscheck_now');
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));
 		$this->setResponse($response);
