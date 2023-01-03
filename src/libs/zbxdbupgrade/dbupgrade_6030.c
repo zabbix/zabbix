@@ -2249,10 +2249,11 @@ static void	tag_free(zbx_db_patch_tag_t *tag)
 	zbx_free(tag);
 }
 
-static void	DBpatch_propogate_tag(zbx_db_patch_tag_t *tag, zbx_uint64_t hostid, zbx_uint64_t itemid)
+static void	DBpatch_propogate_tag(zbx_vector_tag_ptr_t *tags, zbx_db_patch_tag_t *tag, zbx_uint64_t hostid,
+		zbx_uint64_t itemid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	DB_RESULT	result, result2;
+	DB_ROW		row, row2;
 
 	result = DBselect("select h.hostid,i.itemid from hosts h,items i,hosts_templates ht"
 			" where h.hostid=ht.hostid and ht.templateid=" ZBX_FS_UI64" and i.hostid=h.hostid and"
@@ -2265,10 +2266,26 @@ static void	DBpatch_propogate_tag(zbx_db_patch_tag_t *tag, zbx_uint64_t hostid, 
 		ZBX_DBROW2UINT64(child_hostid, row[0]);
 		ZBX_DBROW2UINT64(child_itemid, row[1]);
 		zbx_vector_uint64_append(&tag->itemids, child_itemid);
-		DBpatch_propogate_tag(tag, child_hostid, child_itemid);
+		DBpatch_propogate_tag(tags, tag, child_hostid, child_itemid);
+		result2 = DBselect("select tag,value from host_tag where hostid=" ZBX_FS_UI64, child_hostid);
+
+		while (NULL != (row2 = DBfetch(result2)))
+		{
+			zbx_db_patch_tag_t *tag2;
+			tag2 = zbx_malloc(NULL, sizeof(zbx_db_tag_t));
+			tag2->tag = zbx_strdup(NULL, row2[0]);
+			tag2->value = zbx_strdup(NULL, row2[1]);
+			zbx_vector_uint64_create(&tag2->itemids);
+
+			DBpatch_propogate_tag(tags, tag2, child_hostid, child_itemid);
+			zbx_vector_tag_ptr_append(tags, tag2);
+		}
+
+		DBfree_result(result2);
 	}
 
 	DBfree_result(result);
+
 }
 
 static int	DBpatch_6030161(void)
@@ -2303,8 +2320,7 @@ static int	DBpatch_6030161(void)
 		ZBX_DBROW2UINT64(itemid, row[3]);
 		zbx_vector_uint64_create(&tag->itemids);
 
-		DBpatch_propogate_tag(tag, hostid, itemid);
-
+		DBpatch_propogate_tag(&tags, tag, hostid, itemid);
 		zbx_vector_tag_ptr_append(&tags, tag);
 	}
 
@@ -2318,8 +2334,9 @@ static int	DBpatch_6030161(void)
 		for (i = 0; i < tags.values_num; i++)
 		{
 			tag = tags.values[i];
+			j = i + 1;
 
-			for (j = i + 1; j < tags.values_num; j++)
+			while (j < tags.values_num)
 			{
 				zbx_db_patch_tag_t	*tag2;
 
@@ -2330,8 +2347,10 @@ static int	DBpatch_6030161(void)
 					zbx_vector_uint64_append_array(&tag->itemids, tag2->itemids.values,
 							tag2->itemids.values_num);
 					tag_free(tag2);
-					zbx_vector_tag_ptr_remove_noorder(&tags, j);
+					zbx_vector_tag_ptr_remove(&tags, j);
 				}
+				else
+					j++;
 			}
 
 			zbx_vector_uint64_sort(&tag->itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
