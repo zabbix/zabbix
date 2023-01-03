@@ -105,6 +105,17 @@ class testUrlParameters extends CLegacyWebTest {
 						]
 					],
 					[
+						'url' => 'zabbix.php?action=templategroup.edit&groupid[]=1',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value for "groupid" field.',
+							'Controller: templategroup.edit',
+							'action: templategroup.edit',
+							'groupid: array'
+						]
+					],
+					[
 						'url' => 'zabbix.php?action=hostgroup.edit&groupid=-1',
 						'text_not_present' => 'Host groups',
 						'fatal_error' => true,
@@ -410,6 +421,17 @@ class testUrlParameters extends CLegacyWebTest {
 							'Controller: action.list',
 							'action: action.list',
 							'eventsource: -1'
+						]
+					],
+					[
+						'url' => 'zabbix.php?action=action.list&eventsource[]=0',
+						'text_not_present' => 'Trigger actions',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value for "eventsource" field.',
+							'Controller: action.list',
+							'action: action.list',
+							'eventsource: array'
 						]
 					]
 				]
