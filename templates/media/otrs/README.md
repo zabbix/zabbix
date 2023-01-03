@@ -44,7 +44,7 @@ This guide describes how to integrate your Zabbix 5.0 installation with ((OTRS))
 
 4\. If you want to prioritize issues according to **severity** values in Zabbix, you can define mapping parameters:
 
-- **severity_\<name\>**: OTRS CE ID
+- **severity_\<name\>**: OTRS CE priority ID
 
 [![](images/thumb.08.png?raw=true)](images/08.png)
 
