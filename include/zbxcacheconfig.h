@@ -588,6 +588,34 @@ typedef struct
 }
 zbx_preproc_item_t;
 
+typedef struct
+{
+	zbx_uint64_t		connectorid;
+	zbx_uint64_t		revision;
+	unsigned char		protocol;
+	unsigned char		data_type;
+	char			*url;
+	int			max_records;
+	int			max_senders;
+	char			*timeout;
+	unsigned char		retries;
+	char			*token;
+	char			*http_proxy;
+	unsigned char		authtype;
+	char			*username;
+	char			*password;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	char			*ssl_cert_file;
+	char			*ssl_key_file;
+	char			*ssl_key_password;
+	int			status;
+	int			tags_evaltype;
+	zbx_vector_ptr_t	tags;
+	zbx_list_t		queue;
+}
+zbx_connector_t;
+
 /* the configuration cache statistics */
 typedef struct
 {
@@ -692,6 +720,8 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
+
+void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
@@ -913,6 +943,7 @@ typedef struct
 	zbx_uint64_t	autoreg_tls;	/* autoregistration tls revision */
 	zbx_uint64_t	upstream;	/* configuration revision received from server */
 	zbx_uint64_t	config_table;	/* the global configuration revision (config table) */
+	zbx_uint64_t	connector;
 }
 zbx_dc_revision_t;
 

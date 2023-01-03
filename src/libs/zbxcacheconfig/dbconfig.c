@@ -6485,7 +6485,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  *           4 - tags_evaltype                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_connectors(zbx_dbsync_t *sync)
+static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -6554,6 +6554,8 @@ static void	DCsync_connectors(zbx_dbsync_t *sync)
 
 		zbx_hashset_remove_direct(&config->connectors, connector);
 	}
+	if (0 != sync->add_num || 0 != sync->update_num || 0 != sync->remove_num)
+		config->revision.connector = revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6840,7 +6842,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		dc_maintenance_precache_nested_groups();
 
 	sec = zbx_time();
-	DCsync_connectors(&connector_sync);
+	DCsync_connectors(&connector_sync, new_revision);
+
 	connector_sec2 = zbx_time() - sec;
 
 	FINISH_SYNC;
@@ -6920,7 +6923,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	DCsync_itemscript_param(&itemscrp_sync, new_revision);
 	itemscrp_sec2 = zbx_time() - sec;
 
-	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
 
 	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
@@ -8013,7 +8015,6 @@ int	init_configuration_cache(char **error)
 
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
-	config->item_sync_ts = 0;
 
 	config->internal_actions = 0;
 	config->auto_registration_actions = 0;
@@ -15599,8 +15600,63 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
-#endif
+void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision)
+{
+	zbx_dc_connector_t	*dc_connector;
+	zbx_connector_t		*connector;
+	zbx_hashset_iter_t	iter;
 
+	if (config->revision.connector == *revision)
+		return;
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->connectors, &iter);
+	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(connectors,
+				&dc_connector->connectorid)))
+		{
+			zbx_connector_t	connector_local = {.connectorid = dc_connector->connectorid};
+
+			connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
+					sizeof(connector_local));
+			zbx_list_create(&connector->queue);
+		}
+
+		connector->revision = config->revision.connector;
+		connector->protocol = dc_connector->protocol;
+		connector->data_type = dc_connector->data_type;
+		connector->url = zbx_strdup(connector->url, dc_connector->url);
+		connector->max_records = dc_connector->max_records;
+		connector->max_senders = dc_connector->max_senders;
+		connector->timeout = zbx_strdup(connector->timeout, dc_connector->timeout);
+		connector->retries = dc_connector->retries;
+		connector->token = zbx_strdup(connector->token, dc_connector->token);
+		connector->http_proxy = zbx_strdup(connector->http_proxy, dc_connector->http_proxy);
+		connector->authtype = dc_connector->authtype;
+		connector->username = zbx_strdup(connector->username, dc_connector->username);
+		connector->password = zbx_strdup(connector->password, dc_connector->password);
+		connector->verify_peer = dc_connector->verify_peer;
+		connector->verify_host = dc_connector->verify_host;
+
+		connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
+		connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
+		connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);
+		connector->status = dc_connector->status;
+		connector->tags_evaltype = dc_connector->tags_evaltype;
+	}
+
+	*revision = config->revision.connector;
+
+	UNLOCK_CACHE;
+
+	zbx_hashset_iter_reset(connectors, &iter);
+	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (connector->revision == *revision)
+			continue;
+
+		zbx_hashset_iter_remove(&iter);
+	}
+}

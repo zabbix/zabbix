@@ -888,7 +888,6 @@ typedef struct
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
 	int			sync_ts;
-	int			item_sync_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */

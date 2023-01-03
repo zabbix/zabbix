@@ -42,7 +42,7 @@ void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, si
 		const zbx_connector_object_t *connector_object);
 void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_connector_object_t *connector_objects);
-void	zbx_connector_object_free(zbx_connector_object_t *connector_object);
+void	zbx_connector_object_free(zbx_connector_object_t connector_object);
 
 void	zbx_connector_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 #endif /* ZABBIX_AVAILABILITY_H */

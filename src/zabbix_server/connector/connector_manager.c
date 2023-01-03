@@ -26,6 +26,7 @@
 #include "zbxnix.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxcacheconfig.h"
 
 extern unsigned char			program_type;
 extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
@@ -49,12 +50,30 @@ typedef struct
 	int				worker_count;	/* preprocessing worker count */
 	zbx_list_t			queue;		/* queue of item values */
 	zbx_hashset_t			linked_items;	/* linked items placed in queue */
+	zbx_hashset_t			connectors;
 	zbx_uint64_t			revision;	/* the configuration revision */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
 }
 zbx_connector_manager_t;
+
+static void	connector_clear(zbx_connector_t *connector)
+{
+	int	i;
+
+	zbx_free(connector->url);
+	zbx_free(connector->timeout);
+	zbx_free(connector->token);
+	zbx_free(connector->http_proxy);
+	zbx_free(connector->username);
+	zbx_free(connector->password);
+	zbx_free(connector->ssl_cert_file);
+	zbx_free(connector->ssl_key_file);
+	zbx_free(connector->ssl_key_password);
+	//zbx_list_destroy(&connector->queue);
+
+}
 
 /******************************************************************************
  *                                                                            *
@@ -73,6 +92,9 @@ static void	connector_init_manager(zbx_connector_manager_t *manager)
 			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER], sizeof(zbx_connector_worker_t));
 	zbx_list_create(&manager->queue);
 	zbx_hashset_create(&manager->linked_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -184,7 +206,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					zbx_connector_deserialize_object(message->data, message->size, &connector_objects);
+					DCconfig_get_connectors(&manager.connectors, &manager.revision);
+					zbx_connector_deserialize_object(message->data, message->size,
+							&connector_objects);
 					break;
 				case ZBX_IPC_CONNECTOR_WORKER:
 					connector_register_worker(&manager, client, message);
