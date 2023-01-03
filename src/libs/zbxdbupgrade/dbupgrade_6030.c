@@ -2484,6 +2484,44 @@ static int	DBpatch_propogate_widget(zbx_db_widget_t *widget, uint64_t widgetid,
 	return widget->fields.values_num;
 }
 
+static int	DBpatch_propogate_widget_copy(zbx_db_widget_t *widget, zbx_db_widget_t *widget_orig,
+		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
+{
+	int	 i;
+
+	for (i = 0; i < widget_orig->fields.values_num; i++)
+	{
+		zbx_db_widget_field_t	*field, *field_orig;
+
+		field = zbx_malloc(NULL, sizeof(zbx_db_widget_field_t));
+		field_orig = widget_orig->fields.values[i];
+		field->type = field_orig->type;
+		field->name = zbx_strdup(NULL, field_orig->name);
+		field->value_int = field_orig->value_int;
+		field->value_str = zbx_strdup(NULL, field_orig->value_str);
+		field->value_groupid = field_orig->value_groupid;
+		field->value_hostid = field_orig->value_hostid;
+		field->value_itemid = field_orig->value_itemid;
+		if (0 != field->value_itemid)
+			zbx_vector_uint64_append(value_itemids, field->value_itemid);
+
+		field->value_graphid = field_orig->value_graphid;
+		if (0 != field->value_graphid)
+			zbx_vector_uint64_append(value_graphids, field->value_graphid);
+
+		field->value_sysmapid = field_orig->value_sysmapid;
+		field->value_serviceid = field_orig->value_serviceid;
+		field->value_slaid = field_orig->value_slaid;
+		field->value_userid = field_orig->value_userid;
+		field->value_actionid = field_orig->value_actionid;
+		field->value_mediatypeid = field_orig->value_mediatypeid;
+
+		zbx_vector_widget_field_ptr_append(&widget->fields, field);
+	}
+
+	return widget->fields.values_num;
+}
+
 static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid, int *fields_num,
 		zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
@@ -2517,6 +2555,32 @@ static int	DBpatch_propogate_page(zbx_db_dashboard_page_t *page, uint64_t pageid
 	return page->widgets.values_num;
 }
 
+static int	DBpatch_propogate_page_copy(zbx_db_dashboard_page_t *page, zbx_db_dashboard_page_t *page_orig,
+		int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
+{
+	int	i;
+
+	for (i = 0; i < page_orig->widgets.values_num; i++)
+	{
+		zbx_db_widget_t	*widget, *widget_orig;
+
+		widget = zbx_malloc(NULL, sizeof(zbx_db_widget_t));
+		widget_orig = page_orig->widgets.values[i];
+		widget->type = zbx_strdup(NULL, widget_orig->type);
+		widget->name = zbx_strdup(NULL, widget_orig->name);
+		widget->x = widget_orig->x;
+		widget->y = widget_orig->y;
+		widget->width = widget_orig->width;
+		widget->height =widget_orig->height;
+		widget->view_mode = widget_orig->view_mode;
+		zbx_vector_widget_field_ptr_create(&widget->fields);
+		*fields_num += DBpatch_propogate_widget_copy(widget, widget_orig, value_itemids, value_graphids);
+		zbx_vector_widget_ptr_append(&page->widgets, widget);
+	}
+
+	return page->widgets.values_num;
+}
+
 static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t dashboardid, int *widgets_num,
 		int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
 {
@@ -2542,6 +2606,28 @@ static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t d
 	}
 
 	DBfree_result(result);
+
+	return dashboard->pages.values_num;
+}
+
+static int	DBpatch_propogate_dashboard_copy(zbx_db_dashboard_t *dashboard, zbx_db_dashboard_t *dashboard_orig,
+		int *widgets_num, int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
+{
+	int	i;
+
+	for (i = 0; i < dashboard_orig->pages.values_num; i++)
+	{
+		zbx_db_dashboard_page_t	*page_orig, *page;
+
+		page = zbx_malloc(NULL, sizeof(zbx_db_dashboard_page_t));
+		page_orig = dashboard_orig->pages.values[i];
+		page->name = zbx_strdup(NULL, page_orig->name);
+		page->display_period = page_orig->display_period;
+		page->sortorder = page_orig->sortorder;
+		zbx_vector_widget_ptr_create(&page->widgets);
+		*widgets_num += DBpatch_propogate_page_copy(page, page_orig, fields_num, value_itemids, value_graphids);
+		zbx_vector_dashboard_page_ptr_append(&dashboard->pages, page);
+	}
 
 	return dashboard->pages.values_num;
 }
@@ -2857,7 +2943,7 @@ static void	collect_dashboards(zbx_vector_uint64_t *parent_ids, zbx_vector_uint6
 				zbx_free(seed);
 				dashboard_copy->uniq = 0;
 				zbx_vector_dashboard_page_ptr_create(&dashboard_copy->pages);
-				pages_num += DBpatch_propogate_dashboard(dashboard_copy, dashboard->parent_dashboardid,
+				pages_num += DBpatch_propogate_dashboard_copy(dashboard_copy, dashboard,
 						widgets_num, fields_num, &value_itemids, &value_graphids);
 				zbx_vector_dashboard_ptr_append(dashboards, dashboard_copy);
 
