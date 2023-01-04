@@ -159,7 +159,6 @@ $token_form->addItem([
 				->addClass('js-massdelete-token')
 				->addClass('no-chkbxrange')
 				->removeid()
-				->setAttributeCsrfToken('token.delete')
 		]
 	], 'user.token')
 ]);
@@ -168,6 +167,8 @@ $html_page
 	->addItem($token_form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
 	->setOnDocumentReady()
 	->show();

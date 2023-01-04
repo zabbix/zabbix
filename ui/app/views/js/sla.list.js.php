@@ -31,7 +31,9 @@
 <script>
 	const view = new class {
 
-		init() {
+		init({csrf_tokens}) {
+			this.csrf_tokens = csrf_tokens;
+
 			this._initTagFilter();
 			this._initActions();
 		}
@@ -117,7 +119,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.enable', target.dataset.csrfToken);
+			curl.setAction('sla.enable', this.csrf_tokens['sla.enable']);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -132,7 +134,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.disable', target.dataset.csrfToken);
+			curl.setAction('sla.disable', this.csrf_tokens['sla.disable']);
 
 			this._post(target, slaids, curl.getUrl());
 		}
@@ -147,7 +149,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('sla.delete', target.dataset.csrfToken);
+			curl.setAction('sla.delete', this.csrf_tokens['sla.delete']);
 
 			this._post(target, slaids, curl.getUrl());
 		}

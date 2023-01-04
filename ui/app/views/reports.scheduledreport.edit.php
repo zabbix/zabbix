@@ -26,7 +26,8 @@
 $this->addJsFile('class.calendar.js');
 $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 	'old_dashboardid' => $data['old_dashboardid'],
-	'dashboard_inaccessible' => $data['dashboard_inaccessible']
+	'dashboard_inaccessible' => $data['dashboard_inaccessible'],
+	'csrf_tokens' => $data['csrf_tokens']
 ]);
 
 $html_page = (new CHtmlPage())

@@ -31,9 +31,11 @@
 <script>
 	const view = {
 		applied_filter_groupids: [],
+		csrf_tokens: [],
 
-		init({applied_filter_groupids}) {
+		init({applied_filter_groupids, csrf_tokens}) {
 			this.applied_filter_groupids = applied_filter_groupids;
+			this.csrf_tokens = csrf_tokens;
 
 			this.initFilter();
 		},
@@ -103,7 +105,7 @@
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('host.massdelete', button.dataset.csrfToken);
+			curl.setAction('host.massdelete', this.csrf_tokens['host.massdelete']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

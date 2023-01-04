@@ -173,6 +173,10 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		self::extendProblemEvents($data['services']);
 
 		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
+		$data['csrf_tokens'] = [
+			'service.delete' => self::generateCsrfToken('service.delete'),
+			'popup.massupdate.service' => self::generateCsrfToken('popup.massupdate.service')
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

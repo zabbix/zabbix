@@ -23,7 +23,9 @@
 <script>
 	const view = new class {
 
-		init() {
+		init({csrf_tokens}) {
+			this.csrf_tokens = csrf_tokens;
+
 			this._initActions();
 		}
 
@@ -111,7 +113,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.config.refresh', target.dataset.csrfToken);
+			curl.setAction('proxy.config.refresh', this.csrf_tokens['proxy.config.refresh']);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -126,7 +128,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.host.enable', target.dataset.csrfToken);
+			curl.setAction('proxy.host.enable', this.csrf_tokens['proxy.host.enable']);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -141,7 +143,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.host.disable', target.dataset.csrfToken);
+			curl.setAction('proxy.host.disable', this.csrf_tokens['proxy.host.disable']);
 
 			this._post(target, proxyids, curl.getUrl());
 		}
@@ -156,7 +158,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('proxy.delete', target.dataset.csrfToken);
+			curl.setAction('proxy.delete', this.csrf_tokens['proxy.delete']);
 
 			this._post(target, proxyids, curl.getUrl());
 		}

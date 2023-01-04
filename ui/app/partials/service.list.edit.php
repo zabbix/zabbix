@@ -130,7 +130,6 @@ foreach ($data['services'] as $serviceid => $service) {
 				->addClass(ZBX_STYLE_BTN_REMOVE)
 				->addClass('js-delete-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setAttributeCsrfToken('service.delete')
 				->setTitle(_('Delete'))
 				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
@@ -143,14 +142,12 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-service')
 			->addClass('no-chkbxrange')
-			->setAttributeCsrfToken('popup.massupdate.service')
 	],
 	'service.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-service')
 			->addClass('no-chkbxrange')
-			->setAttributeCsrfToken('service.delete')
 	]
 ], $path !== null ? 'service_'.implode('_', $path) : 'service');
 

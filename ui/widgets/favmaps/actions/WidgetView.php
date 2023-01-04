@@ -60,7 +60,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'allowed_ui_maps' => $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS)
+			'allowed_ui_maps' => $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS),
+			'csrf_tokens' => [
+				'favorite.delete' => self::generateCsrfToken('favorite.delete')
+			]
 		]));
 	}
 }

@@ -131,6 +131,10 @@ class CControllerUserTokenList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$data['csrf_tokens'] = [
+			'token.delete' => self::generateCsrfToken('token.delete')
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));
 		$this->setResponse($response);

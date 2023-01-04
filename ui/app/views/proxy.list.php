@@ -207,28 +207,24 @@ $form->addItem(
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-refresh-proxy-config')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('proxy.config.refresh')
 		],
 		'proxy.host.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-proxy-host')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('proxy.host.enable')
 		],
 		'proxy.host.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-proxy-host')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('proxy.host.disable')
 		],
 		'proxy.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-proxy')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('proxy.delete')
 		]
 	], 'proxy')
 );
@@ -249,7 +245,9 @@ $form->addItem(
 	->show();
 
 (new CScriptTag('
-	view.init();
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

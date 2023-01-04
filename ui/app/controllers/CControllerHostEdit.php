@@ -189,8 +189,7 @@ class CControllerHostEdit extends CController {
 			'warning' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			],
-			'csrf_token_delete' => CController::generateCsrfToken('host.massdelete')
+			]
 		];
 
 		// Rename fields according names of host edit form.
@@ -289,6 +288,10 @@ class CControllerHostEdit extends CController {
 				'itemids' => $this->host['discoveryRule']['itemid'],
 				'editable' => true
 			]);
+
+		$data['csrf_tokens'] = [
+			'host.massdelete' => CController::generateCsrfToken('host.massdelete')
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host'));

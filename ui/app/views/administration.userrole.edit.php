@@ -380,7 +380,7 @@ $buttons = [$cancel_button];
 
 if ($data['roleid'] !== null) {
 	$buttons = [
-		(new CSimpleButton(_('Clone')))->setAttributeCsrfToken('userrole.create')->setId('clone'),
+		(new CSimpleButton(_('Clone')))->setId('clone'),
 		(new CRedirectButton(_('Delete'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
@@ -414,7 +414,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

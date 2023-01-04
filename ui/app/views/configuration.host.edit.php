@@ -49,7 +49,6 @@ $data += [
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host?'))
 				->setAttribute('data-hostid', $data['hostid'])
-				->setAttributeCsrfToken('host.massdelete')
 				->onClick('view.delete(this.dataset.hostid, this);')
 				->removeAttribute('id'),
 			$cancel_button
@@ -72,7 +71,8 @@ if ($data['warning']) {
 (new CScriptTag('view.init('.json_encode([
 		'form_name' => $data['form_name'],
 		'host_interfaces' => $data['host']['interfaces'],
-		'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+		'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');'))
 	->setOnDocumentReady()
 	->show();

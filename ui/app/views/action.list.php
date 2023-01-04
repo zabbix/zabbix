@@ -139,13 +139,11 @@ if ($data['actions']) {
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->addClass('js-disable-action')
-				->setAttributeCsrfToken('action.disable')
 				->setAttribute('data-actionid', $action['actionid'])
 			: (new CLink(_('Disabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
 				->addClass('js-enable-action')
-				->setAttributeCsrfToken('action.enable')
 				->setAttribute('data-actionid', $action['actionid']);
 
 		$action_list->addRow([
@@ -169,21 +167,18 @@ $form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-action')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('action.enable')
 		],
 		'action.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-action')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('action.disable')
 		],
 		'action.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-action')
 				->addClass('no-chkbxrange')
-				->setAttributeCsrfToken('action.delete')
 		]
 	], 'action_'.$data['eventsource'])
 ]);
@@ -195,7 +190,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'eventsource' => $data['eventsource']
+		'eventsource' => $data['eventsource'],
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

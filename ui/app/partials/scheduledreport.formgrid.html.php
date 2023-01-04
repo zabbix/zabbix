@@ -210,7 +210,6 @@ $form_grid
 if ($data['source'] === 'reports') {
 	$test_button = (new CSimpleButton(_('Test')))
 		->setId('test')
-		->setAttributeCsrfToken('popup.scheduledreport.test')
 		->setEnabled($data['allowed_edit']);
 
 	$cancel_button = (new CRedirectButton(_('Cancel'),
@@ -224,7 +223,6 @@ if ($data['source'] === 'reports') {
 	if ($data['reportid'] != 0) {
 		$buttons = [
 			(new CSimpleButton(_('Clone')))
-				->setAttributeCsrfToken('scheduledreport.create')
 				->setId('clone')
 				->setEnabled($data['allowed_edit']),
 			$test_button,
@@ -247,11 +245,9 @@ if ($data['source'] === 'reports') {
 				? (new CSubmitButton(_('Update'), 'action', 'scheduledreport.update'))
 					->setId('update')
 					->setEnabled($data['allowed_edit'])
-					->setAttributeCsrfToken('scheduledreport.update')
 				: (new CSubmitButton(_('Add'), 'action', 'scheduledreport.create'))
 					->setId('add')
-					->setEnabled($data['allowed_edit'])
-					->setAttributeCsrfToken('scheduledreport.create'),
+					->setEnabled($data['allowed_edit']),
 			$buttons
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_1)
 	);

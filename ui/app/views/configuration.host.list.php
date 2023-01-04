@@ -43,7 +43,7 @@ $html_page = (new CHtmlPage())
 				(new CButton('form', _('Import')))
 					->onClick(
 						'return PopUp("popup.import", {rules_preset: "host", '.
-						CController::CSRF_TOKEN_NAME . ' : "' . $data['csrf_token_import'] .
+						CController::CSRF_TOKEN_NAME . ' : "' . $data['csrf_tokens']['popup.import'] .
 						'"}, {dialogue_class: "modal-popup-generic"});'
 					)
 					->removeId()
@@ -530,7 +530,7 @@ $form->addItem([
 				->onClick(
 					"openMassupdatePopup('popup.massupdate.host', {" .
 							CController::CSRF_TOKEN_NAME . " : " .
-								"'" . $data['csrf_token_massupdate'] . "'" .
+								"'" . $data['csrf_tokens']['popup.massupdate.host'] . "'" .
 						"}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this
@@ -546,7 +546,6 @@ $form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
 				->removeAttribute('id')
-				->setAttributeCsrfToken('host.massdelete')
 		]
 	], 'hosts')
 ]);
@@ -557,7 +556,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'applied_filter_groupids' => array_keys($data['filter']['groups'])
+		'applied_filter_groupids' => array_keys($data['filter']['groups']),
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

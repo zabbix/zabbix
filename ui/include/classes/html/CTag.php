@@ -365,17 +365,4 @@ class CTag extends CObject {
 
 		return $this;
 	}
-
-	/**
-	 * Adds CSRF token to a button action to be used in JS functions called by event listeners.
-	 *
-	 * @param string $action
-	 */
-	public function setAttributeCsrfToken(string $action) {
-		$csrf_token = CController::generateCsrfToken($action);
-
-		$this->setAttribute('data-csrf-token', $csrf_token);
-
-		return $this;
-	}
 }

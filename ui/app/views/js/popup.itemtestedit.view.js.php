@@ -148,7 +148,9 @@ function itemGetValueTest(overlay) {
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
 
-	url.setAction('popup.itemtest.getvalue', jQuery('#get_value_btn').data('csrfToken'))
+	let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
+
+	url.setAction('popup.itemtest.getvalue', csrf_tokens['popup.itemtest.getvalue'])
 
 	post_data = jQuery.extend(post_data, {
 		interface: {

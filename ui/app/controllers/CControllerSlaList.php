@@ -150,6 +150,11 @@ class CControllerSlaList extends CController {
 		];
 
 		$data['slas'] = API::Sla()->get($options);
+		$data['csrf_tokens'] = [
+			'sla.enable' => self::generateCsrfToken('sla.enable'),
+			'sla.disable' => self::generateCsrfToken('sla.disable'),
+			'sla.delete' => self::generateCsrfToken('sla.delete')
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('SLA'));
