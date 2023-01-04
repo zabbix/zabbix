@@ -2600,7 +2600,7 @@ static int	DBpatch_propogate_page_copy(zbx_db_dashboard_page_t *page, zbx_db_das
 		widget->x = widget_orig->x;
 		widget->y = widget_orig->y;
 		widget->width = widget_orig->width;
-		widget->height =widget_orig->height;
+		widget->height = widget_orig->height;
 		widget->view_mode = widget_orig->view_mode;
 		zbx_vector_widget_field_ptr_create(&widget->fields);
 		*fields_num += DBpatch_propogate_widget_copy(widget, widget_orig, value_itemids, value_graphids);
