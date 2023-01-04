@@ -26,6 +26,8 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
 
+ZBX_PTR_VECTOR_IMPL(lld_override_operation, zbx_lld_override_operation_t*)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {
 	zbx_vector_db_tag_ptr_clear_ext(&override_operation->tags, zbx_db_tag_free);
@@ -52,7 +54,7 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
  *                                                                            *
  ******************************************************************************/
 static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
-		zbx_vector_ptr_t *ops)
+		zbx_vector_lld_override_operation_t *ops)
 {
 	size_t				sql_offset = 0;
 	DB_RESULT			result;
@@ -84,13 +86,13 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 		{
 			int	index;
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(ops, &override_operationid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)ops,
+					(const void *)&override_operationid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
-			op = (zbx_lld_override_operation_t *)ops->values[index];
+			op = ops->values[index];
 		}
 
 		tag = zbx_db_tag_create(row[1], row[2]);
@@ -113,7 +115,7 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
  *                                                                            *
  ******************************************************************************/
 static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *overrideids, char **sql,
-		size_t *sql_alloc, zbx_vector_ptr_t *ops)
+		size_t *sql_alloc, zbx_vector_lld_override_operation_t *ops)
 {
 	size_t				sql_offset = 0;
 	DB_RESULT			result;
@@ -143,13 +145,13 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 		{
 			int	index;
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(ops, &override_operationid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)ops,
+					(const void *)&override_operationid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
-			op = (zbx_lld_override_operation_t *)ops->values[index];
+			op = ops->values[index];
 		}
 
 		ZBX_STR2UINT64(templateid, row[1]);
@@ -172,7 +174,7 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
  *                                                                            *
  ******************************************************************************/
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
-		zbx_vector_ptr_t *ops)
+		zbx_vector_lld_override_operation_t *ops)
 {
 	size_t				sql_offset = 0;
 	DB_RESULT			result;
@@ -245,7 +247,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ? (signed char)atoi(row[11]) :
 				HOST_INVENTORY_COUNT;
 
-		zbx_vector_ptr_append(ops, override_operation);
+		zbx_vector_lld_override_operation_append(ops, override_operation);
 
 		object_mask |= (1 << override_operation->operationtype);
 	}

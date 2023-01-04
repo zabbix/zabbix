@@ -283,9 +283,9 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 /* vector implementation start */
 
-#define ZBX_VECTOR_DECL(__id, __type)										\
+#define ZBX_VECTOR_STRUCT_DECL(__id, __type)									\
 														\
-typedef struct													\
+typedef struct zbx_vector_ ## __id ## _s									\
 {														\
 	__type			*values;									\
 	int			values_num;									\
@@ -294,7 +294,9 @@ typedef struct													\
 	zbx_mem_realloc_func_t	mem_realloc_func;								\
 	zbx_mem_free_func_t	mem_free_func;									\
 }														\
-zbx_vector_ ## __id ## _t;											\
+zbx_vector_ ## __id ## _t;
+
+#define ZBX_VECTOR_FUNC_DECL(__id, __type)									\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
@@ -327,13 +329,17 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
-#define ZBX_PTR_VECTOR_DECL(__id, __type)									\
+#define ZBX_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type) ZBX_VECTOR_FUNC_DECL(__id, __type)
+
+#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)									\
 														\
-ZBX_VECTOR_DECL(__id, __type)											\
+ZBX_VECTOR_FUNC_DECL(__id, __type)										\
 														\
 typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
+
+#define ZBX_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_DECL(__id, __type)	ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_PTR_VECTOR_DECL(str, char *)
