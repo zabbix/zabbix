@@ -84,9 +84,34 @@ foreach ($data['triggers'] as $trigger) {
 
 	// description
 	$description = [];
-	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
-		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
-	);
+
+	if (array_key_exists($trigger['templateid'], $data['parent_triggers'])) {
+		$parent_trigger = $data['parent_triggers'][$trigger['templateid']];
+
+		$parent_template_names = [];
+
+		foreach ($parent_trigger['template_names'] as $template_name) {
+			if ($parent_trigger['editable']) {
+				$parent_template_names[] = (new CLink(CHtml::encode($template_name),
+					(new CUrl('trigger_prototypes.php'))
+						->setArgument('parent_discoveryid', $parent_trigger['ruleid'])
+						->setArgument('context', 'template')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
+			}
+
+			$parent_template_names[] = ', ';
+		}
+
+		array_pop($parent_template_names);
+		$parent_template_names[] = NAME_DELIMITER;
+
+		$description[] = $parent_template_names;
+	}
 
 	$description[] = new CLink(
 		CHtml::encode($trigger['description']),

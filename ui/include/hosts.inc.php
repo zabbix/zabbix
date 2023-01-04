@@ -557,12 +557,12 @@ function get_host_by_hostid($hostid, $no_error_message = 0) {
  * Get the necessary data to display the parent host prototypes of the given host prototypes.
  *
  * @param array  $host_prototypes
- * @param string $host_prototypes['templateid']
- * @param bool   $allowed_ui_edit_templates
+ * @param string $host_prototypes[]['templateid']
+ * @param bool   $allowed_ui_conf_templates
  *
  * @return array
  */
-function getParentHostPrototypes(array $host_prototypes, bool $allowed_ui_edit_templates): array {
+function getParentHostPrototypes(array $host_prototypes, bool $allowed_ui_conf_templates): array {
 	$parent_host_prototypes = [];
 
 	foreach ($host_prototypes as $host_prototype) {
@@ -582,19 +582,19 @@ function getParentHostPrototypes(array $host_prototypes, bool $allowed_ui_edit_t
 		'preservekeys' => true
 	]);
 
-	if ($allowed_ui_edit_templates) {
+	if ($allowed_ui_conf_templates && $db_host_prototypes) {
 		$editable_host_prototypes = API::HostPrototype()->get([
 			'output' => [],
 			'selectDiscoveryRule' => ['itemid'],
-			'editable' => true,
 			'hostids' => array_keys($parent_host_prototypes),
+			'editable' => true,
 			'preservekeys' => true
 		]);
 	}
 
 	foreach ($parent_host_prototypes as $hostid => &$parent_host_prototype) {
 		if (array_key_exists($hostid, $db_host_prototypes)) {
-			if ($allowed_ui_edit_templates && array_key_exists($hostid, $editable_host_prototypes)) {
+			if ($allowed_ui_conf_templates && array_key_exists($hostid, $editable_host_prototypes)) {
 				$parent_host_prototype = [
 					'editable' => true,
 					'template_name' => $db_host_prototypes[$hostid]['parentHost']['name'],

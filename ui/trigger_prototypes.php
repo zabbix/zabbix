@@ -649,8 +649,9 @@ else {
 		unset($dependencyTrigger);
 	}
 
-	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_triggers'] = getParentTriggerPrototypes($data['triggers'],
+		CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+	);
 
 	// Render view.
 	echo (new CView('configuration.trigger.prototype.list', $data))->getOutput();

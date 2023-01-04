@@ -63,7 +63,7 @@ $host_tab = new CFormList('hostlist');
 
 if (array_key_exists('parent_host_prototype', $data)) {
 	if ($data['parent_host_prototype']['editable']) {
-		$parent_host_prototype = new CLink(CHtml::encode($data['parent_host_prototype']['template_name']),
+		$parent_template_name = new CLink(CHtml::encode($data['parent_host_prototype']['template_name']),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('form', 'update')
 				->setArgument('parent_discoveryid', $data['parent_host_prototype']['ruleid'])
@@ -72,11 +72,11 @@ if (array_key_exists('parent_host_prototype', $data)) {
 		);
 	}
 	else {
-		$parent_host_prototype = (new CSpan(CHtml::encode($data['parent_host_prototype']['template_name'])))
+		$parent_template_name = (new CSpan(CHtml::encode($data['parent_host_prototype']['template_name'])))
 			->addClass(ZBX_STYLE_GREY);
 	}
 
-	$host_tab->addRow(_('Parent host prototype'), $parent_host_prototype);
+	$host_tab->addRow(_('Parent host prototype'), $parent_template_name);
 }
 
 $host_tab->addRow(

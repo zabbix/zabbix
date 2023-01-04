@@ -30,6 +30,13 @@ if (!$data['readonly']) {
 
 $show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
+$parent_template_header = null;
+
+if ($show_inherited_tags) {
+	$parent_template_header = in_array($data['source'], ['trigger', 'trigger_prototype'])
+		? _('Parent templates')
+		: _('Parent template');
+}
 
 // form list
 $tags_form_list = new CFormList('tagsFormList');
@@ -41,7 +48,7 @@ $table = (new CTable())
 		_('Name'),
 		_('Value'),
 		'',
-		$show_inherited_tags ? _('Parent templates') : null
+		$parent_template_header
 	]);
 
 $allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -108,6 +115,29 @@ foreach ($data['tags'] as $i => $tag) {
 
 	if ($show_inherited_tags) {
 		$template_list = [];
+
+		if (array_key_exists('parent_object', $tag)) {
+			foreach ($tag['parent_object']['template_names'] as $templateid => $template_name) {
+				if (array_key_exists('templateids', $tag) && !in_array($templateid, $tag['templateids'])) {
+					continue;
+				}
+
+				if ($tag['parent_object']['editable']) {
+					$template_list[] = (new CLink($template_name,
+						(new CUrl('templates.php'))
+							->setArgument('form', 'update')
+							->setArgument('templateid', $templateid)
+					))->setTarget('_blank');
+				}
+				else {
+					$template_list[] = (new CSpan($template_name))->addClass(ZBX_STYLE_GREY);
+				}
+
+				$template_list[] = ', ';
+			}
+
+			array_pop($template_list);
+		}
 
 		if (array_key_exists('parent_templates', $tag)) {
 			CArrayHelper::sort($tag['parent_templates'], ['name']);

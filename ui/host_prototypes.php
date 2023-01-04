@@ -501,7 +501,7 @@ if (hasRequest('form')) {
 
 	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	if ($data['context'] === 'host') {
+	if ($data['host_prototype']['templateid'] != 0) {
 		$parent_host_prototypes = getParentHostPrototypes([$data['host_prototype']], $allowed_ui_conf_templates);
 		$data['parent_host_prototype'] = reset($parent_host_prototypes);
 	}
@@ -616,9 +616,7 @@ else {
 
 	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	$data['parent_host_prototypes'] = $data['context'] === 'host'
-		? getParentHostPrototypes($data['hostPrototypes'], $allowed_ui_conf_templates)
-		: [];
+	$data['parent_host_prototypes'] = getParentHostPrototypes($data['hostPrototypes'], $allowed_ui_conf_templates);
 
 	$data['writable_templates'] = [];
 

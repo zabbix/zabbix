@@ -979,11 +979,12 @@ else {
 		'show_info_column' => $show_info_column,
 		'show_value_column' => $show_value_column,
 		'single_selected_hostid' => $single_selected_hostid,
-		'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
+		'parent_triggers' => getParentTriggers($triggers,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		),
 		'paging' => $paging,
 		'dep_triggers' => $dep_triggers,
-		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
-		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags)
 	];
 
 	// render view

@@ -1353,7 +1353,9 @@ else {
 		(new CUrl('items.php'))->setArgument('context', $data['context'])
 	);
 
-	$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
@@ -1368,7 +1370,7 @@ else {
 		'preservekeys' => true
 	]);
 
-	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
+	$data['parent_triggers'] = getParentTriggers($data['itemTriggers'], $allowed_ui_conf_templates);
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));
@@ -1376,8 +1378,6 @@ else {
 	$data['config'] = [
 		'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 	];
-
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
