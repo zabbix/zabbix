@@ -48,7 +48,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
-			((((zbx_thread_args_t *)args))->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -63,8 +63,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL);
-	DCsync_kvs_paths(NULL);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault);
+	DCsync_kvs_paths(NULL, dbconfig_args_in->config_vault);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
 
@@ -119,8 +119,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 			zbx_vector_uint64_create(&deleted_itemids);
 
-			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES, &deleted_itemids);
-			DCsync_kvs_paths(NULL);
+			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES, &deleted_itemids,
+					dbconfig_args_in->config_vault);
+			DCsync_kvs_paths(NULL, dbconfig_args_in->config_vault);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 
@@ -135,7 +136,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		}
 		else
 		{
-			DCsync_kvs_paths(NULL);
+			DCsync_kvs_paths(NULL, dbconfig_args_in->config_vault);
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}

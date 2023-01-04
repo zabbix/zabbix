@@ -24,7 +24,7 @@
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
 #include "../zbxreport.h"
-#include "../alerter/alerter_protocol.h"
+#include "../alerter/alerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
@@ -216,9 +216,10 @@ fail:
 }
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb, int config_timeout)
+		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
+		zbx_get_program_type_f get_program_type_cb, int config_timeout)
 {
-	ZBX_UNUSED(zbx_config_tls);
+	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(get_program_type_cb);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
@@ -233,7 +234,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
-		zbx_send_proxyconfig(sock, jp, config_timeout);
+		zbx_send_proxyconfig(sock, jp, config_vault, config_timeout);
 		return SUCCEED;
 	}
 

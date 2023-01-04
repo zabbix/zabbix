@@ -38,7 +38,7 @@ typedef enum
 zbx_host_template_link_type;
 
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout);
 
 int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);

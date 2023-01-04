@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-19 21:58+0000\n"
-"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
+"PO-Revision-Date: 2022-12-22 09:55+0000\n"
+"Last-Translator: Florent <fpasero@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -3709,6 +3709,10 @@ msgid_plural "Cannot update events"
 msgstr[0] "Impossible de mettre à jour l'événement"
 msgstr[1] "Impossible de mettre à jour les événements"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Impossible de mettre à jour le graphique"
@@ -3949,6 +3953,11 @@ msgstr "Reçoit tous les traps SNMP qui correspondent à la regex. Si la regex n
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Reçoit tous les traps SNMP qui n'ont été reçus par aucun élément snmptrap[]."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4005,6 +4014,10 @@ msgstr "Changer le mot de passe"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Changement par seconde"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4832,6 +4845,14 @@ msgstr "Numéro de contrat"
 msgid "Convert to JSON"
 msgstr "Convertir en JSON"
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -5427,7 +5448,7 @@ msgstr "Jeu de données"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
-msgstr ""
+msgstr "Etiquette de jeu de données"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -7773,7 +7794,7 @@ msgstr "Le champ \"%1$s\" doit être manquant."
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
-msgstr ""
+msgstr "Nom du champ"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8498,7 +8519,7 @@ msgstr "Matériel"
 
 #: include/hosts.inc.php:169
 msgid "Hardware (Full details)"
-msgstr "Matériel (détails complet)"
+msgstr "Matériel (détails complets)"
 
 #: include/classes/data/CItemData.php:1010
 msgid "Hardware sensor reading. Returns float"
@@ -12071,7 +12092,7 @@ msgstr "Adresse MAC B"
 #: include/views/js/item.preprocessing.js.php:178
 #: include/views/js/item.preprocessing.js.php:224
 msgid "MAC from Hex-STRING"
-msgstr ""
+msgstr "MAC de Hex-STRING"
 
 #: include/hosts.inc.php:33
 msgid "MD2"
@@ -12354,6 +12375,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Mars"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Marquer les éléments lors de changement de l'état du déclencheur"
@@ -12365,6 +12390,10 @@ msgstr "Marquer les autres"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Marquer les éléments sélectionnés"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -14273,7 +14302,7 @@ msgstr "OS"
 
 #: include/hosts.inc.php:124
 msgid "OS (Full details)"
-msgstr "OS (détails complet)"
+msgstr "OS (détails complets)"
 
 #: include/hosts.inc.php:129
 msgid "OS (Short)"
@@ -15121,6 +15150,10 @@ msgstr "Motif"
 msgid "Pause operations for suppressed problems"
 msgstr "Suspendre les opérations des problèmes supprimés"
 
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
+
 #: include/classes/debug/CProfiler.php:163
 #, c-format
 msgid "Peak memory usage: %1$s"
@@ -15811,6 +15844,10 @@ msgstr "RÉSOLU"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17367,7 +17404,7 @@ msgstr "Envoyer uniquement à"
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:72
 #: app/views/popup.media.php:79 app/views/popup.mediatypetest.edit.php:61
 msgid "Send to"
-msgstr "Envoyer"
+msgstr "Envoyer à"
 
 #: jsLoader.php:278
 msgid "Send to back"
@@ -17805,6 +17842,11 @@ msgstr "Afficher la barre latérale"
 msgid "Show suppressed problems"
 msgstr "Afficher les problèmes supprimés"
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -17978,7 +18020,7 @@ msgstr "Logiciel"
 
 #: include/hosts.inc.php:179
 msgid "Software (Full details)"
-msgstr "Logiciel (détails complet)"
+msgstr "Logiciel (détails complets)"
 
 #: include/hosts.inc.php:184
 msgid "Software application A"
@@ -18474,6 +18516,11 @@ msgstr "Suédois (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Changer de méthode d'authentification va réinitialiser toutes les sessions sauf celle-ci ! Continuer ?"
 
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
+
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
 msgid "System"
@@ -18920,7 +18967,7 @@ msgstr "Tester l'authentification"
 
 #: app/views/administration.script.edit.php:260
 msgid "Test confirmation"
-msgstr "Confirmation du test"
+msgstr "Test de la confirmation"
 
 #: app/views/popup.testtriggerexpr.php:39
 msgid "Test data"
@@ -19889,7 +19936,7 @@ msgstr "Type"
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
-msgstr "Type (détails complet)"
+msgstr "Type (détails complets)"
 
 #: include/views/js/monitoring.sysmaps.js.php:799
 msgid "Type (OK)"
@@ -19927,6 +19974,10 @@ msgstr "L'élément d'interface utilisateur \"%2$s\" n'est pas disponible pour l
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "INCONNU"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -19994,7 +20045,7 @@ msgstr "URLs"
 #: include/views/js/item.preprocessing.js.php:177
 #: include/views/js/item.preprocessing.js.php:223
 msgid "UTF-8 from Hex-STRING"
-msgstr ""
+msgstr "UTF-8 de Hex-STRING"
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -23343,7 +23394,7 @@ msgstr "l'élément \"%1$s\" sur l'hôte \"%2$s\" n'est pas surveillé"
 #: include/classes/widgets/CWidgetHelper.php:819
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
-msgstr "modèle d'article"
+msgstr "modèle d'élément"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -23675,6 +23726,14 @@ msgstr "aucune autorisation pour modifier la sévérité du problème"
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "aucune autorisation pour fermer les problèmes"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"
