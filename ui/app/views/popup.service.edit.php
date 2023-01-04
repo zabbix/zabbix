@@ -340,9 +340,7 @@ $form
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
-				'csrf_token_create' => $data['csrf_token_create'],
-				'csrf_token_update' => $data['csrf_token_update'],
-				'csrf_token_delete' => $data['csrf_token_delete']
+				'csrf_tokens' => $data['csrf_tokens']
 			]).');
 		'))->setOnDocumentReady()
 	);

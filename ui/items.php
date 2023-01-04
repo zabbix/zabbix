@@ -1384,7 +1384,6 @@ else {
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
-	$data['csrf_token_massupdate'] = CController::generateCsrfToken('popup.massupdate.item');
 	$data['csrf_tokens'] = [
 		'popup.massupdate.item' => CController::generateCsrfToken('popup.massupdate.item'),
 		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')

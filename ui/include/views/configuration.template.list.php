@@ -97,7 +97,7 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick('return PopUp("popup.import", {rules_preset: "template", ' .
-						CController::CSRF_TOKEN_NAME . ': "' . $data['csrf_token_import'] .
+						CController::CSRF_TOKEN_NAME . ': "' . $data['csrf_tokens']['popup.import'] .
 					'"},
 						{dialogue_class: "modal-popup-generic"}
 					);')
@@ -283,7 +283,7 @@ $form->addItem([
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.template', {".
-						CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+						CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.template'] .
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this

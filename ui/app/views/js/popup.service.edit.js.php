@@ -23,15 +23,13 @@
 window.service_edit_popup = new class {
 
 	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit,
-			csrf_token_create, csrf_token_update, csrf_token_delete}) {
+			csrf_tokens}) {
 		this._initTemplates();
 
 		this.serviceid = serviceid;
 
 		this.search_limit = search_limit;
-		this.csrf_token_create = csrf_token_create;
-		this.csrf_token_update = csrf_token_update;
-		this.csrf_token_delete = csrf_token_delete;
+		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -440,7 +438,7 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
-		curl.setAction('service.delete', this.csrf_token_delete);
+		curl.setAction('service.delete', this.csrf_tokens['service.delete']);
 
 		this._post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -477,8 +475,8 @@ window.service_edit_popup = new class {
 
 		const curl = new Curl('zabbix.php', false);
 		this.serviceid === null
-			? curl.setAction('service.create', this.csrf_token_create)
-			: curl.setAction('service.update', this.csrf_token_update);
+			? curl.setAction('service.create', this.csrf_tokens['service.create'])
+			: curl.setAction('service.update', this.csrf_tokens['service.update']);
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

@@ -200,10 +200,10 @@ class CControllerPopupActionEdit extends CController {
 			];
 		}
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-		$data += [
-			'csrf_token_create' => self::generateCsrfToken('action.create'),
-			'csrf_token_update' => self::generateCsrfToken('action.update'),
-			'csrf_token_delete' => self::generateCsrfToken('action.delete')
+		$data['csrf_tokens']= [
+			'action.create' => self::generateCsrfToken('action.create'),
+			'action.update' => self::generateCsrfToken('action.update'),
+			'action.delete' => self::generateCsrfToken('action.delete')
 		];
 
 		$response = new CControllerResponseData($data);

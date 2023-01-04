@@ -24,14 +24,12 @@ window.proxy_edit_popup = new class {
 
 	constructor() {
 		this.clone_proxyid = null;
+		this.csrf_tokens = null;
 	}
 
-	init({proxyid, csrf_token_create, csrf_token_update, csrf_token_delete, csrf_token_refresh}) {
+	init({proxyid, csrf_tokens}) {
 		this.proxyid = proxyid;
-		this.csrf_token_create = csrf_token_create;
-		this.csrf_token_update = csrf_token_update;
-		this.csrf_token_delete = csrf_token_delete;
-		this.csrf_token_refresh = csrf_token_refresh;
+		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('proxy_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -156,7 +154,7 @@ window.proxy_edit_popup = new class {
 
 	refreshConfig() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('proxy.config.refresh', this.csrf_token_refresh);
+		curl.setAction('proxy.config.refresh', this.csrf_tokens['proxy.config.refresh']);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			for (const element of this.form.parentNode.children) {
@@ -181,7 +179,7 @@ window.proxy_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('proxy.delete', this.csrf_token_delete);
+		curl.setAction('proxy.delete', this.csrf_tokens['proxy.delete']);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
@@ -214,8 +212,8 @@ window.proxy_edit_popup = new class {
 
 		const curl = new Curl('zabbix.php');
 		this.proxyid === null
-			? curl.setAction('proxy.create', this.csrf_token_create)
-			: curl.setAction('proxy.update', this.csrf_token_update);
+			? curl.setAction('proxy.create', this.csrf_tokens['proxy.create'])
+			: curl.setAction('proxy.update', this.csrf_tokens['proxy.update']);
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

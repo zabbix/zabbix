@@ -361,7 +361,7 @@ $triggers_form->addItem([
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
-							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.trigger'] .
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this

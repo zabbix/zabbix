@@ -79,7 +79,7 @@ function getMenuPopupHistory(options) {
  *
  * @param {string} options['hostid']                  Host ID.
  * @param {array}  options['scripts']                 Host scripts (optional).
- * @param {string} options['csrf_token_script']       CSRF token for script execution.
+ * @param {array}  options['csrf_tokens']             CSRF tokens.
  * @param {string} options[]['name']                  Script name.
  * @param {string} options[]['scriptid']              Script ID.
  * @param {string} options[]['confirmation']          Confirmation text.
@@ -319,7 +319,7 @@ function getMenuPopupHost(options, trigger_element) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid, options.eventid,
-				options.csrf_token_script)
+				options.csrf_tokens['popup.scriptexec'])
 		});
 	}
 
@@ -597,7 +597,7 @@ function getMenuPopupMapElementImage(options) {
  * @param {bool}   options['can_edit_dashboards']
  * @param {bool}   options['can_view_reports']
  * @param {bool}   options['can_create_reports']
- * @param {string} options['csrf_token_delete']
+ * @param {array}  options['csrf_tokens']
  * @param {object} trigger_element                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
@@ -618,7 +618,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 		url_clone.setArgument('clone', '1');
 
 		const url_delete = new Curl('zabbix.php');
-		url_delete.setAction('dashboard.delete', options.csrf_token_delete);
+		url_delete.setAction('dashboard.delete', options.csrf_tokens['dashboard.delete']);
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
 
 		sections.push({
@@ -709,7 +709,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_element                    UI element which triggered opening of overlay dialogue.
- * @param {string} csrf_token_script                  CSRF token for script execution.
+ * @param {array} options[csrf_tokens]                 CSRF token for script execution.
  *
  * @return array
  */
@@ -941,7 +941,9 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid, csrf_token_script)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid,
+				options.csrf_tokens['popup.scriptexec']
+			)
 		});
 	}
 
@@ -958,7 +960,6 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @param bool   options['trends']                      Are trends available.
  * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
  * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
- * @param string options['csrf_token_execute']          CSRF token for item execution.
  *
  * @return array
  */
@@ -1115,7 +1116,7 @@ function getMenuPopupItem(options) {
 		execute.clickCallback = function () {
 			jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-			view.checkNow(options.itemid, options.csrf_token_execute);
+			view.checkNow(options.itemid);
 		};
 	}
 
@@ -1371,11 +1372,11 @@ function getMenuPopupTriggerMacro(options) {
  * @param {Node}   trigger_element    UI element which triggered opening of overlay dialogue.
  * @param {array}  hostid             Host ID.
  * @param {array}  eventid            Event ID.
- * @param {string} csrf_token_script  CSRF token for script execution.
+ * @param {string} csrf_token         CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_token_script) {
+function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_token) {
 	let tree = {};
 
 	// Parse scripts and create tree.
@@ -1394,7 +1395,7 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_
 		}
 	}
 
-	return getMenuPopupScriptItems(tree, trigger_element, csrf_token_script);
+	return getMenuPopupScriptItems(tree, trigger_element, csrf_token);
 }
 
 /**
@@ -1500,11 +1501,11 @@ function getMenuPopupURLItems(tree, trigger_elm) {
  *
  * @param {object} tree              Menu tree object to where menu items are.
  * @param {Node}   trigger_elm       UI element which triggered opening of overlay dialogue.
- * @param {string} csrf_token_script CSRF token for script execution.
+ * @param {string} csrf_token        CSRF token for script execution.
  *
  * @return {array}
  */
-function getMenuPopupScriptItems(tree, trigger_elm, csrf_token_script) {
+function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 	let items = [];
 
 	if (objectSize(tree) > 0) {
@@ -1512,7 +1513,7 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token_script) {
 			const item = {label: data.name};
 
 			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token_script);
+				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token);
 			}
 
 			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
@@ -1521,7 +1522,7 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token_script) {
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
 					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-						data.params.eventid, csrf_token_script
+						data.params.eventid, csrf_token
 					);
 					cancelEvent(e);
 				};

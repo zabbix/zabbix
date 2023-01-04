@@ -941,9 +941,10 @@ else {
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		],
 		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-		'csrf_token_import' => CController::generateCsrfToken('popup.import'),
-		'csrf_token_massupdate' => CController::generateCsrfToken('popup.massupdate.template'),
-		'csrf_token_export' => CController::generateCsrfToken('export.templates')
+		'csrf_tokens' => [
+			'popup.import' => CController::generateCsrfToken('popup.import'),
+			'popup.massupdate.template' => CController::generateCsrfToken('popup.massupdate.template')
+		]
 	];
 
 	$view = new CView('configuration.template.list', $data);

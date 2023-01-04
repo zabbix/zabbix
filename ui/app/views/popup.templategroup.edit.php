@@ -78,7 +78,7 @@ $output = [
 			'popup_url' => $popup_url->getUrl(),
 			'groupid' => $data['groupid'],
 			'name' => $data['name'],
-			'csrf_token_delete' => $data['csrf_token_delete']
+			'csrf_tokens' => $data['csrf_tokens']
 		]).');'
 ];
 

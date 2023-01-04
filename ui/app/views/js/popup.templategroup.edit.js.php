@@ -21,12 +21,12 @@
 
 window.templategroup_edit_popup = new class {
 
-	init({popup_url, groupid, name, csrf_token_delete}) {
+	init({popup_url, groupid, name, csrf_tokens}) {
 		history.replaceState({}, '', popup_url);
 
 		this.groupid = groupid;
 		this.name = name;
-		this.csrf_token_delete = csrf_token_delete;
+		this.csrf_tokens = csrf_tokens;
 
 		this.overlay = overlays_stack.getById('templategroup_edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -67,7 +67,7 @@ window.templategroup_edit_popup = new class {
 
 	delete() {
 		const curl = new Curl('zabbix.php');
-		curl.setAction('templategroup.delete', this.csrf_token_delete);
+		curl.setAction('templategroup.delete', this.csrf_tokens['templategroup.delete']);
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

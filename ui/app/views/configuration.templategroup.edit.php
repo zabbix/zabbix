@@ -56,7 +56,7 @@ $data += [
 (new CScriptTag('view.init('.json_encode([
 	'groupid' => $data['groupid'],
 	'name' => $data['name'],
-	'csrf_token_delete' => $data['csrf_token_delete']
+	'csrf_tokens' => $data['csrf_tokens']
 ]).');'))
 	->setOnDocumentReady()
 	->show();

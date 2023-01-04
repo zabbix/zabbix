@@ -165,7 +165,7 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
 		'token_edit_popup.init("'.
-			$data['csrf_token_delete'].
+			$data['csrf_tokens'].
 		'");',
 	'buttons' => $buttons
 ];

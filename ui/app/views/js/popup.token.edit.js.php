@@ -33,9 +33,9 @@ window.token_edit_popup = {
 	expires_at_label: null,
 	expires_at: null,
 	expires_state: null,
+	csrf_tokens: null,
 
-	init(csrf_token_delete) {
-		this.csrf_token_delte = csrf_token_delete;
+	init(csrf_tokens) {
 		this.overlay = overlays_stack.getById('token_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -44,6 +44,7 @@ window.token_edit_popup = {
 		this.expires_at_label = this.expires_at_field.previousSibling;
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
+		this.csrf_tokens = csrf_tokens;
 		this.expiresAtHandler();
 
 		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
@@ -116,7 +117,7 @@ window.token_edit_popup = {
 		this.removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
-		curl.setAction('token.delete', this.csrf_token_delte);
+		curl.setAction('token.delete', this.csrf_tokens['token.delete']);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

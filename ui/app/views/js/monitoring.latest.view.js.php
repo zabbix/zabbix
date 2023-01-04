@@ -361,7 +361,7 @@
 
 		checkNow(itemid) {
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
+			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
