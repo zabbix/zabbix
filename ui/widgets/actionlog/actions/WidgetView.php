@@ -25,7 +25,8 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CArrayHelper,
-	CRangeTimeParser;
+	CRangeTimeParser,
+	CSettingsHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -111,6 +112,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$range_time_parser->parse($this->getInput('to'));
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 		$alerts = [];
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		foreach (eventSourceObjects() as $eventSource) {
 			$alerts = array_merge($alerts, API::Alert()->get([
@@ -130,7 +132,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 				'searchByAny' => true,
 				'time_from' => $time_from - 1,
-				'time_till' => $time_to + 1
+				'time_till' => $time_to + 1,
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $limit
 			]));
 		}
 
