@@ -17,29 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_PP_ERROR_H
+#define ZABBIX_PP_ERROR_H
 
-#include "module.h"
+#include "pp_item.h"
+#include "zbxvariant.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
+/* preprocessing step execution result */
+typedef struct
 {
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
+	zbx_variant_t	value;
+	unsigned char	action;
 }
+zbx_pp_result_t;
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
-}
+void	pp_result_set(zbx_pp_result_t *result, zbx_variant_t *value, unsigned char action);
+void	pp_free_results(zbx_pp_result_t *results, int results_num);
+
+void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int results_num, char **error);
+int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step);
+
+
+#endif

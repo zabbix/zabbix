@@ -25,6 +25,7 @@
 #include "item_preproc.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxlld.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1

@@ -17,29 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_PP_CACHE_H
+#define ZABBIX_PP_CACHE_H
 
-#include "module.h"
+#include "pp_item.h"
+#include "zbxvariant.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
+typedef struct
 {
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
-}
+	zbx_uint32_t	refcount;
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
+	zbx_variant_t	value;
+
+	unsigned char	type;
+	void		*data;
 }
+zbx_pp_cache_t;
+
+zbx_pp_cache_t	*pp_cache_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value);
+void	pp_cache_release(zbx_pp_cache_t *cache);
+zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache);
+
+void	pp_cache_copy_value(zbx_pp_cache_t *cache, unsigned char step_type, zbx_variant_t *value);
+
+#endif

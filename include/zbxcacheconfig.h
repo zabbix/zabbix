@@ -572,23 +572,6 @@ typedef struct
 }
 zbx_preproc_op_t;
 
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	unsigned char		type;
-	unsigned char		value_type;
-
-	int			dep_itemids_num;
-	int			preproc_ops_num;
-	zbx_uint64_t		revision;
-	zbx_uint64_t		preproc_revision;
-
-	zbx_uint64_pair_t	*dep_itemids;
-	zbx_preproc_op_t	*preproc_ops;
-}
-zbx_preproc_item_t;
-
 /* the configuration cache statistics */
 typedef struct
 {
@@ -603,9 +586,6 @@ int	is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
-void	dc_flush_history(void);
 
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1

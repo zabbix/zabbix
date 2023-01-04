@@ -17,29 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_PP_EXECUTE_H
+#define ZABBIX_PP_EXECUTE_H
 
-#include "module.h"
+#include "pp_cache.h"
+#include "zbxembed.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
+typedef struct
 {
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
+	int		es_initialized;
+	zbx_es_t	es_engine;
 }
+zbx_pp_context_t;
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
-}
+void	pp_context_init(zbx_pp_context_t *ctx);
+void	pp_context_destroy(zbx_pp_context_t *ctx);
+zbx_es_t	*pp_context_es_engine(zbx_pp_context_t *ctx);
+
+void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,
+		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out);
+
+#endif

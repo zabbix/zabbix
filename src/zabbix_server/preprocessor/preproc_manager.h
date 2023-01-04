@@ -22,6 +22,12 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	int	workers_num;
+}
+zbx_thread_preprocessing_manager_args;
+
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args);
 
 #endif

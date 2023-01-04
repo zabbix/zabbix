@@ -731,7 +731,7 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 
 	if (NULL == cache)
 	{
-		if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 			return FAIL;
 
 		ret = preproc_snmp_value_from_walk(value->data.str, params, &value_out, &err);
@@ -743,7 +743,7 @@ int	item_preproc_snmp_walk_to_value(zbx_preproc_cache_t *cache, zbx_variant_t *v
 		if (NULL == (snmp_cache = (zbx_snmp_value_cache_t *)zbx_preproc_cache_get(cache,
 				ZBX_PREPROC_SNMP_WALK_TO_VALUE)))
 		{
-			if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
 
 			snmp_cache = (zbx_snmp_value_cache_t *)zbx_malloc(NULL, sizeof(zbx_snmp_value_cache_t));
@@ -782,7 +782,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_vector_snmp_walk_to_json_param_t	parsed_params;
 	zbx_snmp_value_pair_t			p;
 
-	if (FAIL == zbx_item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);

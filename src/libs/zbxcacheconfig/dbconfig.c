@@ -43,6 +43,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxpreproc.h"
 
 int	sync_in_progress = 0;
 
@@ -9120,113 +9121,38 @@ void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, in
 		errcodes[j] = FAIL;
 }
 
-static void	dc_preproc_dump(zbx_hashset_t *items)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_preproc_item_t	*item;
-	int			i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_hashset_iter_reset(items, &iter);
-	while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " type:%u value_type:%u revision:" ZBX_FS_UI64,
-				item->itemid, item->type, item->value_type, item->preproc_revision);
-
-		zabbix_log(LOG_LEVEL_TRACE, "  dependent items:");
-		for (i = 0; i < item->dep_itemids_num; i++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "    depitemid:" ZBX_FS_UI64 "," ZBX_FS_UI64,
-					item->dep_itemids[i].first, item->dep_itemids[i].second);
-		}
-
-		zabbix_log(LOG_LEVEL_TRACE, "  preprocessing steps:");
-		for (i = 0; i < item->preproc_ops_num; i++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "    type:%u params:%s error_handler:%u error_handler_params:%s",
-					item->preproc_ops[i].type, ZBX_NULL2EMPTY_STR(item->preproc_ops[i].params),
-					item->preproc_ops[i].error_handler,
-					ZBX_NULL2EMPTY_STR(item->preproc_ops[i].error_handler_params));
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	dc_preproc_free_ops(zbx_preproc_op_t *ops, int ops_num)
-{
-	int	i;
-
-	for (i = 0; i < ops_num; i++)
-	{
-		zbx_free(ops[i].params);
-		zbx_free(ops[i].error_handler_params);
-	}
-	zbx_free(ops);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: sync item preprocessing steps with preprocessing manager cache,   *
  *          updating preprocessing revision if any changes were detected      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_preproc_sync_preprocitem(zbx_preproc_item_t *item, const ZBX_DC_PREPROCITEM *preprocitem,
-		zbx_uint64_t revision)
+static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, zbx_uint64_t hostid,
+		const ZBX_DC_PREPROCITEM *preprocitem)
 {
-	int			i, ops_num = 0;
-	zbx_preproc_op_t	*ops;
+	preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) * preprocitem->preproc_ops.values_num);
 
-	if (NULL == preprocitem)
-	{
-		dc_preproc_free_ops(item->preproc_ops, item->preproc_ops_num);
-		item->preproc_ops = NULL;
-		item->preproc_ops_num = 0;
-		return;
-	}
-
-	ops = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t) * preprocitem->preproc_ops.values_num);
-
-	for (i = 0; i < preprocitem->preproc_ops.values_num; i++)
+	for (int i = 0; i < preprocitem->preproc_ops.values_num; i++)
 	{
 		zbx_dc_preproc_op_t	*op = (zbx_dc_preproc_op_t *)preprocitem->preproc_ops.values[i];
 
-		ops[i].type = op->type;
-		ops[i].error_handler = op->error_handler;
+		preproc->steps[i].type = op->type;
+		preproc->steps[i].error_handler = op->error_handler;
 
-		ops[i].params = dc_expand_user_macros_dyn(op->params, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
-		ops[i].error_handler_params = zbx_strdup(NULL, op->error_handler_params);
+		preproc->steps[i].params = dc_expand_user_macros_dyn(op->params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		preproc->steps[i].error_handler_params = zbx_strdup(NULL, op->error_handler_params);
 	}
 
-	if (preprocitem->preproc_ops.values_num == item->preproc_ops_num)
+	for (int i = 0; i < preproc->steps_num; i++)
 	{
-		for (;ops_num < item->preproc_ops_num; ops_num++)
+		if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
 		{
-			zbx_preproc_op_t	*src = &ops[ops_num];
-			zbx_preproc_op_t	*dst = &item->preproc_ops[ops_num];
-
-			if (src->type != dst->type)
-				break;
-
-			if (src->error_handler != dst->error_handler)
-				break;
-
-			if (0 != zbx_strcmp_null(src->params, dst->params))
-				break;
-
-			if (0 != zbx_strcmp_null(src->error_handler_params, dst->error_handler_params))
-				break;
+			preproc->mode = ZBX_PP_PROCESS_SERIAL;
+			break;
 		}
 	}
 
-	if (ops_num != item->preproc_ops_num)
-		item->preproc_revision = revision;
-
-	dc_preproc_free_ops(item->preproc_ops, item->preproc_ops_num);
-
-	item->preproc_ops = ops;
-	item->preproc_ops_num = preprocitem->preproc_ops.values_num;
+	preproc->steps_num = preprocitem->preproc_ops.values_num;
 }
 
 /******************************************************************************
@@ -9234,53 +9160,107 @@ static void	dc_preproc_sync_preprocitem(zbx_preproc_item_t *item, const ZBX_DC_P
  * Purpose: sync mater-dependent item links                                   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_preproc_sync_masteritem(zbx_preproc_item_t *item, const ZBX_DC_MASTERITEM *masteritem)
+static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_MASTERITEM *masteritem)
 {
-	if (NULL == masteritem)
+	preproc->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL,
+			sizeof(zbx_uint64_t) * (size_t)masteritem->dep_itemids.values_num);
+
+	for (int i = 0; i < masteritem->dep_itemids.values_num; i++)
+		preproc->dep_itemids[i] = masteritem->dep_itemids.values[i].first;
+
+	qsort(preproc->dep_itemids, preproc->dep_itemids_num, sizeof(zbx_uint64_t), ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	preproc->dep_itemids_num = masteritem->dep_itemids.values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare item preprocessing data                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the item preprocessing data matches                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_preproc_compare(const zbx_pp_item_preproc_t *pp1, const zbx_pp_item_preproc_t *pp2)
+{
+	if (pp1->type != pp2->type)
+		return FAIL;
+
+	if (pp1->value_type != pp2->value_type)
+		return FAIL;
+
+	if (pp1->flags != pp2->flags)
+		return FAIL;
+
+	if (pp1->dep_itemids_num != pp2->dep_itemids_num)
+		return FAIL;
+
+	if (0 != memcmp(pp1->dep_itemids, pp2->dep_itemids, (size_t)pp1->dep_itemids_num * sizeof(zbx_uint64_t)))
+		return FAIL;
+
+	if (pp1->steps_num != pp2->steps_num)
+		return FAIL;
+
+	for (int i = 0; i < pp1->steps_num; i++)
 	{
-		zbx_free(item->dep_itemids);
-		item->dep_itemids_num = 0;
-		return;
+		if (pp1->steps[i].type != pp2->steps[i].type)
+			return FAIL;
+
+		if (pp1->steps[i].error_handler != pp2->steps[i].error_handler)
+			return FAIL;
+
+		if (0 != zbx_strcmp_null(pp1->steps[i].params, pp2->steps[i].params))
+			return FAIL;
+
+		if (0 != zbx_strcmp_null(pp1->steps[i].error_handler_params, pp2->steps[i].error_handler_params))
+			break;
 	}
 
-	if (masteritem->dep_itemids.values_num > item->dep_itemids_num)
-	{
-		item->dep_itemids = (zbx_uint64_pair_t *)zbx_realloc(item->dep_itemids,
-				sizeof(zbx_uint64_pair_t) * masteritem->dep_itemids.values_num);
-	}
-
-	memcpy(item->dep_itemids, masteritem->dep_itemids.values,
-			sizeof(zbx_uint64_pair_t) * masteritem->dep_itemids.values_num);
-
-	item->dep_itemids_num = masteritem->dep_itemids.values_num;
+	return SUCCEED;
 }
 
 static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx_uint64_t revision)
 {
-	zbx_preproc_item_t	*pp_item;
+	zbx_pp_item_t		*pp_item;
+	zbx_pp_item_preproc_t	*preproc;
 
-	if (NULL == (pp_item = (zbx_preproc_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
+	if (NULL == (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
 	{
-		zbx_preproc_item_t	pp_item_local = {.itemid = dc_item->itemid};
+		zbx_pp_item_t	pp_item_local = {.itemid = dc_item->itemid, .hostid = dc_item->hostid};
 
-		pp_item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &pp_item_local, sizeof(pp_item_local));
-		pp_item->hostid = dc_item->hostid;
-		pp_item->preproc_revision = revision;
+		pp_item = (zbx_pp_item_t *)zbx_hashset_insert(items, &pp_item_local, sizeof(pp_item_local));
 	}
 
-	pp_item->type = dc_item->type;
-	pp_item->value_type = dc_item->value_type;
+	preproc = zbx_pp_item_preproc_create(dc_item->type, dc_item->value_type, dc_item->flags);
 	pp_item->revision = revision;
 
-	dc_preproc_sync_masteritem(pp_item, dc_item->master_item);
-	dc_preproc_sync_preprocitem(pp_item, dc_item->preproc_item, revision);
-}
+	if (NULL != dc_item->master_item)
+		dc_preproc_sync_masteritem(preproc, dc_item->master_item);
 
+	if (NULL != dc_item->preproc_item)
+		dc_preproc_sync_preprocitem(preproc, dc_item->hostid, dc_item->preproc_item);
+
+	if (NULL != pp_item->preproc)
+	{
+		if (SUCCEED == dc_preproc_compare(preproc, pp_item->preproc))
+		{
+			zbx_pp_item_preproc_release(preproc);
+			return;
+		}
+
+		zbx_pp_item_preproc_release(pp_item->preproc);
+	}
+
+	pp_item->preproc = preproc;
+}
 
 static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync)
 {
-	if (NULL != dc_item->master_item || NULL != dc_item->preproc_item || ITEM_TYPE_INTERNAL == dc_item->type)
+	if (NULL != dc_item->master_item || NULL != dc_item->preproc_item || ITEM_TYPE_INTERNAL == dc_item->type ||
+			ZBX_FLAG_DISCOVERY_RULE == dc_item->flags)
+	{
 		zbx_vector_dc_item_ptr_append(items_sync, dc_item);
+	}
 
 	if (NULL != dc_item->master_item)
 	{
@@ -9315,7 +9295,7 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision)
 {
 	ZBX_DC_HOST			*dc_host;
-	zbx_preproc_item_t		*pp_item;
+	zbx_pp_item_t			*pp_item;
 	zbx_hashset_iter_t		iter;
 	int				i;
 	zbx_uint64_t			global_revision = *revision;
@@ -9346,7 +9326,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 				continue;
 
 			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-					ITEM_TYPE_INTERNAL != dc_item->type)
+					ITEM_TYPE_INTERNAL != dc_item->type &&
+					ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
 			{
 				continue;
 			}
@@ -9369,9 +9350,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &macro_revision) &&
 					*revision >= macro_revision)
 			{
+				/* no host/macro changes - update item revision without actually syncing it */
 				for (i = 0; i < items_sync.values_num; i++)
 				{
-					if (NULL != (pp_item = (zbx_preproc_item_t *)zbx_hashset_search(items,
+					if (NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
 							&items_sync.values[i]->itemid)))
 					{
 						pp_item->revision = config->revision.config;
@@ -9395,7 +9377,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	/* remove items without preprocessing */
 
 	zbx_hashset_iter_reset(items, &iter);
-	while (NULL != (pp_item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (pp_item->revision == *revision)
 			continue;
@@ -9404,9 +9386,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	}
 
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
-
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		dc_preproc_dump(items);
 }
 
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num)

@@ -17,29 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_PP_WORKER_H
+#define ZABBIX_PP_WORKER_H
 
-#include "module.h"
+#include "pp_queue.h"
+#include "pp_execute.h"
+#include "zbxtimekeeper.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
+typedef struct
 {
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
-}
+	int			id;	/* TODO: for debug logging, remove */
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
+	zbx_uint32_t		init_flags;
+	int			stop;
+
+	zbx_pp_queue_t		*queue;
+	pthread_t		thread;
+
+	zbx_pp_context_t	execute_ctx;
+
+	zbx_timekeeper_t	*timekeeper;
 }
+zbx_pp_worker_t;
+
+int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
+		char **error);
+void	pp_worker_stop(zbx_pp_worker_t *worker);
+void	pp_worker_destroy(zbx_pp_worker_t *worker);
+
+#endif

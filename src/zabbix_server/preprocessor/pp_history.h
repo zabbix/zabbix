@@ -17,29 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlld.h"
+#ifndef ZABBIX_PP_HISTORY_H
+#define ZABBIX_PP_HISTORY_H
 
-#include "module.h"
+#include "zbxpreproc.h"
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts,
-		char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(error);
-}
+zbx_pp_history_t	*pp_history_create(int history_num);
+void	pp_history_free(zbx_pp_history_t *history);
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
-		unsigned char meta, zbx_uint64_t lastlogsize, int mtime, const char *error)
-{
-	ZBX_UNUSED(itemid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(value);
-	ZBX_UNUSED(ts);
-	ZBX_UNUSED(meta);
-	ZBX_UNUSED(lastlogsize);
-	ZBX_UNUSED(mtime);
-	ZBX_UNUSED(error);
-}
+void	pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts);
+void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+
+#endif

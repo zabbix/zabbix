@@ -17,11 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PREPROCESSING_WORKER_H
-#define ZABBIX_PREPROCESSING_WORKER_H
+#ifndef ZABBIX_PP_ITEM_H
+#define ZABBIX_PP_ITEM_H
 
-#include "zbxthreads.h"
+#include "pp_history.h"
+#include "zbxcommon.h"
+#include "zbxpreproc.h"
 
-ZBX_THREAD_ENTRY(preprocessing_worker_thread, args);
+
+void	pp_item_clear(zbx_pp_item_t *item);
+
+zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
+int	zbx_pp_preproc_has_history(unsigned char type);
+
+void	pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 
 #endif

@@ -22,6 +22,7 @@
 
 #include "zbxcacheconfig.h"
 #include "preproc.h"
+#include "zbxembed.h"
 
 #define ZBX_PREPROC_MAX_PACKET_SIZE	(ZBX_MEBIBYTE * 128)
 
@@ -49,8 +50,6 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zbx_variant_t *value,
 		unsigned char value_type, char **errmsg);
 
-int	zbx_item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
-
 int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error);
@@ -59,5 +58,32 @@ void	*zbx_preproc_cache_get(zbx_preproc_cache_t *cache, unsigned char type);
 void	zbx_preproc_cache_put(zbx_preproc_cache_t *cache, unsigned char type, void *impl);
 void	zbx_preproc_cache_init(zbx_preproc_cache_t *cache);
 void	zbx_preproc_cache_clear(zbx_preproc_cache_t *cache);
+
+int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **errmsg);
+
+int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant_t *value, const char *params,
+		char **errmsg);
+int	item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg);
+int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		unsigned char op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg);
+int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg);
+int	item_preproc_validate_range(unsigned char value_type, const zbx_variant_t *value, const char *params,
+		char **errmsg);
+int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
+		zbx_variant_t *history_value, zbx_timespec_t *history_ts);
+int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
+		zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg);
+int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, zbx_variant_t *bytecode,
+		char **errmsg);
+int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
+int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg);
+int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg);
 
 #endif
