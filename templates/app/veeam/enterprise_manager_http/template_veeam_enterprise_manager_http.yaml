@@ -1,0 +1,483 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-01-04T07:25:42Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 2ce384bafd524db5b910d7f55bca1fbb
+      template: 'Veeam Backup Enterprise Manager by HTTP'
+      name: 'Veeam Backup Enterprise Manager by HTTP'
+      description: |
+        This template is designed to monitor Veeam Backup & Replication used Veeam Backup Enterprise Manager REST API.
+        Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
+        HTTP Authentication look in [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110)
+        It works without any external scripts and uses the script item. 
+        
+        Setup:
+          1. Create a user to monitor the service or use an existing read-only account.
+          You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
+          2. Link the template to a host.
+          3. Configure macros {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: a1b612cd8e274a27a834dbdb69fe7d08
+          name: 'Failed Job Runs'
+          type: DEPENDENT
+          key: veeam.manager.failed.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the failed job runs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.FailedJobRuns
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: e698c05dae9f4d2f8323ce718e9ed83b
+          name: 'Veeam: Get errors'
+          type: DEPENDENT
+          key: veeam.manager.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 83316e2168414042aeb9d98857534baa
+              expression: 'length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0'
+              name: 'Veeam: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 525a61ff4fb747efab6ac58d1ac8b7c4
+          name: 'Veeam Manager: Get metrics'
+          type: SCRIPT
+          key: veeam.manager.get.metrics
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Veeam = {
+               params: {},
+            
+               setParams: function (params) {
+                   ['api_endpoint', 'user', 'password'].forEach(function (field) {
+                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                           throw 'Required param is not set: ' + field + '.';
+                       }
+                   });
+            
+                   Veeam.params = params;
+                   if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
+                       Veeam.params.api_endpoint += '/';
+                   }
+               },
+            
+               request: function (url) {
+                   var response, 
+                       request = new HttpRequest();
+                       request.addHeader('Accept: application/json');
+                       request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
+                       request.post(Veeam.params.api_endpoint + '/sessionMngr');
+                       response = request.get(url);
+                   if (request.getStatus() !== 200 || response === null) {
+                       throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                   }
+                   try {
+                       return JSON.parse(response);
+                   }
+                   catch (error) {
+                       throw 'Failed to parse response received from API.';
+                   }
+               }
+             };  
+             var 
+                 data = {};
+                 data['errors'] = {};
+             try {
+                 Veeam.setParams(JSON.parse(value));
+                 try {
+                     data.reports_summary = Veeam.request(Veeam.params.api_endpoint + 'reports/summary')
+                     data.reports_summary.Links.forEach(function (field)  {
+                             data[field.Name] = Veeam.request(field.Href)
+                         })
+                     data.backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
+                     data.backupFiles.Refs.forEach(function (field) {
+                             data[field.Name] = Veeam.request(field.Href + '?format=Entity')
+                         })
+                 }
+                 catch (error) {
+                     data.errors.raw = error.toString();
+                 }
+             }
+            
+             catch (error) {
+                 error += (String(error).endsWith('.')) ? '' : '.';
+                 Zabbix.log(3, '[ Veeam ] ERROR: ' + error);
+                 return JSON.stringify({ error: error });
+             }
+             return JSON.stringify(data);
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: api_endpoint
+              value: '{$VEEAM.MANAGER.API.URL}'
+            -
+              name: password
+              value: '{$VEEAM.MANAGER.PASSWORD}'
+            -
+              name: user
+              value: '{$VEEAM.MANAGER.USER}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: a0a1e67c99c64bd1a801c87eeda3977b
+          name: 'Running Jobs'
+          type: DEPENDENT
+          key: veeam.manager.running.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the running jobs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.RunningJobs
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: d7510e46c6094e09979ea7dad2828cef
+          name: 'Scheduled Backup Jobs'
+          type: DEPENDENT
+          key: veeam.manager.scheduled.backup.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the scheduled backup jobs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.ScheduledBackupJobs
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: de9f62198b5b42cdb25460315f4af949
+          name: 'Scheduled Jobs'
+          type: DEPENDENT
+          key: veeam.manager.scheduled.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the scheduled jobs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.ScheduledJobs
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: 599a25d753ce4f5d8542d08569f2a136
+          name: 'Scheduled Replica Jobs'
+          type: DEPENDENT
+          key: veeam.manager.scheduled.replica.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the scheduled replica jobs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.ScheduledReplicaJobs
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: 7d96ebb849c94d5b89656bdfa6398a1d
+          name: 'Total Job Runs'
+          type: DEPENDENT
+          key: veeam.manager.scheduled.total.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the total job runs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.TotalJobRuns
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+        -
+          uuid: b39d33c9d5c544a2996736dbdccfcaff
+          name: 'Warnings Job Runs'
+          type: DEPENDENT
+          key: veeam.manager.warning.jobs
+          delay: '0'
+          history: 7d
+          description: 'The informing about of the warning job runs.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.reports_summary.JobStatistics.WarningsJobRuns
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: veeam.manager.get.metrics
+          tags:
+            -
+              tag: component
+              value: reports
+      discovery_rules:
+        -
+          uuid: d07b06fbd84d493bb38d61ac0824e794
+          name: 'Backup Files discovery'
+          type: DEPENDENT
+          key: veeam.backup.files.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: '{$BACKUP.TYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#TYPE}'
+                value: '{$BACKUP.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#NAME}'
+                value: '{$BACKUP.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$BACKUP.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of all backup files created on or imported to backup servers connected to Veeam Backup Enterprise Manager.'
+          item_prototypes:
+            -
+              uuid: d3f87401602c48d3a837504ed08902db
+              name: 'Veeam backup: Compression ratio [{#NAME}]'
+              type: DEPENDENT
+              key: 'veeam.backup.compress.ratio[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Get data compression ratio [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''{#NAME}''].BackupFile.CompressRatio'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: veeam.manager.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: backup
+                -
+                  tag: component
+                  value: '{#NAME}'
+            -
+              uuid: 0c5be137b40949c4946a09c57ccc7796
+              name: 'Veeam backup: Data Size [{#NAME}]'
+              type: DEPENDENT
+              key: 'veeam.backup.data.size[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Get data size [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''{#NAME}''].BackupFile.DataSize'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: veeam.manager.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: backup
+                -
+                  tag: component
+                  value: '{#NAME}'
+            -
+              uuid: 62d0b0341bac40f9a63f0fbf3639e0d0
+              name: 'Veeam backup: Deduplication Ratio [{#NAME}]'
+              type: DEPENDENT
+              key: 'veeam.backup.deduplication.ratio[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Get data deduplication ratio [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''{#NAME}''].BackupFile.DeduplicationRatio'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: veeam.manager.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: backup
+                -
+                  tag: component
+                  value: '{#NAME}'
+            -
+              uuid: 098cc39afb88483f93a98c96fc1450d1
+              name: 'Veeam backup: Backup Size [{#NAME}]'
+              type: DEPENDENT
+              key: 'veeam.backup.file.size[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Get backup size [{#NAME}].'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''{#NAME}''].BackupFile.BackupSize'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: veeam.manager.get.metrics
+              tags:
+                -
+                  tag: component
+                  value: backup
+                -
+                  tag: component
+                  value: '{#NAME}'
+          master_item:
+            key: veeam.manager.get.metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#NAME}'
+              path: $.Name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.Type
+            -
+              lld_macro: '{#UID}'
+              path: $.UID
+            -
+              lld_macro: '{#URL}'
+              path: $.Href
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.backupFiles.Refs
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: veeam
+      macros:
+        -
+          macro: '{$BACKUP.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in backup discovery rule.'
+        -
+          macro: '{$BACKUP.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in backup discovery rule.'
+        -
+          macro: '{$BACKUP.TYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in backup discovery rule.'
+        -
+          macro: '{$BACKUP.TYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in backup discovery rule.'
+        -
+          macro: '{$VEEAM.MANAGER.API.URL}'
+          value: 'https://localhost:9398/api'
+          description: 'Veeam Backup Enterprise Manager API endpoint URL in the format <scheme>://<host>:<port>.'
+        -
+          macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
+          value: '10'
+          description: 'A response timeout for API.'
+        -
+          macro: '{$VEEAM.MANAGER.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Password of the account to be used for authentication..'
+        -
+          macro: '{$VEEAM.MANAGER.USER}'
+          type: SECRET_TEXT
+          description: 'Username of the account to be used for authentication..'
