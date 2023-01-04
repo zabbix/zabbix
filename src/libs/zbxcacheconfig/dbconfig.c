@@ -15600,7 +15600,8 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision)
+void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision,
+		zbx_clean_func_t connector_requests_clean_func)
 {
 	zbx_dc_connector_t	*dc_connector;
 	zbx_connector_t		*connector;
@@ -15622,6 +15623,11 @@ void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision)
 			connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
 					sizeof(connector_local));
 			zbx_list_create(&connector->queue);
+
+			zbx_hashset_create_ext(&connector->object_link, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC, connector_requests_clean_func,
+					ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+					ZBX_DEFAULT_MEM_FREE_FUNC);
 		}
 
 		connector->revision = config->revision.connector;

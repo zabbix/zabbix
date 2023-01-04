@@ -58,6 +58,14 @@ typedef struct
 }
 zbx_connector_manager_t;
 
+typedef struct
+{
+	zbx_uint64_t			objectid;
+	zbx_vector_connector_object_t	connector_objects;
+	zbx_list_item_t			*queue_item;	/* queued item */
+}
+zbx_object_link_t;
+
 static void	connector_clear(zbx_connector_t *connector)
 {
 	int	i;
@@ -71,8 +79,14 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->ssl_cert_file);
 	zbx_free(connector->ssl_key_file);
 	zbx_free(connector->ssl_key_password);
-	//zbx_list_destroy(&connector->queue);
+	zbx_list_destroy(&connector->queue);
+	zbx_hashset_destroy(&connector->object_link);
+}
 
+static void	connector_request_clear(zbx_object_link_t *object_link)
+{
+	zbx_vector_connector_object_clear_ext(&object_link->connector_objects, zbx_connector_object_free);
+	zbx_vector_connector_object_destroy(&object_link->connector_objects);
 }
 
 /******************************************************************************
@@ -91,7 +105,6 @@ static void	connector_init_manager(zbx_connector_manager_t *manager)
 	manager->workers = (zbx_connector_worker_t *)zbx_calloc(NULL,
 			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER], sizeof(zbx_connector_worker_t));
 	zbx_list_create(&manager->queue);
-	zbx_hashset_create(&manager->linked_items, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
@@ -136,6 +149,41 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_connector_object_t *connector_objects)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_connector_t		*connector;
+
+	zbx_hashset_iter_reset(&manager->connectors, &iter);
+	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int	i;
+
+		for (i = 0; i < connector_objects->values_num; i++)
+		{
+			zbx_list_item_t		*enqueued_at;
+			zbx_object_link_t	*object_link;
+
+			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_link,
+					&connector_objects->values[i].objectid)))
+			{
+				zbx_object_link_t	object_link_local = {.objectid =
+						connector_objects->values[i].objectid};
+
+				object_link = (zbx_object_link_t *)zbx_hashset_insert(
+						&connector->object_link, &object_link_local, sizeof(object_link_local));
+				zbx_vector_connector_object_create(&object_link->connector_objects);
+
+				zbx_list_insert_after(&connector->queue, NULL, object_link, &enqueued_at);
+			}
+
+			zbx_vector_connector_object_append(&object_link->connector_objects,
+					connector_objects->values[i]);
+			connector_objects->values[i].str = zbx_strdup(NULL, connector_objects->values[i].str);
+		}
+	}
 }
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
@@ -206,9 +254,11 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					DCconfig_get_connectors(&manager.connectors, &manager.revision);
+					DCconfig_get_connectors(&manager.connectors, &manager.revision,
+							(zbx_clean_func_t)connector_request_clear);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
+					connector_enqueue(&manager, &connector_objects);
 					break;
 				case ZBX_IPC_CONNECTOR_WORKER:
 					connector_register_worker(&manager, client, message);
