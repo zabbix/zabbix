@@ -1,10 +1,16 @@
 Changes for 6.4.0beta6
 
 New features:
+A.F....... [ZBXNEXT-3100] implemented current password which is required for all users when their own password is changed (dpetra)
 A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
 Bug fixes:
+A......... [ZBX-22015] fixed provisioning of new user when group mapping contains duplicate groups (gcalenko)
+........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-21587] added metrics for optimizing dependent items preprocessing in Jenkins template (abiba)
 .......PS. [ZBX-22110] fixed memory leak in Zabbix server in case of monitoring VMware (MVekslers)
 .........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
@@ -224,6 +230,10 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
+........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-21288] renamed LLD macro 'DG_NAME' to 'DGNAME' and fixed preprocessing JSONPATH in Oracle by Zabbix agent 2 template (knaglis)
 .......PS. [ZBX-22110] fixed memory leak in Zabbix server in case of monitoring VMware (MVekslers)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
@@ -780,6 +790,10 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
+........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .......PS. [ZBX-21073] added support of Int8Array(), Buffer() and also duktape plain buffers in md5, sha256 and hmac function parameters (wiper)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
@@ -3074,6 +3088,8 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
 .........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
