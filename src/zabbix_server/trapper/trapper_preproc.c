@@ -18,7 +18,7 @@
 **/
 
 #include "trapper_preproc.h"
-
+#include "zbxpreproc.h"
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
 #include "trapper_auth.h"
@@ -245,13 +245,15 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	char			*values[2] = {NULL, NULL}, *preproc_error = NULL;
 	int			i, single, state, bypass_first, ret = FAIL, values_num = 0;
 	unsigned char		value_type, first_step_type;
-	zbx_vector_ptr_t	steps, results, history;
+	zbx_vector_ptr_t	steps;
 	zbx_timespec_t		ts[2];
-	zbx_preproc_result_t	*result;
+	zbx_pp_result_t		*result;
+	zbx_vector_pp_result_t	results;
+	zbx_pp_history_t	history;
 
 	zbx_vector_ptr_create(&steps);
-	zbx_vector_ptr_create(&results);
-	zbx_vector_ptr_create(&history);
+	zbx_vector_pp_result_create(&results);
+	zbx_pp_history_init(&history);
 
 	if (FAIL == trapper_parse_preproc_test(jp, values, ts, &values_num, &value_type, &steps, &single, &state,
 			&bypass_first, error))
@@ -275,31 +277,34 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 	for (i = 0; i < values_num; i++)
 	{
-		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free);
+		zbx_vector_pp_result_clear_ext(&results, zbx_pp_result_free);
 
 		if (0 == steps.values_num)
 		{
 			zbx_variant_t	value;
 
-			result = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t));
+			result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 
-			result->error = NULL;
 			zbx_variant_set_str(&value, values[i]);
 			zbx_variant_copy(&result->value, &value);
-			zbx_vector_ptr_append(&results, result);
+			zbx_vector_pp_result_append(&results, result);
 		}
 		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
-				&preproc_error, error))
+				error))
 		{
 			goto out;
 		}
 
-		if (NULL != preproc_error)
+
+		if (ZBX_VARIANT_ERR == results.values[results.values_num - 1]->value.type)
+		{
+			preproc_error = results.values[results.values_num - 1]->value.data.err;
 			break;
+		}
 
 		if (0 == single)
 		{
-			result = (zbx_preproc_result_t *)results.values[results.values_num - 1];
+			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
 			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
 					value_type, CONFIG_DOUBLE_PRECISION, &preproc_error))
 			{
@@ -327,17 +332,20 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	{
 		for (i = 0; i < results.values_num; i++)
 		{
-			result = (zbx_preproc_result_t *)results.values[i];
+			result = (zbx_pp_result_t *)results.values[i];
 
 			zbx_json_addobject(json, NULL);
 
-			if (NULL != result->error)
-				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->error, ZBX_JSON_TYPE_STRING);
+			if (ZBX_VARIANT_ERR == result->value.type)
+			{
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value.data.err,
+						ZBX_JSON_TYPE_STRING);
+			}
 
 			if (ZBX_PREPROC_FAIL_DEFAULT != result->action)
 				zbx_json_adduint64(json, ZBX_PROTO_TAG_ACTION, result->action);
 
-			if (i == results.values_num - 1 && NULL != result->error)
+			if (i == results.values_num - 1 && ZBX_VARIANT_ERR == result->value.type)
 			{
 				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
 				{
@@ -351,8 +359,11 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
 						ZBX_JSON_TYPE_STRING);
 			}
-			else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
+			else if (ZBX_VARIANT_ERR != result->value.type ||
+					ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
+			{
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
+			}
 
 			zbx_json_close(json);
 		}
@@ -362,7 +373,7 @@ err:
 
 	if (NULL == preproc_error)
 	{
-		result = (zbx_preproc_result_t *)results.values[results.values_num - 1];
+		result = (zbx_pp_result_t *)results.values[results.values_num - 1];
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
@@ -380,12 +391,11 @@ out:
 	for (i = 0; i < values_num; i++)
 		zbx_free(values[i]);
 
-	zbx_free(preproc_error);
+	zbx_pp_history_clear(&history);
 
-	zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-	zbx_vector_ptr_destroy(&history);
-	zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free);
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_pp_result_clear_ext(&results, zbx_pp_result_free);
+	zbx_vector_pp_result_destroy(&results);
+
 	zbx_vector_ptr_clear_ext(&steps, (zbx_clean_func_t)zbx_preproc_op_free);
 	zbx_vector_ptr_destroy(&steps);
 

@@ -48,20 +48,35 @@ static zbx_pp_task_t	*pp_task_create(size_t size)
 	return task;
 }
 
-
-/* TODO pass socket */
-zbx_pp_task_t	*pp_task_test_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create preprocessing test task                                    *
+ *                                                                            *
+ * Parameters: preproc   - [IN] the item preprocessing data                   *
+ *             value     - [IN] the value to preprocess, its contents will be *
+ *                              directly copied over and cleared by the task  *
+ *                              (optional)                                    *
+ *             ts        - [IN] the value timestamp                           *
+ *             client    - [IN] the request source                            *
+ *                                                                            *
+ * Return value: The created task.                                            *
+ *                                                                            *
+ ******************************************************************************/
+zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value, zbx_timespec_t ts,
+		zbx_ipc_client_t *client)
 {
 	zbx_pp_task_t		*task = pp_task_create(sizeof(zbx_pp_task_test_t));
 	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
 
-	task->itemid = itemid;
+	task->itemid = 0;
 	task->type = ZBX_PP_TASK_TEST;
-	zbx_variant_copy(&d->value, value);
+	d->value = *value;
 	d->ts = ts;
 
 	d->preproc = pp_item_preproc_copy(preproc);
+
+	d->client = client;
+	zbx_ipc_client_addref(client);
 
 	return task;
 }
@@ -77,6 +92,7 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
 {
 	zbx_variant_clear(&task->value);
 	zbx_pp_item_preproc_release(task->preproc);
+	zbx_ipc_client_release(task->client);
 }
 
 /******************************************************************************

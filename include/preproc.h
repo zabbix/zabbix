@@ -22,15 +22,7 @@
 
 #include "module.h"
 #include "zbxcacheconfig.h"
-
-/* preprocessing step execution result */
-typedef struct
-{
-	zbx_variant_t	value;
-	unsigned char	action;
-	char		*error;
-}
-zbx_preproc_result_t;
+#include "zbxpreproc.h"
 
 typedef struct
 {
@@ -48,11 +40,10 @@ void	zbx_preprocessor_flush(void);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 
 void	zbx_preproc_op_free(zbx_preproc_op_t *op);
-void	zbx_preproc_result_free(zbx_preproc_result_t *result);
 
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
-		char **preproc_error, char **error);
+		const zbx_vector_ptr_t *steps, zbx_vector_pp_result_t *results, zbx_pp_history_t *history,
+		char **error);
 
 int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
 		int *pending, char **error);

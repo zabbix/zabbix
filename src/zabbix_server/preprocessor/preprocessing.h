@@ -21,6 +21,7 @@
 #define ZABBIX_PREPROCESSING_H
 
 #include "preproc.h"
+#include "zbxpreproc.h"
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
@@ -91,14 +92,14 @@ void	zbx_preprocessor_unpack_task(zbx_uint64_t *itemid, unsigned char *value_typ
 void	zbx_preprocessor_unpack_result(zbx_variant_t *value, zbx_vector_ptr_t *history, char **error,
 		const unsigned char *data);
 
-void	zbx_preprocessor_unpack_test_request(unsigned char *value_type, char **value, zbx_timespec_t *ts,
-		zbx_vector_ptr_t *history, zbx_preproc_op_t **steps, int *steps_num, const unsigned char *data);
+void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value, zbx_timespec_t *ts,
+		const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_preproc_result_t *results,
-		int results_num, const zbx_vector_ptr_t *history, const char *error);
+zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_pp_result_t *results,
+		int results_num, const zbx_pp_history_t *history);
 
-void	zbx_preprocessor_unpack_test_result(zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
-		char **error, const unsigned char *data);
+void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_t *results, zbx_pp_history_t *history,
+		const unsigned char *data);
 
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
 		int pending);

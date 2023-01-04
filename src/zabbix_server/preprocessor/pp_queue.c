@@ -225,6 +225,20 @@ void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: queue test task to be processed                                   *
+ *                                                                            *
+ * Parameters: queue - [IN] the task queue                                    *
+ *             task  - [IN] the task                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
+{
+	queue->queued_num++;
+	zbx_list_append(&queue->immediate, task, NULL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: queue normal task to be processed                                 *
  *                                                                            *
  * Parameters: queue - [IN] the task queue                                    *
@@ -236,15 +250,6 @@ void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
  ******************************************************************************/
 void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_item_t *item, zbx_pp_task_t *task)
 {
-	if (ZBX_PP_TASK_TEST == task->type)
-	{
-		queue->queued_num++;
-		zbx_list_append(&queue->immediate, task, NULL);
-		return;
-	}
-
-	/* value processing task */
-
 	if (ITEM_TYPE_INTERNAL != item->preproc->type)
 	{
 		queue->queued_num++;

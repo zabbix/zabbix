@@ -42,6 +42,9 @@ typedef struct
 }
 zbx_pp_history_t;
 
+void	zbx_pp_history_init(zbx_pp_history_t *history);
+void	zbx_pp_history_clear(zbx_pp_history_t *history);
+
 typedef enum
 {
 	ZBX_PP_PROCESS_PARALLEL,
@@ -103,6 +106,20 @@ typedef struct
 	zbx_pp_item_preproc_t	*preproc;
 }
 zbx_pp_item_t;
+
+
+/* preprocessing step execution result */
+typedef struct
+{
+	zbx_variant_t	value;
+	unsigned char	action;
+}
+zbx_pp_result_t;
+
+ZBX_PTR_VECTOR_DECL(pp_result, zbx_pp_result_t *);
+
+void	zbx_pp_result_free(zbx_pp_result_t *result);
+
 
 zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags);
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);

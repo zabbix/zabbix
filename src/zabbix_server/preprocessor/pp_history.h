@@ -24,6 +24,7 @@
 
 zbx_pp_history_t	*pp_history_create(int history_num);
 void	pp_history_free(zbx_pp_history_t *history);
+void	pp_history_reserve(zbx_pp_history_t *history, int history_num);
 
 void	pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts);
 void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);

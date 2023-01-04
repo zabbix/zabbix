@@ -45,6 +45,8 @@ int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num
 void	pp_manager_destroy(zbx_pp_manager_t *manager);
 int	pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
+void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
+		zbx_timespec_t ts, zbx_ipc_client_t *client);
 void	pp_manager_process_finished(zbx_pp_manager_t *manager);
 void	pp_manager_dump_items(zbx_pp_manager_t *manager);
 

@@ -189,20 +189,25 @@ void	pp_manager_destroy(zbx_pp_manager_t *manager)
 	pp_curl_destroy();
 }
 
-/* TODO: add output socket/client to parameters */
-void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue value for preprocessing test                                *
+ *                                                                            *
+ * Parameters: manager   - [IN] the manager                                   *
+ *             preproc   - [IN] the item preprocessing data                   *
+ *             value     - [IN] the value to preprocess, its contents will be *
+ *                              directly copied over and cleared by the task  *
+ *             ts        - [IN] the value timestamp                           *
+ *             client    - [IN] the request source                            *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
+		zbx_timespec_t ts, zbx_ipc_client_t *client)
 {
-	zbx_pp_item_t	*item;
 	zbx_pp_task_t	*task;
-	zbx_timespec_t	ts;
 
-	if (NULL == (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
-		return;
-
-	zbx_timespec(&ts);
-
-	task = pp_task_test_create(item->itemid, item->preproc, value, ts);
-	pp_task_queue_push(&manager->queue, item, task);
+	task = pp_task_test_create(preproc, value, ts, client);
+	pp_task_queue_push_test(&manager->queue, task);
 	pp_task_queue_notify(&manager->queue);
 }
 

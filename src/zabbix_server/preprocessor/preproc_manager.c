@@ -222,20 +222,16 @@ static void	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_
 static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
 		zbx_ipc_message_t *message)
 {
+	zbx_pp_item_preproc_t	*preproc;
+	zbx_variant_t		value;
+	zbx_timespec_t		ts;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	/*
-	zbx_ipc_client_addref(client);
-	direct_request = zbx_malloc(NULL, sizeof(zbx_preprocessing_direct_request_t));
-	direct_request->client = client;
-	zbx_ipc_message_copy(&direct_request->message, message);
-	zbx_list_append(&manager->direct_queue, direct_request, NULL);
-
-	preprocessor_assign_tasks(manager);
-	preprocessing_flush_queue(manager);
-	*/
-
-	// TODO: create and queue test task
+	preproc = zbx_pp_item_preproc_create(0, 0, 0);
+	zbx_preprocessor_unpack_test_request(preproc, &value, &ts, message->data);
+	pp_manager_queue_test(manager, preproc, &value, ts, client);
+	zbx_pp_item_preproc_release(preproc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -328,7 +324,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					preprocessor_reply_queue_size(&manager, client);
 					break;
 				case ZBX_IPC_PREPROCESSOR_TEST_REQUEST:
-					//preprocessor_add_test_request(&manager, client, message);
+					preprocessor_add_test_request(&manager, client, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
 					//preprocessor_get_diag_stats(&manager, client);

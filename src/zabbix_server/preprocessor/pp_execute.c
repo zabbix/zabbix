@@ -956,16 +956,19 @@ out:
  *                                                                            *
  * Purpose: execute preprocessing steps                                       *
  *                                                                            *
- * Parameters: ctx           - [IN] the worker specific execution context     *
- *             preproc       - [IN] the item preprocessing data               *
- *             cache         - [IN] the preprocessing cache                   *
- *             value_in      - [IN] the input value                           *
- *             ts            - [IN] the value timestamp                       *
- *             value_out     - [OUT] the output value                         *
+ * Parameters: ctx             - [IN] the worker specific execution context   *
+ *             preproc         - [IN] the item preprocessing data             *
+ *             cache           - [IN] the preprocessing cache                 *
+ *             value_in        - [IN] the input value                         *
+ *             ts              - [IN] the value timestamp                     *
+ *             value_out       - [OUT] the output value                       *
+ *             results_out     - [OUT] the results for each step (optional)   *
+ *             results_num_out - [OUT] the number of results (optional)       *
  *                                                                            *
  ******************************************************************************/
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,
-		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out)
+		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out, zbx_variant_t **results_out,
+		int *results_num_out)
 {
 	zbx_pp_result_t		*results;
 	zbx_pp_history_t	*history;
@@ -1054,8 +1057,12 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	preproc->history = history;
 
-
-	if (0 != results_num)
+	if (NULL != results_out)
+	{
+		*results_out = results;
+		*results_num_out = results_num;
+	}
+	else
 		pp_free_results(results, results_num);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%s' type:%s", __func__, zbx_variant_value_desc(value_out),

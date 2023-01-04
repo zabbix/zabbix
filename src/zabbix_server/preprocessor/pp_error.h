@@ -21,15 +21,8 @@
 #define ZABBIX_PP_ERROR_H
 
 #include "pp_item.h"
+#include "zbxpreproc.h"
 #include "zbxvariant.h"
-
-/* preprocessing step execution result */
-typedef struct
-{
-	zbx_variant_t	value;
-	unsigned char	action;
-}
-zbx_pp_result_t;
 
 void	pp_result_set(zbx_pp_result_t *result, zbx_variant_t *value, unsigned char action);
 void	pp_free_results(zbx_pp_result_t *results, int results_num);

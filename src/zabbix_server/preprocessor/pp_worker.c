@@ -22,6 +22,8 @@
 #include "pp_cache.h"
 #include "pp_queue.h"
 #include "pp_execute.h"
+#include "pp_error.h"
+#include "preprocessing.h"
 
 #include "zbxcommon.h"
 #include "log.h"
@@ -39,10 +41,20 @@ static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
 {
 	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
 	zbx_variant_t		result;
+	zbx_pp_result_t		*results = NULL;
+	int			results_num;
+	unsigned char		*data;
+	zbx_uint32_t		len;
 
-	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, &result);
+	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, &result, &results, &results_num);
 
-	/* TODO: send back result to the ipc client */
+	len = zbx_preprocessor_pack_test_result(&data, results, results_num, d->preproc->history);
+
+	zbx_ipc_client_send(d->client, ZBX_IPC_PREPROCESSOR_TEST_RESULT, data, len);
+	zbx_free(data);
+
+	pp_free_results(results, results_num);
+	zbx_variant_clear(&result);
 }
 
 /******************************************************************************
@@ -54,7 +66,7 @@ static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 
-	pp_execute(ctx, d->preproc, d->cache, &d->value, d->ts, &d->result);
+	pp_execute(ctx, d->preproc, d->cache, &d->value, d->ts, &d->result, NULL, NULL);
 }
 
 /******************************************************************************
@@ -68,7 +80,7 @@ static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task
 	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->first_task);
 
 	d->cache = pp_cache_create(d_first->preproc, &d_first->value);
-	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, &d_first->result);
+	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, &d_first->result, NULL, NULL);
 }
 
 /******************************************************************************

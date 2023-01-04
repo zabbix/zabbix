@@ -22,10 +22,18 @@
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 
+ZBX_PTR_VECTOR_IMPL(pp_result, zbx_pp_result_t *);
+
 void	pp_result_set(zbx_pp_result_t *result, zbx_variant_t *value, unsigned char action)
 {
 	zbx_variant_copy(&result->value, value);
 	result->action = action;
+}
+
+void	zbx_pp_result_free(zbx_pp_result_t *result)
+{
+	zbx_variant_clear(&result->value);
+	zbx_free(result);
 }
 
 void	pp_free_results(zbx_pp_result_t *results, int results_num)

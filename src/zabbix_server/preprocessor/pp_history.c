@@ -23,7 +23,7 @@ ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t);
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create prerpocessing history                                      *
+ * Purpose: create preprocessing history                                      *
  *                                                                            *
  * Parameters: history_num - [IN] the number of steps using history           *
  *                                                                            *
@@ -35,27 +35,40 @@ zbx_pp_history_t	*pp_history_create(int history_num)
 	zbx_pp_history_t	*history = (zbx_pp_history_t *)zbx_malloc(NULL, sizeof(zbx_pp_history_t));
 
 	zbx_vector_pp_step_history_create(&history->step_history);
-	zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
+
+	if (0 != history_num)
+		zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
 
 	return history;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free prerpocessing history                                        *
+ * Purpose: free preprocessing history                                        *
  *                                                                            *
  * Parameters: history - [IN] the preprocessing history                       *
  *                                                                            *
  ******************************************************************************/
 void	pp_history_free(zbx_pp_history_t *history)
 {
-	int	i;
-
-	for (i = 0; i < history->step_history.values_num; i++)
+	for (int i = 0; i < history->step_history.values_num; i++)
 		zbx_variant_clear(&history->step_history.values[i].value);
 
 	zbx_vector_pp_step_history_destroy(&history->step_history);
 	zbx_free(history);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reserve preprocessing history                                     *
+ *                                                                            *
+ * Parameters: history     - [IN] the preprocessing history                   *
+ *             history_num - [IN] the preprocessing history size              *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_history_reserve(zbx_pp_history_t *history, int history_num)
+{
+	zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
 }
 
 /******************************************************************************
@@ -118,4 +131,17 @@ void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, 
 	zbx_variant_set_none(value);
 	ts->sec = 0;
 	ts->ns = 0;
+}
+
+void	zbx_pp_history_init(zbx_pp_history_t *history)
+{
+	zbx_vector_pp_step_history_create(&history->step_history);
+}
+
+void	zbx_pp_history_clear(zbx_pp_history_t *history)
+{
+	for (int i = 0; i < history->step_history.values_num; i++)
+		zbx_variant_clear(&history->step_history.values[i].value);
+
+	zbx_vector_pp_step_history_destroy(&history->step_history);
 }
