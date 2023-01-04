@@ -2640,7 +2640,8 @@ static int	DBpatch_propogate_dashboard(zbx_db_dashboard_t *dashboard, uint64_t d
 }
 
 static int	DBpatch_propogate_dashboard_copy(zbx_db_dashboard_t *dashboard, zbx_db_dashboard_t *dashboard_orig,
-		int *widgets_num, int *fields_num, zbx_vector_uint64_t *value_itemids, zbx_vector_uint64_t *value_graphids)
+		int *widgets_num, int *fields_num, zbx_vector_uint64_t *value_itemids,
+		zbx_vector_uint64_t *value_graphids)
 {
 	int	i;
 
