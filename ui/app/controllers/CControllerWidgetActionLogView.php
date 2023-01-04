@@ -68,6 +68,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines) {
 		$alerts = [];
+		$config = select_config();
 
 		foreach (eventSourceObjects() as $eventsource) {
 			$alerts = array_merge($alerts, API::Alert()->get([
@@ -76,7 +77,10 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				],
 				'selectMediatypes' => ['name', 'maxattempts'],
 				'eventsource' => $eventsource['source'],
-				'eventobject' => $eventsource['object']
+				'eventobject' => $eventsource['object'],
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $config['search_limit']
 			]));
 		}
 
