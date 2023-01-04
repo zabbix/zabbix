@@ -682,12 +682,13 @@ function ApiCall(method, params, id = 1) {
 /**
  * Add object to the list of favorites.
  */
-function add2favorites(object, objectid) {
+function add2favorites(object, objectid, csrf_token) {
 	sendAjaxData('zabbix.php', {
 		data: {
 			object: object,
 			objectid: objectid,
-			action: 'favorite.create'
+			action: 'favorite.create',
+			csrf_token: csrf_token
 		}
 	});
 }
@@ -695,12 +696,13 @@ function add2favorites(object, objectid) {
 /**
  * Remove object from the list of favorites. Remove all favorites if objectid==0.
  */
-function rm4favorites(object, objectid) {
+function rm4favorites(object, objectid, csrf_token) {
 	sendAjaxData('zabbix.php', {
 		data: {
 			object: object,
 			objectid: objectid,
-			action: 'favorite.delete'
+			action: 'favorite.delete',
+			csrf_token: csrf_token,
 		}
 	});
 }
@@ -719,11 +721,12 @@ function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 		[PROFILE_TYPE_STR]: 'value_str'
 	};
 
-	return sendAjaxData('zabbix.php?action=profile.update', {
+	return sendAjaxData('zabbix.php', {
 		data: {
 			idx: idx,
 			[value_fields[profile_type]]: value,
-			idx2: idx2
+			idx2: idx2,
+			action: 'profile.update'
 		}
 	});
 }
@@ -757,8 +760,11 @@ function toggleSection(id, profile_idx) {
 function sendAjaxData(url, options) {
 	let curl = new Curl(url);
 
-	if (options.data.action in CSRF_TOKENS) {
-		curl.setAction(options.data.action, CSRF_TOKENS[options.data.action]);
+	if (options.data.csrf_token) {
+		curl.setAction(options.data.action, options.data.csrf_token);
+	}
+	else {
+		curl.setArgument('action', options.data.action);
 	}
 
 	curl.setArgument('output', 'ajax');

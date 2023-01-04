@@ -124,6 +124,7 @@ class CControllerProblemView extends CControllerProblem {
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
 				'page' => $filter['page'],
+				'csrf_token' => self::generateCsrfToken('tabfilter.profile.update'),
 				'timeselector' => [
 					'from' => $profile->from,
 					'to' => $profile->to,

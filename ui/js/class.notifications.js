@@ -54,6 +54,7 @@ function ZBX_Notifications(store, tab) {
 	}
 
 	this.active = false;
+	this.csrf_tokens = {};
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -418,8 +419,13 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
+	const data = {
+		ids: this.getEventIds(),
+		_csrf_token: this.csrf_tokens['notifications.read']
+	}
+
 	this
-		.fetch('notifications.read', {ids: this.getEventIds()})
+		.fetch('notifications.read', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -469,8 +475,13 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
+	const data = {
+		muted: this.alarm.muted ? 0 : 1,
+		_csrf_token: this.csrf_tokens['notifications.mute']
+	}
+
 	this
-		.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
+		.fetch('notifications.mute', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -516,6 +527,7 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
+	this.csrf_tokens = resp.csrf_tokens;
 	this.render();
 
 	this.pushUpdates();
@@ -568,8 +580,8 @@ ZBX_Notifications.prototype.fetch = function(resource, params) {
 		let data = params || {};
 		data.action = resource;
 
-		sendAjaxData('zabbix.php', {
-			data: data,
+		sendAjaxData('zabbix.php?action=' + resource, {
+			data: params || {},
 			success: resolve,
 			error: reject
 		});

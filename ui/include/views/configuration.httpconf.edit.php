@@ -299,7 +299,8 @@ $html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $http_form->getName()
+		'form_name' => $http_form->getName(),
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

@@ -28,12 +28,6 @@ $page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
-if (isset($_REQUEST['form'])) {
-	CWebUser::setRegisteredCsrfTokens('httpconf.php clone');
-	CWebUser::setRegisteredCsrfTokens('httpconf.php delete');
-	CWebUser::setRegisteredCsrfTokens('httpconf.php del_history');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -684,6 +678,12 @@ if (isset($_REQUEST['form'])) {
 	else {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
+
+	$data['csrf_tokens'] = [
+		'httpconf.php clone' => CController::generateCsrfToken('httpconf.php clone'),
+		'httpconf.php delete' => CController::generateCsrfToken('httpconf.php delete'),
+		'httpconf.php del_history' => CController::generateCsrfToken('httpconf.php del_history'),
+	];
 
 	// render view
 	echo (new CView('configuration.httpconf.edit', $data))->getOutput();

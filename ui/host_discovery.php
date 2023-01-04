@@ -28,11 +28,6 @@ $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = ['multilineinput.js', 'items.js'];
 
-if (hasRequest('form')) {
-	CWebUser::setRegisteredCsrfTokens('host_discovery.php clone');
-	CWebUser::setRegisteredCsrfTokens('host_discovery.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
@@ -829,6 +824,12 @@ if (hasRequest('form')) {
 		krsort($conditions);
 		$data['counter'] = key($conditions) + 1;
 	}
+
+	$data['csrf_tokens'] = [
+		'host_discovery.php clone' => CController::generateCsrfToken('host_discovery.php clone'),
+		'host_discovery.php delete' => CController::generateCsrfToken('host_discovery.php delete'),
+		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')
+	];
 
 	// render view
 	if (!$has_errors) {

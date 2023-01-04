@@ -31,9 +31,11 @@ include dirname(__FILE__).'/itemtest.js.php';
 <script>
 	const view = {
 		form_name: null,
+		csrf_tokens: null,
 
-		init({form_name, trends_default}) {
+		init({form_name, trends_default, csrf_tokens}) {
 			this.form_name = form_name;
+			this.csrf_tokens = csrf_tokens;
 
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
@@ -91,14 +93,14 @@ include dirname(__FILE__).'/itemtest.js.php';
 
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'clone') {
-					csrf_token.value = CSRF_TOKENS['disc_prototypes.php clone'];
+					csrf_token.value = this.csrf_tokens['disc_prototypes.php clone'];
 				}
 				else if (e.target.id === 'delete') {
 					if (!window.confirm('<?= _('Delete item prototype?') ?>')) {
 						e.preventDefault();
 						return;
 					}
-					csrf_token.value = CSRF_TOKENS['disc_prototypes.php delete'];
+					csrf_token.value = this.csrf_tokens['disc_prototypes.php delete'];
 				}
 			})
 		},

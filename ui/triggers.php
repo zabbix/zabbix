@@ -28,11 +28,6 @@ $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
-if (isset($_REQUEST['form'])) {
-	CWebUser::setRegisteredCsrfTokens('triggers.php clone');
-	CWebUser::setRegisteredCsrfTokens('triggers.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR											TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION
@@ -600,7 +595,11 @@ if (isset($_REQUEST['form'])) {
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'context' => getRequest('context'),
-		'backurl' => getRequest('backurl')
+		'backurl' => getRequest('backurl'),
+		'csrf_tokens' => [
+			'triggers.php clone' => CController::generateCsrfToken('triggers.php clone'),
+			'triggers.php delete' => CController::generateCsrfToken('triggers.php delete')
+		]
 	];
 
 	// render view

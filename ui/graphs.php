@@ -28,11 +28,6 @@ $page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph pr
 $page['file'] = 'graphs.php';
 $page['scripts'] = ['colorpicker.js', 'multiselect.js'];
 
-if (isset($_REQUEST['form'])) {
-	CWebUser::setRegisteredCsrfTokens('graphs.php clone');
-	CWebUser::setRegisteredCsrfTokens('graphs.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -687,6 +682,11 @@ elseif (isset($_REQUEST['form'])) {
 
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
+
+	$data['csrf_tokens'] = [
+		'graphs.php clone' => CController::generateCsrfToken('graphs.php clone'),
+		'graphs.php delete' => CController::generateCsrfToken('graphs.php delete')
+	];
 
 	// render view
 	echo (new CView('configuration.graph.edit', $data))->getOutput();

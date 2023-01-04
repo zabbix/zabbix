@@ -27,11 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
 
-if (isset($_REQUEST['form'])) {
-	CWebUser::setRegisteredCsrfTokens('trigger_prototypes.php clone');
-	CWebUser::setRegisteredCsrfTokens('trigger_prototypes.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR											TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -541,7 +536,11 @@ if (isset($_REQUEST['form'])) {
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'context' => getRequest('context'),
-		'backurl' => getRequest('backurl')
+		'backurl' => getRequest('backurl'),
+		'csrf_tokens' => [
+			'trigger_prototypes.php clone' => CController::generateCsrfToken('trigger_prototypes.php clone'),
+			'trigger_prototypes.php delete' => CController::generateCsrfToken('trigger_prototypes.php delete')
+		]
 	]);
 
 	// render view

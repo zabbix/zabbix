@@ -327,7 +327,7 @@ $button_list += [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
-					CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_token_massupdate'] .
+					CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.item'] .
 				"'}, {
 					dialogue_class: 'modal-popup-preprocessing',
 					trigger_element: this
@@ -351,7 +351,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'group_itemid'
+		'checkbox_object' => 'group_itemid',
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

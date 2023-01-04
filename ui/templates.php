@@ -28,17 +28,6 @@ $page['title'] = _('Configuration of templates');
 $page['file'] = 'templates.php';
 $page['scripts'] = ['class.tagfilteritem.js'];
 
-if (hasRequest('form')) {
-	CWebUser::setRegisteredCsrfTokens('templates.php clone');
-	CWebUser::setRegisteredCsrfTokens('templates.php full_clone');
-	CWebUser::setRegisteredCsrfTokens('templates.php delete');
-	CWebUser::setRegisteredCsrfTokens('templates.php delete_and_clear');
-}
-else {
-	CWebUser::setRegisteredCsrfTokens('template.massdelete');
-	CWebUser::setRegisteredCsrfTokens('template.massdeleteclear');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
@@ -762,6 +751,12 @@ if (hasRequest('form')) {
 	$clear_templates = array_diff($clear_templates, array_keys($templateids));
 
 	$data['clear_templates'] = $clear_templates;
+	$data['csrf_tokens_templates'] = [
+		'templates.php clone' => CController::generateCsrfToken('templates.php clone'),
+		'templates.php full_clone' => CController::generateCsrfToken('templates.php full_clone'),
+		'templates.php delete' => CController::generateCsrfToken('templates.php delete'),
+		'templates.php delete_and_clear' => CController::generateCsrfToken('templates.php delete_and_clear')
+	];
 
 	$view = new CView('configuration.template.edit', $data);
 }

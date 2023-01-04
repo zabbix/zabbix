@@ -36,11 +36,6 @@ class CWebUser {
 	}
 
 	/**
-	 * Array of available CSRF tokens on page.
-	 */
-	public static $page_csrf_tokens = [];
-
-	/**
 	 * Tries to login a user and populates self::$data on success.
 	 *
 	 * @param string $login     user login
@@ -248,25 +243,5 @@ class CWebUser {
 	 */
 	public static function getIp(): string {
 		return $_SERVER['REMOTE_ADDR'];
-	}
-
-	/**
-	 * Add specific action CSRF token to the list of available tokens on page.
-	 *
-	 * @param string $action  Action for which token is created.
-	 *
-	 * @return void
-	 */
-	public static function setRegisteredCsrfTokens($action): void {
-		self::$page_csrf_tokens[$action] = CController::generateCsrfToken($action);
-	}
-
-	/**
-	 * Returns all the available tokens for the specific page.
-	 *
-	 * @return array
-	 */
-	public static function getRegisteredCsrfTokens(): array {
-		return self::$page_csrf_tokens;
 	}
 }

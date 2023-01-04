@@ -28,19 +28,6 @@ $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = ['multilineinput.js', 'items.js', 'class.tagfilteritem.js'];
 
-if (getRequest('form') === 'create' || getRequest('form') === 'update'
-	|| (hasRequest('clone') && getRequest('itemid') != 0)) {
-	CWebUser::setRegisteredCsrfTokens('items.php clone');
-	CWebUser::setRegisteredCsrfTokens('items.php del_history');
-	CWebUser::setRegisteredCsrfTokens('items.php delete');
-}
-else {
-	CWebUser::setRegisteredCsrfTokens('item.massclearhistory');
-	CWebUser::setRegisteredCsrfTokens('popup.massupdate.item');
-}
-
-CWebUser::setRegisteredCsrfTokens('item.masscheck_now');
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
@@ -933,6 +920,13 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
 
+	$data['csrf_tokens'] = [
+		'items.php clone' => CController::generateCsrfToken('items.php clone'),
+		'items.php del_history' => CController::generateCsrfToken('items.php del_history'),
+		'items.php delete' => CController::generateCsrfToken('items.php delete'),
+		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')
+	];
+
 	// render view
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();
@@ -1391,6 +1385,10 @@ else {
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
 	$data['csrf_token_massupdate'] = CController::generateCsrfToken('popup.massupdate.item');
+	$data['csrf_tokens'] = [
+		'popup.massupdate.item' => CController::generateCsrfToken('popup.massupdate.item'),
+		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')
+	];
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();

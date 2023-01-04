@@ -28,11 +28,6 @@ $page['title'] = _('Configuration of maintenance periods');
 $page['file'] = 'maintenance.php';
 $page['scripts'] = ['class.calendar.js'];
 
-if (getRequest('form')) {
-	CWebUser::setRegisteredCsrfTokens('maintenance.php clone');
-	CWebUser::setRegisteredCsrfTokens('maintenance.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -314,6 +309,11 @@ if (!empty($data['form'])) {
 
 	$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	CArrayHelper::sort($data['groups_ms'], ['name']);
+
+	$data['csrf_tokens'] = [
+		'maintenance.php clone' => CController::generateCsrfToken('maintenance.php clone'),
+		'maintenance.php delete' => CController::generateCsrfToken('maintenance.php delete')
+	];
 
 	// render view
 	echo (new CView('configuration.maintenance.edit', $data))->getOutput();

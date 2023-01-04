@@ -28,11 +28,6 @@ $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
 $page['scripts'] = ['effects.js'];
 
-if (hasRequest('form')) {
-	CWebUser::setRegisteredCsrfTokens('host_prototypes.php clone');
-	CWebUser::setRegisteredCsrfTokens('host_prototypes.php delete');
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -585,6 +580,11 @@ if (hasRequest('form')) {
 			'inaccessible' => (array_key_exists('inaccessible', $group) && $group['inaccessible'])
 		];
 	}
+
+	$data['csrf_tokens'] = [
+		'host_prototypes.php clone' => CController::generateCsrfToken('host_prototypes.php clone'),
+		'host_prototypes.php delete' => CController::generateCsrfToken('host_prototypes.php delete'),
+	];
 
 	// Render view.
 	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();

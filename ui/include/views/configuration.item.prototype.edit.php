@@ -961,7 +961,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default']
+		'trends_default' => $data['trends_default'],
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

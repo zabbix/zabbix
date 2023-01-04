@@ -31,9 +31,11 @@ include __DIR__.'/itemtest.js.php';
 <script>
 	const view = {
 		form_name: null,
+		csrf_tokens: null,
 
-		init({form_name, trends_default}) {
+		init({form_name, trends_default, csrf_tokens}) {
 			this.form_name = form_name;
+			this.csrf_tokens = csrf_tokens;
 
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
@@ -98,15 +100,15 @@ include __DIR__.'/itemtest.js.php';
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'del_history') {
 					document.addEventListener('submit', (e) => {
-						csrf_token.value = CSRF_TOKENS['items.php del_history'];
+						csrf_token.value = this.csrf_tokens['items.php del_history'];
 					})
 				}
 				else if (e.target.id === 'clone') {
-					csrf_token.value = CSRF_TOKENS['items.php clone'];
+					csrf_token.value = this.csrf_tokens['items.php clone'];
 				}
 				else if (e.target.id === 'delete') {
 					document.addEventListener('submit', (e) => {
-						csrf_token.value = CSRF_TOKENS['items.php delete'];
+						csrf_token.value = this.csrf_tokens['items.php delete'];
 					})
 				}
 			})
@@ -136,7 +138,7 @@ include __DIR__.'/itemtest.js.php';
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', CSRF_TOKENS['item.masscheck_now']);
+			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

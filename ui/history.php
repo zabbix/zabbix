@@ -34,9 +34,6 @@ if (hasRequest('plaintext')) {
 }
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-CWebUser::setRegisteredCsrfTokens('favorite.create');
-CWebUser::setRegisteredCsrfTokens('favorite.delete');
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

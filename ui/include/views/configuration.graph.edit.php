@@ -551,7 +551,8 @@ $html_page
 			'normal_only' => $data['normal_only'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		],
-		'items' => $data['items']
+		'items' => $data['items'],
+		'csrf_tokens' => $data['csrf_tokens']
 	]).');
 '))
 	->setOnDocumentReady()

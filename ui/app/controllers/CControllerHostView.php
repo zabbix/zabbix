@@ -120,7 +120,8 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'csrf_token' => self::generateCsrfToken('tabfilter.profile.update')
 			]
 		] + $this->getData($filter);
 

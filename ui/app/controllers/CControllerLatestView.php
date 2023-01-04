@@ -190,7 +190,8 @@ class CControllerLatestView extends CControllerLatest {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page']
+				'page' => $filter['page'],
+				'csrf_token' => self::generateCsrfToken('tabfilter.profile.update')
 			],
 			'filter' => $filter,
 			'subfilters' => $subfilters,
@@ -208,10 +209,11 @@ class CControllerLatestView extends CControllerLatest {
 			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
 				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
 				(int) $filter['tag_name_format'], $filter['tag_priority']
-			)
+			),
+			'csrf_tokens' => [
+				'item.masscheck_now' => self::generateCsrfToken('item.masscheck_now')
+			]
 		] + $prepared_data;
-
-		CWebUser::setRegisteredCsrfTokens('item.masscheck_now');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Latest data'));

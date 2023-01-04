@@ -113,6 +113,7 @@
 		const $add_url_btn = $('#add-url');
 		const $add_url_row = $add_url_btn.closest('tr');
 		let url_rowid = $('[id^="url-row-"]').length;
+		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
 
 		$add_url_btn.on('click', (e) => {
 			$add_url_row.before(url_tpl.evaluate({id: url_rowid}));
@@ -146,7 +147,7 @@
 				$('#sysmapid').remove();
 			}
 
-			$('input[name=<?= CController::CSRF_TOKEN_NAME ?>]').val(CSRF_TOKENS['sysmaps.php add']);
+			$('input[name=<?= CController::CSRF_TOKEN_NAME ?>]').val(csrf_tokens['sysmaps.php add']);
 
 			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
 
@@ -177,7 +178,7 @@
 					e.preventDefault();
 					return;
 				}
-				csrf_token.value = CSRF_TOKENS['sysmaps.php delete'];
+				csrf_token.value = csrf_tokens['sysmaps.php delete'];
 			}
 		})
 	});

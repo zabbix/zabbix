@@ -40,12 +40,14 @@
 		active_filter: null,
 
 		checkbox_object: null,
+		csrf_tokens: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, csrf_tokens}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
+			this.csrf_tokens = csrf_tokens;
 
 			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
@@ -319,7 +321,7 @@
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setAction('item.masscheck_now', CSRF_TOKENS['item.masscheck_now']);
+			curl.setAction('item.masscheck_now', this.csrf_tokens['item.masscheck_now']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

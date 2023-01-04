@@ -62,7 +62,7 @@ class CControllerFavoriteCreate extends CController {
 
 				if (addrm_fav !== null) {
 					addrm_fav.title = "'._('Remove from favorites').'";
-					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'");
+					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'", "'. $csrf_token .'");
 					addrm_fav.classList.add("btn-remove-fav");
 					addrm_fav.classList.remove("btn-add-fav");
 				}
