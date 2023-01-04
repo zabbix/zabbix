@@ -857,7 +857,7 @@ $itemTab = (new CTabView())
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+				getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 			)
 	);
 
