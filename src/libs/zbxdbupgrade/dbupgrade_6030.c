@@ -1614,8 +1614,8 @@ static void	select_pure_parents(zbx_vector_uint64_t *ids)
 
 	DBfree_result(result);
 
-		if (0 == ids->values_num)
-			return;
+	if (0 == ids->values_num)
+		return;
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1887,6 +1887,9 @@ static int	DBpatch_6030159(void)
 					DBsql_id_ins(valuemapid));
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64 ";\n",
 					valuemap->itemids.values[j]);
+
+			if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				goto clean_sql;
 		}
 
 		for (j = 0; j < valuemap->mappings.values_num; j++)
