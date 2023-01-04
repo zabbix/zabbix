@@ -1237,7 +1237,6 @@ function getItemFormData(array $item = [], array $options = []) {
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
- * @param CForm  $form                                     Form object to where add pre-processing list.
  * @param array  $preprocessing                            Array of item pre-processing steps.
  * @param string $preprocessing[]['type']                  Pre-processing step type.
  * @param array  $preprocessing[]['params']                Additional parameters used by pre-processing.
@@ -1248,7 +1247,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
