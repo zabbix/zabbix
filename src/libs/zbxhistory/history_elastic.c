@@ -27,6 +27,10 @@
 #include "zbxnum.h"
 #include "zbxvariant.h"
 
+#define ZBX_ELASTIC_MIN_VERSION				70000
+#define ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY		"7.x"
+#define ZBX_ELASTIC_MAX_VERSION				79999
+
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 #if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
 

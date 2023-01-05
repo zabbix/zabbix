@@ -28,6 +28,23 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 
+#define ZBX_DB_WAIT_DOWN	10
+
+#define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
+#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
+#	ifdef HAVE_ORACLE
+		/* Do not use "overflowing" (multi-statement) queries for Oracle. */
+		/* Zabbix benefits from cursor_sharing=force Oracle parameter */
+		/* which doesn't apply to PL/SQL blocks. */
+#		define ZBX_MAX_OVERFLOW_SQL_SIZE	0
+#	else
+#		define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
+#	endif
+#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
+		(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
+#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
+#endif
+
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 #		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
@@ -36,6 +53,12 @@
 #	endif
 #else
 #	define	ZBX_SQL_EXEC_FROM	0
+#endif
+
+#ifdef HAVE_MULTIROW_INSERT
+#	define ZBX_ROW_DL	","
+#else
+#	define ZBX_ROW_DL	";\n"
 #endif
 
 #if defined(HAVE_POSTGRESQL)

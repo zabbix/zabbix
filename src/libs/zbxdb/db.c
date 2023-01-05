@@ -40,6 +40,34 @@
 #	include "zbxmutexs.h"
 #endif
 
+#define ZBX_MYSQL_MIN_VERSION				50728
+#define ZBX_MYSQL_MIN_VERSION_FRIENDLY			"5.07.28"
+#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80000
+#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY	"8.00.0"
+#define ZBX_MYSQL_MAX_VERSION				80099
+#define ZBX_MYSQL_MAX_VERSION_FRIENDLY			"8.00.x"
+
+#define ZBX_MARIA_MIN_VERSION				100200
+#define ZBX_MARIA_MIN_VERSION_FRIENDLY			"10.02.00"
+#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
+#define ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY	"10.05.00"
+#define ZBX_MARIA_MAX_VERSION				101099
+#define ZBX_MARIA_MAX_VERSION_FRIENDLY			"10.10.xx"
+
+#define ZBX_POSTGRESQL_MIN_VERSION			100009
+#define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY		"10.9"
+#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
+#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY	"13.0"
+#define ZBX_POSTGRESQL_MAX_VERSION			159999
+#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"15.x"
+
+#define ZBX_ORACLE_MIN_VERSION				1201000200
+#define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
+#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
+#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY	"Database 19c Release 19.x.x"
+#define ZBX_ORACLE_MAX_VERSION				2199000000
+#define ZBX_ORACLE_MAX_VERSION_FRIENDLY			"Database 21c Release 21.x.x"
+
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -2645,7 +2673,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
  * Return value: DBMS version or DBVERSION_UNDEFINED if unknown               *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_dbms_version_get(void)
+static zbx_uint32_t	zbx_dbms_version_get(void)
 {
 #if defined(HAVE_MYSQL)
 	return ZBX_MYSQL_SVERSION;
@@ -2657,20 +2685,6 @@ zbx_uint32_t	zbx_dbms_version_get(void)
 	return ZBX_DBVERSION_UNDEFINED;
 #endif
 }
-
-#ifdef HAVE_MYSQL
-/******************************************************************************
- *                                                                            *
- * Purpose: returns flag if the mariadb was detected                          *
- *                                                                            *
- * Return value: ON  - mariadb detected                                       *
- *               OFF - otherwise (it is unforked mysql)                       *
- ******************************************************************************/
-int	zbx_dbms_mariadb_used(void)
-{
-	return ZBX_MARIADB_SFORK;
-}
-#endif
 
 /***************************************************************************************************************
  *                                                                                                             *
@@ -2942,6 +2956,36 @@ void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *versi
 #undef ZBX_TSDB1_TRENDS_TABLES
 #undef ZBX_TSDB2_TRENDS_TABLES
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrievs TimescaleDB (TSDB) license information                   *
+ *                                                                            *
+ * Return value: license information from datase as string                    *
+ *               "apache"    for TimescaleDB Apache 2 Edition                 *
+ *               "timescale" for TimescaleDB Community Edition                *
+ *                                                                            *
+ * Comments: returns a pointer to allocated memory                            *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_tsdb_get_license(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*tsdb_lic = NULL;
+
+	result = zbx_db_select("show timescaledb.license");
+
+	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
+	{
+		tsdb_lic = zbx_strdup(NULL, row[0]);
+	}
+
+	DBfree_result(result);
+
+	return tsdb_lic;
+}
+
 /***************************************************************************************************************
  *                                                                                                             *
  * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
@@ -3041,35 +3085,6 @@ int	zbx_tsdb_get_version(void)
 		ver = ZBX_TSDB_VERSION;
 out:
 	return ver;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) license information                   *
- *                                                                            *
- * Return value: license information from datase as string                    *
- *               "apache"    for TimescaleDB Apache 2 Edition                 *
- *               "timescale" for TimescaleDB Community Edition                *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_tsdb_get_license(void)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*tsdb_lic = NULL;
-
-	result = zbx_db_select("show timescaledb.license");
-
-	if ((DB_RESULT)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch(result)))
-	{
-		tsdb_lic = zbx_strdup(NULL, row[0]);
-	}
-
-	DBfree_result(result);
-
-	return tsdb_lic;
 }
 
 /******************************************************************************
