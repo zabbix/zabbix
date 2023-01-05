@@ -94,7 +94,9 @@ class CControllerTemplateDashboardEdit extends CController {
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(true),
 			'time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null),
-			'csrf_token_update' => self::generateCsrfToken('template.dashboard.update')
+			'csrf_tokens' => [
+				'template.dashboard.update' => self::generateCsrfToken('template.dashboard.update')
+			]
 		];
 
 		$response = new CControllerResponseData($data);

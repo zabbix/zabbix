@@ -39,15 +39,14 @@
 			dynamic,
 			web_layout_mode,
 			clone,
-			csrf_token_update,
-			csrf_token_widget_rfrate
+			csrf_tokens,
 		}) {
 			this.dashboard = dashboard;
 			this.has_time_selector = has_time_selector;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
 			this.clone = clone;
-			this.csrf_token_update = csrf_token_update;
+			this.csrf_token_update = csrf_tokens['dashboard.update'];
 
 			timeControl.refreshPage = false;
 
@@ -93,7 +92,7 @@
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
 				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
-				csrf_token_widget_rfrate
+				csrf_tokens
 			});
 
 			for (const page of dashboard.pages) {

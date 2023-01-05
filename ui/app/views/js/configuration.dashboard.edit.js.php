@@ -28,11 +28,12 @@
 	const view = {
 		is_busy: false,
 		is_busy_saving: false,
+		csrf_tokens: false,
 
-		init({dashboard, widget_defaults, widget_last_type, time_period, page, csrf_token_update}) {
+		init({dashboard, widget_defaults, widget_last_type, time_period, page, csrf_tokens}) {
 			this.dashboard = dashboard;
 			this.page = page;
-			this.csrf_token_update = csrf_token_update;
+			this.csrf_tokens = csrf_tokens;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
 				containers: {
@@ -121,7 +122,7 @@
 
 			const curl = new Curl('zabbix.php');
 
-			curl.setAction('template.dashboard.update', this.csrf_token_update);
+			curl.setAction('template.dashboard.update', this.csrf_tokens['template.dashboard.update']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

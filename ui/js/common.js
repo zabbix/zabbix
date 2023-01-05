@@ -1129,6 +1129,13 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 	}
 }
 
+/**
+ * Function used to include CSRF token in CActionButtonList.
+ *
+ * @param {string} form
+ * @param {string} csrf_token_name
+ * @param {string} csrf_token_value
+ */
 function addCsrfTokenInput(form, csrf_token_name, csrf_token_value) {
 	let csrf_token = form.querySelector('input[name=\"' + csrf_token_name + '\"]');
 
