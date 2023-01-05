@@ -107,7 +107,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('maintenance', response.keepids ?? []);//TODO row num
+						uncheckTableRows('maintenance', response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
