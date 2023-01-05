@@ -35,7 +35,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>				'string',
+			'form_refresh' =>				'int32',
 			'ldap_test_user' =>				'string',
 			'ldap_test_password' =>			'string',
 			'ldap_test' =>					'in 1',
