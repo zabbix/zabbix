@@ -23,10 +23,9 @@ class CControllerImageUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' => 'int32',
-			'name'         => 'required | not_empty | db images.name',
-			'imageid'      => 'required | fatal | db images.imageid',
-			'imagetype'    => 'required | fatal | db images.imagetype'
+			'name'      => 'required | not_empty | db images.name',
+			'imageid'   => 'required | fatal | db images.imageid',
+			'imagetype' => 'required | fatal | db images.imagetype'
 		];
 
 		$ret = $this->validateInput($fields);
