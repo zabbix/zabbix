@@ -98,8 +98,6 @@ class CControllerPopupImportCompare extends CController {
 				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-
-				unset($rules['templateLinkage']);
 				break;
 		}
 
