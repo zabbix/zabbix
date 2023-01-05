@@ -301,21 +301,23 @@ foreach ($data['hosts'] as $host) {
 
 	order_result($host['parentTemplates'], 'name');
 
-	$hostTemplates = [];
+	$templates = [];
 	$i = 0;
 
 	foreach ($host['parentTemplates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$hostTemplates[] = ' &hellip;';
-
+			$templates[] = ' &hellip;';
 			break;
 		}
 
-		if (array_key_exists($template['templateid'], $data['writable_templates'])
-				&& $data['allowed_ui_conf_templates']) {
-			$caption = [
+		if ($templates) {
+			$templates[] = ', ';
+		}
+
+		if (array_key_exists($template['templateid'], $data['editable_templates'])) {
+			$templates[] = [
 				(new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
@@ -326,16 +328,10 @@ foreach ($data['hosts'] as $host) {
 			];
 		}
 		else {
-			$caption = [
+			$templates[] = [
 				(new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY)
 			];
 		}
-
-		if ($hostTemplates) {
-			$hostTemplates[] = ', ';
-		}
-
-		$hostTemplates[] = $caption;
 	}
 
 	$info_icons = [];
@@ -450,7 +446,7 @@ foreach ($data['hosts'] as $host) {
 		],
 		getHostInterface($interface),
 		$monitored_by,
-		$hostTemplates,
+		$templates,
 		$toggle_status_link,
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,

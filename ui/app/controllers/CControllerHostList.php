@@ -267,27 +267,26 @@ class CControllerHostList extends CController {
 			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
 		}
 
-		$templateids = [];
+		// Get the writable templates among the templates linked to the hosts.
+		$editable_templates = [];
 
-		foreach ($hosts as $host) {
-			$templateids += array_column($host['parentTemplates'], 'templateid', 'templateid');
-		}
+		if (CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			$templateids = [];
 
-		$templates = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $templateids,
-			'preservekeys' => true
-		]);
+			foreach ($hosts as $host) {
+				foreach ($host['parentTemplates'] as $template) {
+					$templateids[$template['templateid']] = true;
+				}
+			}
 
-		$writable_templates = [];
-
-		if ($templateids) {
-			$writable_templates = API::Template()->get([
-				'output' => [],
-				'templateids' => $templateids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
+			if ($templateids) {
+				$editable_templates = API::Template()->get([
+					'output' => [],
+					'templateids' => array_keys($templateids),
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
@@ -366,9 +365,8 @@ class CControllerHostList extends CController {
 			'filter' => $filter,
 			'sortField' => $sort_field,
 			'sortOrder' => $sort_order,
-			'templates' => $templates,
 			'maintenances' => $db_maintenances,
-			'writable_templates' => $writable_templates,
+			'editable_templates' => $editable_templates,
 			'proxies' => $proxies,
 			'proxies_ms' => $proxies_ms,
 			'profileIdx' => 'web.hosts.filter',
@@ -377,7 +375,6 @@ class CControllerHostList extends CController {
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1)
 		];
 
