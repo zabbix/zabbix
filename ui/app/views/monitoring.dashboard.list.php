@@ -47,9 +47,7 @@ $widget = (new CWidget())
 		->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->cleanItems()
-	->setName('dashboardForm');
+$form = (new CForm())->setName('dashboardForm');
 
 $table = (new CTableInfo())
 	->setHeader([
