@@ -33,6 +33,7 @@ $form = (new CForm('post', (new CUrl('zabbix.php'))
 		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
 		->getUrl(), 'multipart/form-data')
 	)
+		->addVar('form_refresh', $data['form_refresh'] + 1)
 		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->addVar('imagetype', $data['imagetype']);
 

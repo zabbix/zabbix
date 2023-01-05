@@ -27,9 +27,10 @@ class CControllerImageEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'imageid'   => 'db images.imageid',
-			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
-			'name'      => 'db images.name'
+			'form_refresh' => 'int32',
+			'imageid'      => 'db images.imageid',
+			'imagetype'    => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
+			'name'         => 'db images.name'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -71,7 +72,7 @@ class CControllerImageEdit extends CController {
 	}
 
 	protected function doAction() {
-		$response = new CControllerResponseData($this->getInputAll() + $this->image);
+		$response = new CControllerResponseData($this->getInputAll() + $this->image + ['form_refresh' => 0]);
 		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}
