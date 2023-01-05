@@ -143,14 +143,14 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Cannot find the specified media type.");
 		goto fail;
 	}
 
 	if (FAIL == zbx_is_ushort(row[8], &smtp_port))
 	{
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		error = zbx_dsprintf(NULL, "Invalid port value.");
 		goto fail;
 	}
@@ -167,7 +167,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 			smtp_authentication, row[13], atoi(row[14]), atoi(row[15]), row[16], content_type, row[18],
 			row[19], sendto, subject, message, params);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_SEND_ALERT, SEC_PER_MIN, data,
 			size, &response, &error))

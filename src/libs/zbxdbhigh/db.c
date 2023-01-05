@@ -669,7 +669,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 					table->recid, table->table, table->recid, min, max);
@@ -690,7 +690,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 				}
 			}
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
 					" values ('%s','%s'," ZBX_FS_UI64 ")",
@@ -708,7 +708,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 		else
 		{
 			ZBX_STR2UINT64(ret1, row[0]);
-			DBfree_result(result);
+			zbx_db_free_result(result);
 
 			if (ret1 < min || ret1 >= max)
 			{
@@ -733,7 +733,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 	}
 
@@ -799,7 +799,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 
 	zbx_tsdb_info_extract(version_info);
 clean:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	DBclose();
 #else
@@ -1390,7 +1390,7 @@ const char	*zbx_host_string(zbx_uint64_t hostid)
 	else
 		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return buf_string;
 }
@@ -1417,7 +1417,7 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
 	else
 		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return buf_string;
 }
@@ -1456,7 +1456,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		user_type = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (-1 == user_type)
 	{
@@ -1481,7 +1481,7 @@ int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *r
 
 		if (NULL == DBfetch(result))
 			ret = FAIL;
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -1506,7 +1506,7 @@ const char	*zbx_user_string(zbx_uint64_t userid)
 	else
 		zbx_snprintf(buf_string, sizeof(buf_string), "unknown");
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return buf_string;
 }
@@ -1546,7 +1546,7 @@ int	DBget_user_names(zbx_uint64_t userid, char **username, char **name, char **s
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1724,7 +1724,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 			}
 
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		hosts.values_num = 0;
 	}
@@ -1757,7 +1757,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				}
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		hosts.values_num = 0;
 	}
@@ -2030,7 +2030,7 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 
 		zbx_vector_uint64_append(&nums, n);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(&nums, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2152,7 +2152,7 @@ int	DBtable_exists(const char *table_name)
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2185,7 +2185,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #elif defined(HAVE_ORACLE)
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
@@ -2202,7 +2202,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #elif defined(HAVE_POSTGRESQL)
 	table_name_esc = DBdyn_escape_string(table_name);
 	field_name_esc = DBdyn_escape_string(field_name);
@@ -2220,7 +2220,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #elif defined(HAVE_SQLITE3)
 	table_name_esc = DBdyn_escape_string(table_name);
 
@@ -2236,7 +2236,7 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 		ret = SUCCEED;
 		break;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #endif
 
 	return ret;
@@ -2275,7 +2275,7 @@ int	DBtrigger_exists(const char *table_name, const char *trigger_name)
 #endif
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(table_name_esc);
 	zbx_free(trigger_name_esc);
@@ -2316,7 +2316,7 @@ int	DBindex_exists(const char *table_name, const char *index_name)
 
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(table_name_esc);
 	zbx_free(index_name_esc);
@@ -2357,7 +2357,7 @@ int	DBpk_exists(const char *table_name)
 #endif
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2384,7 +2384,7 @@ void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
 
 		zbx_vector_uint64_append(ids, id);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
@@ -2503,7 +2503,7 @@ void	DBcheck_character_set(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	charset_list = db_strlist_quote(ZBX_SUPPORTED_DB_CHARACTER_SET, ZBX_DB_STRLIST_DELIM);
 	collation_list = db_strlist_quote(ZBX_SUPPORTED_DB_COLLATION, ZBX_DB_STRLIST_DELIM);
@@ -2532,7 +2532,7 @@ void	DBcheck_character_set(void)
 				ZBX_SUPPORTED_DB_COLLATION);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	DBclose();
 	zbx_free(database_name_esc);
 #elif defined(HAVE_ORACLE)
@@ -2575,7 +2575,7 @@ void	DBcheck_character_set(void)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	DBclose();
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
@@ -2605,7 +2605,7 @@ void	DBcheck_character_set(void)
 
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect(
 			"select oid"
@@ -2621,7 +2621,7 @@ void	DBcheck_character_set(void)
 
 	zbx_strscpy(oid, *row);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect(
 			"select count(*)"
@@ -2646,7 +2646,7 @@ void	DBcheck_character_set(void)
 				" only \"%s\" character set", row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("show client_encoding");
 
@@ -2660,7 +2660,7 @@ void	DBcheck_character_set(void)
 				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	result = DBselect("show server_encoding");
 
@@ -2674,7 +2674,7 @@ void	DBcheck_character_set(void)
 				" \"%s\"", CONFIG_DBNAME, row[0], ZBX_SUPPORTED_DB_CHARACTER_SET);
 	}
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	DBclose();
 	zbx_free(database_name_esc);
 #endif
@@ -3298,7 +3298,7 @@ int	zbx_db_get_database_type(void)
 		ret = ZBX_DB_PROXY;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	DBclose();
 
@@ -3362,7 +3362,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3415,7 +3415,7 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 	else
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3461,7 +3461,7 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 		while (id != ids->values[i])
 			zbx_vector_uint64_remove(ids, i);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	while (i != ids->values_num)
 		zbx_vector_uint64_remove_noorder(ids, i);
@@ -3513,7 +3513,7 @@ int	DBget_user_by_active_session(const char *sessionid, zbx_user_t *user)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -3573,7 +3573,7 @@ int	DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *
 	user->type = atoi(row[3]);
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3629,7 +3629,7 @@ int	zbx_db_check_instanceid(void)
 		zabbix_log(LOG_LEVEL_ERR, "cannot read instance id from database");
 		ret = FAIL;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBclose();
 

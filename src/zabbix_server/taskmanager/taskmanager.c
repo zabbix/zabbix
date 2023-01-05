@@ -79,7 +79,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 	if (NULL != DBfetch(result))
 		zbx_close_problem(triggerid, eventid, userid);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
@@ -154,7 +154,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			}
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_destroy(&locked_triggerids);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -195,7 +195,7 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_EXPIRED, taskid);
 
@@ -259,7 +259,7 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 		ret = SUCCEED;
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where taskid=" ZBX_FS_UI64,
 			ZBX_TM_STATUS_DONE, taskid);
@@ -301,7 +301,7 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 	if (NULL != (row = DBfetch(result)))
 		ZBX_STR2UINT64(parent_taskid, row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update task set status=%d where taskid=" ZBX_FS_UI64,
 			ZBX_TM_STATUS_DONE, taskid);
@@ -633,7 +633,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		ack_task->new_severity = atoi(row[4]);
 		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < ack_tasks.values_num)
 	{
@@ -721,7 +721,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		task->data = (void *)zbx_tm_check_now_create(itemid);
 		zbx_vector_ptr_append(&tasks, task);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != tasks.values_num)
 	{
@@ -1121,7 +1121,7 @@ static void	tm_process_temp_suppression(const char *data)
 			zbx_db_insert_clean(&db_insert);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -1198,7 +1198,7 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (processed_num = done_taskids.values_num))
 	{
@@ -1262,7 +1262,7 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 		if (NULL != (row = DBfetch(result)))
 			compatibility = (zbx_proxy_compatibility_t)atoi(row[0]);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return compatibility;
@@ -1394,7 +1394,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 		}
 
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 < ack_taskids.values_num)
 		processed_num += tm_process_acknowledgments(&ack_taskids);

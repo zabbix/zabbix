@@ -86,7 +86,7 @@ static int	DBpatch_2050001(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(oid);
 
 	return ret;
@@ -235,11 +235,11 @@ static int	DBpatch_2050012(void)
 					" item with converted key \"%s\" already exists on host ID [%s]",
 					row[2], key, row[0]);
 		}
-		DBfree_result(result2);
+		zbx_db_free_result(result2);
 
 		zbx_free(key_esc);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -524,7 +524,7 @@ static int	DBpatch_2050055(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -852,7 +852,7 @@ static int	DBpatch_2050092(void)
 	ret = SUCCEED;
 out:
 	zbx_free(url);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }

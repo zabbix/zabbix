@@ -847,7 +847,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_BYTEAOID = atoi(row[0]);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -873,7 +873,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (90000 <= ZBX_PG_SVERSION)
 	{
@@ -1681,7 +1681,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		zbx_db_errlog(ERR_Z3003, 0, NULL, NULL);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		result = NULL;
 	}
 	else
@@ -1693,7 +1693,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 			err_no = (int)mysql_errno(conn);
 			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 	}
@@ -1851,7 +1851,7 @@ error:
 		int	server_status;
 
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
@@ -1873,12 +1873,12 @@ error:
 
 		if (SUCCEED == is_recoverable_postgresql_error(conn, result->pg_result))
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = (DB_RESULT)ZBX_DB_DOWN;
 		}
 		else
 		{
-			DBfree_result(result);
+			zbx_db_free_result(result);
 			result = NULL;
 		}
 	}
@@ -1900,7 +1900,7 @@ lbl_get_table:
 		zbx_db_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		switch (ret)
 		{
@@ -2226,7 +2226,7 @@ static void	OCI_DBclean_result(DB_RESULT result)
 }
 #endif
 
-void	DBfree_result(DB_RESULT result)
+void	zbx_db_free_result(DB_RESULT result)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL == result)
@@ -2929,7 +2929,7 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 	else
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -2981,7 +2981,7 @@ static char	*zbx_tsdb_get_license(void)
 		tsdb_lic = zbx_strdup(NULL, row[0]);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return tsdb_lic;
 }
@@ -3079,7 +3079,7 @@ int	zbx_tsdb_get_version(void)
 		else
 			ver = ZBX_TSDB_VERSION = 0;
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 	else
 		ver = ZBX_TSDB_VERSION;

@@ -273,7 +273,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -519,7 +519,7 @@ static void	sync_service_problem_tags(zbx_service_manager_t *service_manager, in
 					service_problem_tag);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_problem_tags, &iter);
 	while (NULL != (service_problem_tag = (zbx_service_problem_tag_t *)zbx_hashset_iter_next(&iter)))
@@ -624,7 +624,7 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 		if (0 != update)
 			(*updated)++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->services, &iter);
 	while (NULL != (service = (zbx_service_t *)zbx_hashset_iter_next(&iter)))
@@ -730,7 +730,7 @@ static void	sync_service_rules(zbx_service_manager_t *service_manager, int *upda
 		if (0 != update)
 			(*updated)++;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_rules, &iter);
 	while (NULL != (rule = (zbx_service_rule_t *)zbx_hashset_iter_next(&iter)))
@@ -780,7 +780,7 @@ static void	sync_service_tags(zbx_service_manager_t *service_manager, int revisi
 
 		service_tag->revision = revision;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->service_tags, &iter);
 	while (NULL != (service_tag = (zbx_service_tag_t *)zbx_hashset_iter_next(&iter)))
@@ -847,7 +847,7 @@ static void	sync_services_links(zbx_service_manager_t *service_manager, int *upd
 		zbx_vector_ptr_append(&parent->children, child);
 		zbx_vector_ptr_append(&child->parents, parent);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->services_links, &iter);
 	while (NULL != (services_link = (zbx_services_link_t *)zbx_hashset_iter_next(&iter)))
@@ -894,7 +894,7 @@ static void	sync_service_problems(zbx_hashset_t *services, zbx_hashset_t *servic
 
 		add_service_problem(service, service_problems_index, service_problem);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -932,7 +932,7 @@ static void	sync_actions(zbx_service_manager_t *service_manager, int revision)
 		ZBX_STR2UCHAR(action->evaltype, row[1]);
 		action->revision = revision;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->actions, &iter);
 	while (NULL != (action = (zbx_service_action_t *)zbx_hashset_iter_next(&iter)))
@@ -1061,7 +1061,7 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 
 		zbx_vector_ptr_append(&actions, action);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_hashset_iter_reset(&service_manager->action_conditions, &iter);
 	while (NULL != (action_condition = (zbx_service_action_condition_t *)zbx_hashset_iter_next(&iter)))
@@ -1134,7 +1134,7 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 		}
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }
 
 static void	service_clean(zbx_service_t *service)
@@ -2168,7 +2168,7 @@ static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_
 		zbx_vector_uint64_pair_append(problem_service, pair);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 }
 

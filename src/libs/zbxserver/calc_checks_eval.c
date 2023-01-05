@@ -523,7 +523,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 			zbx_vector_uint64_pair_append(itemhosts, pair);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 		zbx_free_agent_request(&pattern);

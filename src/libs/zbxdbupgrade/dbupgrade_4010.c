@@ -246,7 +246,7 @@ static int	DBpatch_4010025(void)
 	else
 		nextid = 0;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != nextid && ZBX_DB_OK > DBexecute("insert into ids values ('proxy_history','history_lastid'," ZBX_FS_UI64
 			")", nextid))

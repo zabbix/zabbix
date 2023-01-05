@@ -75,7 +75,7 @@ static int	DBpatch_3050001(void)
 
 	ret = SUCCEED;
 clean:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -981,7 +981,7 @@ static int	DBpatch_3050102(void)
 			zbx_vector_uint64_append(&ids, id);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != ids.values_num)
 	{
@@ -1185,7 +1185,7 @@ static int	DBpatch_3050118(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1227,7 +1227,7 @@ static int	DBpatch_3050119(void)
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1282,7 +1282,7 @@ static int	DBpatch_3050120(void)
 		ret = FAIL;
 out:
 	zbx_hashset_destroy(&eventids);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1409,7 +1409,7 @@ static int	DBpatch_3050122(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -1642,7 +1642,7 @@ static int	DBpatch_3050144(void)
 		ZBX_STR2UINT64(widgetid, row[0]);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_suppressed", 1);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
 	ret = zbx_db_insert_execute(&db_insert);

@@ -117,5 +117,5 @@ void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hos
 
 		zbx_vector_tm_task_append(tasks, task);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 }

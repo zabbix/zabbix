@@ -528,7 +528,7 @@ static int	DBpatch_2010050(void)
 						fields[i], (int)ts, row[0]);
 			}
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	return SUCCEED;
@@ -791,7 +791,7 @@ static int	DBpatch_2010080(void)
 
 	ret = SUCCEED;
 out:
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1011,7 +1011,7 @@ static int	DBpatch_2010101(void)
 		zbx_free(dsn);
 		zbx_free(sql);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 
@@ -1494,7 +1494,7 @@ static int	DBpatch_2010176(void)
 
 		zbx_free(name);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1742,7 +1742,7 @@ static int	DBpatch_2010195(void)
 			zbx_free(key_esc);
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(key);
 

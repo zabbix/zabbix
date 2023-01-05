@@ -264,7 +264,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			process_num - 1);
 
 	event_queries_fetch(result, event_queries);
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get event suppress data */
 
@@ -295,7 +295,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		pair.second = atoi(row[2]);
 		zbx_vector_uint64_pair_append(&data->maintenances, pair);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	/* get missing event data */
 
@@ -332,7 +332,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			zbx_free(sql);
 
 			event_queries_fetch(result, event_queries);
-			DBfree_result(result);
+			zbx_db_free_result(result);
 		}
 
 		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

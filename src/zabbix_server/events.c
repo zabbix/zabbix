@@ -685,7 +685,7 @@ static int	correlation_match_event_hostgroup(const ZBX_DB_EVENT *event, zbx_uint
 	if (NULL != DBfetch(result))
 		ret = SUCCEED;
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&groupids);
 
@@ -1229,7 +1229,7 @@ static void	correlate_event_by_global_rules(ZBX_DB_EVENT *event, zbx_problem_sta
 					*problem_state = ZBX_PROBLEM_STATE_RESOLVED;
 				else
 					*problem_state = ZBX_PROBLEM_STATE_OPEN;
-				DBfree_result(result);
+				zbx_db_free_result(result);
 			}
 
 			if (ZBX_PROBLEM_STATE_RESOLVED == *problem_state)
@@ -1302,7 +1302,7 @@ static void	correlate_event_by_global_rules(ZBX_DB_EVENT *event, zbx_problem_sta
 			correlation_execute_operations((zbx_correlation_t *)corr_old.values[i], event, eventid, objectid);
 		}
 
-		DBfree_result(result);
+		zbx_db_free_result(result);
 		zbx_free(sql);
 	}
 
@@ -1589,7 +1589,7 @@ static void	update_trigger_problem_count(zbx_vector_ptr_t *trigger_diff)
 		diff->problem_count = atoi(row[1]);
 		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT;
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zbx_free(sql);
 out:
@@ -1830,7 +1830,7 @@ void	zbx_export_events(void)
 
 		while (NULL != (row = DBfetch(result)))
 			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		zbx_json_close(&json);
 
@@ -2226,7 +2226,7 @@ static void	process_internal_ok_events(zbx_vector_ptr_t *ok_events)
 		recover_event(eventid, EVENT_SOURCE_INTERNAL, object, objectid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zbx_free(sql);
 
 out:
@@ -2307,7 +2307,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 
 		zbx_vector_uint64_append(&eventids, problem->eventid);
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (0 != problems->values_num)
 	{
@@ -2337,7 +2337,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 			tag->value = zbx_strdup(NULL, row[2]);
 			zbx_vector_ptr_append(&problem->tags, tag);
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 	}
 
 	zbx_free(sql);

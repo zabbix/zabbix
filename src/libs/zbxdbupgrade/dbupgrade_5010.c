@@ -84,7 +84,7 @@ static int	DBpatch_5010004(void)
 			break;
 		}
 	}
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
@@ -1339,7 +1339,7 @@ static int	DBpatch_convert_screen(uint64_t screenid, char *name, uint64_t templa
 		zbx_vector_ptr_append(&screen_items, (void *)scr_item);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	if (screen_items.values_num > 0)
 	{
@@ -1464,7 +1464,7 @@ static int	DBpatch_5010044(void)
 			ret = DBpatch_delete_screen(screenid);
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	return ret;
 }
