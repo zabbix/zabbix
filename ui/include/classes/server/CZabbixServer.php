@@ -282,14 +282,14 @@ class CZabbixServer {
 	 * @param array  $data['params']             Report parameters.
 	 * @param string $data['params']['subject']  Report message subject.
 	 * @param string $data['params']['body']     Report message text.
-	 * @param string $csrf_token                 CSRF token.
+	 * @param string $sid                        User session ID.
 	 *
 	 * @return bool|array
 	 */
-	public function testReport(array $data, string $csrf_token) {
+	public function testReport(array $data, string $sid) {
 		return $this->request([
 			'request' => 'report.test',
-			'_csrf_token' => $csrf_token,
+			'sid' => $sid,
 			'data' => $data
 		]);
 	}
