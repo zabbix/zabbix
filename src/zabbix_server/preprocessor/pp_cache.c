@@ -22,6 +22,7 @@
 #include "pp_cache.h"
 #include "zbxjson.h"
 #include "zbxprometheus.h"
+#include "preproc_snmp.h"
 
 /******************************************************************************
  *                                                                            *
@@ -67,6 +68,9 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 				break;
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->data);
+				break;
+			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+				zbx_snmp_value_cache_clear((zbx_snmp_value_cache_t *)cache->data);
 				break;
 		}
 

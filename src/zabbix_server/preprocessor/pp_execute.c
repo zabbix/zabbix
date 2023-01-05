@@ -25,6 +25,7 @@
 #include "item_preproc.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
+#include "preproc_snmp.h"
 
 #ifdef HAVE_LIBXML2
 #	ifndef LIBXML_THREAD_ENABLED
@@ -841,6 +842,55 @@ static int	pp_execute_str_replace(zbx_variant_t *value, const char *params)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute 'snmp to value' step                                      *
+ *                                                                            *
+ * Parameters: cache  - [IN/OUT] the preprocessing cache                      *
+ *             value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the step parameters                              *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise. The error message is stored in value.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_snmp_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED == item_preproc_snmp_walk_to_value(cache, value, params, &errmsg))
+		return SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_error(value, errmsg);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute 'snmp to json' step                                       *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the step parameters                              *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise. The error message is stored in value.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED == item_preproc_snmp_walk_to_json(value, params, &errmsg))
+		return SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_error(value, errmsg);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute preprocessing step                                        *
  *                                                                            *
  * Parameters: ctx           - [IN] the worker specific execution context     *
@@ -940,6 +990,12 @@ static int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigne
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = pp_execute_str_replace(value, step->params);
 			goto out;
+		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+			ret = pp_execute_snmp_to_value(cache, value, step->params);
+			goto out;
+		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+			ret = pp_execute_snmp_to_json(value, step->params);
+			goto out;
 		default:
 			zbx_variant_clear(value);
 			zbx_variant_set_error(value, zbx_dsprintf(NULL, "unknown preprocessing step"));
@@ -967,7 +1023,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,
-		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out, zbx_variant_t **results_out,
+		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out, zbx_pp_result_t **results_out,
 		int *results_num_out)
 {
 	zbx_pp_result_t		*results;
