@@ -1480,6 +1480,12 @@ static int DBpatch_6030159(void)
 
 	return DBadd_field("sessions", &field);
 }
+
+static int DBpatch_6030160(void)
+{
+	if (ZBX_DB_OK > DBexecute("update sessions set csrf_token_salt=sessionid;"))
+		return FAIL;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1646,5 +1652,6 @@ DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
 DBPATCH_ADD(6030159, 0, 1)
+DBPATCH_ADD(6030160, 0, 1)
 
 DBPATCH_END()
