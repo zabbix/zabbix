@@ -82,6 +82,7 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm())
+	->cleanItems()
 	->setName('user_form')
 	->setId('users');
 
