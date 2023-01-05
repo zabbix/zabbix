@@ -103,7 +103,7 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 				(ZBX_COMPRESS_TABLE_HISTORY == type) ? "clock,ns" : "clock");
 	}
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -142,7 +142,7 @@ static int	hk_get_table_compression_age(const char *table_name)
 	if (NULL != (row = DBfetch(result)))
 		age = atoi(row[0]);
 
-	DBfree_result(result);
+	zbx_db_free_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() age: %d", __func__, age);
 
 	return age;
@@ -167,7 +167,7 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 		DB_RESULT	res;
 
 		if (0 != compress_after)
-			DBfree_result(DBselect("select %s('%s')", COMPRESSION_POLICY_REMOVE, table_name));
+			zbx_db_free_result(DBselect("select %s('%s')", COMPRESSION_POLICY_REMOVE, table_name));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
 
@@ -176,7 +176,7 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 		if (NULL == res)
 			zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
 		else
-			DBfree_result(res);
+			zbx_db_free_result(res);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -197,7 +197,7 @@ static void	hk_history_enable_compression(int age)
 
 	for (i = 0; i < (int)ARRSIZE(compression_tables); i++)
 	{
-		DBfree_result(DBselect("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
+		zbx_db_free_result(DBselect("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
 				compression_tables[i].name));
 		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].type);
 		hk_check_table_compression_age(compression_tables[i].name, age);
@@ -222,7 +222,7 @@ static void	hk_history_disable_compression(void)
 		if (0 == hk_get_table_compression_age(compression_tables[i].name))
 			continue;
 
-		DBfree_result(DBselect("select %s('%s')", COMPRESSION_POLICY_REMOVE, compression_tables[i].name));
+		zbx_db_free_result(DBselect("select %s('%s')", COMPRESSION_POLICY_REMOVE, compression_tables[i].name));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -261,7 +261,7 @@ void	hk_history_compression_init(void)
 			db_log_level = zbx_strdup(db_log_level, row[0]);
 			DBexecute("set client_min_messages to warning");
 		}
-		DBfree_result(result);
+		zbx_db_free_result(result);
 
 		if (ON == zbx_tsdb_get_compression_availability() && ON == cfg.db.history_compression_status)
 		{

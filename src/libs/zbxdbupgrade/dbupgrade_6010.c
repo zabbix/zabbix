@@ -703,7 +703,7 @@ out:
 		ZBX_STR2UINT64(groupid, row[0]);							\
 		zbx_vector_uint64_append(&host_groupids, groupid);					\
 	}												\
-	DBfree_result(result);
+	zbx_db_free_result(result);
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
 
 static int	DBpatch_6010033_split_groups(void)
