@@ -27,6 +27,7 @@
 #include "zbxconnector.h"
 #include "zbxembed.h"
 #include "zbxtime.h"
+#include "zbxhttp.h"
 
 extern unsigned char			program_type;
 
@@ -34,20 +35,41 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 		zbx_vector_connector_object_t *connector_objects)
 {
 	zbx_connector_t	connector;
+	int		i;
+	char		*str = NULL, *out = NULL;
+	size_t		str_alloc = 0, str_offset = 0;
+	char		delim = '\0';
 
-	zbx_connector_deserialize_connector(message->data, message->size,
-			&connector, connector_objects);
-	zbx_free(connector.url);
-	/*zbx_free(connector->timeout);
-	zbx_free(connector->token);
-	zbx_free(connector->http_proxy);
-	zbx_free(connector->username);
-	zbx_free(connector->password);
-	zbx_free(connector->ssl_cert_file);
-	zbx_free(connector->ssl_key_file);
-	zbx_free(connector->ssl_key_password);*/
+	zbx_connector_deserialize_connector(message->data, message->size, &connector, connector_objects);
+
+	for (i = 0; i < connector_objects->values_num; i++)
+	{
+		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, delim);
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, connector_objects->values[i].str);
+		delim = '\n';
+	}
 
 	zbx_vector_connector_object_clear_ext(connector_objects, zbx_connector_object_free);
+
+	zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
+			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
+			connector.timeout, connector.ssl_cert_file, connector.ssl_key_file, connector.ssl_key_password,
+			connector.verify_peer, connector.verify_host, connector.authtype, connector.username,
+			connector.password, ZBX_POSTTYPE_RAW, "", HTTP_STORE_RAW,
+			&out);
+
+	zbx_free(str);
+	zbx_free(out);
+
+	zbx_free(connector.url);
+	zbx_free(connector.timeout);
+	zbx_free(connector.token);
+	zbx_free(connector.http_proxy);
+	zbx_free(connector.username);
+	zbx_free(connector.password);
+	zbx_free(connector.ssl_cert_file);
+	zbx_free(connector.ssl_key_file);
+	zbx_free(connector.ssl_key_password);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_CONNECTOR_RESULT, NULL, 0))
 	{

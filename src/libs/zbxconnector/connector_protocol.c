@@ -72,12 +72,26 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_t *connector)
 {
-	zbx_uint32_t	data_len = 0, url_len;
+	zbx_uint32_t	data_len = 0, url_len, timeout_len, token_len, http_proxy_len, username_len, password_len,
+			ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, connector->protocol);
 	zbx_serialize_prepare_value(data_len, connector->data_type);
 	zbx_serialize_prepare_str_len(data_len, connector->url, url_len);
+	zbx_serialize_prepare_str_len(data_len, connector->timeout, timeout_len);
+	zbx_serialize_prepare_value(data_len, connector->retries);
+	zbx_serialize_prepare_str_len(data_len, connector->token, token_len);
+	zbx_serialize_prepare_str_len(data_len, connector->http_proxy, http_proxy_len);
+	zbx_serialize_prepare_value(data_len, connector->authtype);
+	zbx_serialize_prepare_str_len(data_len, connector->username, username_len);
+	zbx_serialize_prepare_str_len(data_len, connector->password, password_len);
+	zbx_serialize_prepare_value(data_len, connector->verify_peer);
+	zbx_serialize_prepare_value(data_len, connector->verify_host);
+	zbx_serialize_prepare_str_len(data_len, connector->ssl_cert_file, ssl_cert_file_len);
+	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_file, ssl_key_file_len);
+	zbx_serialize_prepare_str_len(data_len, connector-> ssl_key_password, ssl_key_password_len);
+	zbx_serialize_prepare_value(data_len, connector->tags_evaltype);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -92,18 +106,45 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 
 	ptr += zbx_serialize_value(ptr, connector->protocol);
 	ptr += zbx_serialize_value(ptr, connector->data_type);
-	zbx_serialize_str(ptr, connector->url, url_len);
+	ptr += zbx_serialize_str(ptr, connector->url, url_len);
+	ptr += zbx_serialize_str(ptr, connector->timeout, timeout_len);
+	ptr += zbx_serialize_value(ptr, connector->retries);
+	ptr += zbx_serialize_str(ptr, connector->token, token_len);
+	ptr += zbx_serialize_str(ptr, connector->http_proxy, http_proxy_len);
+	ptr += zbx_serialize_value(ptr, connector->authtype);
+	ptr += zbx_serialize_str(ptr, connector->username, username_len);
+	ptr += zbx_serialize_str(ptr, connector->password, password_len);
+	ptr += zbx_serialize_value(ptr, connector->verify_peer);
+	ptr += zbx_serialize_value(ptr, connector->verify_host);
+	ptr += zbx_serialize_str(ptr, connector->ssl_cert_file, ssl_cert_file_len);
+	ptr += zbx_serialize_str(ptr, connector->ssl_key_file, ssl_key_file_len);
+	ptr += zbx_serialize_str(ptr, connector->ssl_key_password, ssl_key_password_len);
+	(void)zbx_serialize_value(ptr, connector->tags_evaltype);
 }
 
 void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t size,
 		zbx_connector_t *connector, zbx_vector_connector_object_t *connector_objects)
 {
-	zbx_uint32_t		deserialize_url_len;
+	zbx_uint32_t		url_len, timeout_len, token_len, http_proxy_len, username_len, password_len,
+				ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len;
 	const unsigned char	*start = data;
 
 	data += zbx_deserialize_value(data, &connector->protocol);
 	data += zbx_deserialize_value(data, &connector->data_type);
-	data += zbx_deserialize_str(data, &connector->url, deserialize_url_len);
+	data += zbx_deserialize_str(data, &connector->url, url_len);
+	data += zbx_deserialize_str(data, &connector->timeout, timeout_len);
+	data += zbx_deserialize_value(data, &connector->retries);
+	data += zbx_deserialize_str(data, &connector->token, token_len);
+	data += zbx_deserialize_str(data, &connector->http_proxy, http_proxy_len);
+	data += zbx_deserialize_value(data, &connector->authtype);
+	data += zbx_deserialize_str(data, &connector->username, username_len);
+	data += zbx_deserialize_str(data, &connector->password, password_len);
+	data += zbx_deserialize_value(data, &connector->verify_peer);
+	data += zbx_deserialize_value(data, &connector->verify_host);
+	data += zbx_deserialize_str(data, &connector->ssl_cert_file, ssl_cert_file_len);
+	data += zbx_deserialize_str(data, &connector->ssl_key_file, ssl_key_file_len);
+	data += zbx_deserialize_str(data, &connector->ssl_key_password, ssl_key_password_len);
+	data += zbx_deserialize_value(data, &connector->tags_evaltype);
 
 	zbx_connector_deserialize_object(data, size - (data - start), connector_objects);
 }
