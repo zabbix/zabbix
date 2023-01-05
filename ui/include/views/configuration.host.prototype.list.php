@@ -109,7 +109,7 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 		order_result($host_prototype['templates'], 'name');
 
 		foreach ($host_prototype['templates'] as $template) {
-			if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			if (array_key_exists($template['templateid'], $data['editable_templates'])) {
 				$host_templates[] = (new CLink($template['name'],
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')

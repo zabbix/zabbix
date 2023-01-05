@@ -111,7 +111,7 @@ if ($host_prototype['templates']) {
 	foreach ($host_prototype['templates'] as $template) {
 		$host_tab->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
 
-		if (array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
+		if (array_key_exists($template['templateid'], $host_prototype['editable_templates'])) {
 			$template_link = (new CLink($template['name'],
 				(new CUrl('templates.php'))
 					->setArgument('form', 'update')

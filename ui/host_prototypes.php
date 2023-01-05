@@ -507,10 +507,10 @@ if (hasRequest('form')) {
 	}
 
 	// Select writable templates
-	$data['host_prototype']['writable_templates'] = [];
+	$data['host_prototype']['editable_templates'] = [];
 
 	if ($allowed_ui_conf_templates && $data['host_prototype']['templates']) {
-		$data['host_prototype']['writable_templates'] = API::Template()->get([
+		$data['host_prototype']['editable_templates'] = API::Template()->get([
 			'output' => ['templateid'],
 			'templateids' => array_column($data['host_prototype']['templates'], 'templateid'),
 			'editable' => true,
@@ -618,17 +618,19 @@ else {
 
 	$data['parent_host_prototypes'] = getParentHostPrototypes($data['hostPrototypes'], $allowed_ui_conf_templates);
 
-	$data['writable_templates'] = [];
+	$data['editable_templates'] = [];
 
 	if ($allowed_ui_conf_templates) {
 		$templateids = [];
 
 		foreach ($data['hostPrototypes'] as $host_prototype) {
-			$templateids += array_flip(array_column($host_prototype['templates'], 'templateid'));
+			foreach ($host_prototype['templates'] as $template) {
+				$templateids[$template['templateid']] = true;
+			}
 		}
 
 		if ($templateids) {
-			$data['writable_templates'] = API::Template()->get([
+			$data['editable_templates'] = API::Template()->get([
 				'output' => [],
 				'templateids' => array_keys($templateids),
 				'editable' => true,
