@@ -46,7 +46,6 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm())
-	->cleanItems()
 	->setName('valuemap_form');
 
 $table = (new CTableInfo())
