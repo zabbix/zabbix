@@ -30,7 +30,7 @@ This guide describes how to integrate your Zabbix 5.0 installation with ((OTRS))
 
 [![](images/thumb.06.png?raw=true)](images/06.png)
 
-2\. In the **Administration** > **Media types** section, import the [media_otrs.xml](media_otrs.xml)
+2\. In the **Administration** > **Media types** section, import the [media_otrs_ce.xml](media_otrs_ce.xml)
 
 3\. Open the added **((OTRS)) CE** media type and set:
 
