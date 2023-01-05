@@ -68,3 +68,42 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 		zbx_vector_connector_object_append(connector_objects, connector_object);
 	}
 }
+
+void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc, size_t *data_offset,
+		const zbx_connector_t *connector)
+{
+	zbx_uint32_t	data_len = 0, url_len;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, connector->protocol);
+	zbx_serialize_prepare_value(data_len, connector->data_type);
+	zbx_serialize_prepare_str_len(data_len, connector->url, url_len);
+
+	if (NULL == *data)
+		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
+
+	while (data_len > *data_alloc - *data_offset)
+	{
+		*data_alloc *= 2;
+		*data = (unsigned char *)zbx_realloc(*data, *data_alloc);
+	}
+	ptr = *data + *data_offset;
+	*data_offset += data_len;
+
+	ptr += zbx_serialize_value(ptr, connector->protocol);
+	ptr += zbx_serialize_value(ptr, connector->data_type);
+	zbx_serialize_str(ptr, connector->url, url_len);
+}
+
+void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t size,
+		zbx_connector_t *connector, zbx_vector_connector_object_t *connector_objects)
+{
+	zbx_uint32_t		deserialize_url_len;
+	const unsigned char	*start = data;
+
+	data += zbx_deserialize_value(data, &connector->protocol);
+	data += zbx_deserialize_value(data, &connector->data_type);
+	data += zbx_deserialize_str(data, &connector->url, deserialize_url_len);
+
+	zbx_connector_deserialize_object(data, size - (data - start), connector_objects);
+}

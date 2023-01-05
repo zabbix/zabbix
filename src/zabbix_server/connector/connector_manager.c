@@ -39,7 +39,8 @@ static sigset_t				orig_mask;
 typedef struct
 {
 	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
-	void			*task;		/* the current task data */
+	zbx_uint64_t		taskid;		/* the current task data */
+	zbx_vector_uint64_t	ids;
 }
 zbx_connector_worker_t;
 
@@ -48,13 +49,13 @@ typedef struct
 {
 	zbx_connector_worker_t		*workers;	/* preprocessing worker array */
 	int				worker_count;	/* preprocessing worker count */
-	zbx_list_t			queue;		/* queue of item values */
 	zbx_hashset_t			linked_items;	/* linked items placed in queue */
 	zbx_hashset_t			connectors;
 	zbx_uint64_t			revision;	/* the configuration revision */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
+	zbx_list_t			queue;
 }
 zbx_connector_manager_t;
 
@@ -146,6 +147,97 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
 		worker->client = client;
+		zbx_vector_uint64_create(&worker->ids);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get worker without active preprocessing task                      *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *                                                                            *
+ * Return value: pointer to the worker data or NULL if none                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t *manager)
+{
+	int	i;
+
+	for (i = 0; i < manager->worker_count; i++)
+	{
+		if (0 == manager->workers[i].ids.values_num)
+			return &manager->workers[i];
+	}
+
+	return NULL;
+}
+
+static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
+		zbx_connector_worker_t *worker)
+{
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	zbx_object_link_t	*object_link;
+	int			i;
+
+	while (SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
+	{
+		zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
+
+		for (i = 0; i < object_link->connector_objects.values_num; i++)
+		{
+			zbx_connector_serialize_object(&data, &data_alloc, &data_offset,
+					&object_link->connector_objects.values[i]);
+		}
+
+		zbx_vector_connector_object_clear_ext(&object_link->connector_objects, zbx_connector_object_free);
+
+		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
+	}
+
+	message->code = ZBX_IPC_CONNECTOR_REQUEST;
+	message->data = data;
+	message->size = data_offset;
+
+	if (0 != worker->ids.values_num)
+		worker->taskid = connector->connectorid;
+}
+/******************************************************************************
+ *                                                                            *
+ * Purpose: assign available queued preprocessing tasks to free workers       *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	connector_assign_tasks(zbx_connector_manager_t *manager)
+{
+	zbx_connector_worker_t	*worker;
+	zbx_ipc_message_t	message;
+	zbx_connector_t		*connector;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&manager->connectors, &iter);
+
+	while (NULL != (worker = connector_get_free_worker(manager)) &&
+			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		connector_get_next_task(connector, &message, worker);
+
+		if (NULL == message.data)
+			continue;
+
+		if (FAIL == zbx_ipc_client_send(worker->client, message.code, message.data, message.size))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing worker");
+			exit(EXIT_FAILURE);
+		}
+
+		zbx_ipc_message_clean(&message);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -186,6 +278,64 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 	}
 }
 
+static zbx_connector_worker_t	*connector_get_worker_by_client(zbx_connector_manager_t *manager,
+		zbx_ipc_client_t *client)
+{
+	int				i;
+	zbx_connector_worker_t	*worker = NULL;
+
+	for (i = 0; i < manager->worker_count; i++)
+	{
+		if (client == manager->workers[i].client)
+		{
+			worker = &manager->workers[i];
+			break;
+		}
+	}
+
+	if (NULL == worker)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return worker;
+}
+
+static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_connector_worker_t	*worker;
+	zbx_connector_t		*connector;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	worker = connector_get_worker_by_client(manager, client);
+
+	if (NULL != (connector = (zbx_connector_t *)zbx_hashset_search(&manager->connectors, &worker->taskid)))
+	{
+		for (i = 0; i < worker->ids.values_num; i++)
+		{
+			zbx_object_link_t	*object_link;
+
+			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_link,
+					&worker->ids.values[i])))
+			{
+				continue;
+			}
+
+			if (0 == object_link->connector_objects.values_num)
+			{
+				zbx_hashset_remove_direct(&connector->object_link, object_link);
+			}
+			else
+				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
+		}
+	}
+
+	zbx_vector_uint64_clear(&worker->ids);
+}
+
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
 	zbx_ipc_service_t			service;
@@ -204,6 +354,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
+#define	FLUSH_INTERVAL	1
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 				server_num, get_process_type_string(process_type), process_num);
@@ -240,6 +391,11 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			processed_num = 0;
 		}
 
+		if (FLUSH_INTERVAL < time_now - time_flush)
+		{
+			connector_assign_tasks(&manager);
+		}
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -262,6 +418,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 					break;
 				case ZBX_IPC_CONNECTOR_WORKER:
 					connector_register_worker(&manager, client, message);
+					break;
+				case ZBX_IPC_CONNECTOR_RESULT:
+					connector_add_result(&manager, client);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
