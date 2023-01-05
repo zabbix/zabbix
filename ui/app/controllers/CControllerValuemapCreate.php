@@ -25,7 +25,7 @@ class CControllerValuemapCreate extends CController {
 		$fields = [
 			'name'         => 'required | string | not_empty | db valuemaps.name',
 			'mappings'     => 'required | array',
-			'form_refresh' => '',
+			'form_refresh' => 'int32',
 			'page'         => 'ge 1'
 		];
 

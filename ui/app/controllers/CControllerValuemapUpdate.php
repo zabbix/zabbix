@@ -26,7 +26,7 @@ class CControllerValuemapUpdate extends CController {
 			'valuemapid'   => 'fatal | required | db valuemaps.valuemapid',
 			'name'         => 'required | string | not_empty | db valuemaps.name',
 			'mappings'     => 'required | array',
-			'form_refresh' => '',
+			'form_refresh' => 'int32',
 			'page'         => 'ge 1'
 		];
 
