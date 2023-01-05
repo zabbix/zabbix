@@ -27,7 +27,6 @@ class CControllerIconMapEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'form_refresh'   => 'int32',
 			'iconmapid'      => 'db icon_map.iconmapid',
 			'iconmap'        => 'array'
 		];
@@ -95,7 +94,6 @@ class CControllerIconMapEdit extends CController {
 		order_result($this->iconmap['mappings'], 'sortorder');
 
 		$data = [
-			'form_refresh' => $this->getInput('form_refresh', 0),
 			'iconmapid' => $this->getInput('iconmapid', 0),
 			'icon_list' => $this->images,
 			'iconmap' => $this->iconmap,
