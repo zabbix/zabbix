@@ -23,8 +23,9 @@ class CControllerIconMapUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmapid' => 'fatal | required | db icon_map.iconmapid',
-			'iconmap'   => 'required | array'
+			'form_refresh' => 'int32',
+			'iconmapid'    => 'fatal | required | db icon_map.iconmapid',
+			'iconmap'      => 'required | array'
 		];
 
 		$ret = $this->validateInput($fields);

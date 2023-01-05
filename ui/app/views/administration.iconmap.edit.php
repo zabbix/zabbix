@@ -40,6 +40,7 @@ $name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
 $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('iconmap')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')

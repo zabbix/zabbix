@@ -23,7 +23,8 @@ class CControllerIconMapCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmap'   => 'required | array'
+			'form_refresh' => 'int32',
+			'iconmap'      => 'required | array'
 		];
 
 		$ret = $this->validateInput($fields);
