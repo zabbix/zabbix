@@ -28,9 +28,7 @@ libpreprocessor_a_SOURCES = \
 	pp_task.c \
 	pp_task.h \
 	pp_worker.c \
-	pp_worker.h \
-	preproc_history.c \
-	preproc_history.h
+	pp_worker.h
 
 libpreprocessor_a_CFLAGS = \
 	 $(LIBXML2_CFLAGS)

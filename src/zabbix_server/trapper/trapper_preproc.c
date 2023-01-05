@@ -20,7 +20,6 @@
 #include "trapper_preproc.h"
 #include "zbxpreproc.h"
 #include "preproc.h"
-#include "../preprocessor/preproc_history.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
 

@@ -32,8 +32,6 @@
 
 #include "zbxnum.h"
 
-#include "preproc_history.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: returns numeric type hint based on item value type                *

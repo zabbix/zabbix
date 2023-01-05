@@ -23,7 +23,6 @@
 
 #include "log.h"
 #include "zbxserialize.h"
-#include "preproc_history.h"
 #include "item_preproc.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
@@ -428,74 +427,6 @@ static int	preprocessor_unpack_steps(const unsigned char *data, zbx_pp_item_prep
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free dependent item preprocessing response                        *
- *                                                                            *
- * Parameters: results     - [OUT] the preprocessing results                  *
- *             results_num - [IN] the number of preprocessing results         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_preprocessor_free_dep_results(zbx_preproc_dep_result_t *results, int results_num)
-{
-	int	i;
-
-	for (i = 0; i < results_num; i++)
-	{
-		zbx_free_agent_result(&results[i].value);
-		zbx_free(results[i].error);
-		zbx_vector_ptr_clear_ext(&results[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-		zbx_vector_ptr_destroy(&results[i].history);
-	}
-
-	zbx_free(results);
-}
-
-void	zbx_preprocessor_result_init(zbx_preproc_result_buffer_t *buf, int total_num)
-{
-	if (ZBX_PREPROC_MAX_PACKET_SIZE < (buf->data_alloc = (zbx_uint32_t)total_num * 64))
-		buf->data_alloc = ZBX_PREPROC_MAX_PACKET_SIZE;
-
-	buf->data = (unsigned char *)zbx_malloc(NULL, buf->data_alloc);
-	buf->data_offset = zbx_serialize_value(buf->data, total_num);
-	/* reserve space for number of results in batch */
-	buf->data_offset += (zbx_uint32_t)sizeof(int);
-
-	/* reserve fields for result + one history record */
-	buf->fields_num = 12;
-	buf->fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)buf->fields_num * sizeof(zbx_packed_field_t));
-
-	buf->results_num = 0;
-	buf->code = ZBX_IPC_PREPROCESSOR_DEP_RESULT;
-}
-
-void	zbx_preprocessor_result_clear(zbx_preproc_result_buffer_t *buf)
-{
-	zbx_free(buf->data);
-	zbx_free(buf->fields);
-}
-
-void	zbx_preprocessor_result_flush(zbx_preproc_result_buffer_t *buf, zbx_ipc_socket_t *socket)
-{
-	unsigned char	*batch_ptr;
-
-	if (0 == buf->results_num)
-		return;
-
-	batch_ptr = buf->data;
-
-	if (ZBX_IPC_PREPROCESSOR_DEP_RESULT == buf->code)
-		batch_ptr += sizeof(int);
-
-	(void)zbx_serialize_value(batch_ptr, buf->results_num);
-
-	if (FAIL == zbx_ipc_socket_write(socket, buf->code, buf->data, buf->data_offset))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
-		exit(EXIT_FAILURE);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: pack preprocessing result data into a single buffer that can be   *
  *          used in IPC                                                       *
  *                                                                            *
@@ -713,45 +644,6 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 	value->result = agent_result;
 
 	return (int)(offset - data);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free preprocessing steps                                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_preprocessor_free_steps(zbx_preproc_op_t *steps, int steps_num)
-{
-	while (0 < steps_num)
-	{
-		steps_num--;
-		zbx_free(steps[steps_num].params);
-		zbx_free(steps[steps_num].error_handler_params);
-	}
-
-	zbx_free(steps);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free dependent item preprocessing request                         *
- *                                                                            *
- * Parameters: deps     - [OUT] the dependent items                           *
- *             deps_num - [IN] the number of dependent items                  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_preprocessor_free_deps(zbx_preproc_dep_t *deps, int deps_num)
-{
-	int	i;
-
-	for (i = 0; i < deps_num; i++)
-	{
-		zbx_preprocessor_free_steps(deps[i].steps, deps[i].steps_num);
-		zbx_vector_ptr_clear_ext(&deps[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-		zbx_vector_ptr_destroy(&deps[i].history);
-	}
-
-	zbx_free(deps);
 }
 
 /******************************************************************************
