@@ -516,7 +516,6 @@ void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_
 				{
 					char	*str;
 
-
 					loc = &params->values[index];
 					str = zbx_function_param_unquote_dyn(parameter + loc->l, 1 + loc->r - loc->l,
 							&dummy);
