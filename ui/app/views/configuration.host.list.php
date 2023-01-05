@@ -261,6 +261,7 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
+		->setArgumentCsrfToken()
 		->setArgument('backurl',
 			(new CUrl('zabbix.php', false))
 				->setArgument('action', 'host.list')
@@ -285,16 +286,14 @@ foreach ($data['hosts'] as $host) {
 		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'))
-			->addCsrfToken('popup.massupdate.host');
+			->addConfirmation(_('Disable host?'));
 	}
 	else {
 		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
 		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'))
-			->addCsrfToken('popup.massupdate.host');
+			->addConfirmation(_('Enable host?'));
 	}
 
 	if ($maintenance_icon) {

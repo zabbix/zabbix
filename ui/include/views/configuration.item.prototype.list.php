@@ -132,11 +132,11 @@ foreach ($data['items'] as $item) {
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
+			->setArgumentCsrfToken()
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($item['status']))
-		->addCsrfToken($status_action);
+		->addClass(itemIndicatorStyle($item['status']));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -173,9 +173,9 @@ foreach ($data['items'] as $item) {
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('action', $discover_action)
 				->setArgument('context', $data['context'])
+				->setArgumentCsrfToken()
 				->getUrl()
 		))
-			->addCsrfToken($discover_action)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 

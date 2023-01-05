@@ -89,11 +89,11 @@ foreach ($data['drules'] as $drule) {
 					? 'discovery.disable'
 					: 'discovery.enable'
 				)
+				->setArgumentCsrfToken()
 				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
-			->addCsrfToken($drule['status'] == DRULE_STATUS_ACTIVE ? 'discovery.disable' : 'discovery.enable')
 	);
 
 	$discoveryTable->addRow([

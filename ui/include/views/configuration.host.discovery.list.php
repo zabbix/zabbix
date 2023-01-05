@@ -256,11 +256,11 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('g_hostdruleid[]', $discovery['itemid'])
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
+			->setArgumentCsrfToken()
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
-			->addCsrfToken($status_action);
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP

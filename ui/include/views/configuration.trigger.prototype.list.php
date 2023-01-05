@@ -146,11 +146,11 @@ foreach ($data['triggers'] as $trigger) {
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
+			->setArgumentCsrfToken()
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status']))
-		->addCsrfToken($status_action);
+		->addClass(triggerIndicatorStyle($trigger['status']));
 
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
@@ -164,7 +164,6 @@ foreach ($data['triggers'] as $trigger) {
 				->setArgumentCsrfToken()
 				->getUrl()
 		))
-			->addCsrfToken($discover_action)
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 

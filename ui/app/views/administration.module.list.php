@@ -99,16 +99,14 @@ foreach ($data['modules'] as $moduleid => $module) {
 		->getUrl();
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
-		$status = (new CLink(_('Enabled'), $status_url))
+		$status = (new CLink(_('Enabled'), (new CUrl($status_url))->setArgumentCsrfToken()->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN)
-			->addCsrfToken('module.disable');
+			->addClass(ZBX_STYLE_GREEN);
 	}
 	else {
-		$status = (new CLink(_('Disabled'), $status_url))
+		$status = (new CLink(_('Disabled'), (new CUrl($status_url))->setArgumentCsrfToken()->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED)
-			->addCsrfToken('module.enable');
+			->addClass(ZBX_STYLE_RED);
 	}
 
 	// append table row

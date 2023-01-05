@@ -130,20 +130,20 @@ foreach ($data['tokens'] as $token) {
 					->setArgument('action_src', 'user.token.list')
 					->setArgument('action', 'token.disable')
 					->setArgument('tokenids', (array) $token['tokenid'])
+					->setArgumentCsrfToken()
 					->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addCsrfToken('token.disable')
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 					->setArgument('action_src', 'user.token.list')
 					->setArgument('action', 'token.enable')
 					->setArgument('tokenids', (array) $token['tokenid'])
+					->setArgumentCsrfToken()
 					->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->addCsrfToken('token.enable')
 	]);
 }
 

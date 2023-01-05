@@ -86,20 +86,20 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
+			->setArgumentCsrfToken()
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
-			->addCsrfToken('usergroup.massupdate')
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
+			->setArgumentCsrfToken()
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN)
-			->addCsrfToken('usergroup.massupdate');
+			->addClass(ZBX_STYLE_GREEN);
 
 	$gui_access = user_auth_type2str($usergroup['gui_access']);
 
@@ -114,30 +114,30 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('gui_access', $next_gui_auth)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
+				->setArgumentCsrfToken()
 				->getUrl()
 			))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addCsrfToken('usergroup.massupdate');
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
+				->setArgumentCsrfToken()
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addCsrfToken('usergroup.massupdate')
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
+				->setArgumentCsrfToken()
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
-				->addCsrfToken('usergroup.massupdate');
+				->addClass(ZBX_STYLE_RED);
 	}
 	else {
 		$gui_access = new CSpan($gui_access);

@@ -300,11 +300,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			->setArgument('g_triggerid', $triggerid)
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
+			->setArgumentCsrfToken()
 			->getUrl()
 		))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
-		->addCsrfToken($status_action);
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
 
 	// hosts
 	$hosts = null;
