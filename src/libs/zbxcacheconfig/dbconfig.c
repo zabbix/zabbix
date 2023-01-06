@@ -9256,11 +9256,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 
 static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync)
 {
-	if (NULL != dc_item->master_item || NULL != dc_item->preproc_item || ITEM_TYPE_INTERNAL == dc_item->type ||
-			ZBX_FLAG_DISCOVERY_RULE == dc_item->flags)
-	{
-		zbx_vector_dc_item_ptr_append(items_sync, dc_item);
-	}
+	zbx_vector_dc_item_ptr_append(items_sync, dc_item);
 
 	if (NULL != dc_item->master_item)
 	{
