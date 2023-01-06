@@ -76,7 +76,7 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	// form
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,			null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -344,7 +344,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['current_user_userid'] = $current_userid;
-	$data['form_refresh'] = getRequest('form_refresh');
+	$data['form_refresh'] = getRequest('form_refresh', 0);
 
 	// config
 	$data['config'] = select_config();
