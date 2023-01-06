@@ -268,7 +268,7 @@ class testSlaReport extends CWebTest {
 				case 'Weekly':
 					for ($i = 1; $i <= 20; $i++) {
 						$period_values[$i]['start'] = strtotime('next Sunday '.-$i.' week');
-						$period_values[$i]['end'] = $period_values[$i]['start'] + 86400 * 7 - 1;
+						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 6 days');
 
 						$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
 								date('m-d', $period_values[$i]['end']);
