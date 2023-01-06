@@ -240,6 +240,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$media_mapping_footer = $media_mapping_dialog->getFooter();
 		$this->assertTrue($media_mapping_footer->query('button:Add')->one()->isClickable());
 		$media_mapping_footer->query('button:Cancel')->waitUntilClickable()->one()->click();
+
+		$server_dialog->close();
 	}
 
 	public function getTestData() {
