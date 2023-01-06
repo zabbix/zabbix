@@ -1235,6 +1235,7 @@ if (isset($_REQUEST['form'])) {
 elseif (((hasRequest('action') && getRequest('action') === 'itemprototype.massupdateform') || hasRequest('massupdate'))
 		&& hasRequest('group_itemid')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'action' => 'itemprototype.massupdateform',
 		'hostid' => getRequest('hostid', 0),
