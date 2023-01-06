@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	));
 
 $form = (new CForm())
+	->addVar('form_refresh', getRequest('form_refresh', 0) + 1)
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
