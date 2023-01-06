@@ -792,7 +792,7 @@ function prepareItemHttpAgentFormData(array $item) {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
