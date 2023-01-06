@@ -29,8 +29,6 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 
-#define OVERRIDE_STOP_TRUE	1
-
 /* lld rule filter condition (item_condition table record) */
 typedef struct
 {
@@ -1013,6 +1011,8 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 		zbx_vector_lld_item_link_create(&lld_row->item_links);
 		zbx_vector_lld_override_create(&lld_row->overrides);
 
+#define OVERRIDE_STOP_TRUE	1
+
 		for (i = 0; i < overrides->values_num; i++)
 		{
 			zbx_lld_override_t	*override = overrides->values[i];
@@ -1025,6 +1025,8 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 			if (OVERRIDE_STOP_TRUE == override->stop)
 				break;
 		}
+
+#undef OVERRIDE_STOP_TRUE
 	}
 
 	ret = SUCCEED;
