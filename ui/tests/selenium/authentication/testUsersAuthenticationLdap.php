@@ -47,6 +47,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$this->page->assertHeader('Authentication');
 		$this->assertTrue($form->getField('Enable LDAP authentication')->isEnabled());
 
+		// Check LDAP form default values.
 		$form->checkValue([
 			'Enable LDAP authentication' => false,
 			'Enable JIT provisioning' => false,
@@ -54,6 +55,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			'Provisioning period' => '1h'
 		]);
 
+		// Check LDAP form fields editability.
 		foreach ([false, true] as $status) {
 			$form->fill(['Enable LDAP authentication' => $status]);
 
@@ -62,16 +64,182 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 		}
 
+		// Check 'Provisioning period' field's editability.
 		foreach ([false, true] as $jit_status) {
 			$form->fill(['Enable JIT provisioning' => $jit_status]);
 			$this->assertTrue($form->getField('Provisioning period')->isEnabled($jit_status));
 		}
 
+		// Check default server popup fields.
 		$form->getFieldContainer('Servers')->query('button:Add')->waitUntilClickable()->one()->click();
 		$server_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('New LDAP server', $server_dialog->getTitle());
 		$server_form = $server_dialog->asForm();
 
+		$server_fields = [
+			'Name' => ['visible' => true, 'maxlength' => 128, 'value' => '', 'mandatory' => true],
+			'Host' => ['visible' => true, 'maxlength' => 255, 'value' => '', 'mandatory' => true],
+			'Port' => ['visible' => true, 'maxlength' => 5, 'value' => 389, 'mandatory' => true],
+			'Base DN' => ['visible' => true, 'maxlength' => 255, 'value' => '', 'mandatory' => true],
+			'Search attribute' => ['visible' => true, 'maxlength' => 128, 'value' => '', 'mandatory' => true],
+			'Bind DN' => ['visible' => true, 'maxlength' => 255, 'value' => ''],
+			'Bind password' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
+			'Description' => ['visible' => true, 'maxlength' => 65535, 'value' => ''],
+			'Configure JIT provisioning' => ['visible' => true, 'value' => false],
+			'Advanced configuration' => ['visible' => true, 'value' => false],
+			'Group configuration' => ['visible' => false, 'value' => 'memberOf'],
+			'Group base DN' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'Group name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'Group member attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'Reference attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'Group filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'],
+			'User group membership attribute' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'],
+			'User name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'User last name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
+			'User group mapping' => ['visible' => false, 'mandatory' => true],
+			'Media type mapping' => ['visible' => false ],
+			'StartTLS' => ['visible'  => false, 'value' => false],
+			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
+		];
 
+		foreach ($server_fields as $field => $attributes) {
+			$this->assertEquals($attributes['visible'], $server_form->getField($field)->isVisible());
+			$this->assertTrue($server_form->getField($field)->isEnabled());
+
+			if (array_key_exists('value', $attributes)) {
+				$this->assertEquals($attributes['value'], $server_form->getField($field)->getValue());
+			}
+
+			if (array_key_exists('maxlength', $attributes)) {
+				$this->assertEquals($attributes['maxlength'], $server_form->getField($field)->getAttribute('maxlength'));
+			}
+
+			if (array_key_exists('placeholder', $attributes)) {
+				$this->assertEquals($attributes['placeholder'], $server_form->getField($field)->getAttribute('placeholder'));
+			}
+
+			if (array_key_exists('mandatory', $attributes)) {
+				$this->assertStringContainsString('form-label-asterisk', $server_form->getLabel($field)->getAttribute('class'));
+			}
+		}
+
+		// Check JIT fields (memberOf).
+		$server_form->fill(['Configure JIT provisioning' => true]);
+		$server_form->query('xpath:.//label[text()="Group configuration"]')->waitUntilVisible()->one();
+
+		$jit_fields_memberOf = [
+			'Group base DN' => false,
+			'Group name attribute' => true,
+			'Group member attribute' => false,
+			'Reference attribute' => false,
+			'Group filter' => false,
+			'User group membership attribute' => true,
+			'User name attribute' => true,
+			'User last name attribute' => true,
+			'User group mapping' => true,
+			'Media type mapping' => true
+		];
+
+		foreach ($jit_fields_memberOf as $field => $visible) {
+			$this->assertEquals($visible, $server_form->getField($field)->isVisible());
+			$this->assertTrue($server_form->getField($field)->isEnabled());
+		}
+
+		// Check JIT fields (groupOfNames).
+		$server_form->fill(['Group configuration' => 'groupOfNames']);
+		$server_form->query('xpath:.//label[text()="Group base DN"]')->waitUntilVisible()->one();
+
+		$jit_fields_groupOfNames = [
+			'Group base DN' => true,
+			'Group name attribute' => true,
+			'Group member attribute' => true,
+			'Reference attribute' => true,
+			'Group filter' => true,
+			'User group membership attribute' => false,
+			'User name attribute' => true,
+			'User last name attribute' => true,
+			'User group mapping' => true,
+			'Media type mapping' => true
+		];
+
+		foreach ($jit_fields_groupOfNames as $field => $visible) {
+			$this->assertEquals($visible, $server_form->getField($field)->isVisible());
+			$this->assertTrue($server_form->getField($field)->isEnabled());
+		}
+
+		// Check Advanced fields.
+		$server_form->fill(['Advanced configuration' => true]);
+		$server_form->query('xpath:.//label[text()="StartTLS"]')->waitUntilVisible()->one();
+		$this->assertTrue($server_form->getField('Search filter')->isVisible());
+
+		// Open hintboxes and compare text.
+		$hintboxes = [
+			'Group configuration' => 'memberOf is a preferable way to configure groups because it is faster. '.
+					'Use groupOfNames if your LDAP server does not support memberOf or group filtering is required.',
+			'Reference attribute' => 'Use %{ref} in group filter to reference value of this user attribute.',
+			'Media type mapping' => 'Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending '.
+					'notifications.'
+		];
+
+		foreach ($hintboxes as $field => $text) {
+			$server_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+			$this->assertEquals($text, $hint->getText());
+			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+		}
+
+		// Check group mapping popup.
+		$server_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+		$group_mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals('New user group mapping', $group_mapping_dialog->getTitle());
+		$group_mapping_form = $group_mapping_dialog->asForm();
+
+		foreach (['LDAP group pattern', 'User groups', 'User role'] as $label) {
+			$field = $group_mapping_form->getField($label);
+			$this->assertTrue($field->isVisible());
+			$this->assertTrue($field->isEnabled());
+			$this->assertEquals('', $field->getValue());
+			$this->assertStringContainsString('form-label-asterisk',
+					$group_mapping_form->getLabel($label)->getAttribute('class')
+			);
+		}
+
+		// Check hint in group mapping popup.
+		$group_mapping_form->query('xpath:.//label[text()="LDAP group pattern"]/a')->one()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+		$text = "Naming requirements:".
+				"\ngroup name must match LDAP group name".
+				"\nwildcard patterns with '*' may be used";
+		$this->assertEquals($text, $hint->getText());
+		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+
+		// Check group mapping popup footer buttons.
+		$group_mapping_footer = $group_mapping_dialog->getFooter();
+		$this->assertTrue($group_mapping_footer->query('button:Add')->one()->isClickable());
+		$group_mapping_footer->query('button:Cancel')->waitUntilClickable()->one()->click();
+
+		// Check media type mapping popup.
+		$server_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+		$media_mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals('New media type mapping', $media_mapping_dialog->getTitle());
+		$media_mapping_form = $media_mapping_dialog->asForm();
+
+		foreach (['Name', 'Media type', 'Attribute'] as $label) {
+			$field = $media_mapping_form->getField($label);
+			$this->assertTrue($field->isVisible());
+			$this->assertTrue($field->isEnabled());
+			$this->assertStringContainsString('form-label-asterisk',
+					$media_mapping_form->getLabel($label)->getAttribute('class')
+			);
+		}
+
+		// Check default values in  media type mapping popup.
+		$media_mapping_form->checkValue(['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']);
+
+		// Check media mapping popup footer buttons.
+		$media_mapping_footer = $media_mapping_dialog->getFooter();
+		$this->assertTrue($media_mapping_footer->query('button:Add')->one()->isClickable());
+		$media_mapping_footer->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
 
 	public function getTestData() {
@@ -861,7 +1029,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check DB configuration.
-			$sql = 'SELECT  host, port, base_dn, bind_dn, bind_password, search_attribute '.
+			$sql = 'SELECT host, port, base_dn, bind_dn, bind_password, search_attribute '.
 					'FROM userdirectory_ldap '.
 					'WHERE userdirectoryid IN ('.
 						'SELECT userdirectoryid'.
@@ -926,9 +1094,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Fill and submit LDAP server settings.
 	 *
-	 * @param string $data				  data provider
-	 * @param string $query			      object to click for LDAP creating or updating
-	 * @param string  $values			  simple LDAP server values
+	 * @param string $data				 data provider
+	 * @param string $query			   object to click for LDAP creating or updating
+	 * @param string $values			 simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
@@ -991,8 +1159,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Create or update LDAP server values.
 	 *
-	 * @param array $data	   data provider
-	 * @param string $query    object to click for LDAP creating or updating
+	 * @param array $data	  data provider
+	 * @param string $query  object to click for LDAP creating or updating
 	 */
 	private function checkLdap($data, $query) {
 		$form = $this->openLdapForm('LDAP');
