@@ -1479,6 +1479,8 @@ static int	DBpatch_6030158(void)
 
 #undef HOST_STATUS_TEMPLATE
 #define HOST_STATUS_TEMPLATE		3
+#define MAX_LONG_NAME_COLLISIONS	999999
+#define MAX_LONG_NAME_COLLISIONS_LEN	6
 
 typedef struct
 {
@@ -1748,6 +1750,33 @@ static void	collect_valuemaps(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64
 	zbx_vector_uint64_destroy(&loc_child_templateids);
 }
 
+static void	correct_entity_name(char **name, int uniq, int max_len, int *long_name_collisions)
+{
+	int	tmp, len, uniq_len = 0;
+
+	tmp = uniq;
+	len = strlen(*name);
+
+	do
+	{
+		tmp = tmp / 10;
+		uniq_len++;
+	} while (0 < tmp);
+
+	if (max_len < len + uniq_len + 1)
+	{
+		char	*ptr = *name;
+
+		ptr[len - MAX_LONG_NAME_COLLISIONS_LEN - 1] = '\0';
+		*name = zbx_dsprintf(*name, "%s %d", *name, (*long_name_collisions)--);
+
+		if (0 == *long_name_collisions)
+			*long_name_collisions = MAX_LONG_NAME_COLLISIONS;
+	}
+	else
+		*name = zbx_dsprintf(*name, "%s %d", *name, uniq);
+}
+
 static int	DBpatch_6030159(void)
 {
 	zbx_vector_valuemap_ptr_t		valuemaps;
@@ -1755,7 +1784,8 @@ static int	DBpatch_6030159(void)
 	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
-	int					changed, i, j, mappings_num = 0, ret = SUCCEED;
+	int					iterations, changed, i, j, mappings_num = 0, ret = SUCCEED,
+						long_name_collisions = MAX_LONG_NAME_COLLISIONS;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_valuemap, db_insert_valuemap_mapping;
@@ -1807,8 +1837,11 @@ static int	DBpatch_6030159(void)
 
 	zbx_vector_valuemap_ptr_uniq2(&valuemaps, (zbx_compare_func_t)valuemap_compare);
 
+	iterations = 0;
+
 	do
 	{
+		int			last_collision_idx;
 		zbx_db_valuemap_t	*valuemap, *valuemap2;
 
 		changed = 0;
@@ -1829,6 +1862,7 @@ static int	DBpatch_6030159(void)
 				{
 					changed++;
 					valuemap->uniq++;
+					last_collision_idx = j;
 				}
 			}
 		}
@@ -1847,8 +1881,16 @@ static int	DBpatch_6030159(void)
 				{
 					changed++;
 					valuemap2->uniq++;
+					last_collision_idx = j;
 				}
 			}
+		}
+
+		if (MAX_LONG_NAME_COLLISIONS < iterations)
+		{
+			valuemap_free(valuemaps.values[last_collision_idx]);
+			zbx_vector_valuemap_ptr_remove(&valuemaps, last_collision_idx);
+			iterations = 0;
 		}
 
 		for (i = 0; i < valuemaps.values_num; i++)
@@ -1857,10 +1899,12 @@ static int	DBpatch_6030159(void)
 
 			if (0 != valuemap->uniq)
 			{
-				valuemap->name = zbx_dsprintf(valuemap->name, "%s %d", valuemap->name, valuemap->uniq);
+				correct_entity_name(&valuemap->name, valuemap->uniq, 64, &long_name_collisions);
 				valuemap->uniq = 0;
 			}
 		}
+
+		iterations++;
 	}while (0 != changed);
 
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3007,8 +3051,9 @@ static int	DBpatch_6030162(void)
 	zbx_vector_uint64_t			parent_ids, child_templateids;
 	DB_RESULT				result;
 	DB_ROW					row;
-	int					changed, i, j, k, l, pages_num = 0, widgets_num = 0, fields_num = 0,
-						ret = SUCCEED;
+	int					iterations, changed, i, j, k, l, pages_num = 0, widgets_num = 0,
+						fields_num = 0, ret = SUCCEED,
+						long_name_collisions = MAX_LONG_NAME_COLLISIONS;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 	zbx_db_insert_t				db_insert_dashboard, db_insert_dashboard_page, db_insert_widget,
@@ -3059,8 +3104,11 @@ static int	DBpatch_6030162(void)
 
 	zbx_vector_dashboard_ptr_uniq2(&dashboards, (zbx_compare_func_t)dashboard_compare);
 
+	iterations = 0;
+
 	do
 	{
+		int			last_collision_idx;
 		zbx_db_dashboard_t	*dashboard, *dashboard2;
 
 		changed = 0;
@@ -3081,6 +3129,7 @@ static int	DBpatch_6030162(void)
 				{
 					changed++;
 					dashboard->uniq++;
+					last_collision_idx = j;
 				}
 			}
 		}
@@ -3099,8 +3148,16 @@ static int	DBpatch_6030162(void)
 				{
 					changed++;
 					dashboard2->uniq++;
+					last_collision_idx = j;
 				}
 			}
+		}
+
+		if (MAX_LONG_NAME_COLLISIONS < iterations)
+		{
+			dashboard_free(dashboards.values[last_collision_idx]);
+			zbx_vector_dashboard_ptr_remove(&dashboards, last_collision_idx);
+			iterations = 0;
 		}
 
 		for (i = 0; i < dashboards.values_num; i++)
@@ -3109,11 +3166,12 @@ static int	DBpatch_6030162(void)
 
 			if (0 != dashboard->uniq)
 			{
-				dashboard->name = zbx_dsprintf(dashboard->name, "%s %d", dashboard->name,
-						dashboard->uniq);
+				correct_entity_name(&dashboard->name, dashboard->uniq, 255, &long_name_collisions);
 				dashboard->uniq = 0;
 			}
 		}
+
+		iterations++;
 	}while (0 != changed);
 
 	dashboardid = DBget_maxid_num("dashboard", dashboards.values_num);
@@ -3482,6 +3540,8 @@ static int	DBpatch_6030168(void)
 	return SUCCEED;
 }
 #undef HOST_STATUS_TEMPLATE
+#undef MAX_LONG_NAME_COLLISIONS
+#undef MAX_LONG_NAME_COLLISIONS_LEN
 
 #endif
 
