@@ -756,7 +756,7 @@ function getParentLldRules(array $items, bool $allowed_ui_conf_templates): array
 	}
 
 	$db_items = API::DiscoveryRule()->get([
-		'output' => [],
+		'output' => ['hostid'],
 		'selectHosts' => ['name'],
 		'itemids' => array_keys($parent_items),
 		'preservekeys' => true
@@ -764,7 +764,7 @@ function getParentLldRules(array $items, bool $allowed_ui_conf_templates): array
 
 	if ($allowed_ui_conf_templates && $db_items) {
 		$editable_items = API::DiscoveryRule()->get([
-			'output' => ['hostid'],
+			'output' => [],
 			'itemids' => array_keys($parent_items),
 			'editable' => true,
 			'preservekeys' => true
@@ -773,19 +773,11 @@ function getParentLldRules(array $items, bool $allowed_ui_conf_templates): array
 
 	foreach ($parent_items as $itemid => &$parent_item) {
 		if (array_key_exists($itemid, $db_items)) {
-			if ($allowed_ui_conf_templates && array_key_exists($itemid, $editable_items)) {
-				$parent_item = [
-					'editable' => true,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-					'templateid' => $editable_items[$itemid]['hostid']
-				];
-			}
-			else {
-				$parent_item = [
-					'editable' => false,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name']
-				];
-			}
+			$parent_item = [
+				'editable' => $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items),
+				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
+				'templateid' => $db_items[$itemid]['hostid']
+			];
 		}
 		else {
 			$parent_item = [
@@ -822,7 +814,7 @@ function getParentItemPrototypes(array $items, bool $allowed_ui_conf_templates):
 	}
 
 	$db_items = API::ItemPrototype()->get([
-		'output' => [],
+		'output' => ['hostid'],
 		'selectHosts' => ['name'],
 		'itemids' => array_keys($parent_items),
 		'preservekeys' => true
@@ -840,19 +832,13 @@ function getParentItemPrototypes(array $items, bool $allowed_ui_conf_templates):
 
 	foreach ($parent_items as $itemid => &$parent_item) {
 		if (array_key_exists($itemid, $db_items)) {
-			if ($allowed_ui_conf_templates && array_key_exists($itemid, $editable_items)) {
-				$parent_item = [
-					'editable' => true,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-					'ruleid' => $editable_items[$itemid]['discoveryRule']['itemid']
-				];
-			}
-			else {
-				$parent_item = [
-					'editable' => false,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name']
-				];
-			}
+			$editable = $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items);
+
+			$parent_item = [
+				'editable' => $editable,
+				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
+				'templateid' => $db_items[$itemid]['hostid']
+			] + ($editable ? ['ruleid' => $editable_items[$itemid]['discoveryRule']['itemid']] : []);
 		}
 		else {
 			$parent_item = [
@@ -889,7 +875,7 @@ function getParentItems(array $items, bool $allowed_ui_conf_templates): array {
 	}
 
 	$db_items = API::Item()->get([
-		'output' => [],
+		'output' => ['hostid'],
 		'selectHosts' => ['name'],
 		'itemids' => array_keys($parent_items),
 		'webitems' => true,
@@ -898,7 +884,7 @@ function getParentItems(array $items, bool $allowed_ui_conf_templates): array {
 
 	if ($allowed_ui_conf_templates && $db_items) {
 		$editable_items = API::Item()->get([
-			'output' => ['hostid'],
+			'output' => [],
 			'itemids' => array_keys($parent_items),
 			'webitems' => true,
 			'editable' => true,
@@ -908,19 +894,11 @@ function getParentItems(array $items, bool $allowed_ui_conf_templates): array {
 
 	foreach ($parent_items as $itemid => &$parent_item) {
 		if (array_key_exists($itemid, $db_items)) {
-			if ($allowed_ui_conf_templates && array_key_exists($itemid, $editable_items)) {
-				$parent_item = [
-					'editable' => true,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name'],
-					'templateid' => $editable_items[$itemid]['hostid']
-				];
-			}
-			else {
-				$parent_item = [
-					'editable' => false,
-					'template_name' => $db_items[$itemid]['hosts'][0]['name']
-				];
-			}
+			$parent_item = [
+				'editable' => $allowed_ui_conf_templates && array_key_exists($itemid, $editable_items),
+				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
+				'templateid' => $db_items[$itemid]['hostid']
+			];
 		}
 		else {
 			$parent_item = [

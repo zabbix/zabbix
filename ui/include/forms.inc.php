@@ -1146,7 +1146,7 @@ function getItemFormData(array $item = [], array $options = []) {
 			$inherited_tags = [];
 
 			if (array_key_exists('item', $data)) {
-				if ($data['item']['discoveryRule']) {
+				if ($data['parent_discoveryid'] == 0 && $data['item']['discoveryRule']) {
 					$parent_items = getParentLldRules([$data['item']['discoveryRule']],
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 					);
@@ -1157,7 +1157,7 @@ function getItemFormData(array $item = [], array $options = []) {
 					$parent_item = array_key_exists('parent_item', $data) ? $data['parent_item'] : false;
 				}
 
-				if ($parent_item) {
+				if ($parent_item && array_key_exists('templateid', $parent_item)) {
 					$db_templates = API::Template()->get([
 						'output' => [],
 						'selectTags' => ['tag', 'value'],
@@ -1781,7 +1781,7 @@ function getTriggerFormData(array $data) {
 		$conditions = [];
 
 		if ($data['triggerid'] !== null) {
-			if ($data['parent_discoveryid'] !== null && $trigger['triggerDiscovery']) {
+			if ($data['parent_discoveryid'] === null && $trigger['triggerDiscovery']) {
 				$trigger_prototypes = API::TriggerPrototype()->get([
 					'output' => ['templateid'],
 					'triggerids' => $trigger['triggerDiscovery']['parent_triggerid']
@@ -1797,7 +1797,7 @@ function getTriggerFormData(array $data) {
 				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : false;
 			}
 
-			if ($parent_trigger) {
+			if ($parent_trigger && !array_key_exists(0, $parent_trigger['template_names'])) {
 				$db_templates = API::Template()->get([
 					'output' => [],
 					'selectTags' => ['tag', 'value'],
