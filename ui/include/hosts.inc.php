@@ -659,7 +659,14 @@ function addInheritedMacros(array &$macros, array $templateids = null, ?string $
 
 		foreach ($db_templates as $db_template) {
 			foreach ($db_template['macros'] as $db_macro) {
-				$inherited_macros[CApiInputValidator::trimMacro($db_macro['macro'])]['template'] = [
+				$trimmed_macro = CApiInputValidator::trimMacro($db_macro['macro']);
+
+				if (array_key_exists($trimmed_macro, $inherited_macros)
+						&& array_key_exists('template', $inherited_macros[$trimmed_macro])) {
+					continue;
+				}
+
+				$inherited_macros[$trimmed_macro]['template'] = [
 					'value' => getMacroConfigValue($db_macro),
 					'templateid' => $db_template['templateid'],
 					'name' => $db_template['name'],
