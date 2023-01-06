@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-29T09:52:36Z'
+  date: '2023-01-06T14:51:21Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -361,6 +361,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.[?(@.serviceJob == ''{#SERVICE.JOB}'')].first()'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: controlm.services
               tags:
@@ -494,11 +495,11 @@ zabbix_export:
             key: controlm.services
           lld_macro_paths:
             -
-              lld_macro: '{#SERVICE.JOB}'
-              path: $.serviceJob
-            -
               lld_macro: '{#SERVICE.NAME}'
               path: $.serviceName
+            -
+              lld_macro: '{#SERVICE.JOB}'
+              path: $.serviceJob
           preprocessing:
             -
               type: JSONPATH
@@ -590,7 +591,11 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Get status of jobs.'
-          url: '{$API.URI.ENDPOINT}/run/jobs/status?ctm={$SERVER.NAME}'
+          url: '{$API.URI.ENDPOINT}/run/jobs/status'
+          query_fields:
+            -
+              name: ctm
+              value: '{$SERVER.NAME}'
           headers:
             -
               name: x-api-key
