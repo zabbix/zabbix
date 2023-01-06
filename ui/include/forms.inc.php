@@ -1145,7 +1145,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		if ($data['show_inherited_tags']) {
 			$inherited_tags = [];
 
-			if (array_key_exists('item', $data)) {
+			if ($data['context'] === 'host' && array_key_exists('item', $data)) {
 				if ($data['parent_discoveryid'] == 0 && $data['item']['discoveryRule']) {
 					$parent_items = getParentLldRules([$data['item']['discoveryRule']],
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
@@ -1775,12 +1775,11 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
-
 	if ($data['show_inherited_tags']) {
 		$inherited_tags = [];
 		$conditions = [];
 
-		if ($data['triggerid'] !== null) {
+		if ($data['context'] === 'host' && $data['triggerid'] !== null) {
 			if ($data['parent_discoveryid'] === null && $trigger['triggerDiscovery']) {
 				$trigger_prototypes = API::TriggerPrototype()->get([
 					'output' => ['templateid'],

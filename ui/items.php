@@ -1353,24 +1353,27 @@ else {
 		(new CUrl('items.php'))->setArgument('context', $data['context'])
 	);
 
-	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$triggerids = [];
 
-	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
-
-	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
-		$itemTriggerIds = array_merge($itemTriggerIds, zbx_objectValues($item['triggers'], 'triggerid'));
+		foreach ($item['triggers'] as $trigger) {
+			$triggerids[$trigger['triggerid']] = true;
+		}
 	}
-	$data['itemTriggers'] = API::Trigger()->get([
-		'triggerids' => $itemTriggerIds,
+
+	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
 			'status', 'state', 'error', 'templateid', 'flags'
 		],
 		'selectHosts' => ['hostid', 'name', 'host'],
+		'triggerids' => array_keys($triggerids),
 		'preservekeys' => true
 	]);
 
-	$data['parent_triggers'] = getParentTriggers($data['itemTriggers'], $allowed_ui_conf_templates);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+	$data['parent_items'] = getParentItems($data['items'], $allowed_ui_conf_templates);
+	$data['parent_triggers'] = getParentTriggers($data['triggers'], $allowed_ui_conf_templates);
 
 	sort($filter_hostids);
 	$data['checkbox_hash'] = crc32(implode('', $filter_hostids));

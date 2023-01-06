@@ -101,7 +101,7 @@ $itemTable = (new CTableInfo())
 
 $current_time = time();
 
-$data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['itemTriggers'], [
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
@@ -196,7 +196,7 @@ foreach ($data['items'] as $item) {
 		->getUrl();
 
 	foreach ($item['triggers'] as $num => &$trigger) {
-		$trigger = $data['itemTriggers'][$trigger['triggerid']];
+		$trigger = $data['triggers'][$trigger['triggerid']];
 
 		$trigger_description = [];
 

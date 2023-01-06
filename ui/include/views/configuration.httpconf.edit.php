@@ -240,6 +240,7 @@ $http_tab = (new CTabView())
 			'source' => 'httptest',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
+			'context' => $data['context'],
 			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab'

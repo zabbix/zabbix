@@ -32,7 +32,7 @@ $show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 $parent_template_header = null;
 
-if ($show_inherited_tags) {
+if ($show_inherited_tags && $data['context'] === 'host') {
 	$parent_template_header = in_array($data['source'], ['trigger', 'trigger_prototype'])
 		? _('Parent templates')
 		: _('Parent template');
@@ -113,7 +113,7 @@ foreach ($data['tags'] as $i => $tag) {
 			->addClass(ZBX_STYLE_TOP)
 	];
 
-	if ($show_inherited_tags) {
+	if ($show_inherited_tags && $data['context'] === 'host') {
 		$template_list = [];
 
 		if (array_key_exists('parent_object', $tag)) {
