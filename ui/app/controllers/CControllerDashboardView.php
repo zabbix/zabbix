@@ -136,7 +136,8 @@ class CControllerDashboardView extends CController {
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1),
 			'csrf_tokens' => [
 				'dashboard.update' => self::generateCsrfToken('dashboard.update'),
-				'dashboard.widget.rfrate' => CController::generateCsrfToken('dashboard.widget.rfrate')
+				'dashboard.widget.rfrate' => self::generateCsrfToken('dashboard.widget.rfrate'),
+				'profile.update' => self::generateCsrfToken('profile.update')
 			]
 		];
 

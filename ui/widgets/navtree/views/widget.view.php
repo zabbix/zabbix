@@ -42,4 +42,5 @@ $item = new NavigationTree([
 (new CWidgetView($data))
 	->addItem($item)
 	->setVar('navtree_data', $item->getScriptData())
+	->setVar('csrf_tokens', $data['csrf_tokens'])
 	->show();

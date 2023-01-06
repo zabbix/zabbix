@@ -24,7 +24,9 @@ jQuery(function($) {
 	if ($layout_mode_btn.length) {
 		$layout_mode_btn.on('click', function(e) {
 			e.stopPropagation();
-			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'), []).always(function(){
+			updateUserProfile('web.layout.mode', $layout_mode_btn.data('layout-mode'),
+				$layout_mode_btn.data('csrf-token'), []
+			).always(function(){
 				var url = new Curl('');
 				url.unsetArgument('kiosk');
 				history.replaceState(history.state, '', url.getUrl());

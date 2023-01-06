@@ -162,10 +162,12 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'kioskmode':
+			$csrf_token = CController::generateCsrfToken('profile.update');
 			if ($params['mode'] == ZBX_LAYOUT_KIOSKMODE) {
 				$icon = (new CButton(null, '&nbsp;'))
 					->setTitle(_('Normal view'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
+					->setAttribute('data-csrf-token', $csrf_token)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
 					->addClass(ZBX_STYLE_BTN_MIN);
@@ -174,6 +176,7 @@ function get_icon($type, $params = []) {
 				$icon = (new CButton(null, '&nbsp;'))
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
+					->setAttribute('data-csrf-token', $csrf_token)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_KIOSK);
 			}

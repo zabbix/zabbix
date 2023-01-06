@@ -46,7 +46,7 @@
 			this.time_period = time_period;
 			this.dynamic = dynamic;
 			this.clone = clone;
-			this.csrf_token_update = csrf_tokens['dashboard.update'];
+			this.csrf_tokens = csrf_tokens;
 
 			timeControl.refreshPage = false;
 
@@ -202,7 +202,7 @@
 
 			const curl = new Curl('zabbix.php');
 
-			curl.setAction('dashboard.update', this.csrf_token_update);
+			curl.setAction('dashboard.update', this.csrf_tokens['dashboard.update']);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -391,7 +391,7 @@
 
 				history.pushState({host: host}, '', curl.getUrl());
 
-				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
+				updateUserProfile('web.dashboard.hostid', host ? host.id : 1, view.csrf_tokens['profile.update']);
 			},
 
 			applyProperties() {

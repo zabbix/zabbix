@@ -74,6 +74,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
+		$data['csrf_tokens'] = ['profile.update' => self::generateCsrfToken('profile.update')];
+
 		$this->setResponse(new CControllerResponseData($data));
 	}
 

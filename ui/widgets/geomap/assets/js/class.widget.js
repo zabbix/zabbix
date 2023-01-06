@@ -61,6 +61,8 @@ class CWidgetGeoMap extends CWidget {
 			}
 		}
 
+		this.csrf_tokens = response.csrf_tokens;
+
 		if (response.geomap !== undefined) {
 			if (response.geomap.config !== undefined) {
 				this._initMap(response.geomap.config);
@@ -327,7 +329,9 @@ class CWidgetGeoMap extends CWidget {
 	 * @param {string} filter
 	 */
 	updateFilter(filter) {
-		updateUserProfile('web.dashboard.widget.geomap.severity_filter', filter, [this._widgetid], PROFILE_TYPE_STR)
+		updateUserProfile('web.dashboard.widget.geomap.severity_filter', filter, this.csrf_tokens['profile.update'],
+			[this._widgetid], PROFILE_TYPE_STR
+		)
 			.always(() => {
 				if (this._state === WIDGET_STATE_ACTIVE) {
 					this._startUpdating();
@@ -345,7 +349,9 @@ class CWidgetGeoMap extends CWidget {
 		const zoom = this._map.getZoom();
 		const view = `${ll.lat},${ll.lng},${zoom}`;
 
-		updateUserProfile('web.dashboard.widget.geomap.default_view', view, [this._widgetid], PROFILE_TYPE_STR);
+		updateUserProfile('web.dashboard.widget.geomap.default_view', view, this.csrf_tokens['profile.update'],
+			[this._widgetid], PROFILE_TYPE_STR
+		);
 		this._map.setDefaultView(ll, zoom);
 		this._home_coords['default'] = true;
 		this._map.navigateHomeControl.show();
@@ -358,7 +364,9 @@ class CWidgetGeoMap extends CWidget {
 	 * @returns {undefined}
 	 */
 	unsetDefaultView() {
-		updateUserProfile('web.dashboard.widget.geomap.default_view', '', [this._widgetid], PROFILE_TYPE_STR)
+		updateUserProfile('web.dashboard.widget.geomap.default_view', '', this.csrf_tokens['profile.update'],
+			[this._widgetid], PROFILE_TYPE_STR
+		)
 			.always(() => {
 				delete this._home_coords.default;
 			});

@@ -98,7 +98,7 @@ class CDashboard extends CBaseComponent {
 		this._is_kiosk_mode = is_kiosk_mode;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
-		this._csrf_token_widget_rfrate = csrf_tokens ? csrf_tokens['dashboard.widget.rfrate'] : null;
+		this._csrf_tokens = csrf_tokens;
 
 		this._init();
 		this._registerEvents();
@@ -528,7 +528,7 @@ class CDashboard extends CBaseComponent {
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
-			csrf_token_widget_rfrate: this._csrf_token_widget_rfrate,
+			csrf_token_widget_rfrate: this._csrf_tokens['dashboard.widget.rfrate'],
 			unique_id: this._createUniqueId()
 		});
 
@@ -1460,7 +1460,9 @@ class CDashboard extends CBaseComponent {
 
 				if (type !== this._widget_last_type) {
 					this._widget_last_type = type;
-					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
+					updateUserProfile('web.dashboard.last_widget_type', type, this.csrf_tokens['profile.update'], [],
+						PROFILE_TYPE_STR
+					);
 				}
 
 				const widget_class = eval(this._widget_defaults[type].js_class);

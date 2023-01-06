@@ -31,4 +31,5 @@
 		(new CDiv())->setId($data['unique_id'])
 	)
 	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts'])))
+	->setVar('csrf_tokens', $data['csrf_tokens'])
 	->show();
