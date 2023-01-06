@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-12-23 11:01+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-20 21:32+0000\n"
+"Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -6985,6 +6985,11 @@ msgstr "No mapa \"%2$s\" o campo \"%1$s\" está com valor ausente."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "O campo \"%1$s\" não está correto: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -16080,7 +16085,7 @@ msgstr "Separados"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:141
 #: include/classes/widgets/forms/CWidgetFormProblems.php:161
 msgid "Separately"
-msgstr ""
+msgstr "Separadamente"
 
 #: include/func.inc.php:108 include/func.inc.php:261 jsLoader.php:241
 msgid "September"
@@ -16148,11 +16153,10 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Serviço removido"
-msgstr[1] "Serviço removido"
+msgstr[1] ""
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
@@ -20052,7 +20056,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:142
 #: include/classes/widgets/forms/CWidgetFormProblems.php:162
 msgid "With problem name"
-msgstr ""
+msgstr "Junto com o nome do problema"
 
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
@@ -20536,7 +20540,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
-msgstr ""
+msgstr "um caractere especial"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -20579,7 +20583,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
-msgstr ""
+msgstr "abs() - Valor absoluto"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
@@ -21405,6 +21409,10 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr "sequência de bytes inválida no UTF-8"
 
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"
 msgstr "atraso inválido"
@@ -21556,7 +21564,7 @@ msgstr "lista de caracteres"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:722
 msgid "log() - Natural logarithm"
-msgstr ""
+msgstr "log() - Logaritmo natural"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:729
 msgid "log10() - Decimal logarithm"
