@@ -106,7 +106,9 @@ int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num
 
 	pp_xml_init();
 	pp_curl_init();
-
+#ifdef HAVE_NETSNMP
+	preproc_init_snmp();
+#endif
 	memset(manager, 0, sizeof(zbx_pp_manager_t));
 
 	if (SUCCEED != pp_task_queue_init(&manager->queue, error))
@@ -185,8 +187,11 @@ void	pp_manager_destroy(zbx_pp_manager_t *manager)
 
 	zbx_timekeeper_free(manager->timekeeper);
 
-	pp_xml_destroy();
+#ifdef HAVE_NETSNMP
+	preproc_shutdown_snmp();
+#endif
 	pp_curl_destroy();
+	pp_xml_destroy();
 }
 
 /******************************************************************************
@@ -429,8 +434,6 @@ void	pp_manager_process_finished(zbx_pp_manager_t *manager)
 
 	for (int i = 0; i < tasks.values_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "FLUSH TASK: %d", tasks.values[i]->type);
-
 		switch (tasks.values[i]->type)
 		{
 			case ZBX_PP_TASK_VALUE:

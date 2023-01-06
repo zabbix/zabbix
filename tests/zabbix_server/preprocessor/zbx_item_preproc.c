@@ -194,7 +194,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 #ifdef HAVE_NETSNMP
-	zbx_preproc_init_snmp();
+	preproc_init_snmp();
 #else
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		skip();
@@ -288,6 +288,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_free(error);
 
 #ifdef HAVE_NETSNMP
-	zbx_preproc_shutdown_snmp();
+	preproc_shutdown_snmp();
 #endif
 }

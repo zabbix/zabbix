@@ -1038,7 +1038,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	else
 		value_in = &cache->value;
 
-	if (0 == preproc->steps_num)
+	if (NULL == preproc || 0 == preproc->steps_num)
 	{
 		if (NULL != cache)
 			zbx_variant_copy(value_out, &cache->value);

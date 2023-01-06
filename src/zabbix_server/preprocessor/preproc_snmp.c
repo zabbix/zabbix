@@ -197,8 +197,6 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 #ifdef HAVE_NETSNMP
 			char	*oid_tr_tmp = NULL;
 
-			zbx_preproc_init_snmp();
-
 			if (SUCCEED == preproc_snmp_translate_oid(token, &oid_tr_tmp))
 				oid_prefix = oid_tr_tmp;
 			else
@@ -555,8 +553,6 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 	}
 
 #ifdef HAVE_NETSNMP
-	zbx_preproc_init_snmp();
-
 	if (SUCCEED == preproc_snmp_translate_oid(oid_needle, &oid_tr_tmp))
 		oid_tr = oid_tr_tmp;
 	else
@@ -923,14 +919,14 @@ static void	zbx_init_snmp(void)
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-void	zbx_preproc_init_snmp(void)
+void	preproc_init_snmp(void)
 {
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
 }
 
-void	zbx_preproc_shutdown_snmp(void)
+void	preproc_shutdown_snmp(void)
 {
 	sigset_t	mask, orig_mask;
 

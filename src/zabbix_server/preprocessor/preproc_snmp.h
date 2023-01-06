@@ -85,7 +85,7 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);
 int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 
-void	zbx_preproc_init_snmp(void);
-void	zbx_preproc_shutdown_snmp(void);
+void	preproc_init_snmp(void);
+void	preproc_shutdown_snmp(void);
 
 #endif
