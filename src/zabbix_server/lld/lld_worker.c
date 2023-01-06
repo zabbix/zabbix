@@ -34,7 +34,7 @@
  *                                                                            *
  * Purpose: registers lld worker with lld manager                             *
  *                                                                            *
- * Parameters: socket - [IN] the connections socket                           *
+ * Parameters: socket - [IN] connections socket                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_register_worker(zbx_ipc_socket_t *socket)
@@ -51,7 +51,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  * Purpose: processes lld task and updates rule state/error in configuration  *
  *          cache and database                                                *
  *                                                                            *
- * Parameters: message - [IN] the message with LLD request                    *
+ * Parameters: message - [IN] message with LLD request                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_task(zbx_ipc_message_t *message)

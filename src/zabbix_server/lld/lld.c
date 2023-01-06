@@ -54,7 +54,7 @@ ZBX_PTR_VECTOR_IMPL(lld_item_preproc, zbx_lld_item_preproc_t*)
  *                                                                            *
  * Purpose: release resources allocated by filter condition                   *
  *                                                                            *
- * Parameters: condition  - [IN] the filter condition                         *
+ * Parameters: condition  - [IN] filter condition                             *
  *                                                                            *
  ******************************************************************************/
 static void	lld_condition_free(lld_condition_t *condition)
@@ -71,7 +71,7 @@ static void	lld_condition_free(lld_condition_t *condition)
  *                                                                            *
  * Purpose: release resources allocated by filter conditions                  *
  *                                                                            *
- * Parameters: conditions - [IN] the filter conditions                        *
+ * Parameters: conditions - [IN] filter conditions                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_conditions_free(zbx_vector_ptr_t *conditions)
@@ -83,9 +83,6 @@ static void	lld_conditions_free(zbx_vector_ptr_t *conditions)
 /******************************************************************************
  *                                                                            *
  * Purpose: compare two filter conditions by their macros                     *
- *                                                                            *
- * Parameters: item1  - [IN] the first filter condition                       *
- *             item2  - [IN] the second filter condition                      *
  *                                                                            *
  ******************************************************************************/
 static int	lld_condition_compare_by_macro(const void *item1, const void *item2)
@@ -100,8 +97,6 @@ static int	lld_condition_compare_by_macro(const void *item1, const void *item2)
  *                                                                            *
  * Purpose: initializes lld filter                                            *
  *                                                                            *
- * Parameters: filter  - [IN] the lld filter                                  *
- *                                                                            *
  ******************************************************************************/
 static void	lld_filter_init(zbx_lld_filter_t *filter)
 {
@@ -113,8 +108,6 @@ static void	lld_filter_init(zbx_lld_filter_t *filter)
 /******************************************************************************
  *                                                                            *
  * Purpose: releases resources allocated by lld filter                        *
- *                                                                            *
- * Parameters: filter  - [IN] the lld filter                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_filter_clean(zbx_lld_filter_t *filter)
@@ -162,9 +155,10 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
  *                                                                            *
  * Purpose: loads lld filter data                                             *
  *                                                                            *
- * Parameters: filter     - [IN] the lld filter                               *
- *             lld_ruleid - [IN] the lld rule id                              *
- *             error      - [OUT] the error description                       *
+ * Parameters: filter     - [IN] lld filter                                   *
+ *             lld_ruleid - [IN] lld rule id                                  *
+ *             item       - [IN] lld item                                     *
+ *             error      - [OUT] error message                               *
  *                                                                            *
  ******************************************************************************/
 static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const DC_ITEM *item, char **error)
@@ -198,11 +192,11 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation                    *
  *                                                                            *
- * Parameters: jp_row          - [IN] the lld data row                        *
+ * Parameters: jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             condition       - [IN] the lld filter condition                *
- *             result          - [OUT] the result of evaluation               *
- *             info            - [OUT] the warning description                *
+ *             condition       - [IN] lld filter condition                    *
+ *             result          - [OUT] result of evaluation                   *
+ *             info            - [OUT] warning description                    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *
@@ -268,10 +262,10 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
  *                                                                                      *
  * Purpose: check if the lld data passes filter evaluation by and/or/andor rules        *
  *                                                                                      *
- * Parameters: filter          - [IN] the lld filter                                    *
- *             jp_row          - [IN] the lld data row                                  *
+ * Parameters: filter          - [IN] lld filter                                        *
+ *             jp_row          - [IN] lld data row                                      *
  *             lld_macro_paths - [IN] use json path to extract from jp_row              *
- *             info            - [OUT] the warning description                          *
+ *             info            - [OUT] warning description                              *
  *                                                                                      *
  * Return value: SUCCEED - the lld data passed filter evaluation                        *
  *               FAIL    - otherwise                                                    *
@@ -368,17 +362,17 @@ out:
  * Purpose: check if the lld data passes filter evaluation by custom          *
  *          expression                                                        *
  *                                                                            *
- * Parameters: filter          - [IN] the lld filter                          *
- *             jp_row          - [IN] the lld data row                        *
+ * Parameters: filter          - [IN] lld filter                              *
+ *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             info            - [OUT] the warning description                *
+ *             info            - [OUT] warning description                    *
  *                                                                            *
- * Return value: SUCCEED - the lld data passed filter evaluation              *
+ * Return value: SUCCEED - lld data passed filter evaluation                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: 1) replace {item_condition} references with action condition     *
  *              evaluation results (1 or 0)                                   *
- *           2) call zbx_evaluate() to calculate the final result                 *
+ *           2) call zbx_evaluate() to calculate the final result             *
  *                                                                            *
  ******************************************************************************/
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
@@ -454,10 +448,10 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
  *                                                                            *
  * Purpose: check if the lld data passes filter evaluation                    *
  *                                                                            *
- * Parameters: filter          - [IN] the lld filter                          *
- *             jp_row          - [IN] the lld data row                        *
+ * Parameters: filter          - [IN] lld filter                              *
+ *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             info            - [OUT] the warning description                *
+ *             info            - [OUT] warning description                    *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
  *               FAIL    - otherwise                                          *

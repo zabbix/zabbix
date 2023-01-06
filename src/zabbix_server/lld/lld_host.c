@@ -343,8 +343,6 @@ static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: retrieves tags of the existing hosts                              *
  *                                                                            *
- * Parameters: hosts - [IN/OUT] list of hosts                                 *
- *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 {
@@ -408,6 +406,7 @@ out:
  *                                                                            *
  * Parameters: parent_hostid - [IN] host prototype identifier                 *
  *             hosts         - [OUT] list of hosts                            *
+ *             ...           - [IN] update flag conditions                    *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid,
@@ -553,7 +552,10 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, z
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate low-level discovered hosts                               *
+ *                                                                            *
  * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
+ *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
@@ -1420,6 +1422,7 @@ static int	lld_validate_group_name(const char *name)
 /******************************************************************************
  *                                                                            *
  * Parameters: groups - [IN] list of groups; should be sorted by groupid      *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
@@ -1943,7 +1946,8 @@ out:
  * Purpose: retrieve list of host macros which should be present on the each  *
  *          discovered host                                                   *
  *                                                                            *
- * Parameters: hostmacros - [OUT] list of host macros                         *
+ * Parameters: lld_ruleid - [IN] low-level discovery rule identifier          *
+ *             hostmacros - [OUT] list of host macros                         *
  *                                                                            *
  ******************************************************************************/
 static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostmacros)
@@ -2137,8 +2141,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
  *                                     discovered host                        *
  *             hosts            - [IN/OUT] list of hosts                      *
  *                                         should be sorted by hostid         *
- *             del_hostmacroids - [OUT] list of host macros which should be   *
- *                                      deleted                               *
+ *             lld_macros       - [IN] list of low-level discovery macros     *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
@@ -2521,8 +2524,6 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
  *             ipmi_privilege   - [IN] ipmi privilege                         *
  *             ipmi_username    - [IN] ipmi username                          *
  *             ipmi_password    - [IN] ipmi password                          *
- *             status           - [IN] host status                            *
- *             inventory_mode   - [IN] host inventory mode                    *
  *             tls_connect      - [IN] tls connect                            *
  *             tls_accept       - [IN] tls accept                             *
  *             tls_issuer       - [IN] tls cert issuer                        *
@@ -4298,6 +4299,7 @@ static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, con
 /******************************************************************************
  *                                                                            *
  * Parameters: hosts - [IN/OUT] list of hosts                                 *
+ *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)

@@ -176,11 +176,14 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
  *                                                                            *
  * Purpose: process low level discovery value/error                           *
  *                                                                            *
- * Parameters: itemid - [IN] the LLD rule id                                  *
- *             hostid - [IN] the host id                                      *
- *             value  - [IN] the rule value (can be NULL if error is set)     *
- *             ts     - [IN] the value timestamp                              *
- *             error  - [IN] the error message (can be NULL)                  *
+ * Parameters: itemid      - [IN] LLD rule id                                 *
+ *             hostid      - [IN] host id                                     *
+ *             value       - [IN] rule value (can be NULL if error is set)    *
+ *             ts          - [IN] value timestamp                             *
+ *             meta        - [IN] flag to include metadata                    *
+ *             lastlogsize - [IN] metadata of last log size                   *
+ *             mtime       - [IN] metadata timestamp                          *
+ *             error       - [IN] error message (can be NULL)                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts,
@@ -213,11 +216,11 @@ void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char 
  *                                                                            *
  * Purpose: process low level discovery agent result                          *
  *                                                                            *
- * Parameters: itemid - [IN] the LLD rule id                                  *
- *             hostid - [IN] the host id                                      *
- *             result - [IN] the agent result                                 *
- *             ts     - [IN] the value timestamp                              *
- *             error  - [IN] the error message (can be NULL)                  *
+ * Parameters: itemid - [IN] LLD rule id                                      *
+ *             hostid - [IN] host id                                          *
+ *             result - [IN] agent result                                     *
+ *             ts     - [IN] value timestamp                                  *
+ *             error  - [IN] error message (can be NULL)                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
@@ -249,8 +252,8 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
  *                                                                            *
  * Purpose: get queue size (enqueued value count) of LLD manager              *
  *                                                                            *
- * Parameters: size  - [OUT] the queue size                                   *
- *             error - [OUT] the error message                                *
+ * Parameters: size  - [OUT] queue size                                       *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the queue size was returned successfully           *
  *               FAIL    - otherwise                                          *
@@ -313,9 +316,9 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
  *                                                                            *
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
- * Parameters limit - [IN] the number of top records to retrieve              *
- *            items - [OUT] a vector of top itemid, values_num pairs          *
- *            error - [OUT] the error message                                 *
+ * Parameters limit - [IN] number of top records to retrieve                  *
+ *            items - [OUT] vector of top itemid, values_num pairs            *
+ *            error - [OUT] error message                                     *
  *                                                                            *
  * Return value: SUCCEED - the top n items were returned successfully         *
  *               FAIL - otherwise                                             *

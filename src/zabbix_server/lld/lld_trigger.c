@@ -287,6 +287,7 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
  *                                                                            *
  * Parameters: lld_ruleid         - [IN] discovery rule id                    *
  *             trigger_prototypes - [OUT] sorted list of trigger prototypes   *
+ *             error              - [OUT] error message                       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *trigger_prototypes, char **error)
@@ -821,7 +822,7 @@ static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_
  * Purpose: returns the list of items which are related to the trigger        *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: trigger_prototypes - [IN] a vector of trigger prototypes       *
+ * Parameters: trigger_prototypes - [IN] vector of trigger prototypes         *
  *             items              - [OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
@@ -3051,9 +3052,9 @@ static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: adds a node to trigger cache                                      *
  *                                                                            *
- * Parameters: cache     - [IN] the trigger cache                             *
+ * Parameters: cache     - [IN] trigger cache                                 *
  *             triggerid - [IN]                                               *
- *             trigger   - [IN] the trigger data for new triggers             *
+ *             trigger   - [IN] trigger data for new triggers                 *
  *                                                                            *
  * Return value: the added node                                               *
  *                                                                            *
@@ -3079,8 +3080,8 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
  * Purpose: add trigger and all triggers related to it to trigger dependency  *
  *          validation cache.                                                 *
  *                                                                            *
- * Parameters: cache           - [IN] the trigger cache                       *
- *             trigger         - [IN] the trigger to add                      *
+ * Parameters: cache           - [IN] trigger cache                           *
+ *             trigger         - [IN] trigger to add                          *
  *             triggerids_up   - [OUT] identifiers of generic trigger         *
  *                                     dependents                             *
  *             triggerids_down - [OUT] identifiers of generic trigger         *
@@ -3160,8 +3161,8 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
  * Purpose: initializes trigger cache used to perform trigger dependency      *
  *          validation                                                        *
  *                                                                            *
- * Parameters: cache    - [IN] the trigger cache                              *
- *             triggers - [IN] the discovered triggers                        *
+ * Parameters: cache    - [IN] trigger cache                                  *
+ *             triggers - [IN] discovered triggers                            *
  *                                                                            *
  * Comments: Triggers with new dependencies and.all triggers related to them  *
  *           are added to cache.                                              *
@@ -3339,7 +3340,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
  * Purpose: releases resources allocated by trigger cache                     *
  *          validation                                                        *
  *                                                                            *
- * Parameters: cache - [IN] the trigger cache                                 *
+ * Parameters: cache - [IN] trigger cache                                     *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
@@ -3361,9 +3362,9 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
  *                                                                            *
  * Purpose: removes trigger dependency                                        *
  *                                                                            *
- * Parameters: from  - [IN] the reference to dependent trigger                *
- *             to    - [IN] the reference to trigger the from depends on      *
- *             error - [OUT] the error message                                *
+ * Parameters: from  - [IN] reference to dependent trigger                    *
+ *             to    - [IN] reference to trigger the from depends on          *
+ *             error - [OUT] error message                                    *
  *                                                                            *
  * Comments: If possible (the dependency loop was introduced by discovered    *
  *           dependencies) the last dependency in the loop will be removed.   *
@@ -3423,12 +3424,12 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
  *                                                                            *
  * Purpose: iterates through trigger dependencies to find dependency loops    *
  *                                                                            *
- * Parameters: cache         - [IN] the trigger cache                         *
- *             triggers      - [IN] the discovered triggers                   *
- *             trigger_node  - [IN] the trigger to check                      *
- *             iter          - [IN] the dependency iterator                   *
- *             level         - [IN] the dependency level                      *
- *             error         - [OUT] the error message                        *
+ * Parameters: cache         - [IN] trigger cache                             *
+ *             triggers      - [IN] discovered triggers                       *
+ *             trigger_node  - [IN] trigger to check                          *
+ *             iter          - [IN] dependency iterator                       *
+ *             level         - [IN] dependency level                          *
+ *             error         - [OUT] error message                            *
  *                                                                            *
  * Return value: SUCCEED - the trigger's dependency chain in valid            *
  *               FAIL    - a dependency loop was detected                     *
@@ -3499,12 +3500,8 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_n
  *                                                                            *
  * Purpose: validate discovered trigger dependencies                          *
  *                                                                            *
- * Parameters: triggers - [IN] the discovered triggers                        *
- *             error    - [OUT] the error message                             *
- *             triggers - [IN] the discovered triggers                        *
- *             trigger  - [IN] the trigger to check                           *
- *             iter     - [IN] the dependency iterator                        *
- *             level    - [IN] the dependency level                           *
+ * Parameters: triggers - [IN] discovered triggers                            *
+ *             error    - [OUT] error message                                 *
  *                                                                            *
  * Comments: During validation the dependency loops will be resolved by       *
  *           removing offending dependencies.                                 *

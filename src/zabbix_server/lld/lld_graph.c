@@ -172,6 +172,7 @@ static void	lld_graphs_free(zbx_vector_ptr_t *graphs)
  *                                                                            *
  * Parameters: parent_graphid - [IN] graph prototype identifier               *
  *             graphs         - [OUT] sorted list of graphs                   *
+ *             ...            - [IN] update flag condition values             *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width, int height,
@@ -814,7 +815,11 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 
 /******************************************************************************
  *                                                                            *
- * Parameters: graphs - [IN] sorted list of graphs                            *
+ * Purpose: validate sorted graph                                             *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identifier                                  *
+ *             graphs - [IN] sorted list of graphs                            *
+ *             error  - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, char **error)
@@ -1452,10 +1457,6 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
 /******************************************************************************
  *                                                                            *
  * Purpose: add or update graphs for discovery item                           *
- *                                                                            *
- * Parameters: hostid  - [IN] host identifier from database                   *
- *             agent   - [IN] discovery item identifier from database         *
- *             jp_data - [IN] received data                                   *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully added/updated or       *
  *                         adding/updating was not necessary                  *

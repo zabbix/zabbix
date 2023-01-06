@@ -1119,9 +1119,9 @@ out:
  * Purpose: validation of an item preprocessing step expressions for          *
  *          discovery process                                                 *
  *                                                                            *
- * Parameters: pp       - [IN] the item preprocessing step                    *
+ * Parameters: pp       - [IN] item preprocessing step                        *
  *             itemid   - [IN] item ID for logging                            *
- *             error    - [IN/OUT] the lld error message                      *
+ *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing step is valid                     *
  *               FAIL    - if preprocessing step is not valid                 *
@@ -1320,9 +1320,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
  *                                                                            *
  * Parameters: hostid            - [IN] host id                               *
  *             items             - [IN] list of items                         *
- *             item_prototypes   - [IN] the item prototypes                   *
+ *             item_prototypes   - [IN] item prototypes                       *
  *             item_dependencies - [IN] list of dependencies                  *
- *             error             - [IN/OUT] the lld error message             *
+ *             error             - [OUT] error message                        *
  *                                                                            *
  *****************************************************************************/
 static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_t *items,
@@ -1610,11 +1610,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_t *
  *                                                                            *
  * Purpose: substitutes lld macros in calculated item formula expression      *
  *                                                                            *
- * Parameters: data            - [IN/OUT] the expression                      *
- *             jp_row          - [IN] the lld data row                        *
+ * Parameters: data            - [IN/OUT] expression                          *
+ *             jp_row          - [IN] lld data row                            *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             error           - [IN] pointer to string for reporting errors  *
- *             max_error_len   - [IN] size of 'error' string                  *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
@@ -1635,10 +1634,10 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  *                                                                            *
  * Purpose: creates a new item based on item prototype and lld data row       *
  *                                                                            *
- * Parameters: item_prototype  - [IN] the item prototype                      *
- *             lld_row         - [IN] the lld row                             *
+ * Parameters: item_prototype  - [IN] item prototype                          *
+ *             lld_row         - [IN] lld row                                 *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             error           - [IN/OUT] the lld error message               *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  * Returns: The created item or NULL if cannot create new item from prototype *
  *                                                                            *
@@ -1864,10 +1863,11 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
  *                                                                            *
  * Purpose: updates an existing item based on item prototype and lld data row *
  *                                                                            *
- * Parameters: item_prototype  - [IN] the item prototype                      *
- *             lld_row         - [IN] the lld row                             *
+ * Parameters: item_prototype  - [IN] item prototype                          *
+ *             lld_row         - [IN] lld row                                 *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             item            - [IN] an existing item or NULL                *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
@@ -2208,17 +2208,17 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates existing items and creates new ones based on item         *
+ * Purpose: updates existing items and creates new ones based on item,        *
  *          item prototypes and lld data                                      *
  *                                                                            *
- * Parameters: item_prototypes - [IN] the item prototypes                     *
- *             lld_rows        - [IN] the lld data rows                       *
- *             lld_macro_paths - [IN] use json path to extract from jp_row  *
+ * Parameters: item_prototypes - [IN] item prototypes                         *
+ *             lld_rows        - [IN] lld data rows                           *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *             items_index     - [OUT] index of items based on prototype ids  *
  *                                     and lld rows. Used to quckly find an   *
  *                                     item by prototype and lld_row.         *
- *             error           - [IN/OUT] the lld error message               *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_row_t *lld_rows,
@@ -2321,10 +2321,10 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
  * Purpose: escaping of symbols in items preprocessing steps for discovery    *
  *          process                                                           *
  *                                                                            *
- * Parameters: type            - [IN] the item preprocessing step type        *
+ * Parameters: type            - [IN] item preprocessing step type            *
  *             lld_row         - [IN] lld source value                        *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             sub_params      - [IN/OUT] the preprocessing parameters        *
+ *             sub_params      - [IN/OUT] preprocessing parameters            *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
@@ -2406,7 +2406,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
  * Purpose: updates existing items preprocessing operations and create new    *
  *          based on item item prototypes                                     *
  *                                                                            *
- * Parameters: item_prototypes - [IN] the item prototypes                     *
+ * Parameters: item_prototypes - [IN] item prototypes                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
  *                                                                            *
@@ -2524,10 +2524,10 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  * Purpose: updates existing items parameters and create new based on item    *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: item_prototypes - [IN] the item prototypes                     *
+ * Parameters: item_prototypes - [IN] item prototypes                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
- *             error           - [IN/OUT] the lld error message               *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
@@ -2593,10 +2593,10 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  * Purpose: updates existing items tags and create new based on item          *
  *          prototypes                                                        *
  *                                                                            *
- * Parameters: item_prototypes - [IN] the item prototypes                     *
+ * Parameters: item_prototypes - [IN] item prototypes                         *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             items           - [IN/OUT] sorted list of items                *
- *             error           - [IN/OUT] the lld error message               *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
@@ -4208,7 +4208,7 @@ out:
  *                                                                            *
  * Purpose: create dependent item index in master item data                   *
  *                                                                            *
- * Parameters: items       - [IN/OUT] the lld items                           *
+ * Parameters: items       - [IN/OUT] lld items                               *
  *             items_index - [IN] lld item index                              *
  *                                                                            *
  ******************************************************************************/
