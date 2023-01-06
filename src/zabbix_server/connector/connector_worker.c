@@ -51,12 +51,15 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 
 	zbx_vector_connector_object_clear_ext(connector_objects, zbx_connector_object_free);
 
-	zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
+	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
 			connector.timeout, connector.ssl_cert_file, connector.ssl_key_file, connector.ssl_key_password,
 			connector.verify_peer, connector.verify_host, connector.authtype, connector.username,
 			connector.password, ZBX_POSTTYPE_RAW, "", HTTP_STORE_RAW,
-			&out);
+			&out))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, out);
+	}
 
 	zbx_free(str);
 	zbx_free(out);
