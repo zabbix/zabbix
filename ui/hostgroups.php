@@ -46,7 +46,7 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// other
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -214,6 +214,7 @@ elseif (hasRequest('action')) {
  */
 if (hasRequest('form')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'groupid' => getRequest('groupid', 0),
 		'name' => getRequest('name', ''),
