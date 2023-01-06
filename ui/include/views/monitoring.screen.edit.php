@@ -29,7 +29,7 @@ $widget = (new CWidget())->setTitle(_('Screens'));
 
 $tabs = new CTabView();
 
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
@@ -39,6 +39,7 @@ if (array_key_exists('templateid', $data['screen'])) {
 
 // create form
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('screenForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
