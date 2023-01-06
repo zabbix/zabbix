@@ -59,6 +59,7 @@ else {
 
 		$screen_widget->setControls((new CTag('nav', true,
 			(new CForm('get'))
+				->cleanItems()
 				->setAttribute('aria-label', _('Main filter'))
 				->addItem((new CList())
 					->addItem($screen_select)
