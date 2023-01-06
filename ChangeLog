@@ -790,6 +790,7 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
 A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
 ........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
