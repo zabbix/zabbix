@@ -32,11 +32,12 @@ $widget = (new CWidget())
 
 $divTabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$divTabs->setSelected(0);
 }
 
 $frmHost = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('hostsForm')
 	->setName('hostsForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
