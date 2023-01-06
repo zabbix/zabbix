@@ -85,7 +85,7 @@ class CHostImporter extends CImporter {
 				// Get already linked templates.
 				$db_template_links = API::Host()->get([
 					'output' => ['hostids'],
-					'selectParentTemplates' => ['hostid'],
+					'selectParentTemplates' => ['templateid'],
 					'hostids' => array_column($hosts_to_update, 'hostid'),
 					'preservekeys' => true
 				]);
