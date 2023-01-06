@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -158,7 +159,7 @@ $correlation_tabs = (new CTabView())
 	->addTab('correlationTab', _('Correlation'), $correlation_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$correlation_tabs->setSelected(0);
 }
 
