@@ -56,7 +56,7 @@ $fields = [
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
 	// others
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null]
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null]
 ];
 check_fields($fields);
 
