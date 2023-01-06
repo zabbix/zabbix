@@ -790,6 +790,21 @@ a.link-action {
 		border-color: lighten($table-border-color, 3%);
 	}
 
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
+		background-color: $ui-bg-color;
+
+		td {
+			border-bottom-color: $table-border-color !important;
+		}
+
+		.timeline-axis,
+		.timeline-td,
+		.timeline-date,
+		.problem-expand-td {
+			border-bottom-color: transparent !important;
+		}
+	}
+
 	&.compact-view {
 		.flh-na-bg,
 		.flh-info-bg,
@@ -1222,6 +1237,14 @@ td.inactive-bg {
 
 .icon-action-unsuppress::before {
 	background-position: -249px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -283px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -282px -656px;
 }
 
 .icon-invisible::before {

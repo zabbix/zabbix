@@ -28,6 +28,8 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormUserProfile extends CLegacyWebTest {
 
+	protected static $old_password = 'zabbix';
+
 	public function testFormUserProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,username,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'
 				. ' from users order by userid';
@@ -79,6 +81,20 @@ class testFormUserProfile extends CLegacyWebTest {
 				'error_msg' => 'Both passwords must be equal.'
 			]],
 			[[
+				'expected' => TEST_BAD,
+				'old_password' => 'test_123',
+				'password1' => "test_123",
+				'password2' => "test_123",
+				'error_msg' => 'Incorrect current password.'
+			]],
+			[[
+				'expected' => TEST_BAD,
+				'old_password' => '',
+				'password1' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
+				'password2' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
+				'error_msg' => 'Incorrect value for field "Current password": cannot be empty.'
+			]],
+			[[
 				'expected' => TEST_GOOD,
 				'password1' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
 				'password2' => "'\'$\"\"!$@$#^%$+-=~`\`\\"
@@ -100,16 +116,33 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 
-		$this->zbxTestClickXpathWait("//ul[@id='user_form_list']//button[contains(@onclick, 'change_password')]");
-		$this->zbxTestInputTypeWait('password1', $data['password1']);
-		$this->zbxTestInputType('password2', $data['password2']);
+		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
+		$form->query('button:Change password')->waitUntilClickable()->one()->click();
+		foreach (['current_password', 'password1', 'password2'] as $id) {
+			$form->query('id', $id)->waitUntilVisible()->one();
+		}
+		$form->fill([
+				'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
+				'Password' => $data['password1'],
+				'Password (once again)' => $data['password2']
+		]);
+		$form->submit();
 
-		$this->zbxTestClickWait('update');
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
+
+		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckHeader('Global view');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good' , 'User updated');
+				$this->page->assertTitle('Zabbix');
+				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
+				$this->page->userLogin('Admin', $data['password1']);
+				$this->assertTrue($this->query('xpath://a[@title="Admin (Zabbix Administrator)" and text()='.
+						'"User settings"]')->exists()
+				);
+				self::$old_password = $data['password1'];
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
@@ -437,9 +470,9 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		if (array_key_exists('messages_disabled', $data)) {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat']/input[@type='hidden']");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery']/input[@type='hidden']");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");
@@ -458,9 +491,9 @@ class testFormUserProfile extends CLegacyWebTest {
 		else {
 			$this->zbxTestCheckboxSelect('messages_enabled', false);
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.repeat']/input[@type='hidden']");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_triggers.recovery'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//z-select[@id='messages_sounds.recovery']/input[@type='hidden']");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='start'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//button[@name='stop'][@disabled]");
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_show_suppressed'][@disabled]");

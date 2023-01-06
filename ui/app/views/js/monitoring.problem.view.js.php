@@ -38,6 +38,7 @@
 		running: false,
 		timeout: null,
 		deferred: null,
+		opened_eventids: [],
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
 			this.refresh_url = new Curl(refresh_url, false);
@@ -49,7 +50,10 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initFilter(filter_options);
+			$.subscribe('event.rank_change', () => view.refreshNow());
+
 			this.initAcknowledge();
+			this.initExpandables();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -92,6 +96,8 @@
 				const url = new Curl();
 				url.setArgument('action', 'problem.view.csv');
 				$('#export_csv').attr('data-url', url.getUrl());
+
+				this.refresh_url.setArgument('page', '1');
 
 				this.refreshResults();
 				this.refreshCounters();
@@ -154,7 +160,7 @@
 				view.refreshNow();
 
 				clearMessages();
-				addMessage(makeMessageBox('good', [], response.message));
+				addMessage(makeMessageBox('good', [], response.success.title));
 			});
 
 			$(document).on('submit', '#problem_form', function(e) {
@@ -162,6 +168,81 @@
 
 				acknowledgePopUp({eventids: Object.keys(chkbxRange.getSelectedIds())}, this);
 			});
+		},
+
+		initExpandables() {
+			const table = this.getCurrentResultsTable();
+			const expandable_buttons = table.querySelectorAll("button[data-action='show_symptoms']");
+
+			expandable_buttons.forEach((btn, idx, array) => {
+				['click','keydown'].forEach((type) => {
+					btn.addEventListener(type, (e) => {
+						if (e.type === 'click' || e.which === 13) {
+							this.showSymptoms(btn, idx, array);
+						}
+					});
+				});
+
+				// Check if cause events were opened. If so, after (not full) refresh open them again.
+				if (this.opened_eventids.includes(btn.dataset.eventid)) {
+					const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+
+					[...rows].forEach((row) => row.classList.remove('hidden'));
+
+					btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+					btn.title = '<?= _('Collapse') ?>';
+				}
+			});
+
+			// Fix last row border depending if it is opened or closed.
+			const rows = table.querySelectorAll('.problem-row');
+
+			if (rows.length > 0) {
+				const row = [...rows].pop();
+				const btn = row.querySelector('button[data-action="show_symptoms"]');
+				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+
+				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
+			}
+		},
+
+		showSymptoms(btn, idx, array) {
+			// Prevent multiple clicking by first disabling button.
+			btn.disabled = true;
+
+			const table = this.getCurrentResultsTable();
+			let rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+
+			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
+			if (rows[0].classList.contains('hidden')) {
+				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>', '<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+				btn.title = '<?= _('Collapse') ?>';
+
+				this.opened_eventids.push(btn.dataset.eventid);
+
+				[...rows].forEach((row) => row.classList.remove('hidden'));
+			}
+			else {
+				btn.classList.replace('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>', '<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.title = '<?= _('Expand') ?>';
+
+				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
+
+				[...rows].forEach((row) => row.classList.add('hidden'));
+			}
+
+			// Fix last row border depending if it is opened or closed.
+			rows = table.querySelectorAll('.problem-row');
+
+			if (rows.length > 0) {
+				const row = [...rows].pop();
+				const is_collapsed = btn !== null && btn.classList.contains('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+
+				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
+			}
+
+			// When complete enable button again.
+			btn.disabled = false;
 		},
 
 		getCurrentResultsTable() {
@@ -185,6 +266,7 @@
 				new DOMParser().parseFromString(body, 'text/html').body.firstElementChild
 			);
 			chkbxRange.init();
+			this.initExpandables();
 		},
 
 		refreshDebug(debug) {

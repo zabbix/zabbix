@@ -117,6 +117,9 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(OPERATIONAL_DATA_SHOW_NONE)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('show_symptoms', _('Show symptoms')))->setDefault(0)
+			)
+			->addField(
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(

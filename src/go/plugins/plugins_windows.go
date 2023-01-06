@@ -35,6 +35,7 @@ import (
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/smart"
 	_ "zabbix.com/plugins/system/cpu"
+	_ "zabbix.com/plugins/system/sw"
 	_ "zabbix.com/plugins/system/swap"
 	_ "zabbix.com/plugins/system/uname"
 	_ "zabbix.com/plugins/system/uptime"
