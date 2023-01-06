@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-13 20:36+0000\n"
+"PO-Revision-Date: 2022-12-24 08:36+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4030,7 +4030,7 @@ msgstr "Configura la connexió de base de dades"
 
 #: app/views/js/administration.authentication.edit.js.php:56
 msgid "Confirm changes"
-msgstr ""
+msgstr "Confirmar canvis"
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -6274,7 +6274,7 @@ msgstr "Activa l'autenticació HTTP"
 
 #: app/views/js/administration.authentication.edit.js.php:59
 msgid "Enable HTTP authentication for all users."
-msgstr ""
+msgstr "Activar l'autenticació HTTP per a tots els usuaris."
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -8495,7 +8495,7 @@ msgstr "Identificació del sistema. Retorna una cadena"
 
 #: app/views/administration.authentication.edit.php:113
 msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
-msgstr ""
+msgstr "Si s'activa l'autenticació HTTP, tots els usuaris (tot i que l'accés s'hagi establert com a LDAP/Intern) s'autenticaran pel servidor Web, no pas pel Zabbix."
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

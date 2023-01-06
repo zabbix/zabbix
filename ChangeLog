@@ -12,6 +12,10 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
+A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
+........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .......PS. [ZBX-21073] added support of Int8Array(), Buffer() and also duktape plain buffers in md5, sha256 and hmac function parameters (wiper)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
@@ -2306,6 +2310,8 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
 .......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
 .........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
