@@ -30,7 +30,7 @@ if (isset($_REQUEST['screenitemid'])) {
 }
 
 $form = (new CForm('post', $action))
-	->addVar('form_refresh', getRequest('form_refresh', 0) + 1)
+	->addVar('form_refresh', $cata['form_refresh'] + 1)
 	->setName('screen_item_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
@@ -49,7 +49,7 @@ else {
 		->addVar('y', getRequest('y'));
 }
 
-if (isset($_REQUEST['screenitemid']) && !isset($_REQUEST['form_refresh'])) {
+if (isset($_REQUEST['screenitemid']) && $data['form_refresh'] == 0) {
 	$screenItem		= $screenItems[$_REQUEST['screenitemid']];
 	$resourceType	= $screenItem['resourcetype'];
 	$resourceId		= $screenItem['resourceid'];

@@ -265,6 +265,7 @@ show_messages();
  * Display
  */
 $data = [
+	'form_refresh' => getRequest('form_refresh', 0)i,
 	'screenid' => getRequest('screenid', 0)
 ];
 
