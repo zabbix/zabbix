@@ -196,36 +196,46 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$user['userid'].']', $user['userid'])
 				: null;
 
-			$username = (new CLink($user['username']))
-				->setId('spanid'.$user['userid'])
-				->setAttribute('data-reference', $options['reference'])
-				->setAttribute('data-userid', $user['userid'])
-				->setAttribute('data-parentid', $options['parentid'])
-				->onClick('
-					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+			if (array_key_exists('_disabled', $user)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
 
-			$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
+				$table->addRow([$check_box, $user['username'], $user['name'], $user['surname']]);
+			}
+			else {
+				$username = (new CLink($user['username']))
+					->setId('spanid'.$user['userid'])
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-userid', $user['userid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 
-			$entry = [];
-			$srcfld1 = $options['srcfld1'];
-			if ($srcfld1 === 'userid') {
-				$entry['id'] = $user['userid'];
-			}
-			elseif ($srcfld1 === 'username') {
-				$entry['name'] = $user['username'];
-			}
+				$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
-			$srcfld2 = $options['srcfld2'];
-			if ($srcfld2 === 'fullname') {
-				$entry['name'] = getUserFullname($user);
-			}
-			elseif (array_key_exists($srcfld2, $user)) {
-				$entry[$srcfld2] = $user[$srcfld2];
-			}
+				$entry = [];
+				$srcfld1 = $options['srcfld1'];
+				if ($srcfld1 === 'userid') {
+					$entry['id'] = $user['userid'];
+				}
+				elseif ($srcfld1 === 'username') {
+					$entry['name'] = $user['username'];
+				}
 
-			$user = $entry;
+				$srcfld2 = $options['srcfld2'];
+				if ($srcfld2 === 'fullname') {
+					$entry['name'] = getUserFullname($user);
+				}
+				elseif (array_key_exists($srcfld2, $user)) {
+					$entry[$srcfld2] = $user[$srcfld2];
+				}
+
+				$user = $entry;
+			}
 		}
 		unset($user);
 		break;
@@ -236,19 +246,29 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			$name = (new CLink($item['name']))
-				->setId('spanid'.$item['usrgrpid'])
-				->setAttribute('data-reference', $options['reference'])
-				->setAttribute('data-usrgrpid', $item['usrgrpid'])
-				->setAttribute('data-parentid', $options['parentid'])
-				->onClick('
-					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+			if (array_key_exists('_disabled', $item)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+
+				$name = $item['name'];
+			}
+			else {
+				$name = (new CLink($item['name']))
+					->setId('spanid'.$item['usrgrpid'])
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-usrgrpid', $item['usrgrpid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
+
+				$item['id'] = $item['usrgrpid'];
+			}
 
 			$table->addRow([$check_box, $name]);
-
-			$item['id'] = $item['usrgrpid'];
 		}
 		unset($item);
 		break;
@@ -266,6 +286,14 @@ switch ($data['popup_type']) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.zbx_jsValue($trigger[$options['srcfld1']]).']', $trigger['triggerid'])
 				: null;
+
+			if (array_key_exists('_disabled', $trigger)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$description = new CLabel($trigger['description']);
+			}
 
 			if ($data['multiselect']) {
 				$description
@@ -659,6 +687,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'valuemaps':
+	case 'template_valuemaps':
 		foreach ($data['table_records'] as $valuemap) {
 			$name = [];
 			$check_box = $data['multiselect']
@@ -764,6 +793,72 @@ switch ($data['popup_type']) {
 			$table->addRow([$check_box, $name, $status_tag]);
 		}
 		break;
+
+	case 'actions':
+		foreach ($data['table_records'] as &$action) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$action['actionid'].']', $action['actionid'])
+				: null;
+
+			$name = (new CLink($action['name']))
+				->setId('spanid'.$action['actionid'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-actionid', $action['actionid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.actionid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+
+			$entry = [];
+
+			if ($options['srcfld1'] === 'actionid') {
+				$entry['id'] = $action['actionid'];
+			}
+
+			if ($options['srcfld2'] === 'name') {
+				$entry['name'] = $action['name'];
+			}
+
+			$action = $entry;
+		}
+		unset($action);
+		break;
+
+	case 'media_types':
+		foreach ($data['table_records'] as &$media_type) {
+			$check_box = $data['multiselect']
+				? new CCheckBox('item['.$media_type['mediatypeid'].']', $media_type['mediatypeid'])
+				: null;
+
+			$name = (new CLink($media_type['name']))
+				->setId('spanid'.$media_type['mediatypeid'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.mediatypeid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
+
+			$table->addRow([$check_box, $name]);
+
+			$entry = [];
+
+			if ($options['srcfld1'] === 'mediatypeid') {
+				$entry['id'] = $media_type['mediatypeid'];
+			}
+
+			if ($options['srcfld2'] === 'name') {
+				$entry['name'] = $media_type['name'];
+			}
+
+			$media_type = $entry;
+		}
+		unset($media_type);
+		break;
 }
 
 // Add submit button at footer.
@@ -787,6 +882,7 @@ if ($data['multiselect'] && $form !== null) {
 
 // Types require results returned as array.
 $types = [
+	'actions',
 	'api_methods',
 	'dashboard',
 	'graphs',
@@ -797,13 +893,15 @@ $types = [
 	'template_groups',
 	'items',
 	'item_prototypes',
+	'media_types',
 	'proxies',
 	'roles',
 	'templates',
 	'users',
 	'usrgrp',
 	'sla',
-	'valuemaps'
+	'valuemaps',
+	'template_valuemaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {

@@ -25,6 +25,8 @@
 #include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
 
 #ifdef HAVE_ORACLE
 #	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -766,7 +768,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);

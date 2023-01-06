@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-15 07:08+0000\n"
+"PO-Revision-Date: 2023-01-02 07:26+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -149,6 +149,11 @@ msgid "%1$s event"
 msgid_plural "%1$s events"
 msgstr[0] "אירוע אחד"
 msgstr[1] "%1$s אירועים"
+
+#: app/views/popup.usergroupmapping.edit.php:90
+#, c-format
+msgid "%1$s group pattern"
+msgstr "תבנית קבוצת %1$s"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -690,6 +695,11 @@ msgstr "פעולת משימה"
 msgid "Action updated"
 msgstr "המשימה עודכנה"
 
+#: include/classes/api/services/CDashboardGeneral.php:672
+#, c-format
+msgid "Action with ID \"%1$s\" is not available."
+msgstr "פעולה עם המזהה „%1$s” אינה זמינה."
+
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
 #: app/views/monitoring.dashboard.view.php:122
@@ -917,6 +927,14 @@ msgstr "הוספת שירותים צאצאים"
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
 msgstr "הוספה מתוך"
+
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "הוספה ממארח"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "הוספה מתבנית"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -1220,6 +1238,10 @@ msgstr "מארחים מורשים"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "שיטות מורשות"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1527,6 +1549,12 @@ msgstr "הפרש בין ניסיונות"
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
 msgstr "ניסיונות"
+
+#: app/views/administration.authentication.edit.php:520
+#: app/views/popup.ldap.edit.php:265
+#: app/views/popup.mediatypemapping.edit.php:59
+msgid "Attribute"
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -3356,6 +3384,12 @@ msgstr "לא ניתן לבצע פעולת update על הטבלה „%1$s” בל
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "לא ניתן לבצע פעולת update על הטבלה „%1$s” ללא תנאי where."
 
+#: app/controllers/CControllerUserProvision.php:69
+msgid "Cannot provision user"
+msgid_plural "Cannot provision users"
+msgstr[0] "לא ניתן להקים משתמש"
+msgstr[1] "לא ניתן להקים משתמשים"
+
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
@@ -3674,6 +3708,10 @@ msgid_plural "Cannot update events"
 msgstr[0] "לא ניתן לעדכן אירוע"
 msgstr[1] "לא ניתן לעדכן אירועים"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "לא ניתן לעדכן תרשים"
@@ -3914,6 +3952,11 @@ msgstr "תופסת את כל מלכודות ה־SNMP שתואמות לביטוי
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "תופסת את כל מלכודות ה־SNMP שלא נתפסו על ידי פריטי snmptrap[]‎ כלשהם."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -3970,6 +4013,10 @@ msgstr "שינוי ססמה"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "שינויים בשנייה"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4541,6 +4588,15 @@ msgstr "ההגדרות עודכנו"
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
+#: app/views/administration.authentication.edit.php:417
+#: app/views/popup.ldap.edit.php:115
+msgid "Configure JIT provisioning"
+msgstr "הגדרת הקמת JIT"
+
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr "אישור השינויים"
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "טקסט אימות"
@@ -4787,6 +4843,14 @@ msgstr "מס׳ חוזה"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "המרה ל־JSON"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -5145,6 +5209,15 @@ msgstr "נוכחי"
 msgid "Current host"
 msgstr "מארח נוכחי"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr "משתמש נוכחי"
@@ -5380,6 +5453,10 @@ msgstr "סקירת נתונים"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "ערכת נתונים"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr "תווית סדרת נתונים"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5806,6 +5883,10 @@ msgstr "למחוק את ה־SLA הנבחר?"
 msgid "Delete selected SLAs?"
 msgstr "למחוק את ה־SLAs הנבחרים?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr "למחוק את הפעולה הנבחרת?"
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "למחוק את המשימות הנבחרות?"
@@ -6060,6 +6141,23 @@ msgstr "השימוש הופסק"
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
 msgstr "אי אפשר להשתמש במשתנה „%1$s” שהשימוש בו הופסק עם „%2$s”."
 
+#: app/views/administration.authentication.edit.php:50
+msgid "Deprovisioned users group"
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1011
+msgid "Deprovisioned users group cannot be deleted."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:183
+msgid "Deprovisioned users group cannot be empty."
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:178
+#: include/classes/api/services/CUserGroup.php:321
+msgid "Deprovisioned users group cannot be enabled."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
 #: app/partials/hostmacros.list.html.php:37
@@ -6091,6 +6189,10 @@ msgstr "אי אפשר להשתמש במשתנה „%1$s” שהשימוש בו �
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "תיאור"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6211,6 +6313,10 @@ msgstr "להשבית את ה־SLA הנבחר?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "להשבית את ה־SLAs הנבחרים?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -6916,6 +7022,15 @@ msgstr "הפעלה"
 msgid "Enable HTTP authentication"
 msgstr "הפעלת אימות HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:202
+#: app/views/administration.authentication.edit.php:276
+msgid "Enable JIT provisioning"
+msgstr "הפעלת הקמת JIT"
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "הפעלת אימות מול LDAP"
@@ -6923,6 +7038,10 @@ msgstr "הפעלת אימות מול LDAP"
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
 msgstr "הפעלת אימות SAML"
+
+#: app/views/administration.authentication.edit.php:543
+msgid "Enable SCIM provisioning"
+msgstr "הפעלת הקמת SCIM"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -6994,6 +7113,10 @@ msgstr "להפעיל את ה־SLA הנבחר?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "להפעיל את ה־SLAs הנבחרים?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7659,6 +7782,11 @@ msgstr "לשדה „%1$s” חסר ערך עבור המפה „%2$s”."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "השדה „%1$s” שגוי: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7673,6 +7801,13 @@ msgstr "השדה „%1$s” אינו מחרוזת."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "השדה „%1$s” ודאי חסר."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8268,20 +8403,41 @@ msgstr "הקבוצה „%1$s” עבור המארח „%2$s” אינה קיימ
 msgid "Group added"
 msgstr "נוספה קבוצה"
 
+#: app/views/popup.ldap.edit.php:134
+msgid "Group base DN"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:122
+msgid "Group configuration"
+msgstr "הגדרת קבוצה"
+
 #: hostgroups.php:134 hostgroups.php:155
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "נמחקה קבוצה"
 msgstr[1] "נמחקו קבוצות"
 
+#: app/views/popup.ldap.edit.php:182
+msgid "Group filter"
+msgstr "מסנן קבוצה"
+
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
 msgstr "קבוצה עבור מארחים שהתגלו"
+
+#: app/views/popup.ldap.edit.php:156
+msgid "Group member attribute"
+msgstr "מאפיין חבר בקבוצה"
 
 #: app/views/administration.usergroup.edit.php:43 hostgroups.php:36
 #: include/views/configuration.hostgroups.edit.php:38
 msgid "Group name"
 msgstr "שם קבוצה"
+
+#: app/views/administration.authentication.edit.php:427
+#: app/views/popup.ldap.edit.php:148
+msgid "Group name attribute"
+msgstr "מאפיין שם בקבוצה"
 
 #: include/classes/api/services/CHostPrototype.php:1165
 #, c-format
@@ -9207,6 +9363,10 @@ msgstr "מרחב שם זהה (%1$s) משמש את המודולים תחת %2$s."
 msgid "Identification of the system. Returns string"
 msgstr "זיהוי המערכת. מחזירה מחרוזת"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9355,6 +9515,11 @@ msgstr "הייבוא הצליח"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "לא ניתן לסנן לפי שדה המאגר „%1$s”, שאינו קיים."
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "בעבודות תחזוקה"
@@ -9371,6 +9536,10 @@ msgstr "בטווח"
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
 msgstr "SLA בלתי נגיש"
+
+#: app/controllers/CControllerDashboardWidgetEdit.php:452
+msgid "Inaccessible action"
+msgstr "פעולה בלתי נגישה"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9421,6 +9590,10 @@ msgstr "תחזוקה בלתי נגישה"
 msgid "Inaccessible map"
 msgstr "מפה בלתי נגישה"
 
+#: app/controllers/CControllerDashboardWidgetEdit.php:453
+msgid "Inaccessible media type"
+msgstr "סוג מדיה בלתי נגיש"
+
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
 msgstr "שירות בלתי נגיש"
@@ -9466,11 +9639,11 @@ msgstr "סוג וידג׳ט בלתי נגיש."
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "וידג׳טים בלתי נגישים לא הועתקו."
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "וידג׳טים בלתי נגישים לא הודבקו."
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -9718,6 +9891,10 @@ msgstr "תווים שגויים בשם המארח „%1$s”."
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "תנאים שגויים לכלל הגילוי „%1$s”."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -10530,12 +10707,28 @@ msgstr "כתובת IP שגויה „%1$s”."
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSON שגוי. אירעה שגיאה בשרת בעת פענוח הטקסט ב־JSON."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:171
+msgid "Invalid LDAP JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:164
+msgid "Invalid LDAP JIT provisioning user group mapping configuration."
+msgstr ""
+
 #: app/controllers/CControllerPopupLdapCheck.php:52
 #: app/controllers/CControllerPopupLdapEdit.php:49
 #: app/controllers/CControllerPopupLdapTestEdit.php:44
 #: app/controllers/CControllerPopupLdapTestSend.php:50
 msgid "Invalid LDAP configuration"
 msgstr "הגדרות LDAP שגויות"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:214
+msgid "Invalid SAML JIT provisioning media type mapping configuration."
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationUpdate.php:208
+msgid "Invalid SAML JIT provisioning user group mapping configuration."
+msgstr ""
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -10598,6 +10791,12 @@ msgstr "מפתח שגוי „%1$s” עבור אבטיפוס פריט „%2$s”
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
 msgstr "מפתח שגוי „%1$s”‏: %2$s."
+
+#: app/controllers/CControllerPopupLdapCheck.php:67
+#: app/controllers/CControllerPopupMediaTypeMappingCheck.php:42
+#: app/controllers/CControllerPopupMediaTypeMappingEdit.php:44
+msgid "Invalid media type mapping configuration."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:187
 msgid "Invalid method parameters."
@@ -10899,6 +11098,12 @@ msgstr "תגית שגויה „%1$s”‏: %2$s."
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
 msgstr "פרק הזמן שגוי."
+
+#: app/controllers/CControllerPopupLdapCheck.php:62
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
+#: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
+msgid "Invalid user group mapping configuration."
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2852
 #, c-format
@@ -11369,6 +11574,10 @@ msgstr "אימות LDAP"
 #: include/classes/api/services/CUser.php:1491
 msgid "LDAP authentication is disabled."
 msgstr "אימות LDAP מושבת."
+
+#: app/views/popup.ldap.edit.php:235
+msgid "LDAP group pattern"
+msgstr "תבנית קבוצת LDAP"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -11900,6 +12109,13 @@ msgstr "כתובת MAC א׳"
 msgid "MAC address B"
 msgstr "כתובת MAC ב׳"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12137,6 +12353,14 @@ msgstr "צורת המפה"
 msgid "Map update failed."
 msgstr "עדכון המפה נכשל."
 
+#: app/views/popup.ldap.edit.php:257
+msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:508
+msgid "Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:594
 #, c-format
 msgid "Map with ID \"%1$s\" is not available."
@@ -12173,6 +12397,10 @@ msgstr "מרץ"
 msgid "March"
 msgstr "מרץ"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "סימון רכיבים עם שינוי מצב הקפצה"
@@ -12184,6 +12412,10 @@ msgstr "סימון אחרים"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "סימון הנבחרים"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12258,6 +12490,19 @@ msgstr "מספר עמודות ושורות מרבי בטבלאות סקירה"
 msgid "Max period for time selector"
 msgstr "הטווח המרבי לבורר זמן"
 
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
 msgstr "רמת תקריב מרבית"
@@ -12314,6 +12559,12 @@ msgstr "מדיה"
 msgid "Media type"
 msgstr "סוג המדיה"
 
+#: widgets/actionlog/views/widget.view.php:40
+#: widgets/actionlog/views/widget.view.php:41
+msgctxt "compact table header"
+msgid "Media type"
+msgstr "סוג מדיה"
+
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
@@ -12344,6 +12595,12 @@ msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "סוג המדיה מופעל"
 msgstr[1] "סוגי המדיה מופעלים"
+
+#: app/views/administration.authentication.edit.php:506
+#: app/views/popup.ldap.edit.php:255
+#: app/views/popup.mediatypemapping.edit.php:85
+msgid "Media type mapping"
+msgstr "מיפוי סוגי מדיה"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12985,6 +13242,10 @@ msgctxt "user first name"
 msgid "Name"
 msgstr "שם"
 
+#: app/views/administration.authentication.edit.php:520
+msgid "Name "
+msgstr "שם"
+
 #: app/views/administration.authentication.edit.php:303
 msgid "Name ID"
 msgstr "מזהה שם"
@@ -12996,6 +13257,10 @@ msgstr "שם שדה הטופס לא יכול לחרוג מ־255 תווים."
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
 msgstr "מרחב שם"
+
+#: app/views/popup.usergroupmapping.edit.php:80
+msgid "Naming requirements:"
+msgstr "דרישות מתן שם:"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13071,6 +13336,11 @@ msgstr "שרת LDAP חדש"
 msgid "New SLA"
 msgstr "SLA חדש"
 
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
+msgstr "פעולה חדשה"
+
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
 msgstr "כלל נוסף חדש"
@@ -13121,6 +13391,10 @@ msgstr "מארח חדש"
 msgid "New host group"
 msgstr "קבוצת מארחים חדשה"
 
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "New media type mapping"
+msgstr "מיפוי סוגי מדיה חדש"
+
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "פעילות חדשה"
@@ -13149,6 +13423,10 @@ msgstr "קבוצת תבניות חדשה"
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "הקפצות חדשות"
+
+#: app/views/popup.usergroupmapping.edit.php:114
+msgid "New user group mapping"
+msgstr "מיפוי קבוצת משתמשים חדש"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -13761,6 +14039,11 @@ msgstr "אין הרשאה להגדיר את הססמה למשתמש „guest” 
 msgid "Not allowed to set theme for user \"guest\"."
 msgstr "אין הרשאה להגדיר ערכת עיצוב למשתמש „guest” (אורח)."
 
+#: include/classes/api/services/CUser.php:484
+#, c-format
+msgid "Not allowed to update field \"%1$s\" for provisioned user."
+msgstr ""
+
 #: include/classes/api/clients/CLocalApiClient.php:164
 #: include/classes/api/clients/CLocalApiClient.php:192
 #: include/classes/api/clients/CLocalApiClient.php:218
@@ -13989,6 +14272,17 @@ msgstr "מספרי (ללא סימן)"
 msgid "OEM"
 msgstr "יצרן"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr "קידומת OID"
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14120,6 +14414,10 @@ msgstr "רק בדיקות של סוכן Zabbix,‏ SNMPv1,‏ SNMPv2 ו־SNMPv3 
 msgid "Only administrators can set map owner."
 msgstr "רק מנהלים יכולים להגדיר בעלות על מפה."
 
+#: app/views/administration.authentication.edit.php:51
+msgid "Only disabled group can be set for deprovisioned users."
+msgstr ""
+
 #: app/partials/administration.system.info.php:56
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "רק פריטים שהוקצו למארחים פעילים נספרים"
@@ -14144,6 +14442,11 @@ msgstr "מותר רק בדיקת ערכים אחת בלתי נתמכת."
 #: include/classes/api/services/CItemGeneral.php:1470
 msgid "Only one throttling step is allowed."
 msgstr "מותר רק צעד האטה אחד."
+
+#: include/classes/api/services/CUserDirectory.php:519
+#, c-format
+msgid "Only one user directory of type \"%1$s\" can exist."
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -14186,6 +14489,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "פרטים על מערכת ההפעלה. מחזירה מחרוזת"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -14821,6 +15128,10 @@ msgstr "ססמה"
 msgid "Password (once again)"
 msgstr "ססמה (פעם נוספת)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "ססמה אינה מחייבת עבור סוגי אימות שאינם פנימיים."
@@ -14864,6 +15175,10 @@ msgstr "תבנית"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "השהיית פעולות לתקלות מוסתרות"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15060,6 +15375,10 @@ msgstr "מיקום"
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
 msgstr "המיקום זוכה להתעלמות ביחידות שנ׳, זמן פעילות ושעון יוניקס."
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
+msgstr ""
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15373,6 +15692,26 @@ msgstr "נתיב הסוד שסופק „%1$s” שגוי."
 msgid "Provided secret query string \"%1$s\" is invalid."
 msgstr "מחרוזת שאילתת הסוד שסופקה „%1$s” שגויה."
 
+#: app/views/administration.user.list.php:301
+msgid "Provision now"
+msgstr "להקים עכשיו"
+
+#: app/views/administration.user.list.php:303
+msgid "Provision selected LDAP users?"
+msgstr "להקים את משתמשי ה־LDAP הנבחרים?"
+
+#: app/views/administration.user.list.php:141
+msgid "Provisioned"
+msgstr "הוקמו"
+
+#: app/views/administration.authentication.edit.php:251
+msgid "Provisioning period"
+msgstr "תקופת הקמה"
+
+#: app/controllers/CControllerUserProvision.php:65
+msgid "Provisioning successful."
+msgstr "ההקמה הצליחה."
+
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
 #: app/views/administration.proxy.list.php:34
@@ -15536,6 +15875,10 @@ msgstr "נפתר"
 msgid "RMCP+"
 msgstr "RMCP+‎"
 
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr "דירוג"
+
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
 #: include/views/configuration.item.edit.php:356
@@ -15636,6 +15979,18 @@ msgstr "מען"
 msgid "Recipient already exists."
 msgstr "הנמען כבר קיים."
 
+#: app/views/reports.actionlog.list.csv.php:39
+msgid "Recipient's Zabbix username"
+msgstr "שם המשתמש ב־Zabbix של הנמען"
+
+#: app/views/reports.actionlog.list.csv.php:40
+msgid "Recipient's name"
+msgstr "שם הנמען"
+
+#: app/views/reports.actionlog.list.csv.php:41
+msgid "Recipient's surname"
+msgstr "שם המשפחה של הנמען"
+
 #: include/views/administration.auditacts.list.php:32
 msgid "Recipients"
 msgstr "נמענים"
@@ -15688,6 +16043,10 @@ msgstr "מועד השחזור"
 #: include/views/js/monitoring.sysmaps.js.php:531
 msgid "Rectangle"
 msgstr "מרובע"
+
+#: app/views/popup.ldap.edit.php:168
+msgid "Reference attribute"
+msgstr "מאפיין סימוכין"
 
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
@@ -16415,6 +16774,16 @@ msgctxt "Sunday short"
 msgid "S"
 msgstr "א׳"
 
+#: app/views/administration.user.list.php:224
+#: app/views/administration.user.list.php:225
+#: app/views/popup.usergroupmapping.edit.php:77
+msgid "SAML"
+msgstr "SAML"
+
+#: app/views/administration.authentication.edit.php:483
+msgid "SAML group pattern"
+msgstr "תבנית קבוצת SAML"
+
 #: app/views/administration.authentication.edit.php:337
 msgid "SAML settings"
 msgstr "הגדרות SAML"
@@ -16586,6 +16955,14 @@ msgstr "מפתח מלכודת ה־SNMP שגויה."
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
 msgstr "גרסת SNMP"
+
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr "הליכת SNMP ל־JSON"
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr "ערך הליכת SNMP"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -16906,6 +17283,11 @@ msgstr "מסנן חיפוש"
 msgid "Search pattern is empty"
 msgstr "תבנית החיפוש ריקה"
 
+#: app/views/reports.actionlog.list.php:108
+#: widgets/actionlog/includes/WidgetForm.php:61
+msgid "Search string"
+msgstr "מחרוזת חיפוש"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
@@ -17070,6 +17452,11 @@ msgstr "שליחה למשתמשים"
 #: include/views/administration.auditacts.list.php:79
 msgid "Sent"
 msgstr "נשלח"
+
+#: app/controllers/CControllerActionLogList.php:210
+#: widgets/actionlog/includes/WidgetForm.php:56
+msgid "Sent/Executed"
+msgstr "נשלח/הופעל"
 
 #: include/func.inc.php:244
 msgid "Sep"
@@ -17484,6 +17871,11 @@ msgstr "הצגת סרגל צד"
 #: include/views/monitoring.sysmap.edit.php:273
 msgid "Show suppressed problems"
 msgstr "הצגת תקלות מוסתרות"
+
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr "הצגת תסמינים"
 
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
@@ -18154,6 +18546,11 @@ msgstr "שוודית (sv_SE)"
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "החלפת שיטת אימות תאפס את הכול פרט להפעלה הזאת! להמשיך?"
 
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr "תסמין"
+
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
 msgid "System"
@@ -18656,6 +19053,11 @@ msgstr "טקסט"
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
 msgstr "טקסט, תומך בתצורות המאקרו {INVENTORY.*‎}, {HOST.*‎}"
 
+#: include/classes/api/clients/CLocalApiClient.php:96
+#, c-format
+msgid "The \"%1$s.%2$s\" method must be called without authorization header."
+msgstr "לשיטה „%1$s.%2$s” יש לקרוא ללא הכותרת „authorization” (אימות)."
+
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
@@ -18792,6 +19194,10 @@ msgstr "היום הזה בשבוע שעבר"
 msgid "This field is automatically populated by item \"%1$s\"."
 msgstr "השדה הזה מתמלא אוטומטית בפריט „%1$s”."
 
+#: include/classes/scim/API.php:77
+msgid "This filter is not supported"
+msgstr "אין תמיכה במסנן הזה"
+
 #: app/controllers/CControllerPopupMediatypeTestEdit.php:82
 msgid "This is the test message from Zabbix"
 msgstr "זו הודעת הבדיקה מ־Zabbix"
@@ -18826,6 +19232,10 @@ msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות �
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
 msgstr "סוג המידע הזה כנראה שלא תואם למפתח."
+
+#: app/views/administration.user.edit.php:59
+msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
+msgstr "המשתמש סופק על ידי ספק אימות (IdP). שינויים ידניים לשדות שסופקו חיצונית אינם מורשים."
 
 #: include/func.inc.php:2474
 msgid "This week"
@@ -19595,6 +20005,10 @@ msgstr "רכיב מנשק המשתמש „%2$s” אינו זמין לתפקיד
 msgid "UNKNOWN"
 msgstr "לא ידוע"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr "מתבצע עדכון"
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -19656,6 +20070,13 @@ msgstr "לכתובת אמורים להיות שני השדות: „name” ו־�
 msgid "URLs"
 msgstr "כתובות"
 
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr "UTF-8 ממחרוזת הקסדצימלית"
+
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
 msgid "UUIDv4 is expected"
@@ -19679,6 +20100,11 @@ msgstr "לא ניתן ליצור את קובץ התצורה."
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
 msgstr "לא ניתן לאתר את גרסת מסד הנתונים הנוכחית של Zabbix:‏ %1$s."
+
+#: include/classes/helpers/CAuthenticationHelper.php:88
+#: include/classes/helpers/CAuthenticationHelper.php:107
+msgid "Unable to find SAML userdirectory."
+msgstr "לא ניתן למצוא ספריית משתמשים (userdirectory) ב־SAML."
 
 #: include/classes/helpers/CAuthenticationHelper.php:75
 msgid "Unable to load authentication API parameters."
@@ -19753,6 +20179,13 @@ msgstr "שחרור"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "לשחרר את המשתמשים הנבחרים?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr "ללא שינוי"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20113,9 +20546,17 @@ msgstr "זמן פעילות של שרת ה־Zabbix בשניות."
 msgid "Uptime/Downtime"
 msgstr "זמן פעילות/חוסר פעילות"
 
+#: app/views/popup.ldap.edit.php:169
+msgid "Use %{ref} in group filter to reference value of this user attribute."
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "שימוש בבקשות קבוצתיות"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -20190,6 +20631,11 @@ msgstr "נעשה שימוש במשתמש „%1$s” בפעולה „%2$s”."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "הדוח „%2$s” נוצר בשם המשתמש „%1$s”."
 
+#: app/controllers/CControllerUserProvision.php:61
+#, c-format
+msgid "User \"%1$s\" provisioned."
+msgstr "המשתמש „%1$s” הוקם."
+
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
 msgid "User \"%1$s\" unblocked."
@@ -20235,6 +20681,19 @@ msgstr "ספריית משתמשים"
 #, c-format
 msgid "User directory \"%1$s\" already exists."
 msgstr "ספריית המשתמשים „%1$s” כבר קיימת."
+
+#: include/classes/api/services/CUser.php:715
+#, c-format
+msgid "User directory with ID \"%1$s\" is not available."
+msgstr ""
+
+#: app/views/administration.user.list.php:211
+msgid "User does not have user groups."
+msgstr "למשתמש אין קבוצות משתמשים."
+
+#: app/views/administration.user.list.php:232
+msgid "User does not have user role."
+msgstr "למשתמש אין תפקיד משתמש."
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20285,6 +20744,16 @@ msgstr[1] "קבוצות משתמשים נמחקו"
 msgid "User group for database down message"
 msgstr "קבוצת משתמשים להודעות השבתת מסד נתונים"
 
+#: app/views/administration.authentication.edit.php:471
+#: app/views/popup.ldap.edit.php:226
+#: app/views/popup.usergroupmapping.edit.php:126
+msgid "User group mapping"
+msgstr "מיפוי קבוצות משתמשים"
+
+#: app/views/popup.ldap.edit.php:196
+msgid "User group membership attribute"
+msgstr "מאפיין חברות בקבוצת משתמשים"
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -20321,6 +20790,11 @@ msgstr "קבוצות משתמשים"
 msgid "User is not allowed to delete himself."
 msgstr "למשתמש אין הרשאה למחוק את עצמו."
 
+#: app/views/administration.authentication.edit.php:457
+#: app/views/popup.ldap.edit.php:218
+msgid "User last name attribute"
+msgstr "מאפיין שם משפחה של המשתמש"
+
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
 msgstr "מאקרואים של משתמש"
@@ -20339,6 +20813,11 @@ msgstr "תפריט משתמש"
 #: include/views/configuration.item.prototype.edit.php:655 items.php:94
 msgid "User name"
 msgstr "שם משתמש"
+
+#: app/views/administration.authentication.edit.php:443
+#: app/views/popup.ldap.edit.php:210
+msgid "User name attribute"
+msgstr "מאפיין שם פרטי"
 
 #: app/views/administration.authentication.edit.php:206
 msgid "User password"
@@ -21428,7 +21907,7 @@ msgstr "כתיבה"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "שם מחלקת %1$s.php שגוי למודול שממוקם תחת %2$s."
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -22058,13 +22537,13 @@ msgstr "אמור להיות ערך שלם"
 #: include/classes/api/services/CItemGeneral.php:1827
 #: include/classes/api/services/CItemGeneral.php:1930
 msgid "an item ID is expected"
-msgstr ""
+msgstr "אמור להיות מזהה פריט"
 
 #: include/classes/api/services/CItemGeneral.php:1805
 #: include/classes/api/services/CItemGeneral.php:1826
 #: include/classes/api/services/CItemGeneral.php:1929
 msgid "an item/item prototype ID is expected"
-msgstr ""
+msgstr "אמור להיות מזהה פריט/אבטיפוס פריט"
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
@@ -22221,11 +22700,11 @@ msgstr "אפשר להשתמש כדי להוסיף „‎@2x” לכתובת כד
 
 #: include/classes/api/services/CItemGeneral.php:2383
 msgid "cannot be a value map ID from another host or template"
-msgstr ""
+msgstr "לא יכול להיות מזהה מיפוי ערכים ממארח או תבנית אחרת"
 
 #: include/classes/api/services/CItemGeneral.php:1942
 msgid "cannot be an item ID from another host or template"
-msgstr ""
+msgstr "לא יכול להיות מזהה פריט ממארח או תבנית אחרת"
 
 #: include/classes/api/services/CItemGeneral.php:1956
 msgid "cannot be an item prototype ID from another LLD rule"
@@ -22337,7 +22816,7 @@ msgstr "לא יכול להישאר ריק"
 
 #: include/classes/validators/CApiInputValidator.php:3560
 msgid "cannot be equal to zero without custom intervals"
-msgstr ""
+msgstr "לא יכול להיות שווה לאפס בלי מרווחים מותאמים אישית"
 
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
@@ -22352,7 +22831,7 @@ msgstr "אי אפשר לציין את ערך המשתנה „%1$s”"
 
 #: include/classes/api/services/CItemGeneral.php:1658
 msgid "cannot be the host interface ID from another host"
-msgstr ""
+msgstr "לא יכול להיות מזהה מנשק המארח ממארח אחר"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -22364,11 +22843,11 @@ msgstr "לא ניתן להמיר ל־JSON, ערך התוצאה ארוך מדי"
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
-msgstr ""
+msgstr "לא ניתן למחוק פריט שהתקבל בירושה"
 
 #: include/classes/api/services/CItemPrototype.php:810
 msgid "cannot delete inherited item prototype"
-msgstr ""
+msgstr "לא ניתן למחוק אבטיפוס של פריט שהתקבל בירושה"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -22689,6 +23168,11 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "הגדרות תחזוקה כלליות"
 
+#: app/views/popup.usergroupmapping.edit.php:82
+#, c-format
+msgid "group name must match %1$s group name"
+msgstr ""
+
 #: include/func.inc.php:594 jsLoader.php:224
 msgctxt "hour short"
 msgid "h"
@@ -22788,6 +23272,12 @@ msgstr "שגיאת תחביר ליד „%1$s“"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "שימוש שגוי בפונקציה „%1$s”"
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr "ערך שגוי"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert()‎ - מוסיפה תווים מסוימים או רווחים למחרוזת תווים, בתחילת מיקום מסוים במחרוזת"
@@ -22823,6 +23313,10 @@ msgstr "שיטת האגירה שגויה"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "רצף בתים שגוי ב־UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
@@ -23102,6 +23596,10 @@ msgstr "כמות הפריטים התלויים המרבית מולאה"
 msgid "maximum number of dependency levels reached"
 msgstr "כמות הרמות המרבית לתלויות מולאה"
 
+#: app/views/popup.ldap.edit.php:123
+msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:784
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid()‎ - מחזירה תת־מחרוזת שמתחילה במיקום התו שצוין כהתחלה באורך N תווים"
@@ -23262,6 +23760,14 @@ msgstr "אין הרשאות לשנות חומרת תקלה"
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "אין הרשאות לסגור תקלות"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr "אין הרשאות להמיר תקלות תסמין לתקלות גורם"
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr "אין הרשאות להמיר תקלות גורם לתקלות תסמין"
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"
@@ -23632,6 +24138,10 @@ msgstr "stddevpop()‎ - סטיית תקן של הקבוצה"
 #: app/controllers/CControllerPopupTriggerExpr.php:1005
 msgid "stddevsamp() - Sample standard deviation"
 msgstr "stddevsamp()‎ - סטיית תקן של מדגם"
+
+#: widgets/actionlog/views/widget.edit.php:49
+msgid "subject or body text"
+msgstr "טקסט הגוף או הנושא"
 
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
@@ -24147,6 +24657,10 @@ msgstr "דרך"
 msgctxt "week short"
 msgid "w"
 msgstr "שב"
+
+#: app/views/popup.usergroupmapping.edit.php:83
+msgid "wildcard patterns with '*' may be used"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

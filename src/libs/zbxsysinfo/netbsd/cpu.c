@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxnum.h"
-#include "log.h"
 
 #include "stats.h"
 #include <uvm/uvm_extern.h>

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '6.2'
+  version: '6.4'
   date: '2022-06-07T19:33:12Z'
   template_groups:
     -
@@ -2543,7 +2543,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '24'
                   height: '5'
                   fields:
@@ -2558,7 +2558,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.cpu.util
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2574,7 +2574,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Memory usage'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2598,7 +2598,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2614,7 +2614,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Disk: r/w, rate'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -2630,7 +2630,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Disk: r/w IOPS, rate'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '25'
                   width: '24'
                   height: '5'
@@ -2646,7 +2646,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.disk.iops.in_progress.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '30'
                   width: '24'
                   height: '5'
@@ -2668,7 +2668,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2691,7 +2691,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Storage [{#STORE}]: Ranges'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2715,7 +2715,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.replication.[{#STORE},lease_holders]'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2739,7 +2739,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.rebalancing.queries.average.[{#STORE},rate]'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2769,7 +2769,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '24'
                   height: '5'
                   fields:
@@ -2784,7 +2784,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.live_count
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2800,7 +2800,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Memory usage'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2816,7 +2816,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.go.goroutines.count
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2832,7 +2832,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.gc.runs.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -2848,7 +2848,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.gc.pause_time
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '25'
                   width: '24'
                   height: '5'
@@ -2864,7 +2864,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: CPU Time'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '30'
                   width: '24'
                   height: '5'
@@ -2886,7 +2886,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '24'
                   height: '5'
                   fields:
@@ -2909,7 +2909,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.slow_requests.[{#STORE},raft_proposals]'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '24'
                   height: '5'
@@ -2925,7 +2925,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.slow_requests.rpc
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '10'
                   width: '24'
                   height: '5'
@@ -2949,7 +2949,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.slow_requests.[{#STORE},lease_acquisitions]'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '15'
                   width: '24'
                   height: '5'
@@ -2979,7 +2979,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   width: '12'
                   height: '5'
                   fields:
@@ -2994,7 +2994,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.sessions
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   width: '12'
                   height: '5'
@@ -3010,7 +3010,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.transactions.open
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -3026,7 +3026,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.statements.active
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -3043,7 +3043,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: SQL: Traffic'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -3059,7 +3059,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: SQL statements'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -3076,7 +3076,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.statements.errors.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '15'
                   width: '12'
                   height: '5'
@@ -3092,7 +3092,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.statements.contention.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '15'
                   width: '12'
@@ -3109,7 +3109,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.statements.flows.active.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '20'
                   width: '24'
                   height: '5'
@@ -3125,7 +3125,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: SQL transactions'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '25'
                   width: '12'
                   height: '5'
@@ -3141,7 +3141,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.memory.sql
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '25'
                   width: '12'
@@ -3158,7 +3158,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: cockroachdb.sql.schema_changes.rate
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '30'
                   width: '24'
                   height: '5'
@@ -3180,7 +3180,7 @@ zabbix_export:
             -
               widgets:
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   width: '12'
                   height: '5'
                   fields:
@@ -3203,7 +3203,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Storage [{#STORE}]: Capacity'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   width: '12'
                   height: '5'
@@ -3227,7 +3227,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Storage [{#STORE}]: Bytes'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -3251,7 +3251,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.rocksdb.[{#STORE},read_amp]'
                 -
-                  type: GRAPH_PROTOTYPE
+                  type: graphprototype
                   x: '12'
                   'y': '5'
                   width: '12'
@@ -3276,7 +3276,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         key: 'cockroachdb.rocksdb.[{#STORE},sstables]'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
@@ -3292,7 +3292,7 @@ zabbix_export:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: File descriptors'
                 -
-                  type: GRAPH_CLASSIC
+                  type: graph
                   x: '12'
                   'y': '10'
                   width: '12'

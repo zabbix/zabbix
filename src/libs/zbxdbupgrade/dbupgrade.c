@@ -90,8 +90,6 @@ zbx_db_version_t;
 
 #define ZBX_FIRST_DB_VERSION		2010000
 
-extern unsigned char	program_type;
-
 #ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
@@ -820,6 +818,8 @@ static int	DBset_version(int version, unsigned char mandatory)
 
 #endif	/* not HAVE_SQLITE3 */
 
+zbx_get_program_type_f	DBget_program_type_cb;
+
 extern zbx_dbpatch_t	DBPATCH_VERSION(2010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
@@ -903,6 +903,16 @@ static void	DBget_version(int *mandatory, int *optional)
 	}
 }
 
+unsigned char	DBget_program_type(void)
+{
+	return DBget_program_type_cb();
+}
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
+{
+	DBget_program_type_cb = get_program_type_cb;
+}
+
 int	DBcheck_version(void)
 {
 	const char		*dbversion_table_name = "dbversion";
@@ -950,7 +960,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), required);
+				get_program_type_string(DBget_program_type_cb()), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		ret = NOTSUPPORTED;
@@ -983,7 +993,8 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				get_program_type_string(program_type), db_mandatory, db_optional, required);
+				get_program_type_string(DBget_program_type_cb()), db_mandatory, db_optional,
+				required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
 			zabbix_log(LOG_LEVEL_WARNING, "Zabbix does not support SQLite3 database upgrade.");

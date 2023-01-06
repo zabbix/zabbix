@@ -39,7 +39,8 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
-		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -50,7 +51,8 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
 		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -62,7 +64,8 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -314,15 +317,9 @@ class CItemPrototype extends CItemGeneral {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
 
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -444,6 +441,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -586,6 +584,7 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
+		self::checkPreprocessingSteps($items);
 	}
 
 	/**

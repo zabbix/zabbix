@@ -40,7 +40,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
 		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON
+		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -298,15 +299,8 @@ class CDiscoveryRule extends CItemGeneralOld {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
-
-			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$row) {
-					unset($row['name_upper']);
-				}
-				unset($row);
-			}
-
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter

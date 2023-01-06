@@ -32,6 +32,17 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
+
+typedef enum
+{
+	SYSMAP_ELEMENT_TYPE_HOST = 0,
+	SYSMAP_ELEMENT_TYPE_MAP,
+	SYSMAP_ELEMENT_TYPE_TRIGGER,
+	SYSMAP_ELEMENT_TYPE_HOST_GROUP,
+	SYSMAP_ELEMENT_TYPE_IMAGE
+}
+zbx_sysmap_element_types_t;
 
 typedef struct
 {
@@ -828,11 +839,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT);
+				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -842,9 +853,6 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		{
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
-
-			if (INTERFACE_TYPE_UNKNOWN == type)
-				continue;
 
 			if (INTERFACE_TYPE_ANY == type)
 			{

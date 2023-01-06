@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+#include "zbxtasks.h"
+
 #include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 
-#include "zbxtasks.h"
+ZBX_PTR_VECTOR_IMPL(tm_task, zbx_tm_task_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -80,10 +81,10 @@ static void	tm_data_clear(zbx_tm_data_t *data)
  *                                                                            *
  * Purpose: frees task resources                                              *
  *                                                                            *
- * Parameters: task - [IN]                                                    *
+ * Parameters: task - [IN] the task to free                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_task_clear(zbx_tm_task_t *task)
+static void	zbx_tm_task_clear(zbx_tm_task_t *task)
 {
 	if (NULL != task->data)
 	{
@@ -598,11 +599,11 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
  * Parameters: tasks - [IN] the tasks                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
+void	zbx_tm_save_tasks(zbx_vector_tm_task_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, tasks->values_num);
 
-	tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	tm_save_tasks(tasks->values, tasks->values_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -638,7 +639,7 @@ int	zbx_tm_save_task(zbx_tm_task_t *task)
  *             status - [IN] the new status                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
+void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status)
 {
 	zbx_vector_uint64_t	taskids;
 	int			i;
@@ -651,7 +652,8 @@ void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
 
 	for (i = 0; i < tasks->values_num; i++)
 	{
-		zbx_tm_task_t	*task = (zbx_tm_task_t *)tasks->values[i];
+		zbx_tm_task_t	*task = tasks->values[i];
+
 		zbx_vector_uint64_append(&taskids, task->taskid);
 	}
 
@@ -671,8 +673,8 @@ void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
  *                                                                            *
  * Purpose: serializes common task data in json format                        *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
- *             data - [IN] the task to serialize                              *
+ * Parameters: json - [IN/OUT] the json data                                  *
+ *             task - [IN] the task to serialize                              *
  *                                                                            *
  ******************************************************************************/
 static void	tm_json_serialize_task(struct zbx_json *json, const zbx_tm_task_t *task)
@@ -686,7 +688,7 @@ static void	tm_json_serialize_task(struct zbx_json *json, const zbx_tm_task_t *t
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the remote command to serialize                    *
  *                                                                            *
  ******************************************************************************/
@@ -710,7 +712,7 @@ static void	tm_json_serialize_remote_command(struct zbx_json *json, const zbx_tm
  *                                                                            *
  * Purpose: serializes remote command result data in json format              *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the remote command result to serialize             *
  *                                                                            *
  ******************************************************************************/
@@ -726,7 +728,7 @@ static void	tm_json_serialize_remote_command_result(struct zbx_json *json,
  *                                                                            *
  * Purpose: serializes check now data in json format                          *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the check now to serialize                         *
  *                                                                            *
  ******************************************************************************/
@@ -739,7 +741,7 @@ static void	tm_json_serialize_check_now(struct zbx_json *json, const zbx_tm_chec
  *                                                                            *
  * Purpose: serializes data task in json format                               *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the data task to serialize                         *
  *                                                                            *
  ******************************************************************************/
@@ -754,7 +756,7 @@ static void	tm_json_serialize_data(struct zbx_json *json, const zbx_tm_data_t *d
  *                                                                            *
  * Purpose: serializes data task result in json format                        *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the data task result to serialize                  *
  *                                                                            *
  ******************************************************************************/
@@ -769,11 +771,11 @@ static void	tm_json_serialize_data_result(struct zbx_json *json, const zbx_tm_da
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
  *                                                                            *
- * Parameters: json  - [OUT] the json data                                    *
+ * Parameters: json  - [IN/OUT] the json data                                 *
  *             tasks - [IN] the tasks to serialize                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *tasks)
+void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_tm_task_t *tasks)
 {
 	int	i;
 
@@ -781,7 +783,7 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 
 	for (i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_tm_task_t	*task = (const zbx_tm_task_t *)tasks->values[i];
+		const zbx_tm_task_t	*task = tasks->values[i];
 
 		zbx_json_addobject(json, NULL);
 		tm_json_serialize_task(json, task);
@@ -1085,7 +1087,7 @@ static zbx_tm_task_t	*tm_json_deserialize_task(const struct zbx_json_parse *jp)
  *             tasks - [OUT] the deserialized tasks                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks)
+void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_tm_task_t *tasks)
 {
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_task;
@@ -1138,7 +1140,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 			continue;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 }
 

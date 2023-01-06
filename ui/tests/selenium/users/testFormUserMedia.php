@@ -431,7 +431,7 @@ class testFormUserMedia extends CWebTest {
 			['email' => '2@zabbix.com'],
 			['email' => '3@zabbix.com']
 		];
-		$this->page->login()->open('zabbix.php?action=user.edit&userid=5');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=50');
 		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
 		$user_form->selectTab('Media');
 
@@ -553,10 +553,11 @@ class testFormUserMedia extends CWebTest {
 			$user_form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 			$media_field = $user_form->getField('Media')->asTable();
 			$this->assertTrue($media_field->getRows()->count() === 1);
-			$row = $media_field->getRow(0);
 			// Verify the values of "Type" and "Send to" for the created and updated media.
-			$this->assertEquals($row->getColumn('Type')->getText(), $data['media_fields']['Type']);
-			$this->assertEquals($row->getColumn('Send to')->getText(), $data['media_fields']['Send to']);
+			$media_field->getRow(0)->assertValues([
+				'Type' => $data['media_fields']['Type'],
+				'Send to' => $data['media_fields']['Send to']
+			]);
 		}
 	}
 

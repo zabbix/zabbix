@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "actions.h"
 #include "zbxserver.h"
+#include "server.h"
+#include "actions.h"
 
 #include "log.h"
 #include "operations.h"
@@ -27,6 +28,8 @@
 #include "zbxnum.h"
 #include "zbxip.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -3111,7 +3114,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
@@ -3338,7 +3341,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	}
 
 	zbx_vector_ptr_create(&actions);
-	zbx_dc_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 
 	if (0 == actions.values_num)
@@ -3496,7 +3499,8 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 	DBadd_condition_alloc(&filter, &filter_alloc, &filter_offset, "actionid", actionids->values,
 			actionids->values_num);
 
-	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled"
+	result = DBselect("select actionid,name,status,eventsource,esc_period,pause_suppressed,notify_if_canceled,"
+					"pause_symptoms"
 				" from actions"
 				" where%s order by actionid", filter);
 
@@ -3522,6 +3526,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 
 		ZBX_STR2UCHAR(action->pause_suppressed, row[5]);
 		ZBX_STR2UCHAR(action->notify_if_canceled, row[6]);
+		ZBX_STR2UCHAR(action->pause_symptoms, row[7]);
 		action->name = zbx_strdup(NULL, row[1]);
 		action->recovery = ZBX_ACTION_RECOVERY_NONE;
 
