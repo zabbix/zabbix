@@ -526,6 +526,7 @@ static int	pp_error_from_json(zbx_variant_t *value, const char *params)
 	{
 		zbx_variant_clear(value);
 		zbx_variant_set_error(value, errmsg);
+		ret = FAIL;
 	}
 
 	return ret;
@@ -553,6 +554,7 @@ static int	pp_error_from_xml(zbx_variant_t *value, const char *params)
 	{
 		zbx_variant_clear(value);
 		zbx_variant_set_error(value, errmsg);
+		ret = FAIL;
 	}
 
 	return ret;
@@ -580,6 +582,7 @@ static int	pp_error_from_regex(zbx_variant_t *value, const char *params)
 	{
 		zbx_variant_clear(value);
 		zbx_variant_set_error(value, errmsg);
+		ret = FAIL;
 	}
 
 	return ret;
@@ -905,7 +908,7 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char value_type,
+int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char value_type,
 		zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_step_t *step, zbx_variant_t *history_value,
 		zbx_timespec_t *history_ts)
 {
@@ -1027,6 +1030,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 {
 	zbx_pp_result_t		*results;
 	zbx_pp_history_t	*history;
+	int			quote_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
@@ -1048,8 +1052,11 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * preproc->steps_num);
 	history = (0 != preproc->history_num ? zbx_pp_history_create(preproc->history_num) : NULL);
 
-	unsigned char	action = ZBX_PREPROC_FAIL_DEFAULT;
 	int		results_num = 0;
+	zbx_variant_t	value_raw;
+	unsigned char	action;
+
+	zbx_variant_set_none(&value_raw);
 
 	for (int i = 0; i < preproc->steps_num; i++)
 	{
@@ -1059,21 +1066,25 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		if (ZBX_VARIANT_ERR == value_out->type && ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != preproc->steps[i].type)
 			break;
 
+		action = ZBX_PREPROC_FAIL_DEFAULT;
+		quote_error = 0;
+
 		pp_history_pop(preproc->history, i, &history_value, &history_ts);
 
 		if (SUCCEED != pp_execute_step(ctx, cache, preproc->value_type, value_out, ts, preproc->steps + i,
 				&history_value, &history_ts))
 		{
-			action = pp_error_on_fail(value_out, preproc->steps + i);
+			zbx_variant_copy(&value_raw, value_out);
+			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(value_out, preproc->steps + i)))
+				zbx_variant_clear(&value_raw);
 		}
 		else
-		{	if (ZBX_VARIANT_ERR == value_out->type)
-				action = ZBX_PREPROC_FAIL_FORCE_ERROR;
-			else
-				action = ZBX_PREPROC_FAIL_DEFAULT;
+		{
+			if (ZBX_VARIANT_ERR == value_out->type)
+				quote_error = 1;
 		}
 
-		pp_result_set(results + results_num++, value_out, action);
+		pp_result_set(results + results_num++, value_out, action, &value_raw);
 
 		if (NULL != history && ZBX_VARIANT_NONE != history_value.type && ZBX_VARIANT_ERR != value_out->type)
 		{
@@ -1084,6 +1095,9 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		zbx_variant_clear(&history_value);
 
 		cache = NULL;
+
+		if (ZBX_VARIANT_NONE == value_out->type)
+			break;
 	}
 
 	if (ZBX_VARIANT_ERR == value_out->type)
@@ -1095,7 +1109,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 			history = NULL;
 		}
 
-		if (ZBX_PREPROC_FAIL_SET_ERROR != action && ZBX_PREPROC_FAIL_FORCE_ERROR != action)
+		if (ZBX_PREPROC_FAIL_SET_ERROR != action && 0 == quote_error)
 		{
 			char	*error = NULL;
 

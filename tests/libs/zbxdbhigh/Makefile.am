@@ -93,6 +93,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \

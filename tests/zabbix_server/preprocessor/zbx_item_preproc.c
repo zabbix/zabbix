@@ -27,14 +27,9 @@
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
 #include "log.h"
-
-#include "../../../src/zabbix_server/preprocessor/item_preproc.h"
-
-#ifdef HAVE_NETSNMP
-#include "../../../src/zabbix_server/preprocessor/preproc_snmp.h"
-#endif
-
-zbx_es_t	es_engine;
+#include "zbxpreproc.h"
+#include "libs/zbxpreproc/pp_execute.h"
+#include "libs/zbxpreproc/preproc_snmp.h"
 
 static int	str_to_preproc_type(const char *str)
 {
@@ -131,27 +126,27 @@ static void	read_history_value(const char *path, zbx_variant_t *value, zbx_times
 	zbx_variant_convert(value, zbx_mock_str_to_variant(zbx_mock_get_object_member_string(handle, "variant")));
 }
 
-static void	read_step(const char *path, zbx_preproc_op_t *op)
+static void	read_step(const char *path, zbx_pp_step_t *step)
 {
 	zbx_mock_handle_t	hop, hop_params, herror, herror_params;
 
 	hop = zbx_mock_get_parameter_handle(path);
-	op->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
+	step->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "params", &hop_params))
-		op->params = (char *)zbx_mock_get_object_member_string(hop, "params");
+		step->params = (char *)zbx_mock_get_object_member_string(hop, "params");
 	else
-		op->params = "";
+		step->params = "";
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler", &herror))
-		op->error_handler = str_to_preproc_error_handler(zbx_mock_get_object_member_string(hop, "error_handler"));
+		step->error_handler = str_to_preproc_error_handler(zbx_mock_get_object_member_string(hop, "error_handler"));
 	else
-		op->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
+		step->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler_params", &herror_params))
-		op->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
+		step->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
 	else
-		op->error_handler_params = "";
+		step->error_handler_params = "";
 }
 
 /******************************************************************************
@@ -184,24 +179,20 @@ static int	is_step_supported(int type)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t			value, history_value;
-	unsigned char			value_type;
-	zbx_timespec_t			ts, history_ts, expected_history_ts;
-	zbx_preproc_op_t		op;
-	int				returned_ret, expected_ret;
-	char				*error = NULL;
+	zbx_variant_t		value, history_value;
+	unsigned char		value_type;
+	zbx_timespec_t		ts, history_ts, expected_history_ts;
+	zbx_pp_step_t		step;
+	int			returned_ret, expected_ret;
+	zbx_pp_context_t	ctx;
 
 	ZBX_UNUSED(state);
 
-#ifdef HAVE_NETSNMP
 	preproc_init_snmp();
-#else
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
-		skip();
-#endif
+	pp_context_init(&ctx);
 
 	read_value("in.value", &value_type, &value, &ts);
-	read_step("in.step", &op);
+	read_step("in.step", &step);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
@@ -214,16 +205,21 @@ void	zbx_mock_test_entry(void **state)
 		history_ts.ns = 0;
 	}
 
-	if (FAIL == (returned_ret = zbx_item_preproc(NULL, value_type, &value, &ts, &op, &history_value, &history_ts,
-			&error)))
+	if (FAIL == (returned_ret = pp_execute_step(&ctx, NULL, value_type, &value, ts, &step, &history_value,
+			&history_ts)))
 	{
-		returned_ret = zbx_item_preproc_handle_error(&value, &op, &error);
+		pp_error_on_fail(&value, &step);
+
+		if (ZBX_VARIANT_ERR != value.type)
+			returned_ret = SUCCEED;
 	}
 
-	if (SUCCEED != returned_ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", error);
+	if (SUCCEED != returned_ret && ZBX_VARIANT_ERR == value.type)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Preprocessing error: %s", value.data.err);
+	}
 
-	if (SUCCEED == is_step_supported(op.type))
+	if (SUCCEED == is_step_supported(step.type))
 		expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	else
 		expected_ret = FAIL;
@@ -232,9 +228,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == returned_ret)
 	{
-		if (SUCCEED == is_step_supported(op.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
+		if (SUCCEED == is_step_supported(step.type) && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.error"))
 		{
-			zbx_mock_assert_str_eq("error message", zbx_mock_get_parameter_string("out.error"), error);
+			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 		}
 		else
 		{
@@ -281,13 +277,12 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 	else
-		zbx_mock_assert_ptr_ne("error message", NULL, error);
+		zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
 	zbx_variant_clear(&value);
 	zbx_variant_clear(&history_value);
-	zbx_free(error);
 
-#ifdef HAVE_NETSNMP
+	pp_context_destroy(&ctx);
 	preproc_shutdown_snmp();
-#endif
+
 }

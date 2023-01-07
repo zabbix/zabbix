@@ -24,22 +24,41 @@
 
 ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *);
 
-void	pp_result_set(zbx_pp_result_t *result, zbx_variant_t *value, unsigned char action)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set result value                                                  *
+ *                                                                            *
+ * Parameters: result    - [OUT] the result to set                            *
+ *             value     - [IN] the field type in database schema             *
+ *             action    - [IN] the on fail action                            *
+ *             value_raw - [IN] the value before applying on fail action if   *
+ *                              non-default action was applied. This value is *
+ *                              'moved' over to result.                       *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, unsigned char action,
+		const zbx_variant_t *value_raw)
 {
 	zbx_variant_copy(&result->value, value);
+	result->value_raw = *value_raw;
+	zbx_variant_set_none(value_raw);
 	result->action = action;
 }
 
 void	zbx_pp_result_free(zbx_pp_result_t *result)
 {
 	zbx_variant_clear(&result->value);
+	zbx_variant_clear(&result->value_raw);
 	zbx_free(result);
 }
 
 void	pp_free_results(zbx_pp_result_t *results, int results_num)
 {
 	for (int i = 0; i < results_num; i++)
+	{
 		zbx_variant_clear(&results[i].value);
+		zbx_variant_clear(&results[i].value_raw);
+	}
 
 	zbx_free(results);
 }

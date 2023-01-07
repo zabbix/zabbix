@@ -40,7 +40,7 @@ void	zbx_preprocessor_flush(void);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
+		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		char **error);
 
 int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,

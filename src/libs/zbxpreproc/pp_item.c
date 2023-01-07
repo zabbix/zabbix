@@ -21,6 +21,8 @@
 #include "pp_history.h"
 #include "zbxvariant.h"
 
+ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create item preprocessing data                                    *

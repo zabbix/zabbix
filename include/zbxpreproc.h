@@ -68,6 +68,8 @@ zbx_pp_step_t;
 
 void	zbx_pp_step_free(zbx_pp_step_t *step);
 
+ZBX_PTR_VECTOR_DECL(pp_step_ptr, zbx_pp_step_t *)
+
 typedef struct
 {
 	zbx_uint32_t		refcount;
@@ -121,6 +123,7 @@ zbx_pp_item_t;
 typedef struct
 {
 	zbx_variant_t	value;
+	zbx_variant_t	value_raw;
 	unsigned char	action;
 }
 zbx_pp_result_t;

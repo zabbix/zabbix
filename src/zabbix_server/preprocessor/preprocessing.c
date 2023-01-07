@@ -896,7 +896,7 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
  ******************************************************************************/
 static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigned char value_type,
 		const char *value, const zbx_timespec_t *ts, const zbx_pp_history_t *history,
-		const zbx_vector_ptr_t *steps)
+		const zbx_vector_pp_step_ptr_t *steps)
 {
 	zbx_packed_field_t	*offset, *fields;
 	zbx_uint32_t		size;
@@ -921,7 +921,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 	*offset++ = PACKED_FIELD(&steps->values_num, sizeof(int));
 
 	for (i = 0; i < steps->values_num; i++)
-		offset += preprocessor_pack_step(offset, (zbx_pp_step_t *)steps->values[i]);
+		offset += preprocessor_pack_step(offset, steps->values[i]);
 
 	zbx_ipc_message_init(&message);
 	size = message_pack_data(&message, fields, offset - fields);
@@ -967,7 +967,7 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
+		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		char **error)
 {
 	unsigned char	*data = NULL;
@@ -983,6 +983,8 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 		goto out;
 	}
 
+	zbx_pp_history_clear(history);
+	zbx_pp_history_init(history);
 	zbx_preprocessor_unpack_test_result(results, history, result);
 	zbx_free(result);
 

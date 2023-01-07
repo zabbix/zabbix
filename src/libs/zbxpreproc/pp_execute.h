@@ -38,4 +38,9 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		zbx_variant_t *value_in, zbx_timespec_t ts, zbx_variant_t *value_out, zbx_pp_result_t **results_out,
 		int *results_num_out);
 
+int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char value_type,
+		zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_step_t *step, zbx_variant_t *history_value,
+		zbx_timespec_t *history_ts);
+int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step);
+
 #endif
