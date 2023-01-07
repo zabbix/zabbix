@@ -1985,6 +1985,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
 	src/libs/zbxparam/Makefile
+	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile

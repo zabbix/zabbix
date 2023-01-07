@@ -30,7 +30,7 @@ ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t);
  * Return value: The created preprocessing history.                           *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_history_t	*pp_history_create(int history_num)
+zbx_pp_history_t	*zbx_pp_history_create(int history_num)
 {
 	zbx_pp_history_t	*history = (zbx_pp_history_t *)zbx_malloc(NULL, sizeof(zbx_pp_history_t));
 
@@ -66,7 +66,7 @@ void	pp_history_free(zbx_pp_history_t *history)
  *             history_num - [IN] the preprocessing history size              *
  *                                                                            *
  ******************************************************************************/
-void	pp_history_reserve(zbx_pp_history_t *history, int history_num)
+void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num)
 {
 	zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
 }
@@ -82,7 +82,7 @@ void	pp_history_reserve(zbx_pp_history_t *history, int history_num)
  *             ts      - [IN] the value timestamp                             *
  *                                                                            *
  ******************************************************************************/
-void	pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts)
+void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts)
 {
 	zbx_pp_step_history_t	step_history;
 

@@ -26,7 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
 
-typedef struct
+struct zbx_pp_manager
 {
 	zbx_pp_worker_t		*workers;
 	int			workers_num;
@@ -38,19 +38,6 @@ typedef struct
 	zbx_pp_queue_t		queue;
 
 	zbx_timekeeper_t	*timekeeper;
-}
-zbx_pp_manager_t;
-
-int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num, char **error);
-void	pp_manager_destroy(zbx_pp_manager_t *manager);
-int	pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
-void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
-		zbx_timespec_t ts, zbx_ipc_client_t *client);
-void	pp_manager_process_finished(zbx_pp_manager_t *manager);
-void	pp_manager_dump_items(zbx_pp_manager_t *manager);
-
-void	pp_manager_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
-		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
+};
 
 #endif

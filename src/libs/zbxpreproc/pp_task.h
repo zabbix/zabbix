@@ -29,29 +29,14 @@
 #include "zbxtime.h"
 #include "zbxipcservice.h"
 
-typedef enum
-{
-	ZBX_PP_TASK_TEST = 1,
-	ZBX_PP_TASK_VALUE,
-	ZBX_PP_TASK_VALUE_SEQ,
-	ZBX_PP_TASK_DEPENDENT,
-	ZBX_PP_TASK_SEQUENCE
-}
-zbx_pp_task_type_t;
-
-typedef struct
-{
-	zbx_pp_task_type_t	type;
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	void			*data;
-}
-zbx_pp_task_t;
-
 typedef struct
 {
 	zbx_variant_t		value;
 	zbx_timespec_t		ts;
+
+	zbx_variant_t		result;
+	zbx_pp_result_t		*results;
+	int			results_num;
 
 	zbx_pp_item_preproc_t	*preproc; /* created from the data provided in request */
 
@@ -64,8 +49,6 @@ typedef struct
 	zbx_variant_t		value;
 	zbx_variant_t		result;
 	zbx_timespec_t		ts;
-	zbx_uint64_t		lastlogsize;
-	int			mtime;
 	zbx_pp_value_opt_t	opt;
 
 	zbx_pp_item_preproc_t	*preproc;

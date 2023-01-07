@@ -18,12 +18,10 @@
 **/
 
 #include "preprocessing.h"
-#include "pp_history.h"
 #include "zbxpreproc.h"
 
 #include "log.h"
 #include "zbxserialize.h"
-#include "item_preproc.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxlld.h"
@@ -281,7 +279,7 @@ static int	preprocessor_pack_history(zbx_packed_field_t *fields, const zbx_pp_hi
  * Comments: Don't pack local variables, only ones passed in parameters!      *
  *                                                                            *
  ******************************************************************************/
-static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_preproc_op_t *step)
+static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_pp_step_t *step)
 {
 	int	offset = 0;
 
@@ -355,7 +353,7 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
 
 	if (0 != history_num)
 	{
-		pp_history_reserve(history, history_num);
+		zbx_pp_history_reserve(history, history_num);
 
 		for (i = 0; i < history_num; i++)
 		{
@@ -368,7 +366,7 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
 			offset += zbx_deserialize_int(offset, &ts.sec);
 			offset += zbx_deserialize_int(offset, &ts.ns);
 
-			pp_history_add(history, index, &value, ts);
+			zbx_pp_history_add(history, index, &value, ts);
 		}
 	}
 
@@ -655,7 +653,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
  *             data          - [IN] IPC data buffer                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_t *results, zbx_pp_history_t *history,
+void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		const unsigned char *data)
 {
 	const unsigned char	*offset = data;
@@ -664,14 +662,14 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_t *results, zbx_pp
 
 	offset += zbx_deserialize_int(offset, &results_num);
 
-	zbx_vector_pp_result_reserve(results, (size_t)results_num);
+	zbx_vector_pp_result_ptr_reserve(results, (size_t)results_num);
 
 	for (i = 0; i < results_num; i++)
 	{
 		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 		offset += preprocesser_unpack_variant(offset, &result->value);
 		offset += zbx_deserialize_char(offset, &result->action);
-		zbx_vector_pp_result_append(results, result);
+		zbx_vector_pp_result_ptr_append(results, result);
 	}
 
 	(void)preprocessor_unpack_history(offset, history);
@@ -891,18 +889,6 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees preprocessing step                                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_preproc_op_free(zbx_preproc_op_t *op)
-{
-	zbx_free(op->params);
-	zbx_free(op->error_handler_params);
-	zbx_free(op);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: packs preprocessing step request for serialization                *
  *                                                                            *
  * Return value: The size of packed data                                      *
@@ -935,7 +921,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 	*offset++ = PACKED_FIELD(&steps->values_num, sizeof(int));
 
 	for (i = 0; i < steps->values_num; i++)
-		offset += preprocessor_pack_step(offset, (zbx_preproc_op_t *)steps->values[i]);
+		offset += preprocessor_pack_step(offset, (zbx_pp_step_t *)steps->values[i]);
 
 	zbx_ipc_message_init(&message);
 	size = message_pack_data(&message, fields, offset - fields);
@@ -969,7 +955,7 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 	offset += zbx_deserialize_int(offset, &ts->sec);
 	offset += zbx_deserialize_int(offset, &ts->ns);
 
-	preproc->history = pp_history_create(0);
+	preproc->history = zbx_pp_history_create(0);
 	offset += preprocessor_unpack_history(offset, preproc->history);
 
 	(void)preprocessor_unpack_steps(offset, preproc);
@@ -981,7 +967,7 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
  *                                                                            *
  ******************************************************************************/
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_pp_result_t *results, zbx_pp_history_t *history,
+		const zbx_vector_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		char **error)
 {
 	unsigned char	*data = NULL;

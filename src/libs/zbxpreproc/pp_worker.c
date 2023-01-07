@@ -23,7 +23,6 @@
 #include "pp_queue.h"
 #include "pp_execute.h"
 #include "pp_error.h"
-#include "preprocessing.h"
 
 #include "zbxcommon.h"
 #include "log.h"
@@ -40,21 +39,8 @@
 static void	pp_task_process_test(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
 {
 	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
-	zbx_variant_t		result;
-	zbx_pp_result_t		*results = NULL;
-	int			results_num;
-	unsigned char		*data;
-	zbx_uint32_t		len;
 
-	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, &result, &results, &results_num);
-
-	len = zbx_preprocessor_pack_test_result(&data, results, results_num, d->preproc->history);
-
-	zbx_ipc_client_send(d->client, ZBX_IPC_PREPROCESSOR_TEST_RESULT, data, len);
-	zbx_free(data);
-
-	pp_free_results(results, results_num);
-	zbx_variant_clear(&result);
+	pp_execute(ctx, d->preproc, NULL, &d->value, d->ts, &d->result, &d->results, &d->results_num);
 }
 
 /******************************************************************************

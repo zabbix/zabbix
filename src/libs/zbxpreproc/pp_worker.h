@@ -17,19 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_ITEM_H
-#define ZABBIX_PP_ITEM_H
+#ifndef ZABBIX_PP_WORKER_H
+#define ZABBIX_PP_WORKER_H
 
-#include "pp_history.h"
-#include "zbxcommon.h"
+#include "pp_queue.h"
+#include "pp_execute.h"
+#include "zbxtimekeeper.h"
 #include "zbxpreproc.h"
 
+typedef struct
+{
+	int			id;	/* TODO: for debug logging, remove */
 
-void	pp_item_clear(zbx_pp_item_t *item);
+	zbx_uint32_t		init_flags;
+	int			stop;
 
-zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
-int	zbx_pp_preproc_has_history(unsigned char type);
+	zbx_pp_queue_t		*queue;
+	pthread_t		thread;
 
-void	pp_value_opt_clear(zbx_pp_value_opt_t *opt);
+	zbx_pp_context_t	execute_ctx;
+
+	zbx_timekeeper_t	*timekeeper;
+}
+zbx_pp_worker_t;
+
+int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
+		char **error);
+void	pp_worker_stop(zbx_pp_worker_t *worker);
+void	pp_worker_destroy(zbx_pp_worker_t *worker);
 
 #endif

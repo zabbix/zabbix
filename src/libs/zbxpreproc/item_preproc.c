@@ -19,7 +19,6 @@
 
 #include "item_preproc.h"
 
-#include "../db_lengths.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxembed.h"
@@ -367,7 +366,7 @@ static void	unescape_param(int op_type, const char *in, int len, char *out)
  ******************************************************************************/
 int	item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg)
 {
-	char	params_raw[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char	params_raw[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
@@ -573,7 +572,7 @@ int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg
  ******************************************************************************/
 int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	char		*output, *new_value = NULL;
 	const char	*regex_error;
 	zbx_regexp_t	*regex = NULL;
@@ -629,7 +628,7 @@ int	item_preproc_validate_range(unsigned char value_type, const zbx_variant_t *v
 		char **errmsg)
 {
 	zbx_variant_t	value_num;
-	char		min[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
+	char		min[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *max;
 	zbx_variant_t	range_min, range_max;
 	int		ret = FAIL;
 
@@ -976,7 +975,7 @@ int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *pa
 {
 	zbx_variant_t	value_str;
 	int		ret;
-	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
+	char		pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 
 	zbx_variant_copy(&value_str, value);
 
@@ -1559,8 +1558,8 @@ int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **er
 {
 	unsigned int	len_search, len_replace;
 	const char	*ptr;
-	char		*new_string, search_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-			replace_str[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		*new_string, search_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+			replace_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	if (NULL == (ptr = strchr(params, '\n')))
 	{

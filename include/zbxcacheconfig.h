@@ -563,15 +563,6 @@ typedef struct
 }
 zbx_proxy_counter_t;
 
-typedef struct
-{
-	unsigned char	type;
-	unsigned char	error_handler;
-	char		*params;
-	char		*error_handler_params;
-}
-zbx_preproc_op_t;
-
 /* the configuration cache statistics */
 typedef struct
 {

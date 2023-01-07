@@ -23,6 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
+#include "zbxtimekeeper.h"
+#include "zbxipcservice.h"
 
 /* one preprocessing step history */
 typedef struct
@@ -42,8 +44,11 @@ typedef struct
 }
 zbx_pp_history_t;
 
+zbx_pp_history_t	*zbx_pp_history_create(int history_num);
 void	zbx_pp_history_init(zbx_pp_history_t *history);
 void	zbx_pp_history_clear(zbx_pp_history_t *history);
+void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num);
+void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts);
 
 typedef enum
 {
@@ -60,6 +65,8 @@ typedef struct
 	char		*error_handler_params;
 }
 zbx_pp_step_t;
+
+void	zbx_pp_step_free(zbx_pp_step_t *step);
 
 typedef struct
 {
@@ -97,6 +104,8 @@ typedef struct
 }
 zbx_pp_value_opt_t;
 
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -116,13 +125,55 @@ typedef struct
 }
 zbx_pp_result_t;
 
-ZBX_PTR_VECTOR_DECL(pp_result, zbx_pp_result_t *);
+ZBX_PTR_VECTOR_DECL(pp_result_ptr, zbx_pp_result_t *);
 
 void	zbx_pp_result_free(zbx_pp_result_t *result);
 
+typedef enum
+{
+	ZBX_PP_TASK_TEST = 1,
+	ZBX_PP_TASK_VALUE,
+	ZBX_PP_TASK_VALUE_SEQ,
+	ZBX_PP_TASK_DEPENDENT,
+	ZBX_PP_TASK_SEQUENCE
+}
+zbx_pp_task_type_t;
+
+typedef struct
+{
+	zbx_pp_task_type_t	type;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	void			*data;
+}
+zbx_pp_task_t;
+
+ZBX_PTR_VECTOR_DECL(pp_task_ptr, zbx_pp_task_t *)
+
+void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, unsigned char *flags,
+		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt);
+void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, zbx_variant_t **value,
+		zbx_pp_result_t **results, int *results_num, zbx_pp_history_t **history);
+void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
 zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags);
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
 int	zbx_pp_preproc_has_history(unsigned char type);
+
+typedef struct zbx_pp_manager zbx_pp_manager_t;
+
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error);
+void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
+int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
+		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
+void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
+		zbx_timespec_t ts, zbx_ipc_client_t *client);
+void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks);
+void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager);
+
+zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager);
+void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision);
+zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);
+zbx_uint64_t	zbx_pp_manager_get_queued_num(zbx_pp_manager_t *manager);
 
 #endif

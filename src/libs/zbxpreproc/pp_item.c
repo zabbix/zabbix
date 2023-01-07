@@ -54,6 +54,13 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned c
 	return preproc;
 }
 
+void	zbx_pp_step_free(zbx_pp_step_t *step)
+{
+	zbx_free(step->params);
+	zbx_free(step->error_handler_params);
+	zbx_free(step);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: free item preprocessing data                                      *
@@ -145,7 +152,7 @@ void	pp_item_clear(zbx_pp_item_t *item)
 	zbx_pp_item_preproc_release(item->preproc);
 }
 
-void	pp_value_opt_clear(zbx_pp_value_opt_t *opt)
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
 {
 	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
 		zbx_free(opt->source);

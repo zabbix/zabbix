@@ -147,8 +147,8 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_steps, ptr));)
 	{
-		zbx_preproc_op_t	*step;
-		unsigned char		step_type, error_handler;
+		zbx_pp_step_t	*step;
+		unsigned char	step_type, error_handler;
 
 		if (FAIL == zbx_json_brackets_open(ptr, &jp_step))
 		{
@@ -187,7 +187,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 
 		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type || ZBX_STATE_NOT_SUPPORTED == *state)
 		{
-			step = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t));
+			step = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t));
 			step->type = step_type;
 			step->params = step_params;
 			step->error_handler = error_handler;
@@ -209,7 +209,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 out:
 	if (FAIL == ret)
 	{
-		zbx_vector_ptr_clear_ext(steps, (zbx_clean_func_t)zbx_preproc_op_free);
+		zbx_vector_ptr_clear_ext(steps, (zbx_clean_func_t)zbx_pp_step_free);
 		zbx_free(values[0]);
 		zbx_free(values[1]);
 	}
@@ -247,11 +247,11 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	zbx_vector_ptr_t	steps;
 	zbx_timespec_t		ts[2];
 	zbx_pp_result_t		*result;
-	zbx_vector_pp_result_t	results;
+	zbx_vector_pp_result_ptr_t	results;
 	zbx_pp_history_t	history;
 
 	zbx_vector_ptr_create(&steps);
-	zbx_vector_pp_result_create(&results);
+	zbx_vector_pp_result_ptr_create(&results);
 	zbx_pp_history_init(&history);
 
 	if (FAIL == trapper_parse_preproc_test(jp, values, ts, &values_num, &value_type, &steps, &single, &state,
@@ -262,7 +262,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 	first_step_type = 0;
 	if (0 != steps.values_num)
-		first_step_type  = ((zbx_preproc_op_t *)steps.values[0])->type;
+		first_step_type  = ((zbx_pp_step_t *)steps.values[0])->type;
 
 	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != first_step_type && ZBX_STATE_NOT_SUPPORTED == state)
 	{
@@ -276,7 +276,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 	for (i = 0; i < values_num; i++)
 	{
-		zbx_vector_pp_result_clear_ext(&results, zbx_pp_result_free);
+		zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
 
 		if (0 == steps.values_num)
 		{
@@ -286,7 +286,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 			zbx_variant_set_str(&value, values[i]);
 			zbx_variant_copy(&result->value, &value);
-			zbx_vector_pp_result_append(&results, result);
+			zbx_vector_pp_result_ptr_append(&results, result);
 		}
 		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
 				error))
@@ -392,10 +392,10 @@ out:
 
 	zbx_pp_history_clear(&history);
 
-	zbx_vector_pp_result_clear_ext(&results, zbx_pp_result_free);
-	zbx_vector_pp_result_destroy(&results);
+	zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
+	zbx_vector_pp_result_ptr_destroy(&results);
 
-	zbx_vector_ptr_clear_ext(&steps, (zbx_clean_func_t)zbx_preproc_op_free);
+	zbx_vector_ptr_clear_ext(&steps, (zbx_clean_func_t)zbx_pp_step_free);
 	zbx_vector_ptr_destroy(&steps);
 
 	return ret;

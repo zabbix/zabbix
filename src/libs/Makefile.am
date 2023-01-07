@@ -42,6 +42,7 @@ DIST_SUBDIRS = \
 	zbxnix \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxregexp \
 	zbxrtc \
@@ -90,6 +91,7 @@ SERVER_SUBDIRS = \
 	zbxmedia \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
@@ -131,6 +133,7 @@ PROXY_SUBDIRS = \
 	zbxkvs \
 	zbxnum \
 	zbxparam \
+	zbxpreproc \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \

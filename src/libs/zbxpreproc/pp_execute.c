@@ -20,7 +20,6 @@
 #include "pp_execute.h"
 #include "pp_cache.h"
 #include "pp_error.h"
-#include "../db_lengths.h"
 #include "log.h"
 #include "item_preproc.h"
 #include "zbxprometheus.h"
@@ -656,8 +655,8 @@ static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const 
 static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
-	char	pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output, *value_out = NULL,
-		*err = NULL;
+	char	pattern[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *request, *output,
+			*value_out = NULL, *err = NULL;
 	int	ret = FAIL;
 
 	zbx_strlcpy(pattern, params, sizeof(pattern));
@@ -1047,7 +1046,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	}
 
 	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * preproc->steps_num);
-	history = (0 != preproc->history_num ? pp_history_create(preproc->history_num) : NULL);
+	history = (0 != preproc->history_num ? zbx_pp_history_create(preproc->history_num) : NULL);
 
 	unsigned char	action = ZBX_PREPROC_FAIL_DEFAULT;
 	int		results_num = 0;
@@ -1079,7 +1078,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		if (NULL != history && ZBX_VARIANT_NONE != history_value.type && ZBX_VARIANT_ERR != value_out->type)
 		{
 			if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
-				pp_history_add(history, i, &history_value, history_ts);
+				zbx_pp_history_add(history, i, &history_value, history_ts);
 		}
 
 		zbx_variant_clear(&history_value);

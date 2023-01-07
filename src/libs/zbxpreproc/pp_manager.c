@@ -23,6 +23,7 @@
 #include "pp_queue.h"
 #include "pp_item.h"
 #include "pp_task.h"
+#include "preproc_snmp.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
@@ -86,21 +87,21 @@ static void	pp_curl_destroy(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize preprocessing manager                                  *
+ * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: manager     - [IN] the manager                                 *
- *             workers_num - [IN] the number of workers to create             *
- *             error       - [OUT] the error message                          *
+ * Parameters: program_type - [IN] the component type (server/proxy)          *
+ *             workers_num  - [IN] the number of workers to create            *
+ *             error        - [OUT] the error message                         *
  *                                                                            *
- * Return value: SUCCEED - the manager was initialized successfully           *
- *               FAIL    - otherwise                                          *
+ * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num, char **error)
+zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 {
-	int		i, ret = FAIL, started_num = 0;
-	time_t		time_start;
-	struct timespec	poll_delay = {0, 1e8};
+	int			i, ret = FAIL, started_num = 0;
+	time_t			time_start;
+	struct timespec		poll_delay = {0, 1e8};
+	zbx_pp_manager_t	*manager;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, workers_num);
 
@@ -109,6 +110,7 @@ int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num
 #ifdef HAVE_NETSNMP
 	preproc_init_snmp();
 #endif
+	manager = (zbx_pp_manager_t *)zbx_malloc(NULL, sizeof(zbx_pp_manager_t));
 	memset(manager, 0, sizeof(zbx_pp_manager_t));
 
 	if (SUCCEED != pp_task_queue_init(&manager->queue, error))
@@ -118,8 +120,6 @@ int	pp_manager_init(zbx_pp_manager_t *manager, int program_type, int workers_num
 
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, workers_num, sizeof(zbx_pp_worker_t));
-
-	manager->program_type = program_type;
 
 	for (i = 0; i < workers_num; i++)
 	{
@@ -157,12 +157,15 @@ out:
 			pp_worker_stop(&manager->workers[i]);
 
 		pp_task_queue_destroy(&manager->queue);
+		zbx_free(manager);
+
+		manager = NULL;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 
-	return ret;
+	return manager;
 }
 
 /******************************************************************************
@@ -170,7 +173,7 @@ out:
  * Purpose: destroy preprocessing manager                                     *
  *                                                                            *
  ******************************************************************************/
-void	pp_manager_destroy(zbx_pp_manager_t *manager)
+void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 {
 	int	i;
 
@@ -182,6 +185,8 @@ void	pp_manager_destroy(zbx_pp_manager_t *manager)
 	for (i = 0; i < manager->workers_num; i++)
 		pp_worker_destroy(&manager->workers[i]);
 
+	zbx_free(manager->workers);
+
 	pp_task_queue_destroy(&manager->queue);
 	zbx_hashset_destroy(&manager->items);
 
@@ -192,6 +197,8 @@ void	pp_manager_destroy(zbx_pp_manager_t *manager)
 #endif
 	pp_curl_destroy();
 	pp_xml_destroy();
+
+	zbx_free(manager);
 }
 
 /******************************************************************************
@@ -206,7 +213,7 @@ void	pp_manager_destroy(zbx_pp_manager_t *manager)
  *             client    - [IN] the request source                            *
  *                                                                            *
  ******************************************************************************/
-void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
+void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
 		zbx_timespec_t ts, zbx_ipc_client_t *client)
 {
 	zbx_pp_task_t	*task;
@@ -231,7 +238,7 @@ void	pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *pre
  *               FAIl    - item does not need preprocessing                   *
  *                                                                            *
  ******************************************************************************/
-int	pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
+int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt)
 {
 	zbx_pp_item_t	*item;
@@ -379,10 +386,7 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
 	return task;
 }
 
-#define PP_FINISSHED_TASK_BATCH_SIZE	100
-
-ZBX_PTR_VECTOR_DECL(pp_task, zbx_pp_task_t *)
-ZBX_PTR_VECTOR_IMPL(pp_task, zbx_pp_task_t *)
+#define PP_FINISHED_TASK_BATCH_SIZE	100
 
 /******************************************************************************
  *                                                                            *
@@ -391,20 +395,17 @@ ZBX_PTR_VECTOR_IMPL(pp_task, zbx_pp_task_t *)
  * Parameters: manager - [IN] the manager                                     *
  *                                                                            *
  ******************************************************************************/
-void	pp_manager_process_finished(zbx_pp_manager_t *manager)
+void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
 {
-	zbx_vector_pp_task_t	tasks;
-	zbx_pp_task_t		*task;
-	int			values_num;
+	zbx_pp_task_t	*task;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_pp_task_create(&tasks);
-	zbx_vector_pp_task_reserve(&tasks, PP_FINISSHED_TASK_BATCH_SIZE);
+	zbx_vector_pp_task_ptr_reserve(tasks, PP_FINISHED_TASK_BATCH_SIZE);
 
 	pp_task_queue_lock(&manager->queue);
 
-	while (PP_FINISSHED_TASK_BATCH_SIZE > tasks.values_num)
+	while (PP_FINISHED_TASK_BATCH_SIZE > tasks->values_num)
 	{
 		if (NULL != (task = pp_task_queue_pop_finished(&manager->queue)))
 		{
@@ -427,38 +428,12 @@ void	pp_manager_process_finished(zbx_pp_manager_t *manager)
 		if (NULL == task)
 			break;
 
-		zbx_vector_pp_task_append(&tasks, task);
+		zbx_vector_pp_task_ptr_append(tasks, task);
 	}
 
 	pp_task_queue_unlock(&manager->queue);
 
-	for (int i = 0; i < tasks.values_num; i++)
-	{
-		switch (tasks.values[i]->type)
-		{
-			case ZBX_PP_TASK_VALUE:
-			case ZBX_PP_TASK_VALUE_SEQ:	/* value and value_seq task data is identical */
-				zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(tasks.values[i]);
-
-				pp_manager_flush_value(manager, tasks.values[i]->itemid, d->preproc->value_type,
-						d->preproc->flags, &d->result, d->ts, &d->opt);
-				break;
-			case ZBX_PP_TASK_TEST:
-				/* the result has been already sent back by worker */
-				break;
-			default:
-				/* the internal tasks (dependent/sequence) shouldn't get here */
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-	}
-
-	values_num = tasks.values_num;
-
-	zbx_vector_pp_task_clear_ext(&tasks, pp_task_free);
-	zbx_vector_pp_task_destroy(&tasks);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __func__, values_num);
-
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __func__, tasks->values_num);
 }
 
 /******************************************************************************
@@ -468,7 +443,7 @@ void	pp_manager_process_finished(zbx_pp_manager_t *manager)
  * Parameters: manager - [IN] the manager                                     *
  *                                                                            *
  ******************************************************************************/
-void	pp_manager_dump_items(zbx_pp_manager_t *manager)
+void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_pp_item_t		*item;
@@ -498,59 +473,22 @@ void	pp_manager_dump_items(zbx_pp_manager_t *manager)
 
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: flush preprocessed value                                          *
- *                                                                            *
- * Parameters: manager    - [IN] the preprocessing manager                    *
- *             itemid     - [IN] the item identifier                          *
- *             value_type - [IN] the item value type                          *
- *             flags      - [IN] the item flags                               *
- *             value      - [IN] preprocessed item value                      *
- *             ts         - [IN] the value timestamp                          *
- *             value_opt  - [IN] the optional value data                      *
- *                                                                            *
- ******************************************************************************/
-void	pp_manager_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
-		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
+zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager)
 {
-	if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (manager->program_type & ZBX_PROGRAM_TYPE_SERVER))
-	{
-		dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
-	}
-	else
-	{
-		zbx_pp_item_t	*item;
-
-		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
-		{
-			const char	*value_lld = NULL, *error_lld = NULL;
-			unsigned char	meta = 0;
-			zbx_uint64_t	lastlogsize = 0;
-			int		mtime = 0;
-
-			if (ZBX_VARIANT_ERR == value->type)
-			{
-				error_lld = value->data.err;
-			}
-			else
-			{
-				if (SUCCEED == zbx_variant_convert(value, ZBX_VARIANT_STR))
-					value_lld = value->data.str;
-			}
-
-			if (0 != (value_opt->flags & ZBX_PP_VALUE_OPT_META))
-			{
-				meta = 1;
-				lastlogsize = value_opt->lastlogsize;
-				mtime = value_opt->mtime;
-			}
-
-			if (NULL != value_lld || NULL != error_lld || 0 != meta)
-			{
-				zbx_lld_process_value(itemid, item->hostid, value_lld, &ts, meta, lastlogsize, mtime,
-						error_lld);
-			}
-		}
-	}
+	return manager->revision;
 }
+
+void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision)
+{
+	manager->revision = revision;
+}
+zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager)
+{
+	return &manager->items;
+}
+
+zbx_uint64_t	zbx_pp_manager_get_queued_num(zbx_pp_manager_t *manager)
+{
+	return manager->queue.queued_num;
+}
+

@@ -65,7 +65,7 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_pp_result_t *results,
 		int results_num, const zbx_pp_history_t *history);
 
-void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_t *results, zbx_pp_history_t *history,
+void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		const unsigned char *data);
 
 zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,

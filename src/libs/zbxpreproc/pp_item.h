@@ -17,16 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_HISTORY_H
-#define ZABBIX_PP_HISTORY_H
+#ifndef ZABBIX_PP_ITEM_H
+#define ZABBIX_PP_ITEM_H
 
+#include "pp_history.h"
+#include "zbxcommon.h"
 #include "zbxpreproc.h"
 
-zbx_pp_history_t	*pp_history_create(int history_num);
-void	pp_history_free(zbx_pp_history_t *history);
-void	pp_history_reserve(zbx_pp_history_t *history, int history_num);
+void	pp_item_clear(zbx_pp_item_t *item);
 
-void	pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts);
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
+int	zbx_pp_preproc_has_history(unsigned char type);
+
 
 #endif

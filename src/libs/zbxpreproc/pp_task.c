@@ -18,15 +18,18 @@
 **/
 
 #include "pp_task.h"
-
+#include "pp_error.h"
 #include "zbxcommon.h"
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxsysinc.h"
+#include "zbxipcservice.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00
 #define PP_TASK_QUEUE_INIT_LOCK		0x01
 #define PP_TASK_QUEUE_INIT_EVENT	0x02
+
+ZBX_PTR_VECTOR_IMPL(pp_task_ptr, zbx_pp_task_t *)
 
 void	pp_task_free(zbx_pp_task_t *task);
 
@@ -73,6 +76,10 @@ zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t
 	d->value = *value;
 	d->ts = ts;
 
+	d->results = NULL;
+	d->results_num = 0;
+	zbx_variant_set_none(&d->result);
+
 	d->preproc = pp_item_preproc_copy(preproc);
 
 	d->client = client;
@@ -91,6 +98,10 @@ zbx_pp_task_t	*pp_task_test_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t
 static void	pp_task_test_clear(zbx_pp_task_test_t *task)
 {
 	zbx_variant_clear(&task->value);
+
+	zbx_variant_clear(&task->result);
+	pp_free_results(task->results, task->results_num);
+
 	zbx_pp_item_preproc_release(task->preproc);
 	zbx_ipc_client_release(task->client);
 }
@@ -147,7 +158,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
  ******************************************************************************/
 static void	pp_task_value_clear(zbx_pp_task_value_t *task)
 {
-	pp_value_opt_clear(&task->opt);
+	zbx_pp_value_opt_clear(&task->opt);
 
 	zbx_variant_clear(&task->value);
 	zbx_variant_clear(&task->result);
@@ -290,4 +301,48 @@ void	pp_task_free(zbx_pp_task_t *task)
 	}
 
 	zbx_free(task);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear tasks                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks)
+{
+	zbx_vector_pp_task_ptr_clear_ext(tasks, pp_task_free);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: extract value task data                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, unsigned char *flags,
+		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt)
+{
+	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
+
+	*value_type = d->preproc->value_type;
+	*flags = d->preproc->flags;
+	*value = &d->result;
+	*ts = d->ts;
+	*value_opt = &d->opt;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: extract test task data                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, zbx_variant_t **value,
+		zbx_pp_result_t **results, int *results_num, zbx_pp_history_t **history)
+{
+	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
+
+	*client = d->client;
+	*value = &d->result;
+	*results = d->results;
+	*results_num = d->results_num;
+	*history = d->preproc->history;
 }
