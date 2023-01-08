@@ -64,7 +64,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 	/* prepare history */
 	if (NULL != history)
 	{
-		preproc->history = zbx_pp_history_create(history->step_history.values_num);
+		preproc->history = zbx_pp_history_create(0);
 		*preproc->history = *history;
 		preproc->history_num = 1;
 		memset(history, 0, sizeof(zbx_pp_history_t));
@@ -90,7 +90,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 		if (NULL != preproc->history)
 		{
 			*history = *preproc->history;
-			preproc->history = NULL;
+			zbx_free(preproc->history);
 		}
 	}
 

@@ -25,7 +25,7 @@
 #include "zbxvariant.h"
 
 void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, unsigned char action,
-		const zbx_variant_t *value_raw);
+		zbx_variant_t *value_raw);
 void	pp_free_results(zbx_pp_result_t *results, int results_num);
 
 void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int results_num, char **error);

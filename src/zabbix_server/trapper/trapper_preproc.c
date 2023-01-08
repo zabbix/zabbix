@@ -284,8 +284,10 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 			result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 
-			zbx_variant_set_str(&value, values[i]);
+			result->action = ZBX_PREPROC_FAIL_DEFAULT;
+			zbx_variant_set_str(&value, zbx_strdup(NULL, values[i]));
 			zbx_variant_copy(&result->value, &value);
+			zbx_variant_set_none(&result->value_raw);
 			zbx_vector_pp_result_ptr_append(&results, result);
 		}
 		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
@@ -293,7 +295,6 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 		{
 			goto out;
 		}
-
 
 		if (ZBX_VARIANT_ERR == results.values[results.values_num - 1]->value.type)
 		{
@@ -387,10 +388,12 @@ err:
 
 	ret = SUCCEED;
 out:
+	zbx_free(preproc_error);
+
 	for (i = 0; i < values_num; i++)
 		zbx_free(values[i]);
 
-	//zbx_pp_history_clear(&history);
+	zbx_pp_history_clear(&history);
 
 	zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
 	zbx_vector_pp_result_ptr_destroy(&results);

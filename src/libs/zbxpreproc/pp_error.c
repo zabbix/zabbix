@@ -37,7 +37,7 @@ ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *);
  *                                                                            *
  ******************************************************************************/
 void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, unsigned char action,
-		const zbx_variant_t *value_raw)
+		zbx_variant_t *value_raw)
 {
 	zbx_variant_copy(&result->value, value);
 	result->value_raw = *value_raw;
