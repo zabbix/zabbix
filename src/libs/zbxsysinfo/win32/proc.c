@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxsymbols.h"
+#include "zbxfile.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

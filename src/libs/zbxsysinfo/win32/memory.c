@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxsymbols.h"
+#include "zbxfile.h"
 
 int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
