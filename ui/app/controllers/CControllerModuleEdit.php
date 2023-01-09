@@ -77,6 +77,7 @@ class CControllerModuleEdit extends CController {
 
 		if ($manifest !== null) {
 			$data = [
+				'form_refresh' => $this->getInput('form_refresh', 0),
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
 				'version' => $manifest['version'],

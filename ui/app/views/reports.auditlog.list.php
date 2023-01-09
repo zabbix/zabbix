@@ -159,6 +159,7 @@ $obj = [
 $html_page
 	->addItem(
 		(new CForm('get'))
+			->cleanItems()
 			->setName('auditForm')
 			->addItem([$table, $data['paging']])
 	)
