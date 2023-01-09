@@ -67,10 +67,10 @@ INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50014,'API group for host prototype',0);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NULL,40066);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (120, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
-INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (121, 50011, '', 50014, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50120, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
+INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50121, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (50015,'API discovery group {#HV.NAME}',0,4);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 120, 'API discovery group {#HV.NAME}');
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 50120, 'API discovery group {#HV.NAME}');
 
 
 -- host tags
@@ -1446,9 +1446,9 @@ INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99010
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99011, '{#VALUE}', '{#VALUE}', 0, 2, '');
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012, 'discovered', 'discovered', 0, 4, '');
 INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '', '', '', '');
-INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (122, 99011, 'host group {#VALUE}');
-INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (123, 99011, 50025);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 122, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (50122, 99011, 'host group {#VALUE}');
+INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (50123, 99011, 50025);
+INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 50122, 'host group {#VALUE}');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);

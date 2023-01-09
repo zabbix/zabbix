@@ -232,7 +232,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel(_('Preprocessing steps'))
 			->setChecked(array_key_exists('preprocessing', $data['visible'])),
-		(new CDiv(getItemPreprocessing($form, $data['preprocessing'], false, $data['preprocessing_types'])))
+		(new CDiv(getItemPreprocessing($data['preprocessing'], false, $data['preprocessing_types'])))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setId('preprocessing_div')

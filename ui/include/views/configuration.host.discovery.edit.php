@@ -764,7 +764,7 @@ $tab = (new CTabView())
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+				getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
 			)
 	)
 	->addTab('lldMacroTab', _('LLD macros'), $lld_macro_paths_form_list)

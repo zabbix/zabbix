@@ -40,13 +40,13 @@ $fields = [
 									_('Calculate SLA, acceptable SLA (in %)')
 								],
 	'sortorder' => 				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
-	'times' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'times' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'trigger' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'new_service_time' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_service_time' =>		[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,		null],
 	'new_service_time_from' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('From')],
 	'new_service_time_till' =>	[T_ZBX_ABS_TIME, O_OPT, null, 	NOT_EMPTY,	null, _('Till')],
-	'children' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'children' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,		null],
 	'parentid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'parentname' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
