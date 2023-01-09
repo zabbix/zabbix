@@ -20,19 +20,6 @@
 #ifndef ZABBIX_ZBXFILE_H
 #define ZABBIX_ZBXFILE_H
 
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-#else
-#	define zbx_open(pathname, flags)	open(pathname, flags)
-#	define PATH_SEPARATOR	'/'
-#endif
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-int     __zbx_open(const char *pathname, int flags);
-#endif
-
 typedef struct
 {
 	zbx_fs_time_t	modification_time;	/* time of last modification */
@@ -48,18 +35,16 @@ int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
+#	define PATH_SEPARATOR	'\\'
+#else
+#	define zbx_open(pathname, flags)	open(pathname, flags)
+#	define PATH_SEPARATOR	'/'
+#endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-typedef struct {
-	ULONGLONG	LowPart;
-	ULONGLONG	HighPart;
-} ZBX_EXT_FILE_ID_128;
-
-typedef struct {
-	ULONGLONG		VolumeSerialNumber;
-	ZBX_EXT_FILE_ID_128	FileId;
-} ZBX_FILE_ID_INFO;
-
+int     __zbx_open(const char *pathname, int flags);
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {
@@ -76,14 +61,23 @@ typedef struct {
 	DWORD		FileAttributes;
 } ZBX_FILE_BASIC_INFO;
 
+typedef struct {
+	ULONGLONG	LowPart;
+	ULONGLONG	HighPart;
+} ZBX_EXT_FILE_ID_128;
+
+typedef struct {
+	ULONGLONG		VolumeSerialNumber;
+	ZBX_EXT_FILE_ID_128	FileId;
+} ZBX_FILE_ID_INFO;
+
 DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
 BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
 BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
 BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, ZBX_FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD);
-#endif
 
 void	zbx_import_symbols(void);
-
+#endif
 
 #endif /* ZABBIX_ZBXFILE_H */
