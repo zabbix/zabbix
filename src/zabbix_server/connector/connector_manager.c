@@ -61,9 +61,9 @@ zbx_connector_manager_t;
 
 typedef struct
 {
-	zbx_uint64_t			objectid;
-	zbx_vector_connector_object_t	connector_objects;
-	zbx_list_item_t			*queue_item;	/* queued item */
+	zbx_uint64_t				objectid;
+	zbx_vector_connector_object_data_t	connector_objects;
+	zbx_list_item_t				*queue_item;	/* queued item */
 }
 zbx_object_link_t;
 
@@ -86,8 +86,8 @@ static void	connector_clear(zbx_connector_t *connector)
 
 static void	connector_request_clear(zbx_object_link_t *object_link)
 {
-	zbx_vector_connector_object_clear_ext(&object_link->connector_objects, zbx_connector_object_free);
-	zbx_vector_connector_object_destroy(&object_link->connector_objects);
+	zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects, zbx_connector_object_data_free);
+	zbx_vector_connector_object_data_destroy(&object_link->connector_objects);
 }
 
 /******************************************************************************
@@ -189,11 +189,12 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 
 		for (i = 0; i < object_link->connector_objects.values_num; i++)
 		{
-			zbx_connector_serialize_object(&data, &data_alloc, &data_offset,
+			zbx_connector_serialize_object_data(&data, &data_alloc, &data_offset,
 					&object_link->connector_objects.values[i]);
 		}
 
-		zbx_vector_connector_object_clear_ext(&object_link->connector_objects, zbx_connector_object_free);
+		zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects,
+				zbx_connector_object_data_free);
 
 		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
 	}
@@ -245,18 +246,26 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager)
 
 static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_connector_object_t *connector_objects)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_connector_t		*connector;
+	zbx_connector_t	*connector = NULL;
+	int		i, j;
 
-	zbx_hashset_iter_reset(&manager->connectors, &iter);
-	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+	for (i = 0; i < connector_objects->values_num; i++)
 	{
-		int	i;
+		zbx_list_item_t		*enqueued_at;
+		zbx_object_link_t	*object_link;
 
-		for (i = 0; i < connector_objects->values_num; i++)
+		for (j = 0; j < connector_objects->values[i].ids.values_num; j++)
 		{
-			zbx_list_item_t		*enqueued_at;
-			zbx_object_link_t	*object_link;
+			zbx_connector_object_data_t	connector_object_data;
+
+			if (NULL == connector || connector->connectorid != connector_objects->values[i].ids.values[j])
+			{
+				if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(&manager->connectors,
+						&connector_objects->values[i].ids.values[j])))
+				{
+					continue;
+				}
+			}
 
 			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_link,
 					&connector_objects->values[i].objectid)))
@@ -266,14 +275,20 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 
 				object_link = (zbx_object_link_t *)zbx_hashset_insert(
 						&connector->object_link, &object_link_local, sizeof(object_link_local));
-				zbx_vector_connector_object_create(&object_link->connector_objects);
+				zbx_vector_connector_object_data_create(&object_link->connector_objects);
 
 				zbx_list_insert_after(&connector->queue, NULL, object_link, &enqueued_at);
 			}
 
-			zbx_vector_connector_object_append(&object_link->connector_objects,
-					connector_objects->values[i]);
-			connector_objects->values[i].str = zbx_strdup(NULL, connector_objects->values[i].str);
+			connector_object_data.ts = connector_objects->values[i].ts;
+			connector_object_data.str = connector_objects->values[i].str;
+
+			zbx_vector_connector_object_data_append(&object_link->connector_objects, connector_object_data);
+
+			if (j == connector_objects->values[i].ids.values_num - 1)
+				connector_objects->values[i].str = NULL;
+			else
+				connector_objects->values[i].str = zbx_strdup(NULL, connector_objects->values[i].str);
 		}
 	}
 }

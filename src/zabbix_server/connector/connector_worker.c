@@ -32,7 +32,7 @@
 extern unsigned char			program_type;
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
-		zbx_vector_connector_object_t *connector_objects)
+		zbx_vector_connector_object_data_t *connector_objects)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -49,7 +49,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 		delim = '\n';
 	}
 
-	zbx_vector_connector_object_clear_ext(connector_objects, zbx_connector_object_free);
+	zbx_vector_connector_object_data_clear_ext(connector_objects, zbx_connector_object_data_free);
 
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
@@ -83,15 +83,15 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 
 ZBX_THREAD_ENTRY(connector_worker_thread, args)
 {
-	pid_t				ppid;
-	char				*error = NULL;
-	zbx_ipc_socket_t		socket;
-	zbx_ipc_message_t		message;
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_connector_object_t	connector_objects;
+	pid_t					ppid;
+	char					*error = NULL;
+	zbx_ipc_socket_t			socket;
+	zbx_ipc_message_t			message;
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_vector_connector_object_data_t	connector_objects;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -114,7 +114,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	zbx_vector_connector_object_create(&connector_objects);
+	zbx_vector_connector_object_data_create(&connector_objects);
 
 	while (ZBX_IS_RUNNING())
 	{

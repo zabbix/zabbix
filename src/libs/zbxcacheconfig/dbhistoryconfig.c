@@ -23,6 +23,8 @@
 #include "actions.h"
 #include "zbx_item_constants.h"
 
+ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
+
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
 {
@@ -785,4 +787,26 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 	}
 
 	UNLOCK_CACHE;
+}
+
+void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *connector_filters)
+{
+	zbx_dc_connector_t	*dc_connector;
+	zbx_hashset_iter_t	iter;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	zbx_hashset_iter_reset(&config->connectors, &iter);
+	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_connector_filter_t	connector_filter;
+
+		connector_filter.connectorid = dc_connector->connectorid;
+		connector_filter.data_type = dc_connector->data_type;
+		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
+
+		zbx_vector_connector_filter_append(connector_filters, connector_filter);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }

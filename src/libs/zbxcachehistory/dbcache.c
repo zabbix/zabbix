@@ -1218,8 +1218,10 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
  *                                                                            *
  ******************************************************************************/
 static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx_hashset_t *hosts_info,
-		zbx_hashset_t *items_info, unsigned char **data, size_t *data_alloc, size_t *data_offset)
+		zbx_hashset_t *items_info, zbx_vector_connector_filter_t *connector_filters, unsigned char **data,
+		size_t *data_alloc, size_t *data_offset)
 {
+#define ZBX_CONNECTOR_DATA_TYPE_HISTORY 0
 	const ZBX_DC_HISTORY		*h;
 	const zbx_history_sync_item_t	*item;
 	int				i, j;
@@ -1316,13 +1318,29 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 		if (NULL != data)
 		{
+			int			k;
 			zbx_connector_object_t	connector_object;
 
+			zbx_vector_uint64_create(&connector_object.ids);
 			connector_object.objectid = item->itemid;
 			connector_object.ts = h->ts;
 			connector_object.str = json.buffer;
 
-			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				if (ZBX_CONNECTOR_DATA_TYPE_HISTORY == connector_filters->values->data_type)
+				{
+					zbx_vector_uint64_append(&connector_object.ids,
+							connector_filters->values[k].connectorid);
+				}
+			}
+
+			if (0 != connector_object.ids.values_num)
+			{
+				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+			}
+
+			zbx_vector_uint64_destroy(&connector_object.ids);
 		}
 
 		zbx_history_export_write(json.buffer, json.buffer_size);
@@ -1330,6 +1348,8 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 
 	zbx_history_export_flush();
 	zbx_json_free(&json);
+
+#undef ZBX_CONNECTOR_DATA_TYPE_HISTORY
 }
 
 /******************************************************************************
@@ -1348,8 +1368,8 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
  ******************************************************************************/
 static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
-		const ZBX_DC_TREND *trends, int trends_num, unsigned char **data, size_t *data_alloc,
-		size_t *data_offset)
+		const ZBX_DC_TREND *trends, int trends_num, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	int			i, index;
 	zbx_vector_uint64_t	hostids, item_info_ids;
@@ -1439,7 +1459,8 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 	if (0 != history_num)
 	{
-		DCexport_history(history, history_num, &hosts_info, &items_info, data, data_alloc, data_offset);
+		DCexport_history(history, history_num, &hosts_info, &items_info, connector_filters, data, data_alloc,
+				data_offset);
 	}
 
 	if (0 != trends_num)
@@ -1489,7 +1510,7 @@ static void	DCexport_all_trends(const ZBX_DC_TREND *trends, int trends_num)
 		zbx_dc_config_history_sync_get_items_by_itemids(items, itemids.values, errcodes, num,
 				ZBX_ITEM_GET_SYNC_EXPORT);
 
-		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, NULL, 0, 0);
+		DCexport_history_and_trends(NULL, 0, &itemids, items, errcodes, trends, (int)num, NULL, NULL, 0, 0);
 
 		zbx_dc_config_clean_history_sync_items(items, errcodes, num);
 		zbx_vector_uint64_destroy(&itemids);
@@ -3262,7 +3283,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_LOG		*history_log;
 	static int			module_enabled = FAIL;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
-					history_text_num, history_log_num, txn_error, compression_age;
+					history_text_num, history_log_num, txn_error, compression_age,
+					connectors_retrieved = FAIL;
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
@@ -3278,8 +3300,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_hashset_t			trigger_info;
 	unsigned char			*data = NULL;
 	size_t				data_alloc = 0, data_offset = 0;
-
-	item_retrieve_mode = 0 == zbx_has_export_dir() ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
+	zbx_vector_connector_filter_t	connector_filters;
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
@@ -3318,6 +3339,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	compression_age = hc_get_history_compression_age();
 
+	zbx_vector_connector_filter_create(&connector_filters);
 	zbx_vector_ptr_create(&inventory_values);
 	zbx_vector_ptr_create(&item_diff);
 	zbx_vector_ptr_create(&trigger_diff);
@@ -3339,6 +3361,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_uint64_create(&itemids);
 
 	sync_start = time(NULL);
+
+	item_retrieve_mode = 0 == zbx_has_export_dir() ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
 	do
 	{
@@ -3367,6 +3391,15 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		if (0 != history_num)
 		{
 			zbx_dc_um_handle_t	*um_handle;
+
+			if (FAIL == connectors_retrieved)
+			{
+				zbx_dc_config_history_sync_get_connectors(&connector_filters);
+				connectors_retrieved = SUCCEED;
+
+				if (0 != connector_filters.values_num)
+					item_retrieve_mode = ZBX_ITEM_GET_SYNC_EXPORT;
+			}
 
 			zbx_vector_ptr_sort(&history_items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
@@ -3558,14 +3591,25 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				{
 					data_offset = 0;
 					DCexport_history_and_trends(phistory, history_num_loc, &itemids, items,
-							errcodes, ptrends, trends_num_loc, &data, &data_alloc,
-							&data_offset);
+							errcodes, ptrends, trends_num_loc, &connector_filters, &data,
+							&data_alloc, &data_offset);
 
-					if (NULL != data)
+					if (0 != data_offset)
 					{
 						zbx_connector_send(ZBX_IPC_CONNECTOR_REQUEST, data,
 								(zbx_uint32_t)data_offset);
 					}
+				}
+			}
+			else
+			{
+				if (FAIL == connectors_retrieved)
+				{
+					zbx_dc_config_history_sync_get_connectors(&connector_filters);
+					connectors_retrieved = SUCCEED;
+
+					if (0 != connector_filters.values_num)
+						item_retrieve_mode = ZBX_ITEM_GET_SYNC_EXPORT;
 				}
 			}
 
@@ -3596,6 +3640,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_free(errcodes);
 	zbx_free(data);
 
+	zbx_vector_connector_filter_destroy(&connector_filters);
 	zbx_vector_ptr_destroy(&trigger_order);
 	zbx_hashset_destroy(&trigger_info);
 
