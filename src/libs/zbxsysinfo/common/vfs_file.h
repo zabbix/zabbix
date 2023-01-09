@@ -17,12 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_FILE_H
-#define ZABBIX_SYSINFO_COMMON_FILE_H
+#ifndef ZABBIX_SYSINFO_COMMON_VFS_FILE_H
+#define ZABBIX_SYSINFO_COMMON_VFS_FILE_H
 
 #include "module.h"
-
-#define MAX_FILE_LEN (1024 * 1024)
 
 int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_file_time(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -36,4 +34,4 @@ int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_file_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-#endif /* ZABBIX_SYSINFO_COMMON_FILE_H */
+#endif /* ZABBIX_SYSINFO_COMMON_VFS_FILE_H */

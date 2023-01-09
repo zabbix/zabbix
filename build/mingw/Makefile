@@ -20,6 +20,7 @@ OBJS = \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
+	$(OUTPUTDIR)\file.o \
 	$(OUTPUTDIR)\param.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
@@ -39,7 +40,7 @@ OBJS = \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
-	$(OUTPUTDIR)\file.o \
+	$(OUTPUTDIR)\vfs_file.o \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
@@ -128,7 +129,10 @@ $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 $(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
+$(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\vfs_file.o: $(TOPDIR)\src\libs\zbxcommon\vfs_file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c

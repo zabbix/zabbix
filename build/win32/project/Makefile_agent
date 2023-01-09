@@ -45,8 +45,9 @@ OBJS = \
 	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
+	..\..\..\src\libs\zbxfile\file.o \
 	..\..\..\src\libs\zbxparam\param.o \
-	..\..\..\src\libs\zbxcommon\file.o \
+	..\..\..\src\libs\zbxcommon\vfs_file.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \

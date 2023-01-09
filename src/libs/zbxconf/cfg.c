@@ -22,6 +22,7 @@
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxip.h"
+#include "zbxfile.h"
 
 extern unsigned char	program_type;
 

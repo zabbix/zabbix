@@ -149,6 +149,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
+	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_builddir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \

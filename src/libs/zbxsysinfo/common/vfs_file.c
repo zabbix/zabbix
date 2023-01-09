@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "file.h"
+#include "vfs_file.h"
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
@@ -29,6 +29,7 @@
 #include "zbxregexp.h"
 #include "dir.h"
 #include "zbxalgo.h"
+#include "zbxfile.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"

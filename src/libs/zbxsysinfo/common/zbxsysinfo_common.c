@@ -21,7 +21,7 @@
 #include "zbxsysinfo.h"
 
 #include "log.h"
-#include "file.h"
+#include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
 #include "dns.h"

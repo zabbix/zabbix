@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXFILE_H
 #define ZABBIX_ZBXFILE_H
 
+#include "zbxcommon.h"
+
 typedef struct
 {
 	zbx_fs_time_t	modification_time;	/* time of last modification */

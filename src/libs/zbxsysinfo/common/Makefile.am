@@ -15,8 +15,8 @@ libcommonsysinfo_a_SOURCES = \
 	dir.h \
 	dns.c \
 	dns.h \
-	file.c \
-	file.h \
+	vfs_file.c \
+	vfs_file.h \
 	net.c \
 	net.h \
 	system.c \

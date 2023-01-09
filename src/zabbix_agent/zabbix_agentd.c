@@ -94,8 +94,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #include "active.h"
 #include "listener.h"
 
-#include "zbxsymbols.h"
-
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)

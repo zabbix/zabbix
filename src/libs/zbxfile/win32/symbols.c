@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsymbols.h"
+#include "zbxfile.h"
 
-#include "zbxcommon.h"
 #include "log.h"
 
 DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD) = NULL;

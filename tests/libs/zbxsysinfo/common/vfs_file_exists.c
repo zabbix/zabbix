@@ -24,7 +24,7 @@
 
 #include "zbxsysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/sysinfo.h"
-#include "file.h"
+#include "../../../../src/libs/zbxsysinfo/common/vfs_file.h"
 
 #define TEST_NAME "VFS_FILE_EXISTS"
 
