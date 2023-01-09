@@ -22,7 +22,7 @@
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxcomms.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxalgo.h"
 
 /* number of characters per line when wrapping Base64 data in Email */
@@ -94,7 +94,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 			/* 12 characters are taken by header "=?UTF-8?B?" and trailer "?=" plus '\0' */
 			char	b64_buf[ZBX_EMAIL_B64_MAXWORD_RFC2047 - 12 + 1];
 
-			str_base64_encode(p0, b64_buf, p1 - p0);
+			zbx_base64_encode(p0, b64_buf, p1 - p0);
 
 			if (0 != p_base64_offset)	/* not the first "encoded-word" ? */
 			{
@@ -284,7 +284,7 @@ static char	*email_encode_part(const char *data, size_t data_size)
 {
 	char	*base64 = NULL, *part;
 
-	str_base64_encode_dyn(data, &base64, data_size);
+	zbx_base64_encode_dyn(data, &base64, data_size);
 	part = zbx_str_linefeed(base64, ZBX_EMAIL_B64_MAXLINE, "\r\n");
 	zbx_free(base64);
 

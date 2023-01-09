@@ -21,7 +21,7 @@
 #include "dbsync.h"
 
 #include "log.h"
-#include "base64.h"
+#include "zbxcrypto.h"
 #include "zbxeval.h"
 #include "zbxnum.h"
 
@@ -830,7 +830,7 @@ static char	*encode_expression(const zbx_eval_context_t *ctx)
 	char		*str = NULL;
 
 	len = zbx_eval_serialize(ctx, NULL, &data);
-	str_base64_encode_dyn((const char *)data, &str, len);
+	zbx_base64_encode_dyn((const char *)data, &str, len);
 	zbx_free(data);
 
 	return str;
