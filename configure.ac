@@ -1967,6 +1967,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile
+	src/libs/zbxfile/Makefile
 	src/libs/zbxgetopt/Makefile
 	src/libs/zbxha/Makefile
 	src/libs/zbxhash/Makefile

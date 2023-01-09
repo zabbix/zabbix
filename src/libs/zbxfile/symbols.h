@@ -39,16 +39,6 @@ typedef struct {
 	DWORD		FileAttributes;
 } ZBX_FILE_BASIC_INFO;
 
-typedef struct {
-	ULONGLONG	LowPart;
-	ULONGLONG	HighPart;
-} ZBX_EXT_FILE_ID_128;
-
-typedef struct {
-	ULONGLONG		VolumeSerialNumber;
-	ZBX_EXT_FILE_ID_128	FileId;
-} ZBX_FILE_ID_INFO;
-
 DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
 BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
 BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);

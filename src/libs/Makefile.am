@@ -25,6 +25,7 @@ DIST_SUBDIRS = \
 	zbxexec \
 	zbxexport \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
 	zbxha \
 	zbxhash \
@@ -158,6 +159,7 @@ SUBDIRS = \
 	zbxdiscovery \
 	zbxexec \
 	zbxexpr \
+	zbxfile \
 	zbxgetopt \
 	zbxhash \
 	zbxhttp \
@@ -184,7 +186,6 @@ SUBDIRS = \
 	$(AGENT_SUBDIRS)
 
 EXTRA_DIST = \
-	zbxsymbols \
 	zbxwin32 \
 	zbxwinservice
 
