@@ -27,6 +27,8 @@ if ($data['uncheck']) {
 	uncheckTableRows('scheduledreport');
 }
 
+$this->includeJsFile('reports.sheduledreport.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Scheduled reports'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_LIST))
@@ -83,23 +85,38 @@ $form->addItem([
 		$data['paging'],
 		new CActionButtonList('action', 'reportids', [
 			'scheduledreport.enable' => [
-				'name' => _('Enable'),
-				'confirm' => _('Enable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'content' => (new CSubmitButton(_('Enable'), 'action', 'scheduledreport.enable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-scheduledreport')
+					->addClass('no-chkbxrange')
+					->setEnabled($data['allowed_edit'])
+					->removeid()
 			],
 			'scheduledreport.disable' => [
-				'name' => _('Disable'),
-				'confirm' => _('Disable selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'content' => (new CSubmitButton(_('Disable'), 'action', 'scheduledreport.disable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-scheduledreport')
+					->addClass('no-chkbxrange')
+					->setEnabled($data['allowed_edit'])
+					->removeid()
 			],
 			'scheduledreport.delete' => [
-				'name' => _('Delete'),
-				'confirm' => _('Delete selected scheduled reports?'),
-				'disabled' => !$data['allowed_edit']
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'scheduledreport.delete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-scheduledreport')
+					->addClass('no-chkbxrange')
+					->setEnabled($data['allowed_edit'])
+					->removeid()
 			]
 		], 'scheduledreport')
 	]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

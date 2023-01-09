@@ -200,11 +200,19 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
-			'itemprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create items from selected prototypes as enabled?')
+			'itemprototype.massenable' => [
+				'content' => (new CSubmitButton(_('Enable'), 'action', 'itemprototype.massenable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-itemprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
-			'itemprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create items from selected prototypes as disabled?')
+			'itemprototype.massdisable' => [
+				'content' => (new CSubmitButton(_('Disable'), 'action', 'itemprototype.massdisable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-itemprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
@@ -220,8 +228,12 @@ $itemForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'itemprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected item prototypes?')
+			'itemprototype.massdelete' => [
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'itemprototype.massdelete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-itemprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			]
 		],
 		$data['parent_discoveryid']
@@ -230,4 +242,12 @@ $itemForm->addItem([
 
 $html_page
 	->addItem($itemForm)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

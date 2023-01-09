@@ -24,13 +24,7 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(() => {
-		$('#filter-usrgrpid').on('change', () => {
-			document.forms['main_filter'].submit();
-		});
-	});
-
+<script>
 	const view = new class {
 
 		init({csrf_tokens}) {
@@ -43,14 +37,16 @@
 			document.addEventListener('click', (e) => {
 				let prevent_event = false;
 
-				if (e.target.classList.contains('js-massprovision-user')) {
-					prevent_event = !this.massProvisionUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				if (e.target.classList.contains('js-massenable-scheduledreport')) {
+					prevent_event = !this.massEnableScheduledreport(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (e.target.classList.contains('js-massunblock-user')) {
-					prevent_event = !this.massUnblockUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				else if (e.target.classList.contains('js-massdisable-scheduledreport')) {
+					prevent_event = !this.massDisableScheduledreport(
+						e.target, Object.keys(chkbxRange.getSelectedIds())
+					);
 				}
-				else if (e.target.classList.contains('js-massdelete-user')) {
-					this.massDeleteUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				else if (e.target.classList.contains('js-massdelete-scheduledreport')) {
+					prevent_event = !this.massDeleteScheduledreport(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 
 				if (prevent_event) {
@@ -61,49 +57,49 @@
 			});
 		}
 
-		massProvisionUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Provision selected LDAP users?')) ?>
-				: <?= json_encode(_('Provision selected LDAP user?')) ?>;
+		massEnableScheduledreport(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Enable selected scheduled reports?')) ?>
+				: <?= json_encode(_('Enable selected scheduled report?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
 			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['user.provision'], false
+				this.csrf_tokens['scheduledreport.enable'], false
 			);
 
 			return true;
 		}
 
-		massUnblockUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Unblock selected users?')) ?>
-				: <?= json_encode(_('Unblock selected user?')) ?>;
+		massDisableScheduledreport(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Disable selected scheduled reports?')) ?>
+				: <?= json_encode(_('Disable selected scheduled report?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['user.unblock'],
-				false
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['scheduledreport.disable'], false
 			);
 
 			return true;
 		}
 
-		massDeleteUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Delete selected users?')) ?>
-				: <?= json_encode(_('Delete selected user?')) ?>;
+		massDeleteScheduledreport(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Delete selected scheduled reports?')) ?>
+				: <?= json_encode(_('Delete selected scheduled report?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['user.delete'],
-				false
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['scheduledreport.delete'], false
 			);
 
 			return true;

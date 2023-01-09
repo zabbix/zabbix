@@ -113,6 +113,8 @@ class CControllerUsergroupList extends CController {
 		}
 		unset($usergroup);
 
+		$data['csrf_tokens'] = ['usergroup.delete' => self::generateCsrfToken('usergroup.delete')];
+
 		$response = new CControllerResponseData($data);
 
 		$response->setTitle(_('Configuration of user groups'));

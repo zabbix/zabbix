@@ -30,7 +30,13 @@
 
 <script>
 	const view = {
-		init() {
+		csrf_tokens: null,
+
+		init({csrf_tokens}) {
+			this.csrf_tokens = csrf_tokens;
+
+			this._initActionButtons();
+
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -48,6 +54,85 @@
 					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 				})
 				.trigger('change');
+		},
+
+		_initActionButtons() {
+			document.addEventListener('click', (e) => {
+				let prevent_event = false;
+
+				if (e.target.classList.contains('js-massenable-trigger')) {
+					prevent_event = !this.massEnableTrigger(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-trigger')) {
+					prevent_event = !this.massDisableTrigger(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-masscopyto-trigger')) {
+					this.massCopytoTrigger(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdelete-trigger')) {
+					prevent_event = !this.massDeleteTrigger(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+
+				if (prevent_event) {
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
+				}
+			});
+		},
+
+		massEnableTrigger(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Enable selected triggers?')) ?>
+				: <?= json_encode(_('Enable selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['trigger.massenable'], false
+			);
+
+			return true;
+		},
+
+		massDisableTrigger(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Disable selected triggers?')) ?>
+				: <?= json_encode(_('Disable selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['trigger.massdisable'], false
+			);
+
+			return true;
+		},
+
+		massCopytoTrigger(target) {
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['trigger.masscopyto'], false
+			);
+		},
+
+		massDeleteTrigger(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Delete selected triggers?')) ?>
+				: <?= json_encode(_('Delete selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['trigger.massdelete'], false
+			);
+
+			return true;
 		},
 
 		editHost(e, hostid) {

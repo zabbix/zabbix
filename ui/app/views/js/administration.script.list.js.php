@@ -27,10 +27,19 @@
 <script>
 	const view = new class {
 
-		init() {
+		init({csrf_tokens}) {
+			this.csrf_tokens = csrf_tokens;
+
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-edit')) {
 					this._edit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+				}
+				else if (e.target.classList.contains('js-massdelete-script')) {
+					if(!this.massDeleteScript(e.target, Object.keys(chkbxRange.getSelectedIds()))) {
+						e.preventDefault();
+						e.stopPropagation();
+						return false;
+					}
 				}
 			})
 		}
@@ -61,6 +70,22 @@
 
 				location.href = location.href;
 			});
+		}
+
+		massDeleteScript(target, scriptids) {
+			const confirmation = scriptids.length > 1
+				? <?= json_encode(_('Delete selected scripts?')) ?>
+				: <?= json_encode(_('Delete selected script?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['script.delete'],
+				false
+			);
+
+			return true;
 		}
 
 		_post(target, actionids, url) {

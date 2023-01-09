@@ -420,6 +420,7 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 
 	$data['paging'] = CPagerHelper::paginate($page_num, $data['maintenances'], $sortOrder, new CUrl('maintenance.php'));
+	$data['csrf_tokens'] = ['maintenance.massdelete' => CController::generateCsrfToken('maintenance.massdelete')];
 
 	// render view
 	echo (new CView('configuration.maintenance.list', $data))->getOutput();

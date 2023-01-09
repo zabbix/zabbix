@@ -29,6 +29,8 @@ if ($data['uncheck']) {
 	uncheckTableRows($checkbox_hash);
 }
 
+$this->includeJsFile('configuration.dashboard.list.js.php');
+
 $form = (new CForm())
 	->setName('dashboard_form')
 	->addVar('templateid', $data['templateid']);
@@ -64,8 +66,11 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
-			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?')
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'template.dashboard.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-dashboard')
+				->addClass('no-chkbxrange')
+				->removeid()
 		]
 	], $checkbox_hash)
 ]);
@@ -85,4 +90,10 @@ $form->addItem([
 	)
 	->setNavigation(getHostNavigation('dashboards', $data['templateid']))
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

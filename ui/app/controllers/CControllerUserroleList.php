@@ -123,6 +123,8 @@ class CControllerUserroleList extends CController {
 		}
 		unset($role);
 
+		$data['csrf_tokens'] = ['userrole.delete' => self::generateCsrfToken('userrole.delete')];
+
 		$response = new CControllerResponseData($data);
 
 		$response->setTitle(_('Configuration of user roles'));

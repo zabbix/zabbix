@@ -27,6 +27,8 @@ if ($data['uncheck']) {
 	uncheckTableRows('correlation');
 }
 
+$this->includeJsFile('configuration.correlation.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
@@ -140,12 +142,36 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
-		'correlation.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected correlations?')],
-		'correlation.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected correlations?')],
-		'correlation.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected correlations?')]
+		'correlation.enable' => [
+			'content' => (new CSubmitButton(_('Enable'), 'action', 'correlation.enable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-correlation')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
+		'correlation.disable' => [
+			'content' => (new CSubmitButton(_('Disable'), 'action', 'correlation.disable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-correlation')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
+		'correlation.delete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'correlation.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-correlation')
+				->addClass('no-chkbxrange')
+				->removeid()
+		]
 	], 'correlation')
 ]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

@@ -24,13 +24,7 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(() => {
-		$('#filter-usrgrpid').on('change', () => {
-			document.forms['main_filter'].submit();
-		});
-	});
-
+<script>
 	const view = new class {
 
 		init({csrf_tokens}) {
@@ -43,14 +37,14 @@
 			document.addEventListener('click', (e) => {
 				let prevent_event = false;
 
-				if (e.target.classList.contains('js-massprovision-user')) {
-					prevent_event = !this.massProvisionUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				if (e.target.classList.contains('js-massenable-discovery')) {
+					prevent_event = !this.massEnableDiscovery(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (e.target.classList.contains('js-massunblock-user')) {
-					prevent_event = !this.massUnblockUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				else if (e.target.classList.contains('js-massdisable-discovery')) {
+					prevent_event = !this.massDisableDiscovery(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (e.target.classList.contains('js-massdelete-user')) {
-					this.massDeleteUser(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				else if (e.target.classList.contains('js-massdelete-discovery')) {
+					prevent_event = !this.massDeleteDiscovery(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 
 				if (prevent_event) {
@@ -61,49 +55,49 @@
 			});
 		}
 
-		massProvisionUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Provision selected LDAP users?')) ?>
-				: <?= json_encode(_('Provision selected LDAP user?')) ?>;
+		massEnableDiscovery(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Enable selected discovery rules?')) ?>
+				: <?= json_encode(_('Enable selected discovery rule?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
 			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['user.provision'], false
+				this.csrf_tokens['discovery.enable'], false
 			);
 
 			return true;
 		}
 
-		massUnblockUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Unblock selected users?')) ?>
-				: <?= json_encode(_('Unblock selected user?')) ?>;
+		massDisableDiscovery(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Disable selected discovery rules?')) ?>
+				: <?= json_encode(_('Disable selected discovery rule?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['user.unblock'],
-				false
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['discovery.disable'], false
 			);
 
 			return true;
 		}
 
-		massDeleteUser(target, userids) {
-			const confirmation = userids.length > 1
-				? <?= json_encode(_('Delete selected users?')) ?>
-				: <?= json_encode(_('Delete selected user?')) ?>;
+		massDeleteDiscovery(target, druleids) {
+			const confirmation = druleids.length > 1
+				? <?= json_encode(_('Delete selected discovery rules?')) ?>
+				: <?= json_encode(_('Delete selected discovery rule?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return false;
 			}
 
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['user.delete'],
-				false
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['discovery.delete'], false
 			);
 
 			return true;

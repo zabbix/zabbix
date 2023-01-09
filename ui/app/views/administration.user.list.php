@@ -297,16 +297,37 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'userids', [
 		'user.provision' => [
-			'name' => _('Provision now'),
-			'attributes' => ['data-required' => 'ldap'],
-			'confirm' => _('Provision selected LDAP users?')
+			'content' => (new CSubmitButton(_('Provision now'), 'action', 'user.provision'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massprovision-user')
+				->addClass('no-chkbxrange')
+				->setAttribute('data-required', 'ldap')
+				->removeid()
 		],
-		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
-		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
+		'user.unblock' => [
+			'content' => (new CSubmitButton(_('Unblock'), 'action', 'user.unblock'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massunblock-user')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
+		'user.delete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'user.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-user')
+				->addClass('no-chkbxrange')
+				->removeid()
+		]
 	], 'user')
 ]);
 
 // Append form to widget.
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

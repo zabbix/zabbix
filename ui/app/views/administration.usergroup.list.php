@@ -27,6 +27,8 @@ if ($data['uncheck']) {
 	uncheckTableRows('usergroup');
 }
 
+$this->includeJsFile('administration.usergroup.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_LIST))
@@ -216,30 +218,46 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
+				->setArgumentCsrfToken()
 				->getUrl()
 		],
 		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
+				->setArgumentCsrfToken()
 				->getUrl()
 		],
 		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
+				->setArgumentCsrfToken()
 				->getUrl()
 		],
 		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
+				->setArgumentCsrfToken()
 				->getUrl()
 		],
-		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?')]
+		'regex.delete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'usergroup.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-usergroup')
+				->addClass('no-chkbxrange')
+				->removeid()
+		]
 	], 'usergroup')
 ]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

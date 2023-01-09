@@ -676,6 +676,11 @@ else {
 
 	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['csrf_tokens'] = [
+		'hostprototype.massenable' => CController::generateCsrfToken('hostprototype.massenable'),
+		'hostprototype.massdisable' => CController::generateCsrfToken('hostprototype.massdisable'),
+		'hostprototype.massdelete' => CController::generateCsrfToken('hostprototype.massdelete')
+	];
 
 	// render view
 	echo (new CView('configuration.host.prototype.list', $data))->getOutput();

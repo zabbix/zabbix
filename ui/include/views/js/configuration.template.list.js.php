@@ -43,3 +43,69 @@
 		});
 	});
 </script>
+
+<script>
+	const view = new class {
+
+		init({csrf_tokens}) {
+			this.csrf_tokens = csrf_tokens;
+
+			this._initActionButtons();
+		}
+
+		_initActionButtons() {
+			document.addEventListener('click', (e) => {
+				let prevent_event = false;
+
+				if (e.target.classList.contains('js-massdelete-template')) {
+					prevent_event = !this.massDeleteTemplate(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdeleteclear-template')) {
+					prevent_event = !this.massDeleteClearTemplate(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+
+				if (prevent_event) {
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
+				}
+			});
+		}
+
+		massDeleteTemplate(target, templateids) {
+			const confirmation = templateids.length > 1
+				? <?= json_encode(_('Delete selected templates?')) ?>
+				: <?= json_encode(_('Delete selected template?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['template.massdelete'], false
+			);
+
+			return true;
+		}
+
+		massDeleteClearTemplate(target, templateids) {
+			const confirmation = templateids.length > 1
+				? <?= json_encode(
+						_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+				) ?>
+				: <?= json_encode(
+						_('Delete and clear selected template? (Warning: all linked hosts will be cleared!)')
+				) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['template.massdeleteclear'], false
+			);
+
+			return true;
+		}
+	};
+</script>

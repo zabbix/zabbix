@@ -142,6 +142,12 @@ class CControllerScheduledReportList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$data['csrf_tokens'] = [
+			'scheduledreport.enable' => self::generateCsrfToken('scheduledreport.enable'),
+			'scheduledreport.disable' => self::generateCsrfToken('scheduledreport.disable'),
+			'scheduledreport.delete' => self::generateCsrfToken('scheduledreport.delete')
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Scheduled reports'));
 		$this->setResponse($response);

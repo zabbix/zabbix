@@ -214,21 +214,42 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')]
+	'httptest.massenable' => [
+		'content' => (new CSubmitButton(_('Enable'), 'action', 'httptest.massenable'))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massenable-httptest')
+			->addClass('no-chkbxrange')
+			->removeid()
+	],
+	'httptest.massdisable' => [
+		'content' => (new CSubmitButton(_('Disable'), 'action', 'httptest.massdisable'))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massdisable-httptest')
+			->addClass('no-chkbxrange')
+			->removeid()
+	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'content' => (new CSubmitButton(_('Clear history'), 'action', 'httptest.massclearhistory'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massclearhistory-httptest')
+				->addClass('no-chkbxrange')
+				->removeid()
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+	'httptest.massdelete' => [
+		'content' => (new CSubmitButton(_('Delete'), 'action', 'httptest.massdelete'))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-massdelete-httptest')
+			->addClass('no-chkbxrange')
+			->removeid()
+	]
 ];
 
 // Append table to form.
@@ -240,6 +261,8 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
 	->setOnDocumentReady()
 	->show();

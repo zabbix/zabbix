@@ -751,7 +751,7 @@ if (hasRequest('form')) {
 	$clear_templates = array_diff($clear_templates, array_keys($templateids));
 
 	$data['clear_templates'] = $clear_templates;
-	$data['csrf_tokens_templates'] = [
+	$data['csrf_tokens'] = [
 		'templates.php clone' => CController::generateCsrfToken('templates.php clone'),
 		'templates.php full_clone' => CController::generateCsrfToken('templates.php full_clone'),
 		'templates.php delete' => CController::generateCsrfToken('templates.php delete'),
@@ -943,7 +943,9 @@ else {
 		'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 		'csrf_tokens' => [
 			'popup.import' => CController::generateCsrfToken('popup.import'),
-			'popup.massupdate.template' => CController::generateCsrfToken('popup.massupdate.template')
+			'popup.massupdate.template' => CController::generateCsrfToken('popup.massupdate.template'),
+			'template.massdelete' => CController::generateCsrfToken('template.massdelete'),
+			'template.massdeleteclear' => CController::generateCsrfToken('template.massdeleteclear')
 		]
 	];
 

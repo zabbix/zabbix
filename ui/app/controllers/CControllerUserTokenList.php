@@ -132,6 +132,8 @@ class CControllerUserTokenList extends CController {
 		);
 
 		$data['csrf_tokens'] = [
+			'token.enable' => self::generateCsrfToken('token.enable'),
+			'token.disable' => self::generateCsrfToken('token.disable'),
 			'token.delete' => self::generateCsrfToken('token.delete')
 		];
 

@@ -190,14 +190,26 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
-			'hostprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create hosts from selected prototypes as enabled?')
+			'hostprototype.massenable' => [
+				'content' => (new CSubmitButton(_('Enable'), 'action', 'hostprototype.massenable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-hostprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
-			'hostprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create hosts from selected prototypes as disabled?')
+			'hostprototype.massdisable' => [
+				'content' => (new CSubmitButton(_('Disable'), 'action', 'hostprototype.massdisable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-hostprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
-			'hostprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected host prototypes?')
+			'hostprototype.massdelete' => [
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'hostprototype.massdelete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-hostprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			]
 		],
 		$data['discovery_rule']['itemid']
@@ -206,4 +218,12 @@ $itemForm->addItem([
 
 $html_page
 	->addItem($itemForm)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('configuration.maintenance.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_LIST))
@@ -123,12 +125,25 @@ $maintenanceForm->addItem([
 	$maintenanceTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'maintenanceids', [
-		'maintenance.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maintenance periods?'),
-			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+		'maintenance.massdelete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'maintenance.massdelete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-maintenance')
+				->addClass('no-chkbxrange')
+				->setEnabled($data['allowed_edit'])
+				->removeid()
 		]
 	])
 ]);
 
 $html_page
 	->addItem($maintenanceForm)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

@@ -107,20 +107,14 @@ class CActionButtonList extends CObject {
 							'if (!form.dataset.action) {
 								form.dataset.action = form.action;
 							}
-							form.action = this.dataset.redirect;
-
-							addCsrfTokenInput(form, "' . CController::CSRF_TOKEN_NAME . '", "' .
-							CController::generateCsrfToken($token_action['action']). '");'
+							form.action = this.dataset.redirect;'
 						);
 				}
 				else {
 					$button
 						->setAttribute('value', $action)
 						->onClick('
-							const form = this.closest("form");
-
-							addCsrfTokenInput(form, "' . CController::CSRF_TOKEN_NAME . '", "' .
-								CController::generateCsrfToken($action). '");' .
+							const form = this.closest("form");'.
 
 							// Restore the original form action, if previously saved.
 							'if (form.dataset.action) {

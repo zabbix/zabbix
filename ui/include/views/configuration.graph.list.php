@@ -251,11 +251,21 @@ foreach ($data['graphs'] as $graph) {
 // buttons
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy')];
+	$buttonsArray['graph.masscopyto'] = [
+		'content' => (new CSubmitButton(_('Copy'), 'action', 'graph.masscopyto'))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass('js-masscopyto-graph')
+			->addClass('no-chkbxrange')
+			->removeid()
+	];
 }
-$buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
-	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?')
+
+$buttonsArray['graph.massdelete'] = [
+	'content' => (new CSubmitButton(_('Delete'), 'action', 'graph.massdelete'))
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->addClass('js-massdelete-graph')
+		->addClass('no-chkbxrange')
+		->removeid()
 ];
 
 // append table to form
@@ -271,4 +281,13 @@ $graphForm->addItem([
 
 $html_page
 	->addItem($graphForm)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens'],
+		'is_host' => $data['parent_discoveryid'] ? false : true
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

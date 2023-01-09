@@ -292,9 +292,19 @@ $form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?')],
-			'template.massdeleteclear' => ['name' => _('Delete and clear'),
-				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)')
+			'template.massdelete' => [
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'template.massdelete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-template')
+					->addClass('no-chkbxrange')
+					->removeid()
+			],
+			'template.massdeleteclear' => [
+				'content' => (new CSubmitButton(_('Delete and clear'), 'action', 'template.massdeleteclear'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdeleteclear-template')
+					->addClass('no-chkbxrange')
+					->removeid(),
 			]
 		]
 	)
@@ -302,4 +312,12 @@ $form->addItem([
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens'],
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

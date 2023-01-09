@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->includeJsFile('monitoring.sysmap.list.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
@@ -117,12 +119,23 @@ $sysmapForm->addItem([
 					->getUrl()
 			)
 		],
-		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
-			'disabled' => $data['allowed_edit'] ? null : 'disabled'
+		'map.massdelete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'map.massdelete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-map')
+				->addClass('no-chkbxrange')
+				->setEnabled($data['allowed_edit'])
+				->removeid()
 		]
 	])
 ]);
 
 $html_page
 	->addItem($sysmapForm)
+	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
 	->show();

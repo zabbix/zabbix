@@ -198,11 +198,19 @@ $triggersForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create triggers from selected prototypes as enabled?')
+			'triggerprototype.massenable' => [
+				'content' => (new CSubmitButton(_('Enable'), 'action', 'triggerprototype.massenable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-triggerprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
-			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create triggers from selected prototypes as disabled?')
+			'triggerprototype.massdisable' => [
+				'content' => (new CSubmitButton(_('Disable'), 'action', 'triggerprototype.massdisable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-triggerprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
@@ -218,8 +226,12 @@ $triggersForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'triggerprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected trigger prototypes?')
+			'triggerprototype.massdelete' => [
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'triggerprototype.massdelete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-triggerprototype')
+					->addClass('no-chkbxrange')
+					->removeid()
 			]
 		],
 		$this->data['parent_discoveryid']
@@ -228,4 +240,12 @@ $triggersForm->addItem([
 
 $html_page
 	->addItem($triggersForm)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

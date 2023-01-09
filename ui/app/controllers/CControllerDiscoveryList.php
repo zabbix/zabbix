@@ -122,6 +122,12 @@ class CControllerDiscoveryList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$data['csrf_tokens'] = [
+			'discovery.enable' => self::generateCsrfToken('discovery.enable'),
+			'discovery.disable' => self::generateCsrfToken('discovery.disable'),
+			'discovery.delete' => self::generateCsrfToken('discovery.delete')
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);

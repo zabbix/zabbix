@@ -27,6 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
 $this->addJsFile('layout.mode.js');
+$this->includeJsFile('monitoring.dashboard.list.js.php');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
@@ -121,9 +122,12 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'dashboard.delete' => [
-			'name' => _('Delete'),
-			'confirm' => _('Delete selected dashboards?'),
-			'disabled' => !$data['allowed_edit']
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'dashboard.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-dashboard')
+				->addClass('no-chkbxrange')
+				->setEnabled($data['allowed_edit'])
+				->removeid()
 		]
 	], 'dashboard')
 ]);
@@ -131,3 +135,10 @@ $form->addItem([
 $html_page
 	->addItem($form)
 	->show();
+
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
+	->setOnDocumentReady()
+	->show();
+

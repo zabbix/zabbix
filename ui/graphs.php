@@ -809,6 +809,11 @@ else {
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
+	$data['csrf_tokens'] = [
+		'graph.masscopyto' => CController::generateCsrfToken('graph.masscopyto'),
+		'graph.massdelete' => CController::generateCsrfToken('graph.massdelete')
+	];
+
 	// render view
 	echo (new CView('configuration.graph.list', $data))->getOutput();
 }

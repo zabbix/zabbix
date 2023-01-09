@@ -36,14 +36,28 @@
 
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
+				let prevent_event = false;
+
 				if (e.target.classList.contains('js-create-token')) {
 					this.createToken();
 				}
 				else if (e.target.classList.contains('js-edit-token')) {
 					this.editToken(e.target.dataset.tokenid);
 				}
+				else if (e.target.classList.contains('js-massenable-token')) {
+					prevent_event = !this.massEnableToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-token')) {
+					prevent_event = !this.massDisableToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
 					this.massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+
+				if (prevent_event) {
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
 				}
 			});
 		},
@@ -73,6 +87,38 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.tokenSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.tokenDelete, {once: true});
+		},
+
+		massEnableToken(target, tokenids) {
+			const confirmation = tokenids.length > 1
+				? <?= json_encode(_('Enable selected API tokens?')) ?>
+				: <?= json_encode(_('Enable selected API token?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['token.enable'],
+				false
+			);
+
+			return true;
+		},
+
+		massDisableToken(target, tokenids) {
+			const confirmation = tokenids.length > 1
+				? <?= json_encode(_('Disable selected API tokens?')) ?>
+				: <?= json_encode(_('Disable selected API token?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>', this.csrf_tokens['token.disable'],
+				false
+			);
+
+			return true;
 		},
 
 		massDeleteToken(target, tokenids) {

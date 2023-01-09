@@ -28,10 +28,14 @@
 	const view = {
 		checkbox_object: null,
 		checkbox_hash: null,
+		csrf_tokens: null,
 
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, csrf_tokens}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.csrf_tokens = csrf_tokens;
+
+			this._initActionButtons();
 
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
@@ -39,6 +43,76 @@
 					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 				})
 				.trigger('change');
+		},
+
+		_initActionButtons() {
+			document.addEventListener('click', (e) => {
+				let prevent_event = false;
+
+				if (e.target.classList.contains('js-massenable-discoveryrule')) {
+					prevent_event = !this.massEnableDiscoveryRule(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-discoveryrule')) {
+					prevent_event = !this.massDisableDiscoveryRule(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdelete-discoveryrule')) {
+					prevent_event = !this.massDeleteDiscoveryRule(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+
+				if (prevent_event) {
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
+				}
+			});
+		},
+
+		massEnableDiscoveryRule(target, g_hostdruleids) {
+			const confirmation = g_hostdruleids.length > 1
+				? <?= json_encode(_('Enable selected discovery rules?')) ?>
+				: <?= json_encode(_('Enable selected discovery rule?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['discoveryrule.massenable'], false
+			);
+
+			return true;
+		},
+
+		massDisableDiscoveryRule(target, g_hostdruleids) {
+			const confirmation = g_hostdruleids.length > 1
+				? <?= json_encode(_('Disable selected discovery rules?')) ?>
+				: <?= json_encode(_('Disable selected discovery rule?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['discoveryrule.massdisable'], false
+			);
+
+			return true;
+		},
+
+		massDeleteDiscoveryRule(target, g_hostdruleids) {
+			const confirmation = g_hostdruleids.length > 1
+				? <?= json_encode(_('Delete selected discovery rules?')) ?>
+				: <?= json_encode(_('Delete selected discovery rule?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['discoveryrule.massdelete'], false
+			);
+
+			return true;
 		},
 
 		editHost(e, hostid) {

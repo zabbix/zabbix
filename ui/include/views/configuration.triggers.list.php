@@ -354,9 +354,27 @@ $triggers_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
-			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
-			'trigger.masscopyto' => ['name' => _('Copy')],
+			'trigger.massenable' => [
+				'content' => (new CSubmitButton(_('Enable'), 'action', 'trigger.massenable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-trigger')
+					->addClass('no-chkbxrange')
+					->removeid()
+			],
+			'trigger.massdisable' => [
+				'content' => (new CSubmitButton(_('Disable'), 'action', 'trigger.massdisable'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-trigger')
+					->addClass('no-chkbxrange')
+					->removeid()
+			],
+			'trigger.masscopyto' => [
+				'content' => (new CSubmitButton(_('Copy'), 'action', 'trigger.masscopyto'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-masscopyto-trigger')
+					->addClass('no-chkbxrange')
+					->removeid()
+			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
@@ -370,7 +388,13 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
+			'trigger.massdelete' => [
+				'content' => (new CSubmitButton(_('Delete'), 'action', 'trigger.massdelete'))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-trigger')
+					->addClass('no-chkbxrange')
+					->removeid()
+			]
 		],
 		$data['checkbox_hash']
 	)
@@ -380,6 +404,8 @@ $html_page
 	->addItem($triggers_form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
 	->setOnDocumentReady()
 	->show();

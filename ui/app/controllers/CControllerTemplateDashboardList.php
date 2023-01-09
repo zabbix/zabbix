@@ -84,7 +84,8 @@ class CControllerTemplateDashboardList extends CController {
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'dashboards' => $dashboards,
-			'paging' => $paging
+			'paging' => $paging,
+			'csrf_tokens' => ['template.dashboard.delete' => self::generateCsrfToken('template.dashboard.delete')]
 		];
 
 		$response = new CControllerResponseData($data);

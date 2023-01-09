@@ -184,8 +184,20 @@ $mediaTypeForm->addItem([
 	$mediaTypeTable,
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
-		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
-		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
+		'mediatype.enable' => [
+			'content' => (new CSubmitButton(_('Enable'), 'action', 'mediatype.enable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-mediatype')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
+		'mediatype.disable' => [
+			'content' => (new CSubmitButton(_('Disable'), 'action', 'mediatype.disable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-mediatype')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
 		'mediatype.export' => [
 			'content' => new CButtonExport('export.mediatypes',
 				(new CUrl('zabbix.php'))
@@ -194,7 +206,13 @@ $mediaTypeForm->addItem([
 					->getUrl()
 			)
 		],
-		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
+		'mediatype.delete' => [
+			'content' => (new CSubmitButton(_('Delete'), 'action', 'mediatype.delete'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-mediatype')
+				->addClass('no-chkbxrange')
+				->removeid()
+		]
 	], 'mediatype')
 ]);
 
@@ -203,6 +221,8 @@ $html_page
 	->addItem($mediaTypeForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+		'csrf_tokens' => $data['csrf_tokens']
+	]).');'))
 	->setOnDocumentReady()
 	->show();

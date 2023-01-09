@@ -135,6 +135,12 @@ class CControllerMediatypeList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$data['csrf_tokens'] = [
+			'mediatype.enable' => self::generateCsrfToken('mediatype.enable'),
+			'mediatype.disable' => self::generateCsrfToken('mediatype.disable'),
+			'mediatype.delete' => self::generateCsrfToken('mediatype.delete'),
+		];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
 		$this->setResponse($response);

@@ -114,6 +114,8 @@ class CControllerDashboardList extends CController {
 
 		CDashboardHelper::updateEditableFlag($data['dashboards']);
 
+		$data['csrf_tokens'] = ['dashboard.delete' => self::generateCsrfToken('dashboard.delete')];
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));
 		$this->setResponse($response);

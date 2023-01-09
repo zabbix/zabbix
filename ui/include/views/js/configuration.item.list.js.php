@@ -33,11 +33,15 @@
 		checkbox_object: null,
 		checkbox_hash: null,
 		csrf_tokens: null,
+		compression_status: null,
 
-		init({checkbox_hash, checkbox_object, csrf_tokens}) {
+		init({checkbox_hash, checkbox_object, csrf_tokens, compression_status}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.csrf_tokens = csrf_tokens;
+			this.compression_status = compression_status;
+
+			this._initActionButtons();
 
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
@@ -57,6 +61,106 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
+		},
+
+		_initActionButtons() {
+			document.addEventListener('click', (e) => {
+				let prevent_event = false;
+
+				if (e.target.classList.contains('js-massenable-item')) {
+					prevent_event = !this.massEnableItem(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdisable-item')) {
+					prevent_event = !this.massDisableItem(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massclearhistory-item')) {
+					prevent_event = !this.massClearHistoryItem(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-masscopyto-item')) {
+					this.massCopytoItem(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massdelete-item')) {
+					prevent_event = !this.massDeleteItem(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+
+				if (prevent_event) {
+					e.preventDefault();
+					e.stopPropagation();
+					return false;
+				}
+			});
+		},
+
+		massEnableItem(target, itemids) {
+			const confirmation = itemids.length > 1
+				? <?= json_encode(_('Enable selected items?')) ?>
+				: <?= json_encode(_('Enable selected item?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['item.massenable'], false
+			);
+
+			return true;
+		},
+
+		massDisableItem(target, itemids) {
+			const confirmation = itemids.length > 1
+				? <?= json_encode(_('Disable selected items?')) ?>
+				: <?= json_encode(_('Disable selected item?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['item.massdisable'], false
+			);
+
+			return true;
+		},
+
+		massClearHistoryItem(target, itemids) {
+			if (this.compression_status) {
+				const confirmation = itemids.length > 1
+					? <?= json_encode(_('Delete history of selected items?')) ?>
+					: <?= json_encode(_('Delete history of selected item?')) ?>;
+
+				if (!window.confirm(confirmation)) {
+					return false;
+				}
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['item.massclearhistory'], false
+			);
+
+			return true;
+		},
+
+		massCopytoItem(target) {
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['item.masscopyto'], false
+			);
+		},
+
+		massDeleteItem(target, itemids) {
+			const confirmation = itemids.length > 1
+				? <?= json_encode(_('Delete selected items?')) ?>
+				: <?= json_encode(_('Delete selected item?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return false;
+			}
+
+			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
+				this.csrf_tokens['item.massdelete'], false
+			);
+
+			return true;
 		},
 
 		editHost(e, hostid) {

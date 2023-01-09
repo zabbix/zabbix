@@ -198,8 +198,20 @@ $token_form->addItem([
 	$token_table,
 	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
-		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?')],
-		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?')],
+		'token.enable' => [
+			'content' => (new CSubmitButton(_('Enable'), 'action', 'token.enable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-token')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
+		'token.disable' => [
+			'content' => (new CSubmitButton(_('Disable'), 'action', 'token.disable'))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-token')
+				->addClass('no-chkbxrange')
+				->removeid()
+		],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
