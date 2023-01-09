@@ -116,7 +116,7 @@
 		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),												\
 		0 < value_len ? 																\
 			zbx_vector_uint64_append_array(vector_uint64, (zbx_uint64_t *)(buffer + sizeof(zbx_uint32_t)), value_len / sizeof(zbx_uint64_t))	\
-		 : 0,																		\
+		: 0,																		\
 		value_len + sizeof(zbx_uint32_t)														\
 	)
 
