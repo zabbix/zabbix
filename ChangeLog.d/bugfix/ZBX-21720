@@ -1,1 +1,1 @@
-........S. [ZBX-21720] added additional check and logging upon shrinking of the trend function cache (kprutkovs)
+........S. [ZBX-21720] fixed trends cache size estimation and overallocation handling (kprutkovs, wiper)
