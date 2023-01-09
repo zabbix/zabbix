@@ -1109,7 +1109,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 			history = NULL;
 		}
 
-		if (ZBX_PREPROC_FAIL_SET_ERROR != action && 0 == quote_error)
+		if (0 != results_num && ZBX_PREPROC_FAIL_SET_ERROR != action && 0 == quote_error)
 		{
 			char	*error = NULL;
 

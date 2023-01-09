@@ -244,6 +244,9 @@ int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
 	zbx_pp_item_t	*item;
 	zbx_pp_task_t	*task;
 
+	if (ZBX_VARIANT_NONE == value->type)
+		return FAIL;
+
 	if (NULL == (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemid)))
 		return FAIL;
 

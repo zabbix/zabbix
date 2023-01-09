@@ -106,11 +106,13 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 
 	if (ITEM_STATE_NOTSUPPORTED == value->state)
 	{
-		if (NULL != value->result && ZBX_ISSET_MSG(value->result))
+		if (NULL != value->error)
 		{
-			zbx_variant_set_error(var, value->result->msg);
-			value->result->msg = NULL;
+			zbx_variant_set_error(var, value->error);
+			value->error = NULL;
 		}
+		else if (NULL != value->result && ZBX_ISSET_MSG(value->result))
+			zbx_variant_set_error(var, zbx_strdup(NULL, value->result->msg));
 		else
 			zbx_variant_set_error(var, zbx_strdup(NULL, "Unknown error."));
 
@@ -156,10 +158,7 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 		value->result->text = NULL;
 	}
 	else
-	{
-		zbx_variant_set_error(var, zbx_strdup(NULL, "Unsupported incoming value type."));
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
+		zbx_variant_set_none(var);
 
 	if (ZBX_ISSET_META(value->result))
 	{
@@ -186,6 +185,8 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE) || 0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
@@ -225,6 +226,8 @@ void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, u
 			}
 		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
