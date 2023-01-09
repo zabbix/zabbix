@@ -83,7 +83,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\common\dir.o \
-	..\..\..\src\libs\zbxsysinfo\common\file.o \
+	..\..\..\src\libs\zbxsysinfo\common\vfs_file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\http_metrics.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
