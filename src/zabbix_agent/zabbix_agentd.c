@@ -18,7 +18,7 @@
 **/
 
 #include "log.h"
-#include "modbtype.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxconf.h"
 #include "zbxexpr.h"
