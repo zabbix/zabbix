@@ -481,18 +481,20 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
+			$tag_where = [
+				CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h', 'host_tag', 'hostid')
+			];
+
 			if ($options['inheritedTags']) {
 				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
+
+				$tag_where[] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'ht2',
+					'host_tag', 'hostid', 'templateid'
 				);
 			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+
+			$sqlParts['where'][] = count($tag_where) == 1 ? $tag_where[0] : '('.implode(' OR ', $tag_where).')';
 		}
 
 		// limit
