@@ -52,7 +52,7 @@ $module_tab = (new CFormList())
 $tabs = (new CTabView())
 	->addTab('moduleTab', _('Module'), $module_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
