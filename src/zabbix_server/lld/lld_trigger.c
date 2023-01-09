@@ -27,6 +27,7 @@
 #include "zbxnum.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
+#include "zbxvariant.h"
 
 typedef struct
 {

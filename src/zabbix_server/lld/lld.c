@@ -18,7 +18,6 @@
 **/
 
 #include "lld.h"
-#include "zbxdbwrap.h"
 #include "zbxserver.h"
 
 #include "log.h"
@@ -28,6 +27,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxvariant.h"
 
 /* lld rule filter condition (item_condition table record) */
 typedef struct

@@ -29,6 +29,7 @@
 #include "zbxtime.h"
 #include "zbxdbwrap.h"
 #include "zbx_item_constants.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

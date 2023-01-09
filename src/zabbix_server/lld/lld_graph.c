@@ -25,6 +25,7 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
 typedef struct
 {

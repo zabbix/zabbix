@@ -19,6 +19,7 @@
 
 #include "lld_manager.h"
 
+#include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"

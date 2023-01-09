@@ -22,6 +22,7 @@
 
 #include "zbxalgo.h"
 #include "lld_manager.h"
+#include "zbxtime.h"
 
 #define ZBX_IPC_SERVICE_LLD	"lld"
 

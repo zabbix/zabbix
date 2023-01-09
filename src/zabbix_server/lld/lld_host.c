@@ -28,6 +28,7 @@
 #include "zbxnum.h"
 #include "zbxdbwrap.h"
 #include "zbx_host_constants.h"
+#include "zbxstr.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
