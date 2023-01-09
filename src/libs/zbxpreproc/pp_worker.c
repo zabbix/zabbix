@@ -121,7 +121,7 @@ static void	*pp_worker_entry(void *arg)
 		{
 			pp_task_queue_unlock(queue);
 
-			zabbix_log(LOG_LEVEL_TRACE, "%s() id:%d task_type:%d itemid:" ZBX_FS_UI64, __func__,
+			zabbix_log(LOG_LEVEL_TRACE, "%s() worker:%d process task type:%d itemid:" ZBX_FS_UI64, __func__,
 					worker->id, in->type, in->itemid);
 
 			switch (in->type)
