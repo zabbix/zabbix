@@ -1398,6 +1398,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 #endif
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_alert_scripts_path};
+	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1602,6 +1603,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_alert_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LLDMANAGER:
+				thread_args.args = &lld_manager_args;
 				zbx_thread_start(lld_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LLDWORKER:
