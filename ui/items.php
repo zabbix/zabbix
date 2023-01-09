@@ -235,7 +235,7 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// filter

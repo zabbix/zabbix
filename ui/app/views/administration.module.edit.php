@@ -26,6 +26,7 @@ $widget = (new CWidget())
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')

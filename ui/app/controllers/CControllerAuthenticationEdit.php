@@ -32,7 +32,7 @@ class CControllerAuthenticationEdit extends CController {
 	 */
 	protected function checkInput() {
 		$fields = [
-			'form_refresh' =>					'string',
+			'form_refresh' =>					'int32',
 			'change_bind_password' =>			'in 0,1',
 			'db_authentication_type' =>			'string',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,

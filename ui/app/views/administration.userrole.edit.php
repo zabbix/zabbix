@@ -31,6 +31,7 @@ $widget = (new CWidget())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
