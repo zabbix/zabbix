@@ -163,8 +163,8 @@ int	main(int argc, char **argv)
 				loglevel = atoi(zbx_optarg);
 				break;
 			case 't':
-				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &timeout, sizeof(timeout),
-						JS_TIMEOUT_MIN, JS_TIMEOUT_MAX))
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &timeout,
+						sizeof(timeout), JS_TIMEOUT_MIN, JS_TIMEOUT_MAX))
 				{
 					zbx_error("Invalid timeout, valid range [" JS_TIMEOUT_MIN_STR ":"
 							JS_TIMEOUT_MAX_STR "] seconds");
