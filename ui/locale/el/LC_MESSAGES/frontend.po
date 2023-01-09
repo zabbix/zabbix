@@ -3715,6 +3715,10 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Αδύνατη η ενημέρωση γραφήματος"
@@ -3958,6 +3962,11 @@ msgstr ""
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4013,6 +4022,10 @@ msgstr "Αλλαγή συνθηματικού"
 
 #: include/items.inc.php:1844
 msgid "Change per second"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
@@ -4819,6 +4832,14 @@ msgstr "Αριθμός σύμβασης"
 msgid "Convert to JSON"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -5175,6 +5196,15 @@ msgstr ""
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Τρέχων ξενιστής"
+
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -7742,6 +7772,11 @@ msgstr ""
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -9471,6 +9506,11 @@ msgstr "Επιτυχής εισαγωγή"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "Σε συντήρηση"
@@ -9842,6 +9882,10 @@ msgstr ""
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Λανθασμένες συνθήκες κανόνα εντοπισμού \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12345,6 +12389,10 @@ msgstr "Μαρ"
 msgid "March"
 msgstr "Μάρτιος"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Σημειώστε τα στοιχεία σε μεταβολή κατάστασης εναύσματος"
@@ -12356,6 +12404,10 @@ msgstr "Σημειώστε άλλα"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Σημάδι επιλέχθηκε"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15069,6 +15121,10 @@ msgstr "Συνθηματικό"
 msgid "Password (once again)"
 msgstr "Συνθηματικό (ξανά)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
@@ -15111,6 +15167,10 @@ msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
+msgstr ""
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
@@ -15307,6 +15367,10 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15805,6 +15869,10 @@ msgstr ""
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17801,6 +17869,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18469,6 +18542,11 @@ msgstr "Σουηδικά (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαναφέρει όλες εκτός αυτής της συνεδρίας! Συνέχεια;"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19924,6 +20002,10 @@ msgstr ""
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "ΑΓΝΩΣΤΟ"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -23224,6 +23306,10 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr ""
 
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
 msgstr ""
@@ -23665,6 +23751,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

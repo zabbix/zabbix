@@ -22,13 +22,15 @@
 
 #include "zbxthreads.h"
 
+#include "zbxvault.h"
 #include "zbxcomms.h"
 
 extern int	CONFIG_PROXYCONFIG_FREQUENCY;
 
 typedef struct
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
+	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 }

@@ -24,8 +24,8 @@ require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/translateDefines.inc.php';
 
 /**
+ * @backup ids
  * @onBefore prepareScriptsData
- *
  * @onAfter clearData
  */
 class testScripts extends CAPITest {
@@ -160,11 +160,6 @@ class testScripts extends CAPITest {
 		// Created scripts during script.create test (deleted at the end).
 		'created' => []
 	];
-
-	/**
-	 * @var bool true if "ids" table should clear event IDs.
-	 */
-	private static $clear_ids = false;
 
 	/**
 	 * Prepare data for tests. Create host groups, hosts, items, triggers, events, user groups, users, global macros,
@@ -655,7 +650,6 @@ class testScripts extends CAPITest {
 			);
 
 			$nextid = bcadd($nextid[0]['nextid'], 1, 0);
-			self::$clear_ids = true;
 		}
 
 		$events_data = [];
@@ -1158,7 +1152,7 @@ class testScripts extends CAPITest {
 				'url' => 'http://zabbix/ui/tr_events.php?eventid={EVENT.ID}',
 				'confirmation' => 'Confirmation macros: {EVENT.CAUSE.ID}, {EVENT.CAUSE.NAME}, {EVENT.CAUSE.NSEVERITY},'.
 					' {EVENT.CAUSE.SEVERITY}, {EVENT.CAUSE.STATUS}, {EVENT.CAUSE.VALUE}'
-			],
+			]
 		];
 		$scripts = CDataHelper::call('script.create', $scripts_data);
 		$this->assertArrayHasKey('scriptids', $scripts, 'prepareScriptsData() failed: Could not create scripts.');
@@ -10019,18 +10013,14 @@ class testScripts extends CAPITest {
 		// Delete hosts (items, triggers are deleted as well).
 		CDataHelper::call('host.delete', self::$data['hostids']);
 
-		// Events have to be deleted manually.
+		// All events have to be deleted manually.
+		DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-
-		// Data from 'event_symptom' table should be cascade deleted.
-
-		// If "ids" table did not have any records about events before, make sure there are no when tests are complete.
-		if (self::$clear_ids) {
-			DBexecute("DELETE FROM ids WHERE table_name='events' AND field_name='eventid'");
-		}
 
 		// Delete hosts groups.
 		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
+
+		// The "ids" table should be restored using the standart backup after tests are complete.
 	}
 
 	/**

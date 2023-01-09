@@ -55,7 +55,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 				'{EVENT.CAUSE.ID}' => $this->eventNumToId($cause_n),
 				'{EVENT.CAUSE.SOURCE}' => EVENT_SOURCE_TRIGGERS,
 				'{EVENT.CAUSE.OBJECT}' => EVENT_OBJECT_TRIGGER,
-				'{EVENT.CAUSE.VALUE}' => self::EVENT_START,
+				'{EVENT.CAUSE.VALUE}' => self::EVENT_START
 			]);
 		}
 
@@ -98,7 +98,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			$response = $this->call('event.acknowledge', [
 				'eventids' => $event_ids,
 				'action' => ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-				'cause_eventid' => $cause_event_ids,
+				'cause_eventid' => $cause_event_ids
 			]);
 
 			$this->assertArrayHasKey('result', $response);
@@ -132,7 +132,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			$response = $this->call($request_type, [
 				'output' => [
 					'eventid',
-					'cause_eventid',
+					'cause_eventid'
 				],
 				'objectids' => self::$trigger_ids,
 				'source' => EVENT_SOURCE_TRIGGERS,
@@ -181,7 +181,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 				'output' => [
 					'eventid',
 					'objectid',
-					'cause_eventid',
+					'cause_eventid'
 				],
 				'objectids' => self::$trigger_ids,
 				'source' => EVENT_SOURCE_TRIGGERS,
@@ -320,7 +320,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			// create trigger
 			$response = $this->call('trigger.create', [
 				'description' => 'Trigger trap '.(string) $i,
-				'expression' => 'last(/'.self::HOST_NAME.'/'.$item_key.')='.self::EVENT_START,
+				'expression' => 'last(/'.self::HOST_NAME.'/'.$item_key.')='.self::EVENT_START
 			]);
 
 			$this->assertArrayHasKey('result', $response);
@@ -337,7 +337,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			'command' => sprintf('echo -n "%s"',  self::EVENT_CAUSE_MACRO_TEMPLATE),
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$cause_events_test_scriptid = $response['result']['scriptids'][0];
@@ -348,7 +348,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			'command' => sprintf('echo -n "%s"',  self::EVENT_SYMPTOMS_MACRO_TEMPLATE),
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$symptom_events_test_scriptid = $response['result']['scriptids'][0];
@@ -407,7 +407,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	public function testEventsCauseAndSymptoms_rankAsSymptom() {
 		$this->markAsSymptoms([
 			['event_nums' => [2, 3], 'cause_event_num' => 1],
-			['event_nums' => 5, 'cause_event_num' => 4],
+			['event_nums' => 5, 'cause_event_num' => 4]
 		]);
 
 		$expected = [
@@ -415,7 +415,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			['event_num' => 2, 'cause_event_num' => 1],
 			['event_num' => 3, 'cause_event_num' => 1],
 			['event_num' => 4, 'cause_event_num' => 0],
-			['event_num' => 5, 'cause_event_num' => 4],
+			['event_num' => 5, 'cause_event_num' => 4]
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
@@ -449,7 +449,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testEventsCauseAndSymptoms_swapCauseAndSymptom() {
 		$this->markAsSymptoms([
-			['event_nums' => 1, 'cause_event_num' => 3],
+			['event_nums' => 1, 'cause_event_num' => 3]
 		]);
 
 		$expected = [
@@ -457,7 +457,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			['event_num' => 2, 'cause_event_num' => 3],
 			['event_num' => 3, 'cause_event_num' => 0],
 			['event_num' => 4, 'cause_event_num' => 0],
-			['event_num' => 5, 'cause_event_num' => 4],
+			['event_num' => 5, 'cause_event_num' => 4]
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
@@ -491,7 +491,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 */
 	public function testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom() {
 		$this->markAsSymptoms([
-			['event_nums' => 4, 'cause_event_num' => 2],
+			['event_nums' => 4, 'cause_event_num' => 2]
 		]);
 
 		$expected = [
@@ -499,7 +499,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			['event_num' => 2, 'cause_event_num' => 3],
 			['event_num' => 3, 'cause_event_num' => 0],
 			['event_num' => 4, 'cause_event_num' => 3],
-			['event_num' => 5, 'cause_event_num' => 3],
+			['event_num' => 5, 'cause_event_num' => 3]
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
@@ -546,7 +546,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			['event_num' => 2, 'cause_event_num' => 0],
 			['event_num' => 3, 'cause_event_num' => 0],
 			['event_num' => 4, 'cause_event_num' => 3],
-			['event_num' => 5, 'cause_event_num' => 3],
+			['event_num' => 5, 'cause_event_num' => 3]
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
@@ -593,7 +593,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			['event_num' => 2, 'cause_event_num' => 0],
 			['event_num' => 3, 'cause_event_num' => 0],
 			['event_num' => 4, 'cause_event_num' => 0],
-			['event_num' => 5, 'cause_event_num' => 0],
+			['event_num' => 5, 'cause_event_num' => 0]
 		];
 
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);

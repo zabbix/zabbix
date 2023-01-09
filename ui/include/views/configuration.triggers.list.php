@@ -297,8 +297,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	$status = (new CLink(
 		triggerIndicator($trigger['status'], $trigger['state']),
 		(new CUrl('triggers.php'))
-			->setArgument('g_triggerid', $triggerid)
 			->setArgument('action', $status_action)
+			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
 			->setArgumentCsrfToken()
 			->getUrl()

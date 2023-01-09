@@ -515,21 +515,34 @@ zabbix_export:
                   value: notice
         -
           uuid: 58818005e76d46dda14d6592f601ab00
-          name: 'Software installed'
-          key: system.sw.packages
+          name: 'Number of installed packages'
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: 2c9d36b8f9e641b188c50982ccd013d5
+              expression: 'change(/Linux by Zabbix agent/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 160b82c121b147cbbf18c34dbb01d3ce
           name: 'Free swap space'

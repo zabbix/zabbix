@@ -204,7 +204,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing($form, [], false, $data['preprocessing_types'])))
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
 			->setId('preprocessing_div')
 	);
 
