@@ -3957,7 +3957,7 @@ out:
 static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
 		int *ts_delete, const char **name)
 {
-	zbx_lld_item_full_t	*item = object;
+	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
 
 	*id = item->itemid;
 	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
