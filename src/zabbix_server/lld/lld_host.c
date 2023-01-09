@@ -185,7 +185,7 @@ typedef struct
 	zbx_vector_uint64_t		new_groupids;		/* host groups which should be added */
 	zbx_vector_uint64_t		lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t		del_templateids;	/* templates which should be unlinked */
-	zbx_vector_ptr_t		new_hostmacros;		/* host macros which should be added, deleted or updated */
+	zbx_vector_ptr_t		new_hostmacros;	/* host macros which should be added, deleted or updated */
 	zbx_vector_ptr_t		interfaces;
 	zbx_vector_db_tag_ptr_t		tags;
 	char				*host_proto;
@@ -195,21 +195,37 @@ typedef struct
 	char				*name_orig;
 	int				lastcheck;
 	int				ts_delete;
-#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)	/* hosts.host and host_discovery.host fields should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)	/* hosts.proxy_hostid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)	/* hosts.custom_interfaces field should be updated */
+
+/* hosts which should be updated or added */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED			__UINT64_C(0x00000001)
+/* hosts.host and host_discovery.host fields should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST			__UINT64_C(0x00000002)
+/* hosts.name field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_NAME			__UINT64_C(0x00000004)
+/* hosts.proxy_hostid field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY			__UINT64_C(0x00000008)
+/* hosts.ipmi_authtype field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH		__UINT64_C(0x00000010)
+/* hosts.ipmi_privilege field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV		__UINT64_C(0x00000020)
+/* hosts.ipmi_username field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)
+/* hosts.ipmi_password field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)
+/* hosts.tls_connect field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)
+/* hosts.tls_accept field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)
+/* hosts.tls_issuer field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)
+/* hosts.tls_subject field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)
+/* hosts.tls_psk_identity field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)
+/* hosts.tls_psk field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)
+/* hosts.custom_interfaces field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES	__UINT64_C(0x00004000)
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -411,8 +427,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, zbx_uint64_t proxy_hostid,
-		signed char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
-		unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
+		signed char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
+		const char *ipmi_password, unsigned char tls_connect, unsigned char tls_accept, const char *tls_issuer,
 		const char *tls_subject, const char *tls_psk_identity, const char *tls_psk)
 {
 	DB_RESULT		result;
@@ -787,7 +803,8 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s host:"
 							" host with the same name \"%s\" (\"%s\") already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->host, host->name);
+							(0 != host->hostid ? "update" : "create"), host->host,
+							host->name);
 
 					if (0 != host->hostid)
 					{
@@ -1366,8 +1383,9 @@ out:
 	return group;
 }
 
-static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros)
+static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups,
+		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macros)
 {
 	int	i;
 
@@ -2184,7 +2202,8 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->automatic = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->automatic;
 			hostmacro->flags = 0x00;
 			zbx_substitute_lld_macros(&hostmacro->value, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-			zbx_substitute_lld_macros(&hostmacro->description, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			zbx_substitute_lld_macros(&hostmacro->description, host->jp_row, lld_macros, ZBX_MACRO_ANY,
+					NULL, 0);
 
 			zbx_vector_ptr_append(&host->new_hostmacros, hostmacro);
 		}
@@ -3002,7 +3021,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			if (host->inventory_mode_orig != host->inventory_mode &&
 					HOST_INVENTORY_DISABLED == host->inventory_mode_orig)
 			{
-				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid, (int)host->inventory_mode);
+				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
+						(int)host->inventory_mode);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
@@ -3080,7 +3100,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS))
 				{
 					value_esc = DBdyn_escape_string(interface->dns);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d, value_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d,
+							value_esc);
 					zbx_free(value_esc);
 					d = ",";
 					zbx_audit_host_update_json_update_interface_dns(host->hostid,
@@ -3455,8 +3476,8 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
-					&err))
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids,
+					ZBX_TEMPLATE_LINK_LLD, &err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
 				zbx_free(err);
@@ -3956,10 +3977,12 @@ static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interf
 				ifnew->data.snmp->securitylevel_orig = ifold->data.snmp->securitylevel;
 
 			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPASS))
-				ifnew->data.snmp->authpassphrase_orig = zbx_strdup(NULL, ifold->data.snmp->authpassphrase);
+				ifnew->data.snmp->authpassphrase_orig = zbx_strdup(NULL,
+						ifold->data.snmp->authpassphrase);
 
 			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_PRIVPASS))
-				ifnew->data.snmp->privpassphrase_orig = zbx_strdup(NULL, ifold->data.snmp->privpassphrase);
+				ifnew->data.snmp->privpassphrase_orig = zbx_strdup(NULL,
+						ifold->data.snmp->privpassphrase);
 
 			if (0 != (ifnew->data.snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_AUTHPROTOCOL))
 				ifnew->data.snmp->authprotocol_orig = ifold->data.snmp->authprotocol;
@@ -4117,8 +4140,10 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 			new_interface->port_orig = NULL;
 
 			zbx_substitute_lld_macros(&new_interface->ip, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-			zbx_substitute_lld_macros(&new_interface->dns, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			zbx_substitute_lld_macros(&new_interface->dns, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
+					0);
+			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
+					0);
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -4153,10 +4178,10 @@ static void	lld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_p
 						NULL, 0);
 				zbx_substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
-				zbx_substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
-						NULL, 0);
-				zbx_substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros, ZBX_MACRO_ANY,
-						NULL, 0);
+				zbx_substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros,
+						ZBX_MACRO_ANY, NULL, 0);
+				zbx_substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros,
+						ZBX_MACRO_ANY, NULL, 0);
 				zbx_substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
 			}

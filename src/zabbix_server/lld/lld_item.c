@@ -1048,8 +1048,8 @@ out:
  *          FAIL    - the limit of dependencies is exceeded                   *
  *                                                                            *
  ******************************************************************************/
-static int	lld_item_dependencies_check(const zbx_lld_item_full_t *item, const zbx_lld_item_prototype_t *item_prototype,
-		zbx_vector_ptr_t *dependencies)
+static int	lld_item_dependencies_check(const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_vector_ptr_t *dependencies)
 {
 	zbx_item_dependence_t	*dependence = NULL, *top_dependence = NULL, *tmp_dep;
 	int 			ret = FAIL, i, dependence_num = 0, item_in_deps = FAIL;
@@ -1209,7 +1209,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			else if ('\0' == *param1 && '\0' == *param2)
 			{
-				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s", pp->params);
+				zbx_snprintf(err, sizeof(err), "at least one parameter must be defined: %s",
+						pp->params);
 				ret = FAIL;
 			}
 			else if ('\0' != *param1 && '\0' != *param2)
@@ -1643,8 +1644,8 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  * Returns: The created item or NULL if cannot create new item from prototype *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype,
+		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_item_full_t		*item;
 	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -1685,8 +1686,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->key = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
 
-	if (FAIL == (ret = zbx_substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
-			err, sizeof(err))))
+	if (FAIL == (ret = zbx_substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths,
+			MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
 	}
@@ -1882,8 +1883,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	zbx_substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL,
-			0);
+	zbx_substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -2298,7 +2299,8 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
 		{
 			item_index_local.lld_row = lld_rows->values[j];
 
-			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
+			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index,
+					&item_index_local)))
 			{
 				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths, error);
 
@@ -2308,7 +2310,8 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
 				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
 			}
 			else
-				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths, item_index->item, error);
+				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths,
+						item_index->item, error);
 		}
 	}
 
@@ -2504,7 +2507,8 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
 			}
 
 			buffer = zbx_strdup(buffer, ppsrc->error_handler_params);
-			zbx_substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+			zbx_substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY,
+					NULL, 0);
 
 			if (0 != strcmp(ppdst->error_handler_params, buffer))
 			{

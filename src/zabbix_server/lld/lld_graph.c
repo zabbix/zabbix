@@ -1013,8 +1013,9 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != graph->graphid)
 		{
-			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid, (NULL == graph->name_orig) ?
-					graph->name : graph->name_orig, ZBX_FLAG_DISCOVERY_CREATED);
+			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid,
+					(NULL == graph->name_orig) ? graph->name : graph->name_orig,
+					ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
 		for (j = 0; j < graph->gitems.values_num; j++)

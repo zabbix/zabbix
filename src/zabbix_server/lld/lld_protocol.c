@@ -98,7 +98,8 @@ zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t ite
 	return data_len;
 }
 
-static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num, zbx_uint64_t *values_num)
+static void	zbx_lld_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *items_num,
+		zbx_uint64_t *values_num)
 {
 	data += zbx_deserialize_value(data, items_num);
 	(void)zbx_deserialize_value(data, values_num);
