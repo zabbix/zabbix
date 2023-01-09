@@ -40,7 +40,6 @@ OBJS = \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
-	$(OUTPUTDIR)\vfs_file.o \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
