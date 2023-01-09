@@ -448,7 +448,7 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 
 	history_num = (NULL != history ? history->step_history.values_num : 0);
 
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)(3 + history_num * 5 + results_num * 3) *
+	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)(3 + history_num * 5 + results_num * 5) *
 			sizeof(zbx_packed_field_t));
 	offset = fields;
 
@@ -458,6 +458,7 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 	{
 		offset += preprocessor_pack_variant(offset, &results[i].value);
 		*offset++ = PACKED_FIELD(&results[i].action, sizeof(unsigned char));
+		offset += preprocessor_pack_variant(offset, &results[i].value_raw);
 	}
 
 	offset += preprocessor_pack_history(offset, history, &history_num);
@@ -669,6 +670,7 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
 		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
 		offset += preprocesser_unpack_variant(offset, &result->value);
 		offset += zbx_deserialize_char(offset, &result->action);
+		offset += preprocesser_unpack_variant(offset, &result->value_raw);
 		zbx_vector_pp_result_ptr_append(results, result);
 	}
 
@@ -957,8 +959,13 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 
 	preproc->history = zbx_pp_history_create(0);
 	offset += preprocessor_unpack_history(offset, preproc->history);
-
 	(void)preprocessor_unpack_steps(offset, preproc);
+
+	for (int i = 0; i < preproc->steps_num; i++)
+	{
+		if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
+			preproc->history_num++;
+	}
 }
 
 /******************************************************************************

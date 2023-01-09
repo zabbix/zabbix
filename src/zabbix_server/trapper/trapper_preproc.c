@@ -298,7 +298,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 		if (ZBX_VARIANT_ERR == results.values[results.values_num - 1]->value.type)
 		{
-			preproc_error = results.values[results.values_num - 1]->value.data.err;
+			preproc_error = zbx_strdup(NULL, results.values[results.values_num - 1]->value.data.err);
 			break;
 		}
 
