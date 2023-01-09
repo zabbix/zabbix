@@ -1,11 +1,15 @@
 Changes for 6.4.0beta6
 
 New features:
+A.F....... [ZBXNEXT-3100] added requirement for users to enter current password when changing their own password (dpetra)
+.........T [ZBXNEXT-8115] updated system.sw.packages key in Linux templates (abakaldin)
 A.F....... [ZBXNEXT-3100] implemented current password which is required for all users when their own password is changed (dpetra)
 A.F.I...S. [ZBXNEXT-7964] introduced two-level event/problem hierarchy: causes and symptoms (Ivo, mprihodko)
 .........T [ZBXNEXT-7977] added Azure Microsoft SQL templates (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
+....I..... [ZBX-21826] fixed dummy module Makefile to use cc and compile on FreeBSD (yurii)
 A......... [ZBX-22015] fixed provisioning of new user when group mapping contains duplicate groups (gcalenko)
 ........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
@@ -230,6 +234,8 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
+....I..... [ZBX-21826] fixed dummy module Makefile to use cc and compile on FreeBSD (yurii)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
 A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
 ........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)
@@ -790,6 +796,7 @@ New features:
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+.......PS. [ZBX-22075] fixed crash when Elasticsearch is used (dgoloscapov)
 ........S. [ZBX-21890] fixed config.dbversion_status containing second empty object on PgSQL without TSDB (dgoloscapov)
 A......... [ZBX-22138] fixed inability to delete group from host prototype (vmaksimovs)
 ........S. [ZBX-21950] fixed to not require host interface for script item during template linkage (asestakovs)

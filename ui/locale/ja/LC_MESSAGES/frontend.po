@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-30 03:11+0000\n"
+"PO-Revision-Date: 2023-01-06 13:59+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -4766,11 +4766,11 @@ msgstr "JSONへの変換"
 
 #: app/views/popup.acknowledge.edit.php:134
 msgid "Convert to cause"
-msgstr ""
+msgstr "原因に変換"
 
 #: app/views/popup.acknowledge.edit.php:135
 msgid "Converts a symptom event back to cause event"
-msgstr ""
+msgstr "兆候イベントを原因イベントに戻します"
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -5129,11 +5129,11 @@ msgstr "現在のホスト"
 #: app/controllers/CControllerUserUpdateGeneral.php:85
 #: app/views/administration.user.edit.php:174
 msgid "Current password"
-msgstr ""
+msgstr "現在のパスワード"
 
 #: include/classes/api/services/CUser.php:474
 msgid "Current password is mandatory."
-msgstr ""
+msgstr "現在のバスワードは必須です。"
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -7697,7 +7697,7 @@ msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 
 #: include/validate.inc.php:167
 #, c-format
@@ -9421,7 +9421,7 @@ msgstr "インベントリフィールド\"%1$s\"が存在しないためフィ�
 #: app/views/js/administration.user.edit.js.php:61
 #: app/views/js/administration.userprofile.edit.js.php:69
 msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
-msgstr ""
+msgstr "パスワードの変更が成功すると、ユーザーはすべてのアクティブなセッションからログアウトされます。 続けますか？"
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -9797,7 +9797,7 @@ msgstr "ディスカバリルール\"%1$s\"の条件式が正しくありませ�
 
 #: include/classes/api/services/CUser.php:468
 msgid "Incorrect current password."
-msgstr ""
+msgstr "現在のパスワードが正しくありません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12292,7 +12292,7 @@ msgstr "3月"
 
 #: jsLoader.php:361
 msgid "Mark as cause"
-msgstr ""
+msgstr "原因としてマーク"
 
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
@@ -12308,7 +12308,7 @@ msgstr "選択をマーク"
 
 #: jsLoader.php:362
 msgid "Mark selected as symptoms"
-msgstr ""
+msgstr "選択したものを兆候としてマーク"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15013,7 +15013,7 @@ msgstr "パスワード(確認)"
 
 #: app/views/administration.user.edit.php:199
 msgid "Password can only be changed for users using the internal Zabbix authentication."
-msgstr ""
+msgstr "パスワードは、Zabbixの内部認証を使用しているユーザーに対してのみ変更できます。"
 
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
