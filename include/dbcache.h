@@ -759,12 +759,12 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num, unsigned int mode);
-void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 void	zbx_dc_config_history_sync_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids,
 		int *errcodes, size_t num);
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num);
