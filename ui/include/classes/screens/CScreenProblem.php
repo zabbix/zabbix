@@ -1051,7 +1051,7 @@ class CScreenProblem extends CScreenBase {
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
 							->addStyle('width: 58%;'),
 						(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
-						(new CColHeader(_('Ack')))->addStyle('width: 36px;'),
+						(new CColHeader(_('Update')))->addStyle('width: 40px;'),
 						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
 						$tags_header
 					]))
@@ -1075,7 +1075,7 @@ class CScreenProblem extends CScreenBase {
 							? _('Operational data')
 							: null,
 						_('Duration'),
-						_('Ack'),
+						_('Update'),
 						_('Actions'),
 						$this->data['filter']['show_tags'] ? _('Tags') : null
 					]));
@@ -1611,14 +1611,11 @@ class CScreenProblem extends CScreenBase {
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
-					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+				? (new CLink(_('Update')))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('data-eventid', $problem['eventid'])
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
-				: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
-					$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-				);
+				: new CSpan(_('Update'));
 
 			$row->addItem([
 				CSeverityHelper::makeSeverityCell((int) $problem['severity'], null, $value == TRIGGER_VALUE_FALSE),
@@ -1638,7 +1635,7 @@ class CScreenProblem extends CScreenBase {
 					? zbx_date2age($problem['clock'], $problem['r_clock'])
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users']),
+				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
 				$data['filter']['show_tags'] ? $data['tags'][$problem['eventid']] : null
 			]);
 

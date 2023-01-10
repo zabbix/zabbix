@@ -82,7 +82,7 @@ class CControllerMenuPopup extends CController {
 				$rules = [
 					'triggerid' => 'required|db triggers.triggerid',
 					'eventid' => 'db events.eventid',
-					'acknowledge' => 'in 0,1',
+					'update_problem' => 'in 0,1',
 					'show_rank_change_cause' => 'in 0,1',
 					'show_rank_change_symptom' => 'in 0,1',
 					'ids' => 'array_db events.eventid'
@@ -662,9 +662,9 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
-	 * @param string $data['eventid']      (optional) Mandatory for Acknowledge menu and event rank change.
-	 * @param array  $data['ids']          (optional) Event IDs that are used in event rank change to symptom.
-	 * @param bool   $data['acknowledge']  (optional) Whether to show Acknowledge menu.
+	 * @param string $data['eventid']         (optional) Mandatory for "Update problem" menu and event rank change.
+	 * @param array  $data['ids']             (optional) Event IDs that are used in event rank change to symptom.
+	 * @param bool   $data['update_problem']  (optional) Whether to show "Update problem" menu.
 	 *
 	 * @return mixed
 	 */
@@ -783,8 +783,8 @@ class CControllerMenuPopup extends CController {
 				}
 			}
 
-			if (array_key_exists('acknowledge', $data)) {
-				$menu_data['acknowledge'] = ((bool) $data['acknowledge']
+			if (array_key_exists('update_problem', $data)) {
+				$menu_data['update_problem'] = ((bool) $data['update_problem']
 						&& (CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
