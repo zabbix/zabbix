@@ -364,7 +364,7 @@ class testFormUserMedia extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
 
 		// Edit selected media.
-		$edit_row = $this->getUserMediaTab('Admin')->asTable()->query('xpath:.//tr[@id="user_medias_0"]')->one()->asTableRow();
+		$edit_row = $this->getUserMediaTab('Admin')->asTable()->query('xpath:.//tr[@id="medias_0"]')->one()->asTableRow();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
 		$this->setMediaValues($data);

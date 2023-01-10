@@ -53,7 +53,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->page->assertTitle('Configuration of media types');
 		$this->page->assertHeader('Media types');
 
-		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form = $this->query('id:media-type-form')->asForm()->one();
 		$this->assertEquals(['Media type', 'Message templates', 'Options'], $form->getTabs());
 
 		// Check available media type types.
@@ -197,7 +197,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
 
 		$this->page->waitUntilReady();
-		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form = $this->query('id:media-type-form')->asForm()->one();
 		$form->getField('Type')->fill($data['type']);
 
 		$this->checkTabFields($form, $data);
@@ -908,7 +908,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
-		$this->query('id:media_type_form')->asForm()->waitUntilVisible()->one()->submit();
+		$this->query('id:media-type-form')->asForm()->waitUntilVisible()->one()->submit();
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Media type updated');
@@ -929,7 +929,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', $data['media_type'])->WaitUntilClickable()->one()->click();
 		$this->query('button:Clone')->one()->click();
-		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
 		$clone_name = $data['media_type'].' clone';
 		$form->fill(['Name' => $clone_name]);
 		$form->submit();
@@ -1013,7 +1013,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form = $this->query('id:media-type-form')->asForm()->one();
 
 		if ($action === 'delete') {
 			$form->query('button:Delete')->waitUntilClickable()->one()->click();
@@ -1073,7 +1073,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form = $this->query('id:media-type-form')->asForm()->one();
 		$form->fill($data['mediatype_tab']);
 
 		if (array_key_exists('script_parameters', $data)) {
