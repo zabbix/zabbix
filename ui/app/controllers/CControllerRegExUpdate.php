@@ -29,7 +29,7 @@ class CControllerRegExUpdate extends CController {
 			'test_string'  => 'string | db regexps.test_string',
 			'regexid'      => 'fatal | required | db regexps.regexpid',
 			'expressions'  => 'required | array',
-			'form_refresh' => ''
+			'form_refresh' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -28,6 +28,7 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('items', $data['hostid'], $data['parent_discoveryid']));
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('item_prototype_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('group_itemid', $data['item_prototypeids'])
