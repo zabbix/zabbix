@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-06T14:51:21Z'
+  date: '2023-01-10T08:29:55Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -87,9 +87,6 @@ zabbix_export:
                 -
                   macro: '{$SERVER.NAME}'
                   value: '{#SERVER.NAME}'
-              custom_interfaces: 'YES'
-              interfaces:
-                - {  }
           master_item:
             key: controlm.servers
           lld_macro_paths:
