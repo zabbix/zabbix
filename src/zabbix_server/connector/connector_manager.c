@@ -176,7 +176,7 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 	return NULL;
 }
 
-static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
+static int	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
 		zbx_connector_worker_t *worker)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -184,9 +184,9 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
 	zbx_object_link_t	*object_link;
-	int			i, records = 0, under_limit = SUCCEED;
+	int			i, records = 0, ret = SUCCEED;
 
-	while (SUCCEED == under_limit && SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
+	while (SUCCEED == ret && SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
 	{
 		if (NULL == data)
 			zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
@@ -196,7 +196,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 			if ((records == connector->max_records && 0 != connector->max_records) ||
 					data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
 			{
-				under_limit = FAIL;
+				ret = FAIL;
 				break;
 			}
 
@@ -235,6 +235,8 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 
 	if (0 != worker->ids.values_num)
 		worker->taskid = connector->connectorid;
+
+	return ret;
 #undef ZBX_DATA_JSON_RESERVED
 #undef ZBX_DATA_JSON_RECORD_LIMIT
 }
@@ -245,7 +247,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
  * Parameters: manager - [IN] preprocessing manager                           *
  *                                                                            *
  ******************************************************************************/
-static void	connector_assign_tasks(zbx_connector_manager_t *manager)
+static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 {
 	zbx_connector_worker_t	*worker;
 	zbx_ipc_message_t	message;
@@ -256,7 +258,10 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager)
 	while (NULL != (worker = connector_get_free_worker(manager)) &&
 			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)))
 	{
-		connector_get_next_task(connector, &message, worker);
+		if (SUCCEED == connector_get_next_task(connector, &message, worker))
+			connector->time_flush = now + 1;
+		else
+			connector->time_flush = now;
 
 		if (NULL == message.data)
 			continue;
@@ -438,10 +443,26 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			processed_num = 0;
 		}
 
-		if (FLUSH_INTERVAL < time_now - time_flush)
+
+		if (time_flush < time_now)
 		{
-			connector_assign_tasks(&manager);
-			time_flush = time_now;
+			zbx_hashset_iter_t	iter;
+			zbx_connector_t		*connector;
+
+			connector_assign_tasks(&manager, time_now);
+
+			zbx_hashset_iter_reset(&manager.connectors, &iter);
+
+			time_flush = time_now + 1;
+			while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (connector->time_flush < time_flush)
+				{
+					/* some connector is still not processed or reached it's limit */
+					time_flush = connector->time_flush;
+					break;
+				}
+			}
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
