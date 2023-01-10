@@ -394,7 +394,8 @@ class testUserRolesPermissions extends CWebTest {
 			'Change severity' => false,
 			'Acknowledge problems' => false,
 			'Suppress problems' => false,
-			'Close problems' => false
+			'Close problems' => false,
+			'Change problem ranking' => false
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
@@ -486,9 +487,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Web',
 			'Detect operating system',
 			'Ping',
-			'Script for Clone',
-			'Script for Delete',
-			'Script for Update',
 			'Traceroute'
 		];
 		$context_after = [

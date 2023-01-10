@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-16 01:16+0000\n"
+"PO-Revision-Date: 2022-12-23 10:46+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1223,7 +1223,7 @@ msgstr "允许的方法"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "也用作聚合数据集的图例标签。"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -3635,6 +3635,10 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "无法更新事件"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "无法更新图表"
@@ -3871,6 +3875,11 @@ msgstr "采集所有符合规则的 SNMP 信息，如果没有规则则会采集
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "采集所有SNMP traps规则以外的snmptrap[]"
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -3927,6 +3936,10 @@ msgstr "修改密码"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "每秒更改"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4754,6 +4767,14 @@ msgstr "合同号码"
 msgid "Convert to JSON"
 msgstr "转换到 JSON"
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -5108,6 +5129,15 @@ msgstr "当前"
 msgid "Current host"
 msgstr "当前主机"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr "当前用户"
@@ -5345,7 +5375,7 @@ msgstr "数据集"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
-msgstr ""
+msgstr "数据集标签"
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5774,7 +5804,7 @@ msgstr "删除所选的SLAs?"
 
 #: app/views/js/action.list.js.php:124
 msgid "Delete selected action?"
-msgstr ""
+msgstr "删除选定的动作?"
 
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
@@ -6205,7 +6235,7 @@ msgstr "禁用所选的SLAs?"
 
 #: app/views/js/action.list.js.php:109
 msgid "Disable selected action?"
-msgstr ""
+msgstr "停用所选的动作?"
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7002,7 +7032,7 @@ msgstr "启用所选的SLAs?"
 
 #: app/views/js/action.list.js.php:94
 msgid "Enable selected action?"
-msgstr ""
+msgstr "启用所选的动作?"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7667,6 +7697,11 @@ msgstr "字段 \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "字段 \"%1$s\" 设置错误: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7687,7 +7722,7 @@ msgstr "字段\"%1$s\"不可以填写"
 #: include/views/js/item.preprocessing.js.php:164
 #: include/views/js/item.preprocessing.js.php:210
 msgid "Field name"
-msgstr ""
+msgstr "字段名"
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9387,6 +9422,11 @@ msgstr "已成功导入"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "无法按库存字段“%1$s”过滤，该字段不存在。"
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "维修中"
@@ -9758,6 +9798,10 @@ msgstr "主机名称 \"%1$s\" 中有不支持的字符。"
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "自动发现规则\"%1$s\"的条件不正确."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -11967,7 +12011,7 @@ msgstr "Mac 地址 B"
 #: include/views/js/item.preprocessing.js.php:178
 #: include/views/js/item.preprocessing.js.php:224
 msgid "MAC from Hex-STRING"
-msgstr ""
+msgstr "MAC (16进制字符串)"
 
 #: include/hosts.inc.php:33
 msgid "MD2"
@@ -12250,6 +12294,10 @@ msgstr "三月"
 msgid "March"
 msgstr "三月"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "触发器状态上的标记组件改变"
@@ -12261,6 +12309,10 @@ msgstr "标记其他"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "标记所选"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12342,11 +12394,11 @@ msgstr "时间选择器的最大周期"
 #: app/partials/configuration.host.interface.row.php:105
 #: app/views/popup.itemtestedit.view.php:154
 msgid "Max repetition count"
-msgstr ""
+msgstr "最大重复次数"
 
 #: app/partials/configuration.host.interface.row.php:106
 msgid "Max repetition count is applicable to discovery and snmp.walk only."
-msgstr ""
+msgstr "最大重复计数仅适用于自动发现和 snmp.walk。"
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13175,7 +13227,7 @@ msgstr "添加 SLA"
 #: app/views/js/popup.action.edit.js.php:413
 #: app/views/popup.action.edit.php:302
 msgid "New action"
-msgstr ""
+msgstr "新的动作"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -14110,14 +14162,14 @@ msgstr "OEM"
 
 #: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
 msgid "OID"
-msgstr ""
+msgstr "OID"
 
 #: include/forms.inc.php:1477 include/forms.inc.php:1507
 #: include/views/js/item.preprocessing.js.php:154
 #: include/views/js/item.preprocessing.js.php:169
 #: include/views/js/item.preprocessing.js.php:215
 msgid "OID prefix"
-msgstr ""
+msgstr "OID前缀"
 
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
@@ -14327,7 +14379,7 @@ msgstr "操作系统信息。返回字符串"
 
 #: include/classes/data/CItemData.php:1165
 msgid "Operating system version information. Returns JSON"
-msgstr ""
+msgstr "操作系统版本信息。 返回 JSON"
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -14963,6 +15015,10 @@ msgstr "密码"
 msgid "Password (once again)"
 msgstr "密码 (再次确认)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "非内部身份验证类型的密码不是强制的。"
@@ -15006,6 +15062,10 @@ msgstr "图案"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "针对被抑制的问题暂停操作"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15202,6 +15262,10 @@ msgstr "位置"
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
 msgstr "对于 s、uptime 和 unixtime 单位，位置将被忽略。"
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
+msgstr ""
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15696,6 +15760,10 @@ msgstr "已解决"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16422,7 +16490,7 @@ msgstr "结果已使用值映射"
 #: include/views/configuration.item.edit.php:456
 #: include/views/configuration.item.prototype.edit.php:434
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/data/CItemData.php:1154
 msgid "Retrieving contents of a file. Returns text"
@@ -16772,11 +16840,11 @@ msgstr "SNMP 版本"
 
 #: include/items.inc.php:1802
 msgid "SNMP walk to JSON"
-msgstr ""
+msgstr "SNMP 遍历为JSON"
 
 #: include/items.inc.php:1798
 msgid "SNMP walk value"
-msgstr ""
+msgstr "SNMP遍历值"
 
 #: include/items.inc.php:1299
 #, c-format
@@ -17681,6 +17749,11 @@ msgstr "显示侧边栏"
 msgid "Show suppressed problems"
 msgstr "显示处理的问题"
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18349,6 +18422,11 @@ msgstr "瑞士(sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19797,6 +19875,10 @@ msgstr "图形界面元素“%2$s”不适用于用户角色“%1$s”。"
 msgid "UNKNOWN"
 msgstr "未知的"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -19863,7 +19945,7 @@ msgstr "URLs"
 #: include/views/js/item.preprocessing.js.php:177
 #: include/views/js/item.preprocessing.js.php:223
 msgid "UTF-8 from Hex-STRING"
-msgstr ""
+msgstr "UTF-8 (16进制字符串)"
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -19973,7 +20055,7 @@ msgstr "解除锁定所选的用户?"
 #: include/views/js/item.preprocessing.js.php:176
 #: include/views/js/item.preprocessing.js.php:222
 msgid "Unchanged"
-msgstr ""
+msgstr "未更新"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20343,7 +20425,7 @@ msgstr "使用大量请求"
 
 #: app/partials/configuration.host.interface.row.php:207
 msgid "Use combined requests"
-msgstr ""
+msgstr "使用组合请求"
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -23056,7 +23138,7 @@ msgstr "函数“%1$s”使用不正确"
 #: include/classes/api/services/CItemGeneralOld.php:1761
 #: include/classes/api/services/CItemGeneral.php:2066
 msgid "incorrect value"
-msgstr ""
+msgstr "不正确的值"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -23093,6 +23175,10 @@ msgstr "无效的聚合方法"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8中无效的字节排序"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
@@ -23536,6 +23622,14 @@ msgstr "无权更改问题严重性"
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "无权关闭问题"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

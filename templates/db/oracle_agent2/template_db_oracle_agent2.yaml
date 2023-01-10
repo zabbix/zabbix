@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-11-16T15:07:49Z'
+  date: '2022-12-23T19:05:57Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -75,21 +75,6 @@ zabbix_export:
             -
               tag: component
               value: sessions
-        -
-          uuid: 1ad93880e4314d68b9e1aa4e00f03b6e
-          name: 'Oracle: Get archive log info'
-          key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
-          delay: 5m
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          tags:
-            -
-              tag: component
-              value: archive-log
-            -
-              tag: component
-              value: raw
         -
           uuid: a5533a1c354a4c8dbfec39c9b0637ba2
           name: 'Oracle: Archiver state'
@@ -172,21 +157,6 @@ zabbix_export:
             -
               tag: component
               value: cache
-        -
-          uuid: 1bad65e85d8b482d9cd83b1d202f8d8c
-          name: 'Oracle: Get CDB and No-CDB info'
-          key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'It gets the information about the container database (CDB) and non-CDB databases on an instance.'
-          tags:
-            -
-              tag: component
-              value: cdb
-            -
-              tag: component
-              value: raw
         -
           uuid: fd1ea13484984d0baffc45ea02a33a7c
           name: 'Oracle: Cursor cache hit ratio'
@@ -284,21 +254,6 @@ zabbix_export:
             -
               tag: component
               value: datafiles
-        -
-          uuid: cb703b07fc514ce5aedc561896bcd53f
-          name: 'Oracle: Get ASM stats'
-          key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'It gets the ASM disk groups statistics.'
-          tags:
-            -
-              tag: component
-              value: asm
-            -
-              tag: component
-              value: raw
         -
           uuid: 9692f4f771844438a3f9224455c504b6
           name: 'Oracle: Disk sort per second'
@@ -698,21 +653,6 @@ zabbix_export:
             -
               tag: component
               value: application
-        -
-          uuid: ca4452418d2641bd87fa75e946c2bf98
-          name: 'Oracle: Get PDB info'
-          key: 'oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'It gets the information about the PDB databases on an instance.'
-          tags:
-            -
-              tag: component
-              value: pdb
-            -
-              tag: component
-              value: raw
         -
           uuid: 4926809f2c244b33b1a0650510a30fa4
           name: 'Oracle: Get PGA stats'
@@ -1526,21 +1466,6 @@ zabbix_export:
               tag: component
               value: pga
         -
-          uuid: 97ac4acedcde465b8d004a8ac476dd99
-          name: 'Oracle: Get tablespaces stats'
-          key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'It gets the statistics of the tablespaces.'
-          tags:
-            -
-              tag: component
-              value: raw
-            -
-              tag: component
-              value: tablespaces
-        -
           uuid: 4f1a9efea8594486b226307a52e35474
           name: 'Oracle: Uptime'
           type: DEPENDENT
@@ -1579,7 +1504,7 @@ zabbix_export:
               name: 'Oracle: Host has been restarted'
               event_name: 'Oracle: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1682,6 +1607,22 @@ zabbix_export:
           description: 'Destinations of the log archive.'
           item_prototypes:
             -
+              uuid: 1ad93880e4314d68b9e1aa4e00f03b6e
+              name: 'Archivelog ''{#DEST_NAME}'': Get archive log info'
+              key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]'
+              delay: 5m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'It gets the archivelog statistics.'
+              tags:
+                -
+                  tag: component
+                  value: archive-log
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 46ae0ac79493430a94ac50f79dc053ba
               name: 'Archivelog ''{#DEST_NAME}'': Error'
               type: DEPENDENT
@@ -1701,7 +1642,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]'
               tags:
                 -
                   tag: component
@@ -1723,7 +1664,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#DEST_NAME}''].log_sequence.first()'
               master_item:
-                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]'
               tags:
                 -
                   tag: component
@@ -1756,7 +1697,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DEST_NAME}"]'
               tags:
                 -
                   tag: component
@@ -1798,6 +1739,21 @@ zabbix_export:
           description: 'Scanning databases in the database management system (DBMS).'
           item_prototypes:
             -
+              uuid: 1bad65e85d8b482d9cd83b1d202f8d8c
+              name: 'Oracle Database ''{#DBNAME}'': Get CDB and No-CDB info'
+              key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'It gets the information about the container database (CDB) and non-CDB database on an instance.'
+              tags:
+                -
+                  tag: component
+                  value: cdb
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: d9d1575b767b46e0aefe65a270f2d01b
               name: 'Oracle Database ''{#DBNAME}'': Force logging'
               type: DEPENDENT
@@ -1817,7 +1773,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -1852,7 +1808,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -1887,7 +1843,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -1951,7 +1907,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -1995,9 +1951,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 8b4e5c9385d04a39b2187e093ffca213
-              name: 'ASM ''{#DG_NAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Free size'
               type: DEPENDENT
-              key: 'oracle.asm_free_size["{#DG_NAME}"]'
+              key: 'oracle.asm_free_size["{#DGNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2006,21 +1962,21 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DG_NAME}''].free_size_byte.first()'
+                    - '$..[''{#DGNAME}''].free_bytes.first()'
               master_item:
-                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
             -
               uuid: b80f69f44dd24eae82a301dbefb0c60f
-              name: 'ASM ''{#DG_NAME}'': Total size'
+              name: 'ASM ''{#DGNAME}'': Total size'
               type: DEPENDENT
-              key: 'oracle.asm_total_size["{#DG_NAME}"]'
+              key: 'oracle.asm_total_size["{#DGNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2029,21 +1985,21 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DG_NAME}''].size_byte.first()'
+                    - '$..[''{#DGNAME}''].total_bytes.first()'
               master_item:
-                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
             -
               uuid: e2a0ac73040f401bb05ff88140f6665b
-              name: 'ASM ''{#DG_NAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Free size'
               type: DEPENDENT
-              key: 'oracle.asm_used_pct["{#DG_NAME}"]'
+              key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2053,22 +2009,22 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$..[''{#DG_NAME}''].used_percent.first()'
+                    - '$..[''{#DGNAME}''].used_pct.first()'
               master_item:
-                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
               trigger_prototypes:
                 -
                   uuid: b8aa1b00e2574e35bf71554cabfffcfc
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                  name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
                   description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}'
                   tags:
@@ -2077,35 +2033,50 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: af6ff1d099524209b2806b1257e9a8e3
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
                   description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}'
                   dependencies:
                     -
-                      name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                      expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                      name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                      expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
                   tags:
                     -
                       tag: scope
                       value: capacity
+            -
+              uuid: cb703b07fc514ce5aedc561896bcd53f
+              name: 'ASM ''{#DGNAME}'': Get ASM stats'
+              key: 'oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DGNAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'It gets the ASM disk group statistics.'
+              tags:
+                -
+                  tag: component
+                  value: asm
+                -
+                  tag: component
+                  value: raw
           graph_prototypes:
             -
               uuid: f42e49e6743f4b08b5bdc3ab284b26f3
-              name: 'ASM ''{#DG_NAME}'': ASM disk group ''{#DG_NAME}'''
+              name: 'ASM ''{#DGNAME}'': ASM disk group ''{#DGNAME}'''
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'Oracle by Zabbix agent 2'
-                    key: 'oracle.asm_free_size["{#DG_NAME}"]'
+                    key: 'oracle.asm_free_size["{#DGNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Oracle by Zabbix agent 2'
-                    key: 'oracle.asm_total_size["{#DG_NAME}"]'
+                    key: 'oracle.asm_total_size["{#DGNAME}"]'
         -
           uuid: 479a56fe538f46c094cc4b595d070776
           name: 'PDB discovery'
@@ -2125,6 +2096,21 @@ zabbix_export:
                 formulaid: B
           description: 'Scanning a pluggable database (PDB) in DBMS.'
           item_prototypes:
+            -
+              uuid: ca4452418d2641bd87fa75e946c2bf98
+              name: 'Oracle Database ''{#DBNAME}'': Get PDB info'
+              key: 'oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'It gets the information about the PDB database on an instance.'
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: component
+                  value: raw
             -
               uuid: c52e96105cea45cea1b18201b325ba53
               name: 'Oracle Database ''{#DBNAME}'': Open status'
@@ -2149,7 +2135,7 @@ zabbix_export:
                   parameters:
                     - 15m
               master_item:
-                key: 'oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#DBNAME}"]'
               tags:
                 -
                   tag: component
@@ -2217,7 +2203,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].file_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2243,7 +2229,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].free_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2269,7 +2255,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].max_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2300,7 +2286,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].status.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2353,7 +2339,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_bytes.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2380,7 +2366,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_file_pct.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2432,7 +2418,7 @@ zabbix_export:
                   parameters:
                     - '$..[''{#TABLESPACE}''].used_pct_max.first()'
               master_item:
-                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
               tags:
                 -
                   tag: component
@@ -2468,6 +2454,21 @@ zabbix_export:
                     -
                       tag: scope
                       value: capacity
+            -
+              uuid: 97ac4acedcde465b8d004a8ac476dd99
+              name: 'Oracle TBS ''{#TABLESPACE}'': Get tablespaces stats'
+              key: 'oracle.ts.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}","{#TABLESPACE}","{#CONTENTS}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'It gets the statistics of the tablespace.'
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: tablespaces
           graph_prototypes:
             -
               uuid: 4b20cce21abb453f9aab0dbce75ff060

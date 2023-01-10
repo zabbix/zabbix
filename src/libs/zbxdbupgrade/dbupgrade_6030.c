@@ -1411,6 +1411,68 @@ static int	DBpatch_6030150(void)
 
 	return DBadd_field("interface_snmp", &field);
 }
+
+static int	DBpatch_6030151(void)
+{
+	const ZBX_TABLE table =
+		{"event_symptom", "eventid", 0,
+			{
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030152(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_symptom", 1, &field);
+}
+
+static int	DBpatch_6030153(void)
+{
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("event_symptom", 2, &field);
+}
+
+static int	DBpatch_6030154(void)
+{
+	const ZBX_FIELD field = {"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_6030155(void)
+{
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("problem", 3, &field);
+}
+
+static int	DBpatch_6030156(void)
+{
+	const ZBX_FIELD field = {"pause_symptoms", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_6030157(void)
+{
+	const ZBX_FIELD field = {"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_6030158(void)
+{
+	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1568,5 +1630,13 @@ DBPATCH_ADD(6030147, 0, 1)
 DBPATCH_ADD(6030148, 0, 1)
 DBPATCH_ADD(6030149, 0, 1)
 DBPATCH_ADD(6030150, 0, 1)
+DBPATCH_ADD(6030151, 0, 1)
+DBPATCH_ADD(6030152, 0, 1)
+DBPATCH_ADD(6030153, 0, 1)
+DBPATCH_ADD(6030154, 0, 1)
+DBPATCH_ADD(6030155, 0, 1)
+DBPATCH_ADD(6030156, 0, 1)
+DBPATCH_ADD(6030157, 0, 1)
+DBPATCH_ADD(6030158, 0, 1)
 
 DBPATCH_END()

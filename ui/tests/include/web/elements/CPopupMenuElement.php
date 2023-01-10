@@ -23,6 +23,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * Global popup menu element.
  */
@@ -133,5 +135,13 @@ class CPopupMenuElement extends CElement {
 	 */
 	public function fill($items) {
 		return $this->select($items);
+	}
+
+	/**
+	 * Press Escape key to close context menu.
+	 */
+	public function close() {
+		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
+		(new CElementQuery('xpath://ul['.CXPathHelper::fromClass('menu-popup-top').']'))->waitUntilNotVisible();
 	}
 }

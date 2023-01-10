@@ -28,7 +28,7 @@
 	const view = {
 		init() {
 			$.subscribe("acknowledge.create", function(event, response, overlay) {
-				postMessageOk(response.message);
+				postMessageOk(response.success.title);
 				location.href = location.href;
 			});
 		},

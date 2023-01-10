@@ -1540,7 +1540,7 @@ function getEventUpdates(array $event) {
 /**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid                  Id for event, for which icons are created.
+ * @param string $eventid                  ID for event, for which icons are created.
  * @param array  $actions                  Array of actions data.
  * @param array  $actions['suppressions']  Suppression icon data.
  * @param array  $actions['messages']      Messages icon data.
@@ -1894,16 +1894,23 @@ function makeEventDetailsActionsTable(array $data, array $users, array $mediatyp
 		}
 
 		$message = '';
-		if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
-			$message = [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])];
-		}
-		elseif (($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_COMMAND)
-				|| $action['action_type'] == ZBX_EVENT_HISTORY_MANUAL_UPDATE) {
-			$message = [
-				bold(_('Command').':'),
-				BR(),
-				zbx_nl2br($action['message'])
-			];
+
+		switch ($action['action_type']) {
+			case ZBX_EVENT_HISTORY_ALERT:
+				switch ($action['alerttype']) {
+					case ALERT_TYPE_MESSAGE:
+						$message = [bold($action['subject']), BR(), BR(), zbx_nl2br($action['message'])];
+						break;
+
+					case ALERT_TYPE_COMMAND:
+						$message = [bold(_('Command').':'), BR(), zbx_nl2br($action['message'])];
+						break;
+				}
+				break;
+
+			case ZBX_EVENT_HISTORY_MANUAL_UPDATE:
+				$message = zbx_nl2br($action['message']);
+				break;
 		}
 
 		$table->addRow([
@@ -2031,12 +2038,24 @@ function makeActionTableIcon(array $action) {
 				]);
 			}
 
+			if (($action['action']
+					& ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_CAUSE, 'title' => _('Cause')]);
+			}
+
+			if (($action['action']
+					& ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')]);
+			}
+
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK, 'title' => _('Acknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK, 'title' => _('Unacknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK,
+					'title' => _('Unacknowledged')
+				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {

@@ -215,31 +215,31 @@ static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
 	zbx_free(vect);
 }
 
-void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int accept, unsigned int connect,
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject)
 {
-	zbx_config_tls->connect_mode	= connect;
-	zbx_config_tls->accept_modes	= accept;
+	config_tls->connect_mode	= connect;
+	config_tls->accept_modes	= accept;
 
-	zbx_config_tls->connect		= NULL;
-	zbx_config_tls->accept		= NULL;
-	zbx_config_tls->ca_file		= CAFile;
-	zbx_config_tls->crl_file		= CRLFile;
-	zbx_config_tls->server_cert_issuer	= ServerCertIssuer;
-	zbx_config_tls->server_cert_subject	= ServerCertSubject;
-	zbx_config_tls->cert_file		= CertFile;
-	zbx_config_tls->key_file		= KeyFile;
-	zbx_config_tls->psk_identity		= PSKIdentity;
-	zbx_config_tls->psk_file		= PSKKey;
-	zbx_config_tls->cipher_cert13		= NULL;
-	zbx_config_tls->cipher_cert		= NULL;
-	zbx_config_tls->cipher_psk13		= NULL;
-	zbx_config_tls->cipher_psk		= NULL;
-	zbx_config_tls->cipher_all13		= NULL;
-	zbx_config_tls->cipher_all		= NULL;
-	zbx_config_tls->cipher_cmd13		= NULL;
-	zbx_config_tls->cipher_cmd		= NULL;
+	config_tls->connect		= NULL;
+	config_tls->accept		= NULL;
+	config_tls->ca_file		= CAFile;
+	config_tls->crl_file		= CRLFile;
+	config_tls->server_cert_issuer	= ServerCertIssuer;
+	config_tls->server_cert_subject	= ServerCertSubject;
+	config_tls->cert_file		= CertFile;
+	config_tls->key_file		= KeyFile;
+	config_tls->psk_identity	= PSKIdentity;
+	config_tls->psk_file		= PSKKey;
+	config_tls->cipher_cert13	= NULL;
+	config_tls->cipher_cert		= NULL;
+	config_tls->cipher_psk13	= NULL;
+	config_tls->cipher_psk		= NULL;
+	config_tls->cipher_all13	= NULL;
+	config_tls->cipher_all		= NULL;
+	config_tls->cipher_cmd13	= NULL;
+	config_tls->cipher_cmd		= NULL;
 
 	return;
 }

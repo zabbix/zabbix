@@ -25,8 +25,6 @@
 
 static const char	*program_type_str = NULL;
 
-int	CONFIG_TIMEOUT		= 3;
-
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
 

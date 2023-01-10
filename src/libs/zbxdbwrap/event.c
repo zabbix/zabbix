@@ -278,3 +278,233 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 	zbx_free(filter);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: allocate memory for event                                         *
+ *                                                                            *
+ * Parameters: eventid   - [IN] requested event id                            *
+ *             event     - [OUT]                                              *
+ *                                                                            *
+ * Comments: use 'zbx_db_free_event' function to release allocated memory     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_prepare_empty_event(zbx_uint64_t eventid, ZBX_DB_EVENT **event)
+{
+	ZBX_DB_EVENT	*evt = NULL;
+
+	evt = (ZBX_DB_EVENT*)zbx_malloc(evt, sizeof(ZBX_DB_EVENT));
+	evt->eventid = eventid;
+	evt->name = NULL;
+	zbx_vector_ptr_create(&evt->tags);
+
+	evt->source = EVENT_SOURCE_TRIGGERS;
+	memset(&evt->trigger, 0, sizeof(ZBX_DB_TRIGGER));
+
+	evt->flags = ZBX_FLAGS_DB_EVENT_UNSET;
+
+	*event = evt;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get event data from events table, if it's not obtained already    *
+ *                                                                            *
+ * Parameters: event     - [IN/OUT]                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_get_event_data_core(ZBX_DB_EVENT *event)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE & event->flags))
+		return;
+
+	result = DBselect("select source,object,objectid,clock,value,acknowledged,ns,name,severity"
+			" from events"
+			" where eventid=" ZBX_FS_UI64, event->eventid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		event->source = atoi(row[0]);
+		event->object = atoi(row[1]);
+		ZBX_STR2UINT64(event->objectid, row[2]);
+		event->clock = atoi(row[3]);
+		event->value = atoi(row[4]);
+		event->acknowledged = atoi(row[5]);
+		event->ns = atoi(row[6]);
+		event->name = zbx_strdup(NULL, row[7]);
+		event->severity = atoi(row[8]);
+		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+
+		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_CORE;
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get event tag data from event_tag table, if it's not obtained     *
+ *          already                                                           *
+ *                                                                            *
+ * Parameters: event   - [IN/OUT] event data                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_get_event_data_tags(ZBX_DB_EVENT *event)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS & event->flags) || (EVENT_SOURCE_TRIGGERS != event->source &&
+			EVENT_SOURCE_INTERNAL != event->source && EVENT_SOURCE_SERVICE != event->source))
+	{
+		return;
+	}
+
+	result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, event->eventid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_tag_t	*tag;
+
+		tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+		tag->tag = zbx_strdup(NULL, row[0]);
+		tag->value = zbx_strdup(NULL, row[1]);
+		zbx_vector_ptr_append(&event->tags, tag);
+	}
+	DBfree_result(result);
+
+	if (0 != event->tags.values_num)
+		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_TAGS;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get event trigger data from triggers table, if it's not obtained  *
+ *          already                                                           *
+ *                                                                            *
+ * Parameters: event   - [IN/OUT] event data                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_get_event_data_triggers(ZBX_DB_EVENT *event)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (0 != (ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS & event->flags) || EVENT_OBJECT_TRIGGER != event->object)
+		return;
+
+	result = DBselect("select description,expression,priority,comments,url,url_name,recovery_expression,"
+			"recovery_mode,value,opdata,event_name"
+			" from triggers"
+			" where triggerid=" ZBX_FS_UI64, event->objectid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		event->trigger.triggerid = event->objectid;
+		event->trigger.description = zbx_strdup(NULL, row[0]);
+		event->trigger.expression = zbx_strdup(NULL, row[1]);
+		ZBX_STR2UCHAR(event->trigger.priority, row[2]);
+		event->trigger.comments = zbx_strdup(NULL, row[3]);
+		event->trigger.url = zbx_strdup(NULL, row[4]);
+		event->trigger.url_name = zbx_strdup(NULL, row[5]);
+		event->trigger.recovery_expression = zbx_strdup(NULL, row[6]);
+		ZBX_STR2UCHAR(event->trigger.recovery_mode, row[7]);
+		ZBX_STR2UCHAR(event->trigger.value, row[8]);
+		event->trigger.opdata = zbx_strdup(NULL, row[9]);
+		event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) : NULL);
+		event->trigger.cache = NULL;
+
+		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS;
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: select symptom event IDs                                          *
+ *                                                                            *
+ * Parameters: eventids          - [IN] events to be evaluated                *
+ *             symptom_eventids  - [OUT] array of symptom event IDs           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_select_symptom_eventids(zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *symptom_eventids)
+{
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	s_eventid;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_vector_uint64_sort(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values,
+			eventids->values_num);
+
+	result = DBselect("select eventid from event_symptom where%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(s_eventid, row[0]);
+		zbx_vector_uint64_append(symptom_eventids, s_eventid);
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get cause event id                                                *
+ *                                                                            *
+ * Parameters: eventid   - [IN] event id of the symptom                       *
+ *                                                                            *
+ * Return value: cause event id, or '0' if no cause event id found            *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_get_cause_eventid(zbx_uint64_t eventid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	cause_eventid;
+
+	result = DBselect("select cause_eventid from event_symptom where eventid=" ZBX_FS_UI64, eventid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(cause_eventid, row[0]);
+	else
+		cause_eventid = 0;
+
+	DBfree_result(result);
+
+	return cause_eventid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get id of the object, which generated this event                  *
+ *                                                                            *
+ * Parameters: eventid - [IN]                                                 *
+ *                                                                            *
+ * Return value: object id, or '0' if object no object id found               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	objectid;
+
+	result = DBselect("select objectid from events where eventid=" ZBX_FS_UI64, eventid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(objectid, row[0]);
+	else
+		objectid = 0;
+
+	DBfree_result(result);
+
+	return objectid;
+}

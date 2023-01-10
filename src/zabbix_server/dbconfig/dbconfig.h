@@ -21,9 +21,11 @@
 #define ZABBIX_DBCONFIG_H
 
 #include "zbxthreads.h"
+#include "zbxvault.h"
 
 typedef struct
 {
+	zbx_config_vault_t	*config_vault;
 	int			config_timeout;
 }
 zbx_thread_dbconfig_args;

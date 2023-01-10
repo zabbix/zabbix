@@ -253,6 +253,12 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
+static int	config_timeout = 3;
+static int	get_config_timeout(void)
+{
+	return config_timeout;
+}
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -285,19 +291,12 @@ int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULT			= NULL;
-char	*CONFIG_VAULTURL		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
-char	*CONFIG_VAULTTLSCERTFILE	= NULL;
-char	*CONFIG_VAULTTLSKEYFILE		= NULL;
-char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -338,7 +337,8 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-static zbx_config_tls_t	*zbx_config_tls = NULL;
+static zbx_config_tls_t		*zbx_config_tls = NULL;
+static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -570,8 +570,8 @@ static void	zbx_set_defaults(void)
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
 
-	if (NULL == CONFIG_VAULTURL)
-		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+	if (NULL == zbx_config_vault.url)
+		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
 
 	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
 		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
@@ -659,9 +659,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
-	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path, "cURL library"));
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],
@@ -821,7 +821,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+		{"Timeout",			&config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
 			PARM_OPT,	1,			300},
@@ -859,17 +859,17 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
+		{"VaultToken",			&zbx_config_vault.token,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
+		{"Vault",			&zbx_config_vault.name,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
+		{"VaultTLSCertFile",		&zbx_config_vault.tls_cert_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultTLSKeyFile",		&CONFIG_VAULTTLSKEYFILE,		TYPE_STRING,
+		{"VaultTLSKeyFile",		&zbx_config_vault.tls_key_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
+		{"VaultURL",			&zbx_config_vault.url,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
+		{"VaultDBPath",			&zbx_config_vault.db_path,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1172,6 +1172,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
+	zbx_init_library_sysinfo(get_config_timeout);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1185,7 +1186,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, config_timeout, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1276,17 +1277,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			zbx_config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
-								CONFIG_TIMEOUT};
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
+								config_timeout};
 	zbx_thread_args_t			thread_args;
-	zbx_thread_poller_args			poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_taskmanager_args		taskmanager_args = {&zbx_config_comms, get_program_type};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, CONFIG_TIMEOUT};
-	zbx_thread_trapper_args			trapper_args = {&zbx_config_comms, get_program_type, &listen_sock};
-	zbx_thread_proxy_housekeeper_args	housekeeper_args = {CONFIG_TIMEOUT};
-	zbx_thread_pinger_args			pinger_args = {CONFIG_TIMEOUT};
+	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
+								get_program_type, config_timeout};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, config_timeout};
+	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type};
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, config_timeout};
+	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
+								&listen_sock};
+	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
+	zbx_thread_pinger_args			pinger_args = {config_timeout};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1381,7 +1384,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);
@@ -1431,21 +1434,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&(zbx_config_vault.token), &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init(&error))
+	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
+	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

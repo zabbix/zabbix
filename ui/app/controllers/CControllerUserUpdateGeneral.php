@@ -72,33 +72,30 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	}
 
 	/**
+	 * Validate current password directly from input when updating user.
+	 *
+	 * @return bool
+	 */
+	protected function validateCurrentPassword(): bool {
+		$this->allow_empty_password = !self::hasInternalAuth($this->getUserGroups());
+
+		$current_password = $this->hasInput('current_password') ? $this->getInput('current_password') : null;
+
+		if ($current_password === '' && !$this->allow_empty_password) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Current password'), _('cannot be empty')));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Validate password directly from input when updating user.
 	 *
 	 * @return bool
 	 */
-	protected function validatePassword() {
-		$usrgrps = [];
-
-		if ($this instanceof CControllerUserProfileUpdate) {
-			$usrgrps = API::UserGroup()->get([
-				'output' => ['gui_access'],
-				'userids' => CWebUser::$data['userid'],
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
-			]);
-		}
-		elseif ($this->getInput('user_groups', [])) {
-			$usrgrps = API::UserGroup()->get([
-				'output' => ['gui_access'],
-				'usrgrpids' => $this->getInput('user_groups'),
-				'filter' => [
-					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
-				]
-			]);
-		}
-
-		$this->allow_empty_password = !self::hasInternalAuth($usrgrps);
+	protected function validatePassword(): bool {
+		$this->allow_empty_password = !self::hasInternalAuth($this->getUserGroups());
 
 		$password1 = $this->hasInput('password1') ? $this->getInput('password1') : null;
 		$password2 = $this->hasInput('password2') ? $this->getInput('password2') : null;
@@ -151,5 +148,35 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		}
 
 		return $medias;
+	}
+
+	/**
+	 * Get user groups.
+	 *
+	 * @return array of usergroupids.
+	 */
+	protected function getUserGroups(): array {
+		$usrgrps = [];
+
+		if ($this instanceof CControllerUserProfileUpdate) {
+			$usrgrps = API::UserGroup()->get([
+				'output' => ['gui_access'],
+				'userids' => CWebUser::$data['userid'],
+				'filter' => [
+					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
+				]
+			]);
+		}
+		elseif ($this->getInput('user_groups', [])) {
+			$usrgrps = API::UserGroup()->get([
+				'output' => ['gui_access'],
+				'usrgrpids' => $this->getInput('user_groups'),
+				'filter' => [
+					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
+				]
+			]);
+		}
+
+		return $usrgrps;
 	}
 }

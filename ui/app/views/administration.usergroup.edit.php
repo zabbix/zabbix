@@ -31,6 +31,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -314,7 +315,7 @@ $tabs = (new CTabView())
 	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_TEMPLATE_PERMISSIONS)
 	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_HOST_PERMISSIONS)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER);
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
