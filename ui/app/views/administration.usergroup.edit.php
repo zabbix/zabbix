@@ -28,6 +28,7 @@ $this->includeJsFile('administration.usergroup.edit.js.php');
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);

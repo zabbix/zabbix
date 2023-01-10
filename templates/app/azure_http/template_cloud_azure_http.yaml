@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-12-07T06:34:58Z'
+  date: '2022-12-16T12:03:34Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -20,7 +20,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, and `{$AZURE.SUBSCRIPTION_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -250,6 +250,144 @@ zabbix_export:
               tag: component
               value: raw
       discovery_rules:
+        -
+          uuid: c875a410ddd84ccfbc5b407cd6e34803
+          name: 'Microsoft SQL databases discovery'
+          type: DEPENDENT
+          key: azure.mssql.databases.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.Sql/servers/databases
+                formulaid: H
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#SIZE}'
+                value: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
+          description: 'The list of the Microsoft SQL databases is provided by the subscription.'
+          host_prototypes:
+            -
+              uuid: 2aaf7dc7e9f04ccf9dd91fcd803fa076
+              host: 'Azure Microsoft SQL database {#NAME}'
+              name: 'Azure Microsoft SQL database {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: size
+                  value: '{#SIZE}'
+                -
+                  tag: version
+                  value: '{#VERSION}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#SIZE}'
+              path: $.sku.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#VERSION}'
+              path: $.kind
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          overrides:
+            -
+              name: Server
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#VERSION}'
+                    value: '^((?!serverless).)*$'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure Microsoft SQL database by HTTP'
+            -
+              name: Serverless
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#VERSION}'
+                    value: '^.*serverless$'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure Microsoft SQL serverless database by HTTP'
         -
           uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
@@ -629,11 +767,31 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+        -
+          macro: '{$AZURE.MSSQL.DB.LOCATION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+        -
+          macro: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+        -
+          macro: '{$AZURE.MSSQL.DB.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+        -
+          macro: '{$AZURE.MSSQL.DB.SIZE.NOT_MATCHES}'
+          value: ^System$
+          description: 'This macro is used in Microsoft SQL databases discovery rule.'
         -
           macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
@@ -701,6 +859,1976 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
     -
+      uuid: 2d8b9329b5d04cdf85bf17d2d0db2b29
+      template: 'Azure Microsoft SQL database by HTTP'
+      name: 'Azure Microsoft SQL database by HTTP'
+      description: |
+        This template is designed to monitor Microsoft SQL databases by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 2ff1f479e0b447f2b85e75e99bc011fe
+          name: 'Azure Microsoft SQL: Availability status detailed'
+          type: DEPENDENT
+          key: azure.db.mssql.availability.details
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The summary description of the availability status.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.summary
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: f15e8075ac9a4f1ca6e95106940b246e
+          name: 'Azure Microsoft SQL: Availability state'
+          type: DEPENDENT
+          key: azure.db.mssql.availability.state
+          delay: '0'
+          history: 7d
+          description: 'The availability status of the resource.'
+          valuemap:
+            name: 'Azure resource health state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.availabilityState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Available
+                - '0'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Degraded
+                - '1'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unavailable
+                - '2'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unknown
+                - '3'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '3'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 5156f35b82084fd3b1d1a11c35757993
+              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=1'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in degraded state.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 0cf3cce995c241838e13df12d5908b61
+              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=3'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is unknown.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 2130dc83dee94fdfad87894127c6a578
+              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.availability.state)=2'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource state is unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: ce744d69ed12435db781fbc6100d97ab
+          name: 'Azure Microsoft SQL: Connections failed: System errors'
+          type: DEPENDENT
+          key: azure.db.mssql.connections.failed.system
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of failed connections with system errors.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.connection_failed.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 8ec27240f59947858c41762a266cab25
+          name: 'Azure Microsoft SQL: Connections successful'
+          type: DEPENDENT
+          key: azure.db.mssql.connections.successful
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of successful connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.connection_successful.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 04737f2746444d2fb348a9444964dc7a
+          name: 'Azure Microsoft SQL: CPU limit'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.limit
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The CPU limit. Applies to vCore-based databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_limit.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: e55a199cc0bd4749a69478da8268785d
+          name: 'Azure Microsoft SQL: Percentage CPU'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The CPU percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 506c034e707442519792a4366bc0879d
+              expression: 'min(/Azure Microsoft SQL database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure Microsoft SQL: High CPU utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 9a4a948f41e4434e9a94b3d9546df896
+          name: 'Azure Microsoft SQL: CPU used'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'CPU used. Applies to vCore-based databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_used.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: e8aa1b70a7384ffead05cd2e95a6f10a
+          name: 'Azure Microsoft SQL: Get errors'
+          type: DEPENDENT
+          key: azure.db.mssql.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 62d08fe430bd45e890c81547860d5c3d
+              expression: 'length(last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.data.errors))>0'
+              name: 'Azure Microsoft SQL: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 741cc1ec6a824e429f06b3d12a8a7082
+          name: 'Azure Microsoft SQL: Get data'
+          type: SCRIPT
+          key: azure.db.mssql.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureDB = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureDB.params = params;
+                },
+            
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                        if (AzureDB.token) {
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                        }
+                
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+            }
+            
+            };
+            
+            var metrics = [
+                'cpu_percent',
+                'physical_data_read_percent',
+                'log_write_percent',
+                'storage',
+                'connection_successful',
+                'connection_failed',
+                'blocked_by_firewall',
+                'deadlock',
+                'storage_percent',
+                'xtp_storage_percent',
+                'workers_percent',
+                'sessions_percent',
+                'sessions_count',
+                'cpu_limit',
+                'cpu_used',
+                'sqlserver_process_core_percent',
+                'sqlserver_process_memory_percent',
+                'tempdb_data_size',
+                'tempdb_log_size',
+                'tempdb_log_used_percent',
+                'allocated_data_storage'
+            ],
+                day_metrics = 'full_backup_size_bytes,diff_backup_size_bytes,log_backup_size_bytes',
+                prepared_metrics = [],
+                data = {};
+                data['errors'] = {};
+                data['metrics'] = {};
+            
+            try {
+                AzureDB.setParams(JSON.parse(value));
+            
+                try {
+                    result = AzureDB.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        AzureDB.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
+                    }
+                    catch (error) {
+                        data.errors.health = error.toString();
+                    }
+            
+                    for (var i = 0; i < metrics.length; i += 20) {
+                        var chunk = metrics.slice(i, i + 20);
+            
+                        prepared_metrics.push(
+                            chunk.map(function(element) {
+                                return encodeURIComponent(element);
+                            }).join(',')
+                        );
+                    }
+            
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    
+                    for (var j in prepared_metrics) {
+                        try {
+                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
+                            }
+                        }
+                        catch (error) {
+                            data.errors[prepared_metrics[j]] = error.toString();
+                        }
+                    }
+                    start_date = new Date((new Date().getTime()) - 86400000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    try {
+                        metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + day_metrics + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                        if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                            for (l in metrics_data.value) {
+                                if ('name' in metrics_data.value[l] && typeof metrics_data.value[l].name === 'object' && 'value' in metrics_data.value[l].name && typeof metrics_data.value[l].name.value === 'string' && 'timeseries' in metrics_data.value[l] && Array.isArray(metrics_data.value[l].timeseries) && metrics_data.value[l].timeseries.length > 0 && 'data' in metrics_data.value[l].timeseries[0] && Array.isArray(metrics_data.value[l].timeseries[0].data) && metrics_data.value[l].timeseries[0].data.length > 0) {
+                                    data.metrics[metrics_data.value[l].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[l].timeseries[0].data[metrics_data.value[l].timeseries[0].data.length - 1];
+                                }
+                            }
+                        }
+                    }
+                    catch (error) {
+                        data.errors[day_metrics] = error.toString();
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 75d9288a8240425782cce8701c1bdfa8
+          name: 'Azure Microsoft SQL: Data IO percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.data.read.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The physical data read percentage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.physical_data_read_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: 81f87d35131c426299b233279f8f6c4b
+          name: 'Azure Microsoft SQL: Deadlocks'
+          type: DEPENDENT
+          key: azure.db.mssql.deadlocks
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of deadlocks. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.deadlock.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 4d78e4691b6f4ab095849e6af2713638
+          name: 'Azure Microsoft SQL: Connections blocked by firewall'
+          type: DEPENDENT
+          key: azure.db.mssql.firewall.blocked
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of connections blocked by firewall.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.blocked_by_firewall.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 324c16e5da5b40c78d687f1f41a9d180
+          name: 'Azure Microsoft SQL: Log IO percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.log.write.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Log IO percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.log_write_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: f417464b2de14e3292d68442570b931d
+          name: 'Azure Microsoft SQL: SQL Server process core percent'
+          type: DEPENDENT
+          key: azure.db.mssql.server.cpu.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'CPU usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sqlserver_process_core_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+            -
+              tag: component
+              value: server
+        -
+          uuid: b39aa0798a824dafb3f3871b6406106a
+          name: 'Azure Microsoft SQL: SQL Server process memory percent'
+          type: DEPENDENT
+          key: azure.db.mssql.server.memory.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sqlserver_process_memory_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: server
+        -
+          uuid: 754b453cdf464f73b09eced3dd3e5859
+          name: 'Azure Microsoft SQL: Sessions count'
+          type: DEPENDENT
+          key: azure.db.mssql.sessions.count
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of active sessions. Not applicable to Synapse DW Analytics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sessions_count.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: sessions
+        -
+          uuid: b6696ac3d83841e2a001cdad1aeaea89
+          name: 'Azure Microsoft SQL: Sessions percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.sessions.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Sessions percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sessions_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: sessions
+        -
+          uuid: fddff3dcbcf44c408314946f01f26a79
+          name: 'Azure Microsoft SQL: Data space allocated'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.allocated
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Allocated data storage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.allocated_data_storage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3d492b552468462ba17524a9c6951dd7
+          name: 'Azure Microsoft SQL: Differential backup storage size'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.backup.diff.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Cumulative differential backup storage size. Applies to vCore-based databases. Not applicable to Hyperscale databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.diff_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: e8cd0339a82248e3ad777374f219552e
+          name: 'Azure Microsoft SQL: Log backup storage size'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.backup.log.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Cumulative log backup storage size. Applies to vCore-based and Hyperscale databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.log_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: c92867a096ad4d89b31a2dba7e560df1
+          name: 'Azure Microsoft SQL: Full backup storage size'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.backup.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Cumulative full backup storage size. Applies to vCore-based databases. Not applicable to Hyperscale databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.full_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6eb5dc0a0b864c0bb35634612472ed38
+          name: 'Azure Microsoft SQL: Data space used percent'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Data space used percent. Not applicable to data warehouses or hyperscale databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+          triggers:
+            -
+              uuid: a2d6cf9ac67d4d0eb312e9536299b345
+              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure Microsoft SQL: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 6dbf1d3aeb8b44b8bd96a9ca75f5249e
+              expression: 'last(/Azure Microsoft SQL database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure Microsoft SQL: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: a0335bde6f3546cdad5bbd2db8fa50b1
+          name: 'Azure Microsoft SQL: Data space used'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Data space used. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6ff07a9a680749bfa3deabbec508b7c3
+          name: 'Azure Microsoft SQL: In-Memory OLTP storage percent'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.xtp.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'In-Memory OLTP storage percent. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.xtp_storage_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 76da2f210c084546a19ce156e0aee1d6
+          name: 'Azure Microsoft SQL: Tempdb data file size'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.data.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Space used in tempdb data files in bytes. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_data_size.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: dd2986cc6ce441fe9b3ab9b44b5fc103
+          name: 'Azure Microsoft SQL: Tempdb log used percent'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.log.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Space used percentage in tempdb transaction log file. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_log_used_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 51212e2af3854079950064bd9d16da83
+          name: 'Azure Microsoft SQL: Tempdb log file size'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.log.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Space used in tempdb transaction log file in bytes. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_log_size.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b5d63b2cbcb1470d8559a90cb3df0002
+          name: 'Azure Microsoft SQL: Workers percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.workers.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Workers percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.workers_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: workers
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+        -
+          tag: target
+          value: mssql
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'The AppID of Microsoft Azure.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization expressed in %.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure Microsoft SQL database ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+      valuemaps:
+        -
+          uuid: 6f9c01899d9e45c9a1316ee081718e9e
+          name: 'Azure resource health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Available
+            -
+              value: '1'
+              newvalue: Degraded
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Unknown
+    -
+      uuid: 5175afdf713744d9a81ce53864ccfc1d
+      template: 'Azure Microsoft SQL serverless database by HTTP'
+      name: 'Azure Microsoft SQL serverless database by HTTP'
+      description: |
+        This template is designed to monitor Microsoft SQL serverless databases by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 7c11fcc4f4b349f8b98fac93ae5e32be
+          name: 'Azure Microsoft SQL: App CPU billed'
+          type: DEPENDENT
+          key: azure.db.mssql.app.cpu.billed
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'App CPU billed. Applies to serverless databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.app_cpu_billed.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 6e67a868b2d84838803d3cb464ae9648
+          name: 'Azure Microsoft SQL: App CPU percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.app.cpu.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'App CPU percentage. Applies to serverless databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.app_cpu_percent.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: a38a887341914e75a01c7527c40b678f
+          name: 'Azure Microsoft SQL: App memory percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.app.memory.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'App memory percentage. Applies to serverless databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.app_memory_percent.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: c2d3bc4ff95b4e05898dccee3d73a349
+          name: 'Azure Microsoft SQL: Availability status detailed'
+          type: DEPENDENT
+          key: azure.db.mssql.availability.details
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The summary description of the availability status.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.summary
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 9a3f2e99a768492c859c8f368c6a5cd3
+          name: 'Azure Microsoft SQL: Availability state'
+          type: DEPENDENT
+          key: azure.db.mssql.availability.state
+          delay: '0'
+          history: 7d
+          description: 'The availability status of the resource.'
+          valuemap:
+            name: 'Azure resource health state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.availabilityState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Available
+                - '0'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Degraded
+                - '1'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unavailable
+                - '2'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unknown
+                - '3'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '3'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 37c52a28908a45378266f68acdf5c308
+              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=1'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in degraded state.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 20bd79f05f3241a9950a83dcd9e325ba
+              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=3'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is unknown.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 124813388e9844e8aae5ce474a66a774
+              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.availability.state)=2'
+              name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource state is unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 2457708a49d141faa16bd7b4ceb2c0a4
+          name: 'Azure Microsoft SQL: Connections failed: System errors'
+          type: DEPENDENT
+          key: azure.db.mssql.connections.failed.system
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of failed connections with system errors.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.connection_failed.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 59e028a7323d4222a4efd727314327c1
+          name: 'Azure Microsoft SQL: Connections successful'
+          type: DEPENDENT
+          key: azure.db.mssql.connections.successful
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of successful connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.connection_successful.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 0dc1cf6302574c1fbb51583e03409713
+          name: 'Azure Microsoft SQL: CPU limit'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.limit
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The CPU limit. Applies to vCore-based databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_limit.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 53be31ecfd48472c8edfe223107c0b07
+          name: 'Azure Microsoft SQL: Percentage CPU'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The CPU percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 933a04a1455b4a89b1527f9ce7848259
+              expression: 'min(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure Microsoft SQL: High CPU utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: ec0fc85904e149939836c2818a6ca66a
+          name: 'Azure Microsoft SQL: CPU used'
+          type: DEPENDENT
+          key: azure.db.mssql.cpu.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'CPU used. Applies to vCore-based databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_used.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: d933dbacb2b94e40a757e15f13d51d2d
+          name: 'Azure Microsoft SQL: Get errors'
+          type: DEPENDENT
+          key: azure.db.mssql.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: f56b125a8eff49d2aa002609c7df8b34
+              expression: 'length(last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.data.errors))>0'
+              name: 'Azure Microsoft SQL: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: e1c668773b974deeaf64c0d51d1cb02d
+          name: 'Azure Microsoft SQL: Get data'
+          type: SCRIPT
+          key: azure.db.mssql.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureDB = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureDB.params = params;
+                },
+            
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                        if (AzureDB.token) {
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                        }
+                
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+            }
+            
+            };
+            
+            var metrics = [
+                'cpu_percent',
+                'physical_data_read_percent',
+                'log_write_percent',
+                'storage',
+                'connection_successful',
+                'connection_failed',
+                'blocked_by_firewall',
+                'deadlock',
+                'storage_percent',
+                'xtp_storage_percent',
+                'workers_percent',
+                'sessions_percent',
+                'cpu_limit',
+                'cpu_used',
+                'sqlserver_process_core_percent',
+                'sqlserver_process_memory_percent',
+                'tempdb_data_size',
+                'tempdb_log_size',
+                'tempdb_log_used_percent',
+                'app_cpu_billed',
+                'app_cpu_percent',
+                'app_memory_percent',
+                'allocated_data_storage'
+            ],
+                prepared_metrics = [],
+                data = {};
+                data['errors'] = {};
+                data['metrics'] = {};
+            
+            try {
+                AzureDB.setParams(JSON.parse(value));
+            
+                try {
+                    result = AzureDB.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        AzureDB.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                        if ('value' in health && Array.isArray(health.value) && health.value.length > 0 && 'properties' in health.value[0] && typeof health.value[0].properties === 'object') {
+                            data.health = health.value[0].properties;
+                        }
+                    }
+                    catch (error) {
+                        data.errors.health = error.toString();
+                    }
+            
+                    for (var i = 0; i < metrics.length; i += 20) {
+                        var chunk = metrics.slice(i, i + 20);
+            
+                        prepared_metrics.push(
+                            chunk.map(function(element) {
+                                return encodeURIComponent(element);
+                            }).join(',')
+                        );
+                    }
+            
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    
+                    for (var j in prepared_metrics) {
+                        try {
+                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                            if ('value' in metrics_data && Array.isArray(metrics_data.value) && metrics_data.value.length > 0) {
+                                for (k in metrics_data.value) {
+                                    if ('name' in metrics_data.value[k] && typeof metrics_data.value[k].name === 'object' && 'value' in metrics_data.value[k].name && typeof metrics_data.value[k].name.value === 'string' && 'timeseries' in metrics_data.value[k] && Array.isArray(metrics_data.value[k].timeseries) && metrics_data.value[k].timeseries.length > 0 && 'data' in metrics_data.value[k].timeseries[0] && Array.isArray(metrics_data.value[k].timeseries[0].data) && metrics_data.value[k].timeseries[0].data.length > 0) {
+                                        data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                                    }
+                                }
+                            }
+                        }
+                        catch (error) {
+                            data.errors[prepared_metrics[j]] = error.toString();
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The result of API requests is expressed in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 40b15dd3d7a943d99f1bbe7fb34a9f48
+          name: 'Azure Microsoft SQL: Data IO percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.data.read.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The physical data read percentage.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.physical_data_read_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: 25b97b67d87945b48ae5c44b1db20187
+          name: 'Azure Microsoft SQL: Deadlocks'
+          type: DEPENDENT
+          key: azure.db.mssql.deadlocks
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of deadlocks. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.deadlock.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: de91693b0a3345b4ad2c9aafd2af5325
+          name: 'Azure Microsoft SQL: Connections blocked by firewall'
+          type: DEPENDENT
+          key: azure.db.mssql.firewall.blocked
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of connections blocked by firewall.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.blocked_by_firewall.total
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: b41292705c284a77847856c2818d7145
+          name: 'Azure Microsoft SQL: Log IO percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.log.write.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Log IO percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.log_write_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: 7b772170199f41d4ab614dee66176630
+          name: 'Azure Microsoft SQL: SQL Server process core percent'
+          type: DEPENDENT
+          key: azure.db.mssql.server.cpu.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'CPU usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sqlserver_process_core_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+            -
+              tag: component
+              value: server
+        -
+          uuid: 5c0a5b745c094475b1e7a0d4f17a5627
+          name: 'Azure Microsoft SQL: SQL Server process memory percent'
+          type: DEPENDENT
+          key: azure.db.mssql.server.memory.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sqlserver_process_memory_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: server
+        -
+          uuid: 924d96d212764c3ab18e5c14daa58840
+          name: 'Azure Microsoft SQL: Sessions percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.sessions.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Sessions percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.sessions_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: sessions
+        -
+          uuid: a87fd8ac96944e57ac58b39a18f6ad41
+          name: 'Azure Microsoft SQL: Data space allocated'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.allocated
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Allocated data storage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.allocated_data_storage.average
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 2f95fd2dd48c4664afc5cd62d02b0b0a
+          name: 'Azure Microsoft SQL: Data space used percent'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Data space used percent. Not applicable to data warehouses or hyperscale databases.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+          triggers:
+            -
+              uuid: 4638130e599243fba3206abc85a7447f
+              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure Microsoft SQL: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 4732eab4aabf439fa0b2d80b63e821e5
+              expression: 'last(/Azure Microsoft SQL serverless database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure Microsoft SQL: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: 3b1fb8f993e74795b38abd56eceace0a
+          name: 'Azure Microsoft SQL: Data space used'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Data space used. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: fbd572ca3d3f42eea794ce78a5a27ec1
+          name: 'Azure Microsoft SQL: In-Memory OLTP storage percent'
+          type: DEPENDENT
+          key: azure.db.mssql.storage.xtp.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'In-Memory OLTP storage percent. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.xtp_storage_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cea8a8ea0eaa4d26a28721882c19d9cd
+          name: 'Azure Microsoft SQL: Tempdb data file size'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.data.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Space used in tempdb data files in bytes. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_data_size.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 6c8196751a504b82920b7ffa5314a2fc
+          name: 'Azure Microsoft SQL: Tempdb log used percent'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.log.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Space used percentage in tempdb transaction log file. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_log_used_percent.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: b83992d1001c41b6ad3d13dbb227a733
+          name: 'Azure Microsoft SQL: Tempdb log file size'
+          type: DEPENDENT
+          key: azure.db.mssql.tempdb.log.size
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Space used in tempdb transaction log file in bytes. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.tempdb_log_size.maximum
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: a4f597ab784a4e31aedc82bfb34feeb7
+          name: 'Azure Microsoft SQL: Workers percentage'
+          type: DEPENDENT
+          key: azure.db.mssql.workers.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Workers percentage. Not applicable to data warehouses.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.workers_percent.average
+          master_item:
+            key: azure.db.mssql.data.get
+          tags:
+            -
+              tag: component
+              value: workers
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+        -
+          tag: target
+          value: mssql
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'The AppID of Microsoft Azure.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for an API.'
+        -
+          macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization expressed in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization expressed in %.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure Microsoft SQL database ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+      valuemaps:
+        -
+          uuid: c87b2eaeb88c4932ad63c73fcafa5331
+          name: 'Azure resource health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Available
+            -
+              value: '1'
+              newvalue: Degraded
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Unknown
+    -
       uuid: ec92c7b0b1d14946b6ac61de89357199
       template: 'Azure MySQL flexible server by HTTP'
       name: 'Azure MySQL flexible server by HTTP'
@@ -713,7 +2841,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -1455,11 +3583,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
           value: '25'
@@ -1519,7 +3647,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -2256,11 +4384,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -2324,7 +4452,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -3189,11 +5317,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -3253,7 +5381,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -4001,11 +6129,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -4065,7 +6193,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
+          3. Configure macros `{$AZURE.APP_ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT_ID}`, `{$AZURE.SUBSCRIPTION_ID}`, and `{$AZURE.RESOURCE_ID}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -5507,11 +7635,11 @@ zabbix_export:
       macros:
         -
           macro: '{$AZURE.APP_ID}'
-          description: 'Microsoft Azure app ID.'
+          description: 'The AppID of Microsoft Azure.'
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'A response timeout for API.'
+          description: 'A response timeout for an API.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -5709,6 +7837,108 @@ zabbix_export:
           item:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
+    -
+      uuid: 3b278de1b81a4be7acc865568962c323
+      name: 'Azure Microsoft SQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.connections.successful
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.connections.failed.system
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.firewall.blocked
+    -
+      uuid: 62a9a5e1fb044a52a0b534bd4eeea914
+      name: 'Azure Microsoft SQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.connections.successful
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.connections.failed.system
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.firewall.blocked
+    -
+      uuid: fe250a5f509d45babea9fcd12accbcac
+      name: 'Azure Microsoft SQL: CPU usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.cpu.limit
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.cpu.used
+    -
+      uuid: 083d307db8954fc59e8e5cfccefc16c1
+      name: 'Azure Microsoft SQL: CPU usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.cpu.limit
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.cpu.used
+    -
+      uuid: ec5714017c744484be8c264d24a0e694
+      name: 'Azure Microsoft SQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL database by HTTP'
+            key: azure.db.mssql.storage.allocated
+    -
+      uuid: f541b6591683433aba4b3e58a8ad1e5c
+      name: 'Azure Microsoft SQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure Microsoft SQL serverless database by HTTP'
+            key: azure.db.mssql.storage.allocated
     -
       uuid: 750ae48e6ef749c19a06f4bbe716f92f
       name: 'Azure MySQL: Connections'
