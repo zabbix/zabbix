@@ -31,6 +31,7 @@ $triggersWidget = (new CWidget())
 
 // create form
 $triggersForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('triggersForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
@@ -507,7 +508,7 @@ $triggersFormList
 	);
 
 // append status to form list
-if (empty($data['triggerid']) && empty($data['form_refresh'])) {
+if (empty($data['triggerid']) && $data['form_refresh'] == 0) {
 	$status = true;
 }
 else {
@@ -530,7 +531,7 @@ $triggersFormList
 
 // append tabs to form
 $triggersTab = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);

@@ -113,6 +113,7 @@ if ($data['has_dynamic_widgets']) {
 
 $widget->setControls((new CList([
 	(new CForm('get'))
+		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->setName('slideHeaderForm')
 		->addItem($controls),
