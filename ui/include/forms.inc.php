@@ -726,7 +726,7 @@ function prepareScriptItemFormData(array $item): array {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => $options['form'],
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),

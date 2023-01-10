@@ -38,6 +38,7 @@ $url = (new CUrl('httpconf.php'))
 
 // create form
 $http_form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('http-form')
 	->setName('httpForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -248,7 +249,7 @@ $http_tab = (new CTabView())
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('authenticationTab', _('Authentication'), $http_authentication_form_list, TAB_INDICATOR_HTTP_AUTH);
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$http_tab->setSelected(0);
 }
 

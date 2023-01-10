@@ -156,6 +156,7 @@ $obj = [
 $widget
 	->addItem(
 		(new CForm('get'))
+			->cleanItems()
 			->setName('auditForm')
 			->addItem([$table, $data['paging']])
 	)

@@ -34,6 +34,7 @@ $widget = (new CWidget())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
 	->setAction(

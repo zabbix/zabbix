@@ -31,6 +31,7 @@ $widget = (new CWidget())
 
 // Create form.
 $discoveryForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
