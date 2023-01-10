@@ -696,7 +696,7 @@ class CWidgetNavTree extends CWidget {
 
 		// Set [data-depth] for list and each sublist.
 		jQuery('.tree-list', jQuery(this._target)).each(function() {
-			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length);
+			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length-1);
 		});
 
 		// Change arrow style.
@@ -721,7 +721,7 @@ class CWidgetNavTree extends CWidget {
 
 			if (tools_buttons.length > 0) {
 				for (const button of tools_buttons) {
-					button.disabled = tree_element.dataset.depth >= this._max_depth;
+					button.disabled = tree_element.dataset.depth >= this._max_depth-1;
 				}
 			}
 		}
