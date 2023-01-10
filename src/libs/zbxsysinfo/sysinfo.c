@@ -32,7 +32,6 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
-#include "zbxfile.h"
 
 extern int	CONFIG_TIMEOUT;
 

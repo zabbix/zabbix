@@ -18,13 +18,11 @@
 **/
 
 #include "vfs_file.h"
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
 #include "dir.h"
