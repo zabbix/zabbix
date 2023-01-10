@@ -25,6 +25,7 @@
 #include "zbxcomms.h"
 #include "zbxexec.h"
 #include "zbxstr.h"
+#include "zbxip.h"
 #include "zbxthreads.h"
 #include "zbxfile.h"
 
