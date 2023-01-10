@@ -388,7 +388,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty SMTP server',
 						'SMTP server' => ''
 					],
-					'error' => 'Field "smtp_server" is missing a value for media type "Empty SMTP server"'
+					'error' => 'Invalid parameter "/1/smtp_server": cannot be empty.'
 				]
 			],
 			// Empty space in SMTP server.
@@ -399,7 +399,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty space in SMTP server',
 						'SMTP server' => '   '
 					],
-					'error' => 'Field "smtp_server" is missing a value for media type "Empty space in SMTP server"'
+					'error' => 'Invalid parameter "/1/smtp_server": cannot be empty.'
 				]
 			],
 			// Too high SMTP server port.
@@ -410,7 +410,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Too high SMTP server port',
 						'SMTP server port' => '99999'
 					],
-					'error' => 'Incorrect value "99999" in field "smtp_port" for media type "Too high SMTP server port"'
+					'error' => 'Invalid parameter "/1/smtp_port": value must be one of 0-65535.'
 				]
 			],
 			// Empty SMTP helo.
@@ -421,7 +421,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty SMTP helo',
 						'SMTP helo' => ''
 					],
-					'error' => 'Field "smtp_helo" is missing a value for media type "Empty SMTP helo"'
+					'error' => 'Invalid parameter "/1/smtp_helo": cannot be empty.'
 				]
 			],
 			// Empty space in SMTP helo.
@@ -432,7 +432,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty space in SMTP helo',
 						'SMTP helo' => '   '
 					],
-					'error' => 'Field "smtp_helo" is missing a value for media type "Empty space in SMTP helo"'
+					'error' => 'Invalid parameter "/1/smtp_helo": cannot be empty.'
 				]
 			],
 			// Empty SMTP email.
@@ -443,7 +443,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty SMTP email',
 						'SMTP email' => ''
 					],
-					'error' => 'Field "smtp_email" is missing a value for media type "Empty SMTP email"'
+					'error' => 'Invalid parameter "/1/smtp_email": cannot be empty.'
 				]
 			],
 			// Empty space in SMTP email.
@@ -454,7 +454,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Empty space in SMTP email',
 						'SMTP email' => '   '
 					],
-					'error' => 'Field "smtp_email" is missing a value for media type "Empty space in SMTP email"'
+					'error' => 'Invalid parameter "/1/smtp_email": cannot be empty.'
 				]
 			],
 			// Empty GSM modem.
@@ -466,7 +466,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Type' => 'SMS',
 						'GSM modem' => ''
 					],
-					'error' => 'Field "gsm_modem" is missing a value for media type "Empty GSM modem"'
+					'error' => 'Invalid parameter "/1/gsm_modem": cannot be empty.'
 				]
 			],
 			// Empty space in GSM modem.
@@ -478,7 +478,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Type' => 'SMS',
 						'GSM modem' => '   '
 					],
-					'error' => 'Field "gsm_modem" is missing a value for media type "Empty space in GSM modem"'
+					'error' => 'Invalid parameter "/1/gsm_modem": cannot be empty.'
 				]
 			],
 			// Empty Script name.
@@ -490,7 +490,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Type' => 'Script',
 						'Script name' => ''
 					],
-					'error' => 'Field "exec_path" is missing a value for media type "Empty Script name"'
+					'error' => 'Invalid parameter "/1/exec_path": cannot be empty.'
 				]
 			],
 			// Empty space in Script name.
@@ -502,7 +502,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Type' => 'Script',
 						'Script name' => '   '
 					],
-					'error' => 'Field "exec_path" is missing a value for media type "Empty space in Script name"'
+					'error' => 'Invalid parameter "/1/exec_path": cannot be empty.'
 				]
 			],
 			// Options validation - Attempts.
@@ -515,7 +515,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempts' => 0
 					],
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
 			[
@@ -527,7 +527,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempts' => ''
 					],
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
 			[
@@ -539,7 +539,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempts' => 101
 					],
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
 			[
@@ -551,7 +551,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempts' => 'æų'
 					],
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
 			[
@@ -563,7 +563,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempts' => '☺'
 					],
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
+					'error' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
 				]
 			],
 			// Options validation - Attempt interval.
@@ -576,7 +576,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '3601s'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -588,7 +588,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '3601'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -600,7 +600,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '61m'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -612,7 +612,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '2h'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -624,7 +624,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '1msms'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
 				]
 			],
 			[
@@ -636,7 +636,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '☺'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
 				]
 			],
 			[
@@ -648,7 +648,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '-1s'
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -660,7 +660,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => -1
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'IInvalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
@@ -672,7 +672,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => '   10s   '
 					],
-					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+					'error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
 				]
 			],
 			// Options validation - Concurrent sessions.
@@ -686,7 +686,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'id:maxsessions_type' => 'Custom',
 						'id:maxsessions' => 101
 					],
-					'error' => 'Incorrect value for field "maxsessions": must be between "0" and "100".'
+					'error' => 'Invalid parameter "/1/maxsessions": value must be one of 0-100.'
 				]
 			],
 			// Successful mediatype creation/update.
