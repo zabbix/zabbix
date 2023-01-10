@@ -90,12 +90,6 @@ class CActionButtonList extends CObject {
 				}
 
 				if (array_key_exists('redirect', $button_data)) {
-					if (!array_key_exists('action', $button_data)) {
-						$action = $button_data['redirect'];
-					}
-
-					parse_str(parse_url($action, PHP_URL_QUERY), $token_action);
-
 					$button
 						// Removing parameters not to conflict with the redirecting URL.
 						->removeAttribute('name')
@@ -104,7 +98,7 @@ class CActionButtonList extends CObject {
 						->onClick('var $_form = jQuery(this).closest("form");'.
 							// Save the original form action.
 							'if (!$_form.data("action")) {'.
-							'$_form.data("action", $_form.attr("action"));'.
+								'$_form.data("action", $_form.attr("action"));'.
 							'}'.
 							'$_form.attr("action", this.dataset.redirect);'
 						);
@@ -115,7 +109,7 @@ class CActionButtonList extends CObject {
 						->onClick('var $_form = jQuery(this).closest("form");'.
 							// Restore the original form action, if previously saved.
 							'if ($_form.data("action")) {'.
-							'$_form.attr("action", $_form.data("action"));'.
+								'$_form.attr("action", $_form.data("action"));'.
 							'}'
 						);
 				}
