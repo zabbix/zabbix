@@ -1755,7 +1755,7 @@ static void	correct_entity_name(char **name, int uniq, int max_len, int *long_na
 	int	tmp, len, uniq_len = 0;
 
 	tmp = uniq;
-	len = strlen(*name);
+	len = zbx_strlen_utf8(*name);
 
 	do
 	{
@@ -1767,7 +1767,7 @@ static void	correct_entity_name(char **name, int uniq, int max_len, int *long_na
 	{
 		char	*ptr = *name;
 
-		ptr[len - MAX_LONG_NAME_COLLISIONS_LEN - 1] = '\0';
+		ptr[zbx_strlen_utf8_nchars(ptr, len - MAX_LONG_NAME_COLLISIONS_LEN - 1)] = '\0';
 		*name = zbx_dsprintf(*name, "%s %d", *name, (*long_name_collisions)--);
 
 		if (0 == *long_name_collisions)
