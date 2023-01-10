@@ -951,6 +951,14 @@ msgstr "Добавление дочерних услуг"
 msgid "Add from"
 msgstr "Добавить с"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr ""
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr ""
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Добавить узел сети"
@@ -1253,6 +1261,10 @@ msgstr "Разрешенные хосты"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "Разрешенные методы"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -3774,6 +3786,10 @@ msgstr[0] "Не удалось обновить событие"
 msgstr[1] "Не удалось обновить события"
 msgstr[2] "Не удалось обновить события"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Не удалось обновить график"
@@ -4018,6 +4034,11 @@ msgstr "Отлов всех SNMP трапов, которые совпадают
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[]."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4074,6 +4095,10 @@ msgstr "Изменить пароль"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Изменение в секунду"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4650,6 +4675,10 @@ msgstr "Настройка подключения к БД"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Текст подтверждения"
@@ -4885,6 +4914,14 @@ msgstr "Номер контракта"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "Конвертация в JSON"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -5246,6 +5283,15 @@ msgstr ""
 msgid "Current host"
 msgstr "Текущий узел сети"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr "Текущий пользователь"
@@ -5482,6 +5528,10 @@ msgstr "Обзор данных"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "Набор данных"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5908,6 +5958,10 @@ msgstr "Удалить выбранный SLA?"
 msgid "Delete selected SLAs?"
 msgstr "Удалить выбранные SLA?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Удалить выбранные действия?"
@@ -6211,6 +6265,10 @@ msgstr ""
 msgid "Description"
 msgstr "Описание"
 
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
+
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
 #: app/views/js/reports.auditlog.list.js.php:153
@@ -6330,6 +6388,10 @@ msgstr "Деактивировать выбранный SLA?"
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
 msgstr "Деактивировать выбранные SLA?"
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
@@ -7038,6 +7100,10 @@ msgstr "Активировать"
 msgid "Enable HTTP authentication"
 msgstr "Активация HTTP аутентификации"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
@@ -7125,6 +7191,10 @@ msgstr "Активировать выбранный SLA?"
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
 msgstr "Активировать выбранные SLA?"
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -7791,6 +7861,11 @@ msgstr "В поле \"%1$s\" пропущено значение у карты �
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Поле \"%1$s\" не корректно: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7805,6 +7880,13 @@ msgstr "Поле \"%1$s\" не строка."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Поле \"%1$s\" должно быть пропущено."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9367,6 +9449,10 @@ msgstr "Одинаковые пространства имён (%1$s) испол
 msgid "Identification of the system. Returns string"
 msgstr "Идентификация системы. Возвращает строку"
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9516,6 +9602,11 @@ msgstr "Импортировано успешно"
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "Невозможно отфильтровать по полю инвентарных данных \"%1$s\", которого не существует."
+
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -9888,6 +9979,10 @@ msgstr "Использованы некорректные символы в им
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Некорректные условия в правиле обнаружения \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12112,6 +12207,13 @@ msgstr "MAC адрес A"
 msgid "MAC address B"
 msgstr "MAC адрес B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12393,6 +12495,10 @@ msgstr "Мрт."
 msgid "March"
 msgstr "Март"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Помечать элементы при изменении состояния триггера"
@@ -12404,6 +12510,10 @@ msgstr "Пометить остальное"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Пометить выбранное"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12477,6 +12587,19 @@ msgstr "Макс. количество колонок и строк в табл�
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
 msgstr "Макс. период селектора периода времени"
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
 msgid "Max zoom level"
@@ -13318,6 +13441,11 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
+msgstr ""
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
@@ -14251,6 +14379,17 @@ msgstr "Числовой (целое положительное)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14458,6 +14597,10 @@ msgstr "Opera"
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
 msgstr "Информация об операционной системе. Возвращает строку"
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
+msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
@@ -15093,6 +15236,10 @@ msgstr "Пароль"
 msgid "Password (once again)"
 msgstr "Пароль (подтверждение)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "Пароль не обязателен при не внутреннем типе аутентификации."
@@ -15136,6 +15283,10 @@ msgstr "Шаблон"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "Приостановить операции для подавленных проблем"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15331,6 +15482,10 @@ msgstr "Расположение"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15828,6 +15983,10 @@ msgstr "РЕШЕНО"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16910,6 +17069,14 @@ msgstr "Ключ SNMP trap ошибочный."
 msgid "SNMP version"
 msgstr "Версия SNMP"
 
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
+
 #: include/items.inc.php:1299
 #, c-format
 msgid "SNMPv%1$d"
@@ -17823,6 +17990,11 @@ msgstr "Отображать боковую панель"
 msgid "Show suppressed problems"
 msgstr "Подавленные проблемы"
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18491,6 +18663,11 @@ msgstr "Шведский (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Переключение метода аутентификации сбросит все сессии исключая эту! Продолжить?"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19953,6 +20130,10 @@ msgstr "UI элемент \"%2$s\" недоступен для роли поль
 msgid "UNKNOWN"
 msgstr "НЕИЗВЕСТНО"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -20013,6 +20194,13 @@ msgstr "URL должно быть с обоими полями \"name\" и \"url
 #: include/views/monitoring.sysmap.edit.php:313 jsLoader.php:385
 msgid "URLs"
 msgstr "URLы"
+
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20116,6 +20304,13 @@ msgstr "Разблокировать"
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Разблокировать выбранных пользователей?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20484,6 +20679,10 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Использовать массовые запросы"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -23203,6 +23402,12 @@ msgstr "некорректный синтаксис около \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "некорректное использование функции \"%1$s\""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - Добавление указанных символов или пробелов в строку символов, начиная от указанной позиции в строке"
@@ -23238,6 +23443,10 @@ msgstr "ошибочный метод агрегации"
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "ошибочная последовательность байт в UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
@@ -23681,6 +23890,14 @@ msgstr "отсутствуют права доступа на изменение
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "нет прав закрывать проблемы"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

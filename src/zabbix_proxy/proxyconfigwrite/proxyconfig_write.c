@@ -2060,7 +2060,8 @@ out:
  * Purpose: receive configuration tables from server (passive proxies)        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls, int config_timeout)
+void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
+		const zbx_config_vault_t *config_vault, int config_timeout)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -2069,7 +2070,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", zbx_config_tls,
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", config_tls,
 			config_timeout))
 	{
 		goto out;
@@ -2116,7 +2117,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				DCsync_kvs_paths(&jp_kvs_paths);
+				DCsync_kvs_paths(&jp_kvs_paths, config_vault);
 		}
 		else
 		{

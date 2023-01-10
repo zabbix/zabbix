@@ -17,10 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter_protocol.h"
+#include "alerter.h"
 
+#include "alerter_protocol.h"
 #include "log.h"
+#include "zbxipcservice.h"
 #include "zbxserialize.h"
+#include "zbxstr.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
@@ -41,7 +44,7 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
  *                                                                            *
  * Purpose: frees the alert object                                            *
  *                                                                            *
- * Parameters: alert - [IN] the alert object                                  *
+ * Parameters: alert - [IN]                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert)
@@ -908,6 +911,12 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
  *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
+ * Parameters: alerts_num - [IN] alert count                                  *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - the statistics were returned successfully          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
 {
@@ -929,12 +938,12 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
  *                                                                            *
  * Purpose: get the top N mediatypes by the number of queued alerts           *
  *                                                                            *
- * Parameters limit      - [IN] the number of top records to retrieve         *
+ * Parameters limit      - [IN] number of top records to retrieve             *
  *            mediatypes - [OUT] a vector of top mediatypeid,alerts_num pairs *
- *            error      - [OUT] the error message                            *
+ *            error      - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the top n mediatypes were returned successfully    *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error)
@@ -963,13 +972,13 @@ out:
  *                                                                            *
  * Purpose: get the top N sources by the number of queued alerts              *
  *                                                                            *
- * Parameters limit   - [IN] the number of top records to retrieve            *
+ * Parameters limit   - [IN] number of top records to retrieve                *
  *            sources - [OUT] a vector of top zbx_alerter_source_stats_t      *
  *                             structure                                      *
- *            error   - [OUT] the error message                               *
+ *            error   - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - the top n sources were returned successfully       *
- *               FAIL - otherwise                                             *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
@@ -1116,20 +1125,18 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MED
 	}
 }
 
-#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
-
 /******************************************************************************
  *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
- * Parameters: dispatch     - [IN] the dispatcher                             *
- *             subject      - [IN] the subject                                *
- *             message      - [IN] the message                                *
- *             content_name - [IN] the content name                           *
- *             content_type - [IN] the content type                           *
- *             content      - [IN] the additional content to dispatch         *
- *             content_size - [IN] the content size                           *
- *             error          [OUT] the error message                         *
+ * Parameters: dispatch     - [IN]                                            *
+ *             subject      - [IN]                                            *
+ *             message      - [IN]                                            *
+ *             content_name - [IN]                                            *
+ *             content_type - [IN]                                            *
+ *             content      - [IN] additional content to dispatch             *
+ *             content_size - [IN] additional content size                    *
+ *             error          [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was started successfully              *
  *               FAIL    - otherwise                                          *
@@ -1167,7 +1174,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_create(&dispatch->results);
 	dispatch->total_num = 0;
 	ret = SUCCEED;
 
@@ -1183,10 +1190,10 @@ out:
  *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
- * Parameters: dispatch   - [IN] the dispatcher                               *
- *             mediatype  - [IN] the media type to use for sending            *
- *             recipients - [IN] the dispatch recipients                      *
- *             error      - [OUT] the error message                           *
+ * Parameters: dispatch   - [IN] dispatcher                                   *
+ *             mediatype  - [IN] media type to use for sending                *
+ *             recipients - [IN] dispatch recipients                          *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - the dispatch sent successfully                     *
  *               FAIL    - otherwise                                          *
@@ -1225,10 +1232,8 @@ out:
  *                                                                            *
  * Purpose: finish data dispatch                                              *
  *                                                                            *
- * Parameters: dispatch  - [IN] the dispatcher                                *
- *             sent_num  - [OUT] the number of successfully dispatched        *
- *                              messages                                      *
- *             error     - [OUT] the error message                            *
+ * Parameters: dispatch  - [IN] dispatcher                                    *
+ *             error     - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was finished successfully             *
  *               FAIL    - otherwise                                          *
@@ -1254,9 +1259,13 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 		goto out;
 	}
 
+#define ZBX_ALERTER_REPORT_TIMEOUT	SEC_PER_MIN * 10
+
 	/* wait for the send alert responses for all recipients */
 
 	time_stop = time(NULL) + ZBX_ALERTER_REPORT_TIMEOUT;
+
+#undef ZBX_ALERTER_REPORT_TIMEOUT
 
 	for (i = 0; i < dispatch->total_num; i++)
 	{
@@ -1306,7 +1315,7 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 					value = NULL;
 				}
 
-				zbx_vector_ptr_append(&dispatch->results, result);
+				zbx_vector_alerter_dispatch_result_append(&dispatch->results, result);
 
 				zbx_free(value);
 				zbx_free(errmsg);
@@ -1330,18 +1339,11 @@ out:
 	return ret;
 }
 
-void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result)
-{
-	zbx_free(result->recipient);
-	zbx_free(result->info);
-	zbx_free(result);
-}
-
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch)
 {
 	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
 		zbx_ipc_async_socket_close(&dispatch->alerter);
 
-	zbx_vector_ptr_clear_ext(&dispatch->results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-	zbx_vector_ptr_destroy(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_clear_ext(&dispatch->results, zbx_alerter_dispatch_result_free);
+	zbx_vector_alerter_dispatch_result_destroy(&dispatch->results);
 }

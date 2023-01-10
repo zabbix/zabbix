@@ -87,5 +87,8 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
-#endif
+#endif /* !HAVE_SQLITE3 */
+
+unsigned char	DBget_program_type(void);
+
 #endif

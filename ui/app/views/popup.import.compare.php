@@ -173,6 +173,7 @@ else {
 				->setNoDataMessage(_('No changes.'))
 				->toString()
 			: (new CForm())
+				->cleanItems()
 				->addClass('import-compare')
 				->addVar('import_overlayid', $data['import_overlayid'])
 				->addItem(drawToc($data['diff_toc']))

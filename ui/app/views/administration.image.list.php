@@ -114,9 +114,11 @@ else {
 	}
 
 	$html_page->addItem(
-		(new CForm())->addItem(
-			(new CTabView())->addTab('image', null, $image_table)
-		)
+		(new CForm())
+			->cleanItems()
+			->addItem(
+				(new CTabView())->addTab('image', null, $image_table)
+			)
 	);
 }
 

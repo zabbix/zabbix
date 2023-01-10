@@ -288,6 +288,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => array_keys($problems_per_trigger),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
+					'symptom' => false,
 					'preservekeys' => true
 				]);
 

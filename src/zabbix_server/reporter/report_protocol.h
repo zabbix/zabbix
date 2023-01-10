@@ -20,6 +20,7 @@
 #ifndef ZABBIX_REPORT_PROTOCOL_H
 #define ZABBIX_REPORT_PROTOCOL_H
 
+#include "../alerter/alerter.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 
@@ -51,8 +52,9 @@ void	report_deserialize_test_report(const unsigned char *data, char **name, zbx_
 		zbx_vector_ptr_pair_t *params);
 
 zbx_uint32_t	report_serialize_response(unsigned char **data, int status, const char *error,
-		const zbx_vector_ptr_t *results);
-void	report_deserialize_response(const unsigned char *data, int *status, char **error, zbx_vector_ptr_t *results);
+		const zbx_vector_alerter_dispatch_result_t *results);
+void	report_deserialize_response(const unsigned char *data, int *status, char **error,
+		zbx_vector_alerter_dispatch_result_t *results);
 
 zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *name, const char *url,
 		const char *cookie, int width, int height, const zbx_vector_ptr_pair_t *params);

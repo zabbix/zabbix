@@ -47,20 +47,26 @@
 					: ''
 			};
 
-			if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
-				params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
-			}
-			if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
-				if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-					if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+			if (type == <?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>) {
+				const inputs = document.querySelectorAll(`.group-json-mapping[data-index="${num}"] input`);
+
+				[...inputs].map((input) => params.push(input.value));
+			} else {
+				if (jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).length) {
+					params.push(jQuery('[name="preprocessing[' + num + '][params][0]"]', $preprocessing).val());
+				}
+				if (jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
+					params.push(jQuery('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
+				}
+				if (jQuery('[name="preprocessing[' + num + '][params][2]"]:not(:disabled)', $preprocessing).length) {
+					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
+						if (jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+							params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+						}
+					}
+					else {
 						params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
 					}
-				}
-				else {
-					params.push(jQuery('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
 				}
 			}
 
