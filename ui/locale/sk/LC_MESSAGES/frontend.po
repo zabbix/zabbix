@@ -12610,7 +12610,7 @@ msgid "Max repetition count"
 msgstr "Maximálny počet opakovaní"
 
 #: app/partials/configuration.host.interface.row.php:106
-msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Maximálny počet opakovaní sa vzťahuje len na discovery a snmp.walk."
 
 #: app/views/administration.geomaps.edit.php:98

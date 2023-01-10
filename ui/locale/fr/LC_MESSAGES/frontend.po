@@ -12501,7 +12501,7 @@ msgid "Max repetition count"
 msgstr "Nombre maximal de répétitions"
 
 #: app/partials/configuration.host.interface.row.php:106
-msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "Le nombre maximal de répétitions s'applique uniquement à la découverte et à snmp.walk."
 
 #: app/views/administration.geomaps.edit.php:98
