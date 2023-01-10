@@ -1474,17 +1474,22 @@ static int	DBpatch_6030158(void)
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
 
-static int DBpatch_6030159(void)
+static int	DBpatch_6030159(void)
 {
-	const ZBX_FIELD field = {"csrf_token_salt", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"csrf_token_salt", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sessions", &field);
 }
 
-static int DBpatch_6030160(void)
+static int	DBpatch_6030160(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update sessions set csrf_token_salt=sessionid;"))
 		return FAIL;
+
+	return SUCCEED;
 }
 #endif
 
