@@ -214,12 +214,7 @@ class CControllerPopupServiceEdit extends CController {
 			];
 		}
 
-		$data['csrf_tokens'] = [
-			'service.create' => self::generateCsrfToken('service.create'),
-			'service.update' => self::generateCsrfToken('service.update'),
-			'service.delete' => self::generateCsrfToken('service.delete'),
-		];
-
+		$data['csrf_tokens'] = self::generateCsrfTokens(['service.create', 'service.update', 'service.delete']);
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$this->setResponse(new CControllerResponseData($data));

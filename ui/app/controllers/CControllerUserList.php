@@ -175,12 +175,7 @@ class CControllerUserList extends CController {
 			'login_attempts' => CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS),
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		];
-
-		$data['csrf_tokens'] = [
-			'user.provision' => self::generateCsrfToken('user.provision'),
-			'user.unblock' => self::generateCsrfToken('user.unblock'),
-			'user.delete' => self::generateCsrfToken('user.delete')
-		];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['user.provision', 'user.unblock', 'user.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

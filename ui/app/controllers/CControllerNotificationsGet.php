@@ -279,10 +279,7 @@ class CControllerNotificationsGet extends CController {
 					TRIGGER_SEVERITY_WARNING => $this->settings['sounds.'.TRIGGER_SEVERITY_WARNING]
 				]
 			],
-			'csrf_tokens' => [
-				'notifications.mute' => self::generateCsrfToken('notifications.mute'),
-				'notifications.read' => self::generateCsrfToken('notifications.read')
-			]
+			'csrf_tokens' => self::generateCsrfTokens(['notifications.mute', 'notifications.read'])
 		]);
 	}
 }

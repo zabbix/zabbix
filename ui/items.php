@@ -919,12 +919,9 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 		'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 	];
 
-	$data['csrf_tokens'] = [
-		'items.php clone' => CController::generateCsrfToken('items.php clone'),
-		'items.php del_history' => CController::generateCsrfToken('items.php del_history'),
-		'items.php delete' => CController::generateCsrfToken('items.php delete'),
-		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['items.php clone', 'items.php del_history',
+		'items.php delete', 'item.masscheck_now'
+	]);
 
 	// render view
 	if (!$has_errors) {
@@ -1383,15 +1380,9 @@ else {
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
-	$data['csrf_tokens'] = [
-		'item.massenable' => CController::generateCsrfToken('item.massenable'),
-		'item.massdisable' => CController::generateCsrfToken('item.massdisable'),
-		'popup.massupdate.item' => CController::generateCsrfToken('popup.massupdate.item'),
-		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now'),
-		'item.massclearhistory' => CController::generateCsrfToken('item.massclearhistory'),
-		'item.masscopyto' => CController::generateCsrfToken('item.masscopyto'),
-		'item.massdelete' => CController::generateCsrfToken('item.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['item.massenable', 'item.massdisable',
+		'popup.massupdate.item', 'item.masscheck_now', 'item.massclearhistory', 'item.masscopyto', 'item.massdelete'
+	]);
 
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();

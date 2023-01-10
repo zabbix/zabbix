@@ -581,10 +581,7 @@ if (hasRequest('form')) {
 		];
 	}
 
-	$data['csrf_tokens'] = [
-		'host_prototypes.php clone' => CController::generateCsrfToken('host_prototypes.php clone'),
-		'host_prototypes.php delete' => CController::generateCsrfToken('host_prototypes.php delete'),
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['host_prototypes.php clone', 'host_prototypes.php delete']);
 
 	// Render view.
 	echo (new CView('configuration.host.prototype.edit', $data))->getOutput();
@@ -676,11 +673,9 @@ else {
 
 	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['csrf_tokens'] = [
-		'hostprototype.massenable' => CController::generateCsrfToken('hostprototype.massenable'),
-		'hostprototype.massdisable' => CController::generateCsrfToken('hostprototype.massdisable'),
-		'hostprototype.massdelete' => CController::generateCsrfToken('hostprototype.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['hostprototype.massenable', 'hostprototype.massdisable',
+		'hostprototype.massdelete'
+	]);
 
 	// render view
 	echo (new CView('configuration.host.prototype.list', $data))->getOutput();

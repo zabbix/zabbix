@@ -309,11 +309,7 @@ if (!empty($data['form'])) {
 
 	$data['groups_ms'] = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 	CArrayHelper::sort($data['groups_ms'], ['name']);
-
-	$data['csrf_tokens'] = [
-		'maintenance.php clone' => CController::generateCsrfToken('maintenance.php clone'),
-		'maintenance.php delete' => CController::generateCsrfToken('maintenance.php delete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['maintenance.php clone', 'maintenance.php delete']);
 
 	// render view
 	echo (new CView('configuration.maintenance.edit', $data))->getOutput();

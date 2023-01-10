@@ -373,10 +373,7 @@ if (hasRequest('form')) {
 	]);
 	order_result($data['iconMaps'], 'name');
 
-	$data['csrf_tokens'] = [
-		'sysmaps.php add' => CController::generateCsrfToken('sysmaps.php add'),
-		'sysmaps.php delete' => CController::generateCsrfToken('sysmaps.php delete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['sysmaps.php add', 'sysmaps.php delete']);
 
 	// render view
 	echo (new CView('monitoring.sysmap.edit', $data))->getOutput();

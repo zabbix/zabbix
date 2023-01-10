@@ -187,12 +187,9 @@ class CControllerProxyList extends CController {
 			$data['server_version'] = preg_split('/[a-z]/i', json_decode($server_version, true)['version'], 2)[0];
 		}
 
-		$data['csrf_tokens'] = [
-			'proxy.config.refresh' => self::generateCsrfToken('proxy.config.refresh'),
-			'proxy.host.enable' => self::generateCsrfToken('proxy.host.enable'),
-			'proxy.host.disable' => self::generateCsrfToken('proxy.host.disable'),
-			'proxy.delete' => self::generateCsrfToken('proxy.delete')
-		];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['proxy.config.refresh', 'proxy.host.enable',
+			'proxy.host.disable', 'proxy.delete'
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));

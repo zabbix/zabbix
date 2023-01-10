@@ -825,11 +825,9 @@ if (hasRequest('form')) {
 		$data['counter'] = key($conditions) + 1;
 	}
 
-	$data['csrf_tokens'] = [
-		'host_discovery.php clone' => CController::generateCsrfToken('host_discovery.php clone'),
-		'host_discovery.php delete' => CController::generateCsrfToken('host_discovery.php delete'),
-		'item.masscheck_now' => CController::generateCsrfToken('item.masscheck_now')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['host_discovery.php clone', 'host_discovery.php delete',
+		'item.masscheck_now'
+	]);
 
 	// render view
 	if (!$has_errors) {
@@ -960,11 +958,9 @@ else {
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['csrf_tokens'] = [
-		'discoveryrule.massenable' => CController::generateCsrfToken('discoveryrule.massenable'),
-		'discoveryrule.massdisable' => CController::generateCsrfToken('discoveryrule.massdisable'),
-		'discoveryrule.massdelete' => CController::generateCsrfToken('discoveryrule.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['discoveryrule.massenable', 'discoveryrule.massdisable',
+		'discoveryrule.massdelete'
+	]);
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();

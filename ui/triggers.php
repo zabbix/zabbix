@@ -596,10 +596,7 @@ if (isset($_REQUEST['form'])) {
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'context' => getRequest('context'),
 		'backurl' => getRequest('backurl'),
-		'csrf_tokens' => [
-			'triggers.php clone' => CController::generateCsrfToken('triggers.php clone'),
-			'triggers.php delete' => CController::generateCsrfToken('triggers.php delete')
-		]
+		'csrf_tokens' => CController::generateCsrfTokens(['triggers.php clone', 'triggers.php delete'])
 	];
 
 	// render view
@@ -988,13 +985,9 @@ else {
 		'dep_triggers' => $dep_triggers,
 		'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
 		'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-		'csrf_tokens' => [
-			'trigger.massenable' => CController::generateCsrfToken('trigger.massenable'),
-			'trigger.massdisable' => CController::generateCsrfToken('trigger.massdisable'),
-			'trigger.masscopyto' => CController::generateCsrfToken('trigger.masscopyto'),
-			'popup.massupdate.trigger' => CController::generateCsrfToken('popup.massupdate.trigger'),
-			'trigger.massdelete' => CController::generateCsrfToken('trigger.massdelete')
-		]
+		'csrf_tokens' => CController::generateCsrfTokens(['trigger.massenable', 'trigger.massdisable',
+			'trigger.masscopyto', 'popup.massupdate.trigger', 'trigger.massdelete'
+		])
 	];
 
 	// render view

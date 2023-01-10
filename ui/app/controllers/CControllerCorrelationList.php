@@ -122,11 +122,9 @@ class CControllerCorrelationList extends CController {
 			$data['group_names'] = [];
 		}
 
-		$data['csrf_tokens'] = [
-			'correlation.enable' => self::generateCsrfToken('correlation.enable'),
-			'correlation.disable' => self::generateCsrfToken('correlation.disable'),
-			'correlation.delete' => self::generateCsrfToken('correlation.delete')
-		];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['correlation.enable', 'correlation.disable',
+			'correlation.delete'
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));

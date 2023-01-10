@@ -437,10 +437,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'csrf_tokens' => [
-				'popup.itemtest.send' => self::generateCsrfToken('popup.itemtest.send'),
-				'popup.itemtest.getvalue' => self::generateCsrfToken('popup.itemtest.getvalue')
-			]
+			'csrf_tokens' => self::generateCsrfTokens(['popup.itemtest.send', 'popup.itemtest.getvalue'])
 		]));
 	}
 }

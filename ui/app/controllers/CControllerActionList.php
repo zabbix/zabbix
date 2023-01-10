@@ -155,12 +155,7 @@ class CControllerActionList extends CController {
 			}
 		}
 		$data['operation_descriptions'] = getActionOperationData($operations);
-
-		$data['csrf_tokens'] = [
-			'action.enable' => self::generateCsrfToken('action.enable'),
-			'action.disable' => self::generateCsrfToken('action.disable'),
-			'action.delete' => self::generateCsrfToken('action.delete'),
-		];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['action.enable', 'action.disable', 'action.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of actions'));

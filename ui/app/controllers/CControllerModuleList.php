@@ -115,10 +115,7 @@ class CControllerModuleList extends CController {
 			'paging' => $paging,
 			'filter_profile' => 'web.modules.filter',
 			'filter_active_tab' => CProfile::get('web.modules.filter.active', 1),
-			'csrf_tokens' => [
-				'module.enable' => self::generateCsrfToken('module.enable'),
-				'module.disable' => self::generateCsrfToken('module.disable')
-			]
+			'csrf_tokens' => self::generateCsrfTokens(['module.enable', 'module.disable'])
 		];
 
 		$response = new CControllerResponseData($data);

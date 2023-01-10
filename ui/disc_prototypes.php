@@ -619,10 +619,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
 	}
 
-	$data['csrf_tokens'] = [
-		'disc_prototypes.php clone' => CController::generateCsrfToken('disc_prototypes.php clone'),
-		'disc_prototypes.php delete' => CController::generateCsrfToken('disc_prototypes.php delete'),
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['disc_prototypes.php clone', 'disc_prototypes.php delete']);
 
 	// render view
 	if (!$has_errors) {
@@ -699,13 +696,9 @@ else {
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
-
-	$data['csrf_tokens'] = [
-		'popup.massupdate.itemprototype' => CController::generateCsrfToken('popup.massupdate.itemprototype'),
-		'itemprototype.massenable' => CController::generateCsrfToken('itemprototype.massenable'),
-		'itemprototype.massdisable' => CController::generateCsrfToken('itemprototype.massdisable'),
-		'itemprototype.massdelete' => CController::generateCsrfToken('itemprototype.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['popup.massupdate.itemprototype',
+		'itemprototype.massenable', 'itemprototype.massdisable', 'itemprototype.massdelete'
+	]);
 
 	// render view
 	echo (new CView('configuration.item.prototype.list', $data))->getOutput();

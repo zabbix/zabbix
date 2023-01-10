@@ -537,10 +537,9 @@ if (isset($_REQUEST['form'])) {
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 		'context' => getRequest('context'),
 		'backurl' => getRequest('backurl'),
-		'csrf_tokens' => [
-			'trigger_prototypes.php clone' => CController::generateCsrfToken('trigger_prototypes.php clone'),
-			'trigger_prototypes.php delete' => CController::generateCsrfToken('trigger_prototypes.php delete')
-		]
+		'csrf_tokens' => CController::generateCsrfTokens(['trigger_prototypes.php clone',
+			'trigger_prototypes.php delete'
+		])
 	]);
 
 	// render view
@@ -655,12 +654,9 @@ else {
 
 	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['csrf_tokens'] = [
-		'triggerprototype.massenable' => CController::generateCsrfToken('triggerprototype.massenable'),
-		'triggerprototype.massdisable' => CController::generateCsrfToken('triggerprototype.massdisable'),
-		'popup.massupdate.triggerprototype' => CController::generateCsrfToken('popup.massupdate.triggerprototype'),
-		'triggerprototype.massdelete' => CController::generateCsrfToken('triggerprototype.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['triggerprototype.massenable',
+		'triggerprototype.massdisable', 'popup.massupdate.triggerprototype', 'triggerprototype.massdelete'
+	]);
 
 	// Render view.
 	echo (new CView('configuration.trigger.prototype.list', $data))->getOutput();

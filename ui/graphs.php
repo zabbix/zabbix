@@ -683,10 +683,7 @@ elseif (isset($_REQUEST['form'])) {
 	// is template
 	$data['is_template'] = ($data['hostid'] == 0) ? false : isTemplate($data['hostid']);
 
-	$data['csrf_tokens'] = [
-		'graphs.php clone' => CController::generateCsrfToken('graphs.php clone'),
-		'graphs.php delete' => CController::generateCsrfToken('graphs.php delete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['graphs.php clone', 'graphs.php delete']);
 
 	// render view
 	echo (new CView('configuration.graph.edit', $data))->getOutput();
@@ -808,11 +805,7 @@ else {
 	);
 
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-
-	$data['csrf_tokens'] = [
-		'graph.masscopyto' => CController::generateCsrfToken('graph.masscopyto'),
-		'graph.massdelete' => CController::generateCsrfToken('graph.massdelete')
-	];
+	$data['csrf_tokens'] = CController::generateCsrfTokens(['graph.masscopyto', 'graph.massdelete']);
 
 	// render view
 	echo (new CView('configuration.graph.list', $data))->getOutput();

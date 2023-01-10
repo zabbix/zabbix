@@ -385,11 +385,7 @@ class CControllerHostList extends CController {
 			],
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1),
-			'csrf_tokens' => [
-				'host.massdelete' => self::generateCsrfToken('host.massdelete'),
-				'popup.import' => self::generateCsrfToken('popup.import'),
-				'popup.massupdate.host' => self::generateCsrfToken('popup.massupdate.host')
-			]
+			'csrf_tokens' => self::generateCsrfTokens(['host.massdelete', 'popup.import', 'popup.massupdate.host'])
 		];
 
 		$response = new CControllerResponseData($data);
