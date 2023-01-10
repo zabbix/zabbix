@@ -51,6 +51,7 @@ typedef struct
 	int				worker_count;	/* preprocessing worker count */
 	zbx_hashset_t			linked_items;	/* linked items placed in queue */
 	zbx_hashset_t			connectors;
+	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			revision;	/* the configuration revision */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
@@ -108,6 +109,7 @@ static void	connector_init_manager(zbx_connector_manager_t *manager)
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -186,7 +188,8 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 
 	while (SUCCEED == under_limit && SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
 	{
-		zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
+		if (NULL == data)
+			zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
 
 		for (i = 0; i < object_link->connector_objects.values_num; i++, records++)
 		{
@@ -246,15 +249,12 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager)
 {
 	zbx_connector_worker_t	*worker;
 	zbx_ipc_message_t	message;
-	zbx_connector_t		*connector;
-	zbx_hashset_iter_t	iter;
+	zbx_connector_t		*connector = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_iter_reset(&manager->connectors, &iter);
-
 	while (NULL != (worker = connector_get_free_worker(manager)) &&
-			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)))
 	{
 		connector_get_next_task(connector, &message, worker);
 
@@ -269,6 +269,9 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager)
 
 		zbx_ipc_message_clean(&message);
 	}
+
+	if (NULL == connector)
+		zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -455,7 +458,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					DCconfig_get_connectors(&manager.connectors, &manager.revision,
+					DCconfig_get_connectors(&manager.connectors, &manager.iter, &manager.revision,
 							(zbx_clean_func_t)connector_request_clear);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);

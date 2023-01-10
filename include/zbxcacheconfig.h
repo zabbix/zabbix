@@ -735,7 +735,7 @@ void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 
-void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision,
+void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter, zbx_uint64_t *revision,
 		zbx_clean_func_t connector_requests_clean_func);
 
 #define ZBX_HK_OPTION_DISABLED		0

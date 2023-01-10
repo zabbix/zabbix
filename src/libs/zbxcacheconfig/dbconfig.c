@@ -15600,7 +15600,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision,
+void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter, zbx_uint64_t *revision,
 		zbx_clean_func_t connector_requests_clean_func)
 {
 	zbx_dc_connector_t	*dc_connector;
@@ -15665,4 +15665,6 @@ void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_uint64_t *revision,
 
 		zbx_hashset_iter_remove(&iter);
 	}
+
+	zbx_hashset_iter_reset(connectors, connector_iter);
 }
