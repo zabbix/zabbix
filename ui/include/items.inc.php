@@ -838,7 +838,11 @@ function getParentItemPrototypes(array $items, bool $allowed_ui_conf_templates):
 				'editable' => $editable,
 				'template_name' => $db_items[$itemid]['hosts'][0]['name'],
 				'templateid' => $db_items[$itemid]['hostid']
-			] + ($editable ? ['ruleid' => $editable_items[$itemid]['discoveryRule']['itemid']] : []);
+			];
+
+			if ($editable) {
+				$parent_item['ruleid'] = $editable_items[$itemid]['discoveryRule']['itemid'];
+			}
 		}
 		else {
 			$parent_item = [

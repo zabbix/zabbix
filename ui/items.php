@@ -1104,7 +1104,6 @@ else {
 	}
 
 	$data['items'] = API::Item()->get($options);
-	$data['parent_templates'] = [];
 
 	// Unset unexisting subfilter tags (subfilter tags stored in profiles may contain tags already deleted).
 	if ($subfilter_tags) {

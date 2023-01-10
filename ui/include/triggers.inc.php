@@ -2116,7 +2116,11 @@ function getParentTriggerPrototypes(array $triggers, bool $allowed_ui_conf_templ
 			$parent_trigger = [
 				'editable' => $editable,
 				'template_names' => $template_names
-			] + ($editable ? ['ruleid' => $editable_triggers[$triggerid]['discoveryRule']['itemid']] : []);
+			];
+
+			if ($editable) {
+				$parent_trigger['ruleid'] = $editable_triggers[$triggerid]['discoveryRule']['itemid'];
+			}
 		}
 		else {
 			$parent_trigger = [

@@ -585,7 +585,6 @@ if (isset($_REQUEST['form'])) {
 		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
 		'limited' => false,
 		'templates' => [],
-		'parent_templates' => [],
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,

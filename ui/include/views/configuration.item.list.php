@@ -76,17 +76,19 @@ if (!empty($data['hostid'])) {
 }
 
 // create table
+$object_label = null;
+
+if ($data['hostid'] == 0) {
+	$object_label = $data['context'] === 'host' ? _('Host') : _('Template');
+}
+
 $itemTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		'',
-		($data['hostid'] == 0)
-			? ($data['context'] === 'host')
-				? _('Host')
-				: _('Template')
-			: null,
+		$object_label,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Triggers'),
 		make_sorting_header(_('Key'), 'key_', $data['sort'], $data['sortorder'], $url),
@@ -206,6 +208,10 @@ foreach ($data['items'] as $item) {
 			$parent_template_names = [];
 
 			foreach ($parent_trigger['template_names'] as $templateid => $template_name) {
+				if ($parent_template_names) {
+					$parent_template_names[] = ', ';
+				}
+
 				if ($parent_trigger['editable']) {
 					$parent_template_names[] = (new CLink(CHtml::encode($template_name),
 						(new CUrl('triggers.php'))
@@ -219,14 +225,9 @@ foreach ($data['items'] as $item) {
 				else {
 					$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
 				}
-
-				$parent_template_names[] = ', ';
 			}
 
-			array_pop($parent_template_names);
-			$parent_template_names[] = NAME_DELIMITER;
-
-			$trigger_description[] = $parent_template_names;
+			$trigger_description[] = [$parent_template_names, NAME_DELIMITER];
 		}
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

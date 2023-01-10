@@ -91,6 +91,10 @@ foreach ($data['triggers'] as $trigger) {
 		$parent_template_names = [];
 
 		foreach ($parent_trigger['template_names'] as $template_name) {
+			if ($parent_template_names) {
+				$parent_template_names[] = ', ';
+			}
+
 			if ($parent_trigger['editable']) {
 				$parent_template_names[] = (new CLink(CHtml::encode($template_name),
 					(new CUrl('trigger_prototypes.php'))
@@ -103,14 +107,9 @@ foreach ($data['triggers'] as $trigger) {
 			else {
 				$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
 			}
-
-			$parent_template_names[] = ', ';
 		}
 
-		array_pop($parent_template_names);
-		$parent_template_names[] = NAME_DELIMITER;
-
-		$description[] = $parent_template_names;
+		$description[] = [$parent_template_names, NAME_DELIMITER];
 	}
 
 	$description[] = new CLink(

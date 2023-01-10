@@ -81,6 +81,10 @@ if (array_key_exists('parent_trigger', $data)) {
 	$parent_template_names = [];
 
 	foreach ($data['parent_trigger']['template_names'] as $templateid => $template_name) {
+		if ($parent_template_names) {
+			$parent_template_names[] = ', ';
+		}
+
 		if ($data['parent_trigger']['editable']) {
 			$parent_template_names[] = new CLink(CHtml::encode($template_name),
 				(new CUrl('triggers.php'))
@@ -93,11 +97,7 @@ if (array_key_exists('parent_trigger', $data)) {
 		else {
 			$parent_template_names[] = (new CSpan(CHtml::encode($template_name)))->addClass(ZBX_STYLE_GREY);
 		}
-
-		$parent_template_names[] = ', ';
 	}
-
-	array_pop($parent_template_names);
 
 	$triggersFormList->addRow(_('Parent trigger'), $parent_template_names);
 }

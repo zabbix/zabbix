@@ -317,20 +317,16 @@ foreach ($data['hosts'] as $host) {
 		}
 
 		if (array_key_exists($template['templateid'], $data['editable_templates'])) {
-			$templates[] = [
-				(new CLink(CHtml::encode($template['name']),
+			$templates[] = (new CLink(CHtml::encode($template['name']),
 					(new CUrl('templates.php'))
 						->setArgument('form', 'update')
 						->setArgument('templateid', $template['templateid'])
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY)
-			];
+					->addClass(ZBX_STYLE_GREY);
 		}
 		else {
-			$templates[] = [
-				(new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY)
-			];
+			$templates[] = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 
