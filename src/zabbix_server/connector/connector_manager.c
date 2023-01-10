@@ -63,7 +63,6 @@ typedef struct
 {
 	zbx_uint64_t				objectid;
 	zbx_vector_connector_object_data_t	connector_objects;
-	zbx_list_item_t				*queue_item;	/* queued item */
 }
 zbx_object_link_t;
 
@@ -178,23 +177,51 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
 		zbx_connector_worker_t *worker)
 {
+#define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+#define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
 	zbx_object_link_t	*object_link;
-	int			i;
+	int			i, records = 0, under_limit = SUCCEED;
 
-	while (SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
+	while (SUCCEED == under_limit && SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
 	{
 		zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
 
-		for (i = 0; i < object_link->connector_objects.values_num; i++)
+		for (i = 0; i < object_link->connector_objects.values_num; i++, records++)
 		{
+			if ((records == connector->max_records && 0 != connector->max_records) ||
+					data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
+			{
+				under_limit = FAIL;
+				break;
+			}
+
 			zbx_connector_serialize_object_data(&data, &data_alloc, &data_offset,
 					&object_link->connector_objects.values[i]);
 		}
 
-		zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects,
-				zbx_connector_object_data_free);
+		if (i != object_link->connector_objects.values_num)
+		{
+			zbx_vector_connector_object_data_t	connector_objects_remaining;
+
+			zbx_vector_connector_object_data_create(&connector_objects_remaining);
+
+			zbx_vector_connector_object_data_append_array(&connector_objects_remaining,
+					&object_link->connector_objects.values[i],
+					object_link->connector_objects.values_num - i);
+
+			object_link->connector_objects.values_num = i;
+			zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects,
+					zbx_connector_object_data_free);
+			zbx_vector_connector_object_data_destroy(&object_link->connector_objects);
+			object_link->connector_objects = connector_objects_remaining;
+		}
+		else
+		{
+			zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects,
+					zbx_connector_object_data_free);
+		}
 
 		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
 	}
@@ -205,6 +232,8 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 
 	if (0 != worker->ids.values_num)
 		worker->taskid = connector->connectorid;
+#undef ZBX_DATA_JSON_RESERVED
+#undef ZBX_DATA_JSON_RECORD_LIMIT
 }
 /******************************************************************************
  *                                                                            *
@@ -409,6 +438,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		if (FLUSH_INTERVAL < time_now - time_flush)
 		{
 			connector_assign_tasks(&manager);
+			time_flush = time_now;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
