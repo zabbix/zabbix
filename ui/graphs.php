@@ -525,13 +525,14 @@ elseif (isset($_REQUEST['form'])) {
 			$data['hostid'] = $host['hostid'];
 		}
 
-		// templates
-		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
+		if ($graph['templateid'] != 0) {
+			$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-		if ($data['context'] === 'host') {
-			$data['template'] = makeGraphTemplateHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-				$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
+			$parent_graphs = $data['parent_discoveryid'] == null
+				? getParentGraphs([$graph], $allowed_ui_conf_templates)
+				: getParentGraphPrototypes([$graph], $allowed_ui_conf_templates);
+
+			$data['parent_graph'] = reset($parent_graphs);
 		}
 
 		// items
@@ -798,14 +799,12 @@ else {
 
 	order_result($data['graphs'], $sort_field, $sort_order);
 
-	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
-		? ZBX_FLAG_DISCOVERY_NORMAL
-		: ZBX_FLAG_DISCOVERY_PROTOTYPE
-	);
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$data['parent_graphs'] = $data['parent_discoveryid'] === null
+		? getParentGraphs($data['graphs'], $allowed_ui_conf_templates)
+		: getParentGraphPrototypes($data['graphs'], $allowed_ui_conf_templates);
 
-	// render view
 	echo (new CView('configuration.graph.list', $data))->getOutput();
 }
 

@@ -72,7 +72,6 @@ $hostTable = (new CTableInfo())
 	]);
 
 foreach ($this->data['hostPrototypes'] as $host_prototype) {
-	// name
 	$name = [];
 
 	if (array_key_exists($host_prototype['templateid'], $data['parent_host_prototypes'])) {
@@ -100,15 +99,16 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 			->setArgument('context', $data['context'])
 	);
 
-	// template list
-	if (!$host_prototype['templates']) {
-		$host_templates = '';
-	}
-	else {
-		$host_templates = [];
+	$host_templates = [];
+
+	if ($host_prototype['templates']) {
 		order_result($host_prototype['templates'], 'name');
 
 		foreach ($host_prototype['templates'] as $template) {
+			if ($host_templates) {
+				$host_templates[] = ', ';
+			}
+
 			if (array_key_exists($template['templateid'], $data['editable_templates'])) {
 				$host_templates[] = (new CLink($template['name'],
 					(new CUrl('templates.php'))
@@ -121,16 +121,9 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 			else {
 				$host_templates[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 			}
-
-			$host_templates[] = ', ';
-		}
-
-		if ($host_templates) {
-			array_pop($host_templates);
 		}
 	}
 
-	// status
 	$status = (new CLink(
 		($host_prototype['status'] == HOST_STATUS_NOT_MONITORED) ? _('No') : _('Yes'),
 		(new CUrl('host_prototypes.php'))
@@ -147,19 +140,19 @@ foreach ($this->data['hostPrototypes'] as $host_prototype) {
 		->addClass(itemIndicatorStyle($host_prototype['status']))
 		->addSID();
 
-	$nodiscover = ($host_prototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
+	$no_discover = ($host_prototype['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	$discover = (new CLink($no_discover ? _('No') : _('Yes'),
 			(new CUrl('host_prototypes.php'))
 				->setArgument('hostid', $host_prototype['hostid'])
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 				->setArgument('action', 'hostprototype.updatediscover')
-				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+				->setArgument('discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
 			->addSID()
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+			->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$host_prototype['hostid'].']', $host_prototype['hostid']),

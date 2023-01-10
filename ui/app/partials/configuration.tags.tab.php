@@ -28,7 +28,7 @@ if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'] == 1;
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 $parent_template_header = null;
 
@@ -122,6 +122,10 @@ foreach ($data['tags'] as $i => $tag) {
 					continue;
 				}
 
+				if ($template_list) {
+					$template_list[] = ', ';
+				}
+
 				if ($tag['parent_object']['editable']) {
 					$template_list[] = (new CLink($template_name,
 						(new CUrl('templates.php'))
@@ -132,32 +136,7 @@ foreach ($data['tags'] as $i => $tag) {
 				else {
 					$template_list[] = (new CSpan($template_name))->addClass(ZBX_STYLE_GREY);
 				}
-
-				$template_list[] = ', ';
 			}
-
-			array_pop($template_list);
-		}
-
-		if (array_key_exists('parent_templates', $tag)) {
-			CArrayHelper::sort($tag['parent_templates'], ['name']);
-
-			foreach ($tag['parent_templates'] as $templateid => $template) {
-				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
-				}
-				else {
-					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
-				}
-
-				$template_list[] = ', ';
-			}
-
-			array_pop($template_list);
 		}
 
 		$row[] = $template_list;

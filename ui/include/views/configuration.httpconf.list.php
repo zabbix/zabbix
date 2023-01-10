@@ -155,7 +155,27 @@ $http_tests = $data['http_tests'];
 
 foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
-	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
+
+	if ($httpTest['templateid'] != 0) {
+		$parent_httptest = $data['parent_httptests'][$httpTest['templateid']];
+
+		if ($parent_httptest['editable']) {
+			$name[] = (new CLink(CHtml::encode($parent_httptest['template_name']),
+				(new CUrl('httpconf.php'))
+					->setArgument('filter_set', '1')
+					->setArgument('filter_hostids', [$parent_httptest['templateid']])
+					->setArgument('context', 'template')
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$name[] = (new CSpan(CHtml::encode($parent_httptest['template_name'])))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$name[] = NAME_DELIMITER;
+	}
+
 	$name[] = new CLink(CHtml::encode($httpTest['name']),
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')

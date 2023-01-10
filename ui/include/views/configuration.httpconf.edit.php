@@ -54,8 +54,24 @@ if (!empty($this->data['httptestid'])) {
  */
 $http_form_list = new CFormList();
 
-if (array_key_exists('template', $this->data)) {
-	$http_form_list->addRow(_('Parent web scenario'), $this->data['template']);
+if (array_key_exists('parent_httptest', $this->data)) {
+	$parent_httptest = $this->data['parent_httptest'];
+
+	if ($parent_httptest['editable']) {
+		$parent_template_name = new CLink(CHtml::encode($parent_httptest['template_name']),
+			(new CUrl('httpconf.php'))
+				->setArgument('form', 'update')
+				->setArgument('context', 'template')
+				->setArgument('hostid', $parent_httptest['templateid'])
+				->setArgument('httptestid', $parent_httptest['httptestid'])
+		);
+	}
+	else {
+		$parent_template_name = (new CSpan(CHtml::encode($parent_httptest['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	$http_form_list->addRow(_('Parent web scenario'), $parent_template_name);
 }
 
 // Name

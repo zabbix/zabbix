@@ -156,209 +156,139 @@ function getGraphByGraphId($graphId) {
 }
 
 /**
- * Get parent templates for each given graph.
+ * Get data for displaying parent graph of given graphs.
  *
- * @param $array $graphs                  An array of graphs.
- * @param string $graphs[]['graphid']     ID of a graph.
- * @param string $graphs[]['templateid']  ID of parent template graph.
- * @param int    $flag                    Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or
- *                                        ZBX_FLAG_DISCOVERY_PROTOTYPE).
+ * @param array $graphs
+ * @param bool  $allowed_ui_conf_templates
  *
  * @return array
  */
-function getGraphParentTemplates(array $graphs, $flag) {
-	$parent_graphids = [];
-	$data = [
-		'links' => [],
-		'templates' => []
-	];
+function getParentGraphs(array $graphs, bool $allowed_ui_conf_templates): array {
+	$parent_graphs = [];
 
 	foreach ($graphs as $graph) {
 		if ($graph['templateid'] != 0) {
-			$parent_graphids[$graph['templateid']] = true;
-			$data['links'][$graph['graphid']] = ['graphid' => $graph['templateid']];
+			$parent_graphs[$graph['templateid']] = true;
 		}
 	}
 
-	if (!$parent_graphids) {
-		return $data;
+	if (!$parent_graphs) {
+		return [];
 	}
 
-	$all_parent_graphids = [];
-	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-		$lld_ruleids = [];
+	$db_graphs = API::Graph()->get([
+		'output' => [],
+		'selectHosts' => ['name'],
+		'graphids' => array_keys($parent_graphs),
+		'preservekeys' => true
+	]);
+
+	if ($allowed_ui_conf_templates && $db_graphs) {
+		$editable_graphs = API::Graph()->get([
+			'output' => [],
+			'selectHosts' => ['hostid'],
+			'graphids' => array_keys($parent_graphs),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 	}
 
-	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$db_graphs = API::GraphPrototype()->get([
-				'output' => ['graphid', 'templateid'],
-				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid'],
-				'graphids' => array_keys($parent_graphids)
-			]);
+	foreach ($parent_graphs as $graphid => &$parent_graph) {
+		if (array_key_exists($graphid, $db_graphs)) {
+			if ($allowed_ui_conf_templates && array_key_exists($graphid, $editable_graphs)) {
+				$parent_graph = [
+					'editable' => true,
+					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
+					'hostid' => $editable_graphs[$graphid]['hosts'][0]['hostid'],
+					'templateid' => $graphid
+				];
+			}
+			else {
+				$parent_graph = [
+					'editable' => false,
+					'template_name' => $db_graphs[$graphid]['hosts'][0]['name']
+				];
+			}
 		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$db_graphs = API::Graph()->get([
-				'output' => ['graphid', 'templateid'],
-				'selectHosts' => ['hostid'],
-				'graphids' => array_keys($parent_graphids)
-			]);
-		}
-
-		$all_parent_graphids += $parent_graphids;
-		$parent_graphids = [];
-
-		foreach ($db_graphs as $db_graph) {
-			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
-			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
-
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
-			}
-
-			if ($db_graph['templateid'] != 0) {
-				if (!array_key_exists($db_graph['templateid'], $all_parent_graphids)) {
-					$parent_graphids[$db_graph['templateid']] = true;
-				}
-
-				$data['links'][$db_graph['graphid']] = ['graphid' => $db_graph['templateid']];
-			}
-		}
-	}
-	while ($parent_graphids);
-
-	foreach ($data['links'] as &$parent_graph) {
-		$parent_graph['hostid'] = array_key_exists($parent_graph['graphid'], $hostids)
-			? $hostids[$parent_graph['graphid']]
-			: 0;
-
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
-				? $lld_ruleids[$parent_graph['graphid']]
-				: 0;
+			$parent_graph = [
+				'editable' => false,
+				'template_name' => _('Inaccessible template')
+			];
 		}
 	}
 	unset($parent_graph);
 
-	$db_templates = $data['templates']
-		? API::Template()->get([
-			'output' => ['name'],
-			'templateids' => array_keys($data['templates']),
-			'preservekeys' => true
-		])
-		: [];
+	return $parent_graphs;
+}
 
-	$rw_templates = $db_templates
-		? API::Template()->get([
+/**
+ * Get data for displaying parent graph prototypes of given graph prototypes.
+ *
+ * @param array $graphs
+ * @param bool  $allowed_ui_conf_templates
+ *
+ * @return array
+ */
+function getParentGraphPrototypes(array $graphs, bool $allowed_ui_conf_templates): array {
+	$parent_graphs = [];
+
+	foreach ($graphs as $graph) {
+		if ($graph['templateid'] != 0) {
+			$parent_graphs[$graph['templateid']] = [];
+		}
+	}
+
+	if (!$parent_graphs) {
+		return [];
+	}
+
+	$db_graphs = API::GraphPrototype()->get([
+		'output' => [],
+		'selectHosts' => ['name'],
+		'graphids' => array_keys($parent_graphs),
+		'preservekeys' => true
+	]);
+
+	if ($allowed_ui_conf_templates && $db_graphs) {
+		$editable_graphs = API::GraphPrototype()->get([
 			'output' => [],
-			'templateids' => array_keys($db_templates),
+			'selectHosts' => ['hostid'],
+			'selectDiscoveryRule' => ['itemid'],
 			'editable' => true,
+			'graphids' => array_keys($parent_graphs),
 			'preservekeys' => true
-		])
-		: [];
-
-	$data['templates'][0] = [];
-
-	foreach ($data['templates'] as $hostid => &$template) {
-		$template = array_key_exists($hostid, $db_templates)
-			? [
-				'hostid' => $hostid,
-				'name' => $db_templates[$hostid]['name'],
-				'permission' => array_key_exists($hostid, $rw_templates) ? PERM_READ_WRITE : PERM_READ
-			]
-			: [
-				'hostid' => $hostid,
-				'name' => _('Inaccessible template'),
-				'permission' => PERM_DENY
-			];
-	}
-	unset($template);
-
-	return $data;
-}
-
-/**
- * Returns a template prefix for selected graph.
- *
- * @param string $graphid
- * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
- * @param int    $flag              Origin of the graph (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return array|null
- */
-function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool $provide_links) {
-	if (!array_key_exists($graphid, $parent_templates['links'])) {
-		return null;
+		]);
 	}
 
-	while (array_key_exists($parent_templates['links'][$graphid]['graphid'], $parent_templates['links'])) {
-		$graphid = $parent_templates['links'][$graphid]['graphid'];
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
-
-	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$url = (new CUrl('graphs.php'))->setArgument('context', 'template');
-
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
+	foreach ($parent_graphs as $graphid => &$parent_graph) {
+		if (array_key_exists($graphid, $db_graphs)) {
+			if ($allowed_ui_conf_templates && array_key_exists($graphid, $editable_graphs)) {
+				$parent_graph = [
+					'editable' => true,
+					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
+					'hostid' => $editable_graphs[$graphid]['hosts'][0]['hostid'],
+					'ruleid' => $editable_graphs[$graphid]['discoveryRule']['itemid'],
+					'templateid' => $graphid
+				];
+			}
+			else {
+				$parent_graph = [
+					'editable' => false,
+					'template_name' => $db_graphs[$graphid]['hosts'][0]['name']
+				];
+			}
 		}
-		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url
-				->setArgument('filter_set', '1')
-				->setArgument('filter_hostids', [$template['hostid']]);
+			$parent_graph = [
+				'editable' => false,
+				'template_name' => _('Inaccessible template')
+			];
 		}
-
-		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
-	else {
-		$name = new CSpan(CHtml::encode($template['name']));
-	}
+	unset($parent_graph);
 
-	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
-}
-
-/**
- * Returns graph template element.
- *
- * @param string $graphid
- * @param array  $parent_templates  The list of the templates, prepared by getGraphParentTemplates() function.
- * @param int    $flag              Origin of the item (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return CTag|null
- */
-function makeGraphTemplateHtml(string $graphid, array $parent_templates, int $flag, bool $provide_links): ?CTag {
-	if (!array_key_exists($graphid, $parent_templates['links'])) {
-		return null;
-	}
-
-	$template = $parent_templates['templates'][$parent_templates['links'][$graphid]['hostid']];
-
-	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-		$url = (new CUrl('graphs.php'))
-			->setArgument('form', 'update')
-			->setArgument('context', 'template');
-
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
-		}
-
-		$url->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
-
-		if ($flag == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$url->setArgument('hostid', $template['hostid']);
-		}
-
-		return new CLink(CHtml::encode($template['name']), $url);
-	}
-
-	return (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+	return $parent_graphs;
 }
 
 /**

@@ -61,24 +61,39 @@ if ($data['graphid'] != 0) {
 // Create form list.
 $graphFormList = new CFormList('graphFormList');
 
-$is_templated = array_key_exists('template', $data);
+if (array_key_exists('parent_graph', $data)) {
+	if ($data['parent_graph']['editable']) {
+		$url = (new CUrl('graphs.php'))
+			->setArgument('form', 'update')
+			->setArgument('context', 'template')
+			->setArgument('graphid', $data['parent_graph']['templateid']);
 
-if ($is_templated) {
-	if ($data['parent_discoveryid'] === null) {
-		$graphFormList->addRow(_('Parent graph'), $data['template']);
+		if ($data['parent_discoveryid'] === null) {
+			$url->setArgument('hostid', $data['parent_graph']['hostid']);
+		}
+		else {
+			$url->setArgument('parent_discoveryid', $data['parent_graph']['ruleid']);
+		}
+
+		$parent_template_name = new CLink(CHtml::encode($data['parent_graph']['template_name']), $url);
 	}
 	else {
-		$graphFormList->addRow(_('Parent graph prototype'), $data['template']);
+		$parent_template_name = (new CSpan(CHtml::encode($data['parent_graph']['template_name'])))
+			->addClass(ZBX_STYLE_GREY);
+	}
+
+	if ($data['parent_discoveryid'] === null) {
+		$graphFormList->addRow(_('Parent graph'), $parent_template_name);
+	}
+	else {
+		$graphFormList->addRow(_('Parent graph prototype'), $parent_template_name);
 	}
 }
 
-$discovered_graph = false;
-if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$discovered_graph = true;
-}
-
+$discovered_graph = (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $readonly = false;
-if ($is_templated || $discovered_graph) {
+
+if (array_key_exists('parent_graph', $data) || $discovered_graph) {
 	$readonly = true;
 	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
@@ -510,7 +525,7 @@ if ($data['graphid'] != 0) {
 		$updateButton->setEnabled(false);
 	}
 
-	if ($is_templated) {
+	if (array_key_exists('parent_graph', $data)) {
 		$deleteButton->setEnabled(false);
 	}
 
