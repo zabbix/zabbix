@@ -31,6 +31,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);

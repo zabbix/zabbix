@@ -63,6 +63,7 @@ if ($data['readonly'] == true) {
 
 // Create form.
 $user_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

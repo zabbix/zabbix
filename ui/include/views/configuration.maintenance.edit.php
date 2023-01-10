@@ -30,6 +30,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT));
 
 $maintenance_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

@@ -29,6 +29,7 @@ $form_action = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $form = (new CForm('post', $form_action))
+	->cleanItems()
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form')
 	->addItem(
