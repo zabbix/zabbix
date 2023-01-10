@@ -89,8 +89,6 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 static zbx_mutex_t	sm_lock = ZBX_MUTEX_NULL;
 #endif
 
-extern unsigned char	program_type;
-
 #ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *
@@ -555,7 +553,7 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 	const zbx_thread_info_t	*info = &thread_args->info;
 	int			process_num = info->process_num;
-	const char		*program_type_str = get_program_type_string(program_type);
+	const char		*program_type_str = get_program_type_string(info->program_type);
 	const char		*process_type_str = get_process_type_string(info->process_type);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",  program_type_str, info->server_num,
@@ -567,7 +565,7 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 	{
 		double	sec = zbx_time();
 
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(info->process_type), sec);
 
 		zbx_setproctitle("%s [processing data]", process_type_str);
 

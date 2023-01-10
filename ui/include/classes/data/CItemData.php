@@ -83,7 +83,9 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.os.get',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
+			'system.sw.packages.get[<regexp>,<manager>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -185,7 +187,9 @@ final class CItemData {
 			'system.stat[resource,<type>]',
 			'system.sw.arch',
 			'system.sw.os[<info>]',
-			'system.sw.packages[<package>,<manager>,<format>]',
+			'system.sw.os.get',
+			'system.sw.packages[<regexp>,<manager>,<format>]',
+			'system.sw.packages.get[<regexp>,<manager>]',
 			'system.swap.in[<device>,<type>]',
 			'system.swap.out[<device>,<type>]',
 			'system.swap.size[<device>,<type>]',
@@ -1157,8 +1161,16 @@ final class CItemData {
 				'description' => _('Operating system information. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
-			'system.sw.packages[<package>,<manager>,<format>]' => [
+			'system.sw.os.get' => [
+				'description' => _('Operating system version information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'system.sw.packages[<regexp>,<manager>,<format>]' => [
 				'description' => _('Listing of installed packages. Returns text'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'system.sw.packages.get[<regexp>,<manager>]' => [
+				'description' => _('Detailed listing of installed packages. Returns text in JSON format'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'system.swap.in[<device>,<type>]' => [

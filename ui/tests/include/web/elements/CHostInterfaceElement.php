@@ -132,8 +132,8 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 					}
 				}
 
-				if ($name === 'Use bulk requests') {
-					$selector = 'xpath:.//label[contains(text(), "Use bulk requests")]/../input';
+				if ($name === 'Use combined requests') {
+					$selector = 'xpath:.//label[contains(text(), "Use combined requests")]/../input';
 					$row->query($selector)->asCheckbox()->one()->fill($value);
 					unset($values[$name]);
 				}
@@ -192,12 +192,12 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 	public function checkValue($expected, $raise_exception = true) {
 		$bulks = [];
 		foreach ($expected as $id => &$data) {
-			$bulks[$id] = CTestArrayHelper::get($data, 'Use bulk requests');
-			unset($data['Use bulk requests']);
+			$bulks[$id] = CTestArrayHelper::get($data, 'Use combined requests');
+			unset($data['Use combined requests']);
 		}
 		unset($data);
 
-		$selector = 'xpath:.//label[contains(text(), "Use bulk requests")]/../input';
+		$selector = 'xpath:.//label[contains(text(), "Use combined requests")]/../input';
 		if (parent::checkValue($expected, $raise_exception)) {
 			$rows = $this->getRows();
 

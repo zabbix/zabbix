@@ -59,6 +59,7 @@ DIST_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxprof \
 	zbxxml
 
 if SERVER
@@ -166,6 +167,7 @@ SUBDIRS = \
 	zbxlog \
 	zbxmodules \
 	zbxmutexs \
+	zbxprof \
 	zbxnix \
 	zbxnum \
 	zbxparam \
@@ -187,7 +189,7 @@ EXTRA_DIST = \
 	zbxwinservice
 
 ## hashicorp and cyberark used to be a separate libraries, remove them at some point in the future
-clean:
+clean: clean-recursive
 	rm -rf hashicorp && \
 	rm -rf cyberark
 .PHONY: clean

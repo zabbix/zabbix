@@ -42,6 +42,7 @@ class CSortable extends CBaseComponent {
 		drag_scroll_delay_short = 150,
 		drag_scroll_delay_long = 400,
 		wheel_step = 100,
+		show_grabbing_cursor = true,
 		do_activate = true
 	}) {
 		super(target);
@@ -51,6 +52,7 @@ class CSortable extends CBaseComponent {
 		this._drag_scroll_delay_short = drag_scroll_delay_short;
 		this._drag_scroll_delay_long = drag_scroll_delay_long;
 		this._wheel_step = wheel_step;
+		this._show_grabbing_cursor = show_grabbing_cursor;
 
 		this._init();
 		this._registerEvents();
@@ -278,6 +280,13 @@ class CSortable extends CBaseComponent {
 		// Hide the actual dragging item.
 		drag_item.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
 
+		// Set mouse cursor to "grabbing".
+		if (this._show_grabbing_cursor) {
+			this._dragging_style = document.createElement('style');
+			document.head.appendChild(this._dragging_style);
+			this._dragging_style.sheet.insertRule('* { cursor: grabbing !important; }');
+		}
+
 		this.fire(SORTABLE_EVENT_DRAG_START, {item: drag_item});
 	}
 
@@ -378,6 +387,11 @@ class CSortable extends CBaseComponent {
 		drag_item.focus();
 
 		this._drag_item = null;
+
+		// Reset mouse cursor.
+		if (this._show_grabbing_cursor) {
+			this._dragging_style.remove();
+		}
 
 		this.fire(SORTABLE_EVENT_DRAG_END, {item: drag_item});
 	}

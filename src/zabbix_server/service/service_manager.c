@@ -32,7 +32,6 @@
 #include "zbxcacheconfig.h"
 #include "zbx_trigger_constants.h"
 
-extern unsigned char			program_type;
 extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;
 
 /* keep deleted problem eventids up to 2 hours in case problem deletion arrived before problem or before recovery */
@@ -3281,7 +3280,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -3385,7 +3384,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

@@ -713,6 +713,15 @@
                     <key>zabbix[boottime]</key>
                     <delay>23s</delay>
                 </item>
+                <item>
+                    <uuid>5a7ad63453c4413f8a83809eceb869e2</uuid>
+                    <name>snmp.walk2</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>snmp.walk[.1.1.6.1.2.1.1.9.1.3]</snmp_oid>
+                    <key>snmp.walk1</key>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                </item>
             </items>
         </template>
     </templates>
