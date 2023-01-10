@@ -237,10 +237,6 @@ class Group extends ScimApiService {
 			'filter' => ['scim_groupid' => $options['id']]
 		]);
 
-		if (count($db_scim_group_members) != count($scim_group_members)) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
-		}
-
 		$users_to_add = array_diff($scim_group_members, array_column($db_scim_group_members, 'userid'));
 		$users_to_remove = array_diff(array_column($db_scim_group_members, 'userid'), $scim_group_members);
 
