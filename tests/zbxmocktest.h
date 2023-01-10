@@ -34,6 +34,8 @@
 #	define ZBX_NO_RETURN
 #endif
 
+int	get_config_timeout(void);
+
 void	zbx_mock_test_entry(void **state);
 
 #endif	/* ZABBIX_MOCK_TEST_H */
