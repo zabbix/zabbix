@@ -621,7 +621,6 @@ zbx_connector_t;
 typedef struct
 {
 	zbx_uint64_t		connectorid;
-	unsigned char		data_type;
 	int			tags_evaltype;
 	zbx_vector_ptr_t	tags;
 }
@@ -706,7 +705,8 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		int *errcodes, size_t num);
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num, unsigned int mode);
-void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *connector_filters);
+void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *connector_filters_history,
+		zbx_vector_connector_filter_t *connector_filters_events);
 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);

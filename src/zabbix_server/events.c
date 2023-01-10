@@ -30,6 +30,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxconnector.h"
 
 /* event recovery data */
 typedef struct
@@ -1752,7 +1753,8 @@ static void	db_trigger_get_hosts(zbx_hashset_t *hosts, ZBX_DB_TRIGGER *trigger)
  * Purpose: export events                                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_export_events(void)
+void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	int			i, j;
 	struct zbx_json		json;
@@ -1848,7 +1850,33 @@ void	zbx_export_events(void)
 		zbx_hashset_clear(&hosts);
 		zbx_vector_uint64_clear(&hostids);
 
-		zbx_problems_export_write(json.buffer, json.buffer_size);
+		if (0 != connector_filters->values_num)
+		{
+			int			k;
+			zbx_connector_object_t	connector_object;
+
+			zbx_vector_uint64_create(&connector_object.ids);
+			connector_object.objectid = event->trigger.triggerid;
+			connector_object.ts.sec = event->clock;
+			connector_object.ts.ns = event->ns;
+			connector_object.str = json.buffer;
+
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				zbx_vector_uint64_append(&connector_object.ids,
+						connector_filters->values[k].connectorid);
+			}
+
+			if (0 != connector_object.ids.values_num)
+			{
+				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+			}
+
+			zbx_vector_uint64_destroy(&connector_object.ids);
+		}
+
+		if (SUCCEED == events_export_enabled)
+			zbx_problems_export_write(json.buffer, json.buffer_size);
 	}
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
@@ -1865,10 +1893,37 @@ void	zbx_export_events(void)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, recovery->r_event->eventid);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PROBLEM_EVENTID, recovery->eventid);
 
-		zbx_problems_export_write(json.buffer, json.buffer_size);
+		if (0 != connector_filters->values_num)
+		{
+			int			k;
+			zbx_connector_object_t	connector_object;
+
+			zbx_vector_uint64_create(&connector_object.ids);
+			connector_object.objectid = recovery->r_event->trigger.triggerid;
+			connector_object.ts.sec = recovery->r_event->clock;
+			connector_object.ts.ns = recovery->r_event->ns;
+			connector_object.str = json.buffer;
+
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				zbx_vector_uint64_append(&connector_object.ids,
+						connector_filters->values[k].connectorid);
+			}
+
+			if (0 != connector_object.ids.values_num)
+			{
+				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+			}
+
+			zbx_vector_uint64_destroy(&connector_object.ids);
+		}
+
+		if (SUCCEED == events_export_enabled)
+			zbx_problems_export_write(json.buffer, json.buffer_size);
 	}
 
-	zbx_problems_export_flush();
+	if (SUCCEED == events_export_enabled)
+		zbx_problems_export_flush();
 
 	zbx_hashset_destroy(&hosts);
 	zbx_vector_uint64_destroy(&hostids);
@@ -2843,12 +2898,36 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 		if (ZBX_DB_OK == DBcommit())
 		{
+			int				event_export_enabled;
+			zbx_vector_connector_filter_t	connector_filters_events;
+			unsigned char			*data = NULL;
+			size_t				data_alloc = 0, data_offset = 0;
+
 			DCconfig_triggers_apply_changes(&trigger_diff);
 
-			if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-				zbx_export_events();
-
 			zbx_events_update_itservices();
+
+			zbx_vector_connector_filter_create(&connector_filters_events);
+
+			zbx_dc_config_history_sync_get_connectors(NULL, &connector_filters_events);
+
+			if (SUCCEED == (event_export_enabled = zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS)) ||
+					0 != connector_filters_events.values_num)
+			{
+				zbx_export_events(event_export_enabled, &connector_filters_events, &data, &data_alloc,
+						&data_offset);
+
+				if (0 != data_offset)
+				{
+					zbx_connector_send(ZBX_IPC_CONNECTOR_REQUEST, data,
+							(zbx_uint32_t)data_offset);
+				}
+			}
+
+			zbx_vector_connector_filter_clear(&connector_filters_events);
+			zbx_vector_connector_filter_destroy(&connector_filters_events);
+
+			zbx_free(data);
 		}
 
 		zbx_clean_events();
