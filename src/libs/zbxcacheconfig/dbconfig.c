@@ -15630,6 +15630,7 @@ void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *conn
 					ZBX_DEFAULT_MEM_FREE_FUNC);
 		}
 
+		connector->time_flush = 0;
 		connector->revision = config->revision.connector;
 		connector->protocol = dc_connector->protocol;
 		connector->data_type = dc_connector->data_type;
