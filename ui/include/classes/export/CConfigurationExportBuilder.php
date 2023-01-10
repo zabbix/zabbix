@@ -87,7 +87,7 @@ class CConfigurationExportBuilder {
 
 		$value = $has_data ? $row[$tag] : $default_value;
 
-		if (!$is_required && $has_data && $default_value == $value) {
+		if (!$is_required && $default_value == $value) {
 			return null;
 		}
 

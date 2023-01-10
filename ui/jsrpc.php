@@ -129,8 +129,7 @@ switch ($data['method']) {
 		break;
 
 	/**
-	 * Create multi select data.
-	 * Supported objects: "hosts", "hostGroup", "templates", "templateGroup", "triggers"
+	 * Create multiselect data.
 	 *
 	 * @param string $data['object_name']
 	 * @param string $data['search']
@@ -549,6 +548,7 @@ switch ($data['method']) {
 				break;
 
 			case 'valuemaps':
+			case 'template_valuemaps':
 				if (!array_key_exists('hostids', $data) || !array_key_exists('context', $data)) {
 					break;
 				}

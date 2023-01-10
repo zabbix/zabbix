@@ -832,6 +832,7 @@ class CConfigurationImport {
 
 				foreach ($item['preprocessing'] as &$preprocessing_step) {
 					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+
 					unset($preprocessing_step['parameters']);
 				}
 				unset($preprocessing_step);
@@ -1072,6 +1073,7 @@ class CConfigurationImport {
 
 				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
 					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+
 					unset($preprocessing_step['parameters']);
 				}
 				unset($preprocessing_step);
@@ -1242,6 +1244,7 @@ class CConfigurationImport {
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
 						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+
 						unset($preprocessing_step['parameters']);
 					}
 					unset($preprocessing_step);

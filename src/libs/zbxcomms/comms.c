@@ -55,57 +55,57 @@ extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 zbx_config_tls_t	*zbx_config_tls_new(void)
 {
-	zbx_config_tls_t	*zbx_config_tls;
+	zbx_config_tls_t	*config_tls;
 
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 
-	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
-	zbx_config_tls->accept_modes		= ZBX_TCP_SEC_UNENCRYPTED;
+	config_tls->connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
+	config_tls->accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
-	zbx_config_tls->connect			= NULL;
-	zbx_config_tls->accept			= NULL;
-	zbx_config_tls->ca_file			= NULL;
-	zbx_config_tls->crl_file		= NULL;
-	zbx_config_tls->server_cert_issuer	= NULL;
-	zbx_config_tls->server_cert_subject	= NULL;
-	zbx_config_tls->cert_file		= NULL;
-	zbx_config_tls->key_file		= NULL;
-	zbx_config_tls->psk_identity		= NULL;
-	zbx_config_tls->psk_file		= NULL;
-	zbx_config_tls->cipher_cert13		= NULL;
-	zbx_config_tls->cipher_cert		= NULL;
-	zbx_config_tls->cipher_psk13		= NULL;
-	zbx_config_tls->cipher_psk		= NULL;
-	zbx_config_tls->cipher_all13		= NULL;
-	zbx_config_tls->cipher_all		= NULL;
-	zbx_config_tls->cipher_cmd13		= NULL;
-	zbx_config_tls->cipher_cmd		= NULL;
+	config_tls->connect		= NULL;
+	config_tls->accept		= NULL;
+	config_tls->ca_file		= NULL;
+	config_tls->crl_file		= NULL;
+	config_tls->server_cert_issuer	= NULL;
+	config_tls->server_cert_subject	= NULL;
+	config_tls->cert_file		= NULL;
+	config_tls->key_file		= NULL;
+	config_tls->psk_identity	= NULL;
+	config_tls->psk_file		= NULL;
+	config_tls->cipher_cert13	= NULL;
+	config_tls->cipher_cert		= NULL;
+	config_tls->cipher_psk13	= NULL;
+	config_tls->cipher_psk		= NULL;
+	config_tls->cipher_all13	= NULL;
+	config_tls->cipher_all		= NULL;
+	config_tls->cipher_cmd13	= NULL;
+	config_tls->cipher_cmd		= NULL;
 
-	return zbx_config_tls;
+	return config_tls;
 }
 
-void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls)
+void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 {
-	zbx_free(zbx_config_tls->connect);
-	zbx_free(zbx_config_tls->accept);
-	zbx_free(zbx_config_tls->ca_file);
-	zbx_free(zbx_config_tls->crl_file);
-	zbx_free(zbx_config_tls->server_cert_issuer);
-	zbx_free(zbx_config_tls->server_cert_subject);
-	zbx_free(zbx_config_tls->cert_file);
-	zbx_free(zbx_config_tls->key_file);
-	zbx_free(zbx_config_tls->psk_identity);
-	zbx_free(zbx_config_tls->psk_file);
-	zbx_free(zbx_config_tls->cipher_cert13);
-	zbx_free(zbx_config_tls->cipher_cert);
-	zbx_free(zbx_config_tls->cipher_psk13);
-	zbx_free(zbx_config_tls->cipher_psk);
-	zbx_free(zbx_config_tls->cipher_all13);
-	zbx_free(zbx_config_tls->cipher_all);
-	zbx_free(zbx_config_tls->cipher_cmd13);
-	zbx_free(zbx_config_tls->cipher_cmd);
+	zbx_free(config_tls->connect);
+	zbx_free(config_tls->accept);
+	zbx_free(config_tls->ca_file);
+	zbx_free(config_tls->crl_file);
+	zbx_free(config_tls->server_cert_issuer);
+	zbx_free(config_tls->server_cert_subject);
+	zbx_free(config_tls->cert_file);
+	zbx_free(config_tls->key_file);
+	zbx_free(config_tls->psk_identity);
+	zbx_free(config_tls->psk_file);
+	zbx_free(config_tls->cipher_cert13);
+	zbx_free(config_tls->cipher_cert);
+	zbx_free(config_tls->cipher_psk13);
+	zbx_free(config_tls->cipher_psk);
+	zbx_free(config_tls->cipher_all13);
+	zbx_free(config_tls->cipher_all);
+	zbx_free(config_tls->cipher_cmd13);
+	zbx_free(config_tls->cipher_cmd);
 
-	zbx_free(zbx_config_tls);
+	zbx_free(config_tls);
 }
 
 /******************************************************************************

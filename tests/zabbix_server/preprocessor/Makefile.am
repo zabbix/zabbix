@@ -31,6 +31,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
@@ -41,8 +42,9 @@ JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \
+	../../../src/zabbix_server/preprocessor/preproc_snmp.c \
 	zbx_item_preproc.c
-
+	
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@

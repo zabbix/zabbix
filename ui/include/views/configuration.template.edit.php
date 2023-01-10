@@ -35,11 +35,12 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 
 $tabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
