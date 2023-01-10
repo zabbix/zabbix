@@ -19,6 +19,8 @@
 
 #include "ssh_run.h"
 
+#include "zbxcommon.h"
+
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
@@ -32,6 +34,7 @@
 #include "zbxcomms.h"
 #include "log.h"
 #include "zbxnum.h"
+#include "zbxfile.h"
 #endif
 
 extern char    *CONFIG_SOURCE_IP;
