@@ -4,6 +4,7 @@ AGENT_tests = \
 	vfs_fs_discovery \
 	kernel_maxproc \
 	system_cpu_switches \
+	system_sw_packages_get \
 	kernel_maxfiles \
 	system_cpu_intr \
 	system_boottime \
@@ -123,6 +124,20 @@ system_cpu_switches_LDADD += @AGENT_LIBS@
 system_cpu_switches_LDFLAGS = @AGENT_LDFLAGS@
 
 system_cpu_switches_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+# system_sw_packages_get
+system_sw_packages_get_SOURCES = \
+	system_sw_packages_get.c \
+	$(COMMON_SRC_FILES)
+
+system_sw_packages_get_LDADD = \
+	$(COMMON_LIB_FILES)
+
+system_sw_packages_get_LDADD += @AGENT_LIBS@
+
+system_sw_packages_get_LDFLAGS = @AGENT_LDFLAGS@
+
+system_sw_packages_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 # kernel_maxfiles
 kernel_maxfiles_SOURCES = \

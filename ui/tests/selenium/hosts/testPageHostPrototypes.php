@@ -125,7 +125,7 @@ class testPageHostPrototypes extends CLegacyWebTest {
 		if ($action === 'Click on state') {
 			foreach ($data['hosts'] as $host) {
 				$id = DBfetch(DBselect('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host)));
-				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid=".$id['hostid']."')]");
+				$this->zbxTestClickXpathWait("//a[contains(@onclick,'group_hostid%5B%5D=".$id['hostid']."')]");
 			}
 		}
 		else {

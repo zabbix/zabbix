@@ -5193,6 +5193,15 @@ msgstr ""
 msgid "Current host"
 msgstr "Host atual"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr ""
@@ -7760,6 +7769,11 @@ msgstr "No mapa \"%2$s\" o campo \"%1$s\" está com valor ausente."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "O campo \"%1$s\" não está correto: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -9488,6 +9502,11 @@ msgstr "A importação foi concluída com sucesso"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "Em manutenção"
@@ -9859,6 +9878,10 @@ msgstr ""
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Condições incorretas para a regra de descoberta \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -15097,6 +15120,10 @@ msgstr "Senha"
 msgid "Password (once again)"
 msgstr "Senha (novamente)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "A senha é opcional para autenticação externa."
@@ -15339,6 +15366,10 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -23270,6 +23301,10 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "sequência de bytes inválida no UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
