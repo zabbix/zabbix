@@ -117,7 +117,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'maps_accessible' => array_keys($maps_accessible),
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),
-			'csrf_tokens' => ['profile.update' => self::generateCsrfToken('profile.update')],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

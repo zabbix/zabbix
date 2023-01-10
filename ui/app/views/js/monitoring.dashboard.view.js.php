@@ -391,7 +391,7 @@
 
 				history.pushState({host: host}, '', curl.getUrl());
 
-				updateUserProfile('web.dashboard.hostid', host ? host.id : 1, view.csrf_tokens['profile.update']);
+				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
 			},
 
 			applyProperties() {

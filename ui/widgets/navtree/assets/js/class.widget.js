@@ -233,7 +233,7 @@ class CWidgetNavTree extends CWidget {
 					this._openBranch(this._navtree_item_selected);
 
 					updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected,
-						this.csrf_tokens['profile.update'], [this._widgetid]
+						[this._widgetid]
 					);
 
 					this.fire(CWidgetNavTree.EVENT_SELECT, {
@@ -623,7 +623,7 @@ class CWidgetNavTree extends CWidget {
 
 				if (this._widgetid !== null) {
 					updateUserProfile(`web.dashboard.widget.navtree.item-${branch.getAttribute('data-id')}.toggle`,
-						closed_state, this.csrf_tokens['profile.update'], [this._widgetid]
+						closed_state, [this._widgetid]
 					);
 
 					const index = this._navtree_items_opened.indexOf(branch.getAttribute('data-id'));
@@ -747,9 +747,7 @@ class CWidgetNavTree extends CWidget {
 			step_in_path = step_in_path.parentNode.closest('.tree-item');
 		}
 
-		updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected, this.csrf_tokens['profile.update'],
-			[this._widgetid]
-		);
+		updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected, [this._widgetid]);
 
 		this.fire(CWidgetNavTree.EVENT_MARK, {itemid: this._navtree_item_selected});
 

@@ -34,8 +34,31 @@
 		cookie.init();
 		chkbxRange.init();
 
-		init_sidebar({
-			csrf_tokens: <?= json_encode(['profile.update' => CController::generateCsrfToken('profile.update')]) ?>
-		});
+		init_sidebar({});
 	});
+
+	/**
+	 * Toggles filter state and updates title and icons accordingly.
+	 *
+	 * @param {string} 	idx					User profile index
+	 * @param {string} 	value				Value
+	 * @param {object} 	idx2				An array of IDs
+	 * @param {int} 	profile_type		Profile type
+	 */
+	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT, ) {
+		const value_fields = {
+			[PROFILE_TYPE_INT]: 'value_int',
+			[PROFILE_TYPE_STR]: 'value_str'
+		};
+
+		return sendAjaxData('zabbix.php', {
+			data: {
+				idx: idx,
+				[value_fields[profile_type]]: value,
+				idx2: idx2,
+				action: 'profile.update',
+				_csrf_token: <?= json_encode(CController::generateCsrfToken('profile.update')) ?>
+			}
+		});
+	}
 </script>

@@ -1460,9 +1460,7 @@ class CDashboard extends CBaseComponent {
 
 				if (type !== this._widget_last_type) {
 					this._widget_last_type = type;
-					updateUserProfile('web.dashboard.last_widget_type', type, this.csrf_tokens['profile.update'], [],
-						PROFILE_TYPE_STR
-					);
+					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
 
 				const widget_class = eval(this._widget_defaults[type].js_class);

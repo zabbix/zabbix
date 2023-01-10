@@ -708,39 +708,12 @@ function rm4favorites(object, objectid, csrf_token) {
 }
 
 /**
- * Toggles filter state and updates title and icons accordingly.
- *
- * @param {string} 	idx					User profile index
- * @param {string} 	value				Value
- * @param {string} 	csrf_token			CSRF token
- * @param {object} 	idx2				An array of IDs
- * @param {int} 	profile_type		Profile type
- */
-function updateUserProfile(idx, value, csrf_token, idx2, profile_type = PROFILE_TYPE_INT, ) {
-	const value_fields = {
-		[PROFILE_TYPE_INT]: 'value_int',
-		[PROFILE_TYPE_STR]: 'value_str'
-	};
-
-	return sendAjaxData('zabbix.php', {
-		data: {
-			idx: idx,
-			[value_fields[profile_type]]: value,
-			idx2: idx2,
-			action: 'profile.update',
-			_csrf_token: csrf_token
-		}
-	});
-}
-
-/**
  * Section collapse toggle.
  *
  * @param {string}      id
  * @param {string|null} profile_idx  If not null, stores state in profile.
- * @param {string}      csrf_token   CSRF token.
  */
-function toggleSection(id, profile_idx, csrf_token) {
+function toggleSection(id, profile_idx) {
 	const section = document.getElementById(id);
 	const toggle = section.querySelector('.section-toggle');
 
@@ -750,7 +723,7 @@ function toggleSection(id, profile_idx, csrf_token) {
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
 	if (profile_idx !== '') {
-		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', csrf_token, []);
+		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}
 }
 
@@ -1133,9 +1106,8 @@ jQuery(function ($) {
 /**
  * SideBar initialization.
  */
-function init_sidebar({csrf_tokens}) {
+function init_sidebar() {
 	const sidebar = document.querySelector('.sidebar');
-	this.csrf_tokens = csrf_tokens;
 
 	if (sidebar !== null) {
 		ZABBIX.MenuMain = new CMenu(document.querySelector('.menu-main'));
@@ -1143,7 +1115,7 @@ function init_sidebar({csrf_tokens}) {
 
 		ZABBIX.Sidebar = new CSidebar(sidebar)
 			.on('viewmodechange', (e) => {
-				updateUserProfile('web.sidebar.mode', e.detail.view_mode, this.csrf_tokens['profile.update'],[]);
+				updateUserProfile('web.sidebar.mode', e.detail.view_mode, []);
 				window.dispatchEvent(new Event('resize'));
 			});
 	}

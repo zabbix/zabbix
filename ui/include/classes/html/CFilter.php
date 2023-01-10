@@ -345,12 +345,10 @@ class CFilter extends CDiv {
 		// Set the focus to a field with autofocus after the filter becomes visible.
 		$js .= 'jQuery("[autofocus=autofocus]", jQuery("'.$id.'")).filter(":visible").focus();';
 
-		$csrf_token = CController::generateCsrfToken('profile.update');
-
 		if ($this->idx !== null && $this->idx !== '') {
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
 				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;'.
-				'updateUserProfile("'.$this->idx.'.active", active, "'. $csrf_token .'", []);'.
+				'updateUserProfile("'.$this->idx.'.active", active, []);'.
 
 				'if (active) {'.
 					'jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.
