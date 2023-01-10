@@ -1671,7 +1671,8 @@ function getSingleEventActions(array $event, array $r_events, array $alerts) {
 	// Sort by action_type is done to put Recovery event before actions, resulted from it. Same for other action_type.
 	CArrayHelper::sort($actions, [
 		['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-		['field' => 'action_type', 'order' => ZBX_SORT_DOWN]
+		['field' => 'action_type', 'order' => ZBX_SORT_DOWN],
+		['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
 	]);
 
 	return [
