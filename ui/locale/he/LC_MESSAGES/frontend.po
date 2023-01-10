@@ -4028,6 +4028,10 @@ msgstr "ההגדרות עודכנו"
 msgid "Configure DB connection"
 msgstr "הגדרת חיבור למסד הנתונים"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "טקסט אימות"
@@ -6268,6 +6272,10 @@ msgstr "הפעלה"
 msgid "Enable HTTP authentication"
 msgstr "הפעלת אימות HTTP"
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr "הפעלת אימות מול LDAP"
@@ -8484,6 +8492,10 @@ msgstr "מרחב שם זהה (%1$s) משמש את המודולים תחת %2$s."
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "זיהוי המערכת. מחזירה מחרוזת"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format

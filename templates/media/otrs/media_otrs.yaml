@@ -1,9 +1,9 @@
 zabbix_export:
-  version: '5.4'
+  version: '6.0'
   date: '2020-10-16T09:33:49Z'
   media_types:
     -
-      name: OTRS
+      name: OTRS CE
       type: WEBHOOK
       parameters:
         -
@@ -338,7 +338,7 @@ zabbix_export:
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
-      event_menu_name: 'OTRS: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
+      event_menu_name: 'OTRS CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
       message_templates:
         -
           event_source: TRIGGERS

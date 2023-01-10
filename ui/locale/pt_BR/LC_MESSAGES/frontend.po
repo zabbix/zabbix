@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-04 18:23+0000\n"
-"Last-Translator: Nilton Röhricht Junior <rohricht@gmail.com>\n"
+"PO-Revision-Date: 2022-12-23 11:01+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -1663,11 +1663,11 @@ msgstr "Senha para o Bind"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bits a serem deslocados"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Funções bit a bit"
 
 #: app/views/administration.user.list.php:143
 msgid "Blocked"
@@ -1739,7 +1739,7 @@ msgstr "Abaixo"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "N menores"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -2182,7 +2182,7 @@ msgstr[1] ""
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] "Não é possível excluir o SLA"
+msgstr[0] "Não é possível excluir SLA"
 msgstr[1] ""
 
 #: include/classes/api/services/CUser.php:1257
@@ -2320,8 +2320,8 @@ msgstr[1] "Não foi possível excluir tipo de mídia"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não é possível excluir o módulo: %1$s"
+msgstr[1] "Não é possível excluir os módulos: %1$s."
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2347,7 +2347,7 @@ msgstr[1] "Não foi possível excluir expressões regulares"
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
+msgstr[0] "Não é possível excluir o relatório agendado."
 msgstr[1] ""
 
 #: app/controllers/CControllerScriptDelete.php:69
@@ -2435,7 +2435,7 @@ msgstr "As triggers não foram excluídas"
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
-msgstr[0] "Usuário não foi removido"
+msgstr[0] "Usuário não foi excluído"
 msgstr[1] ""
 
 #: app/controllers/CControllerUsergroupDelete.php:59
@@ -2547,7 +2547,7 @@ msgstr[1] ""
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] ""
+msgstr[0] "Não foi possível ativar SLA"
 msgstr[1] ""
 
 #: actionconf.php:498
@@ -2597,7 +2597,7 @@ msgstr[1] ""
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
 msgid_plural "Cannot enable scheduled reports"
-msgstr[0] ""
+msgstr[0] "Não possível ativar o relatório agendado"
 msgstr[1] ""
 
 #: triggers.php:489
@@ -2618,7 +2618,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
-msgstr ""
+msgstr "Não foi possível executar o script."
 
 #: jsLoader.php:287
 msgid "Cannot expand macros."
@@ -2941,7 +2941,7 @@ msgstr "Não foi possível ler o XML: %1$s."
 #: include/classes/import/readers/CYamlImportReader.php:55
 #, c-format
 msgid "Cannot read YAML: %1$s."
-msgstr ""
+msgstr "Não foi possível ler o YAML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:543
 #, c-format
@@ -3279,7 +3279,7 @@ msgstr "Não foi possível atualizar o tipo de mídia"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "Não foi possível atualizar o módulo: %1$s."
 
 #: sysmaps.php:184
 msgid "Cannot update network map"
@@ -4031,6 +4031,10 @@ msgstr "Configuração atualizada"
 #: include/classes/setup/CSetupWizard.php:601
 msgid "Configure DB connection"
 msgstr "Configura a conexão com o DB"
+
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
 
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
@@ -5437,7 +5441,7 @@ msgstr "Depende de"
 
 #: include/hosts.inc.php:264
 msgid "Deployment status"
-msgstr "Status de desenvolvimento"
+msgstr "Status de implantação"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
@@ -6264,6 +6268,10 @@ msgstr "Ativar"
 #: app/views/administration.authentication.edit.php:110
 msgid "Enable HTTP authentication"
 msgstr "Habilitar autenticação HTTP"
+
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
@@ -8481,6 +8489,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identificação do sistema. Retorna texto"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
