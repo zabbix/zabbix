@@ -1486,7 +1486,7 @@ static int	DBpatch_6030160(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update sessions set csrf_token_salt=sessionid;"))
+	if (ZBX_DB_OK > DBexecute("update sessions set csrf_token_salt=sessionid"))
 		return FAIL;
 
 	return SUCCEED;
