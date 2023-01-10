@@ -12595,7 +12595,7 @@ msgid "Max repetition count"
 msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:106
-msgid "Max repetition count is applicable to discovery and walk only."
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
