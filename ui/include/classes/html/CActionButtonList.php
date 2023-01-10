@@ -101,25 +101,22 @@ class CActionButtonList extends CObject {
 						->removeAttribute('name')
 						->removeAttribute('value')
 						->setAttribute('data-redirect', $button_data['redirect'])
-						->onClick(
-							'const form = this.closest("form");' .
-							// Save the original form action
-							'if (!form.dataset.action) {
-								form.dataset.action = form.action;
-							}
-							form.action = this.dataset.redirect;'
+						->onClick('var $_form = jQuery(this).closest("form");'.
+							// Save the original form action.
+							'if (!$_form.data("action")) {'.
+							'$_form.data("action", $_form.attr("action"));'.
+							'}'.
+							'$_form.attr("action", this.dataset.redirect);'
 						);
 				}
 				else {
 					$button
 						->setAttribute('value', $action)
-						->onClick('
-							const form = this.closest("form");'.
-
+						->onClick('var $_form = jQuery(this).closest("form");'.
 							// Restore the original form action, if previously saved.
-							'if (form.dataset.action) {
-								form.action = form.dataset.action;
-							}'
+							'if ($_form.data("action")) {'.
+							'$_form.attr("action", $_form.data("action"));'.
+							'}'
 						);
 				}
 
