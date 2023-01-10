@@ -34,23 +34,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
 	'parent_discoveryid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null],
-	'host' =>					[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
-	'name' =>					[T_ZBX_STR, O_OPT, null,		null,		'isset({add}) || isset({update})'],
-	'status' =>					[T_ZBX_INT, O_OPT, null,		IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
-	'discover' =>				[T_ZBX_INT, O_OPT, null, IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
-	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null, IN([HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), null],
-	'templates' =>				[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'add_templates' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'group_links' =>			[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'group_prototypes' =>		[T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null],
-	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null],
-	'group_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'host' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
+	'name' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED]), null],
+	'discover' =>				[T_ZBX_INT, O_OPT, null,	IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
+	'inventory_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]), null],
+	'templates' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY, NOT_EMPTY,		null],
+	'add_templates' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY, NOT_EMPTY,		null],
+	'group_links' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY, NOT_EMPTY,		null],
+	'group_prototypes' =>		[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY, NOT_EMPTY,	null],
+	'unlink' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT|P_ONLY_ARRAY,	null,	null],
+	'group_hostid' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'show_inherited_macros' =>	[T_ZBX_INT, O_OPT, null, IN([0,1]), null],
-	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
-	'macros' =>					[T_ZBX_STR, O_OPT, P_SYS,			null,		null],
+	'tags' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
+	'macros' =>					[null,      O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'custom_interfaces' =>		[T_ZBX_INT, O_OPT, null, IN([HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]), null],
-	'interfaces' =>				[T_ZBX_STR, O_OPT, null, null,		null],
-	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, null, DB_ID,		null],
+	'interfaces' =>				[null,      O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'mainInterfaces' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,	IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -65,10 +65,10 @@ $fields = [
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status","discover"'),						null],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,	IN('"name","status","discover"'),				null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -385,6 +385,7 @@ if (hasRequest('form')) {
 	$hostid = getRequest('hostid', 0);
 
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => [
 			'hostid' => $hostid,

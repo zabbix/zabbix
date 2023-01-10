@@ -77,7 +77,9 @@
 		},
 
 		replaceSubfilter(subfilter) {
-			document.getElementById('subfilter').outerHTML = subfilter;
+			if (document.getElementById('subfilter') !== null) {
+				document.getElementById('subfilter').outerHTML = subfilter;
+			}
 		},
 
 		setSubfilter(tag, value) {

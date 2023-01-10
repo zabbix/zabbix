@@ -61,7 +61,7 @@ $fields = [
 											' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0)',
 									_('Update interval')
 								],
-	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
+	'delay_flex' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
@@ -111,8 +111,8 @@ $fields = [
 	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'lld_macro_paths' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
+	'lld_macro_paths' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
@@ -126,10 +126,10 @@ $fields = [
 										' && {type} == '.ITEM_TYPE_HTTPAGENT,
 									_('URL')
 								],
-	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'parameters' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'parameters' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
 	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
 									IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 									null
@@ -138,8 +138,8 @@ $fields = [
 									IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 									null
 								],
-	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' => 				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>			[T_ZBX_INT, O_OPT, null,
 									IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 										HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -190,8 +190,8 @@ $fields = [
 										')',
 									_('Password')
 								],
-	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'preprocessing' =>			[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'overrides' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	'context' =>				[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
@@ -200,19 +200,19 @@ $fields = [
 									),
 									null
 								],
-	'g_hostdruleid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_hostdruleid' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>			[T_ZBX_INT, O_OPT, null,

@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /*
@@ -571,7 +570,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	if (FAIL == zbx_ipc_service_start(&lld_service, ZBX_IPC_SERVICE_LLD, &error))
@@ -611,7 +610,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;

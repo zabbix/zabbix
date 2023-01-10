@@ -60,7 +60,9 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $events = API::Event()->get([
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity',
+		'cause_eventid'
+	],
 	'selectTags' => ['tag', 'value'],
 	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
 		'suppress_until'
@@ -151,7 +153,8 @@ $allowed = [
 	'suppress_problems' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 	'close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-	)
+	),
+	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 ];
 
 /*
