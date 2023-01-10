@@ -28,8 +28,7 @@
 #include "um_cache_mock.h"
 #include "zbxshmem.h"
 
-char    *um_mock_format_macro(const char *name, const char *context);
-
+char	*um_mock_format_macro(const char *name, const char *context);
 void	*__wrap___zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, const void *old, size_t size);
 void	*__wrap___zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, void *old, size_t size);
 void	__wrap___zbx_shmem_free(const char *file, int line, zbx_shmem_info_t *info, void *ptr);

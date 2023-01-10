@@ -46,7 +46,7 @@ int	zbx_write_all(int fd, const char *buf, size_t n);
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int     __zbx_open(const char *pathname, int flags);
+int	__zbx_open(const char *pathname, int flags);
 
 /* some definitions which are not available on older MS Windows versions */
 typedef enum {

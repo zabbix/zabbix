@@ -624,7 +624,7 @@ void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeou
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64 zbx_stat_t;
-int     __zbx_stat(const char *path, zbx_stat_t *buf);
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
