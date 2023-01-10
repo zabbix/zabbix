@@ -1268,11 +1268,11 @@ static void	proxy_db_init(void)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	zbx_socket_t			listen_sock;
-	char				*error = NULL;
-	int				i, ret;
-	zbx_rtc_t			rtc;
-	zbx_timespec_t			rtc_timeout = {1, 0};
+	zbx_socket_t				listen_sock;
+	char					*error = NULL;
+	int					i, ret;
+	zbx_rtc_t				rtc;
+	zbx_timespec_t				rtc_timeout = {1, 0};
 
 	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE,
 								config_timeout};
@@ -1287,6 +1287,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								&listen_sock};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
+
+	zbx_rtc_process_request_ex_func_t	rtc_process_request_ex;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1479,6 +1481,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_diag_init(diag_add_section_info);
 
 	thread_args.info.program_type = program_type;
+
+	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+		rtc_process_request_ex = rtc_process_request_ex_passive;
+	else
+		rtc_process_request_ex = rtc_process_request_ex_active;
 
 	for (i = 0; i < threads_num; i++)
 	{

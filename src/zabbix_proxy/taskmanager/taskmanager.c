@@ -41,7 +41,6 @@
 extern int				CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int				CONFIG_LOG_REMOTE_COMMANDS;
 extern unsigned char			program_type;
-extern int				CONFIG_PROXYMODE;
 extern char 				*CONFIG_HOSTNAME;
 
 /******************************************************************************
@@ -472,7 +471,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 				zbx_clear_cache_snmp(process_type, process_num);
 #endif
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd && ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd &&
+					ZBX_PROXYMODE_PASSIVE == taskmanager_args_in->config_comms->proxymode)
 				force_config_sync();
 
 			zbx_free(rtc_data);
