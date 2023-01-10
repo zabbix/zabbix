@@ -28,6 +28,12 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxstr}.c{..\..\..\src\libs\zbxstr}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxfile}.c{..\..\..\src\libs\zbxfile}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxfile\win32}.c{..\..\..\src\libs\zbxfile\win32}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxparam}.c{..\..\..\src\libs\zbxparam}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
@@ -77,9 +83,6 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxmutexs}.c{..\..\..\src\libs\zbxmutexs}.o:
-	$(CC) $? /Fo"$@" $(CFLAGS)
-
-{..\..\..\src\libs\zbxsymbols}.c{..\..\..\src\libs\zbxsymbols}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxexec}.c{..\..\..\src\libs\zbxexec}.o:

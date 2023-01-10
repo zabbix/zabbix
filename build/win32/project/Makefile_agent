@@ -46,6 +46,7 @@ OBJS = \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
 	..\..\..\src\libs\zbxfile\file.o \
+	..\..\..\src\libs\zbxfile\win32\symbols.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
@@ -71,7 +72,6 @@ OBJS = \
 	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxmutexs\mutexs.o \
-	..\..\..\src\libs\zbxsymbols\symbols.o \
 	..\..\..\src\libs\zbxthreads\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxhash\zbxhash.o \
