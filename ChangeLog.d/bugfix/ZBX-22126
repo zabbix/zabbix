@@ -1,0 +1,1 @@
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
