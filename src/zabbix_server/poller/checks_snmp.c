@@ -2476,7 +2476,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
 	}
-	else if (0 == strncmp(items[j].snmp_oid, "snmp.walk[", 10))
+	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
 	{
 		err = zbx_snmp_process_snmp_bulkwalk(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error));
 	}
