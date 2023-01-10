@@ -660,7 +660,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'options_tab' => [
 						'Attempt interval' => -1
 					],
-					'error' => 'IInvalid parameter "/1/attempt_interval": value must be one of 0-3600.'
+					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
 			[
