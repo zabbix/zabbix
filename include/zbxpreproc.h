@@ -85,8 +85,8 @@ typedef struct
 	unsigned char		flags;
 	zbx_pp_process_mode_t	mode;
 
-	zbx_pp_history_t	*history;
-	int			history_num;
+	zbx_pp_history_t	*history;	/* the preprocessing history */
+	int			history_num;	/* the number of preprocessing steps requiring history */
 }
 zbx_pp_item_preproc_t;
 

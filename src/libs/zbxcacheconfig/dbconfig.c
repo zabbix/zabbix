@@ -9144,15 +9144,6 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, zbx_uint
 		preproc->steps[i].error_handler_params = zbx_strdup(NULL, op->error_handler_params);
 	}
 
-	for (int i = 0; i < preproc->steps_num; i++)
-	{
-		if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
-		{
-			preproc->mode = ZBX_PP_PROCESS_SERIAL;
-			break;
-		}
-	}
-
 	preproc->steps_num = preprocitem->preproc_ops.values_num;
 }
 
@@ -9250,6 +9241,15 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		}
 
 		zbx_pp_item_preproc_release(pp_item->preproc);
+	}
+
+	for (int i = 0; i < preproc->steps_num; i++)
+	{
+		if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
+		{
+			preproc->history_num++;
+			preproc->mode = ZBX_PP_PROCESS_SERIAL;
+		}
 	}
 
 	pp_item->preproc = preproc;
