@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-11T10:15:56Z'
+  date: '2023-01-11T15:24:12Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,10 +13,10 @@ zabbix_export:
       description: |
         This template is designed to monitor Veeam Backup & Replication 11.0.
         It works without any external scripts and uses the script item.
-        Authorization grant type. Available values look in [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request)
         
         Setup:
-          1. Create a user to monitor the service or use an existing read-only account. 
+          1. Create a user to monitor the service or use an existing read-only account.
+          See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
           2. Link the template to a host.
           3. Configure macros {$VEEAM.API.URL}, {$VEEAM.USER}, {$VEEAM.PASSWORD}.
         
@@ -33,10 +33,10 @@ zabbix_export:
           type: DEPENDENT
           key: veeam.get.errors
           delay: '0'
-          history: 0d
+          history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'A list of errors from API requests.'
+          description: 'The errors from API requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -873,7 +873,7 @@ zabbix_export:
           description: 'A response timeout for API.'
         -
           macro: '{$VEEAM.HTTP.PROXY}'
-          description: 'Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.'
+          description: 'Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.'
         -
           macro: '{$VEEAM.PASSWORD}'
           type: SECRET_TEXT

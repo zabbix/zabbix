@@ -5,7 +5,6 @@
 
 This template is designed to monitor Veeam Backup & Replication used Veeam Backup Enterprise Manager REST API.
 Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
-HTTP Authentication look in [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110)
 It works without any external scripts and uses the script item. 
 
 ## Requirements
@@ -18,6 +17,7 @@ For Zabbix version: 6.2 and higher.
 
 1. Create a user to monitor the service or use an existing read-only account.
 You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
+> See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
 2. Link the template to a host.
 3. Configure macros {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
 
@@ -35,7 +35,7 @@ No specific Zabbix configuration is required.
 |{$BACKUP.TYPE.NOT_MATCHES} |<p>This macro is used in backup discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint URL in the format <scheme>://<host>:<port>.</p> |`https://localhost:9398/api` |
 |{$VEEAM.MANAGER.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`10` |
-|{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
+|{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
 |{$VEEAM.MANAGER.PASSWORD} |<p>Password of the account to be used for authentication..</p> |`` |
 |{$VEEAM.MANAGER.USER} |<p>Username of the account to be used for authentication..</p> |`` |
 
@@ -54,7 +54,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam Manager: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.manager.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Veeam |Veeam: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Veeam |Veeam: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Veeam |Running Jobs |<p>The informing about of the running jobs.</p> |DEPENDENT |veeam.manager.running.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.RunningJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Scheduled Jobs |<p>The informing about of the scheduled jobs.</p> |DEPENDENT |veeam.manager.scheduled.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Scheduled Backup Jobs |<p>The informing about of the scheduled backup jobs.</p> |DEPENDENT |veeam.manager.scheduled.backup.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-11T10:15:52Z'
+  date: '2023-01-11T15:24:08Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,12 +13,12 @@ zabbix_export:
       description: |
         This template is designed to monitor Veeam Backup & Replication used Veeam Backup Enterprise Manager REST API.
         Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
-        HTTP Authentication look in [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110)
         It works without any external scripts and uses the script item. 
         
         Setup:
           1. Create a user to monitor the service or use an existing read-only account.
           You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
+          See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
           2. Link the template to a host.
           3. Configure macros {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
         
@@ -58,12 +58,13 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'A list of errors from API requests.'
+          description: 'The errors from API requests.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.errors
+                - $.error
+              error_handler: CUSTOM_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -477,7 +478,7 @@ zabbix_export:
           description: 'A response timeout for API.'
         -
           macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
-          description: 'Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.'
+          description: 'Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.'
         -
           macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT
