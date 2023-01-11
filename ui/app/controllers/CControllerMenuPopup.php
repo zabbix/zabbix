@@ -233,7 +233,7 @@ class CControllerMenuPopup extends CController {
 				'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 				'allowed_ui_hosts' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_HOSTS),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'csrf_tokens' => ['popup.scriptexec' => self::generateCsrfToken('popup.scriptexec')]
+				'csrf_tokens' => self::generateCsrfTokens(['popup.scriptexec'])
 			];
 
 			if ($has_goto) {
@@ -866,7 +866,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($scripts) {
-				$menu_data['csrf_tokens'] = ['popup.scriptexec' => self::generateCsrfToken('popup.scriptexec')];
+				$menu_data['csrf_tokens'] = self::generateCsrfTokens(['popup.scriptexec']);
 			}
 
 			foreach (array_values($urls) as $url) {

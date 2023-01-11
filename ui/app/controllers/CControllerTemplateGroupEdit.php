@@ -80,7 +80,7 @@ class CControllerTemplateGroupEdit extends CController{
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-		$data['csrf_tokens'] = ['templategroup.delete' => self::generateCsrfToken('templategroup.delete')];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['templategroup.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of template group'));

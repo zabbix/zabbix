@@ -113,7 +113,7 @@ class CControllerUsergroupList extends CController {
 		}
 		unset($usergroup);
 
-		$data['csrf_tokens'] = ['usergroup.delete' => self::generateCsrfToken('usergroup.delete')];
+		$data['csrf_tokens'] = self::generateCsrfTokens(['usergroup.delete']);
 
 		$response = new CControllerResponseData($data);
 
