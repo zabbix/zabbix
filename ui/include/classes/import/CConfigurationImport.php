@@ -959,7 +959,7 @@ class CConfigurationImport {
 		/*
 		 * It's possible that some LLD rules use master items which are web items. They don't reside in item
 		 * references at this point. For items and item prototypes web items are found while processing the order of
-		 * them, but for LLD rules there is no ordering, so this is done independetly. Sp due to the nature of constant
+		 * them, but for LLD rules there is no ordering, so this is done independetly. So due to the nature of constant
 		 * item refreshing after each entity type is processed, it's safer to collect web items once more here where it
 		 * is necessary. Collect host IDs and master item keys that cannot be resolved and then find web items and add
 		 * references to item list.

@@ -332,6 +332,7 @@ class CConfigurationExport {
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
 			$templates = $this->gatherHttpTests($templates);
+			$templates = $this->removeHttpTestItems($templates);
 		}
 
 		$this->data['templates'] = $templates;
@@ -376,6 +377,7 @@ class CConfigurationExport {
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
 			$hosts = $this->gatherHttpTests($hosts);
+			$hosts = $this->removeHttpTestItems($hosts);
 		}
 
 		$this->data['hosts'] = $hosts;
@@ -497,11 +499,7 @@ class CConfigurationExport {
 		}
 		unset($item);
 
-		foreach ($items as $itemid => $item) {
-			if ($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($items[$itemid]);
-			}
-		}
+		// Web items will be removed from result after all items and discovery rules are gathered and processed.
 
 		$items = $this->prepareItems($items);
 
@@ -600,33 +598,13 @@ class CConfigurationExport {
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
-		// Dependent items may be web items, but at this point they are removed from $hosts.
-		foreach ($discovery_rules as $discovery_rule) {
-			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT
-					&& !array_key_exists($discovery_rule['master_itemid'], $itemids)) {
-				$unresolved_master_itemids[$discovery_rule['master_itemid']] = true;
-			}
-		}
-
-		if ($unresolved_master_itemids) {
-			$master_items = API::Item()->get([
-				'output' => ['itemid', 'key_'],
-				'itemids' => array_keys($unresolved_master_itemids),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-				'webitems' => true,
-				'preservekeys' => true
-			]);
-		}
-
+		// Discovery rules may use dependent items as web items.
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 				$master_itemid = $discovery_rule['master_itemid'];
 
 				if (array_key_exists($master_itemid, $itemids)) {
 					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
-				}
-				else {
-					$discovery_rule['master_item'] = ['key_' => $master_items[$master_itemid]['key_']];
 				}
 			}
 
@@ -1710,5 +1688,27 @@ class CConfigurationExport {
 		}
 
 		return $ids;
+	}
+
+	/**
+	 * Remove web items.
+	 *
+	 * @param array $hosts  Array of hosts or templates to remove the web items from.
+	 *
+	 * @return array
+	 */
+	protected function removeHttpTestItems(array $hosts) {
+		foreach ($hosts as &$host) {
+			if ($host['items']) {
+				foreach ($host['items'] as $idx => $item) {
+					if ($item['type'] == ITEM_TYPE_HTTPTEST) {
+						unset($host['items'][$idx]);
+					}
+				}
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 }
