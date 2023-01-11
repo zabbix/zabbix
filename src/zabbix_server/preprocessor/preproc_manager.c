@@ -237,11 +237,14 @@ void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, u
  * Parameters: manager - [IN] preprocessing manager                           *
  *             message - [IN] packed preprocessing request                    *
  *                                                                            *
+ *  Return value: The number of requests queued for preprocessing             *
+ *                                                                            *
  ******************************************************************************/
-static void	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message)
+static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
+	zbx_uint64_t			queued_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -264,11 +267,15 @@ static void	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_
 			zbx_variant_clear(&var);
 			zbx_pp_value_opt_clear(&var_opt);
 		}
+		else
+			queued_num++;
 
 		preproc_item_value_clear(&value);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return queued_num;
 }
 
 /******************************************************************************
@@ -392,7 +399,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	const zbx_thread_preprocessing_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
 	zbx_pp_manager_t		*manager;
 	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num;
+	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -435,10 +442,12 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			zbx_setproctitle("%s #%d [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64 " values, idle "
 					ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
 					get_process_type_string(process_type), process_num,
-					0, 0, time_idle, time_now - time_stat);
+					queued_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
+			processed_num = 0;
+			queued_num = 0;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
@@ -455,7 +464,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
-					preprocessor_add_request(manager, message);
+					queued_num += preprocessor_add_request(manager, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					preprocessor_reply_queue_size(manager, client);
@@ -484,6 +493,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 		if (0 < tasks.values_num)
 		{
+			processed_num += tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
 			zbx_pp_tasks_clear(&tasks);
 		}
