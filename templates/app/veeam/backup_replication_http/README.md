@@ -5,7 +5,7 @@
 
 This template is designed to monitor Veeam Backup & Replication 11.0.
 It works without any external scripts and uses the script item.
-Authorization grant type. Available values look in [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request)
+  
 
 ## Requirements
 
@@ -16,6 +16,7 @@ For Zabbix version: 6.0 and higher.
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create a user to monitor the service or use an existing read-only account.
+> See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
 2. Link the template to a host.
 3. Configure macros {$VEEAM.API.URL}, {$VEEAM.USER}, {$VEEAM.PASSWORD}.
 
@@ -48,7 +49,7 @@ No specific Zabbix configuration is required.
 |{$SESSION.TYPE.NOT_MATCHES} |<p>This macro is used in session discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$VEEAM.API.URL} |<p>Veeam API endpoint URL in the format <scheme>://<host>:<port>.</p> |`https://localhost:9419/api` |
 |{$VEEAM.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`10` |
-|{$VEEAM.HTTP.PROXY} |<p>Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
+|{$VEEAM.HTTP.PROXY} |<p>Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
 |{$VEEAM.PASSWORD} |<p>Password. Required if the `grant_type` value is `password`.</p> |`` |
 |{$VEEAM.USER} |<p>User name. Required if the `grant_type` value is `password`.</p> |`` |
 
@@ -70,7 +71,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Veeam |Veeam: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |veeam.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Veeam |Veeam: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Veeam |Veeam proxies: Get server data by [{#NAME}] |<p>Get proxy server raw data.</p> |DEPENDENT |veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p> |
 |Veeam |Veeam proxies: Get data [{#NAME}] [{#TYPE}] |<p>Get proxy [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.proxy.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p> |
 |Veeam |Veeam proxies: Max task count by [{#NAME}] [{#TYPE}] |<p>Maximum number of concurrent tasks.</p> |DEPENDENT |veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.server.maxTaskCount`</p> |
