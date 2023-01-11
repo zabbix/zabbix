@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-04-23T11:14:37Z</date>
+   <date>2021-12-24T06:24:33Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -26,7 +26,7 @@ For more information about configuring the Zabbix MySQL plugin please read the d
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -47,7 +47,6 @@ Template tooling version used: 0.38</description>
                <key>mysql.aborted_clients.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of connections that were aborted because the client died without closing the connection properly.</description>
                <applications>
@@ -75,7 +74,6 @@ Template tooling version used: 0.38</description>
                <key>mysql.aborted_connects.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of failed attempts to connect to the MySQL server.</description>
                <applications>
@@ -117,7 +115,6 @@ Template tooling version used: 0.38</description>
                <key>mysql.binlog_cache_disk_use</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.</description>
                <applications>
@@ -144,7 +141,6 @@ Template tooling version used: 0.38</description>
                <type>CALCULATED</type>
                <key>mysql.buffer_pool_efficiency</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last(mysql.innodb_buffer_pool_reads) / 
@@ -163,7 +159,6 @@ Template tooling version used: 0.38</description>
                <type>CALCULATED</type>
                <key>mysql.buffer_pool_utilization</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>( last(mysql.innodb_buffer_pool_pages_total) - 
@@ -192,7 +187,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.bytes_received.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of bytes received from all clients.</description>
@@ -221,7 +215,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.bytes_sent.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>Bps</units>
                <description>Number of bytes sent to all clients.</description>
@@ -250,7 +243,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.com_delete.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The Com_delete counter variable indicates the number of times the delete statement has been executed.</description>
                <applications>
@@ -278,7 +270,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.com_insert.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The Com_insert counter variable indicates the number of times the insert statement has been executed.</description>
                <applications>
@@ -306,7 +297,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.com_select.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The Com_select counter variable indicates the number of times the select statement has been executed.</description>
                <applications>
@@ -334,7 +324,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.com_update.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The Com_update counter variable indicates the number of times the update statement has been executed.</description>
                <applications>
@@ -362,7 +351,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_accept.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors that occurred during calls to accept() on the listening port.</description>
                <applications>
@@ -390,7 +378,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_internal.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of refused connections due to internal server errors, for example, out of memory errors, or failed thread starts.</description>
                <applications>
@@ -418,7 +405,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_max_connections.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of refused connections due to the max_connections limit being reached.</description>
                <applications>
@@ -454,7 +440,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_peer_address.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors while searching for the connecting client IP address.</description>
                <applications>
@@ -482,7 +467,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_select.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of errors during calls to select() or poll() on the listening port. The client would not necessarily have been rejected in these cases.</description>
                <applications>
@@ -510,7 +494,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connection_errors_tcpwrap.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of connections the libwrap library has refused.</description>
                <applications>
@@ -538,7 +521,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.connections.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of connection attempts (successful or not) to the MySQL server.</description>
                <applications>
@@ -566,7 +548,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.created_tmp_disk_tables.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of internal on-disk temporary tables created by the server while executing statements.</description>
                <applications>
@@ -602,7 +583,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.created_tmp_files.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>How many temporary files mysqld has created.</description>
                <applications>
@@ -638,7 +618,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.created_tmp_tables.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of internal temporary tables created by the server while executing statements.</description>
                <applications>
@@ -673,7 +652,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.get_status_variables["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <description>The item gets server global status information.</description>
                <applications>
@@ -688,7 +666,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_pages_free</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total size of the InnoDB buffer pool, in pages.</description>
                <applications>
                   <application>
@@ -711,7 +688,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_pages_total</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total size of the InnoDB buffer pool, in pages.</description>
                <applications>
                   <application>
@@ -738,7 +714,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_read_requests</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of logical read requests.</description>
                <applications>
                   <application>
@@ -761,7 +736,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_read_requests.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of logical read requests per second.</description>
                <applications>
@@ -789,7 +763,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_reads</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</description>
                <applications>
                   <application>
@@ -812,7 +785,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_reads.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.</description>
                <applications>
@@ -840,7 +812,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_buffer_pool_wait_free</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing innodb_buffer_pool_size.</description>
                <applications>
@@ -867,9 +838,8 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <type>CALCULATED</type>
                <key>mysql.innodb_log_file_size</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
-               <params>(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}</params>
+               <params>(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,,1h)) / {$MYSQL.INNODB_LOG_FILES}</params>
                <description>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</description>
                <applications>
                   <application>
@@ -889,7 +859,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_num_open_files</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of open files held by InnoDB. InnoDB only.</description>
                <applications>
@@ -917,7 +886,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_os_log_written</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>B</units>
                <description>Number of bytes written to the InnoDB log.</description>
@@ -946,7 +914,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_row_lock_time</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>The total time spent in acquiring row locks for InnoDB tables, in milliseconds.</description>
@@ -979,7 +946,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_row_lock_time_max</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>s</units>
                <description>The maximum time to acquire a row lock for InnoDB tables, in milliseconds.</description>
@@ -1012,7 +978,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.innodb_row_lock_waits</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of times operations on InnoDB tables had to wait for a row lock.</description>
                <applications>
                   <application>
@@ -1035,7 +1000,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.max_used_connections</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The maximum number of connections that have been in use simultaneously since the server start.</description>
                <applications>
                   <application>
@@ -1062,7 +1026,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.open_table_definitions</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of cached table definitions.</description>
                <applications>
@@ -1090,7 +1053,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.open_tables</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of tables that are open.</description>
                <applications>
@@ -1116,7 +1078,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <name>MySQL: Status</name>
                <key>mysql.ping["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>MySQL</name>
@@ -1145,7 +1106,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.queries.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.</description>
                <applications>
@@ -1173,7 +1133,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.questions.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.</description>
                <applications>
@@ -1201,7 +1160,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.slow_queries.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of queries that have taken more than long_query_time seconds.</description>
                <applications>
@@ -1237,7 +1195,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.threads_cached</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of threads in the thread cache.</description>
                <applications>
                   <application>
@@ -1260,7 +1217,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.threads_connected</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of currently open connections.</description>
                <applications>
                   <application>
@@ -1283,7 +1239,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.threads_created.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>Number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.</description>
                <applications>
@@ -1311,7 +1266,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.threads_running</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Number of threads which are not sleeping.</description>
                <applications>
                   <application>
@@ -1334,7 +1288,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <key>mysql.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>uptime</units>
                <description>The amount of seconds that the server has been up.</description>
                <applications>
@@ -1353,12 +1306,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                </master_item>
                <triggers>
                   <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>MySQL: Service has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>MySQL uptime is less than 10 minutes.</description>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(30m)}=1</expression>
                      <name>MySQL: Failed to fetch info data (or no data for 30m)</name>
                      <priority>INFO</priority>
@@ -1370,6 +1317,12 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                         </dependency>
                      </dependencies>
                   </trigger>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>MySQL: Service has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>MySQL uptime is less than 10 minutes.</description>
+                  </trigger>
                </triggers>
             </item>
             <item>
@@ -1378,7 +1331,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                <delay>15m</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <applications>
                   <application>
@@ -1405,7 +1357,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
          <discovery_rules>
             <discovery_rule>
                <name>Database discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                <delay>1h</delay>
                <filter>
@@ -1426,7 +1377,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.db.size["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#DATABASE}"]</key>
                      <delay>5m</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <applications>
                         <application>
@@ -1441,7 +1391,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <lld_macro_paths>
                   <lld_macro_path>
                      <lld_macro>{#DATABASE}</lld_macro>
@@ -1468,7 +1417,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.binlog_commits[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Total number of transactions committed to the binary log.</description>
                      <applications>
@@ -1492,7 +1440,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.binlog_group_commits[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Total number of group commits done to the binary log.</description>
                      <applications>
@@ -1516,7 +1463,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.master_gtid_wait_count[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>The number of times MASTER_GTID_WAIT called.</description>
                      <applications>
@@ -1544,7 +1490,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.master_gtid_wait_time[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Total number of time spent in MASTER_GTID_WAIT.</description>
                      <applications>
@@ -1572,7 +1517,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.master_gtid_wait_timeouts[{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <description>Number of timeouts occurring in MASTER_GTID_WAIT.</description>
                      <applications>
@@ -1595,7 +1539,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <master_item>
                   <key>mysql.version["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                </master_item>
@@ -1608,7 +1551,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
             </discovery_rule>
             <discovery_rule>
                <name>Replication discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>mysql.replication.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]</key>
                <delay>1h</delay>
                <description>If "show slave status" returns Master_Host, "Replication: *" items are created.</description>
@@ -1618,7 +1560,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.replication.get_slave_status["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}","{#MASTER_HOST}"]</key>
                      <history>0</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>The item gets status information on the essential parameters of the slave threads.</description>
                      <applications>
@@ -1633,7 +1574,6 @@ last(mysql.innodb_buffer_pool_pages_free) ) /
                      <key>mysql.replication.seconds_behind_master["{#MASTER_HOST}"]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>s</units>
                      <description>Number of seconds that the slave SQL thread is behind processing the master binary log.&#13;
 A high number (or an increasing one) can indicate that the slave is unable to handle events&#13;
@@ -1677,7 +1617,6 @@ from the master in a timely fashion.</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Whether the I/O thread for reading the master's binary log is running. &#13;
 Normally, you want this to be Yes unless you have not yet started a replication or have &#13;
@@ -1702,12 +1641,6 @@ explicitly stopped it with STOP SLAVE.</description>
                      </master_item>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{count(#1,"No",eq)}=1</expression>
-                           <name>MySQL: The slave I/O thread is not running</name>
-                           <priority>AVERAGE</priority>
-                           <description>Whether the I/O thread for reading the master's binary log is running.</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{count(#1,"Yes",ne)}=1</expression>
                            <name>MySQL: The slave I/O thread is not connected to a replication master</name>
                            <priority>WARNING</priority>
@@ -1718,6 +1651,12 @@ explicitly stopped it with STOP SLAVE.</description>
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{count(#1,"No",eq)}=1</expression>
+                           <name>MySQL: The slave I/O thread is not running</name>
+                           <priority>AVERAGE</priority>
+                           <description>Whether the I/O thread for reading the master's binary log is running.</description>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -1727,7 +1666,6 @@ explicitly stopped it with STOP SLAVE.</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>TEXT</value_type>
                      <description>This shows the state of the SQL driver threads.</description>
                      <applications>
@@ -1756,7 +1694,6 @@ explicitly stopped it with STOP SLAVE.</description>
                      <delay>0</delay>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <description>Whether the SQL thread for executing events in the relay log is running. &#13;
 As with the I/O thread, this should normally be Yes.</description>
@@ -1794,7 +1731,6 @@ As with the I/O thread, this should normally be Yes.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <lld_macro_paths>
                   <lld_macro_path>
                      <lld_macro>{#MASTER_HOST}</lld_macro>

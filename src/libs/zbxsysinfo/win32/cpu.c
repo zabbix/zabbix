@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
 
 /* pointer to GetLogicalProcessorInformationEx(), it's not guaranteed to be available */
 typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
-ZBX_THREAD_LOCAL static GETLPIEX		get_lpiex;
+static GETLPIEX		get_lpiex;
 
 /******************************************************************************
  *                                                                            *

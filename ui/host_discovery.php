@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ $fields = [
 										' && {type} != '.ITEM_TYPE_DEPENDENT,
 									_('Update interval')
 								],
-	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
+	'delay_flex' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
 	'type' =>					[T_ZBX_INT, O_OPT, null,
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
@@ -109,8 +109,8 @@ $fields = [
 	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'lld_macro_paths' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,		null],
+	'lld_macro_paths' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,		null],
 	'jmx_endpoint' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 	],
@@ -124,7 +124,7 @@ $fields = [
 										' && {type} == '.ITEM_TYPE_HTTPAGENT,
 									_('URL')
 								],
-	'query_fields' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>			[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'posts' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'status_codes' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'follow_redirects' =>		[T_ZBX_INT, O_OPT, null,
@@ -136,7 +136,7 @@ $fields = [
 									null
 								],
 	'http_proxy' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' => 				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'headers' => 				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'retrieve_mode' =>			[T_ZBX_INT, O_OPT, null,
 									IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 										HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -183,8 +183,8 @@ $fields = [
 											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Password')
 								],
-	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
-	'overrides' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
+	'preprocessing' =>			[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
+	'overrides' =>				[null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,	null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
@@ -192,7 +192,7 @@ $fields = [
 									),
 									null
 								],
-	'g_hostdruleid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'g_hostdruleid' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -200,12 +200,12 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'check_now' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
@@ -257,6 +257,21 @@ if (getRequest('itemid', false)) {
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 	$host = reset($item['hosts']);
+
+	foreach ($item['overrides'] as &$override) {
+		if (!array_key_exists('operations', $override)) {
+			continue;
+		}
+
+		foreach ($override['operations'] as &$operation) {
+			if (array_key_exists('optag', $operation)) {
+				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
+				$operation['optag'] = array_values($operation['optag']);
+			}
+		}
+		unset($operation);
+	}
+	unset($override);
 }
 elseif ($hostid) {
 	$hosts = API::Host()->get([
@@ -790,20 +805,13 @@ if (hasRequest('form')) {
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
-		CArrayHelper::sort($data['overrides'], [
-			['field' => 'step', 'order' => ZBX_SORT_UP]
-		]);
+		CArrayHelper::sort($data['overrides'], ['step']);
 	}
 	// clone form
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
 	}
-
-	// Sort interfaces to be listed starting with one selected as 'main'.
-	CArrayHelper::sort($data['interfaces'], [
-		['field' => 'main', 'order' => ZBX_SORT_DOWN]
-	]);
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
 		$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;

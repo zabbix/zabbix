@@ -1,5 +1,5 @@
 
-# HP Enterprise Switch SNMP
+# Template Net HP Enterprise Switch SNMP
 
 ## Overview
 

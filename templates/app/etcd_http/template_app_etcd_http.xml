@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-05-26T12:09:15Z</date>
+   <date>2022-07-21T11:05:07Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,7 @@
          <name>Template App Etcd by HTTP</name>
          <description>Get Etcd metrics by HTTP agent.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -498,7 +498,7 @@ return valueArr.reduce(function(acc,obj){
                      <expression>{min(5m)}&gt;{$ETCD.HTTP.FAIL.MAX.WARN}</expression>
                      <name>Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'</name>
                      <priority>WARNING</priority>
-                     <description>"Too many reqvests failed on etcd instance with 5xx HTTP code"</description>
+                     <description>"Too many requests failed on etcd instance with 5xx HTTP code"</description>
                   </trigger>
                </triggers>
             </item>
@@ -671,7 +671,7 @@ return valueArr.reduce(function(acc,obj){
                <key>etcd.leader.changes</key>
                <delay>0</delay>
                <history>7d</history>
-               <description>The the number of leader changes the member has seen since its start.</description>
+               <description>The number of leader changes the member has seen since its start.</description>
                <applications>
                   <application>
                      <name>Etcd</name>
@@ -1145,7 +1145,7 @@ return (Math.floor(Date.now()/1000)-Number(value));</params>
                      <expression>{last()}&lt;10m</expression>
                      <name>Etcd: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -1300,8 +1300,8 @@ return valueArr.reduce(function(acc,obj){
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$ETCD.GRPC.ERRORS.MAX.WARN}</expression>
                            <name>Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)</name>
-                           <priority>WARNING</priority>
                            <discover>NO_DISCOVER</discover>
+                           <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1427,7 +1427,7 @@ return JSON.stringify(result);</params>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
-                     <name>Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures</name>
+                     <name>Etcd: Etcd peer {#ETCD.PEER}: Receive failures</name>
                      <type>DEPENDENT</type>
                      <key>etcd.received.fail.rate[{#ETCD.PEER}]</key>
                      <delay>0</delay>
@@ -1520,7 +1520,7 @@ return JSON.stringify(result);</params>
             <macro>
                <macro>{$ETCD.GRPC_CODE.TRIGGER.MATCHES}</macro>
                <value>Aborted|Unavailable</value>
-               <description>Filter of discoverable gRPC codes which will be create triggers</description>
+               <description>Filter of discoverable gRPC codes which will create triggers</description>
             </macro>
             <macro>
                <macro>{$ETCD.GRPC.ERRORS.MAX.WARN}</macro>
@@ -1576,7 +1576,7 @@ return JSON.stringify(result);</params>
          <expression>{Template App Etcd by HTTP:etcd.open.fds.min(5m)}/{Template App Etcd by HTTP:etcd.max.fds.last()}*100&gt;{$ETCD.OPEN.FDS.MAX.WARN}</expression>
          <name>Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)</name>
          <priority>WARNING</priority>
-         <description>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. &#13;
+         <description>"Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue. &#13;
 If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."</description>
       </trigger>
    </triggers>
@@ -1762,19 +1762,6 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>Etcd healthcheck</name>
          <mappings>
             <mapping>
@@ -1797,6 +1784,19 @@ If the file descriptors are exhausted, etcd may panic because it cannot create n
             <mapping>
                <value>1</value>
                <newvalue>Yes</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

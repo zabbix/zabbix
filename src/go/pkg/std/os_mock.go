@@ -1,8 +1,9 @@
+//go:build linux
 // +build linux
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +95,7 @@ func (o *fileStat) Sys() interface{} {
 
 func (o *mockOs) Stat(name string) (os.FileInfo, error) {
 	if data, ok := o.files[name]; !ok {
-		return nil, errors.New("file does not exist")
+		return nil, os.ErrNotExist
 	} else {
 		var fs fileStat
 

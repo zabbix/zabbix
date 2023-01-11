@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1084,6 +1084,7 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			int			dependence_found = 0;
 			zbx_item_dependence_t	*dependence = NULL;
 			zbx_uint64_t		itemid, master_itemid;
 			unsigned int		item_flags;
@@ -1095,11 +1096,15 @@ static void	lld_item_dependencies_get(const zbx_vector_ptr_t *item_prototypes, z
 			for (i = 0; i < item_dependencies->values_num; i++)
 			{
 				dependence = (zbx_item_dependence_t *)item_dependencies->values[i];
+
 				if (dependence->itemid == itemid && dependence->master_itemid == master_itemid)
+				{
+					dependence_found = 1;
 					break;
+				}
 			}
 
-			if (i == item_dependencies->values_num)
+			if (0 == dependence_found)
 			{
 				dependence = lld_item_dependence_add(item_dependencies, itemid, master_itemid,
 						item_flags);
@@ -1757,6 +1762,8 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				dependent = (zbx_lld_item_t *)item->dependent_items.values[j];
 				dependent->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 			}
+
+			continue;
 		}
 	}
 
@@ -2045,17 +2052,15 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	substitute_lld_macros(&item->ssl_key_password, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
-	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
 	zbx_vector_ptr_create(&item->preproc_ops);
 	zbx_vector_ptr_create(&item->dependent_items);
 
-	if (SUCCEED != ret || ZBX_PROTOTYPE_NO_DISCOVER == discover)
-	{
-		lld_item_free(item);
-		item = NULL;
-	}
+	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
+		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	else
+		item->flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -2471,7 +2476,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 			if (0 == strcmp(item->key, buffer) &&
 					SUCCEED == lld_validate_item_override_no_discover(&lld_row->overrides,
-					item->name))
+					item->name, item_prototype->discover))
 			{
 				item_index_local.parent_itemid = item->parent_itemid;
 				item_index_local.lld_row = lld_row;
@@ -2498,14 +2503,12 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_p
 
 			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index, &item_index_local)))
 			{
-				if (NULL != (item = lld_item_make(item_prototype, item_index_local.lld_row,
-						lld_macro_paths, error)))
-				{
-					/* add the created item to items vector and update index */
-					zbx_vector_ptr_append(items, item);
-					item_index_local.item = item;
-					zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
-				}
+				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths, error);
+
+				/* add the created item to items vector and update index */
+				zbx_vector_ptr_append(items, item);
+				item_index_local.item = item;
+				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
 			}
 			else
 				lld_item_update(item_prototype, item_index_local.lld_row, lld_macro_paths, item_index->item, error);
@@ -4520,6 +4523,24 @@ static void	lld_applications_validate(zbx_uint64_t hostid, zbx_uint64_t lld_rule
 		if (0 != application->applicationid && 0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 			continue;
 
+		if (SUCCEED != zbx_is_utf8(application->name))
+		{
+			zbx_replace_invalid_utf8(application->name);
+			*error = zbx_strdcatf(*error,
+					"Cannot %s application: value \"%s\" has invalid UTF-8 sequence.\n",
+					(0 != application->applicationid ? "update" : "create"), application->name);
+			application->flags &= ~ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
+			continue;
+		}
+
+		if (APPLICATION_NAME_LEN < zbx_strlen_utf8(application->name))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s application: value \"%s\" is too long.\n",
+					(0 != application->applicationid ? "update" : "create"), application->name);
+			application->flags &= ~ZBX_FLAG_LLD_APPLICATION_DISCOVERED;
+			continue;
+		}
+
 		/* iterate in reverse order so existing applications would have more priority */
 		/* than new applications which have 0 applicationid and therefore are located */
 		/* at the beginning of applications vector which is sorted by applicationid   */
@@ -5151,13 +5172,19 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 
 	DBbegin();
 
-	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked) &&
-			SUCCEED == lld_items_preproc_save(hostid, &items, &host_record_is_locked) &&
-			SUCCEED == lld_applications_save(hostid, &applications, &application_prototypes,
-					&host_record_is_locked))
+	ret = lld_applications_save(hostid, &applications, &application_prototypes, &host_record_is_locked);
+
+	if (SUCCEED == ret)
+		ret = lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked);
+
+	if (SUCCEED == ret)
 	{
 		lld_items_applications_save(&items_applications, &items);
+		ret = lld_items_preproc_save(hostid, &items, &host_record_is_locked);
+	}
 
+	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK != DBcommit())
 		{
 			ret = FAIL;
@@ -5166,7 +5193,6 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	}
 	else
 	{
-		ret = FAIL;
 		DBrollback();
 		goto clean;
 	}

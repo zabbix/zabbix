@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,13 @@ class CScreenPlainText extends CScreenBase {
 			return $this->getOutput($table);
 		}
 
-		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->screenitem['resourceid'])]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+			'itemids' => [$this->screenitem['resourceid']],
+			'webitems' => true
+		]);
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
 		$item = reset($items);
 
 		$host = get_host_by_itemid($this->screenitem['resourceid']);

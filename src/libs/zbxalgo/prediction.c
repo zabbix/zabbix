@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -592,7 +592,7 @@ while(0)
 					ZBX_MATRIX_EL(coefficients, first_nonzero, 0));
 	}
 
-	radius = lower_bound = 1.0 / lower_bound;
+	radius = 1.0 / lower_bound;
 
 	/* Weierstrass (Durand-Kerner) method */
 	while (ZBX_MAX_ITERATIONS >= ++iteration && !roots_ok)
@@ -998,6 +998,11 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_ERROR;
+	}
+	else if (FIT_POLYNOMIAL == fit)
+	{
+		if ((unsigned)n <= k)
+			return ZBX_MATH_ERROR;
 	}
 
 	zbx_matrix_struct_alloc(&coefficients);

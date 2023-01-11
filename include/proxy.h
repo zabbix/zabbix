@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access);
 
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error);
-void	process_proxyconfig(struct zbx_json_parse *jp_data);
+int	process_proxyconfig(struct zbx_json_parse *jp_data);
 
 int	get_host_availability_data(struct zbx_json *json, int *ts);
 int	process_host_availability(struct zbx_json_parse *jp, char **error);
@@ -58,8 +58,8 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
-int	process_history_data(DC_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win);
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
 

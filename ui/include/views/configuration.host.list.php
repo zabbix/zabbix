@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,17 +215,27 @@ foreach ($data['hosts'] as $host) {
 
 	$description = [];
 
-	if ($host['discoveryRule']) {
-		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
-			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
-		))
-			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_ORANGE);
-		$description[] = NAME_DELIMITER;
-	}
-	elseif ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		// Discovered host which does not contain info about parent discovery rule is inaccessible for current user.
-		$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($host['discoveryRule']) {
+			if ($host['is_discovery_rule_editable']) {
+				$description[] = (new CLink($host['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
+						->setArgument('hostid', $host['hostDiscovery']['parent_hostid'])
+						->setArgument('context', 'host')
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_ORANGE);
+			}
+			else {
+				$description[] = (new CSpan($host['discoveryRule']['name']))->addClass(ZBX_STYLE_ORANGE);
+			}
+		}
+		else {
+			$description[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
 		$description[] = NAME_DELIMITER;
 	}
 

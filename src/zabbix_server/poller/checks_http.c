@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -371,6 +371,13 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err)));
+		goto clean;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s",
+				curl_easy_strerror(err)));
 		goto clean;
 	}
 

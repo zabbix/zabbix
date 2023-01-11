@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-04-02T13:36:12Z</date>
+   <date>2022-07-21T11:11:18Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/398623-discussion-thread-for-official-zabbix-template-memcached&#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -37,7 +37,7 @@ Template tooling version used: 0.35</description>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.</description>
+               <description>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn't take place in production, so check your debug scripts.</description>
                <applications>
                   <application>
                      <name>Memcached</name>
@@ -217,7 +217,7 @@ Template tooling version used: 0.35</description>
                      <expression>{min(5m)}&gt;{$MEMCACHED.CONN.QUEUED.MAX.WARN}</expression>
                      <name>Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
-                     <description>The max number of connections is reachedand and a new connection had to wait in the queue as a result.</description>
+                     <description>The max number of connections is reached and a new connection had to wait in the queue as a result.</description>
                   </trigger>
                </triggers>
             </item>
@@ -691,7 +691,7 @@ A high number of evictions coupled with a low hit rate means your application is
                      <expression>{last()}&lt;10m</expression>
                      <name>Memcached: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>

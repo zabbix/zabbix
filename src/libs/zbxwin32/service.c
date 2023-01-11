@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,19 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 	serviceStatus.dwServiceSpecificExitCode	= 0;
 	serviceStatus.dwCheckPoint		= 0;
 	serviceStatus.dwWaitHint		= 0;
+
+	switch (ctrlCode)
+	{
+		case SERVICE_CONTROL_STOP:
+			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent received stop request.");
+			break;
+		case SERVICE_CONTROL_SHUTDOWN:
+			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent received shutdown request.");
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Agent received request:%u.", ctrlCode);
+			break;
+	}
 
 	switch (ctrlCode)
 	{
@@ -301,7 +314,7 @@ static int	svc_RemoveEventSource()
 				ZABBIX_EVENT_SOURCE, strerror_from_system(GetLastError()));
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 int	ZabbixRemoveService(void)

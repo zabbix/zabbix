@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import java.util.HashSet;
 import javax.management.AttributeList;
 
 import javax.management.InstanceNotFoundException;
+import javax.management.AttributeNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -217,21 +218,25 @@ class JMXItemChecker extends ItemChecker
 			logger.trace("attributeName:'{}'", realAttributeName);
 			logger.trace("fieldNames:'{}'", fieldNames);
 
-			Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
-
-			if (dataObject instanceof TabularData)
-			{
-				logger.trace("'{}' contains tabular data", attributeName);
-				return getTabularData((TabularData)dataObject).toString();
-			}
-
 			try
 			{
+				Object dataObject = mbsc.getAttribute(objectName, realAttributeName);
+
+				if (dataObject instanceof TabularData)
+				{
+					logger.trace("'{}' contains tabular data", attributeName);
+					return getTabularData((TabularData)dataObject).toString();
+				}
+
 				return getPrimitiveAttributeValue(dataObject, fieldNames);
+			}
+			catch (AttributeNotFoundException e)
+			{
+				throw new ZabbixException("Attribute not found: %s", ZabbixException.getRootCauseMessage(e));
 			}
 			catch (InstanceNotFoundException e)
 			{
-				throw new ZabbixException("Object or attribute not found.");
+				throw new ZabbixException("Object or attribute not found: %s", ZabbixException.getRootCauseMessage(e));
 			}
 		}
 		else if (item.getKeyId().equals("jmx.discovery") || item.getKeyId().equals("jmx.get"))

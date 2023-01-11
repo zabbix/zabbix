@@ -365,6 +365,7 @@ By default
 does not read any configuration file.
 Only parameters \fBHostname\fR, \fBServerActive\fR, \fBSourceIP\fR, \fBTLSConnect\fR, \fBTLSCAFile\fR, \fBTLSCRLFile\fR,
 \fBTLSServerCertIssuer\fR, \fBTLSServerCertSubject\fR, \fBTLSCertFile\fR, \fBTLSKeyFile\fR, \fBTLSPSKIdentity\fR and \fBTLSPSKFile\fR are supported.
+Hostname defined through \fBHostnameItem\fR parameter will not be picked up, in this case the hostname should be specified via command line (see -s option).
 All addresses defined in the agent \fBServerActive\fR configuration parameter are used for sending data.
 If sending of batch data fails to one address, the following batches are not sent to this address.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"

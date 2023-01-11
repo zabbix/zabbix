@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,8 +106,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char				*name;
 	char				*uuid;
+	char				*name;
 	char				*id;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
@@ -116,8 +116,19 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
+int	vmware_ds_uuid_compare(const void *d1, const void *d2);
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
+
+typedef struct
+{
+	char	*name;
+	char	*uuid;
+}
+zbx_vmware_ds_name_uuid_t;
+
+int	vmware_hvds_name_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(ds_name_uuid, zbx_vmware_ds_name_uuid_t)
 
 typedef struct
 {
@@ -162,15 +173,15 @@ zbx_vmware_vm_t;
 /* the vmware hypervisor data */
 typedef struct
 {
-	char			*uuid;
-	char			*id;
-	char			*clusterid;
-	char			*datacenter_name;
-	char			*parent_name;
-	char			*parent_type;
-	char			**props;
-	zbx_vector_str_t	ds_names;
-	zbx_vector_ptr_t	vms;
+	char				*uuid;
+	char				*id;
+	char				*clusterid;
+	char				*datacenter_name;
+	char				*parent_name;
+	char				*parent_type;
+	char				**props;
+	zbx_vector_ds_name_uuid_t	ds_names;
+	zbx_vector_ptr_t		vms;
 }
 zbx_vmware_hv_t;
 
@@ -325,8 +336,11 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_VERSION			13
 #define ZBX_VMWARE_HVPROP_NAME				14
 #define ZBX_VMWARE_HVPROP_STATUS			15
+#define ZBX_VMWARE_HVPROP_MAINTENANCE			16
+#define ZBX_VMWARE_HVPROP_SENSOR			17
+#define ZBX_VMWARE_HVPROP_NET_NAME			18
 
-#define ZBX_VMWARE_HVPROPS_NUM				16
+#define ZBX_VMWARE_HVPROPS_NUM				19
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
@@ -357,6 +371,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DS		"Datastore"
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

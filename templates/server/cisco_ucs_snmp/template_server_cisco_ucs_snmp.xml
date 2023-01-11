@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-04T23:48:11Z</date>
+   <date>2021-12-23T06:23:20Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -19,7 +19,7 @@ CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB&#13;
 CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB&#13;
 CISCO-UNIFIED-COMPUTING-STORAGE-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -321,13 +321,6 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                      </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
-                           <name>{#DISK_LOCATION}: Physical disk failed</name>
-                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>Please check physical disk for warnings or errors</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{count(#1,{$DISK_CRIT_STATUS:"bad"},eq)}=1 or {count(#1,{$DISK_CRIT_STATUS:"predictiveFailure"},eq)}=1</expression>
                            <name>{#DISK_LOCATION}: Physical disk error</name>
                            <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
@@ -339,6 +332,13 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                                  <expression>{Template Server Cisco UCS SNMP:system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}].count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
+                           <name>{#DISK_LOCATION}: Physical disk failed</name>
+                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>Please check physical disk for warnings or errors</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -418,6 +418,15 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"CPU"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
@@ -432,15 +441,6 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                                  <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
@@ -478,6 +478,15 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
@@ -492,15 +501,6 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                                  <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
@@ -529,6 +529,15 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
@@ -543,15 +552,6 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                                  <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
@@ -580,6 +580,15 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
@@ -594,15 +603,6 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                                  <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
@@ -631,6 +631,15 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
+                           <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Ambient"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
@@ -645,15 +654,6 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                                  <recovery_expression>{Template Server Cisco UCS SNMP:sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
-                           <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Ambient"}</expression>
@@ -1101,6 +1101,91 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
          </mappings>
       </value_map>
       <value_map>
+         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>empty</newvalue>
+            </mapping>
+            <mapping>
+               <value>10</value>
+               <newvalue>equipped</newvalue>
+            </mapping>
+            <mapping>
+               <value>11</value>
+               <newvalue>missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>12</value>
+               <newvalue>mismatch</newvalue>
+            </mapping>
+            <mapping>
+               <value>13</value>
+               <newvalue>equippedNotPrimary</newvalue>
+            </mapping>
+            <mapping>
+               <value>14</value>
+               <newvalue>equippedSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>15</value>
+               <newvalue>mismatchSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>16</value>
+               <newvalue>missingSlave</newvalue>
+            </mapping>
+            <mapping>
+               <value>20</value>
+               <newvalue>equippedIdentityUnestablishable</newvalue>
+            </mapping>
+            <mapping>
+               <value>21</value>
+               <newvalue>mismatchIdentityUnestablishable</newvalue>
+            </mapping>
+            <mapping>
+               <value>22</value>
+               <newvalue>equippedWithMalformedFru</newvalue>
+            </mapping>
+            <mapping>
+               <value>30</value>
+               <newvalue>inaccessible</newvalue>
+            </mapping>
+            <mapping>
+               <value>40</value>
+               <newvalue>unauthorized</newvalue>
+            </mapping>
+            <mapping>
+               <value>100</value>
+               <newvalue>notSupported</newvalue>
+            </mapping>
+            <mapping>
+               <value>101</value>
+               <newvalue>equippedUnsupported</newvalue>
+            </mapping>
+            <mapping>
+               <value>102</value>
+               <newvalue>equippedDiscNotStarted</newvalue>
+            </mapping>
+            <mapping>
+               <value>103</value>
+               <newvalue>equippedDiscInProgress</newvalue>
+            </mapping>
+            <mapping>
+               <value>104</value>
+               <newvalue>equippedDiscError</newvalue>
+            </mapping>
+            <mapping>
+               <value>105</value>
+               <newvalue>equippedDiscUnknown</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsLsOperState</name>
          <mappings>
             <mapping>
@@ -1238,6 +1323,51 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
          </mappings>
       </value_map>
       <value_map>
+         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>unspecified</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>simple</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>mirror</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>stripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>raid</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>stripeParity</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>stripeDualParity</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>mirrorStripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>8</value>
+               <newvalue>stripeParityStripe</newvalue>
+            </mapping>
+            <mapping>
+               <value>9</value>
+               <newvalue>stripeDualParityStripe</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStoragePDriveStatus</name>
          <mappings>
             <mapping>
@@ -1311,136 +1441,6 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
             <mapping>
                <value>17</value>
                <newvalue>lockedForeignConfiguration</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsStorageLunType</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>unspecified</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>simple</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>mirror</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>stripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>raid</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>stripeParity</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>stripeDualParity</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>mirrorStripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>8</value>
-               <newvalue>stripeParityStripe</newvalue>
-            </mapping>
-            <mapping>
-               <value>9</value>
-               <newvalue>stripeDualParityStripe</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentPresence</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>empty</newvalue>
-            </mapping>
-            <mapping>
-               <value>10</value>
-               <newvalue>equipped</newvalue>
-            </mapping>
-            <mapping>
-               <value>11</value>
-               <newvalue>missing</newvalue>
-            </mapping>
-            <mapping>
-               <value>12</value>
-               <newvalue>mismatch</newvalue>
-            </mapping>
-            <mapping>
-               <value>13</value>
-               <newvalue>equippedNotPrimary</newvalue>
-            </mapping>
-            <mapping>
-               <value>14</value>
-               <newvalue>equippedSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>15</value>
-               <newvalue>mismatchSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>16</value>
-               <newvalue>missingSlave</newvalue>
-            </mapping>
-            <mapping>
-               <value>20</value>
-               <newvalue>equippedIdentityUnestablishable</newvalue>
-            </mapping>
-            <mapping>
-               <value>21</value>
-               <newvalue>mismatchIdentityUnestablishable</newvalue>
-            </mapping>
-            <mapping>
-               <value>22</value>
-               <newvalue>equippedWithMalformedFru</newvalue>
-            </mapping>
-            <mapping>
-               <value>30</value>
-               <newvalue>inaccessible</newvalue>
-            </mapping>
-            <mapping>
-               <value>40</value>
-               <newvalue>unauthorized</newvalue>
-            </mapping>
-            <mapping>
-               <value>100</value>
-               <newvalue>notSupported</newvalue>
-            </mapping>
-            <mapping>
-               <value>101</value>
-               <newvalue>equippedUnsupported</newvalue>
-            </mapping>
-            <mapping>
-               <value>102</value>
-               <newvalue>equippedDiscNotStarted</newvalue>
-            </mapping>
-            <mapping>
-               <value>103</value>
-               <newvalue>equippedDiscInProgress</newvalue>
-            </mapping>
-            <mapping>
-               <value>104</value>
-               <newvalue>equippedDiscError</newvalue>
-            </mapping>
-            <mapping>
-               <value>105</value>
-               <newvalue>equippedDiscUnknown</newvalue>
             </mapping>
          </mappings>
       </value_map>

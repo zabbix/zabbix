@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2021-12-24T09:16:27Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -13,7 +13,7 @@
          <name>Template Module ICMP Ping</name>
          <description>Template Module ICMP Ping&#13;
 &#13;
-Template tooling version used: 0.34</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>

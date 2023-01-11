@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,13 +25,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		parent::__construct($data, WIDGET_SVG_GRAPH);
 
 		$this->data = self::convertDottedKeys($this->data);
-
-		// API doesn't guarantee fields to be retrieved in same order as stored.
-		foreach (['or', 'ds'] as $field) {
-			if (array_key_exists($field, $this->data)) {
-				ksort($this->data[$field]);
-			}
-		}
 
 		/**
 		 * Data set tab.

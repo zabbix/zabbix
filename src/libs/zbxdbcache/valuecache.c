@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2039,7 +2039,10 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
 		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		{
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	/* when updating cache with time based request we can always reset status flags */
@@ -2150,7 +2153,10 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		zbx_vc_item_t	new_item = {.itemid = itemid, .value_type = value_type};
 
 		if (NULL == (*item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(new_item))))
+		{
+			ret = FAIL;
 			goto out;
+		}
 	}
 
 	if (0 < records.values_num)

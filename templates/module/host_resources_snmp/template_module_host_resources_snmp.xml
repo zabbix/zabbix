@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:30:24Z</date>
+   <date>2022-04-10T22:37:26Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -74,7 +74,7 @@ Implementations may approximate this one minute smoothing period if necessary.</
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -173,7 +173,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <params>last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100</params>
-                     <description>Memory utilization in %</description>
+                     <description>Memory utilization in %.</description>
                      <applications>
                         <application>
                            <name>Memory</name>
@@ -241,7 +241,7 @@ The amount of the storage represented by this entry that is allocated, in units 
          <name>Template Module HOST-RESOURCES-MIB SNMP</name>
          <description>HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module HOST-RESOURCES-MIB CPU SNMP</name>
@@ -340,7 +340,7 @@ Template tooling version used: 0.36</description>
          <description>MIBs used:&#13;
 HOST-RESOURCES-MIB&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -450,32 +450,32 @@ The amount of the storage represented by this entry that is allocated, in units 
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 5G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
                      <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
- - The disk free space is less than 10G.&#13;
+ - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.&#13;
  - The disk will be full in less than 24 hours.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                            <expression>{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
-(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+(({Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or {Template Module HOST-RESOURCES-MIB storage SNMP:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                         </dependency>
                      </dependencies>
                   </trigger_prototype>
@@ -512,6 +512,16 @@ The amount of the storage represented by this entry that is allocated, in units 
             </discovery_rule>
          </discovery_rules>
          <macros>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.CRIT}</macro>
+               <value>5G</value>
+               <description>The critical threshold of the filesystem utilization.</description>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FREE.MIN.WARN}</macro>
+               <value>10G</value>
+               <description>The warning threshold of the filesystem utilization.</description>
+            </macro>
             <macro>
                <macro>{$VFS.FS.FSNAME.MATCHES}</macro>
                <value>.+</value>

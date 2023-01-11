@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ function getLocales() {
 		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
 		'fr_FR' => ['name' => _('French (fr_FR)'),	'display' => true],
 		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => false],
-		'de_DE' => ['name' => _('German (de_DE)'),	'display' => false],
-		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => false],
+		'de_DE' => ['name' => _('German (de_DE)'),	'display' => true],
+		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => true],
 		'he_IL' => ['name' => _('Hebrew (he_IL)'),	'display' => true],
 		'hu_HU' => ['name' => _('Hungarian (hu_HU)'),	'display' => false],
 		'id_ID' => ['name' => _('Indonesian (id_ID)'),	'display' => false],
@@ -69,27 +69,30 @@ function getLocales() {
 		'pl_PL' => ['name' => _('Polish (pl_PL)'),	'display' => true],
 		'pt_BR' => ['name' => _('Portuguese (pt_BR)'),	'display' => true],
 		'pt_PT' => ['name' => _('Portuguese (pt_PT)'),	'display' => true],
-		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => false],
+		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => true],
 		'ru_RU' => ['name' => _('Russian (ru_RU)'),	'display' => true],
 		'sk_SK' => ['name' => _('Slovak (sk_SK)'),	'display' => true],
-		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => false],
+		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => true],
 		'sv_SE' => ['name' => _('Swedish (sv_SE)'),	'display' => false],
 		'tr_TR' => ['name' => _('Turkish (tr_TR)'),	'display' => true],
 		'uk_UA' => ['name' => _('Ukrainian (uk_UA)'),	'display' => true],
-		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => false]
+		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => true]
 	];
 }
 
 /**
  * Get support URL for specified language.
  *
- * @param string $language  ISO639-1 code or null for English support URL.
+ * @param string|null $language  ISO639-1 code or null for English support URL.
  *
  * @return string
  */
-function getSupportUrl($language = null) {
+function getSupportUrl(string $language = null): string {
 	$urls = [
+		'cs' => 'https://www.zabbix.com/cz/support',
+		'fr' => 'https://www.zabbix.com/fr/support',
 		'ja' => 'https://www.zabbix.com/jp/support',
+		'pt' => 'https://www.zabbix.com/br/support',
 		'ru' => 'https://www.zabbix.com/ru/support',
 		'zh' => 'https://www.zabbix.com/cn/support'
 	];

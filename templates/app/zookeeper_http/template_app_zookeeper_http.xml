@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-11-16T15:38:49Z</date>
+   <date>2022-07-28T08:48:05Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -12,12 +12,12 @@
          <template>Template App Zookeeper by HTTP</template>
          <name>Template App Zookeeper by HTTP</name>
          <description>Get Apache Zookeeper metrics by HTTP agent.&#13;
-  This template works with standalone and cluster instances. Metrics are collected from each Zookeper node by requests to AdminServer.  &#13;
+  This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to AdminServer.  &#13;
   Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -356,7 +356,7 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                <delay>0</delay>
                <history>7d</history>
                <value_type>FLOAT</value_type>
-               <description>Rate ofconnection revalidations.</description>
+               <description>Rate of connection revalidations.</description>
                <applications>
                   <application>
                      <name>Zookeeper</name>
@@ -826,7 +826,7 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                <delay>0</delay>
                <history>7d</history>
                <units>s</units>
-               <description>Uptime of Zookeeper server.</description>
+               <description>Uptime that a peer has been in a table leading/following/observing state.</description>
                <applications>
                   <application>
                      <name>Zookeeper</name>
@@ -846,13 +846,6 @@ return metrics.snapshottime_count || metrics.cnt_snapshottime</params>
                   <key>zookeeper.get_metrics</key>
                </master_item>
                <triggers>
-                  <trigger>
-                     <expression>{last()}&lt;10m</expression>
-                     <name>Zookeeper: has been restarted (uptime &lt; 10m)</name>
-                     <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
-                     <manual_close>YES</manual_close>
-                  </trigger>
                   <trigger>
                      <expression>{nodata(10m)}=1</expression>
                      <name>Zookeeper: Failed to fetch info data (or no data for 10m)</name>
@@ -1112,7 +1105,6 @@ Note, depending on the number of client connections this operation may be expens
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Zookeeper client {#TYPE} [{#CLIENT}]: Latency</name>
@@ -1335,7 +1327,6 @@ return JSON.stringify(data);</params>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template App Zookeeper by HTTP:zookeeper.synced_followers[{#SINGLETON}].last()} &lt; {Template App Zookeeper by HTTP:zookeeper.quorum_size[{#SINGLETON}].last()}-1</expression>

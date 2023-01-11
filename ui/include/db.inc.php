@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ function DBconnect(&$error) {
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true; // true - if no statements failed in transaction, false - there are failed statements
 	$DB['SELECT_COUNT'] = 0; // stats
 	$DB['EXECUTE_COUNT'] = 0;
-	$DB['DB'] = null;
 
 	if (!isset($DB['TYPE'])) {
 		$error = 'Unknown database type.';
@@ -550,7 +549,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				$pattern = zbx_dbstr($pattern);
 			}
 
-			$fieldSearch[] = 'UPPER('.$tableShort.'.'.$field.')'.$exclude.' LIKE '.$pattern." ESCAPE '!'";
+			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).$exclude.' LIKE '.$pattern." ESCAPE '!'";
 		}
 
 		$search[$field] = '('.implode($glue, $fieldSearch).')';

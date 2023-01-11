@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -954,12 +954,6 @@ class CApiInputValidatorTest extends TestCase {
 				'0'
 			],
 			[
-				['type' => API_ID, 'flags' => API_NOT_EMPTY],
-				0,
-				'/1/id',
-				'Invalid parameter "/1/id": cannot be empty.'
-			],
-			[
 				['type' => API_ID],
 				12345,
 				'/1/id',
@@ -1018,12 +1012,6 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
-			],
-			[
-				['type' => API_ID, 'flags' => API_ALLOW_NULL],
-				null,
-				'/1/id',
-				null
 			],
 			[
 				['type' => API_ID],

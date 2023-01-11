@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
+ * @dataSource LoginUsers
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -352,7 +354,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			[
 				[
 					'user' => 'local.com\\test-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'file' => 'htaccess',
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
@@ -526,7 +528,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$message = CMessageElement::find()->one();
 					$this->assertEquals('msg-bad msg-global', $message->getAttribute('class'));
 					$message_title= $message->getText();
-					$this->assertContains($check['error'], $message_title);
+					$this->assertStringContainsString($check['error'], $message_title);
 				}
 
 				continue;
@@ -611,7 +613,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$form->submit();
 
 		// Check DB configuration.
-		$defautl_values = [
+		$default_values = [
 			'authentication_type' => '0',
 			'ldap_host' => '',
 			'ldap_port' => '389',
@@ -627,7 +629,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 				'http_strip_domains,http_case_sensitive'.
 				' FROM config';
 		$result = CDBHelper::getRow($sql);
-		$this->assertEquals(array_merge($defautl_values, $data['db_check']), $result);
+		$this->assertEquals(array_merge($default_values, $data['db_check']), $result);
 
 		$this->page->logout();
 	}
@@ -681,11 +683,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public static function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
-	public function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+	public static function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1551, 9, 2)');
 	}
 }

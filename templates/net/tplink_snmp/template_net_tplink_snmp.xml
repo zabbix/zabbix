@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-16T09:13:58Z</date>
+   <date>2021-12-23T17:53:48Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -27,7 +27,7 @@ Known Issues:&#13;
   Version: Prior to version V2_170323&#13;
   Device: T2600G-28TS 2.0&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -203,7 +203,6 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: CPU utilization</name>
@@ -256,7 +255,6 @@ Reference: http://www.tp-link.com/faq-1330.html</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPVALUE}: Memory utilization</name>

@@ -149,6 +149,18 @@ session.localname = "";
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
+		AC_TRY_COMPILE([
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>],
+		[
+struct snmp_session session;
+
+session.securityPrivProto = usmDESPrivProtocol;
+		],
+		AC_DEFINE(HAVE_NETSNMP_SESSION_DES, 1, [Define to 1 if 'usmDESPrivProtocol' exist.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
 		CFLAGS="$_save_netsnmp_cflags"
 		LDFLAGS="$_save_netsnmp_ldflags"
 		LIBS="$_save_netsnmp_libs"

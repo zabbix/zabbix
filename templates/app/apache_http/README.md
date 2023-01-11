@@ -1,5 +1,5 @@
 
-# Apache by HTTP
+# Template App Apache by HTTP
 
 ## Overview
 
@@ -129,7 +129,7 @@ There are no template links in this template.
 |Apache |Apache: Connections total |<p>Number of total connections</p> |DEPENDENT |apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p> |
 |Apache |Apache: Bytes per request |<p>Average number of client requests per second</p> |DEPENDENT |apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p> |
 |Apache |Apache: Number of async processes |<p>Number of async processes</p> |DEPENDENT |apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p> |
-|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |HTTP_AGENT |apache.get_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `Text is too long. Please see the template.`</p> |
+|Zabbix_raw_items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |HTTP_AGENT |apache.get_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
@@ -137,7 +137,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Apache: Service is down |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
-|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:apache.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:apache.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Apache: Version has changed (new version: {ITEM.VALUE}) |<p>Apache version has changed. Ack to close.</p> |`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
 |Apache: Failed to fetch status page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
 

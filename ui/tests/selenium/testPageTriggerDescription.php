@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ class testPageTriggerDescription extends CWebTest {
 		$row = $table->findRow('Problem', $data['Trigger name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
-			$row->query('xpath:.//span[contains(@class, "icon-description")]')->one()->click();
+			$row->query('xpath:.//a[contains(@class, "icon-description")]')->one()->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
@@ -113,7 +113,7 @@ class testPageTriggerDescription extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check the URL of the opened page to make sure that correct event is opened.
-		$this->assertContains($data['event_url'], $this->page->getCurrentURL());
+		$this->assertStringContainsString($data['event_url'], $this->page->getCurrentURL());
 		// Find the row that contains trigger description and select the column that holds the value of description field.
 		$description = $this->query('xpath://td[text()="Description"]/..')->one()->asTableRow()->getColumn(1);
 

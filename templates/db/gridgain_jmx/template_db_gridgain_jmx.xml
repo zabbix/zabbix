@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-17T14:05:42Z</date>
+   <date>2022-03-03T14:58:22Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -19,7 +19,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -61,7 +61,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",Backups]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of backups configured for cache group.</description>
@@ -78,7 +77,6 @@ Template tooling version used: 0.38</description>
                      <key>jmx["{#JMXOBJ}",Caches]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -110,7 +108,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of partitions with state MOVING for this cache group located on this node.</description>
@@ -135,7 +132,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",LocalNodeOwningPartitionsCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of partitions with state OWNING for this cache group located on this node.</description>
@@ -151,7 +147,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",LocalNodeRentingEntriesCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of entries remains to evict in RENTING partitions located on this node for this cache group.</description>
@@ -167,7 +162,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",LocalNodeRentingPartitionsCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of partitions with state RENTING for this cache group located on this node.</description>
@@ -183,7 +177,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",MaximumNumberOfPartitionCopies]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Maximum number of partition copies for all partitions of this cache group.</description>
@@ -199,7 +192,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Minimum number of partition copies for all partitions of this cache group.</description>
@@ -222,7 +214,6 @@ Template tooling version used: 0.38</description>
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",Partitions]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Count of partitions for cache group.</description>
@@ -234,7 +225,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}&gt;={Template DB GridGain by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}</expression>
@@ -332,7 +322,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CorePoolSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!msg</units>
                      <username>{$IGNITE.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -349,7 +338,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",MaximumPoolSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!msg</units>
                      <username>{$IGNITE.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -366,7 +354,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",PoolSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!msg</units>
                      <username>{$IGNITE.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -383,7 +370,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",QueueSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!msg</units>
                      <username>{$IGNITE.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -404,7 +390,6 @@ return JSON.stringify(data)
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Thread pool [{#JMXNAME}]: Thread pool size</name>
@@ -487,7 +472,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",AllocationRate]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!pps</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -505,7 +489,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CheckpointBufferSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -523,7 +506,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",DirtyPages]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -540,7 +522,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",EvictionRate]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!pps</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -557,7 +538,7 @@ return JSON.stringify(data)
                            <expression>{min(5m)}&gt;0</expression>
                            <name>Data region {#JMXNAME}: Node started to evict pages</name>
                            <priority>INFO</priority>
-                           <description>You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
+                           <description>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -567,7 +548,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",MaxSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -585,7 +565,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",OffHeapSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -603,7 +582,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",OffheapUsedSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -621,7 +599,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",PagesFillFactor]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -639,7 +616,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",PagesReplaceRate]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!pps</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -665,7 +641,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalAllocatedSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -683,7 +658,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",UsedCheckpointBufferSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -697,7 +671,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100&gt;{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}</expression>
@@ -719,18 +692,18 @@ return JSON.stringify(data)
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                      <priority>HIGH</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                      <dependencies>
                         <dependency>
-                           <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                           <name>Data region {#JMXNAME}: Data region utilization is too high (over {$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                            <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB GridGain by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}</expression>
                         </dependency>
                      </dependencies>
@@ -759,7 +732,7 @@ return JSON.stringify(data)
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>Data region {#JMXNAME}: DataRegion utilisation</name>
+                     <name>Data region {#JMXNAME}: DataRegion utilization</name>
                      <graph_items>
                         <graph_item>
                            <drawtype>BOLD_LINE</drawtype>
@@ -816,7 +789,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentActiveJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Number of currently active jobs concurrently executing on the node.</description>
@@ -832,7 +804,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentCancelledJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Number of cancelled jobs that are still running.</description>
@@ -848,7 +819,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentPmeDuration]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>ms</units>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -861,6 +831,12 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.HIGH}</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)</name>
+                           <priority>HIGH</priority>
+                           <description>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.WARN}</expression>
                            <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.WARN} for 5 min)</name>
                            <priority>WARNING</priority>
@@ -872,12 +848,6 @@ return JSON.stringify(data)
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)} &gt; {$GRIDGAIN.PME.DURATION.MAX.HIGH}</expression>
-                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$GRIDGAIN.PME.DURATION.MAX.HIGH} for 5 min)</name>
-                           <priority>HIGH</priority>
-                           <description>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
@@ -885,7 +855,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentRejectedJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Number of jobs rejected after more recent collision resolution operation.</description>
@@ -901,7 +870,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentThreadCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Current number of live threads.</description>
@@ -931,7 +899,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CurrentWaitingJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Number of queued jobs currently waiting to be executed.</description>
@@ -955,7 +922,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",HeapMemoryUsed]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>B</units>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -972,7 +938,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalCancelledJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -995,7 +960,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalExecutedJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1018,7 +982,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalRejectedJobs]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1037,7 +1000,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs current state</name>
@@ -1136,7 +1098,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",ActiveBaselineNodes]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of nodes that are currently active in the baseline topology.</description>
@@ -1158,7 +1119,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalBaselineNodes]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Total baseline nodes that are registered in the baseline topology.</description>
@@ -1180,7 +1140,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalClientNodes]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of client nodes in the cluster.</description>
@@ -1202,7 +1161,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalNodes]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Total number of nodes.</description>
@@ -1224,7 +1182,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalServerNodes]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of server nodes in the cluster.</description>
@@ -1242,23 +1199,22 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{change()}&lt;0</expression>
-                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology</name>
-                           <priority>WARNING</priority>
-                           <description>One or more server node left the topology. Ack to close.</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{change()}&gt;0</expression>
                            <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology</name>
                            <priority>INFO</priority>
                            <description>One or more server node added to the topology. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{change()}&lt;0</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology</name>
+                           <priority>WARNING</priority>
+                           <description>One or more server node left the topology. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}&gt;{Template DB GridGain by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}</expression>
@@ -1301,7 +1257,6 @@ return JSON.stringify(data)
                      <key>jmx["{#JMXOBJ}",FullVersion]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1339,7 +1294,6 @@ return JSON.stringify(data)
                      <key>jmx["{#JMXOBJ}",LocalNodeId]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1362,7 +1316,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",UpTime]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>uptime</units>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1381,23 +1334,22 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&lt;10m</expression>
-                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime &lt; 10m)</name>
-                           <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{nodata(10m)}=1</expression>
                            <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)</name>
                            <priority>WARNING</priority>
                            <description>Zabbix has not received data for items for the last 10 minutes.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1418,7 +1370,7 @@ return JSON.stringify(data)
                </preprocessing>
             </discovery_rule>
             <discovery_rule>
-               <name>TCP Ccmmunication SPI metrics</name>
+               <name>TCP Communication SPI metrics</name>
                <type>JMX</type>
                <key>jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]</key>
                <delay>30m</delay>
@@ -1431,7 +1383,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",OutboundMessagesQueueSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Outbound messages queue size.</description>
@@ -1447,7 +1398,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",ReceivedMessagesCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!msg/s</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -1471,7 +1421,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",ReconnectCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1494,7 +1443,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",SentMessagesCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!msg/s</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -1514,7 +1462,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages rate</name>
@@ -1572,7 +1519,6 @@ return JSON.stringify(data)
                      <key>jmx["{#JMXOBJ}",Coordinator]</key>
                      <history>7d</history>
                      <trends>0</trends>
-                     <status>ENABLED</status>
                      <value_type>CHAR</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1604,7 +1550,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",MessageWorkerQueueSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Message worker queue current size.</description>
@@ -1620,7 +1565,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",NodesFailed]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Nodes failed count.</description>
@@ -1636,7 +1580,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",NodesJoined]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Nodes join count.</description>
@@ -1652,7 +1595,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",NodesLeft]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>Nodes left count.</description>
@@ -1668,7 +1610,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",ReconnectCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1691,7 +1632,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalProcessedMessages]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!msg/s</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -1715,7 +1655,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TotalReceivedMessages]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!msg/s</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -1735,7 +1674,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate</name>
@@ -1792,7 +1730,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",LockedKeysNumber]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of keys locked on the node.</description>
@@ -1808,7 +1745,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",OwnerTransactionsNumber]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of active transactions for which this node is the initiator.</description>
@@ -1824,7 +1760,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TransactionsCommittedNumber]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1841,7 +1776,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TransactionsHoldingLockNumber]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
                      <description>The number of active transactions holding at least one key lock.</description>
@@ -1857,7 +1791,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",TransactionsRolledBackNumber]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -1870,7 +1803,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions</name>
@@ -1963,7 +1895,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheGets]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -1987,7 +1918,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheHitPercentage]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2005,7 +1935,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheMissPercentage]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>%</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2023,7 +1952,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CachePuts]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2047,7 +1975,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheRemovals]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>ops</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2071,7 +1998,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheSize]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!keys</units>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -2088,7 +2014,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheTxCommits]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!tps</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2112,7 +2037,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",CacheTxRollbacks]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <value_type>FLOAT</value_type>
                      <units>!tps</units>
                      <username>{$GRIDGAIN.USER}</username>
@@ -2136,7 +2060,6 @@ return JSON.stringify(data)
                      <type>JMX</type>
                      <key>jmx["{#JMXOBJ}",HeapEntriesCount]</key>
                      <history>7d</history>
-                     <status>ENABLED</status>
                      <units>!keys</units>
                      <username>{$GRIDGAIN.USER}</username>
                      <password>{$GRIDGAIN.PASSWORD}</password>
@@ -2155,7 +2078,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB GridGain by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Template DB GridGain by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}</expression>

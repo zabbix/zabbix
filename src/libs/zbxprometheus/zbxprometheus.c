@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1078,6 +1078,14 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 		}
 
 		pos = skip_spaces(data, loc.r + 1);
+	}
+	else /* no labels in row */
+	{
+		if (0 < filter->labels.values_num) /* got labels in filter */
+		{
+			match = FAIL;
+			goto out;
+		}
 	}
 
 	/* check if there was a whitespace before metric value */

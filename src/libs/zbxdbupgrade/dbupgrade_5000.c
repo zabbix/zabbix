@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,9 +75,12 @@ static int	DBpatch_5000002(void)
 
 static int	DBpatch_5000003(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select om.operationid,om.subject,om.message"
 			" from opmessage om,operations o,actions a"
@@ -93,12 +96,14 @@ static int	DBpatch_5000003(void)
 	return ret;
 }
 
-
 static int	DBpatch_5000004(void)
 {
-	DB_RESULT	result;
-	int		ret;
-	const char	*fields[] = {"subject", "message"};
+	DB_RESULT		result;
+	int			ret;
+	zbx_field_len_t		fields[] = {
+			{"subject", 255},
+			{"message", 65535}
+	};
 
 	result = DBselect("select mediatype_messageid,subject,message from media_type_message where recovery=1");
 
@@ -108,6 +113,41 @@ static int	DBpatch_5000004(void)
 	DBfree_result(result);
 
 	return ret;
+}
+
+static int	DBpatch_5000005(void)
+{
+	return DBcreate_index("alerts", "alerts_8", "acknowledgeid", 0);
+}
+
+static int	DBpatch_5000006(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, NULL);
+}
+
+static int	DBpatch_5000007(void)
+{
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
+#else /* HAVE_ORACLE */
+#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
+#endif
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef ZBX_DB_CHAR_LENGTH
 }
 
 #endif
@@ -121,5 +161,8 @@ DBPATCH_ADD(5000001, 0, 0)
 DBPATCH_ADD(5000002, 0, 0)
 DBPATCH_ADD(5000003, 0, 0)
 DBPATCH_ADD(5000004, 0, 0)
+DBPATCH_ADD(5000005, 0, 0)
+DBPATCH_ADD(5000006, 0, 0)
+DBPATCH_ADD(5000007, 0, 0)
 
 DBPATCH_END()

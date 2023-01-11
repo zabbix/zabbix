@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,14 +37,15 @@ $widget = (new CWidget())
 
 $divTabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$divTabs->setSelected(0);
 }
 
 $frmHost = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('hostPrototypeForm')
 	->setName('hostPrototypeForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $discoveryRule['itemid'])
 	->addVar('tls_accept', $parentHost['tls_accept']);

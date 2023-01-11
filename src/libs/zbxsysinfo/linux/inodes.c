@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,9 +77,10 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 	}
 	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-		return SYSINFO_RET_FAIL;
+		*pfree = 100.0;
+		*pused = 0.0;
 	}
+
 	return SYSINFO_RET_OK;
 }
 

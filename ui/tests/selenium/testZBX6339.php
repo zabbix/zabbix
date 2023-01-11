@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,10 +51,14 @@ class testZBX6339 extends CLegacyWebTest {
 		$host = $screen['host_name'];
 
 		$this->zbxTestLogin('templates.php');
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $host)->one(false)->isValid() === false) {
+
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 2; $i++) {
+			if ($this->query('link', $host)->one(false)->isValid() === true) {
+				break;
+			}
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-			$this->zbxTestWaitForPageToLoad();
+			$this->page->waitUntilReady();
 		}
 		$this->zbxTestClickLinkText($host);
 

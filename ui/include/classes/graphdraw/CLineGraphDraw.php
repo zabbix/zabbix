@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -541,12 +541,21 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymin_itemid != 0) {
-			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymin_itemid],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$history = Manager::History()->getLastValues($items);
+
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
+			}
+			else {
+				$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
@@ -611,12 +620,21 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE && $this->ymax_itemid != 0) {
-			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item) {
-				$history = Manager::History()->getLastValues([$item]);
-				if (isset($history[$item['itemid']])) {
-					return $history[$item['itemid']][0]['value'];
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => [$this->ymax_itemid],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$history = Manager::History()->getLastValues($items);
+
+				if ($history) {
+					return $history[$items[0]['itemid']][0]['value'];
 				}
+			}
+			else {
+				$this->ymax_type = GRAPH_YAXIS_TYPE_CALCULATED;
 			}
 		}
 
@@ -900,7 +918,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Draw main period label in black color with 7px font size under X axis and a 1px dashed gray vertical line
 	 * according to that label.
 	 *
-	 * @param strimg $value     Readable timestamp.
+	 * @param string $value     Readable timestamp.
 	 * @param int    $position  Position on X axis.
 	 */
 	private function drawSubPeriod($value, $position) {
@@ -929,12 +947,14 @@ class CLineGraphDraw extends CGraphDraw {
 	/**
 	 * Get best matching X-axis interval specification for the preferred sub-interval.
 	 *
-	 * @param int   $pref_sub_interval  Preferred sub-interval in seconds.
-	 * @param float $min_sub_interval   Preferred minimal sub-interval in seconds (float). Discarded if no matches.
+	 * @param int    $pref_sub_interval  Preferred sub-interval in seconds.
+	 * @param float  $min_sub_interval   Preferred minimal sub-interval in seconds (float). Discarded if no matches.
+	 * @param string $magnitude          The highest non-permanent date component (Y, m, d, H, i, s).
 	 *
 	 * @return array
 	 */
-	private function getOptimalDateTimeIntervalSpec(int $pref_sub_interval, float $min_sub_interval): array {
+	private function getOptimalDateTimeIntervalSpec(int $pref_sub_interval, float $min_sub_interval,
+			string $magnitude): array {
 		// Possible X-axis main and sub-intervals.
 		$intervals = [
 			'PT1M' => ['PT1S', 'PT5S', 'PT10S', 'PT30S'],
@@ -961,9 +981,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$formats = [
 			'PT1M' => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
 			'PT1H' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
-			'P1D' => ['main' => _('m-d'), 'sub' => TIME_FORMAT],
-			'P1W' => ['main' => _('m-d'), 'sub' => _('m-d')],
-			'P1M' => ['main' => _('m-d'), 'sub' => _('m-d')],
+			'P1D' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => TIME_FORMAT],
+			'P1W' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],
+			'P1M' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],
 			'P1Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _('M')],
 			'P10Y' => ['main' => _x('Y', DATE_FORMAT_CONTEXT), 'sub' => _x('Y', DATE_FORMAT_CONTEXT)]
 		];
@@ -1081,7 +1101,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
 
-		$optimal = $this->getOptimalDateTimeIntervalSpec($preferred_sub_interval, $label_size);
+		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $magnitude) {
+			if (date($magnitude, $this->stime) !== date($magnitude, $this->stime + $this->period)) {
+				break;
+			}
+		}
+
+		$optimal = $this->getOptimalDateTimeIntervalSpec($preferred_sub_interval, $label_size, $magnitude);
 
 		// Align starting date and time with the interval.
 		$start = strtotime(date($optimal['aligner']['trim'], $this->stime));
@@ -1757,19 +1783,6 @@ class CLineGraphDraw extends CGraphDraw {
 				zbx_imagealine($this->im, $x1, $y1, $x2, $y2, $avg_color, $style);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
-				$a[0] = $x1;
-				$a[1] = $y1;
-				$a[2] = $x1;
-				$a[3] = $y1_shift;
-				$a[4] = $x2;
-				$a[5] = $y2_shift;
-				$a[6] = $x2;
-				$a[7] = $y2;
-
-				imagefilledpolygon($this->im, $a, 4, $avg_color);
-				break;
-
 			case GRAPH_ITEM_DRAWTYPE_DOT:
 				imagefilledrectangle($this->im, $x1 - 1, $y1 - 1, $x1, $y1, $avg_color);
 				break;
@@ -1791,44 +1804,66 @@ class CLineGraphDraw extends CGraphDraw {
 				break;
 
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-				imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
-				imageLine($this->im, $x1, $y1 - 1, $x2, $y2 - 1, $avg_color);
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+				/*
+				 * Graphs should be at least 50px in height in order to visually see the gradient. Though 51px would not
+				 * make any difference either. If graph height is too small to see gradient, use standard solid color
+				 * filling function instead.
+				 */
+				if ($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION
+						|| ($drawtype == GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE && $this->sizeY <= 50)) {
+					$a[0] = $x1;
+					$a[1] = $y1;
+					$a[2] = $x1;
+					$a[3] = $y1_shift;
+					$a[4] = $x2;
+					$a[5] = $y2_shift;
+					$a[6] = $x2;
+					$a[7] = $y2;
 
-				$bitmask = 255;
-				$blue = $avg_color & $bitmask;
+					imagefilledpolygon($this->im, $a, 4, $avg_color);
+				}
+				else {
+					imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
+					imageLine($this->im, $x1, $y1 - 1, $x2, $y2 - 1, $avg_color);
 
-				// $blue_diff = 255 - $blue;
-				$bitmask = $bitmask << 8;
-				$green = ($avg_color & $bitmask) >> 8;
+					$bitmask = 255;
+					$blue = $avg_color & $bitmask;
 
-				// $green_diff = 255 - $green;
-				$bitmask = $bitmask << 8;
-				$red = ($avg_color & $bitmask) >> 16;
-				// $red_diff = 255 - $red;
+					// $blue_diff = 255 - $blue;
+					$bitmask = $bitmask << 8;
+					$green = ($avg_color & $bitmask) >> 8;
 
-				// note: though gradients on the chart looks ok, the formula used is completely incorrect
-				// if you plan to fix something here, it would be better to start from scratch
-				$maxAlpha = 110;
-				$startAlpha = 50;
-				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
+					// $green_diff = 255 - $green;
+					$bitmask = $bitmask << 8;
+					$red = ($avg_color & $bitmask) >> 16;
+					// $red_diff = 255 - $red;
 
-				$diffX = $x1 - $x2;
-				for ($i = 0; $i <= $diffX; $i++) {
-					$Yincr = ($diffX > 0) ? (abs($y2 - $y1) / $diffX) : 0;
+					// note: though gradients on the chart looks ok, the formula used is completely incorrect
+					// if you plan to fix something here, it would be better to start from scratch
+					$maxAlpha = 110;
+					$startAlpha = 50;
 
-					$gy = ($y1 > $y2) ? ($y2 + $Yincr * $i) : ($y2 - $Yincr * $i);
-					$steps = $this->sizeY + $this->shiftY - $gy + 1;
+					$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
 
-					for ($j = 0; $j < $steps; $j++) {
-						if (($gy + $j) < ($this->shiftY + $startAlpha)) {
-							$alpha = 0;
+					$diffX = $x1 - $x2;
+					for ($i = 0; $i <= $diffX; $i++) {
+						$Yincr = ($diffX > 0) ? (abs($y2 - $y1) / $diffX) : 0;
+
+						$gy = ($y1 > $y2) ? ($y2 + $Yincr * $i) : ($y2 - $Yincr * $i);
+						$steps = $this->sizeY + $this->shiftY - $gy + 1;
+
+						for ($j = 0; $j < $steps; $j++) {
+							if (($gy + $j) < ($this->shiftY + $startAlpha)) {
+								$alpha = 0;
+							}
+							else {
+								$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
+							}
+
+							$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
+							imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 						}
-						else {
-							$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
-						}
-
-						$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
-						imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 					}
 				}
 				break;
@@ -2113,24 +2148,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$data = &$this->data[$this->items[$item]['itemid']];
 
-			if ($this->type == GRAPH_TYPE_STACKED) {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
+			$drawtype = $this->items[$item]['drawtype'];
+			$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
+			$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
+			$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
+			$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
 
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
-			else {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
-
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
+			$calc_fnc = $this->items[$item]['calc_fnc'];
 
 			// for each X
 			$prevDraw = true;

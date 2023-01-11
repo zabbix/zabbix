@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ class CItemManager {
 	 * @param array $itemids
 	 */
 	public static function delete(array $itemids) {
+		global $DB;
+
 		$del_itemids = [];
 		$del_ruleids = [];
 		$del_item_prototypeids = [];
@@ -204,9 +206,31 @@ class CItemManager {
 			'value_id' => $del_itemids
 		]);
 
-		$table_names = ['trends', 'trends_uint', 'history_text', 'history_log', 'history_uint', 'history_str',
-			'history', 'events'
-		];
+		$config = select_config();
+
+		$table_names = ['events'];
+
+		if ($config['hk_history_mode'] != 0) {
+			array_push($table_names, 'history', 'history_str', 'history_uint', 'history_log', 'history_text');
+		}
+
+		if ($config['hk_trends_mode'] != 0) {
+			array_push($table_names,'trends', 'trends_uint');
+		}
+
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				if ($config['hk_history_mode'] != 0 && $config['hk_history_global'] == 1) {
+					$table_names = array_diff($table_names,
+						['history', 'history_str', 'history_uint', 'history_log', 'history_text']
+					);
+				}
+
+				if ($config['hk_trends_mode'] != 0 && $config['hk_trends_global'] == 1) {
+					$table_names = array_diff($table_names, ['trends', 'trends_uint']);
+				}
+			}
+		}
 
 		$ins_housekeeper = [];
 

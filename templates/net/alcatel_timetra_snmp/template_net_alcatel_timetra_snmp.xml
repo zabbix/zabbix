@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:14:16Z</date>
+   <date>2022-07-22T07:43:19Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -18,7 +18,7 @@ TIMETRA-CHASSIS-MIB&#13;
 TIMETRA-SYSTEM-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module EtherLike-MIB SNMP</name>
@@ -174,7 +174,7 @@ The value of sgiKbMemoryAvailable indicates the amount of free memory, in kiloby
                <history>7d</history>
                <units>B</units>
                <params>last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]")</params>
-               <description>Total memory in Bytes</description>
+               <description>Total memory in Bytes.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -210,7 +210,7 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last("vm.memory.used[sgiKbMemoryUsed.0]")/(last("vm.memory.available[sgiKbMemoryAvailable.0]")+last("vm.memory.used[sgiKbMemoryUsed.0]"))*100</params>
-               <description>Memory utilization in %</description>
+               <description>Memory utilization in %.</description>
                <applications>
                   <application>
                      <name>Memory</name>
@@ -276,7 +276,6 @@ The value of sgiKbMemoryUsed indicates the total pre-allocated pool memory, in k
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -324,7 +323,6 @@ Current status of the Fan tray.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -343,7 +341,7 @@ Current status of the Fan tray.</description>
                      <trends>0d</trends>
                      <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The overall status of an equipped power supply. &#13;
-For AC multiple powersupplies, this represents the overall status of the first power supplyin the tray (or shelf).&#13;
+For AC multiple power supplies, this represents the overall status of the first power supply in the tray (or shelf).&#13;
 For any other type, this represents the overall status of the power supply.&#13;
 If tmnxChassisPowerSupply1Status is'deviceStateOk', then all monitored statuses are 'deviceStateOk'.&#13;
 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.</description>
@@ -375,7 +373,7 @@ A value of 'deviceStateFailed' represents a condition where at least one monitor
                      <trends>0d</trends>
                      <description>MIB: TIMETRA-SYSTEM-MIB&#13;
 The overall status of an equipped power supply.&#13;
-For AC multiple powersupplies, this represents the overall status of the second power supplyin the tray (or shelf).&#13;
+For AC multiple power supplies, this represents the overall status of the second power supply in the tray (or shelf).&#13;
 For any other type, this field is unused and set to 'deviceNotEquipped'.&#13;
 If tmnxChassisPowerSupply2Status is 'deviceStateOk', then all monitored statuses are 'deviceStateOk'.&#13;
 A value of 'deviceStateFailed' represents a condition where at least one monitored status is in a failed state.</description>
@@ -398,7 +396,6 @@ A value of 'deviceStateFailed' represents a condition where at least one monitor
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Discovery</name>
@@ -434,6 +431,15 @@ The current temperature reading in degrees celsius from this hardware component'
                      </applications>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
@@ -450,15 +456,6 @@ The current temperature reading in degrees celsius from this hardware component'
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                           <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
@@ -469,7 +466,6 @@ The current temperature reading in degrees celsius from this hardware component'
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>

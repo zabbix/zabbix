@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -398,10 +398,19 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 			$gitem['key_'] = $dbItem['key_'];
 		}
 		elseif ($error) {
-			$item = get_item_by_itemid($gitem['itemid']);
-			$host = get_host_by_hostid($destinationHostId);
+			$items = API::Item()->get([
+				'output' => ['key_'],
+				'itemids' => [$gitem['itemid']],
+				'webitems' => true
+			]);
 
-			error(_s('Missing key "%1$s" for host "%2$s".', $item['key_'], $host['host']));
+			$hosts = API::Host()->get([
+				'output' => ['host'],
+				'hostids' => [$destinationHostId],
+				'templated_hosts' => true
+			]);
+
+			error(_s('Missing key "%1$s" for host "%2$s".', $items[0]['key_'], $hosts[0]['host']));
 
 			return false;
 		}

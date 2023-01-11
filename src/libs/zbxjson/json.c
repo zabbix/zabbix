@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,11 +45,23 @@ const char	*zbx_json_strerror(void)
 
 void	zbx_set_json_strerror(const char *fmt, ...)
 {
+	size_t	sz;
 	va_list	args;
 
 	va_start(args, fmt);
 
-	zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+	sz = zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+
+	if (sizeof(zbx_json_strerror_message) - 1 == sz)
+	{
+		/* ensure that the string is not cut in the middle of UTF-8 sequence */
+		size_t	idx = sz - 1;
+		while (0x80 == (0xc0 & zbx_json_strerror_message[idx]) && 0 < idx)
+			idx--;
+
+		if (zbx_utf8_char_len(zbx_json_strerror_message + idx) != sz - idx)
+			zbx_json_strerror_message[idx] = '\0';
+	}
 
 	va_end(args);
 }
@@ -134,16 +146,24 @@ void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
 	zbx_json_addarray(j, NULL);
 }
 
-void	zbx_json_clean(struct zbx_json *j)
+static void	zbx_json_setempty(struct zbx_json *j)
 {
-	assert(j);
-
 	j->buffer_offset = 0;
 	j->buffer_size = 0;
 	j->status = ZBX_JSON_EMPTY;
 	j->level = 0;
 	*j->buffer = '\0';
+}
 
+void	zbx_json_cleanarray(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
+	zbx_json_addarray(j, NULL);
+}
+
+void	zbx_json_clean(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
 	zbx_json_addobject(j, NULL);
 }
 
@@ -575,8 +595,8 @@ static const char	*__zbx_json_rbracket(const char *p)
  ******************************************************************************/
 int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 {
-	char	*error = NULL;
-	int	len;
+	char		*error = NULL;
+	zbx_int64_t	len;
 
 	SKIP_WHITESPACE(buffer);
 
@@ -1215,40 +1235,23 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 	return num;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_open_path                                               *
- *                                                                            *
- * Purpose: opens an object by definite json path                             *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
- * Comments: Only direct path to single object in dot or bracket notation     *
- *           is supported.                                                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+int	json_open_path(const struct zbx_json_parse *jp, const zbx_jsonpath_t *jsonpath, struct zbx_json_parse *out)
 {
 	int			i, ret = FAIL;
 	struct zbx_json_parse	object;
-	zbx_jsonpath_t		jsonpath;
 
 	object = *jp;
 
-	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
-		return FAIL;
-
-	if (0 == jsonpath.definite)
+	if (0 == jsonpath->definite)
 	{
 		zbx_set_json_strerror("cannot use indefinite path when opening sub element");
 		goto out;
 	}
 
-	for (i = 0; i < jsonpath.segments_num; i++)
+	for (i = 0; i < jsonpath->segments_num; i++)
 	{
 		const char		*p;
-		zbx_jsonpath_segment_t	*segment = &jsonpath.segments[i];
+		zbx_jsonpath_segment_t	*segment = &jsonpath->segments[i];
 
 		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
 		{
@@ -1292,6 +1295,33 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 	*out = object;
 	ret = SUCCEED;
 out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_open_path                                               *
+ *                                                                            *
+ * Purpose: opens an object by definite json path                             *
+ *                                                                            *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Comments: Only direct path to single object in dot or bracket notation     *
+ *           is supported.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+{
+	zbx_jsonpath_t		jsonpath;
+	int			ret;
+
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+		return FAIL;
+
+	ret = json_open_path(jp, &jsonpath, out);
+
 	zbx_jsonpath_clear(&jsonpath);
+
 	return ret;
 }

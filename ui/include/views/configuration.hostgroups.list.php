@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,12 +127,36 @@ foreach ($this->data['groups'] as $group) {
 
 	// name
 	$name = [];
-	if ($group['discoveryRule']) {
-		$name[] = (new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid']))
-			->addClass(ZBX_STYLE_ORANGE);
+
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		if ($group['discoveryRule']) {
+			if ($group['is_discovery_rule_editable']) {
+				$lld_name = (new CLink($group['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+						->setArgument('hostid', $group['hostPrototype']['hostid'])
+						->setArgument('context', 'host')
+				))->addClass(ZBX_STYLE_LINK_ALT);
+			}
+			else {
+				$lld_name = new CSpan($group['discoveryRule']['name']);
+			}
+
+			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
+		}
+		else {
+			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
+		}
+
 		$name[] = NAME_DELIMITER;
 	}
-	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
+
+	$name[] = new CLink($group['name'],
+		(new CUrl('hostgroups.php'))
+			->setArgument('form', 'update')
+			->setArgument('groupid', $group['groupid'])
+	);
 
 	// info, discovered item lifetime indicator
 	$info_icons = [];

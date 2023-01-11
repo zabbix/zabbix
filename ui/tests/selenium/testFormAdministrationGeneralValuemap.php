@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,16 +34,13 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 64);
-		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
 		$this->zbxTestTextPresent(['Mappings', 'Value', 'Mapped to']);
 		$this->zbxTestAssertElementPresentId('mappings_0_value');
 		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "maxlength", 64);
-		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "size", 20);
 
 		$this->zbxTestAssertElementPresentId('mappings_0_newvalue');
 		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "maxlength", 64);
-		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "size", 20);
 
 		$this->zbxTestAssertElementPresentId('mapping_add');
 

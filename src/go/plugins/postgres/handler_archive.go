@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,14 +39,23 @@ func archiveHandler(ctx context.Context, conn PostgresClient,
 
 	queryArchiveSize := `SELECT row_to_json(T)
 							FROM (
-									SELECT count(name) AS count_files ,
-									coalesce(sum((pg_stat_file('./pg_wal/' || rtrim(ready.name,'.ready'))).size),0) AS size_files
-									FROM (
-										SELECT name
-										  FROM pg_ls_dir('./pg_wal/archive_status') name
-										  WHERE right( name,6)= '.ready'
-										 ) ready
-								) T;`
+								WITH values AS (
+									SELECT
+										4096/(ceil(pg_settings.setting::numeric/1024/1024))::int AS segment_parts_count,
+										setting::bigint AS segment_size,
+										('x' || substring(pg_stat_archiver.last_archived_wal from 9 for 8))::bit(32)::int AS last_wal_div,
+										('x' || substring(pg_stat_archiver.last_archived_wal from 17 for 8))::bit(32)::int AS last_wal_mod,
+										CASE WHEN pg_is_in_recovery() THEN NULL 
+											ELSE ('x' || substring(pg_walfile_name(pg_current_wal_lsn()) from 9 for 8))::bit(32)::int END AS current_wal_div,
+										CASE WHEN pg_is_in_recovery() THEN NULL 
+											ELSE ('x' || substring(pg_walfile_name(pg_current_wal_lsn()) from 17 for 8))::bit(32)::int END AS current_wal_mod
+									FROM pg_settings, pg_stat_archiver
+									WHERE pg_settings.name = 'wal_segment_size')
+								SELECT 
+									greatest(coalesce((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1, 0), 0) AS count_files,
+									greatest(coalesce(((segment_parts_count - last_wal_mod) + ((current_wal_div - last_wal_div - 1) * segment_parts_count) + current_wal_mod - 1) * segment_size, 0), 0) AS size_files
+								FROM values
+							) T;`
 
 	row, err := conn.QueryRow(ctx, queryArchiveCount)
 	if err != nil {

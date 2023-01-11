@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,16 +387,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
 
-		switch (ss->s_snmp_errno)
-		{
-			case SNMPERR_UNKNOWN_USER_NAME:
-			case SNMPERR_UNSUPPORTED_SEC_LEVEL:
-			case SNMPERR_AUTHENTICATION_FAILURE:
-				ret = NOTSUPPORTED;
-				break;
-			default:
-				ret = NETWORK_ERROR;
-		}
+		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
@@ -568,11 +559,13 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 
 				switch (item->snmpv3_privprotocol)
 				{
+#ifdef HAVE_NETSNMP_SESSION_DES
 					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
 						/* set the privacy protocol to DES */
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
+#endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES:
 						/* set the privacy protocol to AES */
 						session.securityPrivProto = usmAESPrivProtocol;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	protected function doGraphPrototype(array $fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
-			'selectHosts' => ['name'],
+			'selectHosts' => ['hostid', 'name'],
 			'selectDiscoveryRule' => ['hostid']
 		];
 
@@ -151,9 +151,15 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			];
 		}
 
-		$widget_header = $this->hasInput('name')
-			? $this->getInput('name')
-			: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+		if ($this->hasInput('name')) {
+			$widget_header = $this->getInput('name');
+		}
+		else {
+			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
+			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
+
+			$widget_header = $host_name.NAME_DELIMITER.$graph_prototype['name'];
+		}
 
 		return [
 			'header' => $widget_header,

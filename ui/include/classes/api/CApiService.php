@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ class CApiService {
 
 			// if an array of fields is passed, check if the field is present in the array
 			default:
-				return in_array($field, $output);
+				return is_array($output) ? in_array($field, $output) : false;
 		}
 	}
 

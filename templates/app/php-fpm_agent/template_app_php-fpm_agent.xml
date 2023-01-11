@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-06-18T11:30:59Z</date>
+   <date>2022-09-08T12:46:55Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -13,7 +13,9 @@
          <name>Template App PHP-FPM by Zabbix agent</name>
          <description>Get PHP-FPM metrics using Zabbix agent running on Linux.&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/&lt;pid&gt;/status file (https://www.zabbix.com/documentation/5.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.&#13;
+&#13;
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -34,7 +36,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.conn_accepted.rate</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <description>The number of accepted requests per second.</description>
                <applications>
@@ -62,7 +63,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.listen_queue</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The current number of connections that have been initiated, but not yet accepted.</description>
                <applications>
                   <application>
@@ -85,7 +85,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.listen_queue_len</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>Size of the socket queue of pending connections.</description>
                <applications>
                   <application>
@@ -108,7 +107,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.listen_queue_max</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The maximum number of requests in the queue of pending connections since this FPM pool has started.</description>
                <applications>
                   <application>
@@ -130,7 +128,6 @@ Template tooling version used: 0.38</description>
                <type>CALCULATED</type>
                <key>php-fpm.listen_queue_usage</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <params>last(php-fpm.listen_queue)/(last(php-fpm.listen_queue_len)+(last(php-fpm.listen_queue_len)=0))*100</params>
@@ -155,7 +152,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.max_children</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The number of times that pm.max_children has been reached since the php-fpm pool started</description>
                <applications>
                   <application>
@@ -183,7 +179,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The name of current pool.</description>
                <applications>
@@ -211,7 +206,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.ping</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>PHP-FPM</name>
@@ -223,7 +217,7 @@ Template tooling version used: 0.38</description>
                <preprocessing>
                   <step>
                      <type>REGEX</type>
-                     <params>{$PHP_FPM.PING.REPLY}($|\n)
+                     <params>{$PHP_FPM.PING.REPLY}($|\r?\n)
 1</params>
                      <error_handler>CUSTOM_VALUE</error_handler>
                      <error_handler_params>0</error_handler_params>
@@ -254,7 +248,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>The method used by the process manager to control the number of child processes for this pool.</description>
                <applications>
@@ -291,7 +284,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.processes_active</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of active processes.</description>
                <applications>
                   <application>
@@ -314,7 +306,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.processes_idle</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of idle processes.</description>
                <applications>
                   <application>
@@ -337,7 +328,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.processes_max_active</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The highest value that 'active processes' has reached since the php-fpm server started.</description>
                <applications>
                   <application>
@@ -360,7 +350,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.processes_total</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The total number of server processes currently running.</description>
                <applications>
                   <application>
@@ -383,7 +372,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.slow_requests</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <description>The number of requests that exceeded your request_slowlog_timeout value.</description>
                <applications>
                   <application>
@@ -418,7 +406,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.start_time</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>unixtime</units>
                <description>The time when this pool was started.</description>
                <applications>
@@ -442,7 +429,6 @@ Template tooling version used: 0.38</description>
                <key>php-fpm.uptime</key>
                <delay>0</delay>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>s</units>
                <description>How long has this pool been running.</description>
                <applications>
@@ -475,9 +461,9 @@ Template tooling version used: 0.38</description>
                   </trigger>
                   <trigger>
                      <expression>{last()}&lt;10m</expression>
-                     <name>PHP-FPM: has been restarted (uptime &lt; 10m)</name>
+                     <name>PHP-FPM: Pool has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -489,7 +475,6 @@ Template tooling version used: 0.38</description>
                <delay>0</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>CHAR</value_type>
                <description>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</description>
                <applications>
@@ -526,7 +511,6 @@ Template tooling version used: 0.38</description>
                <name>PHP-FPM: CPU utilization</name>
                <key>proc.cpu.util["{$PHP_FPM.PROCESS_NAME}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Process CPU utilization percentage.</description>
@@ -540,7 +524,6 @@ Template tooling version used: 0.38</description>
                <name>PHP-FPM: Memory usage, %</name>
                <key>proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,pmem]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <value_type>FLOAT</value_type>
                <units>%</units>
                <description>Memory used percentage relative to total memory available.</description>
@@ -554,7 +537,6 @@ Template tooling version used: 0.38</description>
                <name>PHP-FPM: Memory usage (rss)</name>
                <key>proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,rss]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <units>B</units>
                <description>Resident set size memory used by process in bytes.</description>
                <applications>
@@ -567,7 +549,6 @@ Template tooling version used: 0.38</description>
                <name>PHP-FPM: Number of processes running</name>
                <key>proc.num["{$PHP_FPM.PROCESS_NAME}"]</key>
                <history>7d</history>
-               <status>ENABLED</status>
                <applications>
                   <application>
                      <name>PHP-FPM</name>
@@ -586,7 +567,6 @@ Template tooling version used: 0.38</description>
                <key>web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -599,7 +579,6 @@ Template tooling version used: 0.38</description>
                <key>web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]</key>
                <history>0</history>
                <trends>0</trends>
-               <status>ENABLED</status>
                <value_type>TEXT</value_type>
                <applications>
                   <application>
@@ -639,7 +618,7 @@ Template tooling version used: 0.38</description>
             <macro>
                <macro>{$PHP_FPM.PROCESS_NAME}</macro>
                <value>php-fpm</value>
-               <description>PHP-FPM process name</description>
+               <description>PHP-FPM process name. May vary depending on your OS distribution.</description>
             </macro>
             <macro>
                <macro>{$PHP_FPM.QUEUE.WARN.MAX}</macro>

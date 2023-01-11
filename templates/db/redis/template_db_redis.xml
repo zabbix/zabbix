@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.4</version>
-   <date>2015-12-30T14:41:30Z</date>
+   <version>5.0</version>
+   <date>2021-12-24T08:20:56Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/389050-discussion-thread-for-official-zabbix-template-redis&#13;
 &#13;
-Template tooling version used: 0.33</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -192,7 +192,6 @@ Once the limit is reached Redis will close all the new connections sending an er
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Redis: Configuration has changed</name>
                      <priority>INFO</priority>
                      <description>Redis configuration has changed. Ack to close.</description>
@@ -1129,7 +1128,6 @@ https://redis.io/topics/memory-optimization</description>
                <triggers>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
-                     <recovery_mode>NONE</recovery_mode>
                      <name>Redis: Version has changed (new version: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>Redis version has changed. Ack to close.</description>
@@ -1669,7 +1667,6 @@ https://redis.io/topics/clients</description>
          <discovery_rules>
             <discovery_rule>
                <name>Process metrics discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>proc.num["{$REDIS.LLD.PROCESS_NAME}"]</key>
                <delay>1h</delay>
                <description>Collect metrics by Zabbix agent if it exists</description>
@@ -1989,13 +1986,6 @@ https://redis.io/topics/clients</description>
                      <master_item>
                         <key>redis.info["{$REDIS.CONN.URI}"]</key>
                      </master_item>
-                     <trigger_prototypes>
-                        <trigger_prototype>
-                           <expression>{Template DB Redis:redis.memory.used_memory.last()}/{Template DB Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
-                           <name>Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)</name>
-                           <priority>WARNING</priority>
-                        </trigger_prototype>
-                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>Redis: Total system memory{#SINGLETON}</name>
@@ -2402,6 +2392,13 @@ https://redis.io/topics/clients</description>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
+               <trigger_prototypes>
+                  <trigger_prototype>
+                     <expression>{Template DB Redis:redis.memory.used_memory.last()}/{Template DB Redis:redis.memory.maxmemory[{#SINGLETON}].min(5m)}*100&gt;{$REDIS.MEM.PUSED.MAX.WARN}</expression>
+                     <name>Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)</name>
+                     <priority>WARNING</priority>
+                  </trigger_prototype>
+               </trigger_prototypes>
                <master_item>
                   <key>redis.info["{$REDIS.CONN.URI}"]</key>
                </master_item>
@@ -3907,15 +3904,11 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
+         <name>Redis bgsave time</name>
          <mappings>
             <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
+               <value>- 1s</value>
+               <newvalue>Inactive</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -3955,11 +3948,15 @@ https://redis.io/topics/clients#maximum-number-of-clients</description>
          </mappings>
       </value_map>
       <value_map>
-         <name>Redis bgsave time</name>
+         <name>Service state</name>
          <mappings>
             <mapping>
-               <value>- 1s</value>
-               <newvalue>Inactive</newvalue>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

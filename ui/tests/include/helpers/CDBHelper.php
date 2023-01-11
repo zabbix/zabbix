@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ class CDBHelper {
 	 * @var array
 	 */
 	static $backups = [];
+
+	static $db_extension;
 
 	/**
 	 * Perform select query and check the result.
@@ -174,6 +176,24 @@ class CDBHelper {
 	}
 
 	/**
+	 * Get all values of database column.
+	 *
+	 * @param type $sql			 query to be executed
+	 * @param type $column		 column name
+	 *
+	 * @return array
+	 */
+	public static function getColumn($sql, $column) {
+		$data = [];
+
+		foreach (CDBHelper::getAll($sql) as $row) {
+			$data[] = $row[$column];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get list of all referenced tables sorted by dependency level.
 	 *
 	 * For example: getTables($tables, 'users')
@@ -230,26 +250,77 @@ class CDBHelper {
 
 	/*
 	 * Saves data of the specified table and all dependent tables in temporary storage.
-	 * For example: backupTables('users')
+	 * For example: backupTables(['users'])
 	 */
-	public static function backupTables($top_table) {
+	public static function backupTables(array $top_tables) {
 		global $DB;
 
 		$tables = [];
-		static::getTables($tables, $top_table);
+		static::getTables($tables, $top_tables);
 		self::$backups[] = $tables;
 
 		$suffix = '_tmp'.count(self::$backups);
 
-		foreach ($tables as $table) {
-			DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if (self::$db_extension == null) {
+				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
 
-			switch ($DB['TYPE']) {
-				case ZBX_DB_MYSQL:
-					DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
-					break;
-				default:
-					DBexecute('SELECT * INTO TABLE '.$table.$suffix.' FROM '.$table);
+				if ($res) {
+					self::$db_extension = $res['db_extension'];
+				}
+			}
+
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
+
+			$cmd = 'pg_dump';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
+			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
+
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd .= ' 2>/dev/null';
+			}
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
+			}
+		}
+		else {
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
+			}
+
+			$cmd = 'mysqldump';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' --add-drop-table '.$DB['DATABASE'];
+			$cmd .= ' '.implode(' ', $tables).' | gzip -c > '.$file;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
 			}
 		}
 	}
@@ -268,23 +339,90 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 		$tables = array_pop(self::$backups);
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
-			$row = DBfetch($result);
-			DBexecute('SET unique_checks=0,foreign_key_checks=0');
-		}
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
 
-		foreach (array_reverse($tables) as $table) {
-			DBexecute('DELETE FROM '.$table);
-		}
+			$cmd = 'pg_restore';
 
-		foreach ($tables as $table) {
-			DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
-			DBexecute('DROP TABLE '.$table.$suffix);
-		}
+			if ($DB['SERVER'] !== 'v') {
+				$server = ' --host='.$DB['SERVER'];
+			}
+			$cmd .= $server;
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
+			$port = '';
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$port .= ' --port='.$DB['PORT'];
+			}
+			$cmd .= $port;
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
+			$cmd .= ' '.$file;
+
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd_tdb = 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_pre_restore();"; ';
+				$cmd_tdb .= $cmd .' 2>/dev/null; ';
+				$cmd_tdb .= 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_post_restore();" ';
+				exec($cmd_tdb, $output, $result_code);
+			}
+			else {
+				exec($cmd, $output, $result_code);
+			}
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('rd '.$file.' /q /s');
+			}
+			else {
+				exec('rm -rf '.$file, $output, $result_code);
+			}
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
+		}
+		else {
+			if ($DB['PASSWORD'] !== '') {
+				putenv('MYSQL_PWD='.$DB['PASSWORD']);
+			}
+
+			$cmd = 'mysql';
+
+			if ($DB['SERVER'] !== 'v') {
+				$cmd .= ' --host='.$DB['SERVER'];
+			}
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' --port='.$DB['PORT'];
+			}
+
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump.gz';
+			$cmd .= ' --user='.$DB['USER'].' '.$DB['DATABASE'];
+			$cmd = 'gzip -cd '.$file.' | '.$cmd;
+
+			exec($cmd, $output, $result_code);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('del '.$file);
+			}
+			else {
+				exec('rm -rf '.$file, $output, $result_code);
+			}
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 	}
 

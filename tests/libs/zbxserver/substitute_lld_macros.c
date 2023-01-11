@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,8 +70,6 @@ static int	get_flags(const char *path)
 			flags |= ZBX_TOKEN_NUMERIC;
 		else if (0 == strcmp(flag, "ZBX_TOKEN_JSON"))
 			flags |= ZBX_TOKEN_JSON;
-		else if (0 == strcmp(flag, "ZBX_TOKEN_XML"))
-			flags |= ZBX_TOKEN_XML;
 		else if (0 == strcmp(flag, "ZBX_TOKEN_REGEXP"))
 			flags |= ZBX_TOKEN_REGEXP;
 		else if (0 == strcmp(flag, "ZBX_TOKEN_XPATH"))
@@ -90,8 +88,6 @@ static int	get_flags(const char *path)
 			flags |= ZBX_MACRO_NUMERIC;
 		else if (0 == strcmp(flag, "ZBX_MACRO_JSON"))
 			flags |= ZBX_MACRO_JSON;
-		else if (0 == strcmp(flag, "ZBX_MACRO_XML"))
-			flags |= ZBX_MACRO_XML;
 		else if (0 == strcmp(flag, "ZBX_MACRO_SIMPLE"))
 			flags |= ZBX_MACRO_SIMPLE;
 		else if (0 == strcmp(flag, "ZBX_MACRO_FUNC"))

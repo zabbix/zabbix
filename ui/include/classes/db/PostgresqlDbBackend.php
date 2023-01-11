@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,9 +91,9 @@ class PostgresqlDbBackend extends DbBackend {
 			' WHERE datname='.zbx_dbstr($DB['DATABASE'])
 		));
 
-		if ($row && $row['db_charset'] != ZBX_DB_DEFAULT_CHARSET) {
+		if ($row && $row['db_charset'] != ZBX_DB_POSTGRESQL_ALLOWED_CHARSET) {
 			$this->setWarning(_s('Incorrect default charset for Zabbix database: %1$s.',
-				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_DEFAULT_CHARSET)
+				_s('"%1$s" instead "%2$s"', $row['db_charset'], ZBX_DB_POSTGRESQL_ALLOWED_CHARSET)
 			));
 			return false;
 		}
@@ -239,7 +239,7 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema), true);
+		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema));
 
 		if(!$schema_set) {
 			$this->setError(pg_last_error());
@@ -297,6 +297,23 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$result = DBfetch(DBselect($query));
 
-		return (bool) $result['chunks'];
+		return $result ? (bool) $result['chunks'] : $result;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists($table_name, $field_name) {
+		global $DB;
+
+		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
+
+		return (bool) DBFetch(DBselect(
+			'SELECT 1'.
+			' FROM information_schema.columns'.
+			' WHERE table_name='.zbx_dbstr($table_name).
+				' AND column_name='.zbx_dbstr($field_name).
+				' AND table_schema='.zbx_dbstr($schema)
+		));
 	}
 }

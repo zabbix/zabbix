@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -319,7 +319,7 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_OPENSSL)
-void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
+static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 {
 	unsigned long	error_code;
 	const char	*file, *data;
@@ -327,13 +327,22 @@ void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset)
 	char		err[1024];
 
 	/* concatenate all error messages in the queue into one string */
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+	const char	*func;
 
+	while (0 != (error_code = ERR_get_error_all(&file, &line, &func, &data, &flags)))
+#else									/* OpenSSL 1.x.x or LibreSSL */
 	while (0 != (error_code = ERR_get_error_line_data(&file, &line, &data, &flags)))
+#endif
 	{
 		ERR_error_string_n(error_code, err, sizeof(err));
 
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >=	3	/* OpenSSL 3.0.0 or newer */
+		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d func %s: %s",
+				file, line, func, err);
+#else									/* OpenSSL 1.x.x or LibreSSL */
 		zbx_snprintf_alloc(error, error_alloc, error_offset, " file %s line %d: %s", file, line, err);
-
+#endif
 		if (NULL != data && 0 != (flags & ERR_TXT_STRING))
 			zbx_snprintf_alloc(error, error_alloc, error_offset, ": %s", data);
 	}
@@ -979,58 +988,6 @@ void	zbx_tls_validate_config(void)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_psk_hex2bin                                                  *
- *                                                                            *
- * Purpose:                                                                   *
- *     convert a pre-shared key from a textual representation (ASCII hex      *
- *     digit string) to a binary representation (byte string)                 *
- *                                                                            *
- * Parameters:                                                                *
- *     p_hex   - [IN] null-terminated input PSK hex-string                    *
- *     buf     - [OUT] output buffer                                          *
- *     buf_len - [IN] output buffer size                                      *
- *                                                                            *
- * Return value:                                                              *
- *     Number of PSK bytes written into 'buf' on successful conversion.       *
- *     -1 - an error occurred.                                                *
- *                                                                            *
- * Comments:                                                                  *
- *     In case of error incomplete useless data may be written into 'buf'.    *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
-{
-	unsigned char	*q, hi, lo;
-	int		len = 0;
-
-	q = buf;
-
-	while ('\0' != *p_hex)
-	{
-		if (0 != isxdigit(*p_hex) && 0 != isxdigit(*(p_hex + 1)) && buf_len > len)
-		{
-			hi = *p_hex & 0x0f;
-
-			if ('9' < *p_hex++)
-				hi += 9u;
-
-			lo = *p_hex & 0x0f;
-
-			if ('9' < *p_hex++)
-				lo += 9u;
-
-			*q++ = hi << 4 | lo;
-			len++;
-		}
-		else
-			return -1;
-	}
-
-	return len;
-}
-
 static void	zbx_psk_warn_misconfig(const char *psk_identity)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "same PSK identity \"%s\" but different PSK values used in proxy configuration"
@@ -1079,7 +1036,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
-			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
@@ -1250,7 +1207,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
-			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
@@ -1403,7 +1360,7 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-	if (0 >= (len_bin = zbx_psk_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
+	if (0 >= (len_bin = zbx_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", CONFIG_TLS_PSK_FILE);
 		goto out;
@@ -1668,7 +1625,7 @@ static int	zbx_x509_dn_gets(const gnutls_x509_dn_t dn, char *buf, size_t size, c
 {
 #define ZBX_AVA_BUF_SIZE	20	/* hopefully no more than 20 RDNs */
 
-	int			res, i = 0, i_max, ava_dyn_size;
+	int			res, i_max = 0, i = 0, ava_dyn_size = 0;
 	char			*p, *p_end;
 	gnutls_x509_ava_st	*ava, *ava_dyn = NULL;
 	char			oid_str[128];		/* size equal to MAX_OID_SIZE, internally defined in GnuTLS */
@@ -2574,12 +2531,21 @@ static const char	*zbx_ctx_name(SSL_CTX *param)
 static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 {
 	const char	*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
-	EC_KEY		*ecdh;
 	long		res;
 	int		ret = SUCCEED;
+#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_NUMBER >= 3	/* OpenSSL 3.0.0 or newer */
+	int		grp_list[1] = { NID_X9_62_prime256v1 };	/* use curve secp256r1/prime256v1/NIST P-256 */
+
+	if (1 != (res = SSL_CTX_set1_groups(ctx, grp_list, ARRSIZE(grp_list))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() SSL_CTX_set1_groups() returned %ld. %s %s",
+				__func__, res, msg, zbx_ctx_name(ctx));
+		ret = FAIL;
+	}
+#else									/* OpenSSL 1.x.x or LibreSSL */
+	EC_KEY	*ecdh;
 
 	/* use curve secp256r1/prime256v1/NIST P-256 */
-
 	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s() EC_KEY_new_by_curve_name() failed. %s %s",
@@ -2597,7 +2563,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	}
 
 	EC_KEY_free(ecdh);
-
+#endif
 	return ret;
 }
 
@@ -3381,7 +3347,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			int		psk_len;
 			unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
 				goto out;
@@ -3550,6 +3516,66 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
+static int	zbx_tls_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
+		char **error)
+{
+	int	result_code;
+
+	result_code = SSL_get_error(s, res);
+
+	switch (result_code)
+	{
+		case SSL_ERROR_NONE:		/* handshake successful */
+			return SUCCEED;
+		case SSL_ERROR_ZERO_RETURN:
+			zbx_snprintf_alloc(error, error_alloc, error_offset,
+					"%s() TLS connection has been closed during read", func);
+			return FAIL;
+		case SSL_ERROR_SYSCALL:
+			if (0 == ERR_peek_error())
+			{
+				if (0 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset,
+							"%s() connection closed by peer", func);
+				}
+				else if (-1 == res)
+				{
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" I/O error: %s", func,
+							strerror_from_system(zbx_socket_last_error()));
+				}
+				else
+				{
+					/* "man SSL_get_error" describes only res == 0 and res == -1 for */
+					/* SSL_ERROR_SYSCALL case */
+					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
+							" returned undocumented code %d", func, res);
+				}
+			}
+			else
+			{
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+						" result code to SSL_ERROR_SYSCALL:", func);
+				zbx_tls_error_msg(error, error_alloc, error_offset);
+				zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			}
+			return FAIL;
+		case SSL_ERROR_SSL:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set"
+					" result code to SSL_ERROR_SSL:", func);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+		default:
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s() set result code"
+					" to %d", func, result_code);
+			zbx_tls_error_msg(error, error_alloc, error_offset);
+			zbx_snprintf_alloc(error, error_alloc, error_offset, "%s", info_buf);
+			return FAIL;
+	}
+}
+
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		char **error)
 {
@@ -3623,7 +3649,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			int	psk_len;
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
+			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
 					sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
@@ -3666,8 +3692,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 #endif
 	if (1 != (res = SSL_connect(s->tls_ctx->ctx)))
 	{
-		int	result_code;
-
 #if defined(_WINDOWS)
 		if (s->timeout < zbx_time() - sec)
 			zbx_alarm_flag_set();
@@ -3691,59 +3715,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		switch (result_code)
-		{
-			case SSL_ERROR_NONE:		/* handshake successful */
-				break;
-			case SSL_ERROR_ZERO_RETURN:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-						"TLS connection has been closed during handshake");
-				goto out;
-			case SSL_ERROR_SYSCALL:
-				if (0 == ERR_peek_error())
-				{
-					if (0 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset,
-								"connection closed by peer");
-					}
-					else if (-1 == res)
-					{
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" I/O error: %s",
-								strerror_from_system(zbx_socket_last_error()));
-					}
-					else
-					{
-						/* "man SSL_get_error" describes only res == 0 and res == -1 for */
-						/* SSL_ERROR_SYSCALL case */
-						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
-								" returned undocumented code %d", res);
-					}
-				}
-				else
-				{
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-							" result code to SSL_ERROR_SYSCALL:");
-					zbx_tls_error_msg(error, &error_alloc, &error_offset);
-					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				}
-				goto out;
-			case SSL_ERROR_SSL:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set"
-						" result code to SSL_ERROR_SSL:");
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-			default:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() set result code"
-						" to %d", result_code);
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s", info_buf);
-				goto out;
-		}
+		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
+			goto out;
 	}
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -4341,34 +4314,25 @@ out1:
 
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_WRITE(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_WRITE(res));
 
@@ -4383,24 +4347,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during write");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS write set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -4412,34 +4364,25 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
-#if defined(_WINDOWS)
-	double	sec;
-#endif
 #if defined(HAVE_GNUTLS)
 	ssize_t	res;
 #elif defined(HAVE_OPENSSL)
 	int	res;
 #endif
 
-#if defined(_WINDOWS)
-	zbx_alarm_flag_clear();
-	sec = zbx_time();
-#endif
 #if defined(HAVE_OPENSSL)
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 #endif
 	do
 	{
 		res = ZBX_TLS_READ(s->tls_ctx->ctx, buf, len);
-#if defined(_WINDOWS)
-		if (s->timeout < zbx_time() - sec)
-			zbx_alarm_flag_set();
-#endif
+#if !defined(_WINDOWS)
 		if (SUCCEED == zbx_alarm_timed_out())
 		{
 			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() timed out");
 			return ZBX_PROTO_ERROR;
 		}
+#endif
 	}
 	while (SUCCEED == ZBX_TLS_WANT_READ(res));
 
@@ -4455,24 +4398,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 #elif defined(HAVE_OPENSSL)
 	if (0 >= res)
 	{
-		int	result_code;
+		size_t	error_alloc = 0, error_offset = 0;
 
-		result_code = SSL_get_error(s->tls_ctx->ctx, res);
-
-		if (0 == res && SSL_ERROR_ZERO_RETURN == result_code)
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, res, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
+				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "connection closed during read");
-		}
-		else
-		{
-			char	*err = NULL;
-			size_t	error_alloc = 0, error_offset = 0;
-
-			zbx_snprintf_alloc(&err, &error_alloc, &error_offset, "TLS read set result code to"
-					" %d:", result_code);
-			zbx_tls_error_msg(&err, &error_alloc, &error_offset);
-			*error = zbx_dsprintf(*error, "%s%s", err, info_buf);
-			zbx_free(err);
+			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;

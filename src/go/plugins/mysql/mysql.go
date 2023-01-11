@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/tlsconfig"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
 )
@@ -45,9 +46,15 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	params, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	params, _, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
+	}
+
+	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
+		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
 	}
 
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
@@ -60,7 +67,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*uri, details)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.

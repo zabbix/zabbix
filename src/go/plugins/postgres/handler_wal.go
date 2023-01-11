@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,9 +35,16 @@ func walHandler(ctx context.Context, conn PostgresClient,
 	query := `SELECT row_to_json(T)
 			    FROM (
 					SELECT
-						pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000') AS WRITE,
+						CASE
+							WHEN pg_is_in_recovery() THEN 0
+							ELSE pg_wal_lsn_diff(pg_current_wal_lsn(),'0/00000000')
+						END AS WRITE,
+						CASE 
+							WHEN NOT pg_is_in_recovery() THEN 0
+							ELSE pg_wal_lsn_diff(pg_last_wal_receive_lsn(),'0/00000000')
+						END AS RECEIVE,
 						count(*)
-					FROM pg_ls_waldir() AS COUNT
+						FROM pg_ls_waldir() AS COUNT
 					) T;`
 
 	row, err := conn.QueryRow(ctx, query)

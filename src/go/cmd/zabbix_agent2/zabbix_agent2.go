@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
-			sendServiceStop()
+
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {

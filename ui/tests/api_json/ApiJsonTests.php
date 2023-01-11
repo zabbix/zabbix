@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,9 +53,11 @@ require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testDependentItems.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class ApiJsonTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
+		$suite = new TestSuite('API_JSON');
 
 		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');

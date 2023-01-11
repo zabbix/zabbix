@@ -1,0 +1,16 @@
+---
+test case: successfully called WEB_PAGE_GET function
+in:
+  in_command: web.page.get[localhost,,80]
+  flags: 4
+---
+test case: successfully called WEB_PAGE_PERF function
+in:
+  in_command: web.page.perf[localhost,,80]
+  flags: 4
+---
+test case: successfully called WEB_PAGE_REGEXP function
+in:
+  in_command: web.page.regexp[localhost,,80,OK]
+  flags: 4
+...

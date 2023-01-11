@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,13 @@ func NewBundle(expressions []*Expression) (bundle *Bundle) {
 	bundle = &Bundle{expressions: expressions}
 	bundle.Cblob = zbxlib.NewGlobalRegexp()
 	for _, e := range expressions {
-		zbxlib.AddGlobalRegexp(bundle.Cblob, e.Name, e.Body, *e.Type, (*e.Delimiter)[0], *e.Mode)
+		var delimeter byte = ','
+
+		if 0 != len(*e.Delimiter) {
+			delimeter = (*e.Delimiter)[0]
+		}
+
+		zbxlib.AddGlobalRegexp(bundle.Cblob, e.Name, e.Body, *e.Type, delimeter, *e.Mode)
 	}
 	runtime.SetFinalizer(bundle, func(b *Bundle) { zbxlib.DestroyGlobalRegexp(b.Cblob) })
 	return

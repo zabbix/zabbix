@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once 'vendor/autoload.php';
 
@@ -75,12 +76,13 @@ class CAPIHelper {
 			]
 		];
 
-		$handle = fopen($URL, 'rb', false, stream_context_create($params));
+		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
 		if ($handle) {
 			$response = @stream_get_contents($handle);
 			fclose($handle);
 		}
 		else {
+			$php_errormsg = CTestArrayHelper::get(error_get_last(), 'message');
 			$response = false;
 		}
 
@@ -202,7 +204,7 @@ class CAPIHelper {
 	 *
 	 * @return string
 	 */
-	public function getDebugInfoAsString($clear = false) {
+	public static function getDebugInfoAsString($clear = false) {
 		$steps = [];
 		foreach (static::getDebugInfo($clear) as $call) {
 			$step = "  Request: ".$call['request'];

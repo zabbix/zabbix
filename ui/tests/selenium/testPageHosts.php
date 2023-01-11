@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/FilterTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
+/**
+ * @dataSource TagFilter
+ */
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
@@ -238,8 +241,6 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByTemplates() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('hosts.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
@@ -319,7 +320,7 @@ class testPageHosts extends CLegacyWebTest {
 					],
 					'result' => [
 						[
-							'Name' => 'Simple form test host',
+							'Name' => 'Host for tags filtering',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
@@ -337,24 +338,24 @@ class testPageHosts extends CLegacyWebTest {
 					],
 					'result' => [
 						[
-							'Name' => 'Host with tags for cloning',
+							'Name' => 'Host for tags filtering',
+							'Tags' => [
+								'selector' => 'class:tag',
+								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
+							]
+						],
+						[
+							'Name' => 'Host for tags filtering - clone',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: host', 'action: clone']
 							]
 						],
 						[
-							'Name' => 'Host with tags for updating',
+							'Name' => 'Host for tags filtering - update',
 							'Tags' => [
 								'selector' => 'class:tag',
 								'text' => ['tag: host', 'action: update']
-							]
-						],
-						[
-							'Name' => 'Simple form test host',
-							'Tags' => [
-								'selector' => 'class:tag',
-								'text' => ['tag: HOST', 'test: test_tag', 'action: simple']
 							]
 						]
 					]
@@ -368,9 +369,9 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Contains', 'value' => 'HOST']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning', 'Templates' => ''],
-						['Name' => 'Host with tags for updating', 'Templates' => ''],
-						['Name' => 'Simple form test host', 'Templates' => 'Form test template']
+						['Name' => 'Host for tags filtering', 'Templates' => 'Template for tags filtering'],
+						['Name' => 'Host for tags filtering - clone', 'Templates' => ''],
+						['Name' => 'Host for tags filtering - update', 'Templates' => '']
 					]
 				]
 			],
@@ -381,7 +382,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'HOST']
 					],
 					'result' => [
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering']
 					]
 				]
 			],
@@ -392,9 +393,9 @@ class testPageHosts extends CLegacyWebTest {
 							['name' => 'action', 'operator' => 'Contains']
 					],
 					'result' => [
-						['Name' => 'Host with tags for cloning'],
-						['Name' => 'Host with tags for updating'],
-						['Name' => 'Simple form test host']
+						['Name' => 'Host for tags filtering'],
+						['Name' => 'Host for tags filtering - clone'],
+						['Name' => 'Host for tags filtering - update']
 					]
 				]
 			],
@@ -405,7 +406,7 @@ class testPageHosts extends CLegacyWebTest {
 						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
-			]
+					]
 		];
 	}
 
@@ -415,7 +416,7 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open('hosts.php?groupid=0');
+		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_port=10051&&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		// Reset filter from possible previous scenario.
 		$form->query('button:Reset')->one()->click();

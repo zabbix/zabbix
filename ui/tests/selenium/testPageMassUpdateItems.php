@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	 * Add items for mass updating.
 	 */
 	public function prepareItemData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,
@@ -271,8 +269,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	 * Add items with preprocessing for mass updating.
 	 */
 	public function prepareItemPreprocessingData() {
-		CDataHelper::setSessionId(null);
-
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => self::HOSTID,

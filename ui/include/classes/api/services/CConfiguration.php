@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CConfiguration extends CApiService {
 				->convert($data);
 
 			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validaiton for the converted data.
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
 				->setStrict(false)
 				->validate($data, '/');
 		}

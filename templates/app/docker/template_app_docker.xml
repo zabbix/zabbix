@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-03-20T05:45:18Z</date>
+   <date>2021-12-21T18:00:04Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum &#13;
 &#13;
-Template tooling version used: 0.35</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1173,7 +1173,6 @@ Template tooling version used: 0.35</description>
          <discovery_rules>
             <discovery_rule>
                <name>Containers discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>docker.containers.discovery[false]</key>
                <delay>15m</delay>
                <filter>
@@ -1591,6 +1590,29 @@ false - Returns only running containers</description>
                            <name>Docker: Container {#NAME}</name>
                         </application_prototype>
                      </application_prototypes>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Container {#NAME}: CPU percent usage</name>
+                     <type>DEPENDENT</type>
+                     <key>docker.container_stats.cpu_pct_usage["{#NAME}"]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
+                     <units>%</units>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Docker: Container {#NAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.cpu_stats.cpu_usage.percent_usage</params>
+                        </step>
+                     </preprocessing>
+                     <master_item>
+                        <key>docker.container_stats["{#NAME}"]</key>
+                     </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Container {#NAME}: CPU kernelmode usage per second</name>
@@ -2276,7 +2298,6 @@ false - Returns only running containers</description>
             </discovery_rule>
             <discovery_rule>
                <name>Images discovery</name>
-               <type>ZABBIX_PASSIVE</type>
                <key>docker.images.discovery</key>
                <delay>15m</delay>
                <filter>
@@ -2623,19 +2644,6 @@ false - Returns only running containers</description>
    </graphs>
    <value_maps>
       <value_map>
-         <name>Service state</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>Down</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>Up</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>Docker flag</name>
          <mappings>
             <mapping>
@@ -2645,6 +2653,19 @@ false - Returns only running containers</description>
             <mapping>
                <value>1</value>
                <newvalue>True</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
             </mapping>
          </mappings>
       </value_map>

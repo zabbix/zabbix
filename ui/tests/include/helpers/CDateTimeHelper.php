@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class CDateTimeHelper {
 	 * @return string
 	 */
 	public static function getUTCOffset($timezone) {
-		$offset = (strtotime('today 12:00 am UTC') - strtotime('today 12:00 am '.$timezone));
+		$offset = (strtotime('now UTC') - strtotime('now '.$timezone));
 		$sign = $offset >= 0 ? '+' : '-';
 		$offset = abs($offset);
 
@@ -77,5 +77,24 @@ class CDateTimeHelper {
 	 */
 	public static function countDays($date = 'now', $period = 'P1Y') {
 		return (new DateTime($date))->diff((new DateTime($date))->sub(new DateInterval($period)))->days;
+	}
+
+	/**
+	 * Get the time difference in months between two moments in time.
+	 *
+	 * @param string|int	$from		timestamp or string that represents the oldest moments in time
+	 * @param string|int	$to			timestamp or string that represents the newest moments in time
+	 *
+	 * @return int
+	 */
+	public static function countMonthsBetweenDates($from, $to = 'now') {
+		foreach ([&$from, &$to] as &$moment) {
+			if (is_string($moment)) {
+				$moment = strtotime($moment);
+			}
+		}
+		unset($moment);
+
+		return ((date('Y', $to) - date('Y', $from)) * 12) + ((date('m', $to) - date('m', $from)));
 	}
 }

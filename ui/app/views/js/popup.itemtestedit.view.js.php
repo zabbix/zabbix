@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -437,7 +437,6 @@ jQuery(document).ready(function($) {
 		placeholder: <?= json_encode(_('value')) ?>,
 		value: <?= json_encode($data['value']) ?>,
 		monospace_font: false,
-		maxlength: 65535,
 		autofocus: true,
 		readonly: false,
 		grow: 'auto',
@@ -448,7 +447,6 @@ jQuery(document).ready(function($) {
 		placeholder: <?= $data['show_prev'] ? json_encode(_('value')) : '""' ?>,
 		value: <?= json_encode($data['prev_value']) ?>,
 		monospace_font: false,
-		maxlength: 65535,
 		disabled: <?= $data['show_prev'] ? 'false' : 'true' ?>,
 		grow: 'auto',
 		rows: 0

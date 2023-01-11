@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groups' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'groupids' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'groups' =>			[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,		null],
 	// group
 	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
@@ -47,7 +46,7 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	// other
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
 	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -215,6 +214,7 @@ elseif (hasRequest('action')) {
  */
 if (hasRequest('form')) {
 	$data = [
+		'form_refresh' => getRequest('form_refresh', 0),
 		'form' => getRequest('form'),
 		'groupid' => getRequest('groupid', 0),
 		'name' => getRequest('name', ''),
@@ -225,6 +225,8 @@ if (hasRequest('form')) {
 		$groups = API::HostGroup()->get([
 			'output' => ['name', 'flags'],
 			'groupids' => $data['groupid'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHostPrototype' => ['hostid'],
 			'editable' => true
 		]);
 
@@ -233,6 +235,13 @@ if (hasRequest('form')) {
 		}
 
 		$data['group'] = reset($groups);
+
+		$data['group']['is_discovery_rule_editable'] = $data['group']['discoveryRule']
+			&& API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $data['group']['discoveryRule']['itemid'],
+				'editable' => true
+			]);
 
 		if (!hasRequest('form_refresh')) {
 			$data['name'] = $data['group']['name'];
@@ -322,11 +331,19 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectHostPrototype' => ['hostid'],
 		'limitSelects' => $config['max_in_table'] + 1
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 
 	foreach ($data['groups'] as &$group) {
+		$group['is_discovery_rule_editable'] = $group['discoveryRule']
+			&& API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => $group['discoveryRule']['itemid'],
+				'editable' => true
+			]);
+
 		order_result($group['hosts'], 'name');
 		order_result($group['templates'], 'name');
 	}

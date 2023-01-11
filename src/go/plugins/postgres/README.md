@@ -1,8 +1,8 @@
 # PostgreSQL plugin
 Provides native Zabbix solution for monitoring PostgreSQL (object-relational database system). 
 It can monitor several PostgreSQL instances simultaneously, remote or local to the Zabbix Agent.
-The plugin keeps connections in the open state to reduce network congestion, latency, CPU and 
-memory usage. Best for use in conjunction with the official 
+Native connection encryption is supported. The plugin keeps connections in the open state to reduce network 
+congestion, latency, CPU and memory usage. Best for use in conjunction with the official 
 [PostgreSQL template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/postgresql_agent2) 
 You can extend it or create your template for your specific needs.
 
@@ -36,12 +36,26 @@ The Zabbix Agent's configuration file is used to configure plugins.
 *Default value:* 300 sec.  
 *Limits:* 60-900
 
+**Plugins.Postgres.Sessions.<session_name>.TLSConnect** — Encryption type for postgres connection. "*" should be replaced with a session name.
+*Default value:* 
+*Accepted values:*  required, verify_ca, verify_full
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for postgres
+*Default value:* 
+
+**Plugins.Postgres.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the postgres certificate or certificate chain.
+*Default value:* 
+
+**Plugins.Postgres.Sessions.*.TLSKeyFile** — Full pathname of a file containing the postgres private key.
+*Default value:* 
+
 ### Configuring connection
 A connection can be configured using either keys' parameters or named sessions.     
 
 *Notes*:  
 * It is not possible to mix configuration using named sessions and keys' parameters simultaneously.
 * You can leave any connection parameter empty, a default hard-coded value will be used in the such case.
+* TLS information can be passed only with sessions.
 * Embedded URI credentials (userinfo) are forbidden and will be ignored. So, you can't pass the credentials by this:   
   
       pgsql.ping[tcp://user:password@127.0.0.1/postgres] — WRONG  
@@ -65,8 +79,8 @@ ConnString will be treated as a URI if no session with the given name is found.
 If you use ConnString as a session name, just skip the rest of the connection parameters.  
  
 #### Using named sessions
-Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, there are only four
-supported parameters: Uri, User, Password and Service.
+Named sessions allow you to define specific parameters for each PostgreSQL instance. Currently, these are the
+supported parameters: Uri, User, Password, Service, TLSConnect, TLSCAFile, TLSCertFile and TLSKeyFile. 
 It's a bit more secure way to store credentials compared to item keys or macros.  
 
 E.g: suppose you have two PostgreSQL instances: "Prod" and "Test". 
@@ -76,11 +90,19 @@ You should add the following options to the agent configuration file:
     Plugins.Postgres.Sessions.Prod.User=<UserForProd>
     Plugins.Postgres.Sessions.Prod.Password=<PasswordForProd>
     Plugins.Postgres.Sessions.Prod.Database=proddb
+    Plugins.Postgres.Sessions.Prod.TLSConnect=verify_full
+    Plugins.Postgres.Sessions.Prod.TLSCAFile=/path/to/ca_file
+    Plugins.Postgres.Sessions.Prod.TLSCertFile=/path/to/cert_file
+    Plugins.Postgres.Sessions.Prod.TLSKeyFile=/path/to/key_file
     
     Plugins.Postgres.Sessions.Test.Uri=tcp://192.168.0.1:5432
     Plugins.Postgres.Sessions.Test.User=<UserForTest>
     Plugins.Postgres.Sessions.Test.Password=<PasswordForTest>
     Plugins.Postgres.Sessions.Test.Service=testdb
+    Plugins.Postgres.Sessions.Test.TLSConnect=verify_ca
+    Plugins.Postgres.Sessions.Test.TLSCAFile=/path/to/test/ca_file
+    Plugins.Postgres.Sessions.Test.TLSCertFile=/path/to/test/cert_file
+    Plugins.Postgres.Sessions.Test.TLSKeyFile=/path/to/test/key_file
         
 Then you will be able to use these names as the 1st parameter (ConnString) in keys instead of URIs, e.g:
 
@@ -432,6 +454,56 @@ FROM pg_catalog.pg_stat_activity" SQL query.
 *Returns:*
 - "1" if the connection is alive.
 - "0" if the connection is broken (returned if there was any error during the test, including AUTH and configuration issues).
+
+**pgsql.queries[\<commonParams\>,TimePeriod]** - queries metrics by execution time.
+*Parameters:*  
+TimePeriod (required) — execution time limit for count of slow queries. (must be an integer, must be greater than 0).
+
+*Returns:* Result of the
+```sql
+WITH T AS
+(SELECT db.datname,
+coalesce(T.query_time_max, 0) query_time_max,
+coalesce(T.tx_time_max, 0) tx_time_max,
+coalesce(T.mro_time_max, 0) mro_time_max,
+coalesce(T.query_time_sum, 0) query_time_sum,
+coalesce(T.tx_time_sum, 0) tx_time_sum,
+coalesce(T.mro_time_sum, 0) mro_time_sum,
+coalesce(T.query_slow_count, 0) query_slow_count,
+coalesce(T.tx_slow_count, 0) tx_slow_count,
+coalesce(T.mro_slow_count, 0) mro_slow_count
+FROM pg_database db NATURAL
+LEFT JOIN (
+SELECT datname,
+extract(epoch FROM now())::integer ts,
+coalesce(max(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle', 'idle in transaction', 'idle in transaction (aborted)') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) query_time_max,
+coalesce(max(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) tx_time_max,
+coalesce(max(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle') AND query ~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) mro_time_max,
+coalesce(sum(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle', 'idle in transaction', 'idle in transaction (aborted)') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) query_time_sum,
+coalesce(sum(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) tx_time_sum,
+coalesce(sum(extract('epoch' FROM (clock_timestamp() - query_start))::integer * (state NOT IN ('idle') AND query ~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) mro_time_sum,
+coalesce(sum((extract('epoch' FROM (clock_timestamp() - query_start)) > %d)::integer * (state NOT IN ('idle', 'idle in transaction', 'idle in transaction (aborted)') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) query_slow_count,
+coalesce(sum((extract('epoch' FROM (clock_timestamp() - query_start)) > %d)::integer * (state NOT IN ('idle') AND query !~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) tx_slow_count,
+coalesce(sum((extract('epoch' FROM (clock_timestamp() - query_start)) > %d)::integer * (state NOT IN ('idle') AND query ~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)')::integer), 0) mro_slow_count
+FROM pg_stat_activity
+WHERE pid <> pg_backend_pid()
+GROUP BY 1) T
+WHERE NOT db.datistemplate )
+SELECT json_object_agg(datname, row_to_json(T))
+FROM T
+```
+> SQL query JSON format.
+
+Then JSON is proceeded by dependent items of:
+- pgsql.queries.mro.time_max["{#DBNAME}"] - max maintenance query time.
+- pgsql.queries.query.time_max["{#DBNAME}"] - max query time.
+- pgsql.queries.tx.time_max["{#DBNAME}"] - max transaction query time.
+- pgsql.queries.mro.slow_count["{#DBNAME}"] - slow maintenance query count.
+- pgsql.queries.query.slow_count["{#DBNAME}"] - slow query count.
+- pgsql.queries.tx.slow_count["{#DBNAME}"] - slow transaction query count.
+- pgsql.queries.mro.time_sum["{#DBNAME}"]  - sum maintenance query time.
+- pgsql.queries.query.time_sum["{#DBNAME}"] - sum query time.
+- pgsql.queries.tx.time_sum["{#DBNAME}"] - sum transaction query time.
 
 **pgsql.replication.count[uri,username,password]** — number of standby servers.  
 *Returns:* Result of the

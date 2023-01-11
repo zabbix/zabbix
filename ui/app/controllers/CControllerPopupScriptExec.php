@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,9 +87,6 @@ class CControllerPopupScriptExec extends CController {
 
 			if (!$result) {
 				error(_('Cannot execute script'));
-			}
-			elseif ($result['response'] === 'failed') {
-				error($result['value']);
 			}
 			else {
 				$data['message'] = $result['value'];

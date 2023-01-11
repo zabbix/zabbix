@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-06-05T01:27:53Z</date>
+   <date>2022-03-03T14:13:58Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -20,7 +20,7 @@ Known Issues:&#13;
 &#13;
   Description: 32bit counters are used in this template (since 64bit are not supported by Windows OS). If busy interfaces return incorrect bits sent/received - set update interval to 1m or less.&#13;
 &#13;
-Template tooling version used: 0.36</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -333,7 +333,7 @@ WARNING: if closed manually - won't fire again on next poll, because of .diff.</
                      <trends>0d</trends>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
-Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
+Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),&#13;
 through updating the syntax of the IANAifType textual convention.</description>
                      <application_prototypes>
                         <application_prototype>
@@ -387,7 +387,7 @@ and&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Interfaces Windows SNMP:net.if.in[ifInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces Windows SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
 {Template Module Interfaces Windows SNMP:net.if.out[ifOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces Windows SNMP:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (&gt;{$IF.UTIL.MAX:"{#IFNAME}"}%)</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
@@ -406,7 +406,7 @@ or {Template Module Interfaces Windows SNMP:net.if.out.errors[ifOutErrors.{#SNMP
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Module Interfaces Windows SNMP:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Interfaces Windows SNMP:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate (&gt;{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
                      <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>

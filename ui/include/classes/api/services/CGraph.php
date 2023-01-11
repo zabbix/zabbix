@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,36 +109,6 @@ class CGraph extends CGraphGeneral {
 							' AND '.dbConditionInt('r.groupid', $userGroups).
 				' WHERE g.graphid=gi.graphid'.
 					' AND gi.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.zbx_dbstr($permission).
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
-				')';
-			// check permissions by Y min item
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-					' AND g.ymin_itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.zbx_dbstr($permission).
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
-				')';
-			// check permissions by Y max item
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
-					' AND g.ymax_itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
 				' HAVING MAX(permission)<'.zbx_dbstr($permission).
@@ -665,7 +635,7 @@ class CGraph extends CGraphGeneral {
 		}
 		unset($graph);
 
-		$itemIds = $this->validateItemsUpdate($graphs);
+		$itemIds = $this->validateItemsUpdate($graphs, $dbGraphs);
 		$this->validateItems($itemIds, $graphs);
 
 		parent::validateUpdate($graphs, $dbGraphs);
@@ -711,30 +681,34 @@ class CGraph extends CGraphGeneral {
 			}
 
 			// Y axis min
-			if (isset($graph['ymin_itemid']) && $graph['ymin_itemid']
-					&& isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$item = $dbItems[$graph['ymin_itemid']];
+			if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
+					&& array_key_exists('ymin_itemid', $graph) && $graph['ymin_itemid'] != 0) {
+				if (array_key_exists($graph['ymin_itemid'], $dbItems)) {
+					$item = $dbItems[$graph['ymin_itemid']];
 
-				if (!in_array($item['value_type'], $allowedValueTypes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-						$item['name'],
-						$graph['name']
-					));
+					if (!in_array($item['value_type'], $allowedValueTypes)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+							$item['name'],
+							$graph['name']
+						));
+					}
 				}
 			}
 
 			// Y axis max
-			if (isset($graph['ymax_itemid']) && $graph['ymax_itemid']
-					&& isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$item = $dbItems[$graph['ymax_itemid']];
+			if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
+					&& array_key_exists('ymax_itemid', $graph) && $graph['ymax_itemid'] != 0) {
+				if (array_key_exists($graph['ymax_itemid'], $dbItems)) {
+					$item = $dbItems[$graph['ymax_itemid']];
 
-				if (!in_array($item['value_type'], $allowedValueTypes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-						$item['name'],
-						$graph['name']
-					));
+					if (!in_array($item['value_type'], $allowedValueTypes)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
+							$item['name'],
+							$graph['name']
+						));
+					}
 				}
 			}
 		}

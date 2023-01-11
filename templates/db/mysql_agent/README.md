@@ -1,5 +1,5 @@
 
-# MySQL by Zabbix agent
+# Template DB MySQL by Zabbix agent
 
 ## Overview
 
@@ -10,7 +10,7 @@ This template was tested on:
 
 - MySQL, version 5.7, 8.0
 - Percona, version 8.0
-- MariaDB, version 10.4
+- MariaDB, version 10.4, 10.6.8
 
 ## Setup
 
@@ -81,7 +81,7 @@ No specific Zabbix configuration is required.
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN} |<p>The maximum number of created tmp files on a disk per second for trigger expressions.</p> |`10` |
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN} |<p>The maximum number of created tmp tables in memory per second for trigger expressions.</p> |`30` |
-|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`localhost` |
+|{$MYSQL.HOST} |<p>Hostname or IP of MySQL host or container.</p> |`127.0.0.1` |
 |{$MYSQL.INNODB_LOG_FILES} |<p>Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.</p> |`2` |
 |{$MYSQL.PORT} |<p>MySQL service port.</p> |`3306` |
 |{$MYSQL.REPL_LAG.MAX.WARN} |<p>The lag of slave from master for trigger expression.</p> |`30m` |
@@ -147,7 +147,7 @@ There are no template links in this template.
 |MySQL |MySQL: Open table definitions |<p>Number of cached table definitions.</p> |DEPENDENT |mysql.open_table_definitions<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Open_table_definitions']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Open tables |<p>Number of tables that are open.</p> |DEPENDENT |mysql.open_tables<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Open_tables']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Innodb log written |<p>Number of bytes written to the InnoDB log.</p> |DEPENDENT |mysql.innodb_os_log_written<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Innodb_os_log_written']/field[@name='Value']/text()`</p> |
-|MySQL |MySQL: Calculated value of innodb_log_file_size |<p>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p> |CALCULATED |mysql.innodb_log_file_size<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,1h)) / {$MYSQL.INNODB_LOG_FILES}` |
+|MySQL |MySQL: Calculated value of innodb_log_file_size |<p>Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p> |CALCULATED |mysql.innodb_log_file_size<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Expression**:</p>`(last(mysql.innodb_os_log_written) - last(mysql.innodb_os_log_written,,1h)) / {$MYSQL.INNODB_LOG_FILES}` |
 |MySQL |MySQL: Size of database {#DBNAME} |<p>-</p> |ZABBIX_PASSIVE |mysql.dbsize["{$MYSQL.HOST}","{$MYSQL.PORT}","{#DBNAME}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |MySQL |MySQL: Replication Slave SQL Running State {#MASTER_HOST} |<p>This shows the state of the SQL driver threads.</p> |DEPENDENT |mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row[field/text()='Slave_SQL_Running_State']/field[@name='Value']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |MySQL |MySQL: Replication Seconds Behind Master {#MASTERHOST} |<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p> |DEPENDENT |mysql.seconds_behind_master["{#MASTERHOST}"]<p>**Preprocessing**:</p><p>- XMLPATH: `/resultset/row/field[@name='Seconds_Behind_Master']/text()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- NOT_MATCHES_REGEX: `null`</p><p>⛔️ON_FAIL: `CUSTOM_ERROR -> Replication is not performed.`</p> |

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@ $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setName('maintenanceForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $this->data['form']);
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);
@@ -248,7 +249,7 @@ $maintenanceTab = (new CTabView())
 	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
 	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList)
 	->addTab('hostTab', _('Hosts and groups'), $hostsAndGroupsFormList);
-if (!$this->data['form_refresh']) {
+if ($this->data['form_refresh'] == 0) {
 	$maintenanceTab->setSelected(0);
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,3 +33,6 @@ define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));
+define('SVG_GRAPH_DATE_TIME_FORMAT_SHORT', _('n-d H:i'));
+define('SVG_GRAPH_DATE_FORMAT', _('Y-n-d'));
+define('SVG_GRAPH_DATE_FORMAT_SHORT', _('n-d'));

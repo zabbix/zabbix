@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -605,12 +605,15 @@ ZABBIX.apps.map = (function($) {
 							type: target.attr('data-type')
 						},
 						can_copy = false,
-						can_paste = (that.copypaste_buffer.items && that.copypaste_buffer.items.length > 0),
+						can_paste = ('items' in that.copypaste_buffer && that.copypaste_buffer.items.length > 0),
 						can_remove = false,
 						can_reorder = false;
 
-					if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
-						that.selectElements([item_data]);
+					if (typeof item_data.id === 'undefined') {
+						that.clearSelection();
+					}
+					else if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
+						that.selectElements([item_data], false, true);
 					}
 
 					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);
@@ -619,6 +622,16 @@ ZABBIX.apps.map = (function($) {
 
 					event.preventDefault();
 					event.stopPropagation();
+
+					const overlay = overlays_stack.end();
+
+					if (typeof overlay !== 'undefined' && 'element' in overlay && overlay.element !== event.target) {
+						$('.menu-popup-top').menuPopup('close', null, false);
+					}
+
+					if (!(can_copy || can_paste || can_remove || can_reorder)) {
+						return false;
+					}
 
 					var items = [
 						{
@@ -728,9 +741,26 @@ ZABBIX.apps.map = (function($) {
 						}
 					];
 
-					$(event.target).menuPopup(items, event);
-				});
+					$(event.target).menuPopup(items, event, {
+						position: {
+							of: event,
+							my: 'left top',
+							at: 'left bottom',
+							using: (pos, data) => {
+								let max_left = (data.horizontal === 'left')
+									? document.getElementById(containerId).clientWidth
+									: document.getElementById(containerId).clientWidth - data.element.width;
 
+								pos.top = Math.max(0, pos.top);
+								pos.left = Math.max(0, Math.min(max_left, pos.left));
+
+								data.element.element[0].style.top = `${pos.top}px`;
+								data.element.element[0].style.left = `${pos.left}px`;
+							}
+						},
+						background_layer: false
+					});
+				});
 				/*
 				 * Form events
 				 */
@@ -976,6 +1006,15 @@ ZABBIX.apps.map = (function($) {
 					$('#last_shape_type').val(value);
 				});
 
+				$(this.container).parents('.sysmap-scroll-container').eq(0)
+					.on('scroll', (e) => {
+						if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
+							$('.menu-popup-top').menuPopup('close', null, false);
+
+							e.target.dataset.last_scroll_at = Date.now();
+						}
+					});
+
 				$('input[type=radio][name=type]:checked').change();
 			},
 
@@ -990,7 +1029,7 @@ ZABBIX.apps.map = (function($) {
 			 * @return {object}
 			 */
 			dragGroupPlaceholder: function() {
-				return $('<div/>').css({
+				return $('<div>').css({
 					width: $(this.domNode).width(),
 					height: $(this.domNode).height()
 				});
@@ -1159,7 +1198,6 @@ ZABBIX.apps.map = (function($) {
 
 						default:
 							throw 'Unsupported element type found in copy buffer!';
-							break;
 					}
 
 					if (element) {
@@ -1426,8 +1464,10 @@ ZABBIX.apps.map = (function($) {
 				this.updateImage();
 			},
 
-			selectElements: function(ids, addSelection) {
+			selectElements: function(ids, addSelection, prevent_form_open) {
 				var i, ln;
+
+				$('.menu-popup-top').menuPopup('close', null, false);
 
 				if (!addSelection) {
 					this.clearSelection();
@@ -1451,7 +1491,9 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
-				this.toggleForm();
+				if (typeof prevent_form_open === 'undefined' || !prevent_form_open) {
+					this.toggleForm();
+				}
 			},
 
 			toggleForm: function() {
@@ -1710,7 +1752,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.shapes[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {
+			this.domNode = $('<div>', {
 					style: 'position: absolute; z-index: 1;\
 						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
@@ -2215,7 +2257,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
+			this.domNode = $('<div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_element')
 				.attr('data-id', this.id)

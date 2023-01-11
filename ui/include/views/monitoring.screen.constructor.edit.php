@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,9 @@ if (isset($_REQUEST['screenitemid'])) {
 }
 
 $form = (new CForm('post', $action))
+	->addVar('form_refresh', getRequest('form_refresh', 0) + 1)
 	->setName('screen_item_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));
 
 if (array_key_exists('templateid', $data['screen'])) {

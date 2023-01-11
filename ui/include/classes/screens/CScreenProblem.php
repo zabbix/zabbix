@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -694,14 +694,6 @@ class CScreenProblem extends CScreenBase {
 			])
 			: [];
 
-		$data['mediatypes'] = $actions['mediatypeids']
-			? API::Mediatype()->get([
-				'output' => ['name', 'maxattempts'],
-				'mediatypeids' => array_keys($actions['mediatypeids']),
-				'preservekeys' => true
-			])
-			: [];
-
 		return $data;
 	}
 
@@ -770,7 +762,7 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], $this->config, true);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
-		if ($this->data['action'] === 'problem.view') {
+		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
 		}
 
@@ -802,7 +794,7 @@ class CScreenProblem extends CScreenBase {
 			? OPERATIONAL_DATA_SHOW_NONE
 			: $this->data['filter']['show_opdata'];
 
-		if ($this->data['action'] === 'problem.view') {
+		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$form = (new CForm('post', 'zabbix.php'))
 				->setId('problem_form')
 				->setName('problem')
@@ -1119,9 +1111,7 @@ class CScreenProblem extends CScreenBase {
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
 					$problem_update_link,
-					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['mediatypes'], $data['users'],
-						$this->config
-					),
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $this->config),
 					$this->data['filter']['show_tags'] ? $tags[$problem['eventid']] : null
 				]), ($this->data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
 					? getSeverityFlhStyle($problem['severity'])
@@ -1133,7 +1123,7 @@ class CScreenProblem extends CScreenBase {
 				'popup.acknowledge.edit' => ['name' => _('Mass update')]
 			], 'problem');
 
-			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
+			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
 		}
 
 		/*

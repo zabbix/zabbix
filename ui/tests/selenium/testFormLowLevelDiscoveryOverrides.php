@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1307,7 +1307,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 1,
-												'Type' => 'Flexible',
+												'type' => 'Flexible',
 												'delay' => '60s',
 												'period' => '1-5,01:01-13:05'
 											]
@@ -1374,11 +1374,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @backup items
 	 */
-	// TODO: uncomment after fix ZBX-18271
-/*	public function testFormLowLevelDiscoveryOverrides_Update($data) {
+	public function testFormLowLevelDiscoveryOverrides_Update($data) {
 		$this->overridesUpdate($data);
 	}
-*/
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
@@ -1634,8 +1632,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 			// Add Type of calculation if there are more then 2 filters.
 			if (array_key_exists('Type of calculation', $override['Filters'])) {
-				$override_overlay->query('name:overrides_evaltype')->waitUntilPresent()->one()
-						->asZDropdown()->fill($override['Filters']['Type of calculation']);
+				$override_overlay->query('name:overrides_evaltype')->waitUntilPresent()->asDropdown()->one()
+						->fill($override['Filters']['Type of calculation']);
 
 				// Add formula if Type of calculation is Custom.
 				if (array_key_exists('formula', $override['Filters'])) {
@@ -1820,7 +1818,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
-					$evaluation_type = $override_overlay->query('name:overrides_evaltype')->one()->asZDropdown()->getValue();
+					$evaluation_type = $override_overlay->query('name:overrides_evaltype')->asDropdown()->one()->getValue();
 					$this->assertEquals($override['Filters']['Type of calculation'], $evaluation_type);
 
 					// Check that Formula is filled correctly.
@@ -1840,27 +1838,22 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			if (array_key_exists('Operations', $override)) {
 				// Write Condititons from data to array.
 				$condition_text = [];
-				foreach($override['Operations'] as $operation) {
+				foreach ($override['Operations'] as $operation) {
 					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;
 
 					$condition_text[] = $fields['Object'].' '.
 							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($condition_text);
 
 				// Compare Conditions from table with data.
 				$actual_conditions = [];
 				for ($n = 0; $n < $operation_count - 1; $n++) {
 					$actual_conditions[] = $operation_container->getRow($n)->getColumn('Condition')->getText();
 				}
-				// TODO: remove sort after fix ZBX-18271
-				sort($actual_conditions);
-
 				$this->assertEquals($condition_text, $actual_conditions);
 
-				foreach($override['Operations'] as $i => $operation) {
+				foreach ($override['Operations'] as $i => $operation) {
 					$operation_container->getRow($i)->query('button:Edit')->one()->click();
 					$operation_overlay = $this->query('id:lldoperation_form')->waitUntilPresent()->asCheckboxForm()->one();
 					$operation_overlay->checkValue(

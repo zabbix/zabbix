@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,8 @@ $web_layout_mode = CViewHelper::loadLayoutMode();
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
-		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->cleanItems()
+		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 		->addItem($hostInventoriesTab)
 	)
 	->show();

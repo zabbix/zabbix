@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 
 $divTabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$divTabs->setSelected(0);
 }
 
@@ -49,16 +49,17 @@ if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('templatesForm')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
 	$frmHost->addVar('templateid', $data['templateid']);
 }
 
-if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
+if ($data['templateid'] != 0 && $data['form_refresh'] == 0) {
 	$host = $data['dbTemplate']['host'];
 	$visiblename = $data['dbTemplate']['name'];
 

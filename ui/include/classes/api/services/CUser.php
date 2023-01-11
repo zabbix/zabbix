@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1280,9 +1280,7 @@ class CUser extends CApiService {
 	public function loginByAlias($alias, $case_sensitive = null, $default_auth = null) {
 		// Check whether the method is called via an API call or from a local php file.
 		if ($case_sensitive === null || $default_auth === null) {
-			return self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', 'user', 'loginByAlias')
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginByAlias'));
 		}
 
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,12 +37,13 @@ if ($data['form_refresh'] == 0) {
 
 // create form
 $mediaTypeForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('media_type_form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
@@ -227,7 +228,7 @@ $mediatype_formlist
 			->setAriaRequired(),
 		'row_webhook_script'
 	)
-	->addRow(new CLabel(_('Timeout'), 'timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_webhook_timeout'
 	)

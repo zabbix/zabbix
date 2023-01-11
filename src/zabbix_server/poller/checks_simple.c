@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,8 +78,10 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.perfcounter", VMCHECK_FUNC(check_vcenter_hv_perfcounter)},
 	{"hv.sensor.health.state", VMCHECK_FUNC(check_vcenter_hv_sensor_health_state)},
 	{"hv.status", VMCHECK_FUNC(check_vcenter_hv_status)},
+	{"hv.maintenance", VMCHECK_FUNC(check_vcenter_hv_maintenance)},
 	{"hv.uptime", VMCHECK_FUNC(check_vcenter_hv_uptime)},
 	{"hv.version", VMCHECK_FUNC(check_vcenter_hv_version)},
+	{"hv.sensors.get", VMCHECK_FUNC(check_vcenter_hv_sensors_get)},
 	{"hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
 
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},

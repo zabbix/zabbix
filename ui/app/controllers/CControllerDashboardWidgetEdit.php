@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,9 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['body' => json_encode('')]));
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => json_encode(['messages' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;
@@ -271,16 +273,19 @@ class CControllerDashboardWidgetEdit extends CController {
 		if ($prototype_graphids) {
 			$graph_prototypes = API::GraphPrototype()->get([
 				'output' => ['graphid', 'name'],
-				'selectHosts' => ['name'],
+				'selectHosts' => ['hostid', 'name'],
+				'selectDiscoveryRule' => ['hostid'],
 				'graphids' => array_keys($prototype_graphids),
 				'preservekeys' => true
 			]);
 
 			foreach ($graph_prototypes as $graphid => $graph) {
+				$host_names = array_column($graph['hosts'], 'name', 'hostid');
+
 				foreach ($prototype_graphids[$graphid] as $field_name) {
 					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
 						'name' => $graph['name'],
-						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+						'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
 					];
 				}
 			}

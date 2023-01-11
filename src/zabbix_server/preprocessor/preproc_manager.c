@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "preprocessing.h"
 #include "preproc_manager.h"
 #include "zbxalgo.h"
+#include "../../libs/zbxalgo/vectorimpl.h"
 #include "preproc_history.h"
 
 extern unsigned char	process_type, program_type;
@@ -52,18 +53,23 @@ typedef enum
 }
 zbx_preprocessing_states_t;
 
+typedef struct preprocessing_request zbx_preprocessing_request_t;
+
+ZBX_PTR_VECTOR_DECL(preprocessing_request, zbx_preprocessing_request_t *)
+ZBX_PTR_VECTOR_IMPL(preprocessing_request, zbx_preprocessing_request_t *)
+
 /* preprocessing request */
-typedef struct preprocessing_request
+struct preprocessing_request
 {
-	zbx_preprocessing_states_t	state;		/* request state */
-	struct preprocessing_request	*pending;	/* the request waiting on this request to complete */
-	zbx_preproc_item_value_t	value;		/* unpacked item value */
-	zbx_preproc_op_t		*steps;		/* preprocessing steps */
-	int				steps_num;	/* number of preprocessing steps */
-	unsigned char			value_type;	/* value type from configuration */
-							/* at the beginning of preprocessing queue */
-}
-zbx_preprocessing_request_t;
+	zbx_preprocessing_states_t		state;		/* request state */
+	zbx_preprocessing_request_t		*pending;	/* the request waiting on this request to complete */
+	zbx_preproc_item_value_t		value;		/* unpacked item value */
+	zbx_preproc_op_t			*steps;		/* preprocessing steps */
+	int					steps_num;	/* number of preprocessing steps */
+	unsigned char				value_type;	/* value type from configuration */
+								/* at the beginning of preprocessing queue */
+	zbx_vector_preprocessing_request_t	flush_queue;	/* processed request waiting to be flushed */
+};
 
 /* preprocessing worker data */
 typedef struct
@@ -251,13 +257,16 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
  *                                                                            *
  * Parameters: manager    - [IN] preprocessing manager                        *
  *             request    - [IN] preprocessing request                        *
- *             queue_item - [IN] queued item                                  *
+ *             queue_item - [IN/OUT] in - queued item                         *
+ *                                   out - new position in queue              *
  *                                                                            *
  ******************************************************************************/
 static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *manager,
-		zbx_preprocessing_request_t *request, const zbx_list_item_t *queue_item)
+		zbx_preprocessing_request_t *request, zbx_list_item_t **queue_item)
 {
-	zbx_item_link_t	*index;
+	zbx_item_link_t			*index;
+	zbx_list_iterator_t		iterator, next_iterator;
+	zbx_preprocessing_request_t	*prev;
 
 	request->state = REQUEST_STATE_DONE;
 
@@ -266,10 +275,37 @@ static	void	preprocessor_set_request_state_done(zbx_preprocessing_manager_t *man
 		request->pending->state = REQUEST_STATE_QUEUED;
 
 	if (NULL != (index = (zbx_item_link_t *)zbx_hashset_search(&manager->linked_items, &request->value.itemid)) &&
-			queue_item == index->queue_item)
+			*queue_item == index->queue_item)
 	{
 		zbx_hashset_remove_direct(&manager->linked_items, index);
 	}
+
+	if (NULL == manager->queue.head)
+		return;
+
+	zbx_list_iterator_init(&manager->queue, &iterator);
+	if (iterator.next == *queue_item)
+		return;
+
+	while (SUCCEED == zbx_list_iterator_next(&iterator))
+	{
+		if (iterator.next == *queue_item)
+			break;
+	}
+
+	*queue_item = iterator.current;
+
+	prev = (zbx_preprocessing_request_t *)iterator.current->data;
+	zbx_vector_preprocessing_request_append(&prev->flush_queue, request);
+
+	next_iterator = iterator;
+	if (SUCCEED == zbx_list_iterator_next(&next_iterator))
+	{
+		if (SUCCEED == zbx_list_iterator_equal(&next_iterator, &manager->priority_tail))
+			manager->priority_tail = iterator;
+	}
+
+	(void)zbx_list_iterator_remove_next(&iterator);
 }
 
 /******************************************************************************
@@ -312,6 +348,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
 		{
 			zbx_preproc_history_t	*vault;
+			zbx_list_item_t		*node = iterator.current;
 
 			if (NULL != (vault = (zbx_preproc_history_t *) zbx_hashset_search(&manager->history_cache,
 					&request->value.itemid)))
@@ -322,7 +359,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 				zbx_hashset_remove_direct(&manager->history_cache, vault);
 			}
 
-			preprocessor_set_request_state_done(manager, request, iterator.current);
+			preprocessor_set_request_state_done(manager, request, &node);
 			continue;
 		}
 
@@ -474,6 +511,9 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
  ******************************************************************************/
 static void	preprocessor_free_request(zbx_preprocessing_request_t *request)
 {
+	zbx_vector_preprocessing_request_clear_ext(&request->flush_queue, preprocessor_free_request);
+	zbx_vector_preprocessing_request_destroy(&request->flush_queue);
+
 	preproc_item_value_clear(&request->value);
 	request_free_steps(request);
 	zbx_free(request);
@@ -518,6 +558,24 @@ static void	preprocessor_flush_value(const zbx_preproc_item_value_t *value)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: flush preprocessing request and all requests waiting on it        *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessing_flush_request(zbx_preprocessing_manager_t *manager, zbx_preprocessing_request_t *request)
+{
+	int	i;
+
+	preprocessor_flush_value(&request->value);
+
+	manager->processed_num++;
+	manager->queued_num--;
+
+	for (i = 0; i < request->flush_queue.values_num; i++)
+		preprocessing_flush_request(manager, request->flush_queue.values[i]);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: preprocessing_flush_queue                                        *
  *                                                                            *
  * Purpose: add all sequential processed values from beginning of the queue   *
@@ -539,16 +597,13 @@ static void	preprocessing_flush_queue(zbx_preprocessing_manager_t *manager)
 		if (REQUEST_STATE_DONE != request->state)
 			break;
 
-		preprocessor_flush_value(&request->value);
+		preprocessing_flush_request(manager, request);
 		preprocessor_free_request(request);
 
 		if (SUCCEED == zbx_list_iterator_equal(&iterator, &manager->priority_tail))
 			zbx_list_iterator_clear(&manager->priority_tail);
 
 		zbx_list_pop(&manager->queue, NULL);
-
-		manager->processed_num++;
-		manager->queued_num--;
 	}
 }
 
@@ -684,6 +739,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 
 	request = (zbx_preprocessing_request_t *)zbx_malloc(NULL, sizeof(zbx_preprocessing_request_t));
 	memset(request, 0, sizeof(zbx_preprocessing_request_t));
+	zbx_vector_preprocessing_request_create(&request->flush_queue);
 	memcpy(&request->value, value, sizeof(zbx_preproc_item_value_t));
 	request->state = state;
 
@@ -1057,10 +1113,10 @@ static void	preprocessor_add_result(zbx_preprocessing_manager_t *manager, zbx_ip
 		}
 	}
 
-	preprocessor_set_request_state_done(manager, request, worker->task);
+	preprocessor_set_request_state_done(manager, request, &node);
 
 	if (FAIL != preprocessor_set_variant_result(request, &value, error))
-		preprocessor_enqueue_dependent(manager, &request->value, worker->task);
+		preprocessor_enqueue_dependent(manager, &request->value, node);
 
 	worker->task = NULL;
 	zbx_variant_clear(&value);
@@ -1428,6 +1484,7 @@ static void preprocessor_register_worker(zbx_preprocessing_manager_t *manager, z
  ******************************************************************************/
 static void	preprocessor_destroy_manager(zbx_preprocessing_manager_t *manager)
 {
+
 	zbx_preprocessing_request_t		*request;
 	zbx_preprocessing_direct_request_t	*direct_request;
 

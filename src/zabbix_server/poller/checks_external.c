@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,17 +78,21 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT, ZBX_EXIT_CODE_CHECKS_DISABLED))
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+			ZBX_EXIT_CODE_CHECKS_DISABLED)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
 		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
 		zbx_free(buf);
-
-		ret = SUCCEED;
 	}
 	else
+	{
+		if (SIG_ERROR != ret)
+			ret = NOTSUPPORTED;
+
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+	}
 out:
 	zbx_free(cmd);
 

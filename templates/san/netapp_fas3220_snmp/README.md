@@ -1,5 +1,5 @@
 
-# NetApp FAS3220 SNMP
+# Template SAN NetApp FAS3220 SNMP
 
 ## Overview
 
@@ -12,7 +12,6 @@ The template to monitor SAN NetApp FAS3220 cluster by Zabbix SNMP agent.
 This template was tested on:
 
 - NetApp FAS3220, firmware version: 5.3.0
-- Zabbix, version 5.0
 
 ## Setup
 
@@ -40,7 +39,7 @@ No specific Zabbix configuration is required.
 |{$FAS3220.FS.NAME.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`.*` |
 |{$FAS3220.FS.NAME.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p> |`snapshot` |
 |{$FAS3220.FS.PUSED.MAX.CRIT} |<p>Maximum percentage of disk used. Can be used with {#FSNAME} as context.</p> |`90` |
-|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10G` |
+|{$FAS3220.FS.TIME} |<p>The time during which disk usage may exceed the threshold. Can be used with {#FSNAME} as context.</p> |`10m` |
 |{$FAS3220.FS.TYPE.MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`.*` |
 |{$FAS3220.FS.TYPE.NOT_MATCHES} |<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p><p>Value should be integer:</p><p>  2 - flexibleVolume,</p><p>  3 - aggregate,</p><p>  4 - stripedAggregate,</p><p>  5 - stripedVolume.</p> |`CHANGE_IF_NEEDED` |
 |{$FAS3220.FS.USE.PCT} |<p>Macro define what threshold will be used for disk space trigger:</p><p>  0 - use Bytes ({$FAS3220.FS.AVAIL.MIN.CRIT})</p><p>  1 - use percents ({$FAS3220.FS.PUSED.MAX.CRIT})</p><p>Can be used with {#FSNAME} as context.</p> |`1` |
@@ -66,7 +65,7 @@ No specific Zabbix configuration is required.
 |CPU discovery |<p>Discovery of CPU metrics per node</p> |SNMP |fas3220.cpu.discovery |
 |Cluster metrics discovery |<p>Discovery of Cluster metrics per node</p> |SNMP |fas3220.cluster.discovery |
 |HA discovery |<p>Discovery of high availability metrics per node</p> |SNMP |fas3220.ha.discovery |
-|Filesystems discovery |<p>Filesystems discovery with filter.</p> |SNMP |fas3220.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$FAS3220.FS.TYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$FAS3220.FS.TYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$FAS3220.FS.NAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$FAS3220.FS.NAME.NOT_MATCHES}`</p> |
+|Filesystems discovery |<p>Filesystems discovery with filter.</p> |SNMP |fas3220.fs.discovery<p>**Filter**:</p>AND <p>- A: {#FSTYPE} MATCHES_REGEX `{$FAS3220.FS.TYPE.MATCHES}`</p><p>- B: {#FSTYPE} NOT_MATCHES_REGEX `{$FAS3220.FS.TYPE.NOT_MATCHES}`</p><p>- C: {#FSNAME} MATCHES_REGEX `{$FAS3220.FS.NAME.MATCHES}`</p><p>- D: {#FSNAME} NOT_MATCHES_REGEX `{$FAS3220.FS.NAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Do not discover aggregate metrics<br> - {#FSTYPE} MATCHES_REGEX `3|4`<br>  - ITEM_PROTOTYPE LIKE `Saved` - NO_DISCOVER</p> |
 |Network ports discovery |<p>Network interfaces discovery with filter.</p> |SNMP |fas3220.net.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- A: {#TYPE} MATCHES_REGEX `{$FAS3220.NET.PORT.TYPE.MATCHES}`</p><p>- B: {#TYPE} NOT_MATCHES_REGEX `{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}`</p><p>- C: {#ROLE} MATCHES_REGEX `{$FAS3220.NET.PORT.ROLE.MATCHES}`</p><p>- D: {#TYPE} NOT_MATCHES_REGEX `{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}`</p><p>- E: {#IFNAME} MATCHES_REGEX `{$FAS3220.NET.PORT.NAME.MATCHES}`</p><p>- F: {#IFNAME} NOT_MATCHES_REGEX `{$FAS3220.NET.PORT.NAME.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -115,21 +114,21 @@ No specific Zabbix configuration is required.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Node {#NODE.NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`{TEMPLATE_NAME:fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"].min(5m)}>{$CPU.UTIL.CRIT}` |WARNING | |
-|NetApp FAS3220: Number of failed disks has changed |<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}>0 and {NetApp FAS3220 SNMP:fas3220.disk[diskFailedMessage].diff()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}=0` |WARNING | |
-|Node {#NODE.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeUptime, "{#NODE.NAME}"].last()}<10m` |INFO |<p>Manual close: YES</p> |
+|NetApp FAS3220: Number of failed disks has changed |<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}>0 and {TEMPLATE_NAME:fas3220.disk[diskFailedMessage].diff()}=1`<p>Recovery expression:</p>`{TEMPLATE_NAME:fas3220.disk[diskFailedCount].last()}=0` |WARNING | |
+|Node {#NODE.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeUptime, "{#NODE.NAME}"].last()}<10m` |INFO |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: Node can not communicate with the cluster |<p>-</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeHealth, "{#NODE.NAME}"].last()}=0` |HIGH |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: NVRAM battery status is not OK |<p>-</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"].last()}<>1` |AVERAGE |<p>Manual close: YES</p> |
 |Node {#NODE.NAME}: Temperature is over than recommended |<p>The hardware will shutdown if the temperature exceeds critical thresholds.</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"].last()}=2` |HIGH | |
-|Node {#NODE.NAME}: Failed FAN count is over than zero |<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}` |HIGH | |
-|Node {#NODE.NAME}: Degraded power supplies count is more than zero |<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}>0 and {NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={NetApp FAS3220 SNMP:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}` |AVERAGE | |
+|Node {#NODE.NAME}: Failed FAN count is over than zero |<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"].last()}>0 and {TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}={TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"].last()}` |HIGH | |
+|Node {#NODE.NAME}: Degraded power supplies count is more than zero |<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"].last()}>0 and {TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}={TEMPLATE_NAME:fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"].last()}` |AVERAGE | |
 |Node {#NODE.NAME}: Node cannot takeover it's HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE} |<p>Possible reasons:</p><p>  unknownReason(2),</p><p>  disabledByOperator(3),</p><p>  interconnectOffline(4),</p><p>  disabledByPartner(5),</p><p>  takeoverFailed(6),</p><p>  mailboxIsInDegradedState(7),</p><p>  partnermailboxIsInUninitialisedState(8),</p><p>  mailboxVersionMismatch(9),</p><p>  nvramSizeMismatch(10),</p><p>  kernelVersionMismatch(11),</p><p>  partnerIsInBootingStage(12),</p><p>  diskshelfIsTooHot(13),</p><p>  partnerIsPerformingRevert(14),</p><p>  nodeIsPerformingRevert(15),</p><p>  sametimePartnerIsAlsoTryingToTakeUsOver(16),</p><p>  alreadyInTakenoverMode(17),</p><p>  nvramLogUnsynchronized(18),</p><p>  stateofBackupMailboxIsDoubtful(19).</p> |`{TEMPLATE_NAME:fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"].last()}<>1` |HIGH | |
 |Node {#NODE.NAME}: Node has been taken over |<p>The thisNodeDead(5) setting indicates that this node has been takenover.</p> |`{TEMPLATE_NAME:fas3220.ha[haSettings, "{#NODE.NAME}"].last()}=5` |HIGH | |
 |Node {#NODE.NAME}: HA is not licensed |<p>The value notConfigured(1) indicates that the HA is not licensed.</p> |`{TEMPLATE_NAME:fas3220.ha[haSettings, "{#NODE.NAME}"].last()}=1` |AVERAGE | |
 |{#VSERVER}{#FSNAME}: Disk space is too low (below {$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} for {$FAS3220.FS.TIME:"{#FSNAME}"}) |<p>-</p> |`{TEMPLATE_NAME:fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"].min({$FAS3220.FS.TIME:"{#FSNAME}"})}<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0` |HIGH | |
 |{#VSERVER}{#FSNAME}: Disk space is too low (used over {$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"}% for {$FAS3220.FS.TIME:"{#FSNAME}"}) |<p>-</p> |`{TEMPLATE_NAME:fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"].max({$FAS3220.FS.TIME:"{#FSNAME}"})}>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1` |HIGH | |
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down |<p>Link state is not UP and the port status is set 'UP' by an administrator.</p> |`{TEMPLATE_NAME:fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"].last()}<>2 and {NetApp FAS3220 SNMP:fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"].last()}=1` |AVERAGE |<p>Manual close: YES</p> |
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy |<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"].last()}<>0 and {NetApp FAS3220 SNMP:fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"].strlen()}>0` |INFO | |
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {NetApp FAS3220 SNMP:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p> |
+|Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down |<p>Link state is not UP and the port status is set 'UP' by an administrator.</p> |`{TEMPLATE_NAME:fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"].last()}<>2 and {TEMPLATE_NAME:fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"].last()}=1` |AVERAGE |<p>Manual close: YES</p> |
+|Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy |<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p> |`{TEMPLATE_NAME:fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"].last()}<>0 and {TEMPLATE_NAME:fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"].strlen()}>0` |INFO | |
+|Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m) |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`{TEMPLATE_NAME:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"} or {TEMPLATE_NAME:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].min(5m)}>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`{TEMPLATE_NAME:fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and {TEMPLATE_NAME:fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"].max(5m)}<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 

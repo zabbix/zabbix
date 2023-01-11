@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ $fields = [
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_groups' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_groups' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,		DB_ID,	null],
 	'filter_groupby' =>		[T_ZBX_STR, O_OPT, P_SYS,		null,	null]
 ];
 check_fields($fields);
@@ -69,10 +69,6 @@ $filter = [
 
 $ms_groups = [];
 $filter_groupids = $filter['groups'] ? getSubGroups($filter['groups'], $ms_groups) : null;
-
-if (count($ms_groups) != count($filter['groups'])) {
-	show_error_message(_('No permissions to referred object or it does not exist!'));
-}
 
 $inventories = [];
 foreach (getHostInventories() as $inventory) {

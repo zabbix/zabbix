@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -792,7 +792,7 @@ function prepareItemHttpAgentFormData(array $item) {
 function getItemFormData(array $item = [], array $options = []) {
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
+		'form_refresh' => getRequest('form_refresh', 0),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
@@ -1147,6 +1147,11 @@ function getItemFormData(array $item = [], array $options = []) {
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND
 	]);
+	// Sort interfaces to be listed starting with one selected as 'main'.
+	CArrayHelper::sort($data['interfaces'], [
+		['field' => 'main', 'order' => ZBX_SORT_DOWN],
+		['field' => 'interfaceid','order' => ZBX_SORT_UP]
+	]);
 
 	if ($data['limited'] || (array_key_exists('item', $data) && $data['parent_discoveryid'] == 0
 			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
@@ -1199,7 +1204,6 @@ function getItemFormData(array $item = [], array $options = []) {
 /**
  * Get list of item pre-processing data and return a prepared HTML object.
  *
- * @param CForm  $form                                     Form object to where add pre-processing list.
  * @param array  $preprocessing                            Array of item pre-processing steps.
  * @param string $preprocessing[]['type']                  Pre-processing step type.
  * @param array  $preprocessing[]['params']                Additional parameters used by pre-processing.
@@ -1210,7 +1214,7 @@ function getItemFormData(array $item = [], array $options = []) {
  *
  * @return CList
  */
-function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, array $types) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
@@ -1730,7 +1734,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {

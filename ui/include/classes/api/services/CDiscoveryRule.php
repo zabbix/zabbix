@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,6 +294,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper'], []);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -1325,7 +1326,7 @@ class CDiscoveryRule extends CItemGeneral {
 							// If same "lld_macro" is found in DB, update only "path" if necessary.
 
 							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
 								$fields_to_update['path'] = $lld_macro_path['path'];
 							}
 						}
@@ -2387,10 +2388,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch source items
 		$items = API::Item()->get([
-			'itemids' => $srcItemIds,
 			'output' => ['itemid', 'key_'],
-			'preservekeys' => true,
-			'filter' => ['flags' => null]
+			'webitems' => true,
+			'itemids' => $srcItemIds,
+			'filter' => ['flags' => null],
+			'preservekeys' => true
 		]);
 
 		$srcItems = [];
@@ -2402,12 +2404,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// fetch newly cloned items
 		$newItems = API::Item()->get([
+			'output' => ['itemid', 'key_'],
+			'webitems' => true,
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => [
 				'key_' => $itemKeys,
 				'flags' => null
 			],
-			'output' => ['itemid', 'key_'],
 			'preservekeys' => true
 		]);
 
@@ -2505,6 +2508,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))

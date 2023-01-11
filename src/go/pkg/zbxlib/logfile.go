@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ extern int CONFIG_MAX_LINES_PER_SECOND;
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef char * char_lp_t;
+typedef zbx_vector_pre_persistent_t * zbx_vector_pre_persistent_lp_t;
 
 ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
 {
@@ -43,8 +44,9 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	metric->key_orig = zbx_strdup(NULL, key);
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	metric->flags = flags;
+	metric->flags = (unsigned char)flags;
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
+	metric->persistent_file_name = NULL;	// initialized but not used in Agent2
 	return metric;
 }
 
@@ -97,6 +99,9 @@ void	metric_free(ZBX_ACTIVE_METRIC *metric)
 {
 	int	i;
 
+	if (NULL == metric)
+		return;
+
 	zbx_free(metric->key);
 	zbx_free(metric->key_orig);
 
@@ -104,6 +109,7 @@ void	metric_free(ZBX_ACTIVE_METRIC *metric)
 		zbx_free(metric->logfiles[i].filename);
 
 	zbx_free(metric->logfiles);
+	zbx_free(metric->persistent_file_name);
 	zbx_free(metric);
 }
 
@@ -184,6 +190,23 @@ int	process_value_cb(const char *server, unsigned short port, const char *host, 
 	add_log_value(result, value, state, *lastlogsize, *mtime);
 	return SUCCEED;
 }
+
+static zbx_vector_pre_persistent_lp_t new_prep_vec(void)
+{
+	zbx_vector_pre_persistent_lp_t vect;
+
+	vect = (zbx_vector_pre_persistent_lp_t)zbx_malloc(NULL, sizeof(zbx_vector_pre_persistent_t));
+	zbx_vector_pre_persistent_create(vect);
+	return vect;
+}
+
+static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
+{
+	// In Agent2 this vector is expected to be empty because 'persistent directory' parameter is not allowed.
+	// Therefore a simplified cleanup is used.
+	zbx_vector_pre_persistent_destroy(vect);
+	zbx_free(vect);
+}
 */
 import "C"
 
@@ -193,6 +216,7 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/pkg/log"
 )
 
 const (
@@ -227,12 +251,24 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	flags := MetricFlagNew | MetricFlagPersistent
 	switch key {
 	case "log":
+		if len(params) >= 9 && params[8] != "" {
+			return nil, errors.New("The ninth parameter (persistent directory) is not supported by Agent2.")
+		}
 		flags |= MetricFlagLogLog
 	case "logrt":
+		if len(params) >= 9 && params[8] != "" {
+			return nil, errors.New("The ninth parameter (persistent directory) is not supported by Agent2.")
+		}
 		flags |= MetricFlagLogLogrt
 	case "log.count":
+		if len(params) >= 8 && params[7] != "" {
+			return nil, errors.New("The eighth parameter (persistent directory) is not supported by Agent2.")
+		}
 		flags |= MetricFlagLogCount | MetricFlagLogLog
 	case "logrt.count":
+		if len(params) >= 8 && params[7] != "" {
+			return nil, errors.New("The eighth parameter (persistent directory) is not supported by Agent2.")
+		}
 		flags |= MetricFlagLogCount | MetricFlagLogLogrt
 	case "eventlog":
 		flags |= MetricFlagLogEventlog
@@ -240,28 +276,38 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		return nil, errors.New("Unsupported item key.")
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
+	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 
 func FreeActiveMetric(data unsafe.Pointer) {
+	log.Tracef("Calling C function \"metric_free()\"")
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
 func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
+	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cmtimeSent, cmtimeLast C.int
+	log.Tracef("Calling C function \"metric_get_meta()\"")
 	C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeSent, &cmtimeSent)
 	clastLogsizeLast = clastLogsizeSent
 	cmtimeLast = cmtimeSent
 
+	log.Tracef("Calling C function \"new_log_result()\"")
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
 	var cerrmsg *C.char
+	log.Tracef("Calling C function \"new_prep_vec()\"")
+	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
+	log.Tracef("Calling C function \"process_log_check()\"")
 	ret := C.process_log_check(C.char_lp_t(unsafe.Pointer(result)), 0, C.zbx_vector_ptr_lp_t(cblob),
-		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent, &cmtimeSent,
-		&cerrmsg)
+		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
+		&cmtimeSent, &cerrmsg, cprepVec)
+	log.Tracef("Calling C function \"free_prep_vec()\"")
+	C.free_prep_vec(cprepVec)
 
 	// add cached results
 	var cvalue *C.char
@@ -271,6 +317,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	if logTs.Before(item.LastTs) {
 		logTs = item.LastTs
 	}
+	log.Tracef("Calling C function \"get_log_value()\"")
 	for i := 0; C.get_log_value(result, C.int(i), &cvalue, &cstate, &clastlogsize, &cmtime) != C.FAIL; i++ {
 		var value string
 		var err error
@@ -291,16 +338,19 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		item.Results = append(item.Results, r)
 		logTs = logTs.Add(time.Nanosecond)
 	}
+	log.Tracef("Calling C function \"free_log_result()\"")
 	C.free_log_result(result)
 
 	item.LastTs = logTs
 
 	if ret == C.FAIL {
+		log.Tracef("Calling C function \"metric_set_unsupported()\"")
 		C.metric_set_unsupported(C.ZBX_ACTIVE_METRIC_LP(data))
 
 		var err error
 		if cerrmsg != nil {
 			err = errors.New(C.GoString(cerrmsg))
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cerrmsg))
 		} else {
 			err = errors.New("Unknown error.")
@@ -311,10 +361,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		}
 		item.Results = append(item.Results, result)
 	} else {
+		log.Tracef("Calling C function \"metric_set_supported()\"")
 		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent, clastLogsizeLast,
 			cmtimeLast)
 
 		if ret == Succeed {
+			log.Tracef("Calling C function \"metric_get_meta()\"")
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtimeLast)
 			result := &LogResult{
 				Ts:          time.Now(),

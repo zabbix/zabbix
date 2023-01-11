@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Working time');
 
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "maxlength", 255);
-		$this->zbxTestAssertAttribute("//input[@id='work_period']", "size", 20);
 		$this->zbxTestAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
 	}
 

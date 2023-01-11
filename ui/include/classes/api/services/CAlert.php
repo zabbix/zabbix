@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,6 +85,7 @@ class CAlert extends CApiService {
 			'selectUsers'				=> null,
 			'selectHosts'				=> null,
 			'countOutput'				=> false,
+			'groupCount'				=> false,
 			'preservekeys'				=> false,
 			'editable'					=> false,
 			'sortfield'					=> '',
@@ -259,6 +260,10 @@ class CAlert extends CApiService {
 			zbx_value2array($options['eventids']);
 
 			$sqlParts['where'][] = dbConditionInt('a.eventid', $options['eventids']);
+
+			if ($options['groupCount']) {
+				$sqlParts['group']['a'] = 'a.eventid';
+			}
 		}
 
 		// actionids
@@ -325,7 +330,12 @@ class CAlert extends CApiService {
 		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
-				$result = $alert['rowscount'];
+				if ($options['groupCount']) {
+					$result[] = $alert;
+				}
+				else {
+					$result = $alert['rowscount'];
+				}
 			}
 			else {
 				$result[$alert['alertid']] = $alert;

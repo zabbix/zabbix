@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,19 @@
 #elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
 		(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
+#endif
+
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
+#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
+#elif defined(HAVE_MYSQL)
+#	define ZBX_DB_STRLIST_DELIM		','
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB3	"utf8mb3"
+#	define ZBX_SUPPORTED_DB_CHARACTER_SET		"utf8,utf8mb3"
+#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin"
 #endif
 
 #define ZBX_DB_TLS_CONNECT_REQUIRED_TXT		"required"
@@ -100,6 +113,14 @@ const char	*zbx_db_last_strerr(void);
 int	zbx_dbms_get_version(void);
 int	zbx_tsdb_get_version(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names);
+
+#define ZBX_TSDB1_HISTORY_TABLES	"'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass," \
+		"'history_text'::regclass,'history'::regclass"
+
+#define ZBX_TSDB2_HISTORY_TABLES	"'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB1_TRENDS_TABLES		"'trends'::regclass,'trends_uint'::regclass"
+#define ZBX_TSDB2_TRENDS_TABLES		"'trends','trends_uint'"
 #endif
 
 #ifdef HAVE_ORACLE

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * @backup dashboard
- * @backup profiles
+ * @dataSource LoginUsers
  */
 class testPageDashboardWidgets extends CWebTest {
 
@@ -149,7 +150,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Expected table values.
 		$expected = [
 			'Host group for tag permissions'	=> 1,
-			'Zabbix servers'					=> 19,
+			'Zabbix servers'					=> 17,
 			'ZBX6648 All Triggers'				=> 1,
 			'ZBX6648 Disabled Triggers'			=> 1,
 			'ZBX6648 Enabled Triggers'			=> 1
@@ -169,39 +170,6 @@ class testPageDashboardWidgets extends CWebTest {
 			$this->assertEquals($problems, $row['Without problems']);
 			$this->assertEquals($problems, $row['Total']);
 		}
-	}
-
-	/**
-	 * Check empty dashboard.
-	 */
-	public function testPageDashboardWidgets_checkEmptyDashboard() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list');
-
-		// Create a new dashboard.
-		$this->query('button:Create dashboard')->one()->click();
-		$this->page->waitUntilReady();
-
-		// Wait until overlay dialog is visible and ready.
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-
-		// Check title of a dialog.
-		$this->assertEquals('Dashboard properties', $dialog->getTitle());
-		// Close the dialog.
-		$dialog->close();
-
-		$dashboard = CDashboardElement::find()->one();
-		// Check if dashboard is empty.
-		$this->assertTrue($dashboard->isEmpty());
-
-		// Open a new widget form.
-		$overlay = $dashboard->edit()->addWidget();
-		// Wait until add widget dialog is shown and close it.
-		$overlay->close();
-
-		// Check if dashboard is still empty.
-		$this->assertTrue($dashboard->isEmpty());
-		// Cancel dashboard editing.
-		$dashboard->cancelEditing();
 	}
 
 	/**
@@ -233,7 +201,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		// Set type to "Clock".
-		$form->getField('Type')->asZDropdown()->select('Clock');
+		$form->getField('Type')->asDropdown()->select('Clock');
 		// Wait until overlay is reloaded.
 		$overlay->waitUntilReady();
 		// Set name of widget.

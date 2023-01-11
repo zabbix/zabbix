@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2021-02-15T11:54:08Z</date>
+   <date>2022-01-10T14:11:37Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -19,7 +19,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Databases</name>
@@ -225,7 +225,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",Backups].min(5m)}&gt;={Template DB Ignite by JMX:jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies].max(5m)}</expression>
@@ -391,7 +390,6 @@ return JSON.stringify(data)
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Thread pool [{#JMXNAME}]: Thread pool size</name>
@@ -540,7 +538,7 @@ return JSON.stringify(data)
                            <expression>{min(5m)}&gt;0</expression>
                            <name>Data region {#JMXNAME}: Node started to evict pages</name>
                            <priority>INFO</priority>
-                           <description>You store more data then region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
+                           <description>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -673,7 +671,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",UsedCheckpointBufferSize].min(5m)}/{Template DB Ignite by JMX:jmx["{#JMXOBJ}",CheckpointBufferSize].last()}*100&gt;{$IGNITE.CHECKPOINT.PUSED.MAX.HIGH}</expression>
@@ -695,18 +692,18 @@ return JSON.stringify(data)
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                      <priority>HIGH</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                   </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$IGNITE.DATA.REGION.PUSED.MAX.WARN}</expression>
-                     <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
+                     <name>Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.WARN} in 5m)</name>
                      <priority>WARNING</priority>
                      <description>Data region utilization is high. Increase data region size or delete any data.</description>
                      <dependencies>
                         <dependency>
-                           <name>Data region {#JMXNAME}: Data region utilisation is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
+                           <name>Data region {#JMXNAME}: Data region utilization is too high (over {$IGNITE.DATA.REGION.PUSED.MAX.HIGH} in 5m)</name>
                            <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffheapUsedSize].min(5m)}/{Template DB Ignite by JMX:jmx["{#JMXOBJ}",OffHeapSize].last()}*100&gt;{$IGNITE.DATA.REGION.PUSED.MAX.HIGH}</expression>
                         </dependency>
                      </dependencies>
@@ -735,7 +732,7 @@ return JSON.stringify(data)
                      </graph_items>
                   </graph_prototype>
                   <graph_prototype>
-                     <name>Data region {#JMXNAME}: DataRegion utilisation</name>
+                     <name>Data region {#JMXNAME}: DataRegion utilization</name>
                      <graph_items>
                         <graph_item>
                            <drawtype>BOLD_LINE</drawtype>
@@ -834,6 +831,12 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{min(5m)} &gt; {$IGNITE.PME.DURATION.MAX.HIGH}</expression>
+                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)</name>
+                           <priority>HIGH</priority>
+                           <description>PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{min(5m)} &gt; {$IGNITE.PME.DURATION.MAX.WARN}</expression>
                            <name>Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.WARN} for 5 min)</name>
                            <priority>WARNING</priority>
@@ -844,12 +847,6 @@ return JSON.stringify(data)
                                  <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",CurrentPmeDuration].min(5m)} &gt; {$IGNITE.PME.DURATION.MAX.HIGH}</expression>
                               </dependency>
                            </dependencies>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{min(5m)} &gt; {$IGNITE.PME.DURATION.MAX.HIGH}</expression>
-                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: PME duration is too long (over {$IGNITE.PME.DURATION.MAX.HIGH} for 5 min)</name>
-                           <priority>HIGH</priority>
-                           <description>PME duration is over {$IGNITE.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</description>
                         </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
@@ -1003,7 +1000,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Jobs current state</name>
@@ -1203,23 +1199,22 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{change()}&lt;0</expression>
-                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology</name>
-                           <priority>WARNING</priority>
-                           <description>One or more server node left the topology. Ack to close.</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{change()}&gt;0</expression>
                            <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology</name>
                            <priority>INFO</priority>
                            <description>One or more server node added to the topology. Ack to close.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{change()}&lt;0</expression>
+                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology</name>
+                           <priority>WARNING</priority>
+                           <description>One or more server node left the topology. Ack to close.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",TotalServerNodes].last()}&gt;{Template DB Ignite by JMX:jmx["{#JMXOBJ}",TotalBaselineNodes].last()}</expression>
@@ -1339,23 +1334,22 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{last()}&lt;10m</expression>
-                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime &lt; 10m)</name>
-                           <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
-                           <manual_close>YES</manual_close>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{nodata(10m)}=1</expression>
                            <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data (or no data for 10m)</name>
                            <priority>WARNING</priority>
                            <description>Zabbix has not received data for items for the last 10 minutes.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{last()}&lt;10m</expression>
+                           <name>Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted (uptime &lt; 10m)</name>
+                           <priority>INFO</priority>
+                           <description>Uptime is less than 10 minutes</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>
@@ -1376,7 +1370,7 @@ return JSON.stringify(data)
                </preprocessing>
             </discovery_rule>
             <discovery_rule>
-               <name>TCP Ccmmunication SPI metrics</name>
+               <name>TCP Communication SPI metrics</name>
                <type>JMX</type>
                <key>jmx.discovery[beans,"org.apache:group=SPIs,name=TcpCommunicationSpi,*"]</key>
                <delay>30m</delay>
@@ -1468,7 +1462,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Communication messages rate</name>
@@ -1681,7 +1674,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate</name>
@@ -1811,7 +1803,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Ignite [{#JMXIGNITEINSTANCENAME}]: Transactions</name>
@@ -2087,7 +2078,6 @@ return JSON.stringify(data)
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template DB Ignite by JMX:jmx["{#JMXOBJ}",CacheSize].last()}={Template DB Ignite by JMX:jmx["{#JMXOBJ}",HeapEntriesCount].last()}</expression>

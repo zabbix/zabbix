@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T10:51:36Z</date>
+   <date>2021-12-23T06:23:21Z</date>
    <groups>
       <group>
          <name>Templates/Server hardware</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 IDRAC-MIB-SMIv2&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -272,6 +272,13 @@ Possible values:&#13;
                      </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
+                           <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the device for faults</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS},eq)}=1</expression>
                            <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in warning state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
@@ -301,17 +308,9 @@ Possible values:&#13;
                               </dependency>
                            </dependencies>
                         </trigger_prototype>
-                        <trigger_prototype>
-                           <expression>{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
-                           <name>Battery {#BATTERY_NUM}: Disk array cache controller battery is in critical state!</name>
-                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                           <priority>AVERAGE</priority>
-                           <description>Please check the device for faults</description>
-                        </trigger_prototype>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
@@ -392,7 +391,6 @@ coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</des
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Array Controller Discovery</name>
@@ -444,13 +442,6 @@ Possible values:&#13;
                      </valuemap>
                      <trigger_prototypes>
                         <trigger_prototype>
-                           <expression>{count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
-                           <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
-                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
-                           <priority>DISASTER</priority>
-                           <description>Please check the device for faults</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_CRIT_STATUS:"critical"},eq)}=1</expression>
                            <name>{#CNTLR_NAME}: Disk array controller is in critical state</name>
                            <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
@@ -462,6 +453,13 @@ Possible values:&#13;
                                  <expression>{Template Server Dell iDRAC SNMP:system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}].count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
                               </dependency>
                            </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$DISK_ARRAY_FAIL_STATUS:"nonRecoverable"},eq)}=1</expression>
+                           <name>{#CNTLR_NAME}: Disk array controller is in unrecoverable state!</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>DISASTER</priority>
+                           <description>Please check the device for faults</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_WARN_STATUS:"nonCritical"},eq)}=1</expression>
@@ -483,7 +481,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Physical Disk Discovery</name>
@@ -678,7 +675,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
@@ -730,7 +726,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature Ambient Discovery</name>
@@ -805,7 +800,6 @@ Possible values:&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"Ambient"}&#13;
@@ -917,7 +911,6 @@ or&#13;
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Server Dell iDRAC SNMP:sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:"CPU"}&#13;
@@ -1128,7 +1121,6 @@ Possible values:&#13;
                      </valuemap>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -1277,6 +1269,52 @@ Possible values:&#13;
    </templates>
    <value_maps>
       <value_map>
+         <name>IDRAC-MIB-SMIv2::batteryState</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Ready</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Failed</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>Degraded</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>Missing</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>Charging</newvalue>
+            </mapping>
+            <mapping>
+               <value>7</value>
+               <newvalue>Below threshold</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::BooleanType</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>failed</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
          <name>IDRAC-MIB-SMIv2::ObjectStatusEnum</name>
          <mappings>
             <mapping>
@@ -1302,6 +1340,52 @@ Possible values:&#13;
             <mapping>
                <value>6</value>
                <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>other</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>ok</newvalue>
+            </mapping>
+            <mapping>
+               <value>4</value>
+               <newvalue>nonCritical</newvalue>
+            </mapping>
+            <mapping>
+               <value>5</value>
+               <newvalue>critical</newvalue>
+            </mapping>
+            <mapping>
+               <value>6</value>
+               <newvalue>nonRecoverable</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Unknown</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>HDD</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>SSD</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1347,98 +1431,6 @@ Possible values:&#13;
             <mapping>
                <value>10</value>
                <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskComponentStatus</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>other</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>nonCritical</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>critical</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>nonRecoverable</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::BooleanType</name>
-         <mappings>
-            <mapping>
-               <value>0</value>
-               <newvalue>ok</newvalue>
-            </mapping>
-            <mapping>
-               <value>1</value>
-               <newvalue>failed</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::physicalDiskMediaType</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>HDD</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>SSD</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
-         <name>IDRAC-MIB-SMIv2::batteryState</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Unknown</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Ready</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Failed</newvalue>
-            </mapping>
-            <mapping>
-               <value>4</value>
-               <newvalue>Degraded</newvalue>
-            </mapping>
-            <mapping>
-               <value>5</value>
-               <newvalue>Missing</newvalue>
-            </mapping>
-            <mapping>
-               <value>6</value>
-               <newvalue>Charging</newvalue>
-            </mapping>
-            <mapping>
-               <value>7</value>
-               <newvalue>Below threshold</newvalue>
             </mapping>
          </mappings>
       </value_map>
@@ -1513,23 +1505,6 @@ Possible values:&#13;
          </mappings>
       </value_map>
       <value_map>
-         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
-         <mappings>
-            <mapping>
-               <value>1</value>
-               <newvalue>Write Through</newvalue>
-            </mapping>
-            <mapping>
-               <value>2</value>
-               <newvalue>Write Back</newvalue>
-            </mapping>
-            <mapping>
-               <value>3</value>
-               <newvalue>Force Write Back</newvalue>
-            </mapping>
-         </mappings>
-      </value_map>
-      <value_map>
          <name>IDRAC-MIB-SMIv2::virtualDiskReadPolicy</name>
          <mappings>
             <mapping>
@@ -1564,6 +1539,23 @@ Possible values:&#13;
             <mapping>
                <value>4</value>
                <newvalue>Degraded</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+      <value_map>
+         <name>IDRAC-MIB-SMIv2::virtualDiskWritePolicy</name>
+         <mappings>
+            <mapping>
+               <value>1</value>
+               <newvalue>Write Through</newvalue>
+            </mapping>
+            <mapping>
+               <value>2</value>
+               <newvalue>Write Back</newvalue>
+            </mapping>
+            <mapping>
+               <value>3</value>
+               <newvalue>Force Write Back</newvalue>
             </mapping>
          </mappings>
       </value_map>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-04-28T10:05:27Z</date>
+    <date>2022-06-09T11:49:36Z</date>
     <media_types>
         <media_type>
             <name>Express.ms</name>
@@ -120,7 +120,7 @@
                     body: Express.params.message&#13;
                 }&#13;
             };&#13;
-            url = 'api/v3/botx/notification/callback/direct';&#13;
+            url = 'api/v4/botx/notifications/direct';&#13;
         }&#13;
         else {&#13;
             data = {&#13;

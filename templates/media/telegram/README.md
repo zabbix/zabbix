@@ -63,4 +63,4 @@ In the "Send to" field enter Telegram user chat ID or group ID obtained during T
 
 Make sure the user has access to all hosts for which you would like to receive Telegram notifications.
 
-Great, you can now start receivng Zabbix notifications in Telegram!
+Great, you can now start receiving Zabbix notifications in Telegram!

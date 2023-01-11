@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,9 +72,6 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				'mediatypeid', 'alerttype'
 			],
 			'selectMediatypes' => ['name', 'maxattempts'],
-			'filter' => [
-				'alerttype' => ALERT_TYPE_MESSAGE
-			],
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => $show_lines

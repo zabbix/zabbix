@@ -1,5 +1,5 @@
 
-# IBM IMM SNMP
+# Template Server IBM IMM SNMP
 
 ## Overview
 

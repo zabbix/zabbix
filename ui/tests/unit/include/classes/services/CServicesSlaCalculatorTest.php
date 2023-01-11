@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@ class CServicesSlaCalculatorTest extends TestCase {
 					'problemTime' => 3600,
 					'okTime' => 75600,
 					'downtimeTime' => 3600,
-					'problem' => 4.5454545454545,
-					'ok' => 95.454545454545
+					'problem' => 4.545454545454546,
+					'ok' => 95.45454545454545
 				]
 			],
 			[
@@ -108,8 +108,8 @@ class CServicesSlaCalculatorTest extends TestCase {
 					'problemTime' => 3600,
 					'okTime' => 2552400,
 					'downtimeTime' => 32400,
-					'problem' => 0.14084507042254,
-					'ok' => 99.859154929577
+					'problem' => 0.14084507042253522,
+					'ok' => 99.85915492957747
 				]
 			],
 			[

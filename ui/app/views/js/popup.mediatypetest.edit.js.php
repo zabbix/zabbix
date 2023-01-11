@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,13 +93,13 @@ function openLogPopup(opener) {
 	}
 
 	var debug = JSON.parse(sessionStorage.getItem('mediatypetest')||'null'),
-		$content = $('<div/>'),
-		$logitems = $('<div/>', {class: 'logitems'}),
-		$footer = $('<div/>', {class: 'logtotalms'});
+		$content = $('<div>'),
+		$logitems = $('<div>', {class: 'logitems'}),
+		$footer = $('<div>', {class: 'logtotalms'});
 
 	if (debug) {
 		debug.log.forEach(function (entry) {
-			$('<pre/>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
+			$('<pre>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
 		});
 		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
 		$content.append($logitems);

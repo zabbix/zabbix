@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-22T11:21:21Z</date>
+   <date>2022-03-03T14:56:42Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -18,7 +18,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -202,7 +202,7 @@ Template tooling version used: 0.38</description>
                      <expression>{last()} &gt; 0</expression>
                      <name>Kafka: There are offline log directories</name>
                      <priority>WARNING</priority>
-                     <description>The offline log directory count metric indicate the number of log directories which are offline (due to an hardware failure for example) so that the broker cannot store incoming messages anymore.</description>
+                     <description>The offline log directory count metric indicate the number of log directories which are offline (due to a hardware failure for example) so that the broker cannot store incoming messages anymore.</description>
                   </trigger>
                </triggers>
             </item>
@@ -683,16 +683,16 @@ Template tooling version used: 0.38</description>
                <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                <triggers>
                   <trigger>
-                     <expression>{max(15m)}&lt;{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}</expression>
-                     <name>Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)</name>
-                     <priority>AVERAGE</priority>
-                     <description>The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.</description>
-                  </trigger>
-                  <trigger>
                      <expression>{nodata(15m)}=1</expression>
                      <name>Kafka: Failed to fetch info data (or no data for 15m)</name>
                      <priority>WARNING</priority>
                      <description>Zabbix has not received data for items for the last 15 minutes</description>
+                  </trigger>
+                  <trigger>
+                     <expression>{max(15m)}&lt;{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}</expression>
+                     <name>Kafka: Network processor average idle percent is too low (under {$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN} for 15m)</name>
+                     <priority>AVERAGE</priority>
+                     <description>The network processor idle ratio metric indicates the percentage of time the network processor are not in use. The lower this number, the more loaded the broker is.</description>
                   </trigger>
                </triggers>
             </item>
@@ -736,7 +736,7 @@ Template tooling version used: 0.38</description>
                <value_type>CHAR</value_type>
                <username>{$KAFKA.USER}</username>
                <password>{$KAFKA.PASSWORD}</password>
-               <description>Current version of brocker.</description>
+               <description>Current version of broker.</description>
                <applications>
                   <application>
                      <name>Kafka</name>
@@ -1309,7 +1309,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Topic Metrics (errors)</name>
@@ -1359,7 +1358,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Topic Metrics (write)</name>
@@ -1432,7 +1430,6 @@ Template tooling version used: 0.38</description>
                      <jmx_endpoint>service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi</jmx_endpoint>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
          </discovery_rules>
          <macros>
@@ -1509,7 +1506,7 @@ Template tooling version used: 0.38</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Kafka: Leader electoin rate</name>
+         <name>Kafka: Leader election rate</name>
          <graph_items>
             <graph_item>
                <color>1A7C11</color>

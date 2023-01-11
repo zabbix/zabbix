@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class CZabbixServer {
 	const ZBX_TCP_EXPECT_DATA = 2;
 
 	/**
-	 * Max number of bytes to read from the response for each each iteration.
+	 * Max number of bytes to read from the response for each iteration.
 	 */
 	const READ_BYTES_LIMIT = 8192;
 

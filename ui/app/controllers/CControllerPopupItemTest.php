@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -886,13 +886,12 @@ abstract class CControllerPopupItemTest extends CController {
 	/**
 	 * Resolve macros used in the calculates item formula.
 	 *
-	 * @param string $formula  Calculated item formula.
+	 * @param string $formula        Calculated item formula.
+	 * @param array  $macros_posted  Macros.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	private function resolveCalcFormulaMacros(string $formula) {
-		$macros_posted = $this->getInput('macros', []);
-
+	private function resolveCalcFormulaMacros(string $formula, array $macros_posted): string {
 		if (!$macros_posted) {
 			return $formula;
 		}
@@ -908,20 +907,8 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		$expression = [];
-		$pos_left = 0;
 
 		foreach ($result->getTokens() as $token) {
-			switch ($token['type']) {
-				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
-				case CTriggerExprParserResult::TOKEN_TYPE_STRING:
-					if ($pos_left != $token['pos']) {
-						$expression[] = substr($formula, $pos_left, $token['pos'] - $pos_left);
-					}
-					$pos_left = $token['pos'] + $token['length'];
-					break;
-			}
-
 			switch ($token['type']) {
 				case CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO:
 				case CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO:
@@ -934,13 +921,25 @@ abstract class CControllerPopupItemTest extends CController {
 					$string = strtr($token['data']['string'], $macros_posted);
 					$expression[] = CTriggerExpression::quoteString($string, false, true);
 					break;
+
+				case CTriggerExprParserResult::TOKEN_TYPE_FUNCTION:
+					$expression[] = $token['data']['functionName'];
+					$expression[] = '(';
+					$expression[] = array_shift($token['data']['functionParams']);
+
+					foreach ($token['data']['functionParams'] as $param) {
+						$expression[] = ',';
+						$string = strtr($param, $macros_posted) ? : $param;
+						$expression[] = CTriggerExpression::quoteString(trim($string),false,true);
+					}
+
+					$expression[] = ')' ;
+					break;
+
+				default:
+					$expression[] = $token['value'];
 			}
 		}
-
-		if ($pos_left != strlen($formula)) {
-			$expression[] = substr($formula, $pos_left);
-		}
-
 		return implode('', $expression);
 	}
 
@@ -1008,14 +1007,30 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
+				if ($field === 'key') {
+					$inputs[$field] = CMacrosResolverGeneral::resolveItemKeyMacros($inputs[$field], $macros_posted, $types);
+				}
+				else {
+					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
 
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$macro_value = array_key_exists($macro, $macros_posted)
-						? $macros_posted[$macro]
-						: '';
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						$macro_value = array_key_exists($macro, $macros_posted)
+							? $macros_posted[$macro]
+							: '';
 
-					$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
+						if ($inputs['type'] == ITEM_TYPE_HTTPAGENT && $field === 'posts') {
+							if ($inputs['post_type'] == ZBX_POSTTYPE_JSON && !is_numeric($macro_value)) {
+								$macro_value = json_encode($macro_value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+								// Remove " wrapping.
+								$macro_value = substr($macro_value, 1, -1);
+							}
+							elseif ($inputs['post_type'] == ZBX_POSTTYPE_XML) {
+								$macro_value = htmlentities($macro_value);
+							}
+						}
+
+						$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
+					}
 				}
 			}
 		}

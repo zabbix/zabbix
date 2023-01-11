@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -284,22 +284,6 @@ func (c *Connection) Read() (data []byte, err error) {
 func (c *Connection) RemoteIP() string {
 	addr, _, _ := net.SplitHostPort(c.conn.RemoteAddr().String())
 	return addr
-}
-
-func Listen(address string, args ...interface{}) (c *Listener, err error) {
-	var tlsconfig *tls.Config
-	if len(args) > 0 {
-		var ok bool
-		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
-		}
-	}
-	l, tmperr := net.Listen("tcp", address)
-	if tmperr != nil {
-		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
-	}
-	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
-	return
 }
 
 func (l *Listener) Accept(timeout time.Duration, timeoutMode int) (c *Connection, err error) {

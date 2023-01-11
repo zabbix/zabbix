@@ -1,8 +1,9 @@
+//go:build windows
 // +build windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,13 +102,11 @@ func (p *Plugin) Collect() (err error) {
 		return
 	}
 
-	if p.collectError = win32.PdhCollectQueryData(p.query); p.collectError != nil {
-		return p.collectError
-	}
+	p.collectError = win32.PdhCollectQueryData(p.query)
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) {
+		if c.lastAccess.Before(expireTime) || nil != p.collectError {
 			if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
 				p.Debugf("error while removing counter '%s': %s", index.path, cerr)
 			}
@@ -119,7 +118,7 @@ func (p *Plugin) Collect() (err error) {
 			c.head = c.head.inc(c.interval)
 		}
 	}
-	return
+	return p.collectError
 }
 
 func (p *Plugin) Period() int {
@@ -226,7 +225,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if interval, err = strconv.ParseInt(params[1], 10, 32); err != nil {
 			return nil, errors.New("Invalid second parameter.")
 		}
-		if interval < 1 || interval >= maxInterval {
+		if interval < 1 || interval > maxInterval {
 			return nil, errors.New("Interval out of range.")
 		}
 	}
@@ -238,10 +237,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.mutex.Lock()
 		defer p.mutex.Unlock()
 
-		if p.collectError != nil {
-			return nil, p.collectError
-		}
-
 		if p.query == 0 {
 			if p.query, err = win32.PdhOpenQuery(nil, 0); err != nil {
 				return
@@ -250,9 +245,17 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		index := perfCounterIndex{path, lang}
 		if counter, ok := p.counters[index]; ok {
+			if p.collectError != nil {
+				return nil, p.collectError
+			}
+
 			return counter.getHistory(int(interval))
 		} else {
-			return nil, p.addCounter(index, interval)
+			if err = p.addCounter(index, interval); err != nil {
+				return nil, err
+			}
+
+			return nil, p.collectError
 		}
 	}
 }
@@ -261,8 +264,6 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
-	_ = win32.PdhCloseQuery(p.query)
-	p.query = 0
 }
 
 func init() {

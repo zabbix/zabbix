@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,14 @@
 #ifndef ZABBIX_DBUPGRADE_MACROS_H
 #define ZABBIX_DBUPGRADE_MACROS_H
 
-int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, const char **fields, int fields_num,
+typedef struct
+{
+	const char	*field_name;
+	size_t		max_len;
+}
+zbx_field_len_t;
+
+int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_field_len_t *fields, int fields_num,
 		const char *oldmacro, const char *newmacro);
 
 #endif

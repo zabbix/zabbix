@@ -1,5 +1,5 @@
 
-# DELL PowerEdge R840 SNMP
+# Template Server DELL PowerEdge R840 SNMP
 
 ## Overview
 

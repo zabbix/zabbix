@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -358,19 +358,26 @@ var hintBox = {
 		}
 	},
 
+	getHintboxAction: function(hint_type) {
+		switch (hint_type) {
+			case 'eventlist':
+				return 'hintbox.eventlist';
+
+			case 'eventactions':
+				return 'hintbox.actionlist';
+		}
+	},
+
 	preloadHint: function(e, $target) {
 		var url = new Curl('zabbix.php'),
 			data = $target.data('hintbox-preload');
 
-		url.setArgument('action', 'hint.box');
-		url.setArgument('type', data.type);
+		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
 		var xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: {
-				data: data.data
-			},
+			data: data.data,
 			dataType: 'json'
 		});
 
@@ -428,7 +435,7 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
 			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
@@ -450,7 +457,7 @@ var hintBox = {
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<div></div>').addClass(className).html(hintText));
+			box.append(jQuery('<div>').addClass(className).html(hintText));
 		}
 		else {
 			box.html(hintText);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-20T07:21:03Z</date>
+   <date>2021-11-29T13:04:57Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -26,7 +26,7 @@ Known Issues:&#13;
   Version: RouterOS 6.38.5&#13;
   Device: Mikrotik 941-2nD, Mikrotik 951G-2HnD&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <templates>
             <template>
                <name>Template Module Generic SNMP</name>
@@ -291,7 +291,6 @@ The average, over the last minute, of the percentage of time that this processor
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>#{#SNMPINDEX}: CPU utilization</name>
@@ -343,6 +342,15 @@ Might be missing in entry models (RB750, RB450G..).</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
+                           <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"CPU"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
@@ -359,15 +367,6 @@ Might be missing in entry models (RB750, RB450G..).</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"CPU"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
-                           <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"CPU"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
@@ -378,7 +377,6 @@ Might be missing in entry models (RB750, RB450G..).</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Temperature sensor discovery</name>
@@ -416,6 +414,15 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      </preprocessing>
                      <trigger_prototypes>
                         <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
+                           <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
                            <expression>{avg(5m)}&gt;{$TEMP_WARN:"Device"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
@@ -432,15 +439,6 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                            </dependencies>
                         </trigger_prototype>
                         <trigger_prototype>
-                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:"Device"}</expression>
-                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
-                           <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
-                           <priority>HIGH</priority>
-                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                        </trigger_prototype>
-                        <trigger_prototype>
                            <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:"Device"}</expression>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
@@ -451,7 +449,6 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>LTE modem discovery</name>
@@ -569,7 +566,6 @@ mtxrLTEModemSignalSINR Signal to Interference &amp; Noise Ratio.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Modem Signal. {#SNMPINDEX}</name>
@@ -718,7 +714,7 @@ mtxrWlApNoiseFloor</description>
                      <key>ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrWlApClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
+mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -726,7 +722,6 @@ mtxrWlApClientCount Client established connection to AP, but didn't finish all a
                      </application_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>CAPsMAN AP channel discovery</name>
@@ -794,7 +789,7 @@ mtxrWlCMChannel</description>
                      <key>ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]</key>
                      <history>7d</history>
                      <description>MIB: MIKROTIK-MIB&#13;
-mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authetncation procedures for full connection.</description>
+mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</description>
                      <application_prototypes>
                         <application_prototype>
                            <name>Interface {#IFNAME}({#IFALIAS})</name>
@@ -832,7 +827,6 @@ mtxrWlCMState Wireless interface state.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
             </discovery_rule>
             <discovery_rule>
                <name>Storage discovery</name>
@@ -923,7 +917,6 @@ The amount of the storage represented by this entry that is allocated, in units 
                      </preprocessing>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <trigger_prototypes>
                   <trigger_prototype>
                      <expression>{Template Net Mikrotik SNMP:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;

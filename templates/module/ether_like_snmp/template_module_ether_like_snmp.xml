@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2020-10-22T12:32:21Z</date>
+   <date>2021-12-24T09:16:28Z</date>
    <groups>
       <group>
          <name>Templates/Modules</name>
@@ -16,7 +16,7 @@
 MIBs used:&#13;
 EtherLike-MIB&#13;
 &#13;
-Template tooling version used: 0.38</description>
+Template tooling version used: 0.39</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -101,7 +101,6 @@ Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.</description>
                      </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <host_prototypes/>
                <preprocessing>
                   <step>
                      <type>JAVASCRIPT</type>

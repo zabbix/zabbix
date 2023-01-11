@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
-require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
-require_once dirname(__FILE__).'/testPageProblems.php';
+require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
+require_once dirname(__FILE__).'/problems/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
@@ -35,7 +35,7 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php';
-require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
@@ -89,9 +89,9 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.p
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTriggerSeverities.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
-require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
+require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
@@ -104,30 +104,32 @@ require_once dirname(__FILE__).'/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemHttpAgent.php';
-require_once dirname(__FILE__).'/testFormItemPreprocessing.php';
-require_once dirname(__FILE__).'/testFormItemPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
-require_once dirname(__FILE__).'/testFormItemPrototypePreprocessing.php';
 require_once dirname(__FILE__).'/testFormTestItem.php';
 require_once dirname(__FILE__).'/testFormTestItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testFormLowLevelDiscoveryOverrides.php';
-require_once dirname(__FILE__).'/testFormLowLevelDiscoveryPreprocessing.php';
 require_once dirname(__FILE__).'/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
-require_once dirname(__FILE__).'/testFormTagsHost.php';
-require_once dirname(__FILE__).'/testFormTagsTemplate.php';
-require_once dirname(__FILE__).'/testFormTagsTrigger.php';
-require_once dirname(__FILE__).'/testFormTagsTriggerPrototype.php';
+require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
@@ -163,14 +165,21 @@ require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
+
+use PHPUnit\Framework\TestSuite;
 
 class SeleniumTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('selenium');
+		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testGraphAxis');
@@ -185,10 +194,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageAvailabilityReport');
-		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
+		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
@@ -258,23 +267,25 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
-		$suite->addTestSuite('testFormItemPreprocessing');
-		$suite->addTestSuite('testFormItemPreprocessingTest');
 		$suite->addTestSuite('testFormItemPrototype');
-		$suite->addTestSuite('testFormItemPrototypePreprocessing');
 		$suite->addTestSuite('testFormTestItem');
 		$suite->addTestSuite('testFormTestItemPrototype');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
-		$suite->addTestSuite('testFormLowLevelDiscoveryPreprocessing');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testFormPreprocessingCloneHost');
+		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
+		$suite->addTestSuite('testFormPreprocessingItem');
+		$suite->addTestSuite('testFormPreprocessingItemPrototype');
+		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
+		$suite->addTestSuite('testFormPreprocessingTest');
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
@@ -317,9 +328,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
+		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
+		$suite->addTestSuite('testDashboardForm');
+		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testSID');
 
 		return $suite;

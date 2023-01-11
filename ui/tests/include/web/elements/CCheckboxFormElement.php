@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CCheckboxFormElement extends CFormElement {
 	 *
 	 * @return
 	 */
-	private function setFieldValue($field, $values) {
+	protected function setFieldValue($field, $values) {
 		if ($values === null) {
 			try {
 				$this->getLabelCheckbox($this->getLabel($field))->uncheck();
@@ -89,7 +89,7 @@ class CCheckboxFormElement extends CFormElement {
 	 *
 	 * @throws Exception
 	 */
-	private function checkFieldValue($field, $values, $raise_exception = true) {
+	protected function checkFieldValue($field, $values, $raise_exception = true) {
 		if ($values === null) {
 			try {
 				return $this->getLabelCheckbox($this->getLabel($field))->checkValue(false, $raise_exception);

@@ -1,5 +1,5 @@
 
-# Memcached
+# Template App Memcached
 
 ## Overview
 
@@ -7,7 +7,7 @@ For Zabbix version: 5.0 and higher
 The template to monitor Memcached server by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Memcached` — collects metrics by polling zabbix-agent2.
+Template `Memcached` — collects metrics by polling zabbix-agent2.
 
 
 
@@ -59,7 +59,7 @@ There are no template links in this template.
 |Memcached |Memcached: Throttled connections |<p>Number of times a client connection was throttled. When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |DEPENDENT |memcached.connections.throttled.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conn_yields`</p><p>- CHANGE_PER_SECOND |
 |Memcached |Memcached: Connection structures |<p>Number of  connection structures allocated by the server</p> |DEPENDENT |memcached.connections.structures<p>**Preprocessing**:</p><p>- JSONPATH: `$.connection_structures`</p> |
 |Memcached |Memcached: Open connections |<p>The number of clients presently connected</p> |DEPENDENT |memcached.connections.current<p>**Preprocessing**:</p><p>- JSONPATH: `$.curr_connections`</p> |
-|Memcached |Memcached: Commands: FLUSH per second |<p>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn’t take place in production, so check your debug scripts.</p> |DEPENDENT |memcached.commands.flush.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_flush`</p><p>- CHANGE_PER_SECOND |
+|Memcached |Memcached: Commands: FLUSH per second |<p>The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn't take place in production, so check your debug scripts.</p> |DEPENDENT |memcached.commands.flush.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_flush`</p><p>- CHANGE_PER_SECOND |
 |Memcached |Memcached: Commands: GET per second |<p>Number of GET requests received by server per second.</p> |DEPENDENT |memcached.commands.get.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_get`</p><p>- CHANGE_PER_SECOND |
 |Memcached |Memcached: Commands: SET per second |<p>Number of SET requests received by server per second.</p> |DEPENDENT |memcached.commands.set.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.cmd_set`</p><p>- CHANGE_PER_SECOND |
 |Memcached |Memcached: Process id |<p>PID of the server process</p> |DEPENDENT |memcached.process_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.pid`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -82,12 +82,12 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Memcached: Service is down |<p>-</p> |`{TEMPLATE_NAME:memcached.ping["{$MEMCACHED.CONN.URI}"].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
 |Memcached: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`{TEMPLATE_NAME:memcached.cpu.sys.nodata(30m)}=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Memcached: Service is down</p> |
-|Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m) |<p>The max number of connections is reachedand and a new connection had to wait in the queue as a result.</p> |`{TEMPLATE_NAME:memcached.connections.queued.rate.min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}` |WARNING | |
+|Memcached: Too many queued connections (over {$MEMCACHED.CONN.QUEUED.MAX.WARN} in 5m) |<p>The max number of connections is reached and a new connection had to wait in the queue as a result.</p> |`{TEMPLATE_NAME:memcached.connections.queued.rate.min(5m)}>{$MEMCACHED.CONN.QUEUED.MAX.WARN}` |WARNING | |
 |Memcached: Too many throttled connections (over {$MEMCACHED.CONN.THROTTLED.MAX.WARN} in 5m) |<p>Number of times a client connection was throttled is too high.</p><p>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p> |`{TEMPLATE_NAME:memcached.connections.throttled.rate.min(5m)}>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}` |WARNING | |
-|Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m) |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`{TEMPLATE_NAME:memcached.connections.current.min(5m)}/{Memcached:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
+|Memcached: Total number of connected clients is too high (over {$MEMCACHED.CONN.PRC.MAX.WARN}% in 5m) |<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p> |`{TEMPLATE_NAME:memcached.connections.current.min(5m)}/{TEMPLATE_NAME:memcached.connections.max.last()}*100>{$MEMCACHED.CONN.PRC.MAX.WARN}` |WARNING | |
 |Memcached: Version has changed (new version: {ITEM.VALUE}) |<p>Memcached version has changed. Ack to close.</p> |`{TEMPLATE_NAME:memcached.version.diff()}=1 and {TEMPLATE_NAME:memcached.version.strlen()}>0` |INFO |<p>Manual close: YES</p> |
-|Memcached: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:memcached.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
-|Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:memcached.stats.bytes.min(5m)}/{Memcached:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}` |WARNING | |
+|Memcached: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:memcached.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|Memcached: Memory usage is too high (over {$MEMCACHED.MEM.PUSED.MAX.WARN} in 5m) |<p>-</p> |`{TEMPLATE_NAME:memcached.stats.bytes.min(5m)}/{TEMPLATE_NAME:memcached.config.limit_maxbytes.last()}*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

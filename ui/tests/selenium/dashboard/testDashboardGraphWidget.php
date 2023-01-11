@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,10 +100,8 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
-		$this->page->removeFocus();
 		$element = $overlay->query('id:svg-graph-preview')->one();
 
-		$errors = [];
 		$tabs = ['Data set', 'Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
 		foreach ($tabs as $tab) {
 			$form->selectTab($tab);
@@ -115,16 +113,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 			$this->page->removeFocus();
 			sleep(1);
-			// Collect all screenshot errors.
-			try {
-				$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
-			} catch (Exception $ex) {
-				$errors[] = $ex->getMessage();
-			}
-		}
-
-		if ($errors) {
-			$this->fail(implode("\n", $errors));
+			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
 		}
 	}
 
@@ -524,7 +513,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-31 15:53:07',
+						'From' => '2021-07-04 15:53:07',
 						'To' => ''
 					],
 					'error' => 'Invalid parameter "To": cannot be empty.'
@@ -535,7 +524,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Time period' => [
 						'Set custom time period' => true,
 						'From' => '',
-						'To' => '2019-07-31 15:53:07'
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": cannot be empty.',
@@ -549,7 +538,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Time period' => [
 						'Set custom time period' => true,
 						'From' => '1',
-						'To' => '2019-07-31 15:53:07'
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -561,7 +550,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-31 15:53:07',
+						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
@@ -571,8 +560,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '5:53:06 2019-07-31',
-						'To' => '2019-07-31 15:53:07'
+						'From' => '5:53:06 2021-07-31',
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -584,8 +573,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-02-30 00:00:00',
-						'To' => '2019-07-31 15:53:07'
+						'From' => '2021-02-30 00:00:00',
+						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
 						'Invalid parameter "From": a time range is expected.',
@@ -617,7 +606,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
+						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
@@ -628,8 +617,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
-						'To' => '2019-07-04 12:52:59'
+						'From' => '2021-07-04 12:53:00',
+						'To' => '2021-07-04 12:52:59'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
@@ -638,17 +627,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2019-07-04 12:53:00',
-						'To' => '2019-07-04 12:52:59'
-					],
-					'error' => 'Minimum time period to display is 1 minute.'
-				]
-			],
-			[
-				[
-					'Time period' => [
-						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
 					'error' => 'Minimum time period to display is 1 minute.'

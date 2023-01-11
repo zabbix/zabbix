@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,10 +36,10 @@
 		 */
 		var data = JSON.parse('<?= json_encode($data) ?>'),
 			$table = $('#charts'),
-			$tmpl_row = $('<tr />').append(
-				$('<div />', {class: 'flickerfreescreen'}).append(
-					$('<div />', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 100px;'}).append(
-						$('<img />')
+			$tmpl_row = $('<tr>').append(
+				$('<div>', {class: 'flickerfreescreen'}).append(
+					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 100px;'}).append(
+						$('<img>')
 					)
 				)
 			);

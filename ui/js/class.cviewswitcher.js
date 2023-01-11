@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ CViewSwitcher.prototype = {
 			}
 		}
 
-		if (isset(myValue, this.depObjects)) {
+		if (isset(myValue, this.depObjects) && !this.mainObj.disabled) {
 			for (var key in this.depObjects[myValue]) {
 				if (empty(this.depObjects[myValue][key])) {
 					continue;

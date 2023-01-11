@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,13 +55,8 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			continue
 		}
 
-		if bytes.Total > 0 && inodes.Total > 0 {
-			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
-		}
+		fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
 	}
-
-	fsStatCaller.close()
-	fsInodeCaller.close()
 
 	allData, err = p.getFsInfo()
 	if err != nil {
@@ -111,6 +107,8 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 }
 
 func getFsStats(path string) (stats *FsStats, err error) {
+	var pused float64
+
 	fs := unix.Statfs_t{}
 	err = unix.Statfs(path, &fs)
 	if err != nil {
@@ -125,19 +123,30 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	total := fs.Blocks * uint64(fs.Bsize)
 	free := available * uint64(fs.Bsize)
 	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
-	pfree := 100.00 * float64(available) / float64(fs.Blocks-fs.Bfree+fs.Bavail)
+	pfree := float64(fs.Blocks-fs.Bfree+fs.Bavail)
+
+	if pfree > 0 {
+		pfree = 100.00 * float64(available) / pfree
+		pused = 100 - pfree
+	} else {
+		pfree = 0
+		pused = 0
+	}
+
 	stats = &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
 		PFree: pfree,
-		PUsed: 100 - pfree,
+		PUsed: pused,
 	}
 
 	return
 }
 
 func getFsInode(path string) (stats *FsStats, err error) {
+	var pfree, pused float64
+
 	fs := unix.Statfs_t{}
 	err = unix.Statfs(path, &fs)
 	if err != nil {
@@ -147,12 +156,21 @@ func getFsInode(path string) (stats *FsStats, err error) {
 	total := fs.Files
 	free := fs.Ffree
 	used := fs.Files - fs.Ffree
+
+	if 0 < total {
+		pfree = 100 * float64(free) / float64(total)
+		pused = 100 * float64(total-free) / float64(total)
+	} else {
+		pfree = 100.0
+		pused = 0.0
+	}
+
 	stats = &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
-		PFree: 100 * float64(free) / float64(total),
-		PUsed: 100 * float64(total-free) / float64(total),
+		PFree: pfree,
+		PUsed: pused,
 	}
 
 	return

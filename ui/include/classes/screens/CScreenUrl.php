@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class CScreenUrl extends CScreenBase {
 			return $item;
 		}
 
-		return makeMessageBox(false, [[
+		return makeMessageBox(ZBX_STYLE_MSG_BAD, [[
 			'type' => 'error',
 			'message' => _s('Provided URL "%1$s" is invalid.', $this->screenitem['url'])
 		]]);

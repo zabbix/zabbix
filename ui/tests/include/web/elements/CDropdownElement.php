@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Dropdown (select) element.
+ * Custom dropdown element.
  */
 class CDropdownElement extends CElement {
 
@@ -33,22 +33,16 @@ class CDropdownElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getOptions() {
-		return $this->query('tag:option')->all();
+		return $this->query('xpath:.//li[not(@optgroup)]')->all();
 	}
 
 	/**
-	 * Get text of selected option.
+	 * Get text of selected element.
 	 *
 	 * @return string
 	 */
 	public function getText() {
-		foreach ($this->getOptions() as $option) {
-			if ($option->isSelected()) {
-				return $option->getText();
-			}
-		}
-
-		return null;
+		return $this->query('xpath:./button')->one()->getText();
 	}
 
 	/**
@@ -59,17 +53,25 @@ class CDropdownElement extends CElement {
 	 * @return $this
 	 */
 	public function select($text) {
-		$option = $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($text).']')->one();
-		if (!$option->isSelected()) {
-			if ($option->isClickable()) {
-				$option->click();
+		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
+
+		if ($text === $this->getText()) {
+			return $this;
+		}
+
+		for ($i = 0; $i < 5; $i++) {
+			try {
+				$this->waitUntilClickable()->click();
+				$this->query($xpath)->one()->click();
+
+				return $this;
 			}
-			else {
-				throw new Exception('Cannot select disabled dropdown element.');
+			catch (Exception $exception) {
+				// Code is not missing here.
 			}
 		}
 
-		return $this;
+		throw new Exception('Failed to select dropdown option "'.$text.'".');
 	}
 
 	/**
