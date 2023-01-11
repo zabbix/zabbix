@@ -28,6 +28,7 @@ $widget = (new CWidget())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $token_form = (new CForm())
+	->cleanItems()
 	->setId('token_form')
 	->setName('token')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);

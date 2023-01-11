@@ -4028,6 +4028,10 @@ msgstr "Configuração actualizada"
 msgid "Configure DB connection"
 msgstr "Configura a ligação com o DB"
 
+#: app/views/js/administration.authentication.edit.js.php:56
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:254
 msgid "Confirmation text"
 msgstr "Texto de confirmação"
@@ -6258,6 +6262,10 @@ msgstr "Activar"
 msgid "Enable HTTP authentication"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:59
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
 msgstr ""
@@ -6970,6 +6978,11 @@ msgstr "No mapa \"%2$s\" o campo \"%1$s\" está com valor ausente."
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "O campo \"%1$s\" não está correcto: %2$s"
+
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
 
 #: include/validate.inc.php:167
 #, c-format
@@ -8474,6 +8487,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1121
 msgid "Identification of the system. Returns string"
 msgstr "Identificação do sistema. Retorna texto"
+
+#: app/views/administration.authentication.edit.php:113
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
 
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
@@ -21380,6 +21397,10 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
 msgstr "sequência de bytes inválida no UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2067
 msgid "invalid delay"
