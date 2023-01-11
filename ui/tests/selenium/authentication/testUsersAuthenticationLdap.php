@@ -868,7 +868,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		else {
 			foreach ($data['db_check'] as $table => $rows) {
 				foreach ($rows as $i => $row) {
-					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT '.$i.',1';
+					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
 					$this->assertEquals([$row], CDBHelper::getAll($sql));
 				}
 			}
