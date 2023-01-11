@@ -680,34 +680,6 @@ function ApiCall(method, params, id = 1) {
 }
 
 /**
- * Add object to the list of favorites.
- */
-function add2favorites(object, objectid, csrf_token) {
-	sendAjaxData('zabbix.php', {
-		data: {
-			object: object,
-			objectid: objectid,
-			action: 'favorite.create',
-			csrf_token: csrf_token
-		}
-	});
-}
-
-/**
- * Remove object from the list of favorites. Remove all favorites if objectid==0.
- */
-function rm4favorites(object, objectid, csrf_token) {
-	sendAjaxData('zabbix.php', {
-		data: {
-			object: object,
-			objectid: objectid,
-			action: 'favorite.delete',
-			csrf_token: csrf_token,
-		}
-	});
-}
-
-/**
  * Section collapse toggle.
  *
  * @param {string}      id
