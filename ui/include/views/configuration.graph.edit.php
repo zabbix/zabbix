@@ -497,10 +497,6 @@ $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CSubmit('delete', _('Delete'));
-//	$deleteButton = new CButtonDelete(
-//		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-//		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
-//	);
 
 	if ($readonly) {
 		$updateButton->setEnabled(false);

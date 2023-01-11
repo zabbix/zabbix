@@ -491,10 +491,19 @@
 					csrf_token.value = this.csrf_tokens['graphs.php clone'];
 				}
 				else if (e.target.id === 'delete') {
-					if (!window.confirm('<?= _('Delete graph?') ?>')) {
-						e.preventDefault();
-						return;
+					if (this.graphs.parent_discoveryid === null) {
+						if (!window.confirm('<?= _('Delete graph?') ?>')) {
+							e.preventDefault();
+							return;
+						}
 					}
+					else {
+						if (!window.confirm('<?= _('Delete graph prototype?') ?>')) {
+							e.preventDefault();
+							return;
+						}
+					}
+
 					csrf_token.value = this.csrf_tokens['graphs.php delete'];
 				}
 			})

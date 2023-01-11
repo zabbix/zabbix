@@ -201,14 +201,14 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_itemid',
 		[
 			'itemprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Enable'), 'action', 'itemprototype.massenable'))
+				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'itemprototype.massenable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-itemprototype')
 					->addClass('no-chkbxrange')
 					->removeid()
 			],
 			'itemprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Disable'), 'action', 'itemprototype.massdisable'))
+				'content' => (new CSubmitButton(_('Create disabled'), 'action', 'itemprototype.massdisable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-itemprototype')
 					->addClass('no-chkbxrange')
