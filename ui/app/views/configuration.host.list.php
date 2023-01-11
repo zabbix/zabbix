@@ -129,7 +129,7 @@ $filter = (new CFilter())
 				new CLabel(_('Status'), 'filter_status'),
 				new CFormField(
 					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-						->addValue(_('Any'), HOST_STATUS_ANY)
+						->addValue(_('Any'), -1)
 						->addValue(_('Enabled'), HOST_STATUS_MONITORED)
 						->addValue(_('Disabled'), HOST_STATUS_NOT_MONITORED)
 						->setModern(true)
