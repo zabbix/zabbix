@@ -561,6 +561,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 	public function getUpdateData() {
 		return [
+			// 0.
 			[
 				[
 					'servers_settings' => [
@@ -583,6 +584,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+			// 1.
 			[
 				[
 					'servers_settings' => [
@@ -603,6 +605,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+			// 2.
 			[
 				[
 					'servers_settings' => [
@@ -622,6 +625,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+			// 3.
 			[
 				[
 					'servers_settings' => [
@@ -640,6 +644,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+			// 4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -656,16 +661,21 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Advanced configuration' => true,
 								'StartTLS' => true,
 								'Search filter' => 'search_filter'
-							]
+							],
+							'Bind password' => 'test_password'
 						]
 					],
 					'db_check' => [
-						'userdirectory' => [['name' => 'updated_name', 'description' => 'updated_description']],
+						'userdirectory' => [
+							['name' => '', 'description' => ''],
+							['name' => 'updated_name', 'description' => 'updated_description']
+						],
 						'userdirectory_ldap' => [
 							[
 								'host' => 'updated_host',
 								'port' => '777',
 								'base_dn' => 'updated_dn',
+								'bind_password' => 'test_password',
 								'search_attribute' => 'updated_search',
 								'bind_dn' => 'updated_bin_dn',
 								'start_tls' => '1',
@@ -675,6 +685,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+			// 5.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -687,7 +698,6 @@ class testUsersAuthenticationLdap extends CWebTest {
 								'Base DN' => 'base dn',
 								'Search attribute' => 'search attribute',
 								'Bind DN' => 'bin dn test',
-	//							'Bind password' => 'password',
 								'Description' => 'test description with jit',
 								'Configure JIT provisioning' => true,
 								'Group configuration' => 'groupOfNames',
@@ -722,11 +732,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 					],
 					'db_check' => [
 						'userdirectory' => [
-							[
-								'name' => 'ldap_with_jit',
-								'description' => 'test description with jit',
-								'provision_status' => 1
-							]
+							['name' => '', 'description' => '', 'provision_status' => 0],
+							['name' => 'ldap_with_jit', 'description' => 'test description with jit', 'provision_status' => 1]
 						],
 						'userdirectory_ldap' => [
 							[
@@ -769,6 +776,63 @@ class testUsersAuthenticationLdap extends CWebTest {
 						]
 					]
 				]
+			],
+			// 6 Two LDAP servers.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						[
+							'fields' =>  [
+								'Name' => 'ldap1',
+								'Host' => '111.222.444',
+								'Port' => '123',
+								'Base DN' => 'base dn 1',
+								'Search attribute' => 'search attribute 1',
+								'Bind DN' => 'bin dn test 1'
+							]
+						],
+						[
+							'fields' =>  [
+								'Name' => 'ldap2',
+								'Host' => '111.222.555',
+								'Port' => '999',
+								'Base DN' => 'base dn 2',
+								'Search attribute' => 'search attribute 2',
+								'Bind DN' => 'bin dn test 2'
+							]
+						]
+					],
+					'db_check' => [
+						'userdirectory' => [
+							[
+								'name' => ''
+							],
+							[
+								'name' => 'ldap1'
+							],
+							[
+								'name' => 'ldap2'
+							]
+						],
+						'userdirectory_ldap' => [
+							[
+								'host' => '111.222.444',
+								'port' => '123',
+								'base_dn' => 'base dn 1',
+								'search_attribute' => 'search attribute 1',
+								'bind_dn' => 'bin dn test 1'
+							],
+							[
+								'host' => '111.222.555',
+								'port' => '999',
+								'base_dn' => 'base dn 2',
+								'search_attribute' => 'search attribute 2',
+								'bind_dn' => 'bin dn test 2'
+							]
+						]
+					]
+				]
 			]
 		];
 	}
@@ -803,12 +867,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 		}
 		else {
 			foreach ($data['db_check'] as $table => $rows) {
-				foreach ($rows as $row) {
-					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table;
-					$condition = (array_key_exists('name', $row))
-						? ' WHERE name = '.zbx_dbstr($row['name'])
-						: null;
-					$this->assertEquals($row, CDBHelper::getRow($sql.$condition));
+				foreach ($rows as $i => $row) {
+					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT '.$i.',1';
+					$this->assertEquals([$row], CDBHelper::getAll($sql));
 				}
 			}
 
@@ -1172,16 +1233,28 @@ class testUsersAuthenticationLdap extends CWebTest {
 		}
 
 		// Fill LDAP server form.
-		foreach ($data['servers_settings'] as $ldap) {
+		foreach ($data['servers_settings'] as $i => $ldap) {
+			if ($i > 0) {
+				$query = 'button:Add';
+			}
+
 			$form->query($query)->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$ldap_form = $dialog->asForm();
 			$ldap_form->fill($ldap['fields']);
 
+			if (array_key_exists('Bind password', $ldap)) {
+				$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
+								->one()->click();
+				$ldap_form->query('id:bind_password')->one()->waitUntilVisible();
+				$ldap_form->fill(['Bind password' => $ldap['Bind password']]);
+			}
+
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
 				if (array_key_exists('User group mapping', $ldap)) {
 					foreach ($ldap['User group mapping'] as $user_group_mapping) {
-						$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+						$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()
+								->one()->click();
 						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 						$usergroup_mapping_form = $dialog->asForm();
 						$usergroup_mapping_form->fill($user_group_mapping);
@@ -1192,7 +1265,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 				if (array_key_exists('Media type mapping', $ldap)) {
 					foreach ($ldap['Media type mapping'] as $media_mapping) {
-						$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+						$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()
+								->one()->click();
 						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 						$usergroup_mapping_form = $dialog->asForm();
 						$usergroup_mapping_form->fill($media_mapping);
