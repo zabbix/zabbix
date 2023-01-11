@@ -22,7 +22,7 @@
 class CControllerCorrelationEdit extends CController {
 
 	private $correlation = [];
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput() {
 		$fields = [

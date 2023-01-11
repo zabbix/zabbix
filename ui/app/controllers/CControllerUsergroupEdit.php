@@ -26,7 +26,7 @@ class CControllerUsergroupEdit extends CController {
 	 */
 	private $user_group = [];
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput() {
 		$fields = [

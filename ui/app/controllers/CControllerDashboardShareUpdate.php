@@ -27,7 +27,7 @@ class CControllerDashboardShareUpdate extends CController {
 	public const EMPTY_USER = 'empty_user';
 	public const EMPTY_GROUP = 'empty_group';
 
-	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
+	protected int $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	protected function checkInput() {
 		$fields = [

@@ -25,7 +25,7 @@
 class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 	private $role;
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput(): bool {
 		$fields = [

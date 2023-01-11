@@ -24,8 +24,6 @@
  */
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
-	protected $validate_csrf_token = false;
-
 	protected function checkInput(): bool {
 		$fields = [
 			'action' =>				'string',

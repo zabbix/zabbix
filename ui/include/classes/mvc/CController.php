@@ -35,7 +35,7 @@ abstract class CController {
 	 *
 	 * @var int
 	 */
-	protected $post_content_type = self::POST_CONTENT_TYPE_FORM;
+	protected int $post_content_type = self::POST_CONTENT_TYPE_FORM;
 
 	/**
 	 * Action name, so that controller knows what action he is executing.
@@ -77,7 +77,7 @@ abstract class CController {
 	 *
 	 * @var bool
 	 */
-	protected $validate_csrf_token = true;
+	protected bool $validate_csrf_token = true;
 
 	public function __construct() {
 		$this->init();

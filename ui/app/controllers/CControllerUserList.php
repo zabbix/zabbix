@@ -26,7 +26,7 @@ class CControllerUserList extends CController {
 	public const FILTERS_SOURCE_LDAP= 2;
 	public const FILTERS_SOURCE_SAML = 3;
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput() {
 		$fields = [

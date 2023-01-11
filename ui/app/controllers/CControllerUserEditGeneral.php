@@ -36,7 +36,7 @@ abstract class CControllerUserEditGeneral extends CController {
 	 */
 	protected $timezones = [];
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function init(): void {
 		$timezone = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);

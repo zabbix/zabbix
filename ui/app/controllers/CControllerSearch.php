@@ -42,7 +42,7 @@ class CControllerSearch extends CController {
 	 */
 	private $limit;
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function init() {
 		$this->admin = in_array($this->getUserType(), [

@@ -21,7 +21,7 @@
 
 class CControllerPopupLdapTestSend extends CController {
 
-	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
+	protected int $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	protected function checkInput(): bool {
 		$fields = [

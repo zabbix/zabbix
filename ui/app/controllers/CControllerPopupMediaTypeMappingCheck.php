@@ -21,8 +21,8 @@
 
 class CControllerPopupMediaTypeMappingCheck extends CController {
 
-	protected $validate_csrf_token = false;
-	protected $post_content_type = self::POST_CONTENT_TYPE_JSON;
+	protected bool $validate_csrf_token = false;
+	protected int $post_content_type = self::POST_CONTENT_TYPE_JSON;
 
 	protected function checkInput(): bool {
 		$fields = [

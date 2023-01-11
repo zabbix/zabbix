@@ -38,7 +38,7 @@ class CControllerPopup extends CController {
 	 */
 	protected $popup_controller;
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function init() {
 		$this->supported_popups = [

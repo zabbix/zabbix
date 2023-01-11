@@ -24,7 +24,7 @@ class CControllerPopupLdapEdit extends CController {
 	const LDAP_MEMBER_OF = 0;
 	const LDAP_GROUP_OF_NAMES = 1;
 
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput(): bool {
 		$fields = [

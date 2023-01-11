@@ -25,7 +25,7 @@ class CControllerHintboxEventlist extends CController {
 	 * @var array
 	 */
 	protected $trigger;
-	protected $validate_csrf_token = false;
+	protected bool $validate_csrf_token = false;
 
 	protected function checkInput(): bool {
 		$fields = [

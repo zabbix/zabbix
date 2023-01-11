@@ -41,6 +41,7 @@ class CSectionCollapsible extends CSection {
 
 	public function toString($destroy = true): string {
 		$this->addClass($this->is_expanded ? null : self::ZBX_STYLE_COLLAPSED);
+
 		$toggle = (new CSimpleButton())
 			->addClass(self::ZBX_STYLE_TOGGLE)
 			->setTitle($this->is_expanded ? _('Collapse') : _('Expand'))
