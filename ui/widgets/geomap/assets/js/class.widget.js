@@ -61,8 +61,6 @@ class CWidgetGeoMap extends CWidget {
 			}
 		}
 
-		this.csrf_tokens = response.csrf_tokens;
-
 		if (response.geomap !== undefined) {
 			if (response.geomap.config !== undefined) {
 				this._initMap(response.geomap.config);
