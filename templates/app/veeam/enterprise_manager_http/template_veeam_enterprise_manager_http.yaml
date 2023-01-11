@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-04T07:25:42Z'
+  date: '2023-01-11T09:15:23Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -41,7 +41,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.FailedJobRuns
+                - $.JobStatistics.FailedJobRuns
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -63,7 +63,8 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.errors
+                - $.error
+              error_handler: CUSTOM_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -96,65 +97,65 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Veeam = {
-               params: {},
+                params: {},
             
-               setParams: function (params) {
-                   ['api_endpoint', 'user', 'password'].forEach(function (field) {
-                       if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                           throw 'Required param is not set: ' + field + '.';
-                       }
-                   });
+                setParams: function (params) {
+                    ['api_endpoint', 'user', 'password'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
             
-                   Veeam.params = params;
-                   if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
-                       Veeam.params.api_endpoint += '/';
-                   }
-               },
+                    Veeam.params = params;
+                    if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
+                        Veeam.params.api_endpoint += '/';
+                    }
+                },
             
-               request: function (url) {
-                   var response, 
-                       request = new HttpRequest();
-                       request.addHeader('Accept: application/json');
-                       request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
-                       request.post(Veeam.params.api_endpoint + '/sessionMngr');
-                       response = request.get(url);
-                   if (request.getStatus() !== 200 || response === null) {
-                       throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                   }
-                   try {
-                       return JSON.parse(response);
-                   }
-                   catch (error) {
-                       throw 'Failed to parse response received from API.';
-                   }
-               }
-             };  
-             var 
-                 data = {};
-                 data['errors'] = {};
-             try {
-                 Veeam.setParams(JSON.parse(value));
-                 try {
-                     data.reports_summary = Veeam.request(Veeam.params.api_endpoint + 'reports/summary')
-                     data.reports_summary.Links.forEach(function (field)  {
-                             data[field.Name] = Veeam.request(field.Href)
-                         })
-                     data.backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
-                     data.backupFiles.Refs.forEach(function (field) {
-                             data[field.Name] = Veeam.request(field.Href + '?format=Entity')
-                         })
-                 }
-                 catch (error) {
-                     data.errors.raw = error.toString();
-                 }
-             }
+                request: function (url) {
+                    var response, request = new HttpRequest();
+                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+                        request.setProxy(Veeam.params.http_proxy);
+                    }
+                    request.addHeader('Accept: application/json');
+                    request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
+                    request.post(Veeam.params.api_endpoint + '/sessionMngr');
+                    response = request.get(url);
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+                },
             
-             catch (error) {
-                 error += (String(error).endsWith('.')) ? '' : '.';
-                 Zabbix.log(3, '[ Veeam ] ERROR: ' + error);
-                 return JSON.stringify({ error: error });
-             }
-             return JSON.stringify(data);
+                getMetricsData: function() {
+                    var data = {};
+                    reports_summary = Veeam.request(Veeam.params.api_endpoint + 'reports/summary')
+                    reports_summary.Links.forEach(function (field)  {
+                            data[field.Name] = Veeam.request(field.Href)
+                        })
+                    backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
+                    backupFiles.Refs.forEach(function (field) {
+                            data[field.Name] = Veeam.request(field.Href + '?format=Entity')
+                        })
+                    return data;
+                }
+            
+            };  
+            try {
+                Veeam.setParams(JSON.parse(value));
+            
+                return JSON.stringify(Veeam.getMetricsData());
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
+                return JSON.stringify({'error': error});
+            }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           parameters:
@@ -167,6 +168,9 @@ zabbix_export:
             -
               name: user
               value: '{$VEEAM.MANAGER.USER}'
+            -
+              name: proxy
+              value: '{$VEEAM.MANAGER.HTTP.PROXY}'
           tags:
             -
               tag: component
@@ -183,7 +187,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.RunningJobs
+                - $.JobStatistics.RunningJobs
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -203,7 +207,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.ScheduledBackupJobs
+                - $.JobStatistics.ScheduledBackupJobs
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -243,7 +247,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.ScheduledReplicaJobs
+                - $.JobStatistics.ScheduledReplicaJobs
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -263,7 +267,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.TotalJobRuns
+                - $.JobStatistics.TotalJobRuns
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -283,7 +287,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.WarningsJobRuns
+                - $.JobStatistics.WarningsJobRuns
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
@@ -473,6 +477,9 @@ zabbix_export:
           macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           value: '10'
           description: 'A response timeout for API.'
+        -
+          macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
+          description: 'Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.'
         -
           macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT
