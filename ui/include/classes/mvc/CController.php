@@ -163,11 +163,11 @@ abstract class CController {
 	 * @return string  Returns CSRF token in string format or null if session id is not set.
 	 */
 	public static function generateCsrfToken(string $action): ?string {
-		if (!CWebUser::$data['csrf_token_salt']) {
+		if (!CWebUser::$data['secret']) {
 			return null;
 		}
 
-		return CEncryptHelper::sign(CWebUser::$data['csrf_token_salt'] . $action);
+		return CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
 	}
 
 	/**
@@ -179,14 +179,14 @@ abstract class CController {
 	 *                of the action.
 	 */
 	public static function generateCsrfTokens(array $actions): ?array {
-		if (!CWebUser::$data['csrf_token_salt']) {
+		if (!CWebUser::$data['secret']) {
 			return null;
 		}
 
 		$csrf_tokens = [];
 
 		foreach ($actions as $action) {
-			$csrf_tokens[$action] =  CEncryptHelper::sign(CWebUser::$data['csrf_token_salt'] . $action);
+			$csrf_tokens[$action] =  CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
 		}
 
 		return $csrf_tokens;
