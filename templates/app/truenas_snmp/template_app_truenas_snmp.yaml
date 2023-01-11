@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-27T12:21:19Z'
+  date: '2023-01-10T14:15:57Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -316,7 +316,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            System host name.
+            The host name of the system.
           inventory_link: NAME
           preprocessing:
             -
@@ -334,7 +334,7 @@ zabbix_export:
               name: 'TrueNAS: System name has changed'
               event_name: 'TrueNAS: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The name of the system has changed. Ack to close the problem manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -397,7 +397,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//system.swap.free)/last(//system.swap.total)*100'
-          description: 'The free space of swap volume/file in percent.'
+          description: 'The free space of the swap volume/file expressed in %.'
           tags:
             -
               tag: component
@@ -440,7 +440,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            System uptime in 'N days, hh:mm:ss' format.
+            The system uptime expressed in the following format:'N days, hh:mm:ss'.
           preprocessing:
             -
               type: MULTIPLIER
@@ -457,7 +457,7 @@ zabbix_export:
               name: 'TrueNAS: Host has been restarted'
               event_name: 'TrueNAS: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -933,7 +933,7 @@ zabbix_export:
           units: B
           description: |
             MIB: UCD-SNMP-MIB
-            Total memory in Bytes.
+            The total memory expressed in Bytes.
           preprocessing:
             -
               type: MULTIPLIER
@@ -1076,7 +1076,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: UCD-SNMP-MIB
-                Amount of time the CPU has been waiting for I/O to complete.
+                The amount of time the CPU has been waiting for I/O to complete.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1182,7 +1182,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'CPU utilization in %.'
+              description: 'The CPU utilization expressed in %.'
               preprocessing:
                 -
                   type: JAVASCRIPT
@@ -1204,7 +1204,7 @@ zabbix_export:
                   event_name: 'TrueNAS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   dependencies:
                     -
                       name: 'TrueNAS: Load average is too high'
@@ -1304,7 +1304,7 @@ zabbix_export:
                 formulaid: J
               -
                 macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
+                value: '@Network interfaces for discovery'
                 formulaid: G
               -
                 macro: '{#IFNAME}'
@@ -2648,12 +2648,8 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'This macro used in filters of network interfaces discovery rule.'
         -
-          macro: '{$NET.IF.IFNAME.MATCHES}'
-          value: '^em[0-9]+$'
-          description: 'This macro used in filters of network interfaces discovery rule.'
-        -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: ^$
+          value: CHANGE_IF_NEEDED
           description: 'This macro used in filters of network interfaces discovery rule.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
