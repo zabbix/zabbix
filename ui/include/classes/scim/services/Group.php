@@ -459,6 +459,15 @@ class Group extends ScimApiService {
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
+		if ($user_media) {
+			foreach ($user_media[0]['medias'] as &$media ) {
+				if (!is_array($media['sendto'])) {
+					$media['sendto'] = [$media['sendto']];
+				}
+			}
+			unset($media);
+		}
+
 		APIRPC::User()->updateProvisionedUser([
 			'userid' => $userid,
 			'roleid' => array_key_exists('roleid', $group_rights) ? $group_rights['roleid'] : '0',
