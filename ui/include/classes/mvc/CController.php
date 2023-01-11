@@ -183,7 +183,6 @@ abstract class CController {
 	 *                of the action.
 	 */
 	public static function generateCsrfTokens(array $actions): ?array {
-		CWebUser::$data['secret'] =null;
 		if (!CWebUser::$data['secret']) {
 			throw new CAccessDeniedException();
 		}
