@@ -60,6 +60,8 @@ class CXmlImportReader extends CImportReader {
 		$data = $this->xml_to_array($xml);
 		$xml->close();
 
+		self::transform($data);
+
 		return $data;
 	}
 
