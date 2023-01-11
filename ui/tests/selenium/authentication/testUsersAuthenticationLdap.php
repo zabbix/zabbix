@@ -249,7 +249,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #0 test without Host, Base DN and Search attribute.
 			[
 				[
-					'ldap_settings' => [],
+					'servers_settings' => [
+						[
+							'fields' => []
+						]
+					],
 					'test_error' => 'Invalid LDAP configuration',
 					'test_error_details' => [
 						'Incorrect value for field "host": cannot be empty.',
@@ -261,8 +265,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #1 test without Base DN and Search attribute.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ldap.forumsys.com'
+							]
+						]
 					],
 					'test_error' => 'Invalid LDAP configuration',
 					'test_error_details' => [
@@ -274,9 +282,13 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #2 test without Search attribute.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com'
+							]
+						]
 					],
 					'test_error' => 'Invalid LDAP configuration',
 					'test_error_details' => [
@@ -287,10 +299,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #3 test with empty credentials.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
-						'Search attribute' => 'uid'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com',
+								'Search attribute' => 'uid'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => '',
@@ -306,10 +322,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #4 test with empty password field.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
-						'Search attribute' => 'uid'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com',
+								'Search attribute' => 'uid'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'galieleo',
@@ -324,10 +344,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #5 test with empty username field.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
-						'Search attribute' => 'uid'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com',
+								'Search attribute' => 'uid'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => '',
@@ -342,10 +366,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #6 test with incorrect username and password values.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'test',
@@ -360,10 +388,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #7 test with incorrect LDAP settings.
 			[
 				[
-					'ldap_settings' => [
-						'Host' => 'test',
-						'Base DN' => 'test',
-						'Search attribute' => 'test'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'test',
+								'Base DN' => 'test',
+								'Search attribute' => 'test'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'test',
@@ -378,17 +410,21 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #8 test with all available values.
 			[
 				[
-					'ldap_settings' => [
-						'Name' => 'Test Name',
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid',
-						'Bind DN' => 'test_DN',
-						'Bind password' => 'test_password',
-						'Description' => 'Test description',
-						'Advanced configuration' => true,
-						'StartTLS' => true,
-						'Search filter' => 'filter'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'Test Name',
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid',
+								'Bind DN' => 'test_DN',
+								'Bind password' => 'test_password',
+								'Description' => 'Test description',
+								'Advanced configuration' => true,
+								'StartTLS' => true,
+								'Search filter' => 'filter'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'employee',
@@ -403,14 +439,18 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #9 test with Bind DN and Bind password.
 			[
 				[
-					'ldap_settings' => [
-						'Name' => 'Test Name',
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid',
-						'Bind DN' => 'test_DN',
-						'Bind password' => 'test_password',
-						'Description' => 'Test description'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'Test Name',
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid',
+								'Bind DN' => 'test_DN',
+								'Bind password' => 'test_password',
+								'Description' => 'Test description'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'employee',
@@ -426,10 +466,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid'
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid'
+							]
+						]
 					],
 					'test_settings' => [
 						'Login' => 'employee',
@@ -449,7 +493,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$form = $this->openLdapForm();
 		$form->fill(['Enable LDAP authentication' => true]);
 		$form->query('button:Add')->waitUntilCLickable()->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->fill($data['ldap_settings']);
+		COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->fill($data['servers_settings']);
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
 
 		// Fill login and user password in Test authentication form.
@@ -563,13 +607,15 @@ class testUsersAuthenticationLdap extends CWebTest {
 		return [
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => '',
-							'Host' => '',
-							'Base DN' => '',
-							'Port' => '',
-							'Search attribute' => ''
+							'fields' =>  [
+								'Name' => '',
+								'Host' => '',
+								'Base DN' => '',
+								'Port' => '',
+								'Search attribute' => ''
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -583,12 +629,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			],
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => '',
-							'Host' => 'updated_host',
-							'Base DN' => '',
-							'Search attribute' => ''
+							'fields' =>  [
+								'Name' => '',
+								'Host' => 'updated_host',
+								'Base DN' => '',
+								'Search attribute' => ''
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -601,12 +649,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			],
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => '',
-							'Host' => 'updated_host',
-							'Base DN' => 'updated_dn',
-							'Search attribute' => ''
+							'fields' =>  [
+								'Name' => '',
+								'Host' => 'updated_host',
+								'Base DN' => 'updated_dn',
+								'Search attribute' => ''
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -618,12 +668,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			],
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => '',
-							'Host' => 'updated_host',
-							'Base DN' => 'updated_dn',
-							'Search attribute' => 'updated_search'
+							'fields' =>  [
+								'Name' => '',
+								'Host' => 'updated_host',
+								'Base DN' => 'updated_dn',
+								'Search attribute' => 'updated_search'
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -632,21 +684,28 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
+
+
+
+
+
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'updated_name',
-							'Host' => 'updated_host',
-							'Port' => '777',
-							'Base DN' => 'updated_dn',
-							'Search attribute' => 'updated_search',
-							'Bind DN' => 'updated_bin_dn',
-							'Description' => 'updated_description',
-							'Advanced configuration' => true,
-							'StartTLS' => true,
-							'Search filter' => 'search_filter'
+							'fields' =>  [
+								'Name' => 'updated_name',
+								'Host' => 'updated_host',
+								'Port' => '777',
+								'Base DN' => 'updated_dn',
+								'Search attribute' => 'updated_search',
+								'Bind DN' => 'updated_bin_dn',
+								'Description' => 'updated_description',
+								'Advanced configuration' => true,
+								'StartTLS' => true,
+								'Search filter' => 'search_filter'
+							]
 						]
 					],
 					'db_check' => [
@@ -655,10 +714,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'host' => 'updated_host',
 							'port' => '777',
 							'base_dn' => 'updated_dn',
-							'bind_dn' => 'updated_bin_dn',
 							'search_attribute' => 'updated_search',
-							'search_filter' => 'updated_filter',
-							'start_tls' => '1'
+							'bind_dn' => 'updated_bin_dn',
+							'start_tls' => '1',
+							'search_filter' => 'search_filter'
 						]
 					]
 				]
@@ -666,49 +725,55 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'ldap_with_jit',
-							'Host' => '111.222.333',
-							'Port' => '',
-							'Base DN' => 'base dn',
-							'Search attribute' => 'search attribute',
-							'Bind DN' => 'bin dn test',
-//							'Bind password' => 'password',
-							'Description' => 'test description with jit',
-							'Configure JIT provisioning' => true,
-							'Group configuration' => 'groupOfNames',
-							'Group base DN' => 'test group base dn',
-							'Group name attribute' => 'test group name attribute',
-//							'User group membership attribute' => 'memberOf',
-							'Reference attribute' => 'test reference attribute',
-							'Group filter' => 'test group filter',
-							'User name attribute' => 'user name attribute',
-							'User last name attribute' => 'User last name'
-						]
-					],
-					'User group mapping' => [
-						[
-							'LDAP group pattern' => 'NEW group pattern',
-							'User groups' => 'Test timezone',
-							'User role' => 'User role'
-						]
-					],
-					'Media type mapping' => [
-						[
-							'Name' => 'Test Discord mapping',
-							'Media type' => 'Discord',
-							'Attribute' => 'test discord'
-						],
-						[
-							'Name' => 'Test iLert mapping',
-							'Media type' => 'iLert',
-							'Attribute' => 'test iLert'
+							'fields' =>  [
+								'Name' => 'ldap_with_jit',
+								'Host' => '111.222.333',
+								'Port' => '',
+								'Base DN' => 'base dn',
+								'Search attribute' => 'search attribute',
+								'Bind DN' => 'bin dn test',
+	//							'Bind password' => 'password',
+								'Description' => 'test description with jit',
+								'Configure JIT provisioning' => true,
+								'Group configuration' => 'groupOfNames',
+								'Group base DN' => 'test group base dn',
+								'Group name attribute' => 'test group name attribute',
+								'Group member attribute' => 'test group member',
+								'Reference attribute' => 'test reference attribute',
+								'Group filter' => 'test group filter',
+								'User name attribute' => 'user name attribute',
+								'User last name attribute' => 'user last name'
+							],
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => 'NEW group pattern',
+									'User groups' => 'Test timezone',
+									'User role' => 'User role'
+								]
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Test Discord mapping',
+									'Media type' => 'Discord',
+									'Attribute' => 'test discord'
+								],
+								[
+									'Name' => 'Test iLert mapping',
+									'Media type' => 'iLert',
+									'Attribute' => 'test iLert'
+								]
+							]
 						]
 					],
 					'db_check' => [
-						'userdirectory' => ['name' => 'ldap_with_jit', 'description' => 'test description with jit'],
-						'config' => ['ldap_jit_status' => true],
+						'userdirectory' => [
+							'name' => 'ldap_with_jit',
+							'description' => 'test description with jit',
+							'provision_status' => 1
+						],
+//						'config' => ['ldap_jit_status' => true],
 						'userdirectory_ldap' => [
 							'host' => '111.222.333',
 							'port' => '0',
@@ -717,12 +782,21 @@ class testUsersAuthenticationLdap extends CWebTest {
 							'search_attribute' => 'search attribute',
 							'group_basedn' => 'test group base dn',
 							'group_name' => 'test group name attribute',
-							'group_member' => 'memberOf',
+							'group_member' => 'test group member',
 							'user_ref_attr' => 'test reference attribute',
 							'group_filter' => 'test group filter',
 							'user_username' => 'user name attribute',
-							'user_lastname' => 'User last name'
-						]
+							'user_lastname' => 'user last name'
+						],
+//						'jit_fields' => [
+//							'User group mapping' => [
+//								[
+//									'LDAP group pattern' => 'NEW group pattern',
+//									'User groups' => 'Test timezone',
+//									'User role' => 'User role'
+//								]
+//							]
+//						],
 //						'userdirectory_idpgroup' => [
 //							'name' => 'NEW group pattern',
 //							'userdirectoryid' => 20
@@ -740,18 +814,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 	 */
 	public function testUsersAuthenticationLdap_Update($data) {
 		if (CDBHelper::getCount('SELECT * FROM userdirectory_ldap') === 0) {
-			$ldap_settings = [
-				'ldap_settings' => [
-					[
-						'Name' => 'test_update',
-						'Host' => 'test_update',
-						'Base DN' => 'test_update',
-						'Search attribute' => 'test_update'
-					]
-				]
+			$server_settings['servers_settings'][0]['fields'] = [
+				'Name' => 'test_update',
+				'Host' => 'test_update',
+				'Base DN' => 'test_update',
+				'Search attribute' => 'test_update'
 			];
 
-			$this->checkLdap($ldap_settings, 'button:Add');
+			$this->checkLdap($server_settings, 'button:Add');
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		}
 
@@ -766,21 +836,29 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM userdirectory_ldap'));
 		}
 		else {
-			$this->assertEquals($data['db_check']['userdirectory_ldap'], CDBHelper::getRow(
-					'SELECT host,port,base_dn,bind_dn,search_attribute,search_filter,start_tls'.
-					' FROM userdirectory_ldap')
-			);
+			foreach ($data['db_check'] as $table => $values) {
+				$sql = 'SELECT '.implode(",", array_keys($values)).' FROM '.$table;
+				$condition = ($table === 'userdirectory')
+					? ' WHERE name = '.zbx_dbstr($data['db_check']['userdirectory']['name'])
+					: null;
+				$this->assertEquals($values, CDBHelper::getRow($sql.$condition));
+			}
 
-			$this->assertEquals($data['db_check']['userdirectory'],
-					CDBHelper::getRow('SELECT name, description'.
-							' FROM userdirectory'.
-							' WHERE userdirectoryid IN ('.
-								'SELECT userdirectoryid'.
-								' FROM userdirectory_ldap'.
-								' WHERE name = '.zbx_dbstr($data['db_check']['userdirectory']['name']).
-							')'
-					)
-			);
+//			$this->assertEquals($data['db_check']['userdirectory_ldap'], CDBHelper::getRow(
+//					'SELECT host,port,base_dn,bind_dn,search_attribute,search_filter,start_tls'.
+//					' FROM userdirectory_ldap')
+//			);
+
+//			$this->assertEquals($data['db_check']['userdirectory'],
+//					CDBHelper::getRow('SELECT name, description'.
+//							' FROM userdirectory'.
+//							' WHERE userdirectoryid IN ('.
+//								'SELECT userdirectoryid'.
+//								' FROM userdirectory_ldap'.
+//								' WHERE name = '.zbx_dbstr($data['db_check']['userdirectory']['name']).
+//							')'
+//					)
+//			);
 
 			$form = $this->openLdapForm();
 			$table = $form->query('id:ldap-servers')->asTable()->one();
@@ -809,7 +887,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #1 LDAP server without any parameters.
 			[
 				[
-					'ldap_settings' => [[]],
+					'servers_settings' => [[]],
 					'ldap_error' => 'Invalid LDAP configuration',
 					'ldap_error_details' => [
 						'Incorrect value for field "name": cannot be empty.',
@@ -823,9 +901,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #2 LDAP server without name, Base DN and Search attribute.
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Host' => 'ipa.demo1.freeipa.org'
+							'fields' => [
+								'Host' => 'ipa.demo1.freeipa.org'
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -840,10 +920,12 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #3 LDAP server without name and search attribute.
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org'
+							'fields' => [
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org'
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -857,11 +939,13 @@ class testUsersAuthenticationLdap extends CWebTest {
 			//#4 LDAP server without name.
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Host' => 'ipa.demo1.freeipa.org',
-							'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-							'Search attribute' => 'uid'
+							'fields' => [
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid'
+							]
 						]
 					],
 					'ldap_error' => 'Invalid LDAP configuration',
@@ -874,18 +958,22 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #5 Two LDAP servers with same names.
 			[
 				[
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'TEST',
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com',
-							'Search attribute' => 'uid'
+							'fields' => [
+								'Name' => 'TEST',
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com',
+								'Search attribute' => 'uid'
+							]
 						],
 						[
-							'Name' => 'TEST',
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com',
-							'Search attribute' => 'uid'
+							'fields' => [
+								'Name' => 'TEST',
+								'Host' => 'ldap.forumsys.com',
+								'Base DN' => 'dc=example,dc=com',
+								'Search attribute' => 'uid'
+							]
 						]
 					],
 					'dialog_submit' => true,
@@ -896,12 +984,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'кириллица',
-							'Host' => 'кириллица',
-							'Base DN' => 'кириллица',
-							'Search attribute' => 'кириллица'
+							'fields' => [
+								'Name' => 'кириллица',
+								'Host' => 'кириллица',
+								'Base DN' => 'кириллица',
+								'Search attribute' => 'кириллица'
+							]
 						]
 					],
 					'db_check' => [
@@ -921,12 +1011,14 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => '@#$%^&*.',
-							'Host' => '@#$%^&*.',
-							'Base DN' => '@#$%^&*.',
-							'Search attribute' => '@#$%^&*.'
+							'fields' => [
+								'Name' => '@#$%^&*.',
+								'Host' => '@#$%^&*.',
+								'Base DN' => '@#$%^&*.',
+								'Search attribute' => '@#$%^&*.'
+							]
 						]
 					],
 					'db_check' => [
@@ -946,20 +1038,22 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-									'_long_value_long_value_long_value_long_value_long_va',
-							'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-									'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long'.
-									'_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-									'value_long_value_long_v',
-							'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
-									'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
-									'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
-									'value_long_value_long_v',
-							'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
-									'long_value_long_value_long_value_long_value_long_value_long_va'
+							'fields' => [
+								'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+										'_long_value_long_value_long_value_long_value_long_va',
+								'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long'.
+										'_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+										'value_long_value_long_v',
+								'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+										'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
+										'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+										'value_long_value_long_v',
+								'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+										'long_value_long_value_long_value_long_value_long_value_long_va'
+							]
 						]
 					],
 					'db_check' => [
@@ -987,19 +1081,21 @@ class testUsersAuthenticationLdap extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'ldap_settings' => [
+					'servers_settings' => [
 						[
-							'Name' => 'LDAP',
-							'Host' => 'ipa.demo1.freeipa.org',
-							'Port' => '389',
-							'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-							'Search attribute' => 'uid',
-							'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-							'Bind password' => 'Secret123',
-							'Description' => 'description',
-							'Advanced configuration' => true,
-							'StartTLS' => true,
-							'Search filter' => 'filter'
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'ipa.demo1.freeipa.org',
+								'Port' => '389',
+								'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Search attribute' => 'uid',
+								'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+								'Bind password' => 'Secret123',
+								'Description' => 'description',
+								'Advanced configuration' => true,
+								'StartTLS' => true,
+								'Search filter' => 'filter'
+							]
 						]
 					],
 					'db_check' => [
@@ -1096,9 +1192,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 	/**
 	 * Fill and submit LDAP server settings.
 	 *
-	 * @param string $data				 data provider
+	 * @param string $data			   data provider
 	 * @param string $query			   object to click for LDAP creating or updating
-	 * @param string $values			 simple LDAP server values
+	 * @param string $values		   simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
@@ -1111,42 +1207,42 @@ class testUsersAuthenticationLdap extends CWebTest {
 		// Open and fill LDAP settings form.
 		$this->query('id:ldap_auth_enabled')->asCheckbox()->one()->set(true);
 		if ($values !== null) {
-			$data['ldap_settings'] = [
-				[
+			$data['servers_settings'][0]['fields'] = [
 					'Name' => $values,
 					'Host' => $values,
 					'Base DN' => $values,
 					'Search attribute' => $values
-				]
 			];
 		}
 
 		// Fill LDAP server form.
-		foreach ($data['ldap_settings'] as $ldap) {
+		foreach ($data['servers_settings'] as $ldap) {
 			$form->query($query)->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$ldap_form = $dialog->asForm();
-			$ldap_form->fill($ldap);
+			$ldap_form->fill($ldap['fields']);
 
-			if (array_key_exists('User group mapping', $data)) {
-				foreach ($data['User group mapping'] as $user_group_mapping) {
-					$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$usergroup_mapping_form = $dialog->asForm();
-					$usergroup_mapping_form->fill($user_group_mapping);
-					$usergroup_mapping_form->submit();
-					$dialog->waitUntilNotVisible();
+			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
+				if (array_key_exists('User group mapping', $ldap)) {
+					foreach ($ldap['User group mapping'] as $user_group_mapping) {
+						$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+						$usergroup_mapping_form = $dialog->asForm();
+						$usergroup_mapping_form->fill($user_group_mapping);
+						$usergroup_mapping_form->submit();
+						$dialog->waitUntilNotVisible();
+					}
 				}
-			}
 
-			if (array_key_exists('Media type mapping', $data)) {
-				foreach ($data['Media type mapping'] as $media_mapping) {
-					$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$usergroup_mapping_form = $dialog->asForm();
-					$usergroup_mapping_form->fill($media_mapping);
-					$usergroup_mapping_form->submit();
-					$dialog->waitUntilNotVisible();
+				if (array_key_exists('Media type mapping', $ldap)) {
+					foreach ($ldap['Media type mapping'] as $media_mapping) {
+						$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
+						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+						$usergroup_mapping_form = $dialog->asForm();
+						$usergroup_mapping_form->fill($media_mapping);
+						$usergroup_mapping_form->submit();
+						$dialog->waitUntilNotVisible();
+					}
 				}
 			}
 
@@ -1168,7 +1264,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$form = $this->openLdapForm('LDAP');
 
 		// Configuration at 'LDAP settings' tab.
-		if (array_key_exists('ldap_settings', $data)) {
+		if (array_key_exists('servers_settings', $data)) {
 			$this->setLdap($data, $query);
 
 			// Check error message in ldap creation form.
