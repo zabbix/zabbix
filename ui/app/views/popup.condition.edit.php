@@ -27,6 +27,7 @@
 $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
 
 $form = (new CForm())
+	->cleanItems()
 	->setId('popup.condition')
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
