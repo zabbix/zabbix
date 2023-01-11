@@ -160,11 +160,13 @@ abstract class CController {
 	 *
 	 * @param string $action  action that controller should perform.
 	 *
+	 * @throws CAccessDeniedException
+	 *
 	 * @return string  Returns CSRF token in string format or null if session id is not set.
 	 */
 	public static function generateCsrfToken(string $action): ?string {
 		if (!CWebUser::$data['secret']) {
-			return null;
+			throw new CAccessDeniedException();
 		}
 
 		return CEncryptHelper::sign(CWebUser::$data['secret'] . $action);
@@ -175,12 +177,15 @@ abstract class CController {
 	 *
 	 * @param array $actions  array of actions for which tokens should be generated.
 	 *
+	 * @throws CAccessDeniedException
+	 *
 	 * @return array  Returns associative array of CSRF tokens for the specified actions, where the key is the name
 	 *                of the action.
 	 */
 	public static function generateCsrfTokens(array $actions): ?array {
+		CWebUser::$data['secret'] =null;
 		if (!CWebUser::$data['secret']) {
-			return null;
+			throw new CAccessDeniedException();
 		}
 
 		$csrf_tokens = [];
