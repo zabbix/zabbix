@@ -610,8 +610,6 @@ typedef struct
 	char			*ssl_key_file;
 	char			*ssl_key_password;
 	int			status;
-	int			tags_evaltype;
-	zbx_vector_ptr_t	tags;
 
 	zbx_list_t		queue;
 	zbx_hashset_t		object_link;

@@ -15651,7 +15651,6 @@ void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *conn
 		connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
 		connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);
 		connector->status = dc_connector->status;
-		connector->tags_evaltype = dc_connector->tags_evaltype;
 	}
 
 	*revision = config->revision.connector;

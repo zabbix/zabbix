@@ -288,7 +288,6 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 
 	for (i = 0; i < connector_objects->values_num; i++)
 	{
-		zbx_list_item_t		*enqueued_at;
 		zbx_object_link_t	*object_link;
 
 		for (j = 0; j < connector_objects->values[i].ids.values_num; j++)
@@ -314,7 +313,7 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 						&connector->object_link, &object_link_local, sizeof(object_link_local));
 				zbx_vector_connector_object_data_create(&object_link->connector_objects);
 
-				zbx_list_insert_after(&connector->queue, NULL, object_link, &enqueued_at);
+				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
 			}
 
 			connector_object_data.ts = connector_objects->values[i].ts;

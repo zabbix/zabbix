@@ -3609,7 +3609,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 					}
 				}
 			}
-			else
+			else if (0 != timers_num)
 			{
 				if (FAIL == connectors_retrieved)
 				{

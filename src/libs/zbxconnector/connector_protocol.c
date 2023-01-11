@@ -139,7 +139,6 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_cert_file, ssl_cert_file_len);
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_file, ssl_key_file_len);
 	zbx_serialize_prepare_str_len(data_len, connector-> ssl_key_password, ssl_key_password_len);
-	zbx_serialize_prepare_value(data_len, connector->tags_evaltype);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -166,8 +165,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	ptr += zbx_serialize_value(ptr, connector->verify_host);
 	ptr += zbx_serialize_str(ptr, connector->ssl_cert_file, ssl_cert_file_len);
 	ptr += zbx_serialize_str(ptr, connector->ssl_key_file, ssl_key_file_len);
-	ptr += zbx_serialize_str(ptr, connector->ssl_key_password, ssl_key_password_len);
-	(void)zbx_serialize_value(ptr, connector->tags_evaltype);
+	(void)zbx_serialize_str(ptr, connector->ssl_key_password, ssl_key_password_len);
 }
 
 void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t size,
@@ -192,7 +190,6 @@ void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t
 	data += zbx_deserialize_str(data, &connector->ssl_cert_file, ssl_cert_file_len);
 	data += zbx_deserialize_str(data, &connector->ssl_key_file, ssl_key_file_len);
 	data += zbx_deserialize_str(data, &connector->ssl_key_password, ssl_key_password_len);
-	data += zbx_deserialize_value(data, &connector->tags_evaltype);
 
 	zbx_connector_deserialize_object_data(data, size - (data - start), connector_objects);
 }
