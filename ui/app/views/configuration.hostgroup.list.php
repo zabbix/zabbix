@@ -208,15 +208,15 @@ $html_page
 (new CScriptTag('view.init('.json_encode([
 	'enable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.enable')
-		->setArgumentCsrfToken()
+		->addCsrfToken('hostgroup.enable')
 		->getUrl(),
 	'disable_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.disable')
-		->setArgumentCsrfToken()
+		->addCsrfToken('hostgroup.disable')
 		->getUrl(),
 	'delete_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'hostgroup.delete')
-		->setArgumentCsrfToken()
+		->addCsrfToken('hostgroup.delete')
 		->getUrl()
 ]).');'))
 	->setOnDocumentReady()

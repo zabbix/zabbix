@@ -158,7 +158,7 @@ else {
 	$delete_button = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'discovery.delete')
 			->setArgument('druleids', (array) $data['druleid'])
-			->setArgumentCsrfToken('discovery.delete'),
+			->addCsrfToken('discovery.delete'),
 		_('Delete discovery rule?')
 	))
 		->setId('delete');

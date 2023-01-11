@@ -331,7 +331,7 @@ if ($data['usrgrpid'] != 0) {
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.delete')
 					->setArgument('usrgrpids', [$data['usrgrpid']])
-					->setArgumentCsrfToken(),
+					->addCsrfToken('usergroup.delete'),
 				_('Delete selected group?')
 			))->setId('delete'),
 			$cancel_button

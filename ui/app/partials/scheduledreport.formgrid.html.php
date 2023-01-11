@@ -230,7 +230,7 @@ if ($data['source'] === 'reports') {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'scheduledreport.delete')
 					->setArgument('reportids', [$data['reportid']])
-					->setArgumentCsrfToken('scheduledreport.delete'),
+					->addCsrfToken('scheduledreport.delete'),
 				_('Delete selected scheduled report?')
 			))
 				->setId('delete')

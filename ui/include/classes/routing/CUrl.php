@@ -130,7 +130,7 @@ class CUrl {
 	 *
 	 * @return $this
 	 */
-	public function setArgumentCsrfToken(string $action = ''): self {
+	public function addCsrfToken(string $action): self {
 		$action = array_key_exists('action', $this->arguments) ? $this->arguments['action'] : $action;
 
 		$this->arguments[CController::CSRF_TOKEN_NAME] = CController::generateCsrfToken($action);

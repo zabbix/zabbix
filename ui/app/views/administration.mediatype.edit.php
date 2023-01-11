@@ -373,7 +373,7 @@ else {
 	$deleteButton = (new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'mediatype.delete')
 			->setArgument('mediatypeids', [$data['mediatypeid']])
-			->setArgumentCsrfToken('mediatype.delete'),
+			->addCsrfToken('mediatype.delete'),
 		_('Delete media type?')
 	))
 		->setId('delete');

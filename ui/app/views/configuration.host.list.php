@@ -261,7 +261,7 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
-		->setArgumentCsrfToken()
+		->addCsrfToken('popup.massupdate.host')
 		->setArgument('backurl',
 			(new CUrl('zabbix.php', false))
 				->setArgument('action', 'host.list')
@@ -491,7 +491,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
-	->setArgumentCsrfToken()
+	->addCsrfToken('popup.massupdate.host')
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',

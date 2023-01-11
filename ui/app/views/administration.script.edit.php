@@ -299,7 +299,7 @@ else {
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'script.delete')
 			->setArgument('scriptids[]', $data['scriptid'])
-			->setArgumentCsrfToken('script.delete'),
+			->addCsrfToken('script.delete'),
 		_('Delete script?')
 	))->setId('delete');
 

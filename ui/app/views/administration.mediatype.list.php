@@ -146,10 +146,10 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? (new CLink(_('Enabled'), (new CUrl($statusLink))->setArgumentCsrfToken()->getUrl()))
+		? (new CLink(_('Enabled'), (new CUrl($statusLink))->addCsrfToken('mediatype.disable')->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
-		: (new CLink(_('Disabled'), (new CUrl($statusLink))->setArgumentCsrfToken()->getUrl()))
+		: (new CLink(_('Disabled'), (new CUrl($statusLink))->addCsrfToken('mediatype.enable')->getUrl()))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED);
 

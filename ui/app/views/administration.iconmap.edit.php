@@ -141,7 +141,7 @@ if ($data['iconmapid'] != 0) {
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
 					->setArgument('iconmapid', $data['iconmapid'])
-					->setArgumentCsrfToken('iconmap.delete'),
+					->addCsrfToken('iconmap.delete'),
 				_('Delete icon map?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

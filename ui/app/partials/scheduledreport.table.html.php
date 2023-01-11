@@ -104,7 +104,7 @@ foreach ($data['reports'] as $report) {
 		? (new CLink($status_name, (new CUrl('zabbix.php'))
 			->setArgument('action', $action)
 			->setArgument('reportids', [$report['reportid']])
-			->setArgumentCsrfToken()
+			->addCsrfToken($action)
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)

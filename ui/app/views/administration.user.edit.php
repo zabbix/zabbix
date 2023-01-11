@@ -840,7 +840,7 @@ if ($data['action'] === 'user.edit') {
 				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'user.delete')
 					->setArgument('userids', [$data['userid']])
-					->setArgumentCsrfToken(),
+					->addCsrfToken('user.delete'),
 					_('Delete selected user?')
 				))
 					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)

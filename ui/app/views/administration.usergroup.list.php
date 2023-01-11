@@ -88,7 +88,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
-			->setArgumentCsrfToken()
+			->addCsrfToken('usergroup.massupdate')
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -97,7 +97,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->setArgument('action', 'usergroup.massupdate')
 			->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
-			->setArgumentCsrfToken()
+			->addCsrfToken('usergroup.massupdate')
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -116,7 +116,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('gui_access', $next_gui_auth)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 			))
 			->addClass(ZBX_STYLE_LINK_ACTION);
@@ -126,7 +126,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
@@ -135,7 +135,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 			))
 				->addClass(ZBX_STYLE_LINK_ACTION)
@@ -218,28 +218,28 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 		],
 		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 		],
 		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 		],
 		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
-				->setArgumentCsrfToken()
+				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 		],
 		'regex.delete' => [
