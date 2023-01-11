@@ -121,7 +121,7 @@ class CControllerHostDashboardView extends CController {
 			}
 		}
 
-		$data['csrf_tokens'] = CController::generateCsrfTokens(['dashboard.widget.rfrate']);
+		$data['csrf_tokens'] = self::generateCsrfTokens(['dashboard.widget.rfrate']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

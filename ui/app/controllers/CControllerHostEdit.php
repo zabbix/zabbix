@@ -289,7 +289,7 @@ class CControllerHostEdit extends CController {
 				'editable' => true
 			]);
 
-		$data['csrf_tokens'] = CController::generateCsrfTokens(['host.massdelete']);
+		$data['csrf_tokens'] = self::generateCsrfTokens(['host.massdelete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host'));
