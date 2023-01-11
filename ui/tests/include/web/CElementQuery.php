@@ -521,6 +521,17 @@ class CElementQuery implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->one(false)->hasClass($classes);
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getVisibleCondition() {
 		$target = $this;
 

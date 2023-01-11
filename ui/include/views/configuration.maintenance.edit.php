@@ -30,6 +30,7 @@ $widget = (new CWidget())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_MAINTENANCE_EDIT));
 
 $maintenance_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)

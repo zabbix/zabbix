@@ -41,7 +41,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -102,7 +102,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsEC2.params.proxy !== 'undefined' && AwsEC2.params.proxy !== '') {
+                        request.setProxy(AwsEC2.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -141,22 +144,18 @@ zabbix_export:
                             || item.instancesSet.item.hasOwnProperty('instanceId') === false)
                             throw 'Failed response parse. Check debug log for more information.';
                         var instanceName = item.instancesSet.item.instanceId
-                        if (typeof item.instancesSet.item.tagSet !== 'object'
-                            || typeof item.instancesSet.item.tagSet.item !== 'object')
-                            throw 'Failed response parse. Check debug log for more information.';
-                        if (Array.isArray(item.instancesSet.item.tagSet.item)) {
+                        if (typeof item.instancesSet.item.tagSet === 'object'
+                            && typeof item.instancesSet.item.tagSet.item === 'object') {
+                            if (!Array.isArray(item.instancesSet.item.tagSet.item))
+                              item.instancesSet.item.tagSet.item = [item.instancesSet.item.tagSet.item];
                             item.instancesSet.item.tagSet.item.forEach(
                                 function (tag) {
                                     if (tag.hasOwnProperty('key') && tag.key === 'Name') {
                                         instanceName = tag.value;
                                     }
                                 }
-                            )
-                        } else {
-                            if (item.instancesSet.item.tagSet.item.hasOwnProperty('key') && item.instancesSet.item.tagSet.item.key === 'Name')
-                                instanceName = item.instancesSet.item.tagSet.item.value
+                            );
                         }
-            
                         instance_array[index]['instanceName'] = instanceName;
                     });
             
@@ -173,10 +172,15 @@ zabbix_export:
             
                     if (typeof result !== 'object'
                         || typeof result.DescribeInstancesResponse !== 'object'
-                        || typeof result.DescribeInstancesResponse.reservationSet !== 'object'
-                        || typeof result.DescribeInstancesResponse.reservationSet.item !== 'object') {
+                        || typeof result.DescribeInstancesResponse.reservationSet !== 'object') {
                         throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
                     }
+            
+                    if (result.DescribeInstancesResponse.reservationSet === null)
+                        return [];
+            
+                    if (typeof result.DescribeInstancesResponse.reservationSet.item !== 'object')
+                        throw 'Cannot get EC2 instance list from AWS API. Check debug log for more information.';
             
                     return AwsEC2.tagToNameInstances(result.DescribeInstancesResponse.reservationSet.item);
                 }
@@ -237,6 +241,9 @@ zabbix_export:
             -
               name: region
               value: '{$AWS.REGION}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.EC2.INSTANCE.ID}'
@@ -255,7 +262,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -316,7 +323,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsRDS.params.proxy !== 'undefined' && AwsRDS.params.proxy !== '') {
+                        request.setProxy(AwsRDS.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -421,6 +431,9 @@ zabbix_export:
             -
               name: region
               value: '{$AWS.REGION}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.RDS.INSTANCE.ID}'
@@ -436,7 +449,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key',].forEach(function (field) {
+                    ['access_key', 'secret_key'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -497,7 +510,10 @@ zabbix_export:
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
-            
+
+                    if (typeof AwsS3.params.proxy !== 'undefined' && AwsS3.params.proxy !== '') {
+                        request.setProxy(AwsS3.params.proxy);
+                    }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
@@ -551,12 +567,16 @@ zabbix_export:
                         result = AwsS3.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AwsS3.prepareParams(payload), '', '');
                     if (typeof result !== 'object'
                         || typeof result.ListAllMyBucketsResult !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
+                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object') {
+                        throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
+                    }
+                    if (result.ListAllMyBucketsResult.Buckets === null)
+                        return []
+                    if (typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
                         throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
                     }
             
-                    var buckets = []
+                    var buckets = [];
                     if (!Array.isArray(result.ListAllMyBucketsResult.Buckets.Bucket))
                         buckets = [result.ListAllMyBucketsResult.Buckets.Bucket]
                     else
@@ -635,6 +655,9 @@ zabbix_export:
             -
               name: secret_key
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            -
+              name: proxy
+              value: '{$AWS.PROXY}'
           lld_macro_paths:
             -
               lld_macro: '{#AWS.S3.NAME}'
@@ -661,6 +684,9 @@ zabbix_export:
           macro: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered EC2 instances by namespace.'
+        -
+          macro: '{$AWS.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         -
           macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
           value: '.*'

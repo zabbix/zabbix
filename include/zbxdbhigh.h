@@ -191,6 +191,14 @@ zbx_host_template_link_type;
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_SORT_ASC(field)	field " asc"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc"
+#else
+#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	druleid;

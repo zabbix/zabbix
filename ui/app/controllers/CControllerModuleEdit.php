@@ -79,6 +79,7 @@ class CControllerModuleEdit extends CController {
 
 		if ($manifest) {
 			$data = [
+				'form_refresh' => $this->getInput('form_refresh', 0),
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
 				'version' => $manifest['version'],
@@ -88,9 +89,7 @@ class CControllerModuleEdit extends CController {
 				'namespace' => $manifest['namespace'],
 				'url' => array_key_exists('url', $manifest) ? $manifest['url'] : null,
 				'status' => $this->hasInput('form_refresh')
-					? $this->hasInput('status')
-						? MODULE_STATUS_ENABLED
-						: MODULE_STATUS_DISABLED
+					? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
 					: $this->module['status']
 			];
 

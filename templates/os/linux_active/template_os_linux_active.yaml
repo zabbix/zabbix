@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-16T21:04:16Z'
+  date: '2022-12-19T10:43:29Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -1753,6 +1753,22 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.fs.size[{#FSNAME},used]'
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class
