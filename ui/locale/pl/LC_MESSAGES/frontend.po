@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-12-16 15:07+0000\n"
-"Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
+"PO-Revision-Date: 2023-01-01 22:59+0000\n"
+"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -953,11 +953,11 @@ msgstr "Dodaj z"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Dodaj z hosta"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Dodaj z szablonu"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -3786,6 +3786,10 @@ msgstr[0] "Nie można zaktualizować zdarzenia"
 msgstr[1] "Nie można zaktualizować zdarzeń"
 msgstr[2] "Nie można zaktualizować zdarzeń"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr "Nie można zaktualizować zdarzeń"
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Nie można zaktualizować wykresu"
@@ -4030,6 +4034,11 @@ msgstr "Wyłapuje wszystkie pułapki SNMP zgodne z wyrażeniem regularnym. Jeże
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Wyłapuje wszystkie pułapki SNMP, które nie zostały wyłapane przez jakąś pozycję snmptrap[]."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr "Przyczyna"
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4086,6 +4095,10 @@ msgstr "Zmień hasło"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Zmiana na sekundę"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4664,7 +4677,7 @@ msgstr "Konfiguruj dostępy JIT"
 
 #: app/views/js/administration.authentication.edit.js.php:137
 msgid "Confirm changes"
-msgstr ""
+msgstr "Potwierdź zmiany"
 
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
@@ -4912,6 +4925,14 @@ msgstr "Numer kontraktu"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "Konwertuj do JSON"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -5272,6 +5293,15 @@ msgstr "Aktualny"
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Bieżący host"
+
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -7842,6 +7872,11 @@ msgstr "Brak wartości w polu \"%1$s\" dla mapy \"%2$s\"."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Pole \"%1$s\" jest niewłaściwe: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -9579,6 +9614,11 @@ msgstr "Import się powiódł"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "Niemożliwe filtrowanie przez pole inwenatrza \"%1$s\", które nie istnieje."
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "W utrzymaniu"
@@ -9950,6 +9990,10 @@ msgstr "Błędne znak wykorzystane dla nazwy hosta  \"%1$s\"."
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Błędne warunki dla reguły wykrywania \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12462,6 +12506,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Marzec"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Zaznacz elementy po zmianie stanu wyzwalacza"
@@ -12473,6 +12521,10 @@ msgstr "Zaznacz inne"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Zaznacz wybrane"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15195,6 +15247,10 @@ msgstr "Hasło"
 msgid "Password (once again)"
 msgstr "Hasło (ponownie)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr "Hasło nie jest obowiązkowe dla niewewnętrznych rodzajów autentykacji."
@@ -15238,6 +15294,10 @@ msgstr "Wzorzec"
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
 msgstr "Zatrzymaj operacje dla wstrzymanych problemów"
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
+msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -15434,6 +15494,10 @@ msgstr "Pozycja"
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
 msgstr "Pozycja jest ignorowana dla jednostek s, uptime i unixtime."
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
+msgstr ""
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -15930,6 +15994,10 @@ msgstr "ROZWIĄZANY"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17933,6 +18001,11 @@ msgstr "Pokaż panel boczny"
 msgid "Show suppressed problems"
 msgstr "Pokaż wstrzymane problemy"
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18601,6 +18674,11 @@ msgstr "Szwedzki (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji poza tą! Kontynuować?"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -20062,6 +20140,10 @@ msgstr "Element interfejsu \"%2$s\" nie jest dostępny dla roli użytkownika \"%
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "NIEZNANE"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -23376,6 +23458,10 @@ msgstr "niewłaściwa metoda agregacji"
 msgid "invalid byte sequence in UTF-8"
 msgstr "niepoprawna sekwencja bajtów w UTF-8"
 
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
 msgstr "niepoprawne opóźnienie"
@@ -23818,6 +23904,14 @@ msgstr "brak uprawnień do zmiany stopnia problemów"
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
 msgstr "brak uprawnień do zamknięcia problemów"
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168
 msgid "no permissions to create and edit maps"

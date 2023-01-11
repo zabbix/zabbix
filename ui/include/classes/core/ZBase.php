@@ -761,6 +761,7 @@ class ZBase {
 		else {
 			$view['header'] = _('You are not logged in');
 			$view['messages'][] = _('You must login to view this page.');
+			$view['messages'][] = _('Possibly the session has expired or the password was changed.');
 		}
 
 		$view['messages'][] = _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
