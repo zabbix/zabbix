@@ -314,6 +314,7 @@ class CConfigurationExport {
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
 			$templates = $this->gatherHttpTests($templates);
+			$templates = $this->removeHttpTestItems($templates);
 		}
 
 		$this->data['templates'] = $templates;
@@ -356,6 +357,7 @@ class CConfigurationExport {
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
 			$hosts = $this->gatherHttpTests($hosts);
+			$hosts = $this->removeHttpTestItems($hosts);
 		}
 
 		$this->data['hosts'] = $hosts;
@@ -521,11 +523,7 @@ class CConfigurationExport {
 		}
 		unset($item);
 
-		foreach ($items as $itemid => $item) {
-			if ($item['type'] == ITEM_TYPE_HTTPTEST) {
-				unset($items[$itemid]);
-			}
-		}
+		// Web items will be removed from result after all items and discovery rules are gathered and processed.
 
 		$items = $this->prepareItems($items);
 
@@ -598,14 +596,14 @@ class CConfigurationExport {
 
 		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
+		// Discovery rules may use dependent items as web items.
 		foreach ($discovery_rules as $discovery_rule) {
 			if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
-				if (!array_key_exists($discovery_rule['master_itemid'], $itemids)) {
-					// Do not export dependent discovery rule with master item from template.
-					continue;
-				}
+				$master_itemid = $discovery_rule['master_itemid'];
 
-				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+				if (array_key_exists($master_itemid, $itemids)) {
+					$discovery_rule['master_item'] = ['key_' => $itemids[$master_itemid]];
+				}
 			}
 
 			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
@@ -1465,5 +1463,27 @@ class CConfigurationExport {
 		}
 
 		return $ids;
+	}
+
+	/**
+	 * Remove web items.
+	 *
+	 * @param array $hosts  Array of hosts or templates to remove the web items from.
+	 *
+	 * @return array
+	 */
+	protected function removeHttpTestItems(array $hosts): array {
+		foreach ($hosts as &$host) {
+			if ($host['items']) {
+				foreach ($host['items'] as $idx => $item) {
+					if ($item['type'] == ITEM_TYPE_HTTPTEST) {
+						unset($host['items'][$idx]);
+					}
+				}
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 }
