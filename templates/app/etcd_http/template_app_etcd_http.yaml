@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-18T14:10:24Z'
+  date: '2023-01-11T12:56:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -50,7 +50,7 @@ zabbix_export:
               name: 'Etcd: Cluster version has changed'
               event_name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Ack to close.'
+              description: 'The Etcd version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -97,7 +97,7 @@ zabbix_export:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_db_total_size_in_bytes
+                - etcd_mvcc_db_total_size_in_bytes
                 - value
                 - ''
           master_item:
@@ -120,7 +120,7 @@ zabbix_export:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_delete_total
+                - etcd_mvcc_delete_total
                 - value
                 - ''
             -
@@ -358,7 +358,7 @@ zabbix_export:
               name: 'Etcd: Node healthcheck failed'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check'
+              description: 'https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check'
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
@@ -873,7 +873,7 @@ zabbix_export:
             -
               type: PROMETHEUS_PATTERN
               parameters:
-                - etcd_debugging_mvcc_put_total
+                - etcd_mvcc_put_total
                 - value
                 - ''
             -
@@ -1002,7 +1002,7 @@ zabbix_export:
               name: 'Etcd: Server version has changed'
               event_name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Etcd version has changed. Ack to close.'
+              description: 'The Etcd version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1071,7 +1071,7 @@ zabbix_export:
               name: 'Etcd: Host has been restarted'
               event_name: 'Etcd: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

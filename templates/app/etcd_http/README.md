@@ -8,13 +8,18 @@ The template to monitor Etcd by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
 Template `Etcd` — collects metrics by HTTP agent from /metrics endpoint.
-See https://etcd.io/docs/v3.4.0/op-guide/monitoring/#metrics-endpoint.
+See https://etcd.io/docs/v3.5/op-guide/monitoring/#metrics-endpoint.
+
+> **For Etcd version <= 3.4 users!**
+>
+> In Etcd v3.5 some metrics used by this template have been deprecated. See more info [here](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
+Please upgrade your Etcd instance or use older Etcd by Zabbix template.
 
 
 
 This template was tested on:
 
-- Etcd, version 3.0+
+- Etcd, version 3.5.6
 
 ## Setup
 
@@ -26,7 +31,7 @@ This template was tested on:
 3. Check if etcd is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring.
   To verify run `curl -L  http://<etcd_node_address>:2379/metrics`
 4. Add the template to each node with etcd.
-  By default template use client port. You can configure metrics endpoint location by --listen-metrics-urls flag (See [etcd docs](https://github.com/etcd-io/website/blob/master/content/docs/v3.4.0/op-guide/configuration.md#--listen-metrics-urls)).
+  By default template use client port. You can configure metrics endpoint location by --listen-metrics-urls flag (See [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
 
   If you have specified a non-standard port for etcd, don't forget change macros {$ETCD.SCHEME}, {$ETCD.PORT}.
 
@@ -95,7 +100,7 @@ There are no template links in this template.
 |Etcd |Etcd: RPCs started per second |<p>The number of RPCs started on the server.</p> |DEPENDENT |etcd.grpc.started.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_server_started_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Server version |<p>Version of the Etcd server.</p> |DEPENDENT |etcd.server.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.etcdserver`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Etcd |Etcd: Cluster version |<p>Version of the Etcd cluster.</p> |DEPENDENT |etcd.cluster.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.etcdcluster`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Etcd |Etcd: DB size |<p>Total size of the underlying database.</p> |DEPENDENT |etcd.db.size<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_total_size_in_bytes`</p> |
+|Etcd |Etcd: DB size |<p>Total size of the underlying database.</p> |DEPENDENT |etcd.db.size<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_mvcc_db_total_size_in_bytes`</p> |
 |Etcd |Etcd: Keys compacted per second |<p>The number of DB keys compacted per second.</p> |DEPENDENT |etcd.keys.compacted.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_compaction_keys_total`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Keys expired per second |<p>The number of expired keys per second.</p> |DEPENDENT |etcd.keys.expired.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_store_expires_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Keys total |<p>Total number of keys.</p> |DEPENDENT |etcd.keys.total<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_keys_total`</p> |
@@ -105,8 +110,8 @@ There are no template links in this template.
 |Etcd |Etcd: CPU |<p>Total user and system CPU time spent in seconds.</p> |DEPENDENT |etcd.cpu.util<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_cpu_seconds_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Open file descriptors |<p>Number of open file descriptors.</p> |DEPENDENT |etcd.open.fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_open_fds`</p> |
 |Etcd |Etcd: Maximum open file descriptors |<p>The Maximum number of open file descriptors.</p> |DEPENDENT |etcd.max.fds<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_max_fds`</p> |
-|Etcd |Etcd: Deletes per second |<p>The number of deletes seen by this member per second.</p> |DEPENDENT |etcd.delete.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_delete_total`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: PUT per second |<p>The number of puts seen by this member per second.</p> |DEPENDENT |etcd.put.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_put_total`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Deletes per second |<p>The number of deletes seen by this member per second.</p> |DEPENDENT |etcd.delete.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_mvcc_delete_total`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: PUT per second |<p>The number of puts seen by this member per second.</p> |DEPENDENT |etcd.put.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_mvcc_put_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Range per second |<p>The number of ranges seen by this member per second.</p> |DEPENDENT |etcd.range.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_range_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Transaction per second |<p>The number of transactions seen by this member per second.</p> |DEPENDENT |etcd.txn.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_range_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Pending events |<p>Total number of pending events to be sent.</p> |DEPENDENT |etcd.events.sent.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_pending_events_total`</p> |
@@ -123,20 +128,20 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Etcd: Service is unavailable |<p>-</p> |`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
-|Etcd: Node healthcheck failed |<p>https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
+|Etcd: Node healthcheck failed |<p>https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Member has no leader |<p>If a member does not have a leader, it is totally unavailable.</p> |`last(/Etcd by HTTP/etcd.has.leader)=0` |AVERAGE | |
 |Etcd: Instance has seen too many leader changes |<p>Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.</p> |`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
 |Etcd: Too many proposal failures |<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p> |`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}` |WARNING | |
 |Etcd: Too many proposals are queued to commit |<p>Rising pending proposals suggests there is a high client load or the member cannot commit proposals.</p> |`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}` |WARNING | |
 |Etcd: Too many HTTP requests failures |<p>Too many requests failed on etcd instance with 5xx HTTP code.</p> |`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}` |WARNING | |
-|Etcd: Server version has changed |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
-|Etcd: Cluster version has changed |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
-|Etcd: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Etcd: Server version has changed |<p>The Etcd version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: Cluster version has changed |<p>The Etcd version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: Host has been restarted |<p>The host uptime is less than 10 minutes.</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Etcd: Current number of open files is too high |<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
 |Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
