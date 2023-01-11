@@ -173,6 +173,7 @@ else {
 				->setNoDataMessage(_('No changes.'))
 				->toString()
 			: (new CForm())
+				->cleanItems()
 				->addClass('import-compare')
 				->addItem(drawToc($data['diff_toc']))
 				->addItem(drawDiff($data['diff']))

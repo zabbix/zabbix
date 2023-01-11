@@ -29,17 +29,10 @@
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 
-extern char	*CONFIG_VAULT;
-extern char	*CONFIG_VAULTTOKEN;
-extern char	*CONFIG_VAULTURL;
-extern char	*CONFIG_VAULTTLSCERTFILE;
-extern char	*CONFIG_VAULTTLSKEYFILE;
-extern char	*CONFIG_VAULTDBPATH;
-
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
-int	zbx_vault_init(char **error)
+int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 {
 #define ZBX_HASHICORP_NAME		"HashiCorp"
 #define ZBX_HASHICORP_DBUSER_KEY	"username"
@@ -48,12 +41,13 @@ int	zbx_vault_init(char **error)
 #define ZBX_CYBERARK_NAME		"CyberArk"
 #define ZBX_CYBERARK_DBUSER_KEY		"UserName"
 #define ZBX_CYBERARK_DBPASSWORD_KEY	"Content"
-	if (NULL == CONFIG_VAULT || '\0' == *CONFIG_VAULT || 0 == strcmp(CONFIG_VAULT, ZBX_HASHICORP_NAME))
+	if (NULL == config_vault->name || '\0' == *(config_vault->name) || 0 == strcmp(config_vault->name,
+			ZBX_HASHICORP_NAME))
 	{
-		if (NULL == CONFIG_VAULTTOKEN && 0 == zbx_strcmp_null(CONFIG_VAULT, ZBX_HASHICORP_NAME))
+		if (NULL == config_vault->token && 0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\" configuration"
-					" parameter or \"VAULT_TOKEN\" environment variable", CONFIG_VAULT);
+					" parameter or \"VAULT_TOKEN\" environment variable", config_vault->name);
 			return FAIL;
 		}
 
@@ -61,13 +55,13 @@ int	zbx_vault_init(char **error)
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
-	else if (0 == strcmp(CONFIG_VAULT, ZBX_CYBERARK_NAME))
+	else if (0 == strcmp(config_vault->name, ZBX_CYBERARK_NAME))
 	{
-		if (NULL != CONFIG_VAULTTOKEN)
+		if (NULL != config_vault->token)
 		{
 			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" cannot be used when \"VaultToken\""
 					" configuration parameter or \"VAULT_TOKEN\" environment variable is defined",
-					CONFIG_VAULT);
+					config_vault->name);
 			return FAIL;
 		}
 
@@ -77,7 +71,7 @@ int	zbx_vault_init(char **error)
 	}
 	else
 	{
-		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", CONFIG_VAULT);
+		*error = zbx_dsprintf(*error, "invalid \"Vault\" configuration parameter: '%s'", config_vault->name);
 		return FAIL;
 	}
 
@@ -91,20 +85,21 @@ int	zbx_vault_init(char **error)
 #undef ZBX_CYBERARK_DBPASSWORD_KEY
 }
 
-int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error)
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault, char **error)
 {
-	return zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE, CONFIG_VAULTTLSKEYFILE,
-			path, ZBX_VAULT_TIMEOUT, kvs, error);
+	return zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
+			config_vault->tls_key_file, path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
-int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
+int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
+		char **error)
 {
 	int		ret = FAIL;
 	zbx_kvs_t	kvs;
 	const zbx_kv_t	*kv_username, *kv_password;
 	zbx_kv_t	kv_local;
 
-	if (NULL == CONFIG_VAULTDBPATH)
+	if (NULL == config_vault->db_path)
 		return SUCCEED;
 
 	if (NULL != *dbuser)
@@ -123,9 +118,8 @@ int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error)
 
 	zbx_kvs_create(&kvs, 2);
 
-	if (SUCCEED != zbx_vault_kvs_get_cb(CONFIG_VAULTURL, CONFIG_VAULTTOKEN, CONFIG_VAULTTLSCERTFILE,
-			CONFIG_VAULTTLSKEYFILE, CONFIG_VAULTDBPATH, ZBX_VAULT_TIMEOUT, &kvs,
-			error))
+	if (SUCCEED != zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
+			config_vault->tls_key_file, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs, error))
 	{
 		goto fail;
 	}

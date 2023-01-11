@@ -69,6 +69,7 @@ No specific Zabbix configuration is required.
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES} |<p>Filter of discoverable alarms by name.</p> |`.*` |
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES} |<p>Filter to exclude discovered alarms by name.</p> |`CHANGE_IF_NEEDED` |
 |{$AWS.SECRET.ACCESS.KEY} |<p>Secret access key.</p> |`` |
+|{$AWS.PROXY} |<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p> |`` |
 
 ## Template links
 

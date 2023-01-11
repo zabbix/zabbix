@@ -29,10 +29,17 @@
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
+#include "zbxjson.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>
 #endif
+
+#define SW_OS_FULL			"/proc/version"
+#define SW_OS_SHORT 			"/proc/version_signature"
+#define SW_OS_NAME			"/etc/issue.net"
+#define SW_OS_NAME_RELEASE		"/etc/os-release"
+#define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
 
 #define TIME_FMT	"%a %b %e %H:%M:%S %Y"
 
@@ -55,11 +62,101 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	get_line_from_file(char **line, int size, FILE *f)
+{
+	if (NULL == fgets(*line, size, f))
+	{
+		*line = zbx_strdup(*line, "Cannot read from file.");
+		return FAIL;
+	}
+
+	zbx_rtrim(*line, ZBX_WHITESPACE);
+	return SUCCEED;
+}
+
+static int	get_os_name(char **line)
+{
+	char	tmp_line[MAX_STRING_LEN];
+	FILE	*f = NULL;
+
+	*line = zbx_malloc(NULL, sizeof(char) * MAX_STRING_LEN);
+
+	/* firstly need to check option PRETTY_NAME in /etc/os-release */
+	/* if cannot find it, get value from /etc/issue.net            */
+	if (NULL != (f = fopen(SW_OS_NAME_RELEASE, "r")))
+	{
+		char	line2[MAX_STRING_LEN];
+		int	line_read = FAIL;
+
+		while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
+		{
+
+			if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME,
+					ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
+				continue;
+
+			if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", *line) ||
+					1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^ \t\n] %s", *line, line2))
+			{
+				line_read = SUCCEED;
+				break;
+			}
+		}
+		zbx_fclose(f);
+
+		if (SUCCEED == line_read)
+		{
+			zbx_rtrim(*line, ZBX_WHITESPACE);
+			goto out;
+		}
+	}
+
+	if (NULL == (f = fopen(SW_OS_NAME, "r")))
+	{
+		*line = zbx_dsprintf(*line, "Cannot open " SW_OS_NAME ": %s", zbx_strerror(errno));
+		goto error;
+	}
+	else
+	{
+		if (FAIL == get_line_from_file(line, MAX_STRING_LEN, f))
+			goto error;
+		zbx_fclose(f);
+	}
+
+out:
+	return SUCCEED;
+
+error:
+	if (NULL != f)
+		zbx_fclose(f);
+
+	return FAIL;
+}
+
+static int	get_os_info_file(char **line, const char *filename)
+{
+	FILE	*f = NULL;
+	int	ret = FAIL;
+
+	*line = zbx_malloc(NULL, sizeof(char) * MAX_STRING_LEN);
+
+	if (NULL == (f = fopen(filename, "r")))
+	{
+		*line = zbx_dsprintf(*line, "Cannot open %s: %s", filename, zbx_strerror(errno));
+
+		return FAIL;
+	}
+
+	ret = get_line_from_file(line, MAX_STRING_LEN, f);
+	zbx_fclose(f);
+
+	return ret;
+}
+
 int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
-	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
-	FILE	*f = NULL;
+	char	*type, *str;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 	{
@@ -71,53 +168,15 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full"))
 	{
-		if (NULL == (f = fopen(SW_OS_FULL, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_FULL ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_info_file(&str, SW_OS_FULL);
 	}
 	else if (0 == strcmp(type, "short"))
 	{
-		if (NULL == (f = fopen(SW_OS_SHORT, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_SHORT ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_info_file(&str, SW_OS_SHORT);
 	}
 	else if (0 == strcmp(type, "name"))
 	{
-		/* firstly need to check option PRETTY_NAME in /etc/os-release */
-		/* if cannot find it, get value from /etc/issue.net            */
-		if (NULL != (f = fopen(SW_OS_NAME_RELEASE, "r")))
-		{
-			while (NULL != fgets(tmp_line, sizeof(tmp_line), f))
-			{
-				char	line2[MAX_STRING_LEN];
-
-				if (0 != strncmp(tmp_line, SW_OS_OPTION_PRETTY_NAME,
-						ZBX_CONST_STRLEN(SW_OS_OPTION_PRETTY_NAME)))
-					continue;
-
-				if (1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=\"%[^\"]", line) ||
-						1 == sscanf(tmp_line, SW_OS_OPTION_PRETTY_NAME "=%[^ \t\n] %s",
-								line, line2))
-				{
-					line_read = SUCCEED;
-					break;
-				}
-			}
-			zbx_fclose(f);
-		}
-
-		if (FAIL == line_read && NULL == (f = fopen(SW_OS_NAME, "r")))
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open " SW_OS_NAME ": %s",
-					zbx_strerror(errno)));
-			return ret;
-		}
+		ret = get_os_name(&str);
 	}
 	else
 	{
@@ -125,16 +184,17 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (SUCCEED == line_read || NULL != fgets(line, sizeof(line), f))
+	if (SUCCEED == ret)
 	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, str));
 		ret = SYSINFO_RET_OK;
-		zbx_rtrim(line, ZBX_WHITESPACE);
-		SET_STR_RESULT(result, zbx_strdup(NULL, line));
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
-
-	zbx_fclose(f);
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, str));
+		ret = SYSINFO_RET_FAIL;
+	}
+	zbx_free(str);
 
 	return ret;
 }
@@ -153,25 +213,25 @@ static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 }
 
 static void	add_package_to_json(struct zbx_json *json, const char *name, const char *manager, const char *version,
-		const char *arch, zbx_uint64_t size, const char *buildtime_value, time_t buildtime_timestamp,
-		const char *installtime_value, time_t installtime_timestamp)
+		zbx_uint64_t size, const char *arch, time_t buildtime_timestamp, const char *buildtime_value,
+		time_t installtime_timestamp, const char *installtime_value)
 {
 	zbx_json_addobject(json, NULL);
 
 	zbx_json_addstring(json, "name", name, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "manager", manager, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "arch", arch, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(json, "size", size);
+	zbx_json_addstring(json, "arch", arch, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(json, "buildtime");
-	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "timestamp", buildtime_timestamp);
+	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 
 	zbx_json_addobject(json, "installtime");
-	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "timestamp", installtime_timestamp);
+	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 
 	zbx_json_close(json);
@@ -217,7 +277,7 @@ static void	dpkg_details(const char *manager, const char *line, const char *rege
 	/* the reported size is in kB, we want bytes */
 	size *= ZBX_KIBIBYTE;
 
-	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+	add_package_to_json(json, name, manager, version, size, arch, 0, "", 0, "");
 }
 
 static void	rpm_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -260,8 +320,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
 	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
 
-	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
-			installtime_value, installtime_timestamp);
+	add_package_to_json(json, name, manager, version, size, arch, buildtime_timestamp, buildtime_value,
+			installtime_timestamp, installtime_value);
 }
 
 static void	pacman_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -389,8 +449,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	installtime_timestamp = mktime(&tm);
 
-	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
-			installtime_value, installtime_timestamp);
+	add_package_to_json(json, name, manager, version, size, arch, buildtime_timestamp, buildtime_value,
+			installtime_timestamp, installtime_value);
 }
 
 static void	pkgtools_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -479,7 +539,7 @@ static void	pkgtools_details(const char *manager, const char *line, const char *
 
 	size = (zbx_uint64_t)(size_double * multiplier);
 
-	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+	add_package_to_json(json, name, manager, version, size, arch, 0, "", 0, "");
 out:
 	zbx_free(out);
 }
@@ -597,11 +657,11 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
@@ -661,6 +721,106 @@ next:
 	return ret;
 }
 
+static void append_to_pretty_ver(char **pretty, const char *str)
+{
+	size_t	prt_alloc = 0, prt_offset = 0;
+
+	if (NULL == *pretty)
+		zbx_strcpy_alloc(pretty, &prt_alloc, &prt_offset, str);
+	else
+		*pretty = zbx_dsprintf(*pretty, "%s %s", *pretty, str);
+
+	return;
+}
+
+int	system_sw_os_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+#define SW_OS_GET_TYPE		"os_type"
+#define SW_OS_GET_PROD_NAME	"product_name"
+#define SW_OS_GET_ARCH		"architecture"
+#define SW_OS_GET_KRNL_MAJOR	"kernel_major"
+#define SW_OS_GET_KRNL_MINOR	"kernel_minor"
+#define SW_OS_GET_KRNL_PATCH	"kernel_patch"
+#define SW_OS_GET_KRNL		"kernel"
+#define SW_OS_GET_VER_PRETTY	"version_pretty"
+#define SW_OS_GET_VER_FULL	"version_full"
+
+	struct zbx_json	j;
+	struct utsname	info;
+	int		read;
+	char		*str, *prt_version = NULL;
+
+	char		major[sizeof(info.release)], minor[sizeof(info.release)], patch[sizeof(info.release)];
+
+	ZBX_UNUSED(request);
+
+	if (0 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&j, SW_OS_GET_TYPE, "linux", ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED == get_os_name(&str))
+	{
+		zbx_json_addstring(&j, SW_OS_GET_PROD_NAME, str, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, str);
+	}
+	zbx_free(str);
+
+	if (0 != uname(&info))
+		goto out;
+
+	if (0 != strlen(info.machine))
+	{
+		zbx_json_addstring(&j, SW_OS_GET_ARCH, info.machine, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, info.machine);
+	}
+
+	if (0 != strlen(info.release))
+	{
+		read = sscanf(info.release, "%[0-9].%[0-9].%[0-9]", major, minor, patch);
+
+		if (0 < read)
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_MAJOR, major, ZBX_JSON_TYPE_STRING);
+		if (1 < read)
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_MINOR, minor, ZBX_JSON_TYPE_STRING);
+		if (2 < read)
+			zbx_json_addstring(&j, SW_OS_GET_KRNL_PATCH, patch, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addstring(&j, SW_OS_GET_KRNL, info.release, ZBX_JSON_TYPE_STRING);
+		append_to_pretty_ver(&prt_version, info.release);
+	}
+out:
+	if (NULL != prt_version && 0 != strlen(prt_version))
+		zbx_json_addstring(&j, SW_OS_GET_VER_PRETTY, prt_version, ZBX_JSON_TYPE_STRING);
+
+	if (SUCCEED == get_os_info_file(&str, SW_OS_FULL))
+		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, str, ZBX_JSON_TYPE_STRING);
+	else
+		zbx_json_addstring(&j, SW_OS_GET_VER_FULL, "", ZBX_JSON_TYPE_STRING);
+
+	zbx_free(str);
+	zbx_free(prt_version);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+
+#undef SW_OS_GET_TYPE
+#undef SW_OS_GET_PROD_NAME
+#undef SW_OS_GET_ARCH
+#undef SW_OS_GET_KRNL_MAJOR
+#undef SW_OS_GET_KRNL_MINOR
+#undef SW_OS_GET_KRNL_PATCH
+#undef SW_OS_GET_KRNL
+#undef SW_OS_GET_VER_PRETTY
+#undef SW_OS_GET_VER_FULL
+}
+
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
@@ -689,11 +849,11 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;

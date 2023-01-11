@@ -1243,6 +1243,10 @@ msgstr "Επιτρεπόμενοι ξενιστές"
 msgid "Allowed methods"
 msgstr ""
 
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
 msgstr ""
@@ -3711,6 +3715,10 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Αδύνατη η ενημέρωση γραφήματος"
@@ -3954,6 +3962,11 @@ msgstr ""
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4009,6 +4022,10 @@ msgstr "Αλλαγή συνθηματικού"
 
 #: include/items.inc.php:1844
 msgid "Change per second"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
@@ -4815,6 +4832,14 @@ msgstr "Αριθμός σύμβασης"
 msgid "Convert to JSON"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -5172,6 +5197,15 @@ msgstr ""
 msgid "Current host"
 msgstr "Τρέχων ξενιστής"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr ""
@@ -5406,6 +5440,10 @@ msgstr "Επισκόπηση δεδομένων"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
+msgstr ""
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
 msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:52
@@ -5833,6 +5871,10 @@ msgstr ""
 msgid "Delete selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Διαγραφή επιλεγμένων ενεργειών;"
@@ -6258,6 +6300,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:117
 msgid "Disable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:171
@@ -7057,6 +7103,10 @@ msgstr ""
 msgid "Enable selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
 msgstr "Ενεργοποίηση επιλεγμένων ενεργειών;"
@@ -7722,6 +7772,11 @@ msgstr ""
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7736,6 +7791,13 @@ msgstr "Πεδίο \"%1$s\" δεν είναι συμβολοσειρά."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Πεδίο \"%1$s\" πρέπει να λείπει."
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -9444,6 +9506,11 @@ msgstr "Επιτυχής εισαγωγή"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr "Σε συντήρηση"
@@ -9815,6 +9882,10 @@ msgstr ""
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "Λανθασμένες συνθήκες κανόνα εντοπισμού \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -12030,6 +12101,13 @@ msgstr "MAC διεύθυνση A"
 msgid "MAC address B"
 msgstr "MAC διεύθυνση B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12311,6 +12389,10 @@ msgstr "Μαρ"
 msgid "March"
 msgstr "Μάρτιος"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr "Σημειώστε τα στοιχεία σε μεταβολή κατάστασης εναύσματος"
@@ -12322,6 +12404,10 @@ msgstr "Σημειώστε άλλα"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Σημάδι επιλέχθηκε"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12394,6 +12480,19 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -13228,6 +13327,11 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
+msgstr ""
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
@@ -14161,6 +14265,17 @@ msgstr "Αριθμητικό (απρόσημο)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14366,6 +14481,10 @@ msgstr "Opera"
 
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
 msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
@@ -15002,6 +15121,10 @@ msgstr "Συνθηματικό"
 msgid "Password (once again)"
 msgstr "Συνθηματικό (ξανά)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
@@ -15044,6 +15167,10 @@ msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
+msgstr ""
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
@@ -15240,6 +15367,10 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15738,6 +15869,10 @@ msgstr ""
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16816,6 +16951,14 @@ msgstr "SNMP άκυρο κλειδί παγίδας."
 msgid "SNMP version"
 msgstr ""
 
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
+
 #: include/items.inc.php:1299
 #, c-format
 msgid "SNMPv%1$d"
@@ -17726,6 +17869,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18394,6 +18542,11 @@ msgstr "Σουηδικά (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαναφέρει όλες εκτός αυτής της συνεδρίας! Συνέχεια;"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19850,6 +20003,10 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr "ΑΓΝΩΣΤΟ"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -19910,6 +20067,13 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:313 jsLoader.php:385
 msgid "URLs"
 msgstr "URLs"
+
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2638
 #: include/classes/validators/CApiInputValidator.php:2644
@@ -20013,6 +20177,13 @@ msgstr ""
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Απεμπλοκή επιλεγμένων χρηστών;"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20380,6 +20551,10 @@ msgstr ""
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Χρήση ομαδικών αιτήσεων"
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -23089,6 +23264,12 @@ msgstr "ανακριβής σύνταξη πλησίον \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
@@ -23123,6 +23304,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
@@ -23566,6 +23751,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

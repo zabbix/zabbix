@@ -462,6 +462,7 @@ typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
+typedef int		(*zbx_get_config_int_f)(void);
 
 typedef enum
 {
@@ -717,6 +718,8 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 #define ZBX_PREPROC_XML_TO_JSON			27
+#define ZBX_PREPROC_SNMP_WALK_TO_VALUE		28
+#define ZBX_PREPROC_SNMP_WALK_TO_JSON		29
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

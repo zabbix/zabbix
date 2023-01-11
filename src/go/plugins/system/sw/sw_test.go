@@ -23,8 +23,8 @@
 package sw
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 var testData = map[string]map[string]string{
@@ -60,24 +60,24 @@ func TestPackagesGet(t *testing.T) {
 
 	for _, m := range managers {
 		if _, ok := testData[m.name]; !ok {
-			t.Errorf("unexpected package manager %s\n", m.name)
+			t.Errorf("unexpected package manager %s", m.name)
 
 			return
 		}
 
 		input, ok := testData[m.name]["input"]
 		if !ok {
-			t.Errorf("input not defined for package manager %s\n", m.name)
+			t.Errorf("input not defined for package manager %s", m.name)
 		}
 
 		expectedOutput, ok := testData[m.name]["expectedOutput"]
 		if !ok {
-			t.Errorf("output not defined for package manager %s\n", m.name)
+			t.Errorf("output not defined for package manager %s", m.name)
 		}
 
 		output, err := m.detailsParser(m.name, strings.Split(input, "\n"), "")
 		if err != nil {
-			t.Errorf("%s failed: %s\n", m.name, err)
+			t.Errorf("%s failed: %s", m.name, err)
 		} else if expectedOutput != output {
 			t.Errorf("unexpected output from %s, expected\n%s\ngot\n%s", m.name, expectedOutput, output)
 		}

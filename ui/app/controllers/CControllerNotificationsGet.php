@@ -88,6 +88,7 @@ class CControllerNotificationsGet extends CController {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'severities' => array_keys($this->settings['triggers.severities']),
 			'suppressed' => $this->settings['show_suppressed'] ? null : false,
+			'symptom' => false,
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => 'eventid',
 			'limit' => 15,
