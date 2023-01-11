@@ -298,9 +298,9 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
 {
-	zbx_uint64_t	queued_num = zbx_pp_manager_get_queued_num(manager);
+	zbx_uint64_t	pending_num = zbx_pp_manager_get_pending_num(manager);
 
-	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&queued_num, sizeof(queued_num));
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&pending_num, sizeof(pending_num));
 }
 
 /******************************************************************************
@@ -391,7 +391,8 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	const zbx_thread_preprocessing_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
 	zbx_pp_manager_t		*manager;
-	zbx_vector_pp_task_ptr_t		tasks;
+	zbx_vector_pp_task_ptr_t	tasks;
+	zbx_uint64_t			pending_num, finished_num;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -479,13 +480,16 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		zbx_pp_manager_process_finished(manager, &tasks);
+		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &finished_num);
 
 		if (0 < tasks.values_num)
 		{
 			preprocessor_flush_tasks(manager, &tasks);
 			zbx_pp_tasks_clear(&tasks);
+		}
 
+		if (0 != finished_num)
+		{
 			timeout.sec = 0;
 			timeout.ns = 0;
 		}
@@ -495,7 +499,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		if (0 == zbx_pp_manager_get_queued_num(manager) || 1 < time_now - time_flush)
+		if (0 == pending_num || 1 < time_now - time_flush)
 		{
 			dc_flush_history();
 			time_flush = time_now;

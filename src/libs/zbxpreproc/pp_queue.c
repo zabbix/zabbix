@@ -60,7 +60,8 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
-	queue->queued_num = 0;
+	queue->pending_num = 0;
+	queue->finished_num = 0;
 	zbx_list_create(&queue->pending);
 	zbx_list_create(&queue->immediate);
 	zbx_list_create(&queue->finished);
@@ -199,13 +200,22 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
  ******************************************************************************/
 void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
-	if (ZBX_PP_TASK_VALUE_SEQ == task->type || ZBX_PP_TASK_DEPENDENT == task->type)
+	switch (task->type)
 	{
-		if (NULL == (task = pp_task_queue_add_sequence(queue, task)))
-			return;
+		case ZBX_PP_TASK_VALUE_SEQ:
+		case ZBX_PP_TASK_DEPENDENT:
+			queue->pending_num++;
+			if (NULL == (task = pp_task_queue_add_sequence(queue, task)))
+				return;
+			break;
+		case ZBX_PP_TASK_SEQUENCE:
+			/* sequence task is just a container for other tasks - it does not affect statistics, */
+			/* so there is no need to increment queue->pending_num                                */
+			break;
+		default:
+			queue->pending_num++;
+			break;
 	}
-
-	queue->queued_num++;
 
 	zbx_list_append(&queue->immediate, task, NULL);
 }
@@ -233,7 +243,7 @@ void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
  ******************************************************************************/
 void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
-	queue->queued_num++;
+	queue->pending_num++;
 	zbx_list_append(&queue->immediate, task, NULL);
 }
 
@@ -250,16 +260,16 @@ void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
  ******************************************************************************/
 void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_item_t *item, zbx_pp_task_t *task)
 {
+	queue->pending_num++;
+
 	if (ITEM_TYPE_INTERNAL != item->preproc->type)
 	{
-		queue->queued_num++;
 		zbx_list_append(&queue->pending, task, NULL);
 		return;
 	}
 
 	if (ZBX_PP_TASK_VALUE == task->type)
 	{
-		queue->queued_num++;
 		zbx_list_append(&queue->immediate, task, NULL);
 		return;
 	}
@@ -267,10 +277,7 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_item_t *item, zbx_pp_task_
 	zbx_pp_task_t	*seq_task;
 
 	if (NULL != (seq_task = pp_task_queue_add_sequence(queue, task)))
-	{
-		queue->queued_num++;
 		zbx_list_append(&queue->immediate, seq_task, NULL);
-	}
 }
 
 /******************************************************************************
@@ -293,19 +300,28 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
 
 	if (SUCCEED == zbx_list_pop(&queue->immediate, (void **)&task))
 	{
-		queue->queued_num--;
+		/* while sequence tasks do not affect statistics, the first task in sequence */
+		/* does, so the statistics can be updated for all tasks                      */
+		queue->pending_num--;
+
 		return (zbx_pp_task_t *)task;
 	}
 
 	while (SUCCEED == zbx_list_pop(&queue->pending, (void **)&task))
 	{
-		queue->queued_num--;
-
 		if (ZBX_PP_TASK_VALUE_SEQ == task->type)
+		{
+			/* task is being moved from pending to immediate queue */
+			/* while still pending, so statistics are not affected */
 			task = pp_task_queue_add_sequence(queue, task);
+		}
 
 		if (NULL != task)
+		{
+			queue->pending_num--;
+
 			return task;
+		}
 	}
 
 	return NULL;
@@ -321,6 +337,7 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
  ******************************************************************************/
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
+	queue->finished_num++;
 	zbx_list_append(&queue->finished, task, NULL);
 }
 
@@ -338,7 +355,10 @@ zbx_pp_task_t	*pp_task_queue_pop_finished(zbx_pp_queue_t *queue)
 	zbx_pp_task_t	*task;
 
 	if (SUCCEED == zbx_list_pop(&queue->finished, (void **)&task))
+	{
+		queue->finished_num--;
 		return task;
+	}
 
 	return NULL;
 }

@@ -30,7 +30,8 @@ typedef struct
 {
 	zbx_uint32_t	init_flags;
 	int		workers_num;
-	zbx_uint64_t	queued_num;
+	zbx_uint64_t	pending_num;
+	zbx_uint64_t	finished_num;
 
 	zbx_hashset_t	sequences;
 
