@@ -3,12 +3,15 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher.  
 The template is developed to monitor a single DBMS Oracle Database instance with ODBC.
 
-This template was tested on:
+This template has been tested on:
 
 - Oracle Database, version 12c2, 18c, 19c
+
+## Requirements
+
+For Zabbix version: 6.0 and higher.
 
 ## Setup
 
@@ -72,7 +75,7 @@ This template was tested on:
   The "Service's TCP port state" item uses {HOST.CONN} and {$ORACLE.PORT} macros to check the availability of the listener.
 
 
-## Zabbix configuration
+## Configuration
 
 No specific Zabbix configuration is required.
 
@@ -107,11 +110,11 @@ No specific Zabbix configuration is required.
 |{$ORACLE.TBS.UTIL.PCT.MAX.WARN} |<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p> |`80` |
 |{$ORACLE.USER} |<p>Oracle username.</p> |`<Put your username here>` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
@@ -121,7 +124,7 @@ There are no template links in this template.
 |PDB discovery |<p>Scanning a pluggable database (PDB) in DBMS.</p> |ODBC |db.odbc.discovery[pdb_list,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Filter**:</p>AND <p>- {#DBNAME} MATCHES_REGEX `{$ORACLE.DBNAME.MATCHES}`</p><p>- {#DBNAME} NOT_MATCHES_REGEX `{$ORACLE.DBNAME.NOT_MATCHES}`</p> |
 |Tablespace discovery |<p>Scanning tablespaces in DBMS.</p> |ODBC |db.odbc.discovery[tbsname,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Filter**:</p>AND <p>- {#TABLESPACE} MATCHES_REGEX `{$ORACLE.TABLESPACE.NAME.MATCHES}`</p><p>- {#TABLESPACE} NOT_MATCHES_REGEX `{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -191,39 +194,39 @@ There are no template links in this template.
 |Oracle |Oracle: SGA, fixed |<p>The fixed System Global Area (SGA) is an internal housekeeping area.</p> |DEPENDENT |oracle.sga_fixed<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SGA::Fixed_Sga')].VALUE.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Oracle |Oracle: SGA, buffer cache |<p>The size of standard block cache.</p> |DEPENDENT |oracle.sga_buffer_cache<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='SGA::Buffer_Cache')].VALUE.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |Oracle |Oracle: Redo logs available to switch |<p>The number of inactive/unused redo logs available for log switching.</p> |DEPENDENT |oracle.redo_logs_available<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.METRIC=='REDO::Available')].VALUE.first()`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.db_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Role |<p>The current role of the database where:</p><p>1 - 'SNAPSHOT STANDBY';</p><p>2 - 'LOGICAL STANDBY';</p><p>3 - 'PHYSICAL STANDBY';</p><p>4 - 'PRIMARY ';</p><p>5 - 'FAR SYNC'.</p> |DEPENDENT |oracle.db_role["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DBNAME=='{#DBNAME}')].ROLE.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Log mode |<p>The archive log mode where:</p><p>0 - 'NOARCHIVELOG';</p><p>1 - 'ARCHIVELOG';</p><p>2 - 'MANUAL'.</p> |DEPENDENT |oracle.db_log_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DBNAME=='{#DBNAME}')].LOG_MODE.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Force logging |<p>It indicates whether the database is under force logging mode 'YES' or 'NO'.</p> |DEPENDENT |oracle.db_force_logging["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DBNAME=='{#DBNAME}')].FORCE_LOGGING.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DBNAME=='{#DBNAME}')].OPEN_MODE.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes |<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p> |DEPENDENT |oracle.tbs_alloc_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].FILE_BYTES.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes |<p>The maximum size of the tablespace.</p> |DEPENDENT |oracle.tbs_max_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].MAX_BYTES.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace used, bytes |<p>Currently used bytes for the tablespace (current size of datafiles - the free space).</p> |DEPENDENT |oracle.tbs_used_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_BYTES.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace free, bytes |<p>Free bytes of the allocated space.</p> |DEPENDENT |oracle.tbs_free_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].FREE_BYTES.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent |<p>Allocated bytes/max bytes*100.</p> |DEPENDENT |oracle.tbs_used_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_PCT_MAX.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace usage, percent |<p>Used bytes/allocated bytes*100.</p> |DEPENDENT |oracle.tbs_used_file_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].USED_FILE_PCT.first()`</p> |
-|Oracle |Oracle TBS '{#TABLESPACE}': Open status |<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p> |DEPENDENT |oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.TABLESPACE=='{#TABLESPACE}')].STATUS.first()`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Error |<p>It displays the error message.</p> |DEPENDENT |oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DEST_NAME=='{#DEST_NAME}')].ERROR.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Last sequence |<p>It identifies the sequence number of the last archived redo log to be archived.</p> |DEPENDENT |oracle.archivelog_log_sequence["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DEST_NAME=='{#DEST_NAME}')].LOG_SEQUENCE.first()`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Status |<p>It identifies the current status of the destination where:</p><p>1 - 'VALID';</p><p>2 - 'DEFERRED';</p><p>3 - 'ERROR';</p><p>0 - 'UNKNOWN'.</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DEST_NAME=='{#DEST_NAME}')].STATUS.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Oracle |ASM '{#DGNAME}': Total size |<p>The total size of the ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DG_NAME=='{#DG_NAME}')].SIZE_BYTE.first()`</p> |
-|Oracle |ASM '{#DGNAME}': Free size |<p>The free size of the ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DG_NAME=='{#DG_NAME}')].FREE_SIZE_BYTE.first()`</p> |
-|Oracle |ASM '{#DGNAME}': Free size |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.DG_NAME=='{#DG_NAME}')].USED_PERCENT.first()`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.db_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.OPEN_MODE`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Role |<p>The current role of the database where:</p><p>1 - 'SNAPSHOT STANDBY';</p><p>2 - 'LOGICAL STANDBY';</p><p>3 - 'PHYSICAL STANDBY';</p><p>4 - 'PRIMARY ';</p><p>5 - 'FAR SYNC'.</p> |DEPENDENT |oracle.db_role["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ROLE`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Log mode |<p>The archive log mode where:</p><p>0 - 'NOARCHIVELOG';</p><p>1 - 'ARCHIVELOG';</p><p>2 - 'MANUAL'.</p> |DEPENDENT |oracle.db_log_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.LOG_MODE`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Force logging |<p>It indicates whether the database is under force logging mode 'YES' or 'NO'.</p> |DEPENDENT |oracle.db_force_logging["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.FORCE_LOGGING`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.OPEN_MODE`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes |<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p> |DEPENDENT |oracle.tbs_alloc_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.FILE_BYTES`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes |<p>The maximum size of the tablespace.</p> |DEPENDENT |oracle.tbs_max_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.MAX_BYTES`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace used, bytes |<p>Currently used bytes for the tablespace (current size of datafiles - the free space).</p> |DEPENDENT |oracle.tbs_used_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.USED_BYTES`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace free, bytes |<p>Free bytes of the allocated space.</p> |DEPENDENT |oracle.tbs_free_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.FREE_BYTES`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent |<p>Allocated bytes/max bytes*100.</p> |DEPENDENT |oracle.tbs_used_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.USED_PCT_MAX`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Tablespace usage, percent |<p>Used bytes/allocated bytes*100.</p> |DEPENDENT |oracle.tbs_used_file_pct["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.USED_FILE_PCT`</p> |
+|Oracle |Oracle TBS '{#TABLESPACE}': Open status |<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p> |DEPENDENT |oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.STATUS`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Error |<p>It displays the error message.</p> |DEPENDENT |oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ERROR`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Last sequence |<p>It identifies the sequence number of the last archived redo log to be archived.</p> |DEPENDENT |oracle.archivelog_log_sequence["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.LOG_SEQUENCE`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Status |<p>It identifies the current status of the destination where:</p><p>1 - 'VALID';</p><p>2 - 'DEFERRED';</p><p>3 - 'ERROR';</p><p>0 - 'UNKNOWN'.</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.STATUS`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Oracle |ASM '{#DGNAME}': Total size |<p>The total size of the ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.SIZE_BYTE`</p> |
+|Oracle |ASM '{#DGNAME}': Free size |<p>The free size of the ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.FREE_SIZE_BYTE`</p> |
+|Oracle |ASM '{#DGNAME}': Free size |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.USED_PERCENT`</p> |
 |Zabbix raw items |Oracle: Get instance state |<p>The item gets its state of the current instance.</p> |ODBC |db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Oracle: Get system metrics |<p>The item gets the values of the system metrics.</p> |ODBC |db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Oracle: Get tablespaces stats |<p>It gets the statistics of the tablespaces.</p> |ODBC |db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB databases on an instance.</p> |ODBC |db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Oracle: Get PDB info |<p>It gets the information about the PDB databases on an instance.</p> |ODBC |db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Oracle: Get archive log info | |ODBC |db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Oracle: Get ASM stats |<p>It gets the ASM disk groups statistics.</p> |ODBC |db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Oracle Database '{#DBNAME}': Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB database on an instance.</p> |ODBC |db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Oracle Database '{#DBNAME}': Get PDB info |<p>It gets the information about the PDB database on an instance.</p> |ODBC |db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Oracle TBS '{#TABLESPACE}': Get tablespaces stats |<p>It gets the statistics of the tablespace.</p> |ODBC |db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Archivelog '{#DEST_NAME}': Get archive log info |<p>It gets the archivelog statistics.</p> |ODBC |db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |ASM '{#DGNAME}': Get ASM stats |<p>It gets the ASM disk group statistics.</p> |ODBC |db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>**Expression**:</p>`The text is too long. Please see the template.` |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Oracle: Port {$ORACLE.PORT} is unavailable |<p>The TCP port of the Oracle Server service is currently unavailable.</p> |`max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)>0` |DISASTER | |
 |Oracle: LISTENER process is not running |<p>-</p> |`max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)=0` |DISASTER | |
-|Oracle: Version has changed |<p>The Oracle DB version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0` |INFO |<p>Manual close: YES</p> |
+|Oracle: Version has changed |<p>The Oracle DB version has changed. Acknowledge to close manually.</p> |`last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Oracle by ODBC/oracle.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Oracle: Failed to fetch info data |<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p> |`nodata(/Oracle by ODBC/oracle.uptime,5m)=1` |WARNING |<p>**Depends on**:</p><p>- Oracle: Port {$ORACLE.PORT} is unavailable</p> |
 |Oracle: Instance name has changed |<p>The Oracle DB instance has changed. Ack to close manually.</p> |`last(/Oracle by ODBC/oracle.instance_name,#1)<>last(/Oracle by ODBC/oracle.instance_name,#2) and length(last(/Oracle by ODBC/oracle.instance_name))>0` |INFO |<p>Manual close: YES</p> |
