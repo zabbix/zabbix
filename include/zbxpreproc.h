@@ -179,5 +179,19 @@ zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager);
 void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision);
 zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);
 zbx_uint64_t	zbx_pp_manager_get_pending_num(zbx_pp_manager_t *manager);
+void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num);
+
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	int		tasks_num;
+}
+zbx_pp_sequence_stats_t;
+
+ZBX_PTR_VECTOR_DECL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
+
+void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences);
+
 
 #endif

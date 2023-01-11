@@ -9268,7 +9268,8 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 			ZBX_DC_ITEM	*dep_item;
 
 			if (NULL == (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-					&dc_item->master_item->dep_itemids.values[i].first)))
+					&dc_item->master_item->dep_itemids.values[i].first)) ||
+					ITEM_STATUS_ACTIVE != dep_item->status)
 			{
 				continue;
 			}

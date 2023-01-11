@@ -59,7 +59,7 @@ zbx_pp_task_value_t;
 typedef struct
 {
 	zbx_pp_item_preproc_t	*preproc;
-	zbx_pp_task_t		*first_task;
+	zbx_pp_task_t		*primary;
 	zbx_pp_cache_t		*cache;
 }
 zbx_pp_task_dependent_t;

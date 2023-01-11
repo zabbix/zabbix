@@ -210,7 +210,7 @@ zbx_pp_task_t	*pp_task_dependent_create(zbx_uint64_t itemid, zbx_pp_item_preproc
 	task->itemid = itemid;
 	task->type = ZBX_PP_TASK_DEPENDENT;
 
-	d->first_task = NULL;
+	d->primary = NULL;
 	d->cache = NULL;
 
 	d->preproc = pp_item_preproc_copy(preproc);
@@ -230,8 +230,8 @@ static void	pp_task_dependent_clear(zbx_pp_task_dependent_t *task)
 	zbx_pp_item_preproc_release(task->preproc);
 	pp_cache_release(task->cache);
 
-	if (NULL != task->first_task)
-		pp_task_free(task->first_task);
+	if (NULL != task->primary)
+		pp_task_free(task->primary);
 
 }
 

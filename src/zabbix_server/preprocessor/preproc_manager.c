@@ -383,6 +383,74 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: respond to diagnostic information request                         *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *             client  - [IN] the request source                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
+	unsigned char	*data;
+	zbx_uint32_t	data_len;
+
+	zbx_pp_manager_get_diag_stats(manager, &preproc_num, &pending_num, &finished_num, &sequences_num);
+	data_len = zbx_preprocessor_pack_diag_stats(&data, preproc_num, pending_num, finished_num, sequences_num);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
+
+	zbx_free(data);
+}
+
+static int	preprocessor_compare_sequence_stats(const void *d1, const void *d2)
+{
+	zbx_pp_sequence_stats_t *s1 = *(zbx_pp_sequence_stats_t **)d1;
+	zbx_pp_sequence_stats_t *s2 = *(zbx_pp_sequence_stats_t **)d2;
+
+	return s2->tasks_num - s1->tasks_num;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: respond to top sequences request                                  *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *             client  - [IN] the request source                              *
+ *             message - [IN] the request message                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_reply_top_sequences(zbx_pp_manager_t *manager, zbx_ipc_client_t *client,
+		zbx_ipc_message_t *message)
+{
+	int					limit;
+	zbx_vector_pp_sequence_stats_ptr_t	sequences;
+	unsigned char				*data;
+	zbx_uint32_t				data_len;
+
+	zbx_vector_pp_sequence_stats_ptr_create(&sequences);
+
+	zbx_preprocessor_unpack_top_request(&limit, message->data);
+
+	zbx_pp_manager_get_sequence_stats(manager, &sequences);
+
+	if (limit > sequences.values_num)
+		limit = sequences.values_num;
+
+	zbx_vector_pp_sequence_stats_ptr_sort(&sequences, preprocessor_compare_sequence_stats);
+
+	data_len = zbx_preprocessor_pack_top_sequences_result(&data, &sequences, limit);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES_RESULT, data, data_len);
+
+	zbx_free(data);
+	zbx_vector_pp_sequence_stats_ptr_clear_ext(&sequences, (zbx_pp_sequence_stats_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_pp_sequence_stats_ptr_destroy(&sequences);
+}
+
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -473,13 +541,10 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					preprocessor_add_test_request(manager, client, message);
 					break;
 				case ZBX_IPC_PREPROCESSOR_DIAG_STATS:
-					//preprocessor_get_diag_stats(&manager, client);
+					preprocessor_reply_diag_info(manager, client);
 					break;
-				case ZBX_IPC_PREPROCESSOR_TOP_ITEMS:
-					//preprocessor_get_top_items(&manager, client, message);
-					break;
-				case ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS:
-					//preprocessor_get_oldest_preproc_items(&manager, client, message);
+				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
+					preprocessor_reply_top_sequences(manager, client, message);
 					break;
 			}
 

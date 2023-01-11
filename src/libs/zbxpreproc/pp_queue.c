@@ -19,7 +19,6 @@
 
 #include "pp_queue.h"
 #include "pp_task.h"
-
 #include "zbxcommon.h"
 #include "log.h"
 #include "zbxalgo.h"
@@ -28,6 +27,8 @@
 #define PP_TASK_QUEUE_INIT_NONE		0x00
 #define PP_TASK_QUEUE_INIT_LOCK		0x01
 #define PP_TASK_QUEUE_INIT_EVENT	0x02
+
+ZBX_PTR_VECTOR_IMPL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
 
 /* task sequence registry by itemid */
 typedef struct
@@ -426,4 +427,49 @@ void	pp_task_queue_notify_all(zbx_pp_queue_t *queue)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot broadcast conditional variable: %s", zbx_strerror(err));
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get registered task sequence statistics sorted by number of tasks *
+ *          in descending order                                               *
+ *                                                                            *
+ * Parameters: queue - [IN] the task queue                                    *
+ *             stats - [IN] the sequence statistics                           *
+ *                                                                            *
+ ******************************************************************************/
+void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_sequence_stats_ptr_t *stats)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_pp_item_task_sequence_t	*sequence;
+	zbx_pp_sequence_stats_t		*stat;
+	zbx_list_iterator_t		li;
+
+	pp_task_queue_lock(queue);
+
+	zbx_hashset_iter_reset(&queue->sequences, &iter);
+	while (NULL != (sequence = (zbx_pp_item_task_sequence_t *)zbx_hashset_iter_next(&iter)))
+	{
+		stat = (zbx_pp_sequence_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_sequence_stats_t));
+		stat->tasks_num = 0;
+		stat->itemid = sequence->itemid;
+
+		zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(sequence->task);
+
+		if (NULL != d_seq->tasks.head)
+		{
+			zbx_list_iterator_init(&d_seq->tasks, &li);
+
+			do
+			{
+				stat->tasks_num++;
+			}
+			while (SUCCEED == zbx_list_iterator_next(&li));
+		}
+
+		zbx_vector_pp_sequence_stats_ptr_append(stats, stat);
+	}
+
+	pp_task_queue_unlock(queue);
+
 }

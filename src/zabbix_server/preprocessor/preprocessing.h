@@ -26,22 +26,14 @@
 
 #define ZBX_IPC_SERVICE_PREPROCESSING	"preprocessing"
 
-#define ZBX_IPC_PREPROCESSOR_WORKER			1
 #define ZBX_IPC_PREPROCESSOR_REQUEST			2
-#define ZBX_IPC_PREPROCESSOR_RESULT			3
 #define ZBX_IPC_PREPROCESSOR_QUEUE			4
 #define ZBX_IPC_PREPROCESSOR_TEST_REQUEST		5
 #define ZBX_IPC_PREPROCESSOR_TEST_RESULT		6
 #define ZBX_IPC_PREPROCESSOR_DIAG_STATS			7
 #define ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT		8
-#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS			9
-#define ZBX_IPC_PREPROCESSOR_TOP_ITEMS_RESULT		10
-#define ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS	11
-#define ZBX_IPC_PREPROCESSOR_DEP_REQUEST		12
-#define ZBX_IPC_PREPROCESSOR_DEP_REQUEST_CONT		13
-#define ZBX_IPC_PREPROCESSOR_DEP_NEXT			14
-#define ZBX_IPC_PREPROCESSOR_DEP_RESULT			15
-#define ZBX_IPC_PREPROCESSOR_DEP_RESULT_CONT		16
+#define ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES		9
+#define ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES_RESULT	10
 
 /* item value data used in preprocessing manager */
 typedef struct
@@ -68,20 +60,21 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
-		int pending);
+zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
+		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num);
 
-void	zbx_preprocessor_unpack_diag_stats(int *total, int *queued, int *processing, int *done,
-		int *pending, const unsigned char *data);
+void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit);
+zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, int limit);
 
 void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data);
 
-zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_preproc_item_stats_t **items,
-		int items_num);
+zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
+		zbx_vector_pp_sequence_stats_ptr_t *sequences, int sequences_num);
 
-void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned char *data);
+void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences,
+		const unsigned char *data);
 
 ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
 

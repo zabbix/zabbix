@@ -39,5 +39,6 @@ void	pp_cache_release(zbx_pp_cache_t *cache);
 zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache);
 
 void	pp_cache_copy_value(zbx_pp_cache_t *cache, unsigned char step_type, zbx_variant_t *value);
+int	pp_cache_is_supported(zbx_pp_item_preproc_t *preproc);
 
 #endif

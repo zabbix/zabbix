@@ -476,41 +476,34 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
  *                                                                            *
  * Purpose: pack diagnostic statistics data into a single buffer that can be  *
  *          used in IPC                                                       *
- * Parameters: data       - [OUT] memory buffer for packed data               *
- *             total      - [IN] the number of values                         *
- *             queued     - [IN] the number of values waiting to be           *
+ * Parameters: data          - [OUT] memory buffer for packed data            *
+ *             preproc_num   - [IN] the number of items with preprocessing    *
+ *                                related data (preprocessing, internal/      *
+ *                                master/dependent items)                     *
+ *             pending_num   - [IN] the number of values waiting to be        *
  *                               preprocessed                                 *
- *             processing - [IN] the number of values being preprocessed      *
- *             done       - [IN] the number of values waiting to be flushed   *
- *                               that are either preprocessed or did not      *
- *                               require preprocessing                        *
- *             pending    - [IN] the number of values pending to be           *
- *                               preprocessed after previous value for        *
- *                               example delta, throttling depends on         *
- *                               previous value                               *
- *             data       - [IN] IPC data buffer                              *
+ *             finished_num  - [IN] the number of values being preprocessed   *
+ *             sequences_num - [IN] the number of registered task sequences   *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, int queued, int processing, int done,
-		int pending)
+zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t preproc_num,
+		zbx_uint64_t pending_num, zbx_uint64_t finished_num, zbx_uint64_t sequences_num)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0;
 
-	zbx_serialize_prepare_value(data_len, total);
-	zbx_serialize_prepare_value(data_len, queued);
-	zbx_serialize_prepare_value(data_len, processing);
-	zbx_serialize_prepare_value(data_len, done);
-	zbx_serialize_prepare_value(data_len, pending);
+	zbx_serialize_prepare_value(data_len, preproc_num);
+	zbx_serialize_prepare_value(data_len, pending_num);
+	zbx_serialize_prepare_value(data_len, finished_num);
+	zbx_serialize_prepare_value(data_len, sequences_num);
 
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
-	ptr += zbx_serialize_value(ptr, total);
-	ptr += zbx_serialize_value(ptr, queued);
-	ptr += zbx_serialize_value(ptr, processing);
-	ptr += zbx_serialize_value(ptr, done);
-	(void)zbx_serialize_value(ptr, pending);
+	ptr += zbx_serialize_value(ptr, preproc_num);
+	ptr += zbx_serialize_value(ptr, pending_num);
+	ptr += zbx_serialize_value(ptr, finished_num);
+	(void)zbx_serialize_value(ptr, sequences_num);
 
 	return data_len;
 }
@@ -524,7 +517,7 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, int total, i
  *             limit - [IN] the number of top values to return                *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int limit)
+zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, int limit)
 {
 	zbx_uint32_t	data_len = 0;
 
@@ -540,36 +533,34 @@ zbx_uint32_t	zbx_preprocessor_pack_top_items_request(unsigned char **data, int l
  * Purpose: pack top result data into a single buffer that can be used in IPC *
  *                                                                            *
  * Parameters: data      - [OUT] memory buffer for packed data                *
- *             items     - [IN] the array of item references                  *
- *             items_num - [IN] the number of items                           *
+ *             sequences - [IN] the list of sequences                         *
+ *             items_num - [IN] the number of sequences to pack               *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_items_result(unsigned char **data, zbx_preproc_item_stats_t **items,
-		int items_num)
+zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
+		zbx_vector_pp_sequence_stats_ptr_t *sequences, int sequences_num)
 {
 	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, item_len = 0;
+	zbx_uint32_t	data_len = 0, sequence_len = 0;
 	int		i;
 
-	if (0 != items_num)
+	if (0 != sequences_num)
 	{
-		zbx_serialize_prepare_value(item_len, items[0]->itemid);
-		zbx_serialize_prepare_value(item_len, items[0]->values_num);
-		zbx_serialize_prepare_value(item_len, items[0]->steps_num);
+		zbx_serialize_prepare_value(sequence_len, sequences->values[0]->itemid);
+		zbx_serialize_prepare_value(sequence_len, sequences->values[0]->tasks_num);
 	}
 
-	zbx_serialize_prepare_value(data_len, items_num);
-	data_len += item_len * (zbx_uint32_t)items_num;
+	zbx_serialize_prepare_value(data_len, sequences_num);
+	data_len += sequence_len * (zbx_uint32_t)sequences_num;
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
-	ptr += zbx_serialize_value(ptr, items_num);
+	ptr += zbx_serialize_value(ptr, sequences_num);
 
-	for (i = 0; i < items_num; i++)
+	for (i = 0; i < sequences_num; i++)
 	{
-		ptr += zbx_serialize_value(ptr, items[i]->itemid);
-		ptr += zbx_serialize_value(ptr, items[i]->values_num);
-		ptr += zbx_serialize_value(ptr, items[i]->steps_num);
+		ptr += zbx_serialize_value(ptr, sequences->values[i]->itemid);
+		ptr += zbx_serialize_value(ptr, sequences->values[i]->tasks_num);
 	}
 
 	return data_len;
@@ -681,30 +672,24 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
  *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
- * Parameters: total      - [OUT] the number of values                        *
- *             queued     - [OUT] the number of values waiting to be          *
- *                                preprocessed                                *
- *             processing - [OUT] the number of values being preprocessed     *
- *             done       - [OUT] the number of values waiting to be flushed  *
- *                                that are either preprocessed or did not     *
- *                                require preprocessing                       *
- *             pending    - [OUT] the number of values pending to be          *
- *                                preprocessed after previous value for       *
- *                                example delta, throttling depends on        *
- *                                previous value                              *
- *             data       - [IN] IPC data buffer                              *
+ * Parameters: preproc_num   - [OUT] the number of items with preprocessing   *
+ *                                related data (preprocessing, internal/      *
+ *                                master/dependent items)                     *
+ *             pending_num   - [OUT] the number of values waiting to be       *
+ *                               preprocessed                                 *
+ *             finished_num  - [OUT] the number of values being preprocessed  *
+ *             sequences_num - [OUT] the number of registered task sequences  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_diag_stats(int *total, int *queued, int *processing, int *done,
-		int *pending, const unsigned char *data)
+void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, const unsigned char *data)
 {
 	const unsigned char	*offset = data;
 
-	offset += zbx_deserialize_int(offset, total);
-	offset += zbx_deserialize_int(offset, queued);
-	offset += zbx_deserialize_int(offset, processing);
-	offset += zbx_deserialize_int(offset, done);
-	(void)zbx_deserialize_int(offset, pending);
+	offset += zbx_deserialize_value(offset, preproc_num);
+	offset += zbx_deserialize_value(offset, pending_num);
+	offset += zbx_deserialize_value(offset, finished_num);
+	(void)zbx_deserialize_value(offset, sequences_num);
 }
 
 /******************************************************************************
@@ -728,25 +713,24 @@ void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
  *             data  - [IN] memory buffer for packed data                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_top_result(zbx_vector_ptr_t *items, const unsigned char *data)
+void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences, const unsigned char *data)
 {
-	int	i, items_num;
+	int	i, sequences_num;
 
-	data += zbx_deserialize_value(data, &items_num);
+	data += zbx_deserialize_value(data, &sequences_num);
 
-	if (0 != items_num)
+	if (0 != sequences_num)
 	{
-		zbx_vector_ptr_reserve(items, (size_t)items_num);
+		zbx_vector_pp_sequence_stats_ptr_reserve(sequences, (size_t)sequences_num);
 
-		for (i = 0; i < items_num; i++)
+		for (i = 0; i < sequences_num; i++)
 		{
-			zbx_preproc_item_stats_t	*item;
+			zbx_pp_sequence_stats_t	*stat;
 
-			item = (zbx_preproc_item_stats_t *)zbx_malloc(NULL, sizeof(zbx_preproc_item_stats_t));
-			data += zbx_deserialize_value(data, &item->itemid);
-			data += zbx_deserialize_value(data, &item->values_num);
-			data += zbx_deserialize_value(data, &item->steps_num);
-			zbx_vector_ptr_append(items, item);
+			stat = (zbx_pp_sequence_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_sequence_stats_t));
+			data += zbx_deserialize_value(data, &stat->itemid);
+			data += zbx_deserialize_value(data, &stat->tasks_num);
+			zbx_vector_ptr_append(sequences, stat);
 		}
 	}
 }
@@ -1007,8 +991,8 @@ out:
  * Purpose: get preprocessing manager diagnostic statistics                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
-		int *pending, char **error)
+int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, char **error)
 {
 	unsigned char	*result;
 
@@ -1018,7 +1002,7 @@ int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, in
 		return FAIL;
 	}
 
-	zbx_preprocessor_unpack_diag_stats(total, queued, processing, done, pending, result);
+	zbx_preprocessor_unpack_diag_stats(preproc_num, pending_num, finished_num, sequences_num, result);
 	zbx_free(result);
 
 	return SUCCEED;
@@ -1029,13 +1013,14 @@ int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, in
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
-static int	preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error, zbx_uint32_t code)
+static int	preprocessor_get_top_view(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error,
+		zbx_uint32_t code)
 {
 	int		ret;
 	unsigned char	*data, *result;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_preprocessor_pack_top_items_request(&data, limit);
+	data_len = zbx_preprocessor_pack_top_sequences_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, code, SEC_PER_MIN, data, data_len,
 			&result, error)))
@@ -1043,7 +1028,7 @@ static int	preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char *
 		goto out;
 	}
 
-	zbx_preprocessor_unpack_top_result(items, result);
+	zbx_preprocessor_unpack_top_sequences_result(sequences, result);
 	zbx_free(result);
 out:
 	zbx_free(data);
@@ -1056,17 +1041,7 @@ out:
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error)
+int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error)
 {
-	return preprocessor_get_top_items(limit, items, error, ZBX_IPC_PREPROCESSOR_TOP_ITEMS);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get the oldest items with preprocessing still in queue            *
- *                                                                            *
- ******************************************************************************/
-int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error)
-{
-	return preprocessor_get_top_items(limit, items, error, ZBX_IPC_PREPROCESSOR_TOP_OLDEST_PREPROC_ITEMS);
+	return preprocessor_get_top_view(limit, sequences, error, ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES);
 }

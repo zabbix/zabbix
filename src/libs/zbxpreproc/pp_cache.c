@@ -135,3 +135,30 @@ void	pp_cache_copy_value(zbx_pp_cache_t *cache, unsigned char step_type, zbx_var
 		zbx_variant_copy(value, &cache->value);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if caching can be done for the specified preprocessing      *
+ *          data                                                              *
+ *                                                                            *
+ * Parameters: preproc  - [IN] the preprocessing data                         *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing caching is possible              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	pp_cache_is_supported(zbx_pp_item_preproc_t *preproc)
+{
+	if (0 < preproc->steps_num)
+	{
+		switch (preproc->steps[0].type)
+		{
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}

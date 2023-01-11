@@ -18,12 +18,12 @@
 **/
 
 #include "pp_manager.h"
-
 #include "pp_worker.h"
 #include "pp_queue.h"
 #include "pp_item.h"
 #include "pp_task.h"
 #include "preproc_snmp.h"
+#include "zbxpreproc.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
@@ -266,6 +266,38 @@ int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get the dependent item that must be preprocessed first            *
+ *                                                                            *
+ * Parameters: manager     - [IN] the manager                                 *
+ *             itemids     - [IN] the dependent itemids                       *
+ *             itemids_num - [IN] the number of dependent itemids             *
+ *                                                                            *
+ * Comments: Dependent items with cacheable preprocessing configuration are   *
+ *           prioritized over others.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_pp_item_t	*pp_manager_get_priority_dependent_item(zbx_pp_manager_t *manager, zbx_uint64_t *itemids,
+		int itemids_num)
+{
+	zbx_pp_item_t	*item, *item_backup = NULL;
+
+	for (int i = 0; i < itemids_num; i++)
+	{
+		if (NULL == (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &itemids[i])))
+			continue;
+
+		if (SUCCEED == pp_cache_is_supported(item->preproc))
+			return item;
+
+		if (NULL == item_backup)
+			item_backup = item;
+	}
+
+	return item_backup;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: queue new tasks in response to finished value task                *
  *                                                                            *
  * Parameters: manager - [IN] the manager                                     *
@@ -275,26 +307,19 @@ int	zbx_pp_manager_queue_preproc(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
 static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
+	zbx_pp_item_t		*item;
 
-	if (0 != d->preproc->dep_itemids_num)
+	if (NULL != (item = pp_manager_get_priority_dependent_item(manager, d->preproc->dep_itemids,
+			d->preproc->dep_itemids_num)))
 	{
-		zbx_pp_task_t		*dep_task;
-		zbx_pp_item_t		*item;
-		zbx_pp_item_preproc_t	*preproc;
-		zbx_variant_t		value;
+		zbx_pp_task_t	*dep_task;
+		zbx_variant_t	value;
 
-		dep_task = pp_task_dependent_create(d->preproc->dep_itemids[0], d->preproc);
-
-		if (NULL != (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &d->preproc->dep_itemids[0])))
-			preproc = item->preproc;
-		else
-			preproc = NULL;
-
+		dep_task = pp_task_dependent_create(task->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
 
 		zbx_variant_copy(&value, &d->result);
-		d_dep->first_task = pp_task_value_create(d->preproc->dep_itemids[0], preproc, &value, d->ts, NULL,
-				NULL);
+		d_dep->primary = pp_task_value_create(item->itemid, item->preproc, &value, d->ts, NULL, NULL);
 
 		pp_task_queue_push_immediate(&manager->queue, dep_task);
 		pp_task_queue_notify(&manager->queue);
@@ -314,16 +339,21 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	int	i;
 
 	zbx_pp_task_dependent_t	*d = (zbx_pp_task_dependent_t *)PP_TASK_DATA(task);
-	zbx_pp_task_t		*task_value = d->first_task;
+	zbx_pp_task_t		*task_value = d->primary;
 	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
-	pp_manager_queue_value_task_result(manager, d->first_task);
+	pp_manager_queue_value_task_result(manager, d->primary);
 
-	for (i = 1; i < d->preproc->dep_itemids_num; i++)
+	for (i = 0; i < d->preproc->dep_itemids_num; i++)
 	{
 		zbx_pp_item_t	*item;
 		zbx_pp_task_t	*new_task;
 
+		/* skip already preprocessed dependent item */
+		if (d->preproc->dep_itemids[i] == task_value->itemid)
+			continue;
+
+		/* skip disabled/removed items */
 		if (NULL == (item = (zbx_pp_item_t *)zbx_hashset_search(&manager->items, &d->preproc->dep_itemids[i])))
 			continue;
 
@@ -342,7 +372,7 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 
 	pp_task_queue_notify_all(&manager->queue);
 
-	d->first_task = NULL;
+	d->primary = NULL;
 	pp_task_free(task);
 
 	return task_value;
@@ -480,22 +510,66 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get manager configuration revision                                *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager)
 {
 	return manager->revision;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set manager configuration revision                                *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision)
 {
 	manager->revision = revision;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get item configuration data for reading and updates               *
+ *                                                                            *
+ ******************************************************************************/
 zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager)
 {
 	return &manager->items;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of pending preprocessing tasks                         *
+ *                                                                            *
+ ******************************************************************************/
 zbx_uint64_t	zbx_pp_manager_get_pending_num(zbx_pp_manager_t *manager)
 {
 	return manager->queue.pending_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get diagnostic statistics                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num)
+{
+	*preproc_num = (zbx_uint64_t)manager->items.num_data;
+	*pending_num = manager->queue.pending_num;
+	*finished_num = manager->queue.finished_num;
+	*sequences_num = (zbx_uint64_t)manager->queue.sequences.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get task sequence statistics                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences)
+{
+	pp_task_queue_get_sequence_stats(&manager->queue, sequences);
+}

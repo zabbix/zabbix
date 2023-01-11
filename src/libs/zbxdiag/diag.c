@@ -28,6 +28,7 @@
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxpreproc.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
@@ -43,11 +44,9 @@
 #define ZBX_DIAG_HISTORYCACHE_MEMORY	(ZBX_DIAG_HISTORYCACHE_MEMORY_DATA | \
 					ZBX_DIAG_HISTORYCACHE_MEMORY_INDEX)
 
-#define ZBX_DIAG_PREPROC_VALUES			0x00000001
-#define ZBX_DIAG_PREPROC_VALUES_PREPROC		0x00000002
+#define ZBX_DIAG_PREPROC_INFO			0x00000001
 
-#define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_VALUES | \
-					ZBX_DIAG_PREPROC_VALUES_PREPROC)
+#define ZBX_DIAG_PREPROC_SIMPLE		(ZBX_DIAG_PREPROC_INFO)
 
 static zbx_diag_add_section_info_func_t	add_diag_cb;
 
@@ -372,20 +371,18 @@ int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_j
  *             items - [IN] a top item list                                   *
  *                                                                            *
  ******************************************************************************/
-static void	diag_add_preproc_items(struct zbx_json *json, const char *field, const zbx_vector_ptr_t *items)
+static void	diag_add_preproc_sequences(struct zbx_json *json, const char *field,
+		const zbx_vector_pp_sequence_stats_ptr_t *sequences)
 {
 	int	i;
 
 	zbx_json_addarray(json, field);
 
-	for (i = 0; i < items->values_num; i++)
+	for (i = 0; i < sequences->values_num; i++)
 	{
-		const zbx_preproc_item_stats_t	*item = (const zbx_preproc_item_stats_t *)items->values[i];
-
 		zbx_json_addobject(json, NULL);
-		zbx_json_adduint64(json, "itemid", item->itemid);
-		zbx_json_adduint64(json, "values", item->values_num);
-		zbx_json_adduint64(json, "steps", item->steps_num);
+		zbx_json_adduint64(json, "itemid", sequences->values[i]->itemid);
+		zbx_json_adduint64(json, "tasks", sequences->values[i]->tasks_num);
 		zbx_json_close(json);
 	}
 
@@ -411,9 +408,7 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 	double			time1, time2, time_total = 0;
 	zbx_uint64_t		fields;
 	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_PREPROC_VALUES | ZBX_DIAG_PREPROC_VALUES_PREPROC},
-					{"values", ZBX_DIAG_PREPROC_VALUES},
-					{"preproc.values", ZBX_DIAG_PREPROC_VALUES_PREPROC},
+					{"", ZBX_DIAG_PREPROC_INFO},
 					{NULL, 0}
 					};
 
@@ -425,11 +420,11 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
-			int	total, queued, processing, done, pending;
+			zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num;
 
 			time1 = zbx_time();
-			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&total, &queued, &processing, &done,
-					&pending, error)))
+			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&preproc_num, &pending_num, &finished_num,
+					&sequences_num, error)))
 			{
 				goto out;
 			}
@@ -437,16 +432,12 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 			time2 = zbx_time();
 			time_total += time2 - time1;
 
-			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES))
+			if (0 != (fields & ZBX_DIAG_PREPROC_INFO))
 			{
-				zbx_json_addint64(json, "values", total);
-				zbx_json_addint64(json, "done", done);
-			}
-			if (0 != (fields & ZBX_DIAG_PREPROC_VALUES_PREPROC))
-			{
-				zbx_json_addint64(json, "queued", queued);
-				zbx_json_addint64(json, "processing", processing);
-				zbx_json_addint64(json, "pending", pending);
+				zbx_json_adduint64(json, "cached items", preproc_num);
+				zbx_json_adduint64(json, "pending tasks", pending_num);
+				zbx_json_adduint64(json, "finished tasks", finished_num);
+				zbx_json_adduint64(json, "task sequences", sequences_num);
 			}
 		}
 
@@ -460,29 +451,28 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 			{
 				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
 
-				if (0 == strcmp(map->name, "values") || 0 == strcmp(map->name, "oldest.preproc.values"))
+				if (0 == strcmp(map->name, "sequences"))
 				{
-					zbx_vector_ptr_t	items;
+					zbx_vector_pp_sequence_stats_ptr_t	sequences;
 
-					zbx_vector_ptr_create(&items);
+					zbx_vector_pp_sequence_stats_ptr_create(&sequences);
 					time1 = zbx_time();
-					if (0 == strcmp(map->name, "values"))
-						ret = zbx_preprocessor_get_top_items(map->value, &items, error);
-					else
-						ret = zbx_preprocessor_get_top_oldest_preproc_items(map->value, &items,
-								error);
 
-					if (FAIL == ret)
+					if (SUCCEED != (ret = zbx_preprocessor_get_top_sequences(map->value, &sequences,
+							error)))
 					{
-						zbx_vector_ptr_destroy(&items);
+						zbx_vector_ptr_destroy(&sequences);
 						goto out;
 					}
+
 					time2 = zbx_time();
 					time_total += time2 - time1;
 
-					diag_add_preproc_items(json, map->name, &items);
-					zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
-					zbx_vector_ptr_destroy(&items);
+					diag_add_preproc_sequences(json, map->name, &sequences);
+
+					zbx_vector_pp_sequence_stats_ptr_clear_ext(&sequences,
+							(zbx_pp_sequence_stats_ptr_free_func_t)(zbx_ptr_free));
+					zbx_vector_pp_sequence_stats_ptr_destroy(&sequences);
 				}
 				else
 				{
@@ -647,7 +637,7 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 		diag_add_section_request(j, ZBX_DIAG_VALUECACHE, "values", "request.values", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_PREPROCESSING)))
-		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "values", "oldest.preproc.values", NULL);
+		diag_add_section_request(j, ZBX_DIAG_PREPROCESSING, "sequences", NULL);
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_LLD)))
 		diag_add_section_request(j, ZBX_DIAG_LLD, "values", NULL);
@@ -847,8 +837,7 @@ static void	diag_log_preprocessing(struct zbx_json_parse *jp, char **out, size_t
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", msg);
 	zbx_free(msg);
 
-	diag_log_top_view(jp, "top.values", "$.top.values", out, out_alloc, out_offset);
-	diag_log_top_view(jp, "top.oldest.preproc.values", "$.top['oldest.preproc.values']", out, out_alloc, out_offset);
+	diag_log_top_view(jp, "top.sequences", "$.top.sequences", out, out_alloc, out_offset);
 
 	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
 }

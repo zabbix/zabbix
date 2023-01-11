@@ -24,18 +24,10 @@
 #include "zbxcacheconfig.h"
 #include "zbxpreproc.h"
 
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	int		values_num;
-	int		steps_num;
-}
-zbx_preproc_item_stats_t;
-
 /* the following functions are implemented differently for server and proxy */
 
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
+		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
 void	zbx_preprocessor_flush(void);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 
@@ -43,9 +35,9 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 		const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results, zbx_pp_history_t *history,
 		char **error);
 
-int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
-		int *pending, char **error);
+int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
+		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, char **error);
 
-int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
-int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error);
+int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error);
+
 #endif /* ZABBIX_PREPROC_H */

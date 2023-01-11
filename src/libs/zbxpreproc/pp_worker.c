@@ -63,7 +63,7 @@ static void	pp_task_process_value(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
 static void	pp_task_process_dependent(zbx_pp_context_t *ctx, zbx_pp_task_t *task)
 {
 	zbx_pp_task_dependent_t	*d = (zbx_pp_task_dependent_t *)PP_TASK_DATA(task);
-	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->first_task);
+	zbx_pp_task_value_t	*d_first = (zbx_pp_task_value_t *)PP_TASK_DATA(d->primary);
 
 	d->cache = pp_cache_create(d_first->preproc, &d_first->value);
 	pp_execute(ctx, d_first->preproc, d->cache, &d_first->value, d_first->ts, &d_first->result, NULL, NULL);
