@@ -4022,7 +4022,7 @@ static int	dbsync_compare_connector(const zbx_dc_connector_t *connector, const D
 	if (FAIL == dbsync_compare_str(dbrow[6], connector->timeout))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_uchar(dbrow[7], connector->retries))
+	if (FAIL == dbsync_compare_uchar(dbrow[7], connector->max_attempts))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[8], connector->token))
@@ -4084,7 +4084,7 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 	zbx_dc_connector_t	*connector;
 
 	if (NULL == (result = DBselect("select connectorid,protocol,data_type,url,max_records,max_senders,timeout,"
-				"retries,token,http_proxy,authtype,username,password,verify_peer,"
+				"max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
 				"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
 				"tags_evaltype"
 			" from connector")))

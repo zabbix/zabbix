@@ -548,6 +548,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	zbx_http_response_t	body = {0}, header = {0};
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
+	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
 	char			application_xml[] = {"Content-Type: application/xml"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request method '%s' URL '%s%s' headers '%s' message body '%s'",
@@ -649,6 +650,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			headers_slist = curl_slist_append(headers_slist, application_json);
 		else if (ZBX_POSTTYPE_XML == post_type)
 			headers_slist = curl_slist_append(headers_slist, application_xml);
+		else if (ZBX_POSTTYPE_NDJSON == post_type)
+			headers_slist = curl_slist_append(headers_slist, application_ndjson);
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))

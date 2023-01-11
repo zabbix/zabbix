@@ -49,14 +49,12 @@ typedef struct
 {
 	zbx_connector_worker_t		*workers;	/* preprocessing worker array */
 	int				worker_count;	/* preprocessing worker count */
-	zbx_hashset_t			linked_items;	/* linked items placed in queue */
 	zbx_hashset_t			connectors;
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			revision;	/* the configuration revision */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
-	zbx_list_t			queue;
 }
 zbx_connector_manager_t;
 
@@ -105,7 +103,7 @@ static void	connector_init_manager(zbx_connector_manager_t *manager)
 
 	manager->workers = (zbx_connector_worker_t *)zbx_calloc(NULL,
 			(size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER], sizeof(zbx_connector_worker_t));
-	zbx_list_create(&manager->queue);
+
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);

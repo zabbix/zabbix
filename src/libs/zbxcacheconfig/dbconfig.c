@@ -6517,7 +6517,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		connector->max_records = atoi(row[4]);
 		connector->max_senders = atoi(row[5]);
 		dc_strpool_replace(found, &connector->timeout, row[6]);
-		ZBX_STR2UCHAR(connector->retries, row[7]);
+		ZBX_STR2UCHAR(connector->max_attempts, row[7]);
 		dc_strpool_replace(found, &connector->token, row[8]);
 		dc_strpool_replace(found, &connector->http_proxy, row[9]);
 		ZBX_STR2UCHAR(connector->authtype, row[10]);
@@ -15638,7 +15638,7 @@ void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *conn
 		connector->max_records = dc_connector->max_records;
 		connector->max_senders = dc_connector->max_senders;
 		connector->timeout = zbx_strdup(connector->timeout, dc_connector->timeout);
-		connector->retries = dc_connector->retries;
+		connector->max_attempts = dc_connector->max_attempts;
 		connector->token = zbx_strdup(connector->token, dc_connector->token);
 		connector->http_proxy = zbx_strdup(connector->http_proxy, dc_connector->http_proxy);
 		connector->authtype = dc_connector->authtype;

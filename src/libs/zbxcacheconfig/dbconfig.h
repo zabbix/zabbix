@@ -865,7 +865,7 @@ typedef struct
 	int			max_records;
 	int			max_senders;
 	const char		*timeout;
-	unsigned char		retries;
+	unsigned char		max_attempts;
 	const char		*token;
 	const char		*http_proxy;
 	unsigned char		authtype;

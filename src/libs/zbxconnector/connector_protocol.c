@@ -128,7 +128,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	zbx_serialize_prepare_value(data_len, connector->data_type);
 	zbx_serialize_prepare_str_len(data_len, connector->url, url_len);
 	zbx_serialize_prepare_str_len(data_len, connector->timeout, timeout_len);
-	zbx_serialize_prepare_value(data_len, connector->retries);
+	zbx_serialize_prepare_value(data_len, connector->max_attempts);
 	zbx_serialize_prepare_str_len(data_len, connector->token, token_len);
 	zbx_serialize_prepare_str_len(data_len, connector->http_proxy, http_proxy_len);
 	zbx_serialize_prepare_value(data_len, connector->authtype);
@@ -138,7 +138,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	zbx_serialize_prepare_value(data_len, connector->verify_host);
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_cert_file, ssl_cert_file_len);
 	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_file, ssl_key_file_len);
-	zbx_serialize_prepare_str_len(data_len, connector-> ssl_key_password, ssl_key_password_len);
+	zbx_serialize_prepare_str_len(data_len, connector->ssl_key_password, ssl_key_password_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -155,7 +155,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 	ptr += zbx_serialize_value(ptr, connector->data_type);
 	ptr += zbx_serialize_str(ptr, connector->url, url_len);
 	ptr += zbx_serialize_str(ptr, connector->timeout, timeout_len);
-	ptr += zbx_serialize_value(ptr, connector->retries);
+	ptr += zbx_serialize_value(ptr, connector->max_attempts);
 	ptr += zbx_serialize_str(ptr, connector->token, token_len);
 	ptr += zbx_serialize_str(ptr, connector->http_proxy, http_proxy_len);
 	ptr += zbx_serialize_value(ptr, connector->authtype);
@@ -179,7 +179,7 @@ void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t
 	data += zbx_deserialize_value(data, &connector->data_type);
 	data += zbx_deserialize_str(data, &connector->url, url_len);
 	data += zbx_deserialize_str(data, &connector->timeout, timeout_len);
-	data += zbx_deserialize_value(data, &connector->retries);
+	data += zbx_deserialize_value(data, &connector->max_attempts);
 	data += zbx_deserialize_str(data, &connector->token, token_len);
 	data += zbx_deserialize_str(data, &connector->http_proxy, http_proxy_len);
 	data += zbx_deserialize_value(data, &connector->authtype);

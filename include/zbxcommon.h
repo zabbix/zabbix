@@ -741,6 +741,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_POSTTYPE_FORM		1
 #define ZBX_POSTTYPE_JSON		2
 #define ZBX_POSTTYPE_XML		3
+#define ZBX_POSTTYPE_NDJSON		4
 
 #define ZBX_RETRIEVE_MODE_CONTENT	0
 #define ZBX_RETRIEVE_MODE_HEADERS	1
