@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-04T12:38:43Z'
+  date: '2023-01-11T10:15:56Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -33,7 +33,7 @@ zabbix_export:
           type: DEPENDENT
           key: veeam.get.errors
           delay: '0'
-          history: 7d
+          history: 0d
           trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
@@ -41,7 +41,8 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.errors
+                - $.error
+              error_handler: CUSTOM_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -75,7 +76,8 @@ zabbix_export:
           params: |
             var Veeam = {
                 params: {},
-                //Add Params 
+                token: '',
+            
                 setParams: function (params) {
                     ['api_endpoint', 'user', 'password', 'created_after'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
@@ -87,100 +89,97 @@ zabbix_export:
                     if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
                         Veeam.params.api_endpoint += '/';
                     }
-                },
-                //Function for choose request 
-                request: function (url, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
+                    if (Veeam.params.created_after >= 365 || Veeam.params.created_after <= 1) {
+                        throw 'Incorrect "created_after" parameter given: ' + Veeam.params.created_after + '\nMust be between 1 and 365 days.';
                     }
-                    var response, 
-                        request = new HttpRequest();
-                    //Request used for get data 
+                },
+            
+                login: function () {
+            
+                    var resp, login = new HttpRequest();
+                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+                        login.setProxy(Veeam.params.http_proxy);
+                    }
+                    login.addHeader('Content-Type: application/x-www-form-urlencoded');
+                    login.addHeader('x-api-version: 1.0-rev2');
+                    resp = login.post(Veeam.params.api_endpoint+ '/oauth2/token', 
+                    'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password='+ encodeURIComponent(Veeam.params.password));
+            
+                    if (login.getStatus() !== 200 || resp === null) {
+                        throw 'Login failed with status code ' + login.getStatus() + ': ' + resp;
+                    }
+            
+                    try {
+                        resp =  JSON.parse(resp);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse authentication token for the logon session.'; 
+                    }
+                    if (!resp.hasOwnProperty('access_token')) {
+                        throw 'Auth response does not contain access token.';
+                    }
+                    Veeam.token = resp['access_token']
+            
+                },
+            
+                request: function (url) {
+              
+                    var response, request = new HttpRequest();
+                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+                        request.setProxy(Veeam.params.http_proxy);
+                    }
                     if (Veeam.token) {
                         request.addHeader('Authorization: Bearer ' + Veeam.token);
                         request.addHeader('x-api-version: 1.0-rev2');
-                    }
-                    //Request used for get access_token
-                    if (data !== '') {
-                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                        request.addHeader('x-api-version: 1.0-rev2');
-                        response = request.post(url, data);
-                    }
-                    else {
                         response = request.get(url);
                     }
-            
                     if (request.getStatus() !== 200 || response === null) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
                     try {
                         return JSON.parse(response);
                     }
                     catch (error) {
                         throw 'Failed to parse response received from API.';
-                    }
+                    } 
+                },
+            
+                getMetricsData: function() {
+                    var 
+                    data = {};
+                    ms = 86400000;
+                    start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
+                    endpoints = {
+                        'proxies': 'v1/backupInfrastructure/proxies',
+                        'repositories': 'v1/backupInfrastructure/repositories',
+                        'managedServers': 'v1/backupInfrastructure/managedServers',
+                        'repositories_states': 'v1/backupInfrastructure/repositories/states',
+                        'services': 'v1/services',
+                        'jobs_states': 'v1/jobs/states',
+                        'backups': 'v1/backups',
+                        'backupObjects': 'v1/backupObjects',
+                        'objectRestorePoints': 'v1/objectRestorePoints',
+                        'sessions': 'v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
+                    };
+            
+                    Object.keys(endpoints).forEach(function (key) {
+                        data[key] = Veeam.request(Veeam.params.api_endpoint + endpoints[key]);
+                    });
+            
+                    return data;
                 }
-            };  
-            var result,
-                data = {};
-                data['errors'] = {};
+            };
             
             try {
                 Veeam.setParams(JSON.parse(value));
-            
-                try {
-                    start_date = new Date((new Date().getTime()) - 86400000*Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
-                    result = Veeam.request(
-                        Veeam.params.api_endpoint+ '/oauth2/token',
-                        'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password='+ encodeURIComponent(Veeam.params.password)
-                    );
-            
-                    if ('access_token' in result) {
-                        Veeam.token = result['access_token'];
-                    } else {
-                        throw 'Auth response does not contain access token.';
-                    }
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
-                if (!('auth' in data.errors)) {
-                    try {
-                            {
-                                data.proxies = Veeam.request(Veeam.params.api_endpoint + '/v1/backupInfrastructure/proxies');
-                                data.repositories = Veeam.request(Veeam.params.api_endpoint + '/v1/backupInfrastructure/repositories')
-                                data.managedServers = Veeam.request(Veeam.params.api_endpoint + '/v1/backupInfrastructure/managedServers'); 
-                                data.repositories_states = Veeam.request(Veeam.params.api_endpoint + '/v1/backupInfrastructure/repositories/states');
-                                data.services = Veeam.request(Veeam.params.api_endpoint + '/v1/services');
-                                data.sessions = Veeam.request(Veeam.params.api_endpoint + '/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date));
-                                data.jobs_states = Veeam.request(Veeam.params.api_endpoint + '/v1/jobs/states');
-                                data.backups = Veeam.request(Veeam.params.api_endpoint + '/v1/backups');
-                                data.backupObjects = Veeam.request(Veeam.params.api_endpoint + '/v1/backupObjects');
-                                data.objectRestorePoints = Veeam.request(Veeam.params.api_endpoint + '/v1/objectRestorePoints');  
-                            }    
-                    }
-                    catch (error) {
-                    data.errors.raw = error.toString();
-                    }
-                }
+                Veeam.login();
+                return JSON.stringify(Veeam.getMetricsData());
             }
             catch (error) {
-                data.errors.params = error.toString();
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
+                return JSON.stringify({'error': error});
             }
-            
-            if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
-            }
-            else {
-                data.errors = '';
-            }
-            
-            return JSON.stringify(data);
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.DATA.TIMEOUT}'
           parameters:
@@ -195,7 +194,10 @@ zabbix_export:
               value: '{$VEEAM.USER}'
             -
               name: created_after
-              value: '{$CRAEATED.AFTER}'
+              value: '{$CREATED.AFTER}'
+            -
+              name: http_proxy
+              value: '{$VEEAM.HTTP.PROXY}'
           tags:
             -
               tag: component
@@ -245,7 +247,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
-              history: 1d
+              history: 0d
               trends: '0'
               value_type: TEXT
               description: 'Get jobs states [{#NAME}] raw data.'
@@ -344,7 +346,7 @@ zabbix_export:
                 value: '{$PROXIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery Porxies.'
+          description: 'Discovery Proxies.'
           item_prototypes:
             -
               uuid: 1daea1ba8ac144fc9e22296720af0b22
@@ -371,10 +373,10 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
-              history: 1d
+              history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get proxie [{#NAME}] [{#TYPE}] raw data.'
+              description: 'Get proxy [{#NAME}] [{#TYPE}] raw data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -413,10 +415,10 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
-              history: 1d
+              history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get proxie server raw data.'
+              description: 'Get proxy server raw data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -511,7 +513,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
-              history: 1d
+              history: 0d
               trends: '0'
               value_type: TEXT
               description: 'Get repositories [{#NAME}] [{#TYPE}] raw data.'
@@ -530,7 +532,7 @@ zabbix_export:
               uuid: 80a13587e8cc40ba886f987fcde23c13
               name: 'Veeam repositories: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
               type: DEPENDENT
-              key: 'veeam.repository.capasity[{#NAME}]'
+              key: 'veeam.repository.capacity[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -681,7 +683,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
-              history: 1d
+              history: 0d
               trends: '0'
               value_type: TEXT
               description: 'Get sessions [{#NAME}] [{#TYPE}] raw data.'
@@ -786,9 +788,9 @@ zabbix_export:
           value: veeam
       macros:
         -
-          macro: '{$CRAEATED.AFTER}'
+          macro: '{$CREATED.AFTER}'
           value: '7'
-          description: 'Returns sessions that are created after choosed days.'
+          description: 'Returns sessions that are created after chosen days.'
         -
           macro: '{$JOB.NAME.MATCHES}'
           value: '.*'
@@ -864,11 +866,14 @@ zabbix_export:
         -
           macro: '{$VEEAM.API.URL}'
           value: 'https://localhost:9419/api'
-          description: 'Veem API endpoint URL in the format <scheme>://<host>:<port>.'
+          description: 'Veeam API endpoint URL in the format <scheme>://<host>:<port>.'
         -
           macro: '{$VEEAM.DATA.TIMEOUT}'
           value: '10'
           description: 'A response timeout for API.'
+        -
+          macro: '{$VEEAM.HTTP.PROXY}'
+          description: 'Sets HTTP proxy to "proxy" value. If this parameter is empty then no proxy is used.'
         -
           macro: '{$VEEAM.PASSWORD}'
           type: SECRET_TEXT
