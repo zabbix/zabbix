@@ -199,14 +199,14 @@ $triggersForm->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'triggerprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Enable'), 'action', 'triggerprototype.massenable'))
+				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'triggerprototype.massenable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-triggerprototype')
 					->addClass('no-chkbxrange')
 					->removeid()
 			],
 			'triggerprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Disable'), 'action', 'triggerprototype.massdisable'))
+				'content' => (new CSubmitButton(_('Create disable'), 'action', 'triggerprototype.massdisable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-triggerprototype')
 					->addClass('no-chkbxrange')

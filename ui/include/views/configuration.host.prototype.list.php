@@ -193,14 +193,14 @@ $itemForm->addItem([
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Enable'), 'action', 'hostprototype.massenable'))
+				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'hostprototype.massenable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-hostprototype')
 					->addClass('no-chkbxrange')
 					->removeid()
 			],
 			'hostprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Disable'), 'action', 'hostprototype.massdisable'))
+				'content' => (new CSubmitButton(_('Create disabled'), 'action', 'hostprototype.massdisable'))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-hostprototype')
 					->addClass('no-chkbxrange')
