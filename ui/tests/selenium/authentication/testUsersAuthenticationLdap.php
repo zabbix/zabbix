@@ -839,7 +839,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 			// #1 LDAP server without any parameters.
 			[
 				[
-					'servers_settings' => [[]],
+					'servers_settings' => [
+						[
+							'fields' => []
+						]
+					],
 					'ldap_error' => 'Invalid LDAP configuration',
 					'ldap_error_details' => [
 						'Incorrect value for field "name": cannot be empty.',
