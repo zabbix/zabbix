@@ -427,13 +427,59 @@ class testUsersAuthenticationLdap extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'servers_settings' => [
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
-						'Search attribute' => 'uid'
+						'Host' => 'dc-ad-srv.zabbix.sandbox',
+						'Base DN' => 'DC=zbx,DC=local',
+						'Search attribute' => 'sAMAccountName'
 					],
 					'test_settings' => [
 						'Login' => 'employee',
 						'User password' => 'Secret123'
+					]
+				]
+			],
+			// #11 test with correct LDAP settings and JIT settings.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						'Host' => 'dc-ad-srv.zabbix.sandbox',
+						'Base DN' => 'DC=zbx,DC=local',
+						'Search attribute' => 'sAMAccountName',
+						'Bind DN' => 'CN=Admin,OU=Users,OU=Zabbix,DC=zbx,DC=local',
+						'Bind password' => 'zabbix#33',
+						'Configure JIT provisioning' => true,
+						'Group configuration' => 'memberOf',
+						'Group name attribute' => 'CN',
+						'User group membership attribute' => 'memberof',
+						'User name attribute' => 'mail'
+					],
+					'User group mapping' => [
+						[
+							'LDAP group pattern' => 'Zabbix admins',
+							'User groups' => 'Zabbix administrators',
+							'User role' => 'Super admin role'
+						],
+						[
+							'LDAP group pattern' => 'Zabbix users',
+							'User groups' => 'Guests',
+							'User role' => 'Guest role'
+						]
+					],
+					'Media type mapping' => [
+						[
+							'Name' => 'Email',
+							'id:mediatypeid' => 'Email',
+							'Attribute' => 'mail'
+						]
+					],
+					'test_settings' => [
+						'Login' => 'user1',
+						'User password' => 'zabbix#33'
+					],
+					'check_provisioning' =>[
+						'role' => 'Super admin role',
+						'groups' => 'Zabbix administratorsGuests',
+						'medias' => 'Email'
 					]
 				]
 			]
@@ -449,12 +495,42 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$form = $this->openLdapForm();
 		$form->fill(['Enable LDAP authentication' => true]);
 		$form->query('button:Add')->waitUntilCLickable()->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->fill($data['servers_settings']);
+		$server_form_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$server_form = $server_form_dialog->asForm();
+		$server_form->fill($data['servers_settings']);
+
+		if (CTestArrayHelper::get($data['servers_settings'], 'Configure JIT provisioning')) {
+			if (array_key_exists('User group mapping', $data)) {
+				foreach ($data['User group mapping'] as $group_mapping) {
+					$server_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()
+							->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+					$group_mapping_form = $dialog->asForm();
+					$group_mapping_form->fill($group_mapping);
+					$group_mapping_form->submit();
+					$dialog->waitUntilNotVisible();
+				}
+			}
+
+			if (array_key_exists('Media type mapping', $data)) {
+				foreach ($data['Media type mapping'] as $media_mapping) {
+					$server_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()
+							->one()->click();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+					$media_mapping_form = $dialog->asForm();
+					$media_mapping_form->fill($media_mapping);
+					$media_mapping_form->submit();
+					$dialog->waitUntilNotVisible();
+				}
+			}
+		}
+
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$test_form_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$test_form = $test_form_dialog->asForm();
 			$test_form->fill($data['test_settings'])->submit()->waitUntilReady();
 		}
 
@@ -465,6 +541,15 @@ class testUsersAuthenticationLdap extends CWebTest {
 		else {
 			$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
 		}
+
+		if (array_key_exists('check_provisioning', $data)) {
+			foreach ($data['check_provisioning'] as $id => $text) {
+				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()->one()->getText());
+			}
+		}
+
+		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$server_form_dialog->close();
 	}
 
 	/**
@@ -1252,13 +1337,13 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
 				if (array_key_exists('User group mapping', $ldap)) {
-					foreach ($ldap['User group mapping'] as $user_group_mapping) {
+					foreach ($ldap['User group mapping'] as $group_mapping) {
 						$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()
 								->one()->click();
 						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-						$usergroup_mapping_form = $dialog->asForm();
-						$usergroup_mapping_form->fill($user_group_mapping);
-						$usergroup_mapping_form->submit();
+						$group_mapping_form = $dialog->asForm();
+						$group_mapping_form->fill($group_mapping);
+						$group_mapping_form->submit();
 						$dialog->waitUntilNotVisible();
 					}
 				}
@@ -1268,9 +1353,9 @@ class testUsersAuthenticationLdap extends CWebTest {
 						$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()
 								->one()->click();
 						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-						$usergroup_mapping_form = $dialog->asForm();
-						$usergroup_mapping_form->fill($media_mapping);
-						$usergroup_mapping_form->submit();
+						$media_mapping_form = $dialog->asForm();
+						$media_mapping_form->fill($media_mapping);
+						$media_mapping_form->submit();
 						$dialog->waitUntilNotVisible();
 					}
 				}
