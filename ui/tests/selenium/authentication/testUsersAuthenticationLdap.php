@@ -526,10 +526,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 		}
 
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
+		$test_form_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 			$test_form = $test_form_dialog->asForm();
 			$test_form->fill($data['test_settings'])->submit()->waitUntilReady();
 		}
@@ -548,10 +548,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 		}
 
-		if (array_key_exists('test_settings', $data)) {
-			$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
-		}
-
+		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$server_form_dialog->close();
 	}
 
