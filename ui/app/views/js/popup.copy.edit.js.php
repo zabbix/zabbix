@@ -32,19 +32,18 @@ window.copy_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.curl = new Curl('zabbix.php');
 		this.curl.setArgument('action', action);
-		let copy_type = <?= COPY_TYPE_TO_HOST_GROUP ?>;
 
-		document.querySelectorAll('input[name="copy_type"]').forEach(element => {
-			element.addEventListener('change', () => {
-				this.changeTargetType(parseInt(element.value));
-			})
-		});
+		for (const element of document.querySelectorAll('input[name="copy_type"]')) {
+			element.addEventListener('change', () =>
+				this.changeTargetType(parseInt(element.value))
+			)
+		}
 
-		this.changeTargetType(copy_type);
+		this.changeTargetType();
 	}
 
-	changeTargetType(copy_type) {
-		let $multiselect = $('<div>', {
+	changeTargetType(copy_type = <?= COPY_TYPE_TO_HOST_GROUP ?>) {
+		const $multiselect = $('<div>', {
 			id: 'copy_targetids',
 			class: 'multiselect',
 			css: {
