@@ -254,7 +254,7 @@ $form = (new CForm('post', $form_action))
 			(new CLabel([
 				_('Media type mapping'),
 				makeHelpIcon(
-					_('Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.')
+					_("Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications.")
 			)]))->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CDiv(
