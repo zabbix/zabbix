@@ -1,4 +1,3 @@
-
 # Etcd by HTTP
 
 ## Overview
@@ -13,8 +12,8 @@ The template `Etcd by HTTP ` — collects metrics by help of HTTP agent from `/
 
 **For the users of  `etcd version <= 3.4` !**
 
-> In `etcd v3.5` some metrics used by this template have been deprecated. See more details [here](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
-  Please upgrade your `etcd` instance, or use older `etcd` version by Zabbix template.
+> In `etcd v3.5` some metrics have been deprecated. See more details on [Upgrade etcd from 3.4 to 3.5](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
+  Please upgrade your `etcd` instance, or use older `Etcd by HTTP` template version.
 
 This template has been tested on:
 
@@ -32,9 +31,9 @@ Follow these instructions:
 4. Add the template to each `etcd node`.
   By default the template uses a client's port. You can configure metrics endpoint location by adding `--listen-metrics-urls flag`. (For more details, see [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
 
-If you have specified a non-standard port for `etcd`:
+Addtional points to consider:
 
--  Don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
+-  If you have specified a non-standard port for `etcd`, don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
 -  You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
 -  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`.
 -  See the macros section, as it will set the trigger values.
@@ -61,18 +60,18 @@ No specific Zabbix configuration is required.
 |{$ETCD.SCHEME} |<p>The request schem,e which may be `http` or `https`.</p> |`http` |
 |{$ETCD.USER} |<p>-</p> |`` |
 
-## Template links
+### Template links
 
 There are no template links in this template.
 
-## Discovery rules
+### Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |gRPC codes discovery |<p>-</p> |DEPENDENT |etcd.grpc_code.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_server_handled_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#GRPC.CODE} NOT_MATCHES_REGEX `{$ETCD.GRPC_CODE.NOT_MATCHES}`</p><p>- {#GRPC.CODE} MATCHES_REGEX `{$ETCD.GRPC_CODE.MATCHES}`</p><p>**Overrides:**</p><p>trigger<br> - {#GRPC.CODE} MATCHES_REGEX `{$ETCD.GRPC_CODE.TRIGGER.MATCHES}`<br>  - TRIGGER_PROTOTYPE LIKE `Too many failed gRPC requests`<br>  - DISCOVER</p> |
 |Peers discovery |<p>-</p> |DEPENDENT |etcd.peer.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_network_peer_sent_bytes_total`</p> |
 
-## Items collected
+### Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -120,7 +119,7 @@ There are no template links in this template.
 |Zabbix raw items |Etcd: Get node metrics |<p>-</p> |HTTP_AGENT |etcd.get_metrics |
 |Zabbix raw items |Etcd: Get version |<p>-</p> |HTTP_AGENT |etcd.get_version |
 
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
