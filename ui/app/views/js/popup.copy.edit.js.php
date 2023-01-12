@@ -43,14 +43,15 @@ window.copy_popup = new class {
 	}
 
 	changeTargetType(copy_type = <?= COPY_TYPE_TO_HOST_GROUP ?>) {
-		const $multiselect = $('<div>', {
-			id: 'copy_targetids',
-			class: 'multiselect',
-			css: {
-				width: '<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px'
-			},
-			'aria-required': true
-		});
+		document.querySelector("#copy_targets").innerHTML = "";
+
+		var multiselect = document.createElement("div");
+		multiselect.setAttribute("id", "copy_targetids");
+		multiselect.setAttribute("class", "multiselect");
+		multiselect.style.width = "<?= ZBX_TEXTAREA_MEDIUM_WIDTH ?>px";
+		multiselect.setAttribute("aria-required", true);
+
+		document.querySelector("#copy_targets").appendChild(multiselect);
 
 		const helper_options = {
 			id: 'copy_targetids',
@@ -95,14 +96,13 @@ window.copy_popup = new class {
 				break;
 		}
 
-		$('#copy_targets').html($multiselect);
-		$multiselect.multiSelectHelper(helper_options);
-
-		$multiselect.on('change', () => {
-			$('#copy_targetids').multiSelect('setDisabledEntries',
-				[... this.form.querySelectorAll('[name^="copy_targetids["]')].map((input) => input.value)
-			);
-		});
+		jQuery('#copy_targetids')
+			.multiSelectHelper(helper_options)
+			.on('change', () => {
+				$('#copy_targetids').multiSelect('setDisabledEntries',
+					[... this.form.querySelectorAll('[name^="copy_targetids["]')].map((input) => input.value)
+				);
+			});
 	}
 
 	submit() {
