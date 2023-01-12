@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-11T15:44:24Z'
+  date: '2023-01-12T07:39:22Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -227,7 +227,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.reports_summary.JobStatistics.ScheduledJobs
+                - $.JobStatistics.ScheduledJobs
               error_handler: DISCARD_VALUE
           master_item:
             key: veeam.manager.get.metrics
