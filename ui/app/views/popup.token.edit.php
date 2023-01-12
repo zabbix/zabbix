@@ -164,9 +164,9 @@ $output = [
 	'body' => $token_form->toString(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.token.edit.js.php').
-		'token_edit_popup.init("'.
-			$data['csrf_tokens'].
-		'");',
+		'token_edit_popup.init('. json_encode([
+			'csrf_tokens' => $data['csrf_tokens']
+		]) .');',
 	'buttons' => $buttons
 ];
 

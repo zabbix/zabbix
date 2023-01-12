@@ -447,7 +447,7 @@ $output = [
 			'keepOpen' => true,
 			'enabled' => true,
 			'isSubmit' => true,
-			'action' => 'return itemCompleteTest(overlay, "'. $data['csrf_tokens']['popup.itemtest.send'] .'");'
+			'action' => 'return itemCompleteTest(overlay);'
 		]
 	]
 ];

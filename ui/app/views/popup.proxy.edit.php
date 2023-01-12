@@ -198,8 +198,7 @@ $form
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
 				'proxyid' => $data['proxyid'],
-				'csrf_tokens' => $data['csrf_tokens'],
-
+				'csrf_tokens' => $data['csrf_tokens']
 			]).');
 		'))->setOnDocumentReady()
 	);

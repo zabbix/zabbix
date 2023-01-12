@@ -35,7 +35,7 @@ window.token_edit_popup = {
 	expires_state: null,
 	csrf_tokens: null,
 
-	init(csrf_tokens) {
+	init({csrf_tokens}) {
 		this.overlay = overlays_stack.getById('token_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');

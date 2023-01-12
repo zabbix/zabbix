@@ -35,7 +35,7 @@ function tabFilterDelete(overlay) {
 		url = new Curl($form.attr('action')),
 		form_data = $form.serializeJSON();
 
-	url.setAction('popup.tabfilter.delete', <?= json_encode($data['csrf_tokens']['popup.tabfilter.delete'])?>);
+	url.setAction('popup.tabfilter.delete', <?= json_encode($data['csrf_tokens']['popup.tabfilter.delete']) ?>);
 	url.setArgument('idx', form_data['idx']);
 	url.setArgument('idx2', form_data['idx2']);
 

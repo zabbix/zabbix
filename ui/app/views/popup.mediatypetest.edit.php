@@ -79,6 +79,7 @@ else {
 				->setEnabled($data['enabled'])
 		);
 }
+
 $form = (new CForm())
 	->cleanItems()
 	->setName('mediatypetest_form')
