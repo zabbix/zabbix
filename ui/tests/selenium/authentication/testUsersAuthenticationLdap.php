@@ -199,9 +199,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 			$this->assertTrue($field->isVisible());
 			$this->assertTrue($field->isEnabled());
 			$this->assertEquals('', $field->getValue());
-			$this->assertStringContainsString('form-label-asterisk',
-					$group_mapping_form->getLabel($label)->getAttribute('class')
-			);
+			$this->assertStringContainsString('form-label-asterisk', $group_mapping_form->getLabel($label)->getAttribute('class'));
 		}
 
 		// Check hint in group mapping popup.
@@ -501,27 +499,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 		if (CTestArrayHelper::get($data['servers_settings'], 'Configure JIT provisioning')) {
 			if (array_key_exists('User group mapping', $data)) {
-				foreach ($data['User group mapping'] as $group_mapping) {
-					$server_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()
-							->one()->click();
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$group_mapping_form = $dialog->asForm();
-					$group_mapping_form->fill($group_mapping);
-					$group_mapping_form->submit();
-					$dialog->waitUntilNotVisible();
-				}
+				$this->setMapping($data['User group mapping'], $server_form, 'User group mapping');
 			}
 
 			if (array_key_exists('Media type mapping', $data)) {
-				foreach ($data['Media type mapping'] as $media_mapping) {
-					$server_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()
-							->one()->click();
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$media_mapping_form = $dialog->asForm();
-					$media_mapping_form->fill($media_mapping);
-					$media_mapping_form->submit();
-					$dialog->waitUntilNotVisible();
-				}
+				$this->setMapping($data['Media type mapping'], $server_form, 'Media type mapping');
 			}
 		}
 
@@ -1337,27 +1319,11 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
 				if (array_key_exists('User group mapping', $ldap)) {
-					foreach ($ldap['User group mapping'] as $group_mapping) {
-						$ldap_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()
-								->one()->click();
-						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-						$group_mapping_form = $dialog->asForm();
-						$group_mapping_form->fill($group_mapping);
-						$group_mapping_form->submit();
-						$dialog->waitUntilNotVisible();
-					}
+					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping');
 				}
 
 				if (array_key_exists('Media type mapping', $ldap)) {
-					foreach ($ldap['Media type mapping'] as $media_mapping) {
-						$ldap_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()
-								->one()->click();
-						$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-						$media_mapping_form = $dialog->asForm();
-						$media_mapping_form->fill($media_mapping);
-						$media_mapping_form->submit();
-						$dialog->waitUntilNotVisible();
-					}
+					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping');
 				}
 			}
 
@@ -1393,6 +1359,24 @@ class testUsersAuthenticationLdap extends CWebTest {
 
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
+		}
+	}
+
+	/**
+	 * Set mapping for LDAP server.
+	 *
+	 * @param array            $data	 given mapping
+	 * @param CFormElement     $form     LDAP form
+	 * @param string           $field    mapping field which is being filled
+	 */
+	private function setMapping($data, $form, $field) {
+		foreach ($data as $mapping) {
+			$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$param_form = $dialog->asForm();
+			$param_form->fill($mapping);
+			$param_form->submit();
+			$dialog->waitUntilNotVisible();
 		}
 	}
 }
