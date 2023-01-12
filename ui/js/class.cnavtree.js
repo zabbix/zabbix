@@ -58,8 +58,8 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_mouseDrag: function(event) {
-			var o = this.options,
-				prev_offset_top;
+			const o = this.options;
+			let prev_offset_top;
 
 			// Compute the helpers position.
 			this.position = this._generatePosition(event);
@@ -130,10 +130,10 @@ if (typeof addPopupValues === 'undefined') {
 			}
 
 			// re-arrange
-			for (var i = this.items.length - 1; i >= 0; i--) {
+			for (let i = this.items.length - 1; i >= 0; i--) {
 
 				// Cache variables and intersection, continue if no intersection.
-				var item = this.items[i], itemElement = item.item[0], intersection = this._intersectsWithPointer(item);
+				const item = this.items[i], itemElement = item.item[0], intersection = this._intersectsWithPointer(item);
 
 				if (!intersection) {
 					continue;
@@ -145,7 +145,7 @@ if (typeof addPopupValues === 'undefined') {
 						&& !$.contains(this.placeholder[0], itemElement)
 						&& (this.options.type == 'semi-dynamic' ? !$.contains(this.element[0], itemElement) : true)) {
 					if (!this.hovering && !$(itemElement).hasClass('opened')) {
-						var uiObj = this;
+						const uiObj = this;
 
 						$(itemElement).addClass('hovering');
 
@@ -184,11 +184,11 @@ if (typeof addPopupValues === 'undefined') {
 				}
 			}
 
-			var parent_item = $(this.placeholder.parent()).closest('.tree-item'),
+			const parent_item = $(this.placeholder.parent()).closest('.tree-item'),
 				level = +$(this.placeholder.parent()).attr('data-depth'),
-				prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
+				child_levels = this._levelsUnder(this.currentItem[0]);
+			let prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
 				next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null,
-				child_levels = this._levelsUnder(this.currentItem[0]),
 				direction_moved = null,
 				levels_moved = 0;
 
@@ -250,7 +250,7 @@ if (typeof addPopupValues === 'undefined') {
 			$('.highlighted-parent').removeClass('highlighted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
-				var drop_to = prev_item,
+				const drop_to = prev_item,
 					uiObj = this;
 
 				this._isAllowed(prev_item, level, level + child_levels);
@@ -272,9 +272,9 @@ if (typeof addPopupValues === 'undefined') {
 			}
 
 			else if (direction_moved === 'left' && levels_moved) {
-				var drop_to = $(this.currentItem[0]).closest('.tree-item'),
-					one_before = null,
-					uiObj = this;
+				let drop_to = $(this.currentItem[0]).closest('.tree-item'),
+					one_before = null;
+				const uiObj = this;
 
 				while (levels_moved > 0) {
 					if ($(drop_to).parent().closest('.tree-item').length) {
@@ -351,7 +351,7 @@ if (typeof addPopupValues === 'undefined') {
 				$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
 
 				if (this.options.revert) {
-					var self = this,
+					const self = this,
 						cur = self.placeholder.offset();
 
 					self.reverting = true;
@@ -374,11 +374,11 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_isAllowed: function(parentItem, level, levels) {
-			if (this.options.max_depth != 0 && (this.options.max_depth < levels
+			if (this.options.max_depth != 0 && (this.options.max_depth+1 < levels
 					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth)
 			) {
 				this.placeholder.addClass('sortable-error');
-				this.beyondMaxLevels = levels - this.options.max_depth;
+				this.beyondMaxLevels = levels - (this.options.max_depth+1);
 			}
 			else {
 				this.placeholder.removeClass('sortable-error');
@@ -387,7 +387,8 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_levelsUnder: function(item) {
-			var depths = [], levels;
+			const depths = [];
+			let levels;
 
 			$('.tree-list', item).not(':empty').each(function(i, item) {
 				levels = 0;
