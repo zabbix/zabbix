@@ -28,7 +28,7 @@ Follow these instructions:
 
 1. Import the template into Zabbix.
 2. After importing the template, make sure that `etcd` allows the collection of metrics. You can test it by running: `curl -L http://localhost:2379/metrics`.
-3. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it,  run `curl -L  http://<etcd_node_address>:2379/metrics`
+3. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it,  run `curl -L  http://<etcd_node_address>:2379/metrics`.
 4. Add the template to each `etcd node`.
   By default the template uses a client's port. You can configure metrics endpoint location by adding `--listen-metrics-urls flag`. (For more details, see [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
 
@@ -36,7 +36,7 @@ If you have specified a non-standard port for `etcd`:
 
 -  Don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
 -  You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
--  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`
+-  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`.
 -  See the macros section, as it will set the trigger values.
 
 ## Zabbix configuration
@@ -78,8 +78,8 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Etcd |Etcd: Service's TCP port state |<p>-</p> |SIMPLE |net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Node health |<p>-</p> |HTTP_AGENT |etcd.health<p>**Preprocessing**:</p><p>- JSONPATH: `$.health`</p><p>- BOOL_TO_DECIMAL</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|Etcd |Etcd: Server is a leader |<p>It defines - whether or not this member is a leader.</p><p>1 - if it is;</p><p>0 - otherwise.</p> |DEPENDENT |etcd.is.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_is_leader`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|Etcd |Etcd: Server has a leader |<p>It defines - whether or not a leader exists.</p><p>1 - it exists;</p><p>0 - it does not.</p> |DEPENDENT |etcd.has.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_has_leader`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Etcd |Etcd: Server is a leader |<p>It defines - whether or not this member is a leader:</p><p>1 - it is;</p><p>0 - otherwise.</p> |DEPENDENT |etcd.is.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_is_leader`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Etcd |Etcd: Server has a leader |<p>It defines - whether or not a leader exists:</p><p>1 - it exists;</p><p>0 - it does not.</p> |DEPENDENT |etcd.has.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_has_leader`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Leader changes |<p>The number of leader changes the member has seen since its start.</p> |DEPENDENT |etcd.leader.changes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_leader_changes_seen_total`</p> |
 |Etcd |Etcd: Proposals committed per second |<p>The number of consensus proposals committed.</p> |DEPENDENT |etcd.proposals.committed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_committed_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals applied per second |<p>The number of consensus proposals applied.</p> |DEPENDENT |etcd.proposals.applied.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_applied_total`</p><p>- CHANGE_PER_SECOND</p> |
@@ -101,7 +101,7 @@ There are no template links in this template.
 |Etcd |Etcd: Keys compacted per second |<p>The number of DB keys compacted per second.</p> |DEPENDENT |etcd.keys.compacted.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_db_compaction_keys_total`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Keys expired per second |<p>The number of expired keys per second.</p> |DEPENDENT |etcd.keys.expired.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_store_expires_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Keys total |<p>The total number of keys.</p> |DEPENDENT |etcd.keys.total<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_keys_total`</p> |
-|Etcd |Etcd: Uptime |<p>Etcd server uptime.</p> |DEPENDENT |etcd.uptime<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_start_time_seconds`</p><p>- JAVASCRIPT: `//use boottime to calculate uptime return (Math.floor(Date.now()/1000)-Number(value)); `</p> |
+|Etcd |Etcd: Uptime |<p>`Etcd` server uptime.</p> |DEPENDENT |etcd.uptime<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_start_time_seconds`</p><p>- JAVASCRIPT: `//use boottime to calculate uptime return (Math.floor(Date.now()/1000)-Number(value)); `</p> |
 |Etcd |Etcd: Virtual memory |<p>The size of virtual memory expressed in bytes.</p> |DEPENDENT |etcd.virtual.bytes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_virtual_memory_bytes`</p> |
 |Etcd |Etcd: Resident memory |<p>The size of resident memory expressed in bytes.</p> |DEPENDENT |etcd.res.bytes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_resident_memory_bytes`</p> |
 |Etcd |Etcd: CPU |<p>The total user and system CPU time spent in seconds.</p> |DEPENDENT |etcd.cpu.util<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `process_cpu_seconds_total`</p><p>- CHANGE_PER_SECOND</p> |
