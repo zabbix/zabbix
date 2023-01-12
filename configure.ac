@@ -2008,6 +2008,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxstats/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
 	src/libs/zbxtime/Makefile

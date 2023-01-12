@@ -17,28 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRAPPER_H
-#define ZABBIX_TRAPPER_H
+#include "preproc_stats.h"
 
-#include "zbxthreads.h"
-#include "zbxcomms.h"
-#include "zbxvault.h"
+#include "preproc.h"
+#include "zbxjson.h"
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
-extern char	*CONFIG_STATS_ALLOWED_IP;
-
-#define ZBX_IPC_SERVICE_TRAPPER	"trapper"
-
-typedef struct
+void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg)
 {
-	zbx_config_comms_args_t	*config_comms;
-	zbx_config_vault_t	*config_vault;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	zbx_socket_t		*listen_sock;
-	int			config_startup_time;
+	ZBX_UNUSED(arg);
+
+	/* zabbix[preprocessing_queue] */
+	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 }
-zbx_thread_trapper_args;
-
-ZBX_THREAD_ENTRY(trapper_thread, args);
-
-#endif

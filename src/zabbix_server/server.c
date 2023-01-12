@@ -81,6 +81,7 @@
 #include "zbxthreads.h"
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
+#include "preprocessor/preproc_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -317,6 +318,8 @@ static int	get_config_timeout(void)
 	return config_timeout;
 }
 
+static int	config_startup_time	= 0;
+
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -372,8 +375,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 10;
@@ -610,7 +611,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	CONFIG_SERVER_STARTUP_TIME = time(NULL);
+	config_startup_time = time(NULL);
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
@@ -1261,6 +1262,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
+	zbx_init_library_stats(get_program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1388,9 +1390,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, 0, config_timeout};
 
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
-							listen_sock};
+	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
+							config_startup_time};
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type, listen_sock,
+							config_startup_time};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, config_timeout};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							config_timeout};
@@ -1399,9 +1402,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, config_timeout};
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {config_timeout};
-	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout};
+	zbx_thread_taskmanager_args	taskmanager_args = {config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, config_timeout};
 	zbx_thread_pinger_args		pinger_args = {config_timeout};
+
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {config_timeout};
 #endif
@@ -2036,7 +2040,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_set_exiting_with_fail();
 	}
 
-	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
+	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
+	zbx_register_stats_data_func(zbx_server_stats_ext_get, NULL);
+	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
