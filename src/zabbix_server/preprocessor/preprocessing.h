@@ -34,6 +34,7 @@
 #define ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT		8
 #define ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES		9
 #define ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES_RESULT	10
+#define ZBX_IPC_PREPROCESSOR_USAGE_STATS		11
 
 /* item value data used in preprocessing manager */
 typedef struct
@@ -75,6 +76,8 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
 
 void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences,
 		const unsigned char *data);
+
+zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage);
 
 ZBX_PTR_VECTOR_DECL(ipcmsg, zbx_ipc_message_t *)
 

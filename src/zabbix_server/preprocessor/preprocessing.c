@@ -510,6 +510,31 @@ zbx_uint32_t	zbx_preprocessor_pack_diag_stats(unsigned char **data, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: pack diagnostic statistics data into a single buffer that can be  *
+ *          used in IPC                                                       *
+ * Parameters: data    - [OUT] memory buffer for packed data                  *
+ *             usage   - [IN] the worker usage statistics                     *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len;
+
+	data_len = (zbx_uint32_t)(usage->values_num * sizeof(double) + sizeof(int));
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += zbx_serialize_value(ptr, usage->values_num);
+
+	for (int i = 0; i < usage->values_num; i++)
+		ptr += zbx_serialize_value(ptr, usage->values[i]);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: pack top request data into a single buffer that can be used in IPC*
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
@@ -694,6 +719,31 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: unpack worker usage statistics                                    *
+ *                                                                            *
+ * Parameters: usage - [OUT] the worker usage statistics                      *
+ *             data  - [IN] the input data                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, const unsigned char *data)
+{
+	const unsigned char	*offset = data;
+	int			usage_num;
+
+	offset += zbx_deserialize_value(offset, &usage_num);
+	zbx_vector_dbl_reserve(usage, usage_num);
+
+	for (int i = 0; i < usage_num; i++)
+	{
+		double	busy;
+
+		offset += zbx_deserialize_value(offset, &busy);
+		zbx_vector_dbl_append(usage, busy);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: unpack preprocessing test data from IPC data buffer               *
  *                                                                            *
  * Parameters: data  - [OUT] memory buffer for packed data                    *
@@ -730,7 +780,7 @@ void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_p
 			stat = (zbx_pp_sequence_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_sequence_stats_t));
 			data += zbx_deserialize_value(data, &stat->itemid);
 			data += zbx_deserialize_value(data, &stat->tasks_num);
-			zbx_vector_ptr_append(sequences, stat);
+			zbx_vector_pp_sequence_stats_ptr_append(sequences, stat);
 		}
 	}
 }
@@ -1044,4 +1094,25 @@ out:
 int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error)
 {
 	return preprocessor_get_top_view(limit, sequences, error, ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get preprocessing manager diagnostic statistics                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, char **error)
+{
+	unsigned char	*result;
+
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_USAGE_STATS,
+			SEC_PER_MIN, NULL, 0, &result, error))
+	{
+		return FAIL;
+	}
+
+	zbx_preprocessor_unpack_usage_stats(usage, result);
+	zbx_free(result);
+
+	return SUCCEED;
 }

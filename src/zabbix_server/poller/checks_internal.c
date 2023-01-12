@@ -171,6 +171,68 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 	return SUCCEED;
 }
 
+static double	get_selfmon_stat(double busy, unsigned char state)
+{
+	return (ZBX_PROCESS_STATE_BUSY == state ? busy : 100.0 - busy);
+}
+
+static int	get_preprocessor_selfmon_stats(unsigned char aggr_func, int proc_num, unsigned char state,
+		double *value, char **error)
+{
+	zbx_vector_dbl_t	usage;
+	int			ret;
+
+	zbx_vector_dbl_create(&usage);
+
+	if (SUCCEED != (ret = zbx_preprocessor_get_usage_stats(&usage, error)))
+		goto out;
+
+	if (0 == usage.values_num)
+	{
+		*value = 0;
+		goto out;
+	}
+
+	if (ZBX_SELFMON_AGGR_FUNC_ONE == aggr_func)
+	{
+		*value = get_selfmon_stat(usage.values[proc_num - 1], state);
+	}
+	else
+	{
+		double	min, max, total;
+
+		min = max = total = usage.values[0];
+
+		for (int i = 1; i < usage.values_num; i++)
+		{
+			if (usage.values[i] < min)
+				min = usage.values[i];
+
+			if (usage.values[i] > max)
+				max = usage.values[i];
+
+			total += usage.values[i];
+		}
+
+		switch (aggr_func)
+		{
+			case ZBX_SELFMON_AGGR_FUNC_AVG:
+				*value = get_selfmon_stat(total / usage.values_num, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MIN:
+				*value = get_selfmon_stat(min, state);
+				break;
+			case ZBX_SELFMON_AGGR_FUNC_MAX:
+				*value = get_selfmon_stat(max, state);
+				break;
+		}
+	}
+out:
+	zbx_vector_dbl_destroy(&usage);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
@@ -537,7 +599,21 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR != process_type)
+			{
+				zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			}
+			else
+			{
+				char	*error = NULL;
+
+				if (SUCCEED != get_preprocessor_selfmon_stats(aggr_func, process_num, state, &value,
+						&error))
+				{
+					SET_MSG_RESULT(result, error);
+					goto out;
+				}
+			}
 
 			SET_DBL_RESULT(result, value);
 		}

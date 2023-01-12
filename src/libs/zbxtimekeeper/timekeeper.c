@@ -532,6 +532,60 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get usage statistics for all monitored processes/threads          *
+ *                                                                            *
+ * Parameters: timekeeper - [IN] the timekeeper                               *
+ *             usage      - [IN] the busy % for all monitored units           *
+ *                                                                            *
+ * Return value: SUCCEED - the statistics were retrieved successfully         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_timekeeper_get_usage(zbx_timekeeper_t *timekeeper, zbx_vector_dbl_t *usage)
+{
+	int	current, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_dbl_reserve(usage, timekeeper->units_num);
+
+	timekeeper->sync->lock(timekeeper->sync->data);
+
+	if (1 >= timekeeper->count)
+		goto out;
+
+	if (MAX_HISTORY <= (current = (timekeeper->first + timekeeper->count - 1)))
+		current -= MAX_HISTORY;
+
+	for (int i = 0; i < timekeeper->units_num; i++)
+	{
+		unsigned int	total = 0, busy;
+		unsigned char	s;
+
+		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
+		{
+			total += (unsigned short)(timekeeper->units[i].h_counter[s][current] -
+					timekeeper->units[i].h_counter[s][timekeeper->first]);
+		}
+
+		busy = (unsigned short)(timekeeper->units[i].h_counter[ZBX_PROCESS_STATE_BUSY][current] -
+				timekeeper->units[i].h_counter[ZBX_PROCESS_STATE_BUSY][timekeeper->first]);
+
+		zbx_vector_dbl_append(usage, (0 == total ? 0 : 100. * (double)busy / (double)total));
+	}
+
+	ret = SUCCEED;
+out:
+	timekeeper->sync->unlock(timekeeper->sync->data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get raw counters for all processes/threads                        *
  *                                                                            *
  * Parameters: timekeeper - [IN] the timekeeper                               *

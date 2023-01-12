@@ -432,6 +432,8 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num)
 {
 	zbx_pp_task_t	*task;
+	static time_t	timekeeper_clock = 0;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -469,6 +471,13 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 	*finished_num = manager->queue.finished_num;
 
 	pp_task_queue_unlock(&manager->queue);
+
+	now = time(NULL);
+	if (now != timekeeper_clock)
+	{
+		zbx_timekeeper_collect(manager->timekeeper);
+		timekeeper_clock = now;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __func__, tasks->values_num);
 }
@@ -572,4 +581,14 @@ void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *prep
 void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences)
 {
 	pp_task_queue_get_sequence_stats(&manager->queue, sequences);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get worker usage statistics                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t *worker_usage)
+{
+	(void)zbx_timekeeper_get_usage(manager->timekeeper, worker_usage);
 }

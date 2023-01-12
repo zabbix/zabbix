@@ -451,6 +451,32 @@ static void	preprocessor_reply_top_sequences(zbx_pp_manager_t *manager, zbx_ipc_
 	zbx_vector_pp_sequence_stats_ptr_destroy(&sequences);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: respond to worker usage statistics request                        *
+ *                                                                            *
+ * Parameters: manager - [IN] preprocessing manager                           *
+ *             client  - [IN] the request source                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_vector_dbl_t	usage;
+	unsigned char		*data;
+	zbx_uint32_t		data_len;
+
+	zbx_vector_dbl_create(&usage);
+	zbx_pp_manager_get_worker_usage(manager, &usage);
+
+	data_len = zbx_preprocessor_pack_usage_stats(&data, &usage);
+
+	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_DIAG_STATS_RESULT, data, data_len);
+
+	zbx_free(data);
+	zbx_vector_dbl_destroy(&usage);
+}
+
+
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -545,6 +571,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 					break;
 				case ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES:
 					preprocessor_reply_top_sequences(manager, client, message);
+					break;
+				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
+					preprocessor_reply_usage_stats(manager, client);
 					break;
 			}
 
