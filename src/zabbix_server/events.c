@@ -2909,7 +2909,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 
 			zbx_vector_connector_filter_create(&connector_filters_events);
 
-			zbx_dc_config_history_sync_get_connectors(NULL, &connector_filters_events);
+			zbx_dc_config_history_sync_get_connector_filters(NULL, &connector_filters_events);
 
 			if (SUCCEED == (event_export_enabled = zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS)) ||
 					0 != connector_filters_events.values_num)

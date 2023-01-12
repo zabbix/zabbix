@@ -3433,7 +3433,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			if (FAIL == connectors_retrieved)
 			{
-				zbx_dc_config_history_sync_get_connectors(&connector_filters_history,
+				zbx_dc_config_history_sync_get_connector_filters(&connector_filters_history,
 						&connector_filters_events);
 
 				connectors_retrieved = SUCCEED;
@@ -3651,7 +3651,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			{
 				if (FAIL == connectors_retrieved)
 				{
-					zbx_dc_config_history_sync_get_connectors(&connector_filters_history,
+					zbx_dc_config_history_sync_get_connector_filters(&connector_filters_history,
 								&connector_filters_events);
 					connectors_retrieved = SUCCEED;
 

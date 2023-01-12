@@ -805,10 +805,11 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *connector_filters_history,
+void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events)
 {
-#define ZBX_CONNECTOR_DATA_TYPE_HISTORY 0
+#define ZBX_CONNECTOR_DATA_TYPE_HISTORY	0
+#define ZBX_CONNECTOR_STATUS_ENABLED	0
 	zbx_dc_connector_t	*dc_connector;
 	zbx_hashset_iter_t	iter;
 
@@ -820,6 +821,9 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *co
 		zbx_connector_filter_t		connector_filter;
 		zbx_vector_connector_filter_t	*connector_filter_dest;
 		int				i;
+
+		if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
+			continue;
 
 		if (dc_connector->data_type == ZBX_CONNECTOR_DATA_TYPE_HISTORY)
 		{
@@ -856,6 +860,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *co
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 #undef ZBX_CONNECTOR_DATA_TYPE_HISTORY
+#undef ZBX_CONNECTOR_STATUS_ENABLED
 }
 static void	zbx_connector_tag_free(zbx_connector_tag_t connector_tag)
 {

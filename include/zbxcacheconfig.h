@@ -717,7 +717,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		int *errcodes, size_t num);
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num, unsigned int mode);
-void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *connector_filters_history,
+void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events);
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
