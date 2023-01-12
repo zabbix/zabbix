@@ -26,6 +26,7 @@
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
 #include "zbxcomms.h"
+#include "preproc.h"
 
 extern unsigned char	program_type;
 extern int	CONFIG_SERVER_STARTUP_TIME;
@@ -42,6 +43,56 @@ static zbx_zabbix_stats_ext_get_func_t	stats_ex_cb;
 void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb)
 {
 	stats_ex_cb = cb;
+}
+
+static void	add_preprocessor_worker_stats(struct zbx_json *json)
+{
+	zbx_vector_dbl_t	usage;
+	char			*error = NULL;
+	double			min, max, total;
+
+	zbx_vector_dbl_create(&usage);
+
+	if (SUCCEED != zbx_preprocessor_get_usage_stats(&usage, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get preprocessor usage statistics: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
+	if (0 == usage.values_num)
+		goto out;
+
+	min = max = total = usage.values[0];
+
+	for (int i = 1; i < usage.values_num; i++)
+	{
+		if (usage.values[i] < min)
+			min = usage.values[i];
+
+		if (usage.values[i] > max)
+			max = usage.values[i];
+
+		total += usage.values[i];
+	}
+
+	total /= usage.values_num;
+
+	zbx_json_addobject(json, get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR));
+	zbx_json_addobject(json, "busy");
+	zbx_json_addfloat(json, "avg", total);
+	zbx_json_addfloat(json, "max", max);
+	zbx_json_addfloat(json, "min", min);
+	zbx_json_close(json);
+	zbx_json_addobject(json, "idle");
+	zbx_json_addfloat(json, "avg", 100.0 - total);
+	zbx_json_addfloat(json, "max", 100.0 - max);
+	zbx_json_addfloat(json, "min", 100.0 - min);
+	zbx_json_close(json);
+	zbx_json_addint64(json, "count", usage.values_num);
+	zbx_json_close(json);
+out:
+	zbx_vector_dbl_destroy(&usage);
 }
 
 /******************************************************************************
@@ -163,22 +214,27 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *
 	{
 		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 		{
-			if (0 == process_stats[proc_type].count)
-				continue;
+			if (ZBX_PROCESS_TYPE_PREPROCESSOR != proc_type)
+			{
+				if (0 == process_stats[proc_type].count)
+					continue;
 
-			zbx_json_addobject(json, get_process_type_string(proc_type));
-			zbx_json_addobject(json, "busy");
-			zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
-			zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
-			zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
-			zbx_json_close(json);
-			zbx_json_addobject(json, "idle");
-			zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
-			zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
-			zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
-			zbx_json_close(json);
-			zbx_json_addint64(json, "count", process_stats[proc_type].count);
-			zbx_json_close(json);
+				zbx_json_addobject(json, get_process_type_string(proc_type));
+				zbx_json_addobject(json, "busy");
+				zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
+				zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
+				zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
+				zbx_json_close(json);
+				zbx_json_addobject(json, "idle");
+				zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
+				zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
+				zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
+				zbx_json_close(json);
+				zbx_json_addint64(json, "count", process_stats[proc_type].count);
+				zbx_json_close(json);
+			}
+			else
+				add_preprocessor_worker_stats(json);
 		}
 	}
 
