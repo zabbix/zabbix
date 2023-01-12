@@ -720,11 +720,6 @@ class CWidgetNavTree extends CWidget {
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
 			const tools_buttons = tree_element.querySelectorAll('.js-button-add-child, .js-button-add-maps');
 
-			if (tree_element.dataset.depth > this._max_depth) {
-				tree_element.remove();
-				continue;
-			}
-
 			if (tools_buttons.length > 0) {
 				for (const button of tools_buttons) {
 					button.disabled = tree_element.dataset.depth >= this._max_depth;
@@ -795,7 +790,7 @@ class CWidgetNavTree extends CWidget {
 	_makeSortable() {
 		jQuery('.root-item > .tree-list', jQuery(this._target))
 			.sortable_tree({
-				max_depth: this._max_depth,
+				max_depth: this._max_depth-1,
 				stop: () => {
 					this._setTreeHandlers();
 					this._updateWidgetFields();
