@@ -80,6 +80,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
 #include "zbxicmpping.h"
+#include "zbxipcservice.h"
 #include "preprocessor/preproc_stats.h"
 
 #ifdef HAVE_OPENIPMI
@@ -799,7 +800,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"IPMI support"));
 #endif
 
-	err |= (FAIL == zbx_db_validate_config_features());
+	err |= (FAIL == zbx_db_validate_config_features(program_type));
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)
 	{
@@ -1257,8 +1258,10 @@ int	main(int argc, char **argv)
 	zbx_init_metrics();
 	zbx_load_config(&t);
 
+	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
+	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 
@@ -1284,7 +1287,7 @@ int	main(int argc, char **argv)
 	}
 
 	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg.log_type, log_file_cfg.log_file_name);
+			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL);
 }
 
 static void	zbx_check_db(void)
@@ -1293,7 +1296,7 @@ static void	zbx_check_db(void)
 	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
 
 	if (SUCCEED == result)
 	{
