@@ -719,6 +719,8 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 		int *errcodes, size_t num, unsigned int mode);
 void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events);
+void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
+		zbx_uint64_t *revision, zbx_clean_func_t object_link_clean);
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
@@ -748,9 +750,6 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 void	DCconfig_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
 void	DCconfig_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
-
-void	DCconfig_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter, zbx_uint64_t *revision,
-		zbx_clean_func_t connector_requests_clean_func);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1

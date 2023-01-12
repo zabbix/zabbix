@@ -82,7 +82,7 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_hashset_destroy(&connector->object_link);
 }
 
-static void	connector_request_clear(zbx_object_link_t *object_link)
+static void	object_link_clean(zbx_object_link_t *object_link)
 {
 	zbx_vector_connector_object_data_clear_ext(&object_link->connector_objects, zbx_connector_object_data_free);
 	zbx_vector_connector_object_data_destroy(&object_link->connector_objects);
@@ -476,8 +476,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					DCconfig_get_connectors(&manager.connectors, &manager.iter, &manager.revision,
-							(zbx_clean_func_t)connector_request_clear);
+					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
+							&manager.revision, (zbx_clean_func_t)object_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);
