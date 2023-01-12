@@ -753,18 +753,35 @@ class testDashboardURLWidget extends CWebTest {
 		$this->assertUriScheme($form, $default_valid_schemes);
 		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
 
-		// TODO: uncomment after ZBX-22192 fix
 		// Change valid URI schemes on "Other configuration parameters" page.
-//		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-//		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
-//		$config_form->fill(['Valid URI schemes' => 'dns,message']);
-//		sleep(10);
-//		$config_form->submit();
-//		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
+		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-//		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-//		$this->assertUriScheme($form, $invalid_schemes);
-//		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
+		// Check that already created widget became invalid and returns errror regarding invalid parameter.
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$widget = $dashboard->getWidget('URL')->getContent();
+		$this->assertEquals('Invalid parameter "URL": unacceptable URL.', $widget->query('class:msg-details')->one()->getText());
+		$broken_form = $dashboard->getWidget('URL')->edit();
+
+		// Check that the widget URL field is empty.
+		$this->assertEquals('', $broken_form->getField('URL')->getValue());
+		$this->assertEquals(self::$default_widget, $broken_form->getField('Name')->getValue());
+		COverlayDialogElement::find()->one()->close();
+		$this->query('button:Save changes')->one()->click();
+
+		// Check that Dashboard can't be saved and returns errror regarding invalid parameter.
+		CMessageElement::find()->one()->waitUntilVisible();
+		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": unacceptable URL.');
+		CMessageElement::find()->one()->close();
+
+		// Check updated valid URI schemes.
+		$dashboard->getWidget('URL')->edit();
+		$broken_form->fill(['URL' => 'any'])->submit();
+		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
+		$this->assertUriScheme($form, $invalid_schemes);
 
 		// Disable URI scheme validation.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
@@ -798,8 +815,8 @@ class testDashboardURLWidget extends CWebTest {
 			}
 			else {
 				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "URL": unacceptable URL.');
+				CMessageElement::find()->one()->close();
 				COverlayDialogElement::find()->one()->close();
-				$dashboard->save();
 			}
 		}
 	}
