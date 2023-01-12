@@ -35,13 +35,12 @@
  * Return value: The created preprocessing cache                              *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_cache_t	*pp_cache_create(zbx_pp_item_preproc_t *preproc, zbx_variant_t *value)
+zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_variant_t *value)
 {
 	zbx_pp_cache_t	*cache = (zbx_pp_cache_t *)zbx_malloc(NULL, sizeof(zbx_pp_cache_t));
 
 	cache->type = (0 != preproc->steps_num ? preproc->steps[0].type : ZBX_PREPROC_NONE);
-	cache->value = *value;
-	zbx_variant_set_none(value);
+	zbx_variant_copy(&cache->value, value);
 	cache->data = NULL;
 	cache->refcount = 1;
 
