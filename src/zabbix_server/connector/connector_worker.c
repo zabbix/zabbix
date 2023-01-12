@@ -31,6 +31,11 @@
 
 extern unsigned char			program_type;
 
+static int	connector_object_compare_func(const void *d1, const void *d2)
+{
+	return zbx_timespec_compare(&((zbx_connector_object_data_t *)d1)->ts, &((zbx_connector_object_data_t *)d2)->ts);
+}
+
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
 		zbx_vector_connector_object_data_t *connector_objects)
 {
@@ -42,6 +47,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 
 	zbx_connector_deserialize_connector(message->data, message->size, &connector, connector_objects);
 
+	zbx_vector_connector_object_data_sort(connector_objects, connector_object_compare_func);
 	for (i = 0; i < connector_objects->values_num; i++)
 	{
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, delim);

@@ -1490,7 +1490,7 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 	if (0 != history_num)
 	{
-		DCexport_history(history, history_num, &hosts_info, &items_info,history_export_enabled,
+		DCexport_history(history, history_num, &hosts_info, &items_info, history_export_enabled,
 				connector_filters, data, data_alloc, data_offset);
 	}
 
