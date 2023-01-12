@@ -873,7 +873,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 				}
 			}
 
-			$form = $this->openLdapForm();
+//			$form = $this->openLdapForm();
 			$table = $form->query('id:ldap-servers')->asTable()->one();
 
 			foreach ($table->query('button:Remove')->all() as $button) {
