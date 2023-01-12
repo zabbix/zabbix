@@ -4133,3 +4133,96 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares connector_tag table row with cached configuration data   *
+ *                                                                            *
+ * Parameter: maintenance_tag - [IN] the cached maintenance tag               *
+ *            dbrow           - [IN] the database row                         *
+ *                                                                            *
+ * Return value: SUCCEED - the row matches configuration data                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dbsync_compare_connector_tag(const zbx_dc_connector_tag_t *connector_tag, const DB_ROW dbrow)
+{
+	if (FAIL == dbsync_compare_int(dbrow[2], connector_tag->op))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[3], connector_tag->tag))
+		return FAIL;
+
+	if (FAIL == dbsync_compare_str(dbrow[4], connector_tag->value))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares connector tag table with cached configuration data       *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
+{
+	DB_ROW			dbrow;
+	DB_RESULT		result;
+	zbx_hashset_t		ids;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		rowid;
+	zbx_dc_connector_tag_t	*connector_tag;
+
+	if (NULL == (result = DBselect("select connector_tagid,connectorid,operator,tag,value"
+						" from connector_tag")))
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, 5, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->connector_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	while (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		ZBX_STR2UINT64(rowid, dbrow[0]);
+		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
+
+		connector_tag = (zbx_dc_connector_tag_t *)zbx_hashset_search(&dbsync_env.cache->connector_tags,
+				&rowid);
+
+		if (NULL == connector_tag)
+			tag = ZBX_DBSYNC_ROW_ADD;
+		else if (FAIL == dbsync_compare_connector_tag(connector_tag, dbrow))
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, rowid, tag, dbrow);
+	}
+
+	zbx_hashset_iter_reset(&dbsync_env.cache->connector_tags, &iter);
+	while (NULL != (connector_tag = (zbx_dc_connector_tag_t *)zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == zbx_hashset_search(&ids, &connector_tag->connectortagid))
+			dbsync_add_row(sync, connector_tag->connectortagid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+	}
+
+	zbx_hashset_destroy(&ids);
+	DBfree_result(result);
+
+	return SUCCEED;
+}

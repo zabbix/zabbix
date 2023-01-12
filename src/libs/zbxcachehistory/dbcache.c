@@ -3698,6 +3698,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_free(errcodes);
 	zbx_free(data);
 
+	zbx_vector_connector_filter_clear_ext(&connector_filters_events, zbx_connector_filter_free);
+	zbx_vector_connector_filter_clear_ext(&connector_filters_history, zbx_connector_filter_free);
 	zbx_vector_connector_filter_destroy(&connector_filters_events);
 	zbx_vector_connector_filter_destroy(&connector_filters_history);
 	zbx_vector_ptr_destroy(&trigger_order);

@@ -80,6 +80,7 @@ ZBX_PTR_VECTOR_IMPL(dc_httptest_ptr, zbx_dc_httptest_t *)
 ZBX_PTR_VECTOR_IMPL(dc_host_ptr, ZBX_DC_HOST *)
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
+ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -6507,7 +6508,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (0 == found)
 		{
-			zbx_vector_ptr_create_ext(&connector->tags, config->connectors.mem_malloc_func,
+			zbx_vector_dc_connector_tag_create_ext(&connector->tags, config->connectors.mem_malloc_func,
 					config->connectors.mem_realloc_func, config->connectors.mem_free_func);
 		}
 
@@ -6539,7 +6540,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (connector = (zbx_dc_connector_t *)zbx_hashset_search(&config->connectors, &rowid)))
 			continue;
 
-		zbx_vector_ptr_destroy(&connector->tags);
+		zbx_vector_dc_connector_tag_destroy(&connector->tags);
 		dc_strpool_release(connector->url);
 		dc_strpool_release(connector->timeout);
 		dc_strpool_release(connector->token);
@@ -6554,6 +6555,121 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	}
 	if (0 != sync->add_num || 0 != sync->update_num || 0 != sync->remove_num)
 		config->revision.connector = revision;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare connector tags by tag name for sorting                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_connector_tags(const void *d1, const void *d2)
+{
+	const zbx_dc_connector_tag_t	*tag1 = *(const zbx_dc_connector_tag_t **)d1;
+	const zbx_dc_connector_tag_t	*tag2 = *(const zbx_dc_connector_tag_t **)d2;
+
+	return strcmp(tag1->tag, tag2->tag);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Updates connector tags in configuration cache                     *
+ *                                                                            *
+ * Parameters: sync - [IN] the db synchronization data                        *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - maintenancetagid                                             *
+ *           1 - maintenanceid                                                *
+ *           2 - operator                                                     *
+ *           3 - tag                                                          *
+ *           4 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_connector_tags(zbx_dbsync_t *sync)
+{
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	zbx_uint64_t		connectortagid, connectorid;
+	zbx_dc_connector_tag_t	*connector_tag;
+	zbx_dc_connector_t	*connector;
+	zbx_vector_ptr_t	connectors;
+	int			found, ret, index, i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&connectors);
+
+	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
+	{
+		/* removed rows will be always added at the end */
+		if (ZBX_DBSYNC_ROW_REMOVE == tag)
+			break;
+
+		ZBX_STR2UINT64(connectorid, row[1]);
+		if (NULL == (connector = (zbx_dc_connector_t *)zbx_hashset_search(&config->connectors,
+				&connectorid)))
+		{
+			continue;
+		}
+
+		ZBX_STR2UINT64(connectortagid, row[0]);
+		connector_tag = (zbx_dc_connector_tag_t *)DCfind_id(&config->connector_tags, connectortagid,
+				sizeof(zbx_dc_connector_tag_t), &found);
+
+		connector_tag->connectorid = connectorid;
+		ZBX_STR2UCHAR(connector_tag->op, row[2]);
+		dc_strpool_replace(found, &connector_tag->tag, row[3]);
+		dc_strpool_replace(found, &connector_tag->value, row[4]);
+
+		if (0 == found)
+			zbx_vector_dc_connector_tag_append(&connector->tags, connector_tag);
+
+		zbx_vector_ptr_append(&connectors, connector);
+	}
+
+	/* remove deleted connector tags */
+
+	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
+	{
+		if (NULL == (connector_tag = (zbx_dc_connector_tag_t *)zbx_hashset_search(&config->connector_tags,
+				&rowid)))
+		{
+			continue;
+		}
+
+		if (NULL != (connector = (zbx_dc_connector_t *)zbx_hashset_search(&config->connectors,
+				&connector_tag->connectorid)))
+		{
+			index = zbx_vector_dc_connector_tag_search(&connector->tags, connector_tag,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+			if (FAIL != index)
+				zbx_vector_dc_connector_tag_remove_noorder(&connector->tags, index);
+
+			zbx_vector_ptr_append(&connectors, connector);
+		}
+
+		dc_strpool_release(connector_tag->tag);
+		dc_strpool_release(connector_tag->value);
+
+		zbx_hashset_remove_direct(&config->connector_tags, connector_tag);
+	}
+
+	/* sort connector tags */
+
+	zbx_vector_ptr_sort(&connectors, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&connectors, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < connectors.values_num; i++)
+	{
+		connector = (zbx_dc_connector_t *)connectors.values[i];
+		zbx_vector_dc_connector_tag_sort(&connector->tags, dc_compare_connector_tags);
+	}
+
+	zbx_vector_ptr_destroy(&connectors);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -6586,7 +6702,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
 			maintenance_tag_sync, maintenance_group_sync, maintenance_host_sync, hgroup_host_sync,
 			drules_sync, dchecks_sync, httptest_sync, httptest_field_sync, httpstep_sync,
-			httpstep_field_sync, autoreg_host_sync, connector_sync;
+			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync;
 
 	double		autoreg_csec, autoreg_csec2, autoreg_host_csec, autoreg_host_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
@@ -6667,6 +6783,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	zbx_dbsync_init(&httpstep_field_sync, changelog_sync_mode);
 
 	zbx_dbsync_init(&connector_sync, mode);
+	zbx_dbsync_init(&connector_tag_sync, mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
@@ -6801,6 +6918,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_connectors(&connector_sync))
 		goto out;
+	if (FAIL == zbx_dbsync_compare_connector_tags(&connector_tag_sync))
+		goto out;
 	connector_sec = zbx_time() - sec;
 
 	START_SYNC;
@@ -6843,7 +6962,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 	sec = zbx_time();
 	DCsync_connectors(&connector_sync, new_revision);
-
+	DCsync_connector_tags(&connector_tag_sync);
 	connector_sec2 = zbx_time() - sec;
 
 	FINISH_SYNC;
@@ -7390,6 +7509,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector: %d (%d slots)", __func__,
 				config->connectors.num_data, config->connectors.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector tags : %d (%d slots)", __func__,
+				config->connector_tags.num_data, config->connector_tags.num_slots);
 
 		for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 		{
@@ -7504,6 +7625,7 @@ clean:
 	zbx_dbsync_clear(&httpstep_sync);
 	zbx_dbsync_clear(&httpstep_field_sync);
 	zbx_dbsync_clear(&connector_sync);
+	zbx_dbsync_clear(&connector_tag_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -7937,6 +8059,7 @@ int	init_configuration_cache(char **error)
 #endif
 
 	CREATE_HASHSET(config->connectors, 0);
+	CREATE_HASHSET(config->connector_tags, 0);
 
 	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
 	{

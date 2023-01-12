@@ -24,6 +24,7 @@
 #include "zbx_item_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
+ZBX_PTR_VECTOR_IMPL(connector_tag, zbx_connector_tag_t)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
@@ -816,20 +817,54 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_vector_connector_filter_t *co
 	zbx_hashset_iter_reset(&config->connectors, &iter);
 	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_connector_filter_t	connector_filter;
-
-		connector_filter.connectorid = dc_connector->connectorid;
-		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
+		zbx_connector_filter_t		connector_filter;
+		zbx_vector_connector_filter_t	*connector_filter_dest;
+		int				i;
 
 		if (dc_connector->data_type == ZBX_CONNECTOR_DATA_TYPE_HISTORY)
 		{
-			if (NULL != connector_filters_history)
-				zbx_vector_connector_filter_append(connector_filters_history, connector_filter);
+			if (NULL == connector_filters_history)
+				continue;
+
+			connector_filter_dest = connector_filters_history;
 		}
 		else
-			zbx_vector_connector_filter_append(connector_filters_events, connector_filter);
+			connector_filter_dest = connector_filters_events;
+
+		connector_filter.connectorid = dc_connector->connectorid;
+		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
+		zbx_vector_connector_tag_create(&connector_filter.connector_tags);
+
+		if (0 != dc_connector->tags.values_num)
+		{
+			zbx_vector_connector_tag_reserve(&connector_filter.connector_tags, dc_connector->tags.values_num);
+
+			for (i = 0; i < dc_connector->tags.values_num; i++)
+			{
+				zbx_connector_tag_t	connector_tag;
+
+				connector_tag.tag = zbx_strdup(NULL, dc_connector->tags.values[i]->tag);
+				connector_tag.value = zbx_strdup(NULL, dc_connector->tags.values[i]->value);
+				connector_tag.op = dc_connector->tags.values[i]->op;
+
+				zbx_vector_connector_tag_append(&connector_filter.connector_tags, connector_tag);
+			}
+		}
+
+		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 #undef ZBX_CONNECTOR_DATA_TYPE_HISTORY
+}
+static void	zbx_connector_tag_free(zbx_connector_tag_t connector_tag)
+{
+	zbx_free(connector_tag.tag);
+	zbx_free(connector_tag.value);
+}
+
+void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
+{
+	zbx_vector_connector_tag_clear_ext(&connector_filter.connector_tags, zbx_connector_tag_free);
+	zbx_vector_connector_tag_destroy(&connector_filter.connector_tags);
 }
