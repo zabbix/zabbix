@@ -28,7 +28,7 @@ package zbxlib
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 #include "zbx_item_constants.h"
 
-void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int accept, unsigned int connect,
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject);
 
@@ -47,7 +47,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 
 int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
-		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *zbx_config_tls, int config_timeout, char **error);
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout, char **error);
 
 typedef struct
 {

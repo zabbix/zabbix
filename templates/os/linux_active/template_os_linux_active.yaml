@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-15T14:05:24Z'
+  date: '2022-12-19T09:58:33Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -556,22 +556,35 @@ zabbix_export:
                   value: notice
         -
           uuid: 16b1e5ab950040ef8c29139e0649d622
-          name: 'Software installed'
+          name: 'Number of installed packages'
           type: ZABBIX_ACTIVE
-          key: system.sw.packages
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: c3cfa59933504e10a1bf5a9c2319ac0e
+              expression: 'change(/Linux by Zabbix agent active/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f08e1de57cbd4b08b9fd3294d0d95906
           name: 'Free swap space'
@@ -1880,6 +1893,22 @@ zabbix_export:
             -
               lld_macro: '{#FSTYPE}'
               path: $.fstype
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

@@ -57,7 +57,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Block devices discovery |<p>-</p> |ZABBIX_ACTIVE |vfs.dev.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#DEVTYPE} MATCHES_REGEX `disk`</p><p>- {#DEVNAME} MATCHES_REGEX `{$VFS.DEV.DEVNAME.MATCHES}`</p><p>- {#DEVNAME} NOT_MATCHES_REGEX `{$VFS.DEV.DEVNAME.NOT_MATCHES}`</p> |
-|Mounted filesystem discovery |<p>The discovery of mounted filesystems with different types.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p> |
+|Mounted filesystem discovery |<p>The discovery of mounted filesystems with different types.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p>AND <p>- {#FSTYPE} MATCHES_REGEX `{$VFS.FS.FSTYPE.MATCHES}`</p><p>- {#FSTYPE} NOT_MATCHES_REGEX `{$VFS.FS.FSTYPE.NOT_MATCHES}`</p><p>- {#FSNAME} MATCHES_REGEX `{$VFS.FS.FSNAME.MATCHES}`</p><p>- {#FSNAME} NOT_MATCHES_REGEX `{$VFS.FS.FSNAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 |Network interface discovery |<p>The discovery of network interfaces.</p> |ZABBIX_ACTIVE |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -98,7 +98,7 @@ There are no template links in this template.
 |General |Number of running processes |<p>-</p> |ZABBIX_ACTIVE |proc.num[,,run] |
 |Inventory |Operating system |<p>-</p> |ZABBIX_ACTIVE |system.sw.os<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Inventory |Operating system architecture |<p>The architecture of the operating system.</p> |ZABBIX_ACTIVE |system.sw.arch<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |Software installed |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Inventory |Number of installed packages |<p>-</p> |ZABBIX_ACTIVE |system.sw.packages.get<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p><p>- JSONPATH: `$.length()`</p> |
 |Memory |Memory utilization |<p>The percentage of used memory is calculated as `100-pavailable`.</p> |DEPENDENT |vm.memory.utilization<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return (100-value);`</p> |
 |Memory |Available memory in % |<p>The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p> |ZABBIX_ACTIVE |vm.memory.size[pavailable] |
 |Memory |Total memory |<p>The total memory expressed in Bytes.</p> |ZABBIX_ACTIVE |vm.memory.size[total] |
@@ -148,6 +148,7 @@ There are no template links in this template.
 |Configured max number of open filedescriptors is too low |<p>-</p> |`last(/Linux by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}` |INFO | |
 |Configured max number of processes is too low |<p>-</p> |`last(/Linux by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}` |INFO |<p>**Depends on**:</p><p>- Getting closer to process limit</p> |
 |Getting closer to process limit |<p>-</p> |`last(/Linux by Zabbix agent active/proc.num)/last(/Linux by Zabbix agent active/kernel.maxproc)*100>80` |WARNING | |
+|Number of installed packages has been changed |<p>-</p> |`change(/Linux generic by Zabbix agent/system.sw.packages.get)<>0` |WARNING |<p>Manual close: YES</p> |
 |Operating system description has changed |<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.</p> |`last(/Linux by Zabbix agent active/system.sw.os,#1)<>last(/Linux by Zabbix agent active/system.sw.os,#2) and length(last(/Linux by Zabbix agent active/system.sw.os))>0` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed</p> |
 |High memory utilization |<p>The system is running out of free memory.</p> |`min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- Lack of available memory</p> |
 |Lack of available memory |<p>-</p> |`max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0` |AVERAGE | |

@@ -17,11 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ALERT_MANAGER_H
-#define ZABBIX_ALERT_MANAGER_H
+#include "alerter.h"
 
-#include "zbxthreads.h"
+#include "zbxalgo.h"
 
-ZBX_THREAD_ENTRY(alert_manager_thread, args);
+ZBX_PTR_VECTOR_IMPL(alerter_dispatch_result, zbx_alerter_dispatch_result_t *)
 
-#endif
+void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result)
+{
+	zbx_free(result->recipient);
+	zbx_free(result->info);
+	zbx_free(result);
+}

@@ -459,16 +459,7 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
 				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
 
-		switch (ss->s_snmp_errno)
-		{
-			case SNMPERR_UNKNOWN_USER_NAME:
-			case SNMPERR_UNSUPPORTED_SEC_LEVEL:
-			case SNMPERR_AUTHENTICATION_FAILURE:
-				ret = NOTSUPPORTED;
-				break;
-			default:
-				ret = NETWORK_ERROR;
-		}
+		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
 	{
@@ -1189,7 +1180,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		{
 			/* The logic of iteratively reducing request size here is the same as in function */
 			/* zbx_snmp_get_values(). Please refer to the description there for explanation.  */
-
+reduce_max_vars:
 			if (*min_fail > max_vars)
 				*min_fail = max_vars;
 
@@ -1208,6 +1199,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
+			if (1 >= level)
+				goto reduce_max_vars;
+
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
@@ -1597,7 +1591,12 @@ halve:
 		}
 	}
 	else
+	{
+		if (1 <= level)
+			goto halve;
+
 		ret = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error, max_error_len);
+	}
 exit:
 	if (NULL != response)
 		snmp_free_pdu(response);
@@ -1993,7 +1992,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 static int	snmp_bulkwalk(struct snmp_session *ss, int pdu_type, const DC_ITEM *item, zbx_snmp_oid_t *p_oid,
 		char **results, size_t *results_alloc, size_t *results_offset, char *error, size_t max_error_len)
 {
-	struct snmp_pdu		*pdu = NULL, *response = NULL;
+	struct snmp_pdu		*pdu, *response = NULL;
 	int			ret, running = 1, vars_num = 0, status;
 	oid			name[MAX_OID_LEN];
 	size_t			name_length = MAX_OID_LEN;
@@ -2485,7 +2484,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
 	}
-	else if (0 == strncmp(items[j].snmp_oid, "snmp.walk[", 10))
+	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
 	{
 		err = zbx_snmp_process_snmp_bulkwalk(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error));
 	}

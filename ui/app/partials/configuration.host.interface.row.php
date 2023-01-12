@@ -103,7 +103,7 @@
 				->addItem([
 					(new CLabel([
 						_('Max repetition count'),
-						makeHelpIcon(_('Max repetition count is applicable to discovery and snmp.walk only.'))
+						makeHelpIcon(_('Max repetition count is applicable to discovery and walk only.'))
 					], 'interfaces[#{iface.interfaceid}][details][max_repetitions]'))
 						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 					(new CFormField(

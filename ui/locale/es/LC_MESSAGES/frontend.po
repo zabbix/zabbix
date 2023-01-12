@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-01-28 12:08+0300\n"
-"Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
+"PO-Revision-Date: 2022-12-16 23:54+0000\n"
+"Last-Translator: Danny <danny.ricce@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1643364496.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -153,7 +154,7 @@ msgstr[1] "%1$s eventos"
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s patrón de grupo"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -274,22 +275,22 @@ msgstr "%1$s, seleccionado"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "La clase %1$s.php debe extenderse a %2$s para el módulo ubicado en %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s th percentil: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -327,11 +328,11 @@ msgstr "(Sólo los súper administradores pueden crear grupos)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(creado por descubrimiento de host)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(vinculado por descubrimiento de host)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -364,11 +365,11 @@ msgstr "100 disparadores más ocupados"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-horas"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-horas"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -543,7 +544,7 @@ msgstr "Reconocer"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Reconocer"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -641,7 +642,7 @@ msgstr "Acción"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -698,7 +699,7 @@ msgstr "Acción actualizada"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "La acción con ID \"%1$s\" no está disponible."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -720,7 +721,7 @@ msgstr "Acciones"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Acciones"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -737,7 +738,7 @@ msgstr "Activo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Cheques activos"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -914,7 +915,7 @@ msgstr "Agregar un elemento hijo"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Agregar elementos hijos"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -930,11 +931,11 @@ msgstr "Añadir desde"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Añadir desde el equipo"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Añadir desde plantilla"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -3711,6 +3712,10 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "No es posible actualizar el gráfico"
@@ -3954,6 +3959,11 @@ msgstr "Captura todos los traps SNMP que concuerden con regexp. Si no se especif
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Captura todos los traps SNMP que no fueron capturados por ninguno de los elementos snmptrap[]."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4010,6 +4020,10 @@ msgstr "Cambiar la contraseña"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Cambio por segundo"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4815,6 +4829,14 @@ msgstr "Número de contrato"
 msgid "Convert to JSON"
 msgstr ""
 
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
 msgid "Coordinates"
@@ -5172,6 +5194,15 @@ msgstr ""
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Equipo actual"
+
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
 
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
@@ -7740,6 +7771,11 @@ msgstr "Falta el valor del campo \"%1$s\" para el mapa \"%2$s\"."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -9470,6 +9506,11 @@ msgstr ""
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
+msgstr ""
+
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
 msgstr ""
@@ -9841,6 +9882,10 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
 msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
@@ -12345,6 +12390,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Marzo"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr ""
@@ -12356,6 +12405,10 @@ msgstr "Marcar otros"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Marcar seleccionados"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -15068,6 +15121,10 @@ msgstr "Contraseña"
 msgid "Password (once again)"
 msgstr "Contraseña (de nuevo)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
@@ -15110,6 +15167,10 @@ msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
+msgstr ""
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
@@ -15306,6 +15367,10 @@ msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15802,6 +15867,10 @@ msgstr "RESUELTO"
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -17797,6 +17866,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18465,6 +18539,11 @@ msgstr "Sueco (sv_SE)"
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "¡Cambiar el método de autenticación reinicializará todas las sesiones menos ésta! ¿Continuar?"
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
+msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
 #: include/classes/setup/CSetupWizard.php:611
@@ -19919,6 +19998,10 @@ msgstr ""
 #: include/translateDefines.inc.php:25
 msgid "UNKNOWN"
 msgstr "DESCONOCIDO"
+
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
 
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
@@ -23219,6 +23302,10 @@ msgstr ""
 msgid "invalid byte sequence in UTF-8"
 msgstr ""
 
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
 msgid "invalid delay"
 msgstr ""
@@ -23660,6 +23747,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

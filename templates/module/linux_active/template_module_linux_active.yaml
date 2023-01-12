@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-15T14:05:12Z'
+  date: '2022-12-19T09:58:22Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -972,6 +972,22 @@ zabbix_export:
             -
               lld_macro: '{#FSTYPE}'
               path: $.fstype
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       macros:
         -
           macro: '{$VFS.FS.FREE.MIN.CRIT}'
@@ -1239,22 +1255,35 @@ zabbix_export:
                   value: notice
         -
           uuid: 42df39b3317a4bd6908686a491fd3d18
-          name: 'Software installed'
+          name: 'Number of installed packages'
           type: ZABBIX_ACTIVE
-          key: system.sw.packages
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: 85a719a64e61402ab5562afe8c4ac14d
+              expression: 'change(/Linux generic by Zabbix agent active/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d875142b4ea0442db59768be58c9d026
           name: 'System description'
