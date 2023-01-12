@@ -45,7 +45,9 @@ window.ZABBIX = Object.create({
 	/**
 	 * Logs user out, also, handles side effects before that.
 	 */
-	logout: function() {
+	logout: function(event) {
+		cancelEvent(event);
+
 		var ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
