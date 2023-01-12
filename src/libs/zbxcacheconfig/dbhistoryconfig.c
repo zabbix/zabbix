@@ -805,11 +805,13 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 	UNLOCK_CACHE;
 }
 
+#define ZBX_CONNECTOR_STATUS_ENABLED	0
+
 void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events)
 {
 #define ZBX_CONNECTOR_DATA_TYPE_HISTORY	0
-#define ZBX_CONNECTOR_STATUS_ENABLED	0
+
 	zbx_dc_connector_t	*dc_connector;
 	zbx_hashset_iter_t	iter;
 
@@ -860,7 +862,6 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 #undef ZBX_CONNECTOR_DATA_TYPE_HISTORY
-#undef ZBX_CONNECTOR_STATUS_ENABLED
 }
 static void	zbx_connector_tag_free(zbx_connector_tag_t connector_tag)
 {
@@ -889,6 +890,9 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_hashset_iter_reset(&config->connectors, &iter);
 	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
+		if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
+			continue;
+
 		if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(connectors,
 				&dc_connector->connectorid)))
 		{
@@ -924,7 +928,6 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
 		connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
 		connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);
-		connector->status = dc_connector->status;
 	}
 
 	*revision = config->revision.connector;
@@ -942,3 +945,4 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 
 	zbx_hashset_iter_reset(connectors, connector_iter);
 }
+#undef ZBX_CONNECTOR_STATUS_ENABLED

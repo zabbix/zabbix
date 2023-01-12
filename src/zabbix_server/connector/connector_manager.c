@@ -460,6 +460,9 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 					break;
 				}
 			}
+
+			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
+					&manager.revision, (zbx_clean_func_t)object_link_clean);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

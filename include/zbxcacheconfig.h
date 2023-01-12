@@ -610,7 +610,6 @@ typedef struct
 	char			*ssl_cert_file;
 	char			*ssl_key_file;
 	char			*ssl_key_password;
-	int			status;
 
 	zbx_list_t		queue;
 	zbx_hashset_t		object_link;
