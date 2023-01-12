@@ -55,6 +55,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_result(&result);
 	zbx_init_agent_request(&request);
+	zbx_init_library_sysinfo(get_config_timeout);
+
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");
 

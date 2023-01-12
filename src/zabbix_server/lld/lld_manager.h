@@ -67,6 +67,12 @@ typedef struct
 }
 zbx_lld_rule_info_t;
 
+typedef struct
+{
+	zbx_get_config_forks_f	get_process_forks_cb_arg;
+}
+zbx_thread_lld_manager_args;
+
 ZBX_THREAD_ENTRY(lld_manager_thread, args);
 
 #endif

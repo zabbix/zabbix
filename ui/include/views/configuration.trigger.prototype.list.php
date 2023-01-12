@@ -139,12 +139,12 @@ foreach ($data['triggers'] as $trigger) {
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('trigger_prototypes.php'))
-			->setArgument('g_triggerid', $triggerid)
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
 				? 'triggerprototype.massenable'
 				: 'triggerprototype.massdisable'
 			)
+			->setArgument('g_triggerid[]', $triggerid)
+			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
 			->getUrl()
 	))

@@ -93,7 +93,6 @@ int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= 0;
-char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
@@ -176,6 +175,12 @@ char	**CONFIG_USER_PARAMETERS	= NULL;
 char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
+
+static int	config_timeout = 3;
+int		get_config_timeout(void)
+{
+	return config_timeout;
+}
 
 /* test itself */
 

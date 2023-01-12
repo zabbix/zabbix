@@ -213,25 +213,25 @@ static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 }
 
 static void	add_package_to_json(struct zbx_json *json, const char *name, const char *manager, const char *version,
-		const char *arch, zbx_uint64_t size, const char *buildtime_value, time_t buildtime_timestamp,
-		const char *installtime_value, time_t installtime_timestamp)
+		zbx_uint64_t size, const char *arch, time_t buildtime_timestamp, const char *buildtime_value,
+		time_t installtime_timestamp, const char *installtime_value)
 {
 	zbx_json_addobject(json, NULL);
 
 	zbx_json_addstring(json, "name", name, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "manager", manager, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "arch", arch, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(json, "size", size);
+	zbx_json_addstring(json, "arch", arch, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addobject(json, "buildtime");
-	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "timestamp", buildtime_timestamp);
+	zbx_json_addstring(json, "value", buildtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 
 	zbx_json_addobject(json, "installtime");
-	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(json, "timestamp", installtime_timestamp);
+	zbx_json_addstring(json, "value", installtime_value, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(json);
 
 	zbx_json_close(json);
@@ -277,7 +277,7 @@ static void	dpkg_details(const char *manager, const char *line, const char *rege
 	/* the reported size is in kB, we want bytes */
 	size *= ZBX_KIBIBYTE;
 
-	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+	add_package_to_json(json, name, manager, version, size, arch, 0, "", 0, "");
 }
 
 static void	rpm_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -320,8 +320,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
 	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
 
-	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
-			installtime_value, installtime_timestamp);
+	add_package_to_json(json, name, manager, version, size, arch, buildtime_timestamp, buildtime_value,
+			installtime_timestamp, installtime_value);
 }
 
 static void	pacman_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -449,8 +449,8 @@ static void	pacman_details(const char *manager, const char *line, const char *re
 
 	installtime_timestamp = mktime(&tm);
 
-	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
-			installtime_value, installtime_timestamp);
+	add_package_to_json(json, name, manager, version, size, arch, buildtime_timestamp, buildtime_value,
+			installtime_timestamp, installtime_value);
 }
 
 static void	pkgtools_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
@@ -539,7 +539,7 @@ static void	pkgtools_details(const char *manager, const char *line, const char *
 
 	size = (zbx_uint64_t)(size_double * multiplier);
 
-	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+	add_package_to_json(json, name, manager, version, size, arch, 0, "", 0, "");
 out:
 	zbx_free(out);
 }
@@ -657,11 +657,11 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT,
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
@@ -849,11 +849,11 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;

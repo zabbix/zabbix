@@ -55,7 +55,7 @@ $fields = [
 												' && isset({key}) && strncmp({key}, "mqtt.get", 8) === 0))',
 										_('Update interval')
 									],
-	'delay_flex' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'delay_flex' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'history' =>					[T_ZBX_STR, O_OPT, null,	null, '(isset({add}) || isset({update}))'.
 										' && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
@@ -149,10 +149,10 @@ $fields = [
 											' && {type} == '.ITEM_TYPE_HTTPAGENT,
 										_('URL')
 									],
-	'query_fields' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'parameters' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'posts' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
-	'status_codes' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'query_fields' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'parameters' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'posts' =>						[T_ZBX_STR, O_OPT, null,			null,	null],
+	'status_codes' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'follow_redirects' =>			[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 										null
@@ -161,8 +161,8 @@ $fields = [
 										IN([ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 										null
 									],
-	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'headers' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'http_proxy' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'headers' =>					[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'retrieve_mode' =>				[T_ZBX_INT, O_OPT, null,
 										IN([HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
 											HTTPTEST_STEP_RETRIEVE_MODE_BOTH
@@ -226,15 +226,15 @@ $fields = [
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
-	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
 	// filter
-	'filter_set' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_hostids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'filter_name' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_name' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
@@ -263,23 +263,23 @@ $fields = [
 										null
 									],
 	'filter_evaltype' =>			[T_ZBX_INT, O_OPT, null,	IN([TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), null],
-	'filter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'filter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'filter_valuemapids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	// subfilters
-	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_types' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_status' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_state' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
-	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_history' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'subfilter_set' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
+	'subfilter_types' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_value_types' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_status' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_state' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_inherited' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_with_triggers' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_discovered' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_hosts' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_history' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
+	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
@@ -696,8 +696,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 // clean history for selected items
-elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
-		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory' && hasRequest('group_itemid')) {
 	$result = (bool) API::History()->clear(getRequest('group_itemid'));
 
 	if ($result) {
