@@ -75,7 +75,7 @@ $output = [
 			'enabled' => !$data['create'],
 			'class' => 'float-left',
 			'confirmation' => _('Are you sure you want to delete this filter?'),
-			'action' => 'return tabFilterDelete(overlay, "'. $data['csrf_tokens']['popup.tabfilter.delete'] .'")'
+			'action' => 'return tabFilterDelete(overlay)'
 		],
 		[
 			'title' => _('Save'),
