@@ -48,8 +48,8 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ETCD.GRPC.ERRORS.MAX.WARN} |<p>The maximum number of gRPC request failures.</p> |`1` |
-|{$ETCD.GRPC_CODE.MATCHES} |<p>The filter of discoverable gRPC codes. See more details on `[Status codes and their use in gRPC]`(https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`.*` |
-|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>The filter to exclude discovered gRPC codes. See more details on `[Status codes and their use in gRPC]`(https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`CHANGE_IF_NEEDED` |
+|{$ETCD.GRPC_CODE.MATCHES} |<p>The filter of discoverable gRPC codes. See more details on [`Status codes and their use in gRPC`] (https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`.*` |
+|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>The filter to exclude discovered gRPC codes. See more details on [`Status codes and their use in gRPC`] (https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`CHANGE_IF_NEEDED` |
 |{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>The filter of discoverable gRPC codes, which will create triggers.</p> |`Aborted|Unavailable` |
 |{$ETCD.HTTP.FAIL.MAX.WARN} |<p>The maximum number of HTTP request failures.</p> |`2` |
 |{$ETCD.LEADER.CHANGES.MAX.WARN} |<p>The maximum number of leader changes.</p> |`5` |
@@ -125,7 +125,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Etcd: Service is unavailable |<p>-</p> |`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
-|Etcd: Node healthcheck failed |<p>See more details on `[Health Check]`(https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check).</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
+|Etcd: Node healthcheck failed |<p>See more details on [`Health Check`] (https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check).</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Member has no leader |<p>If a member does not have a leader, it is totally unavailable.</p> |`last(/Etcd by HTTP/etcd.has.leader)=0` |AVERAGE | |
 |Etcd: Instance has seen too many leader changes |<p>Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.</p> |`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
