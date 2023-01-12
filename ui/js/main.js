@@ -1075,10 +1075,11 @@ jQuery(function ($) {
 	}
 });
 
-/**
- * SideBar initialization.
- */
-function init_sidebar() {
+window.addEventListener('load', e => {
+
+	/**
+	 * SideBar initialization.
+	 */
 	const sidebar = document.querySelector('.sidebar');
 
 	if (sidebar !== null) {
@@ -1091,4 +1092,4 @@ function init_sidebar() {
 				window.dispatchEvent(new Event('resize'));
 			});
 	}
-}
+});

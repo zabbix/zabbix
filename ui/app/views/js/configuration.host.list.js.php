@@ -38,6 +38,7 @@
 			this.csrf_tokens = csrf_tokens;
 
 			this.initFilter();
+			this._initActionButtons();
 		},
 
 		initFilter() {
@@ -62,6 +63,37 @@
 				else {
 					$('#filter_proxyids_').multiSelect('disable');
 				}
+			});
+		},
+
+		_initActionButtons() {
+			document.addEventListener('click', e => {
+				const class_list = e.target.classList;
+
+				if (class_list.contains('js-import-host')) {
+					this.openHostImportPopup();
+				}
+				else if (class_list.contains('js-massupdate-host')) {
+					this.openHostMassUpdatePopup(e.target);
+				}
+			})
+		},
+
+		openHostImportPopup() {
+			return PopUp('popup.import', {
+				rules_preset: 'host',
+				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.import']
+			},
+				{dialogue_class: "modal-popup-generic"}
+			);
+		},
+
+		openHostMassUpdatePopup(button) {
+			openMassupdatePopup('popup.massupdate.host', {
+				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.massupdate.host']
+			}, {
+				dialogue_class: 'modal-popup-static',
+				trigger_element: button
 			});
 		},
 

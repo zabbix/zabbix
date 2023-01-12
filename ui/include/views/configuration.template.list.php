@@ -96,11 +96,7 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {rules_preset: "template", ' .
-						CController::CSRF_TOKEN_NAME . ': "' . $data['csrf_tokens']['popup.import'] .
-					'"},
-						{dialogue_class: "modal-popup-generic"}
-					);')
+					->addClass('js-import-template')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))

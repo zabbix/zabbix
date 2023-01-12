@@ -228,32 +228,34 @@
 				proxy_form.submit();
 			}, {passive: false});
 
-		if (document.templatesForm) {
-			let csrf_token = document.templatesForm.querySelector('input[name=<?= CController::CSRF_TOKEN_NAME ?>]');
-			let csrf_tokens = <?= json_encode($data['csrf_tokens'])?>;
+		let csrf_token = '';
+		let csrf_tokens = <?= json_encode($data['csrf_tokens'])?>;
 
-			document.addEventListener('click', (e) => {
-				if (e.target.id === 'clone') {
-					csrf_token.value = csrf_tokens['templates.php clone'];
+		document.addEventListener('click', (e) => {
+			if (e.target.id === 'clone') {
+				csrf_token = csrf_tokens['templates.php clone'];
+			}
+			else if (e.target.id === 'full_clone') {
+				csrf_token = csrf_tokens['templates.php full_clone'];
+			}
+			else if (e.target.id === 'delete') {
+				if (!window.confirm('<?= _('Delete template?') ?>')) {
+					e.preventDefault();
+					return;
 				}
-				else if (e.target.id === 'full_clone') {
-					csrf_token.value = csrf_tokens['templates.php full_clone'];
+				csrf_token= csrf_tokens['templates.php delete'];
+			}
+			else if (e.target.id === 'delete_and_clear') {
+				if (!confirm('<?= _('Delete and clear template? (Warning: all linked hosts will be cleared!)') ?>')) {
+					e.preventDefault();
+					return;
 				}
-				else if (e.target.id === 'delete') {
-					if (!window.confirm('<?= _('Delete template?') ?>')) {
-						e.preventDefault();
-						return;
-					}
-					csrf_token.value = csrf_tokens['templates.php delete'];
-				}
-				else if (e.target.id === 'delete_and_clear') {
-					if (!confirm('<?= _('Delete and clear template? (Warning: all linked hosts will be cleared!)') ?>')) {
-						e.preventDefault();
-						return;
-					}
-					csrf_token.value = csrf_tokens['templates.php delete_and_clear'];
-				}
-			})
-		}
+				csrf_token = csrf_tokens['templates.php delete_and_clear'];
+			}
+
+			if (csrf_token != '') {
+				create_var(document.templatesForm, <?= json_encode(CController::CSRF_TOKEN_NAME) ?>, csrf_token, false);
+			}
+		})
 	});
 </script>

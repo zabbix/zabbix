@@ -33,8 +33,6 @@
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
-
-		init_sidebar({});
 	});
 
 	/**
@@ -65,7 +63,7 @@
 	/**
 	 * Add object to the list of favorites.
 	 */
-	function add2favorites(object, objectid, csrf_token) {
+	function addToFavorites(object, objectid) {
 		sendAjaxData('zabbix.php', {
 			data: {
 				object: object,
@@ -79,7 +77,7 @@
 	/**
 	 * Remove object from the list of favorites. Remove all favorites if objectid==0.
 	 */
-	function rm4favorites(object, objectid, csrf_token) {
+	function removeFromFavorites(object, objectid) {
 		sendAjaxData('zabbix.php', {
 			data: {
 				object: object,

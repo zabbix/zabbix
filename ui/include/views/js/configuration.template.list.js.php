@@ -63,6 +63,9 @@
 				else if (e.target.classList.contains('js-massdeleteclear-template')) {
 					prevent_event = !this.massDeleteClearTemplate(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
+				else if (e.target.classList.contains('js-import-template')) {
+					this.openTemplateImportPopup(e.target);
+				}
 
 				if (prevent_event) {
 					e.preventDefault();
@@ -106,6 +109,15 @@
 			);
 
 			return true;
+		}
+
+		openTemplateImportPopup() {
+			return PopUp("popup.import", {
+				rules_preset: "template",
+				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.import']
+			},
+				{dialogue_class: "modal-popup-generic"}
+			);
 		}
 	};
 </script>

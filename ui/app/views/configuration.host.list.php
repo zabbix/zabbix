@@ -41,11 +41,7 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->onClick(
-						'return PopUp("popup.import", {rules_preset: "host", '.
-						CController::CSRF_TOKEN_NAME . ' : "' . $data['csrf_tokens']['popup.import'] .
-						'"}, {dialogue_class: "modal-popup-generic"});'
-					)
+					->addClass('js-import-host')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -527,17 +523,9 @@ $form->addItem([
 		],
 		'popup.massupdate.host' => [
 			'content' => (new CButton('', _('Mass update')))
-				->onClick(
-					"openMassupdatePopup('popup.massupdate.host', {" .
-							CController::CSRF_TOKEN_NAME . " : " .
-								"'" . $data['csrf_tokens']['popup.massupdate.host'] . "'" .
-						"}, {
-						dialogue_class: 'modal-popup-static',
-						trigger_element: this
-					});"
-				)
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
+				->addClass('js-massupdate-host')
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
