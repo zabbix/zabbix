@@ -548,7 +548,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 			}
 		}
 
-		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		if (array_key_exists('test_settings', $data)) {
+			$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		}
+
 		$server_form_dialog->close();
 	}
 
