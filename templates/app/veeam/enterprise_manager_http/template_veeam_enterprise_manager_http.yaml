@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-12T07:39:22Z'
+  date: '2023-01-12T07:50:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -138,8 +138,8 @@ zabbix_export:
                     reports_summary.Links.forEach(function (field)  {
                             data[field.Name] = Veeam.request(field.Href)
                         })
-                    backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
-                    backupFiles.Refs.forEach(function (field) {
+                    data.backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
+                    data.backupFiles.Refs.forEach(function (field) {
                             data[field.Name] = Veeam.request(field.Href + '?format=Entity')
                         })
                     return data;
@@ -153,7 +153,7 @@ zabbix_export:
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
+                Zabbix.log(3, '[ VEEAM MANAGER ] ERROR: ' + error);
                 return JSON.stringify({'error': error});
             }
           description: 'The result of API requests is expressed in the JSON.'
