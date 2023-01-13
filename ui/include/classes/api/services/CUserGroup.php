@@ -194,7 +194,7 @@ class CUserGroup extends CApiService {
 
 		self::updateRights($usrgrps, __FUNCTION__);
 		self::updateTagFilters($usrgrps, __FUNCTION__);
-		self::updateUsersGroups($usrgrps, __FUNCTION__);
+		self::updateUsersGroups($usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER_GROUP, $usrgrps);
 
@@ -643,7 +643,7 @@ class CUserGroup extends CApiService {
 
 		self::updateRights($usrgrps, 'update', $db_usrgrps);
 		self::updateTagFilters($usrgrps, 'update', $db_usrgrps);
-		self::updateUsersGroups($usrgrps, 'update', $db_usrgrps);
+		self::updateUsersGroups($usrgrps, $db_usrgrps);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER_GROUP, $usrgrps, $db_usrgrps);
 	}
@@ -809,66 +809,69 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups".
+	 * Update table "users_groups" relations.
 	 *
 	 * @static
 	 *
 	 * @param array      $usrgrps
-	 * @param string     $method
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateUsersGroups(array &$usrgrps, string $method, array $db_usrgrps = null): void {
-		$ins_users_groups = [];
-		$del_ids = [];
+	private static function updateUsersGroups(array &$usrgrps, array $db_usrgrps = null): void {
+		$changes = [];
 
 		foreach ($usrgrps as &$usrgrp) {
 			if (!array_key_exists('users', $usrgrp)) {
 				continue;
 			}
 
-			$db_users = ($method === 'update')
-				? array_column($db_usrgrps[$usrgrp['usrgrpid']]['users'], null, 'userid')
-				: [];
+			$db_userids = $db_usrgrps === null
+				? []
+				: array_column($db_usrgrps[$usrgrp['usrgrpid']]['users'], 'userid', 'userid');
+			$userids = array_column($usrgrp['users'], 'userid', 'userid');
 
-			foreach ($usrgrp['users'] as &$user) {
-				if (array_key_exists($user['userid'], $db_users)) {
-					$user['id'] = $db_users[$user['userid']]['id'];
-					unset($db_users[$user['userid']]);
-				}
-				else {
-					$ins_users_groups[] = [
-						'userid' => $user['userid'],
-						'usrgrpid' => $usrgrp['usrgrpid']
-					];
-				}
+			$del_userids = array_diff_key($db_userids, $userids);
+			$ins_userids = array_diff_key($userids, $db_userids);
+
+			$changes += array_fill_keys($db_userids + $ins_userids, []);
+
+			foreach ($del_userids as $userid) {
+				$changes[$userid]['del_groupids'][$usrgrp['usrgrpid']] = true;
 			}
-			unset($user);
 
-			$del_ids = array_merge($del_ids, array_column($db_users, 'id'));
+			foreach ($ins_userids as $userid) {
+				$changes[$userid]['ins_groups'][$usrgrp['usrgrpid']] = ['usrgrpid' => $usrgrp['usrgrpid']];
+			}
+
+			unset($usrgrp['users']);
 		}
 		unset($usrgrp);
 
-		if ($ins_users_groups) {
-			$ids = DB::insertBatch('users_groups', $ins_users_groups);
+		if (!$changes) {
+			return;
 		}
 
-		if ($del_ids) {
-			DB::delete('users_groups', ['id' => $del_ids]);
-		}
+		$users = API::User()->get([
+			'output' => ['userid'],
+			'selectUsrgrps' => ['usrgrpid'],
+			'userids' => array_keys($changes)
+		]);
 
-		foreach ($usrgrps as &$usrgrp) {
-			if (!array_key_exists('users', $usrgrp)) {
-				continue;
+		foreach ($users as &$user) {
+			$user['usrgrps'] = array_column($user['usrgrps'], null, 'usrgrpid');
+
+			if (array_key_exists('ins_groups', $changes[$user['userid']])) {
+				$user['usrgrps'] += $changes[$user['userid']]['ins_groups'];
 			}
 
-			foreach ($usrgrp['users'] as &$user) {
-				if (!array_key_exists('id', $user)) {
-					$user['id'] = array_shift($ids);
-				}
+			if (array_key_exists('del_groupids', $changes[$user['userid']])) {
+				$user['usrgrps'] = array_diff_key($user['usrgrps'], $changes[$user['userid']]['del_groupids']);
 			}
-			unset($user);
+
+			$user['usrgrps'] = array_values($user['usrgrps']);
 		}
-		unset($usrgrp);
+		unset($user);
+
+		API::User()->update($users);
 	}
 
 	/**

@@ -32,6 +32,8 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 	private const USRGRPID = 12;
 
 	public function testAuditlogUserGroups_Create() {
+		$userid = 2;
+
 		$create = $this->call('usergroup.create', [
 			[
 				'name' => 'Audit user groups',
@@ -40,7 +42,7 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 					'id' => 2
 				],
 				'users' => [
-					'userid' => 2
+					'userid' => $userid
 				]
 			]
 		]);
@@ -54,13 +56,18 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			'usergroup.rights['.$rights['rightid'].']' => ['add'],
 			'usergroup.rights['.$rights['rightid'].'].id' => ['add', '2'],
 			'usergroup.rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
-			'usergroup.users['.$id['id'].']' => ['add'],
-			'usergroup.users['.$id['id'].'].userid' => ['add', '2'],
-			'usergroup.users['.$id['id'].'].id' => ['add', $id['id']],
 			'usergroup.usrgrpid' => ['add', $resourceid]
 		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+
+		$updated = json_encode([
+			'user.usrgrps['.$id['id'].']' => ['add'],
+			'user.usrgrps['.$id['id'].'].usrgrpid' => ['add', $resourceid],
+			'user.usrgrps['.$id['id'].'].id' => ['add', $id['id']]
+		]);
+
+		$this->getAuditDetails('details', $this->update_actionid, $updated, $userid);
 	}
 
 	public function testAuditlogUserGroups_Update() {
