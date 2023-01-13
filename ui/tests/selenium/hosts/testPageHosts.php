@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @dataSource TagFilter, Proxies
  *
  * @backup hosts
+ *
+ * @onBefore prepareHostsData
  */
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
@@ -35,6 +37,25 @@ class testPageHosts extends CLegacyWebTest {
 
 	use TagTrait;
 	use TableTrait;
+
+	public static function prepareHostsData() {
+		CDataHelper::createHosts([
+			[
+				'host' => 'Disabled status',
+				'status' => HOST_STATUS_NOT_MONITORED,
+				'groups' => [
+					'groupid' => '6'
+				]
+			],
+			[
+				'host' => 'Enabled status',
+				'status' => HOST_STATUS_MONITORED,
+				'groups' => [
+					'groupid' => '6'
+				]
+			]
+		]);
+	}
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(
@@ -703,5 +724,79 @@ class testPageHosts extends CLegacyWebTest {
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();
+	}
+
+	public function getFilterByStatusData() {
+		return [
+			// Retrieve only Enabled host from specific host group.
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Virtual machines',
+						'Status' => 'Enabled'
+					],
+					'expected' => [
+						'Enabled status'
+					]
+				]
+			],
+			// Wrong name in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => 'No data should be returned'
+					]
+				]
+			],
+			// Retrieve only Disabled Host.
+			[
+				[
+					'filter' => [
+						'Status' => 'Disabled'
+					],
+					'expected' => [
+						'Disabled status'
+					]
+				]
+			],
+			// Retrieve Any host with a partial name match.
+			[
+				[
+					'filter' => [
+						'Name' => 'status',
+						'Status' => 'Any'
+					],
+					'expected' => [
+						'Disabled status',
+						'Enabled status'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilterByStatusData
+	 */
+	public function testPageHosts_FilterByStatus($data) {
+		$this->page->login()->open('zabbix.php?action=host.list');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+
+		// Fill filter fields if such are present in the data provider.
+		$form->fill(CTestArrayHelper::get($data, 'filter'));
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		if (!array_key_exists('expected', $data)) {
+			// Check that 'No data found.' string is returned if no results are expected.
+			$this->assertTableData();
+		}
+		else {
+			// Using column Name check that only the expected Hosts are returned in the list.
+			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
+		}
+
+		// Reset filter due to not influence further tests.
+		$this->query('button:Reset')->one()->click();
 	}
 }
