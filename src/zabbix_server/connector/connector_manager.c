@@ -32,6 +32,10 @@ extern unsigned char			program_type;
 extern int				CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 #define ZBX_CONNECTOR_MANAGER_DELAY	1
+#define ZBX_CONNECTOR_FLUSH_INTERVAL	1
+
+#define ZBX_CONNECTOR_RESCHEDULE_FALSE	0
+#define ZBX_CONNECTOR_RESCHEDULE_TRUE	1
 
 static sigset_t				orig_mask;
 
@@ -41,6 +45,7 @@ typedef struct
 	zbx_ipc_client_t	*client;	/* the connected preprocessing worker client */
 	zbx_uint64_t		taskid;		/* the current task data */
 	zbx_vector_uint64_t	ids;
+	unsigned char		reschedule;
 }
 zbx_connector_worker_t;
 
@@ -174,7 +179,7 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 	return NULL;
 }
 
-static int	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
+static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
 		zbx_connector_worker_t *worker)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -231,10 +236,11 @@ static int	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t
 	message->data = data;
 	message->size = data_offset;
 
+	worker->reschedule = FAIL == ret ? ZBX_CONNECTOR_RESCHEDULE_TRUE : ZBX_CONNECTOR_RESCHEDULE_FALSE;
+
 	if (0 != worker->ids.values_num)
 		worker->taskid = connector->connectorid;
 
-	return ret;
 #undef ZBX_DATA_JSON_RESERVED
 #undef ZBX_DATA_JSON_RECORD_LIMIT
 }
@@ -253,13 +259,24 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	while (NULL != (worker = connector_get_free_worker(manager)) &&
-			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)))
+	if (NULL == (worker = connector_get_free_worker(manager)))
+		goto out;
+
+	if (NULL == (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)))
 	{
-		if (SUCCEED == connector_get_next_task(connector, &message, worker))
-			connector->time_flush = now + 1;
-		else
-			connector->time_flush = now;
+		zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
+		if (NULL == (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)))
+			goto out;
+	}
+
+	do
+	{
+		if (connector->time_flush > now)
+			continue;
+
+		connector_get_next_task(connector, &message, worker);
+
+		connector->time_flush = now + ZBX_CONNECTOR_FLUSH_INTERVAL;
 
 		if (NULL == message.data)
 			continue;
@@ -272,10 +289,10 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 
 		zbx_ipc_message_clean(&message);
 	}
+	while (NULL != (worker = connector_get_free_worker(manager)) &&
+			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)));
 
-	if (NULL == connector)
-		zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -351,7 +368,7 @@ static zbx_connector_worker_t	*connector_get_worker_by_client(zbx_connector_mana
 	return worker;
 }
 
-static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_client_t *client)
+static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_client_t *client, int now)
 {
 	zbx_connector_worker_t	*worker;
 	zbx_connector_t		*connector;
@@ -383,6 +400,13 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 	}
 
 	zbx_vector_uint64_clear(&worker->ids);
+
+	if (ZBX_CONNECTOR_RESCHEDULE_TRUE == worker->reschedule)
+	{
+		if (NULL != connector)
+			connector->time_flush = now;
+	}
+
 }
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
@@ -392,7 +416,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
 	int					ret, processed_num = 0;
-	double					time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
+	double					time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -418,8 +442,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	connector_init_manager(&manager);
 
 	/* initialize statistics */
-	time_stat = last_proxy_flush = zbx_time();
-	time_flush = time_stat;
+	time_stat = zbx_time();
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	zbx_vector_connector_object_create(&connector_objects);
@@ -441,29 +464,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		}
 
 
-		if (time_flush < time_now)
-		{
-			zbx_hashset_iter_t	iter;
-			zbx_connector_t		*connector;
-
-			connector_assign_tasks(&manager, time_now);
-
-			zbx_hashset_iter_reset(&manager.connectors, &iter);
-
-			time_flush = time_now + 1;
-			while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
-			{
-				if (connector->time_flush < time_flush)
-				{
-					/* some connector is still not processed or reached it's limit */
-					time_flush = connector->time_flush;
-					break;
-				}
-			}
-
-			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
-					&manager.revision, (zbx_clean_func_t)object_link_clean);
-		}
+		connector_assign_tasks(&manager, time_now);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
@@ -476,20 +477,23 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		if (NULL != message)
 		{
+			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
+					&manager.revision, (zbx_clean_func_t)object_link_clean);
+
 			switch (message->code)
 			{
 				case ZBX_IPC_CONNECTOR_REQUEST:
-					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
-							&manager.revision, (zbx_clean_func_t)object_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);
+					zbx_vector_connector_object_clear_ext(&connector_objects,
+							zbx_connector_object_free);
 					break;
 				case ZBX_IPC_CONNECTOR_WORKER:
 					connector_register_worker(&manager, client, message);
 					break;
 				case ZBX_IPC_CONNECTOR_RESULT:
-					connector_add_result(&manager, client);
+					connector_add_result(&manager, client, time_now);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -497,8 +501,6 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 			zbx_ipc_message_free(message);
 		}
-
-		zbx_vector_connector_object_clear_ext(&connector_objects, zbx_connector_object_free);
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
