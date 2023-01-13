@@ -9463,9 +9463,9 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => '30s'
+				'default' => '5s'
 			],
-			'retries' => [
+			'max_attempts' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -9575,7 +9575,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '2'
+				'default' => '0'
 			],
 			'value' => [
 				'null' => false,
