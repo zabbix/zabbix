@@ -437,22 +437,7 @@ class testUsersAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #10 test with correct LDAP settings and credentials.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'servers_settings' => [
-						'Host' => 'dc-ad-srv.zabbix.sandbox',
-						'Base DN' => 'DC=zbx,DC=local',
-						'Search attribute' => 'sAMAccountName'
-					],
-					'test_settings' => [
-						'Login' => 'employee',
-						'User password' => 'Secret123'
-					]
-				]
-			],
-			// #11 test with correct LDAP settings and JIT settings.
+			// #10 test with correct LDAP settings and JIT settings.
 			[
 				[
 					'expected' => TEST_GOOD,
