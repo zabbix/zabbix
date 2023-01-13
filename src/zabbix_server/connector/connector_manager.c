@@ -179,31 +179,29 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 	return NULL;
 }
 
-static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_t *message,
-		zbx_connector_worker_t *worker)
+static void	connector_get_next_task(zbx_connector_t *connector,  zbx_connector_worker_t *worker,
+		unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
-	unsigned char		*data = NULL;
-	size_t			data_alloc = 0, data_offset = 0;
 	zbx_object_link_t	*object_link;
 	int			i, records = 0, ret = SUCCEED;
 
 	while (SUCCEED == ret && SUCCEED == zbx_list_pop(&connector->object_link_queue, (void **)&object_link))
 	{
-		if (NULL == data)
-			zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
+		if (0 == *data_offset)
+			zbx_connector_serialize_connector(data, data_alloc, data_offset, connector);
 
 		for (i = 0; i < object_link->connector_data_points.values_num; i++, records++)
 		{
 			if ((records == connector->max_records && 0 != connector->max_records) ||
-					data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
+					*data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
 			{
 				ret = FAIL;
 				break;
 			}
 
-			zbx_connector_serialize_data_point(&data, &data_alloc, &data_offset,
+			zbx_connector_serialize_data_point(data, data_alloc, data_offset,
 					&object_link->connector_data_points.values[i]);
 		}
 
@@ -232,10 +230,6 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 		zbx_vector_uint64_append(&worker->ids, object_link->objectid);
 	}
 
-	message->code = ZBX_IPC_CONNECTOR_REQUEST;
-	message->data = data;
-	message->size = data_offset;
-
 	if (0 != worker->ids.values_num)
 	{
 		worker->reschedule = FAIL == ret ? ZBX_CONNECTOR_RESCHEDULE_TRUE : ZBX_CONNECTOR_RESCHEDULE_FALSE;
@@ -255,8 +249,9 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 {
 	zbx_connector_worker_t	*worker;
-	zbx_ipc_message_t	message;
 	zbx_connector_t		*connector = NULL;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -279,18 +274,18 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 
 		while (connector->senders < connector->max_senders)
 		{
-			connector_get_next_task(connector, &message, worker);
+			data_offset = 0;
+			connector_get_next_task(connector, worker, &data, &data_alloc, &data_offset);
 
-			if (NULL == message.data)
+			if (0 == data_offset)
 				break;
 
-			if (FAIL == zbx_ipc_client_send(worker->client, message.code, message.data, message.size))
+			if (FAIL == zbx_ipc_client_send(worker->client, ZBX_IPC_CONNECTOR_REQUEST, data, data_offset))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector worker");
 				exit(EXIT_FAILURE);
 			}
 
-			zbx_ipc_message_clean(&message);
 			connector->senders++;
 
 			if (NULL == (worker = connector_get_free_worker(manager)))
@@ -298,6 +293,8 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 		}
 	}
 	while (NULL != worker && NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)));
+
+	zbx_free(data);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
