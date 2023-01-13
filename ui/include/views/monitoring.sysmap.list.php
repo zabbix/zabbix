@@ -39,9 +39,10 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick(
-							'return PopUp("popup.import", {rules_preset: "map"},
-								{dialogue_class: "modal-popup-generic"}
-							);'
+							'return PopUp("popup.import", {rules_preset: "map"}, {
+								dialogueid: "popup_import",
+								dialogue_class: "modal-popup-generic"
+							});'
 						)
 						->setEnabled($data['allowed_edit'])
 						->removeId()

@@ -355,6 +355,7 @@ class CItemPrototype extends CItemGeneral {
 			'selectValueMap' => ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -511,6 +512,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
+			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -599,6 +601,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'uuid' => 			['type' => API_UUID],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
@@ -634,6 +637,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'uuid' => 			['type' => API_UUID],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
