@@ -571,7 +571,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
-			foreach(arrayKeys($fields) as $name){
+			foreach(array_keys($fields) as $name){
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
