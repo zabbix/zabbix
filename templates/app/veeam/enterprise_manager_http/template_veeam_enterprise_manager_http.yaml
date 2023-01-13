@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-12T07:50:48Z'
+  date: '2023-01-13T06:36:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -31,7 +31,7 @@ zabbix_export:
       items:
         -
           uuid: a1b612cd8e274a27a834dbdb69fe7d08
-          name: 'Failed Job Runs'
+          name: 'Veeam Manager: Failed Job Runs'
           type: DEPENDENT
           key: veeam.manager.failed.jobs
           delay: '0'
@@ -49,9 +49,21 @@ zabbix_export:
             -
               tag: component
               value: reports
+          triggers:
+            -
+              uuid: 4885d43f36b541219be87b5e5ea19088
+              expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}'
+              name: 'Veeam Manager: Failed job runs is too high'
+              event_name: 'Veeam Manager: Failed job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.FAIL})'
+              priority: AVERAGE
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: jobs
         -
           uuid: e698c05dae9f4d2f8323ce718e9ed83b
-          name: 'Veeam: Get errors'
+          name: 'Veeam Manager: Get errors'
           type: DEPENDENT
           key: veeam.manager.get.errors
           delay: '0'
@@ -79,7 +91,7 @@ zabbix_export:
             -
               uuid: 83316e2168414042aeb9d98857534baa
               expression: 'length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0'
-              name: 'Veeam: There are errors in requests to API'
+              name: 'Veeam Manager: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -92,6 +104,7 @@ zabbix_export:
           name: 'Veeam Manager: Get metrics'
           type: SCRIPT
           key: veeam.manager.get.metrics
+          delay: 5m
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -148,7 +161,6 @@ zabbix_export:
             };  
             try {
                 Veeam.setParams(JSON.parse(value));
-            
                 return JSON.stringify(Veeam.getMetricsData());
             }
             catch (error) {
@@ -177,7 +189,7 @@ zabbix_export:
               value: raw
         -
           uuid: a0a1e67c99c64bd1a801c87eeda3977b
-          name: 'Running Jobs'
+          name: 'Veeam Manager: Running Jobs'
           type: DEPENDENT
           key: veeam.manager.running.jobs
           delay: '0'
@@ -197,7 +209,7 @@ zabbix_export:
               value: reports
         -
           uuid: d7510e46c6094e09979ea7dad2828cef
-          name: 'Scheduled Backup Jobs'
+          name: 'Veeam Manager: Scheduled Backup Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.backup.jobs
           delay: '0'
@@ -217,7 +229,7 @@ zabbix_export:
               value: reports
         -
           uuid: de9f62198b5b42cdb25460315f4af949
-          name: 'Scheduled Jobs'
+          name: 'Veeam Manager: Scheduled Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.jobs
           delay: '0'
@@ -237,7 +249,7 @@ zabbix_export:
               value: reports
         -
           uuid: 599a25d753ce4f5d8542d08569f2a136
-          name: 'Scheduled Replica Jobs'
+          name: 'Veeam Manager: Scheduled Replica Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.replica.jobs
           delay: '0'
@@ -257,7 +269,7 @@ zabbix_export:
               value: reports
         -
           uuid: 7d96ebb849c94d5b89656bdfa6398a1d
-          name: 'Total Job Runs'
+          name: 'Veeam Manager: Total Job Runs'
           type: DEPENDENT
           key: veeam.manager.scheduled.total.jobs
           delay: '0'
@@ -277,7 +289,7 @@ zabbix_export:
               value: reports
         -
           uuid: b39d33c9d5c544a2996736dbdccfcaff
-          name: 'Warnings Job Runs'
+          name: 'Veeam Manager: Warnings Job Runs'
           type: DEPENDENT
           key: veeam.manager.warning.jobs
           delay: '0'
@@ -295,6 +307,18 @@ zabbix_export:
             -
               tag: component
               value: reports
+          triggers:
+            -
+              uuid: f65998e99bb24e02a2810b632a4a3f4e
+              expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}'
+              name: 'Veeam Manager: Warning job runs is too high'
+              event_name: 'Veeam Manager: Warning job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.WARN})'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: jobs
       discovery_rules:
         -
           uuid: d07b06fbd84d493bb38d61ac0824e794
@@ -327,7 +351,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: d3f87401602c48d3a837504ed08902db
-              name: 'Veeam backup: Compression ratio [{#NAME}]'
+              name: 'Veeam Manager: Compression ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.compress.ratio[{#NAME}]'
               delay: '0'
@@ -343,14 +367,14 @@ zabbix_export:
                 key: veeam.manager.get.metrics
               tags:
                 -
-                  tag: component
-                  value: backup
+                  tag: backup
+                  value: '{#NAME}'
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: backups
             -
               uuid: 0c5be137b40949c4946a09c57ccc7796
-              name: 'Veeam backup: Data Size [{#NAME}]'
+              name: 'Veeam Manager: Data Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.data.size[{#NAME}]'
               delay: '0'
@@ -368,14 +392,14 @@ zabbix_export:
                 key: veeam.manager.get.metrics
               tags:
                 -
-                  tag: component
-                  value: backup
+                  tag: backup
+                  value: '{#NAME}'
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: backups
             -
               uuid: 62d0b0341bac40f9a63f0fbf3639e0d0
-              name: 'Veeam backup: Deduplication Ratio [{#NAME}]'
+              name: 'Veeam Manager: Deduplication Ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.deduplication.ratio[{#NAME}]'
               delay: '0'
@@ -391,14 +415,14 @@ zabbix_export:
                 key: veeam.manager.get.metrics
               tags:
                 -
-                  tag: component
-                  value: backup
+                  tag: backup
+                  value: '{#NAME}'
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: backups
             -
               uuid: 098cc39afb88483f93a98c96fc1450d1
-              name: 'Veeam backup: Backup Size [{#NAME}]'
+              name: 'Veeam Manager: Backup Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.file.size[{#NAME}]'
               delay: '0'
@@ -416,11 +440,11 @@ zabbix_export:
                 key: veeam.manager.get.metrics
               tags:
                 -
-                  tag: component
-                  value: backup
+                  tag: backup
+                  value: '{#NAME}'
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: backups
           master_item:
             key: veeam.manager.get.metrics
           lld_macro_paths:
@@ -480,6 +504,14 @@ zabbix_export:
         -
           macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
           description: 'Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.'
+        -
+          macro: '{$VEEAM.MANAGER.JOB.MAX.FAIL}'
+          value: '5'
+          description: 'Maximum failed job''s score (for trigger expression).'
+        -
+          macro: '{$VEEAM.MANAGER.JOB.MAX.WARN}'
+          value: '10'
+          description: 'Maximum warning job''s score (for trigger expression).'
         -
           macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT

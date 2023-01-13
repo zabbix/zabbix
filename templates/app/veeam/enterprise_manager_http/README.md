@@ -36,6 +36,8 @@ No specific Zabbix configuration is required.
 |{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint URL in the format <scheme>://<host>:<port>.</p> |`https://localhost:9398/api` |
 |{$VEEAM.MANAGER.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`10` |
 |{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
+|{$VEEAM.MANAGER.JOB.MAX.FAIL} |<p>Maximum failed job's score (for trigger expression).</p> |`5` |
+|{$VEEAM.MANAGER.JOB.MAX.WARN} |<p>Maximum warning job's score (for trigger expression).</p> |`10` |
 |{$VEEAM.MANAGER.PASSWORD} |<p>Password of the account to be used for authentication..</p> |`` |
 |{$VEEAM.MANAGER.USER} |<p>Username of the account to be used for authentication..</p> |`` |
 
@@ -54,24 +56,26 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam Manager: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.manager.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Veeam |Veeam: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Veeam |Running Jobs |<p>The informing about of the running jobs.</p> |DEPENDENT |veeam.manager.running.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.RunningJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Scheduled Jobs |<p>The informing about of the scheduled jobs.</p> |DEPENDENT |veeam.manager.scheduled.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Scheduled Backup Jobs |<p>The informing about of the scheduled backup jobs.</p> |DEPENDENT |veeam.manager.scheduled.backup.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Scheduled Replica Jobs |<p>The informing about of the scheduled replica jobs.</p> |DEPENDENT |veeam.manager.scheduled.replica.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Total Job Runs |<p>The informing about of the total job runs.</p> |DEPENDENT |veeam.manager.scheduled.total.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.TotalJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Warnings Job Runs |<p>The informing about of the warning job runs.</p> |DEPENDENT |veeam.manager.warning.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Failed Job Runs |<p>The informing about of the failed job runs.</p> |DEPENDENT |veeam.manager.failed.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.FailedJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam backup: Backup Size [{#NAME}] |<p>Get backup size [{#NAME}].</p> |DEPENDENT |veeam.backup.file.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.BackupSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam backup: Data Size [{#NAME}] |<p>Get data size [{#NAME}].</p> |DEPENDENT |veeam.backup.data.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DataSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam backup: Compression ratio [{#NAME}] |<p>Get data compression ratio [{#NAME}].</p> |DEPENDENT |veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam backup: Deduplication Ratio [{#NAME}] |<p>Get data deduplication ratio [{#NAME}].</p> |DEPENDENT |veeam.backup.deduplication.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DeduplicationRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Veeam |Veeam Manager: Running Jobs |<p>The informing about of the running jobs.</p> |DEPENDENT |veeam.manager.running.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.RunningJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Scheduled Jobs |<p>The informing about of the scheduled jobs.</p> |DEPENDENT |veeam.manager.scheduled.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Scheduled Backup Jobs |<p>The informing about of the scheduled backup jobs.</p> |DEPENDENT |veeam.manager.scheduled.backup.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Scheduled Replica Jobs |<p>The informing about of the scheduled replica jobs.</p> |DEPENDENT |veeam.manager.scheduled.replica.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Total Job Runs |<p>The informing about of the total job runs.</p> |DEPENDENT |veeam.manager.scheduled.total.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.TotalJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Warnings Job Runs |<p>The informing about of the warning job runs.</p> |DEPENDENT |veeam.manager.warning.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Failed Job Runs |<p>The informing about of the failed job runs.</p> |DEPENDENT |veeam.manager.failed.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.FailedJobRuns`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Backup Size [{#NAME}] |<p>Get backup size [{#NAME}].</p> |DEPENDENT |veeam.backup.file.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.BackupSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Data Size [{#NAME}] |<p>Get data size [{#NAME}].</p> |DEPENDENT |veeam.backup.data.size[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DataSize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Compression ratio [{#NAME}] |<p>Get data compression ratio [{#NAME}].</p> |DEPENDENT |veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam Manager: Deduplication Ratio [{#NAME}] |<p>Get data deduplication ratio [{#NAME}].</p> |DEPENDENT |veeam.backup.deduplication.ratio[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['{#NAME}'].BackupFile.DeduplicationRatio`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Veeam: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0` |AVERAGE | |
+|Veeam Manager: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0` |AVERAGE | |
+|Veeam Manager: Warning job runs is too high |<p>-</p> |`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}` |WARNING |<p>Manual close: YES</p> |
+|Veeam Manager: Failed job runs is too high |<p>-</p> |`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
