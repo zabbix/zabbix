@@ -1,3 +1,4 @@
+
 # Etcd by HTTP
 
 ## Overview
@@ -6,18 +7,20 @@ For Zabbix version: 6.2 and higher.
 This template is designed to monitor `etcd` by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-The template `Etcd by HTTP ` — collects metrics by help of HTTP agent from `/metrics` endpoint.
+The template `Etcd by HTTP` — collects metrics by help of HTTP agent from `/metrics` endpoint.
 
 > Refer to the [vendor documentation](https://etcd.io/docs/v3.5/op-guide/monitoring/#metrics-endpoint).
 
 **For the users of  `etcd version <= 3.4` !**
 
 > In `etcd v3.5` some metrics have been deprecated. See more details on [Upgrade etcd from 3.4 to 3.5](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
-  Please upgrade your `etcd` instance, or use older `Etcd by HTTP` template version.
+Please upgrade your `etcd` instance, or use older `Etcd by HTTP` template version.
 
-This template has been tested on:
 
-- etcd, version 3.5.6
+
+This template was tested on:
+
+- Etcd, version 3.5.6
 
 ## Setup
 
@@ -29,14 +32,15 @@ Follow these instructions:
 2. After importing the template, make sure that `etcd` allows the collection of metrics. You can test it by running: `curl -L http://localhost:2379/metrics`.
 3. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it,  run `curl -L  http://<etcd_node_address>:2379/metrics`.
 4. Add the template to each `etcd node`.
-  By default the template uses a client's port. You can configure metrics endpoint location by adding `--listen-metrics-urls flag`. (For more details, see [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
+By default, the template uses a client's port. You can configure metrics endpoint location by adding `--listen-metrics-urls flag`. (For more details, see [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
 
-Addtional points to consider:
+Additional points to consider:
 
--  If you have specified a non-standard port for `etcd`, don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
--  You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
--  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`.
--  See the macros section, as it will set the trigger values.
+  -  If you have specified a non-standard port for `etcd`, don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
+  -  You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
+  -  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`.
+  -  See the macros section, as it will set the trigger values.
+
 
 ## Zabbix configuration
 
@@ -47,31 +51,31 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ETCD.GRPC.ERRORS.MAX.WARN} |<p>The maximum number of gRPC request failures.</p> |`1` |
-|{$ETCD.GRPC_CODE.MATCHES} |<p>The filter of discoverable gRPC codes. See more details on [Status codes and their use in gRPC](https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`.*` |
-|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>The filter to exclude discovered gRPC codes. See more details on [Status codes and their use in gRPC](https://github.com/grpc/grpc/blob/master/doc/statuscodes.md).</p> |`CHANGE_IF_NEEDED` |
+|{$ETCD.GRPC_CODE.MATCHES} |<p>The filter of discoverable gRPC codes. See more details on https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`.*` |
+|{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>The filter to exclude discovered gRPC codes. See more details on https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`CHANGE_IF_NEEDED` |
 |{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>The filter of discoverable gRPC codes, which will create triggers.</p> |`Aborted|Unavailable` |
 |{$ETCD.HTTP.FAIL.MAX.WARN} |<p>The maximum number of HTTP request failures.</p> |`2` |
 |{$ETCD.LEADER.CHANGES.MAX.WARN} |<p>The maximum number of leader changes.</p> |`5` |
 |{$ETCD.OPEN.FDS.MAX.WARN} |<p>The maximum percentage of used file descriptors.</p> |`90` |
 |{$ETCD.PASSWORD} |<p>-</p> |`` |
-|{$ETCD.PORT} |<p>The port of `etcd` API endpoint.</p> |`2379` |
+|{$ETCD.PORT} |<p>The port of etcd API endpoint.</p> |`2379` |
 |{$ETCD.PROPOSAL.FAIL.MAX.WARN} |<p>The maximum number of proposal failures.</p> |`2` |
 |{$ETCD.PROPOSAL.PENDING.MAX.WARN} |<p>The maximum number of proposals in queue.</p> |`5` |
-|{$ETCD.SCHEME} |<p>The request schem,e which may be `http` or `https`.</p> |`http` |
+|{$ETCD.SCHEME} |<p>The request scheme which may be http or https.</p> |`http` |
 |{$ETCD.USER} |<p>-</p> |`` |
 
-### Template links
+## Template links
 
 There are no template links in this template.
 
-### Discovery rules
+## Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |gRPC codes discovery |<p>-</p> |DEPENDENT |etcd.grpc_code.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_server_handled_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Filter**:</p>AND <p>- {#GRPC.CODE} NOT_MATCHES_REGEX `{$ETCD.GRPC_CODE.NOT_MATCHES}`</p><p>- {#GRPC.CODE} MATCHES_REGEX `{$ETCD.GRPC_CODE.MATCHES}`</p><p>**Overrides:**</p><p>trigger<br> - {#GRPC.CODE} MATCHES_REGEX `{$ETCD.GRPC_CODE.TRIGGER.MATCHES}`<br>  - TRIGGER_PROTOTYPE LIKE `Too many failed gRPC requests`<br>  - DISCOVER</p> |
 |Peers discovery |<p>-</p> |DEPENDENT |etcd.peer.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_network_peer_sent_bytes_total`</p> |
 
-### Items collected
+## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
@@ -84,7 +88,7 @@ There are no template links in this template.
 |Etcd |Etcd: Proposals applied per second |<p>The number of consensus proposals applied.</p> |DEPENDENT |etcd.proposals.applied.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_applied_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals failed per second |<p>The number of failed proposals seen.</p> |DEPENDENT |etcd.proposals.failed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_failed_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals pending |<p>The current number of pending proposals to commit.</p> |DEPENDENT |etcd.proposals.pending<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_pending`</p> |
-|Etcd |Etcd: Reads per second |<p>The number of read actions by `get/getRecursive`, local to this member.</p> |DEPENDENT |etcd.reads.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_debugging_store_reads_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Reads per second |<p>The number of read action by `get/getRecursive`, local to this member.</p> |DEPENDENT |etcd.reads.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_debugging_store_reads_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Writes per second |<p>The number of writes (e.g., `set/compareAndDelete`) seen by this member.</p> |DEPENDENT |etcd.writes.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `etcd_debugging_store_writes_total`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Client gRPC received bytes per second |<p>The number of bytes received from gRPC clients per second.</p> |DEPENDENT |etcd.network.grpc.received.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_client_grpc_received_bytes_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Client gRPC sent bytes per second |<p>The number of bytes sent from gRPC clients clients per second.</p> |DEPENDENT |etcd.network.grpc.sent.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_client_grpc_sent_bytes_total`</p><p>- CHANGE_PER_SECOND</p> |
@@ -111,30 +115,30 @@ There are no template links in this template.
 |Etcd |Etcd: Range per second |<p>The number of ranges seen by this member per second.</p> |DEPENDENT |etcd.range.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_range_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Transaction per second |<p>The number of transactions seen by this member per second.</p> |DEPENDENT |etcd.txn.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_range_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Pending events |<p>The total number of pending events to be sent.</p> |DEPENDENT |etcd.events.sent.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_debugging_mvcc_pending_events_total`</p> |
-|Etcd |Etcd: RPCs completed with code {#GRPC.CODE} |<p>The number of RPCs completed on the server with `grpc_code {#GRPC.CODE}`.</p> |DEPENDENT |etcd.grpc.handled.rate[{#GRPC.CODE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes sent |<p>The number of bytes sent to a peer with the `ID {#ETCD.PEER}`.</p> |DEPENDENT |etcd.bytes.sent.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes received |<p>The number of bytes received from a peer with the `ID {#ETCD.PEER}`.</p> |DEPENDENT |etcd.bytes.received.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Send failures |<p>The number of send failures from a peer with the `ID {#ETCD.PEER}`.</p> |DEPENDENT |etcd.sent.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
-|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Receive failures |<p>The number of receive failures from a peer with the `ID {#ETCD.PEER}`.</p> |DEPENDENT |etcd.received.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: RPCs completed with code {#GRPC.CODE} |<p>The number of RPCs completed on the server with grpc_code {#GRPC.CODE}.</p> |DEPENDENT |etcd.grpc.handled.rate[{#GRPC.CODE}]<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `grpc_server_handled_total{grpc_method="{#GRPC.CODE}"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes sent |<p>The number of bytes sent to a peer with the ID `{#ETCD.PEER}`.</p> |DEPENDENT |etcd.bytes.sent.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Bytes received |<p>The number of bytes received from a peer with the ID `{#ETCD.PEER}`.</p> |DEPENDENT |etcd.bytes.received.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Send failures |<p>The number of send failures from a peer with the ID `{#ETCD.PEER}`.</p> |DEPENDENT |etcd.sent.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
+|Etcd |Etcd: Etcd peer {#ETCD.PEER}: Receive failures |<p>The number of receive failures from a peer with the ID `{#ETCD.PEER}`.</p> |DEPENDENT |etcd.received.fail.rate[{#ETCD.PEER}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- CHANGE_PER_SECOND</p> |
 |Zabbix raw items |Etcd: Get node metrics |<p>-</p> |HTTP_AGENT |etcd.get_metrics |
 |Zabbix raw items |Etcd: Get version |<p>-</p> |HTTP_AGENT |etcd.get_version |
 
-### Triggers
+## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Etcd: Service is unavailable |<p>-</p> |`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
-|Etcd: Node healthcheck failed |<p>See more details on [Health Check](https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check).</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
+|Etcd: Node healthcheck failed |<p>See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Member has no leader |<p>If a member does not have a leader, it is totally unavailable.</p> |`last(/Etcd by HTTP/etcd.has.leader)=0` |AVERAGE | |
 |Etcd: Instance has seen too many leader changes |<p>Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.</p> |`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
 |Etcd: Too many proposal failures |<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p> |`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}` |WARNING | |
 |Etcd: Too many proposals are queued to commit |<p>Rising pending proposals suggests there is a high client load, or the member cannot commit proposals.</p> |`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}` |WARNING | |
 |Etcd: Too many HTTP requests failures |<p>Too many requests failed on `etcd` instance with the `5xx HTTP code`.</p> |`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}` |WARNING | |
-|Etcd: Server version has changed |<p>The `etcd` version has changed. Acknowledge to close manually.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
-|Etcd: Cluster version has changed |<p>The `etcd` version has changed. Acknowledge to close manually.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: Server version has changed |<p>The Etcd version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: Cluster version has changed |<p>The Etcd version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
 |Etcd: Host has been restarted |<p>The host uptime is less than 10 minutes.</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Etcd: Current number of open files is too high |<p>Heavy usage of a file descriptor  (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
+|Etcd: Current number of open files is too high |<p>Heavy usage of a file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
 |Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
