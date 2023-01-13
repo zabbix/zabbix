@@ -539,7 +539,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 			$this->query('button:Sign in')->one()->click();
 		}
 		else {
-			$link = $this->query('link:Sign in with Single Sign-On (SAML)')->one()->waitUntilClickable()->click();
+			$this->query('link:Sign in with Single Sign-On (SAML)')->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$this->query('id:username')->one()->waitUntilVisible()->fill($data['username']);
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
