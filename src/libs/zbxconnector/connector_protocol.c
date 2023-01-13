@@ -74,14 +74,14 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 }
 
 void	zbx_connector_serialize_object_data(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_connector_object_data_t *connector_object)
+		const zbx_connector_object_data_t *connector_data)
 {
 	zbx_uint32_t	data_len = 0, error_len;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, connector_object->ts.sec);
-	zbx_serialize_prepare_value(data_len, connector_object->ts.ns);
-	zbx_serialize_prepare_str_len(data_len, connector_object->str, error_len);
+	zbx_serialize_prepare_value(data_len, connector_data->ts.sec);
+	zbx_serialize_prepare_value(data_len, connector_data->ts.ns);
+	zbx_serialize_prepare_str_len(data_len, connector_data->str, error_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -94,13 +94,13 @@ void	zbx_connector_serialize_object_data(unsigned char **data, size_t *data_allo
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	ptr += zbx_serialize_value(ptr, connector_object->ts.sec);
-	ptr += zbx_serialize_value(ptr, connector_object->ts.ns);
-	ptr += zbx_serialize_str(ptr, connector_object->str, error_len);
+	ptr += zbx_serialize_value(ptr, connector_data->ts.sec);
+	ptr += zbx_serialize_value(ptr, connector_data->ts.ns);
+	ptr += zbx_serialize_str(ptr, connector_data->str, error_len);
 }
 
 void	zbx_connector_deserialize_object_data(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_connector_object_data_t *connector_objects)
+		zbx_vector_connector_object_data_t *connector_data)
 {
 	const unsigned char	*end = data + size;
 
@@ -113,7 +113,7 @@ void	zbx_connector_deserialize_object_data(const unsigned char *data, zbx_uint32
 		data += zbx_deserialize_value(data, &connector_object.ts.ns);
 		data += zbx_deserialize_str(data, &connector_object.str, deserialize_str_len);
 
-		zbx_vector_connector_object_data_append(connector_objects, connector_object);
+		zbx_vector_connector_object_data_append(connector_data, connector_object);
 	}
 }
 

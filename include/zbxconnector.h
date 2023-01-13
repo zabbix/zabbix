@@ -49,7 +49,7 @@ typedef struct
 }
 zbx_connector_object_data_t;
 
-ZBX_PTR_VECTOR_DECL(connector_object_data, zbx_connector_object_data_t)
+ZBX_PTR_VECTOR_DECL(connector_data, zbx_connector_object_data_t)
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object);
@@ -59,9 +59,9 @@ void	zbx_connector_object_free(zbx_connector_object_t connector_object);
 void	zbx_connector_object_data_free(zbx_connector_object_data_t connector_object_data);
 
 void	zbx_connector_serialize_object_data(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_connector_object_data_t *connector_object);
+		const zbx_connector_object_data_t *connector_data);
 void	zbx_connector_deserialize_object_data(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_connector_object_data_t *connector_objects);
+		zbx_vector_connector_object_data_t *connector_data);
 
 void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_t *connector);
