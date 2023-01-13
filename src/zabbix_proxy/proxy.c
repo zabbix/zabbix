@@ -1288,7 +1288,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {config_timeout};
 	zbx_thread_pinger_args			pinger_args = {config_timeout};
 
-	zbx_rtc_process_request_ex_func_t	rtc_process_request_func;
+	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1483,9 +1483,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	thread_args.info.program_type = program_type;
 
 	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
-		rtc_process_request_func = rtc_process_request_ex;
-	else
-		rtc_process_request_func = NULL;
+		rtc_process_request_func = rtc_process_request_ex_passive;
 
 	for (i = 0; i < threads_num; i++)
 	{
