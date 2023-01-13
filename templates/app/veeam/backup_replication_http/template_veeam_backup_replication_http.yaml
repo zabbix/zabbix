@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-11T15:24:12Z'
+  date: '2023-01-13T07:15:18Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -70,6 +70,7 @@ zabbix_export:
           name: 'Veeam: Get metrics'
           type: SCRIPT
           key: veeam.get.metrics
+          delay: 5m
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -145,8 +146,7 @@ zabbix_export:
                 },
             
                 getMetricsData: function() {
-                    var 
-                    data = {};
+                    var data = {};
                     ms = 86400000;
                     start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
                     endpoints = {
@@ -242,8 +242,47 @@ zabbix_export:
           description: 'Discovery jobs states.'
           item_prototypes:
             -
+              uuid: 120a6bf888e74e0c9b054c3bdd50473f
+              name: 'Veeam: Job last result [{#NAME}] [{#TYPE}]'
+              type: DEPENDENT
+              key: 'veeam.jobs.last.result[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.lastResult
+              master_item:
+                key: 'veeam.jobs.states.raw[{#ID}]'
+              tags:
+                -
+                  tag: component
+                  value: jobs
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: workload
+                  value: '{#WORKLOAD}'
+              trigger_prototypes:
+                -
+                  uuid: 337b1cafc2674b4fb44e5baf1076183b
+                  expression: 'find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1'
+                  name: 'Veeam: Last result job failed'
+                  event_name: 'Veeam: Failed job [{#NAME}]'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: jobs
+            -
               uuid: cd2bc50b71184c5ebf39b75a2dafa483
-              name: 'Veeam jobs: Get jobs states data [{#NAME}]'
+              name: 'Veeam: Get jobs states data [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
@@ -261,10 +300,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: jobs
+                -
+                  tag: component
                   value: raw
             -
               uuid: 6f3837f27334466b814728036dd65c1d
-              name: 'Veeam jobs: Job status [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Job status [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
               delay: '0'
@@ -282,10 +324,10 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: jobs
                 -
-                  tag: repository-name
-                  value: '{#REPOSITORY.NAME}'
+                  tag: job
+                  value: '{#NAME}'
                 -
                   tag: workload
                   value: '{#WORKLOAD}'
@@ -296,20 +338,20 @@ zabbix_export:
               lld_macro: '{#ID}'
               path: $.id
             -
-              lld_macro: '{#JOB.STATUS}'
-              path: $.status
-            -
               lld_macro: '{#NAME}'
               path: $.name
-            -
-              lld_macro: '{#REPOSITORY.NAME}'
-              path: $.repositoryName
             -
               lld_macro: '{#TYPE}'
               path: $.type
             -
               lld_macro: '{#WORKLOAD}'
               path: $.workload
+            -
+              lld_macro: '{#JOB.STATUS}'
+              path: $.status
+            -
+              lld_macro: '{#REPOSITORY.NAME}'
+              path: $.repositoryName
           preprocessing:
             -
               type: JSONPATH
@@ -350,7 +392,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 1daea1ba8ac144fc9e22296720af0b22
-              name: 'Veeam proxies: Max task count by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Max task count by [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.proxy.maxtask[{#NAME}]'
               delay: '0'
@@ -366,10 +408,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: proxies
+                -
+                  tag: proxy
                   value: '{#NAME}'
             -
               uuid: 40d85eb402274838b00765ab91de3896
-              name: 'Veeam proxies: Get data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Get data [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
@@ -387,10 +432,16 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: proxies
+                -
+                  tag: component
                   value: raw
+                -
+                  tag: proxy
+                  value: '{#NAME}'
             -
               uuid: 4c304283f1ad480b8251a72ade27620f
-              name: 'Veeam proxies: Host name by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Host name by [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
@@ -408,10 +459,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: proxies
+                -
+                  tag: proxy
                   value: '{#NAME}'
             -
               uuid: 83e2e092ae1f4e1a9b4a426076f76467
-              name: 'Veeam proxies: Get server data by [{#NAME}]'
+              name: 'Veeam: Get server data by [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
@@ -429,10 +483,16 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: proxies
+                -
+                  tag: component
                   value: raw
+                -
+                  tag: proxy
+                  value: '{#NAME}'
             -
               uuid: 7dca605f25854e89a7e18702e8a48fc7
-              name: 'Veeam proxies: Host type by [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Host type by [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
@@ -450,16 +510,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: proxies
+                -
+                  tag: proxy
                   value: '{#NAME}'
           master_item:
             key: veeam.get.metrics
           lld_macro_paths:
-            -
-              lld_macro: '{#DESCRIPTION}'
-              path: $.description
-            -
-              lld_macro: '{#HOSTID}'
-              path: $.server.hostId
             -
               lld_macro: '{#ID}'
               path: $.id
@@ -467,8 +524,14 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
             -
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
+            -
               lld_macro: '{#TYPE}'
               path: $.type
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
           preprocessing:
             -
               type: JSONPATH
@@ -509,7 +572,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 1c925cfa0a2b46838588471aa58a1591
-              name: 'Veeam repositories: Get data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Get data [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
@@ -528,9 +591,15 @@ zabbix_export:
                 -
                   tag: component
                   value: raw
+                -
+                  tag: component
+                  value: repositories
+                -
+                  tag: repository
+                  value: '{#NAME}'
             -
               uuid: 80a13587e8cc40ba886f987fcde23c13
-              name: 'Veeam repositories: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
+              name: 'Veeam: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.capacity[{#NAME}]'
               delay: '0'
@@ -548,10 +617,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: repositories
+                -
+                  tag: repository
                   value: '{#NAME}'
             -
               uuid: 882451efee0a4ce8aabc2d2f3955d0be
-              name: 'Veeam repositories: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
+              name: 'Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.free.space[{#NAME}]'
               delay: '0'
@@ -569,19 +641,13 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: repositories
+                -
+                  tag: repository
                   value: '{#NAME}'
           master_item:
             key: veeam.get.metrics
           lld_macro_paths:
-            -
-              lld_macro: '{#DESCRIPTION}'
-              path: $.description
-            -
-              lld_macro: '{#HOSTID}'
-              path: $.server.hostId
-            -
-              lld_macro: '{#HOSTNAME}'
-              path: $.hostName
             -
               lld_macro: '{#ID}'
               path: $.id
@@ -589,11 +655,20 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
             -
-              lld_macro: '{#PATH}'
-              path: $.path
+              lld_macro: '{#HOSTID}'
+              path: $.server.hostId
             -
               lld_macro: '{#TYPE}'
               path: $.type
+            -
+              lld_macro: '{#DESCRIPTION}'
+              path: $.description
+            -
+              lld_macro: '{#HOSTNAME}'
+              path: $.hostName
+            -
+              lld_macro: '{#PATH}'
+              path: $.path
           preprocessing:
             -
               type: JSONPATH
@@ -634,7 +709,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 7224f41e5c614268bf6997ad8a49710b
-              name: 'Veeam sessions: Session message [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session message [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
               delay: '0'
@@ -652,13 +727,16 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: '{#NAME}'
+                  value: sessions
                 -
                   tag: creation-date
                   value: '{#CREATION.TIME}'
+                -
+                  tag: session
+                  value: '{#NAME}'
             -
               uuid: 3f449f47943b4877a32e89774712510f
-              name: 'Veeam sessions: Session progress percent [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session progress percent [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.progress.percent[{#ID}]'
               delay: '0'
@@ -676,10 +754,16 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
                   value: '{#NAME}'
             -
               uuid: f82984e1180946c6b4bff1f46987555d
-              name: 'Veeam sessions: Get sessions data [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Get sessions data [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
@@ -692,6 +776,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.sessions.data.[?(@.id==''{#ID}'')].first()'
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: veeam.get.metrics
               tags:
@@ -699,11 +784,11 @@ zabbix_export:
                   tag: component
                   value: raw
                 -
-                  tag: component
+                  tag: session
                   value: '{#NAME}'
             -
               uuid: 5fb9dcb62bfe4d1dae94beefa329691d
-              name: 'Veeam sessions: Session result [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session result [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
               delay: '0'
@@ -721,10 +806,28 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
                   value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: eeb93a10f3d04eee819587c6fa4ce8f8
+                  expression: 'find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1'
+                  name: 'Veeam: Last result session failed'
+                  event_name: 'Veeam: Failed session [{#NAME}]'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: sessions
             -
               uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
-              name: 'Veeam sessions: Session state [{#NAME}] [{#TYPE}]'
+              name: 'Veeam: Session state [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
               delay: '0'
@@ -742,16 +845,16 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: sessions
+                -
+                  tag: creation-date
+                  value: '{#CREATION.TIME}'
+                -
+                  tag: session
                   value: '{#NAME}'
           master_item:
             key: veeam.get.metrics
           lld_macro_paths:
-            -
-              lld_macro: '{#CREATION.TIME}'
-              path: $.creationTime
-            -
-              lld_macro: '{#END.TIME}'
-              path: $.endTime
             -
               lld_macro: '{#ID}'
               path: $.id
@@ -759,11 +862,17 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
             -
+              lld_macro: '{#TYPE}'
+              path: $.sessionType
+            -
               lld_macro: '{#STATE}'
               path: $.state
             -
-              lld_macro: '{#TYPE}'
-              path: $.sessionType
+              lld_macro: '{#CREATION.TIME}'
+              path: $.creationTime
+            -
+              lld_macro: '{#END.TIME}'
+              path: $.endTime
           preprocessing:
             -
               type: JSONPATH

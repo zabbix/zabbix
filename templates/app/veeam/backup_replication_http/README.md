@@ -71,27 +71,30 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Veeam |Veeam: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Veeam |Veeam proxies: Get server data by [{#NAME}] |<p>Get proxy server raw data.</p> |DEPENDENT |veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p> |
-|Veeam |Veeam proxies: Get data [{#NAME}] [{#TYPE}] |<p>Get proxy [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.proxy.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p> |
-|Veeam |Veeam proxies: Max task count by [{#NAME}] [{#TYPE}] |<p>Maximum number of concurrent tasks.</p> |DEPENDENT |veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.server.maxTaskCount`</p> |
-|Veeam |Veeam proxies: Host name by [{#NAME}] [{#TYPE}] |<p>The proxy server name.</p> |DEPENDENT |veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.name`</p> |
-|Veeam |Veeam proxies: Host type by [{#NAME}] [{#TYPE}] |<p>The proxy server type.</p> |DEPENDENT |veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.type`</p> |
-|Veeam |Veeam repositories: Get data [{#NAME}] [{#TYPE}] |<p>Get repositories [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
-|Veeam |Veeam repositories: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Repository used space in GB.</p> |DEPENDENT |veeam.repository.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.usedSpaceGB`</p> |
-|Veeam |Veeam repositories: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Repository free space in GB.</p> |DEPENDENT |veeam.repository.free.space[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.freeGB`</p> |
-|Veeam |Veeam sessions: Get sessions data [{#NAME}] [{#TYPE}] |<p>Get sessions [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.sessions.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p> |
-|Veeam |Veeam sessions: Session state [{#NAME}] [{#TYPE}] |<p>State of the session. Enum: `"Stopped"` `"Starting"` `"Stopping"` `"Working"` `"Pausing"` `"Resuming"` `"WaitingTape"` `"Idle"` `"Postprocessing"` `"WaitingRepository"` `"WaitingSlot"`.</p> |DEPENDENT |veeam.sessions.state[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
-|Veeam |Veeam sessions: Session result [{#NAME}] [{#TYPE}] |<p>Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`</p> |DEPENDENT |veeam.sessions.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.result`</p> |
-|Veeam |Veeam sessions: Session message [{#NAME}] [{#TYPE}] |<p>Message that explains the session result.</p> |DEPENDENT |veeam.sessions.message[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.message`</p> |
-|Veeam |Veeam sessions: Session progress percent [{#NAME}] [{#TYPE}] |<p>Progress percentage of the session.</p> |DEPENDENT |veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.progressPercent`</p> |
-|Veeam |Veeam jobs: Get jobs states data [{#NAME}] |<p>Get jobs states [{#NAME}] raw data.</p> |DEPENDENT |veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p> |
-|Veeam |Veeam jobs: Job status [{#NAME}] [{#TYPE}] |<p>Current status of the job. Enum: `"running"` `"inactive"` `"disabled"`.</p> |DEPENDENT |veeam.jobs.status[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p> |
+|Veeam |Veeam: Get server data by [{#NAME}] |<p>Get proxy server raw data.</p> |DEPENDENT |veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p> |
+|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Get proxy [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.proxy.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Max task count by [{#NAME}] [{#TYPE}] |<p>Maximum number of concurrent tasks.</p> |DEPENDENT |veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.server.maxTaskCount`</p> |
+|Veeam |Veeam: Host name by [{#NAME}] [{#TYPE}] |<p>The proxy server name.</p> |DEPENDENT |veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.name`</p> |
+|Veeam |Veeam: Host type by [{#NAME}] [{#TYPE}] |<p>The proxy server type.</p> |DEPENDENT |veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.type`</p> |
+|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Get repositories [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Repository used space in GB.</p> |DEPENDENT |veeam.repository.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.usedSpaceGB`</p> |
+|Veeam |Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Repository free space in GB.</p> |DEPENDENT |veeam.repository.free.space[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.freeGB`</p> |
+|Veeam |Veeam: Get sessions data [{#NAME}] [{#TYPE}] |<p>Get sessions [{#NAME}] [{#TYPE}] raw data.</p> |DEPENDENT |veeam.sessions.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam: Session state [{#NAME}] [{#TYPE}] |<p>State of the session. Enum: `"Stopped"` `"Starting"` `"Stopping"` `"Working"` `"Pausing"` `"Resuming"` `"WaitingTape"` `"Idle"` `"Postprocessing"` `"WaitingRepository"` `"WaitingSlot"`.</p> |DEPENDENT |veeam.sessions.state[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
+|Veeam |Veeam: Session result [{#NAME}] [{#TYPE}] |<p>Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`</p> |DEPENDENT |veeam.sessions.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.result`</p> |
+|Veeam |Veeam: Session message [{#NAME}] [{#TYPE}] |<p>Message that explains the session result.</p> |DEPENDENT |veeam.sessions.message[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.message`</p> |
+|Veeam |Veeam: Session progress percent [{#NAME}] [{#TYPE}] |<p>Progress percentage of the session.</p> |DEPENDENT |veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.progressPercent`</p> |
+|Veeam |Veeam: Get jobs states data [{#NAME}] |<p>Get jobs states [{#NAME}] raw data.</p> |DEPENDENT |veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Job status [{#NAME}] [{#TYPE}] |<p>Current status of the job. Enum: `"running"` `"inactive"` `"disabled"`.</p> |DEPENDENT |veeam.jobs.status[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p> |
+|Veeam |Veeam: Job last result [{#NAME}] [{#TYPE}] |<p>Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`.</p> |DEPENDENT |veeam.jobs.last.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastResult`</p> |
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Veeam: There are errors in requests to API |<p>Zabbix has received errors in response to API requests.</p> |`length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0` |AVERAGE | |
+|Veeam: Last result session failed |<p>-</p> |`find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1` |AVERAGE |<p>Manual close: YES</p> |
+|Veeam: Last result job failed |<p>-</p> |`find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
