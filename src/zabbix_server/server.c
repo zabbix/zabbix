@@ -1499,7 +1499,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex_server)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
@@ -2097,7 +2097,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex_server);
 			}
 			else
 			{
