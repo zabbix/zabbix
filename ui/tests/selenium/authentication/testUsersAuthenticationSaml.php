@@ -491,7 +491,9 @@ class testUsersAuthenticationSaml extends CWebTest {
 	}
 
 	/**
-	 * ignoreBrowserErrors
+	 * @ignoreBrowserErrors
+	 * This annotation is put here for avoiding the following errors:
+	 * /favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found).
 	 *
 	 * @backup config
 	 *
