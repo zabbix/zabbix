@@ -478,7 +478,7 @@ class CMenuHelper {
 				->setIcon('icon-signout')
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
-				->onClick('ZABBIX.logout()')
+				->onClick('ZABBIX.logout(event)')
 		);
 
 		return $menu;

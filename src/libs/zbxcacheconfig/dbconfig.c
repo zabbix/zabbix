@@ -347,7 +347,7 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
-			if (0 == strncmp(snmpitem->snmp_oid, "snmp.walk[", 10))
+			if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
 			{
 				return itemid;
 			}

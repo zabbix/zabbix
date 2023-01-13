@@ -24,7 +24,7 @@
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
 #include "../zbxreport.h"
-#include "../alerter/alerter_protocol.h"
+#include "../alerter/alerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"

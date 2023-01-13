@@ -40,6 +40,7 @@ $url = (new CUrl('triggers.php'))
 
 // Create form.
 $triggersForm = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setid('triggers-form')
 	->setName('triggersForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -562,7 +563,7 @@ $triggersFormList
 	);
 
 // Append status to form list.
-if (empty($data['triggerid']) && empty($data['form_refresh'])) {
+if (empty($data['triggerid']) && $data['form_refresh'] == 0) {
 	$status = true;
 }
 else {
@@ -594,7 +595,7 @@ $triggersFormList
 
 // Append tabs to form.
 $triggersTab = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);

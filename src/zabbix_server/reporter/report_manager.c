@@ -27,7 +27,7 @@
 #include "base64.h"
 #include "../zbxreport.h"
 #include "zbxcrypto.h"
-#include "zbxalert.h"
+#include "../alerter/alerter.h"
 #include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -2248,18 +2248,18 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	}
 	else
 	{
-		zbx_vector_ptr_t		results;
-		int				status, i, total_num = 0, sent_num = 0;
-		zbx_alerter_dispatch_result_t	*result;
-		char				*error;
+		zbx_vector_alerter_dispatch_result_t	results;
+		int					status, i, total_num = 0, sent_num = 0;
+		zbx_alerter_dispatch_result_t		*result;
+		char					*error;
 
-		zbx_vector_ptr_create(&results);
+		zbx_vector_alerter_dispatch_result_create(&results);
 
 		report_deserialize_response(message->data, &status, &error, &results);
 
 		for (i = 0; i < results.values_num; i++)
 		{
-			result = (zbx_alerter_dispatch_result_t *)results.values[i];
+			result = results.values[i];
 
 			if (SUCCEED == result->status)
 			{
@@ -2277,8 +2277,8 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 		rm_finish_job(manager, writer->job, status, error, sent_num, total_num);
 		zbx_free(error);
 
-		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-		zbx_vector_ptr_destroy(&results);
+		zbx_vector_alerter_dispatch_result_clear_ext(&results, zbx_alerter_dispatch_result_free);
+		zbx_vector_alerter_dispatch_result_destroy(&results);
 	}
 
 	writer->job = NULL;

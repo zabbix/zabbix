@@ -31,6 +31,7 @@ $html_page = (new CHtmlPage())
 
 // create form
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')
@@ -57,7 +58,7 @@ $module_tab = (new CFormList())
 $tabs = (new CTabView())
 	->addTab('moduleTab', _('Module'), $module_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 

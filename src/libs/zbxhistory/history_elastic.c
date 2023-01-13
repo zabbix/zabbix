@@ -1013,7 +1013,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
 	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
-	struct zbx_db_version_info_t	db_version_info;
+	struct zbx_db_version_info_t	db_version_info = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
