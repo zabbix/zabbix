@@ -1645,6 +1645,12 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 INSERT INTO services (serviceid, name, description) VALUES (1, 'API Service for delete', '');
 INSERT INTO services (serviceid, name, description) VALUES (2, 'API Service for update', '');
 
+-- sla
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50038, 'Sla for delete 1', 0, 99.9999, 2147483637, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50039, 'Sla for delete 2', 1, 99.9999, 2147483547, 'Europe/Riga', 1, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50040, 'Sla for delete 3', 2, 99.9999, 2147482647, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50041, 'Sla for getSli', 2, 99.9999, 2147482647, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
+
 -- high availability nodes
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node1','192.168.1.5','10051','0','ckuo7i1nv00090sajelcon0su');
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node2','192.168.1.6','10051','0','ckuo7i1nv000a0saj1fcdkeu4');
