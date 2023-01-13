@@ -323,7 +323,7 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, int code, cons
 	char		*result = NULL, *result_ex = NULL;
 	zbx_uint32_t	size = 0;
 
-	if (FAIL == cb_proc_req(rtc, code, data, &result_ex))
+	if (NULL == cb_proc_req || FAIL == cb_proc_req(rtc, code, data, &result_ex))
 		rtc_process_request(rtc, code, data, &result);
 
 	if (NULL != result_ex)

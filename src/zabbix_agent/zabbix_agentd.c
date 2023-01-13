@@ -1098,6 +1098,48 @@ static void	zbx_on_exit(int ret)
 	exit(EXIT_SUCCESS);
 }
 
+#ifdef ZABBIX_DAEMON
+static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
+{
+#ifdef HAVE_SIGQUEUE
+	int	scope;
+
+	switch (ZBX_RTC_GET_MSG(flags))
+	{
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			scope = ZBX_RTC_GET_SCOPE(flags);
+
+			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
+			{
+				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags, NULL);
+			}
+			else
+			{
+				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				{
+					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
+							flags, NULL);
+				}
+			}
+
+			/* call custom sigusr handler to handle log level changes for non worker processes */
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
+
+			break;
+		case ZBX_RTC_USER_PARAMETERS_RELOAD:
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			break;
+		default:
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
+	}
+#endif
+}
+#endif
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1365,6 +1407,7 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
+	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_config_timeout);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
@@ -1524,7 +1567,7 @@ int	main(int argc, char **argv)
 	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg.log_type, log_file_cfg.log_file_name);
+			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb);
 #endif
 	exit(EXIT_SUCCESS);
 }

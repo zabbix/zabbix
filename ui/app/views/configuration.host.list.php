@@ -42,7 +42,10 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CButton('form', _('Import')))
 					->onClick(
-						'return PopUp("popup.import", {rules_preset: "host"}, {dialogue_class: "modal-popup-generic"});'
+						'return PopUp("popup.import", {rules_preset: "host"}, {
+							dialogueid: "popup_import",
+							dialogue_class: "modal-popup-generic"
+						});'
 					)
 					->removeId()
 			)

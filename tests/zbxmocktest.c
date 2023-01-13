@@ -121,8 +121,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
-
 /* how often Zabbix server sends configuration data to proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */

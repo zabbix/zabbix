@@ -52,6 +52,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxshmem \
 	zbxsysinfo \
+	zbxstats \
 	zbxstr \
 	zbxtasks \
 	zbxthreads \
@@ -98,6 +99,7 @@ SERVER_SUBDIRS = \
 	zbxserver \
 	zbxservice \
 	zbxshmem \
+	zbxstats \
 	zbxstr \
 	zbxtasks \
 	zbxtime \
@@ -138,6 +140,7 @@ PROXY_SUBDIRS = \
 	zbxserialize \
 	zbxserver \
 	zbxshmem \
+	zbxstats \
 	zbxstr \
 	zbxtasks \
 	zbxtime \

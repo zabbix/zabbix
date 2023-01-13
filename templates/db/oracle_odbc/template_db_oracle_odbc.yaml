@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-11-16T15:08:52Z'
+  date: '2023-01-10T10:28:58Z'
   template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -28,81 +28,6 @@ zabbix_export:
           name: Templates/Databases
       items:
         -
-          uuid: 1a6e01f90dca47459975632c14ce5a39
-          name: 'Oracle: Get archive log info'
-          type: ODBC
-          key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          delay: 5m
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            SELECT
-            d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
-            d.log_sequence,
-            d.error
-            FROM v$archive_dest d , v$database db
-            WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: archive-log
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 63fad55a2ced487aa30017b33bf1692e
-          name: 'Oracle: Get ASM stats'
-          type: ODBC
-          key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            SELECT
-            name AS dg_name,
-            ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
-            ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
-            ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
-            FROM v$asm_diskgroup ;
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'It gets the ASM disk groups statistics.'
-          tags:
-            -
-              tag: component
-              value: asm
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 5de7c786988d49d0b50f28d2d622db62
-          name: 'Oracle: Get CDB and No-CDB info'
-          type: ODBC
-          key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            SELECT name as DBNAME,
-            DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode,
-            DECODE(database_role, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0) AS ROLE,
-            DECODE(force_logging, 'YES',1,'NO',0,0) AS force_logging,
-            DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode
-            FROM v$database
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'It gets the information about the container database (CDB) and non-CDB databases on an instance.'
-          tags:
-            -
-              tag: component
-              value: cdb
-            -
-              tag: component
-              value: raw
-        -
           uuid: dde19b79507648bd80a82a0575bf8671
           name: 'Oracle: Get instance state'
           type: ODBC
@@ -124,29 +49,6 @@ zabbix_export:
           password: '{$ORACLE.PASSWORD}'
           description: 'The item gets its state of the current instance.'
           tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: cedcebd0b7ce474c9681022fcc75df1c
-          name: 'Oracle: Get PDB info'
-          type: ODBC
-          key: 'db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            SELECT
-            name as DBNAME,
-            DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode
-            FROM v$pdbs;
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'It gets the information about the PDB databases on an instance.'
-          tags:
-            -
-              tag: component
-              value: pdb
             -
               tag: component
               value: raw
@@ -224,88 +126,6 @@ zabbix_export:
             -
               tag: component
               value: raw
-        -
-          uuid: 972be2e777e44c539d0ddd7918b79e88
-          name: 'Oracle: Get tablespaces stats'
-          type: ODBC
-          key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            SELECT
-              df.tablespace_name AS TABLESPACE,
-              df.type AS TYPE,
-              NVL(SUM(df.BYTES), 0) AS FILE_BYTES,
-              NVL(SUM(df.MAX_BYTES), 0) AS MAX_BYTES,
-              NVL(SUM(f.FREE), 0) AS FREE_BYTES,
-              SUM(df.BYTES)-SUM(f.FREE) AS USED_BYTES,
-              ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-              ROUND(DECODE(SUM(df.BYTES), 0, 0,(SUM(df.BYTES)-SUM(f.FREE))/ SUM(df.BYTES)* 100), 2) AS USED_FILE_PCT,
-              DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-            FROM ( SELECT
-               ddf.file_id,
-               dt.contents AS TYPE,
-               dt.STATUS ,
-               ddf.file_name,
-               ddf.tablespace_name,
-               TRUNC(ddf.bytes) AS bytes,
-               TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes
-               FROM
-                dba_data_files ddf,
-                dba_tablespaces dt
-              WHERE
-               ddf.tablespace_name = dt.tablespace_name ) df,
-               ( SELECT TRUNC(SUM(bytes)) AS FREE, file_id FROM dba_free_space GROUP BY file_id ) f
-               WHERE df.file_id = f.file_id (+)
-               GROUP BY df.tablespace_name, df.TYPE, df.status
-            UNION ALL
-            SELECT
-              Y.name AS TABLESPACE,
-              Y.type AS TYPE,
-              NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
-              NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
-              NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE,
-              SUM(Y.BYTES)-MAX(Y.FREE_BYTES) AS USED_BYTES,
-              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2) AS USED_PCT_MAX,
-              ROUND(DECODE(SUM(Y.BYTES), 0, 0,(SUM(Y.BYTES)-MAX(Y.FREE_BYTES))/ SUM(Y.BYTES)* 100), 2) AS USED_FILE_PCT,
-              DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
-               FROM ( SELECT
-                 dtf.tablespace_name AS name,
-                 dt.contents AS TYPE,
-                 dt.STATUS AS tbs_status,
-                 dtf.status AS status,
-                 dtf.bytes AS bytes,
-                 (SELECT
-                   ((f.total_blocks - s.tot_used_blocks)* vp.value)
-                   FROM ( SELECT tablespace_name, SUM(used_blocks) tot_used_blocks FROM gv$sort_segment
-                      WHERE tablespace_name != 'DUMMY'
-                      GROUP BY tablespace_name) s,
-                 ( SELECT tablespace_name, SUM(blocks) total_blocks FROM dba_temp_files
-                   WHERE tablespace_name != 'DUMMY'
-                   GROUP BY tablespace_name) f,
-                 ( SELECT value FROM v$parameter WHERE name = 'db_block_size') vp
-               WHERE
-                 f.tablespace_name = s.tablespace_name
-                 AND f.tablespace_name = dtf.tablespace_name ) AS free_bytes,
-                 CASE WHEN dtf.maxbytes = 0 THEN dtf.bytes
-                 ELSE dtf.maxbytes END AS max_bytes
-               FROM
-                sys.dba_temp_files dtf,
-                sys.dba_tablespaces dt
-               WHERE
-               dtf.tablespace_name = dt.tablespace_name ) Y
-               GROUP BY Y.name, Y.TYPE, Y.tbs_status;
-          username: '{$ORACLE.USER}'
-          password: '{$ORACLE.PASSWORD}'
-          description: 'It gets the statistics of the tablespaces.'
-          tags:
-            -
-              tag: component
-              value: raw
-            -
-              tag: component
-              value: tablespaces
         -
           uuid: 7ee99dfbd8dd4048bc2867aaa2fc335e
           name: 'Oracle: Service''s TCP port state'
@@ -1737,7 +1557,7 @@ zabbix_export:
               name: 'Oracle: Host has been restarted'
               event_name: 'Oracle: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes.'
+              description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1829,7 +1649,7 @@ zabbix_export:
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Oracle DB version has changed. Acknowledge (Ack) to close manually.'
+              description: 'The Oracle DB version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1876,6 +1696,38 @@ zabbix_export:
           description: 'Destinations of the log archive.'
           item_prototypes:
             -
+              uuid: 1a6e01f90dca47459975632c14ce5a39
+              name: 'Archivelog ''{#DEST_NAME}'': Get archive log info'
+              type: ODBC
+              key: 'db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              delay: 5m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT
+                d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
+                d.log_sequence,
+                d.error
+                FROM v$archive_dest d , v$database db
+                WHERE d.dest_name = '{#DEST_NAME}' AND d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
+              username: '{$ORACLE.USER}'
+              password: '{$ORACLE.PASSWORD}'
+              description: 'It gets the archivelog statistics.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: component
+                  value: archive-log
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 06e47a56685e4dd784628c40d5038c88
               name: 'Archivelog ''{#DEST_NAME}'': Error'
               type: DEPENDENT
@@ -1889,13 +1741,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].ERROR.first()'
+                    - $.ERROR
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -1915,9 +1767,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].LOG_SEQUENCE.first()'
+                    - $.LOG_SEQUENCE
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -1944,13 +1796,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DEST_NAME==''{#DEST_NAME}'')].STATUS.first()'
+                    - $.STATUS
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_archivelog_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -1978,16 +1830,48 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.discovery[asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
-          params: 'SELECT name AS dg_name FROM v$asm_diskgroup;'
+          params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
           description: 'The ASM disk groups.'
           item_prototypes:
             -
+              uuid: 63fad55a2ced487aa30017b33bf1692e
+              name: 'ASM ''{#DGNAME}'': Get ASM stats'
+              type: ODBC
+              key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT
+                name AS dgname,
+                ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
+                ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
+                ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
+                FROM v$asm_diskgroup
+                WHERE name = '{#DGNAME}';
+              username: '{$ORACLE.USER}'
+              password: '{$ORACLE.PASSWORD}'
+              description: 'It gets the ASM disk group statistics.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: component
+                  value: asm
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: da6116af9f54452ab1694af8eef9f38d
-              name: 'ASM ''{#DG_NAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Free size'
               type: DEPENDENT
-              key: 'oracle.asm_free_size["{#DG_NAME}"]'
+              key: 'oracle.asm_free_size["{#DGNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -1996,21 +1880,21 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DG_NAME==''{#DG_NAME}'')].FREE_SIZE_BYTE.first()'
+                    - $.FREE_SIZE_BYTE
               master_item:
-                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
             -
               uuid: 7f2a51d7eeb64c5b8929dcb0e3a49273
-              name: 'ASM ''{#DG_NAME}'': Total size'
+              name: 'ASM ''{#DGNAME}'': Total size'
               type: DEPENDENT
-              key: 'oracle.asm_total_size["{#DG_NAME}"]'
+              key: 'oracle.asm_total_size["{#DGNAME}"]'
               delay: '0'
               history: 7d
               units: B
@@ -2019,21 +1903,21 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DG_NAME==''{#DG_NAME}'')].SIZE_BYTE.first()'
+                    - $.SIZE_BYTE
               master_item:
-                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
             -
               uuid: 9c87a9089a19468f85eb1d3c28893092
-              name: 'ASM ''{#DG_NAME}'': Free size'
+              name: 'ASM ''{#DGNAME}'': Free size'
               type: DEPENDENT
-              key: 'oracle.asm_used_pct["{#DG_NAME}"]'
+              key: 'oracle.asm_used_pct["{#DGNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2043,22 +1927,22 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DG_NAME==''{#DG_NAME}'')].USED_PERCENT.first()'
+                    - $.USED_PERCENT
               master_item:
-                key: 'db.odbc.get[get_asm_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
                   value: asm
                 -
                   tag: disk-group
-                  value: '{#DG_NAME}'
+                  value: '{#DGNAME}'
               trigger_prototypes:
                 -
                   uuid: 756a8b4b04bc4aadab6b4b4cc856ad32
-                  expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
+                  expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                  name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
                   description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.'
                   tags:
@@ -2067,15 +1951,15 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: d65971e0f3994dfcbcbde145c9866678
-                  expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
-                  name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                  event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
+                  expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                  event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
                   description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.'
                   dependencies:
                     -
-                      name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
-                      expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                      name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
+                      expression: 'min(/Oracle by ODBC/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
                   tags:
                     -
                       tag: scope
@@ -2083,19 +1967,19 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 75f9f07dbae84443900aad10095e37f9
-              name: 'ASM ''{#DG_NAME}'': ASM disk group ''{#DG_NAME}'''
+              name: 'ASM ''{#DGNAME}'': ASM disk group ''{#DGNAME}'''
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'Oracle by ODBC'
-                    key: 'oracle.asm_free_size["{#DG_NAME}"]'
+                    key: 'oracle.asm_free_size["{#DGNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'Oracle by ODBC'
-                    key: 'oracle.asm_total_size["{#DG_NAME}"]'
+                    key: 'oracle.asm_total_size["{#DGNAME}"]'
         -
           uuid: 0f65936b86314c269b7720a9ff3f1c14
           name: 'Database discovery'
@@ -2120,6 +2004,38 @@ zabbix_export:
           description: 'Scanning databases in the database management system (DBMS).'
           item_prototypes:
             -
+              uuid: 5de7c786988d49d0b50f28d2d622db62
+              name: 'Oracle Database ''{#DBNAME}'': Get CDB and No-CDB info'
+              type: ODBC
+              key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT name as DBNAME,
+                DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode,
+                DECODE(database_role, 'SNAPSHOT STANDBY', 1, 'LOGICAL STANDBY', 2, 'PHYSICAL STANDBY', 3, 'PRIMARY', 4, 'FAR SYNC', 5, 0) AS ROLE,
+                DECODE(force_logging, 'YES',1,'NO',0,0) AS force_logging,
+                DECODE(log_mode, 'MANUAL',2 ,'ARCHIVELOG',1,'NOARCHIVELOG',0,0) AS log_mode
+                FROM v$database
+                WHERE name = '{#DBNAME}';
+              username: '{$ORACLE.USER}'
+              password: '{$ORACLE.PASSWORD}'
+              description: 'It gets the information about the container database (CDB) and non-CDB database on an instance.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: component
+                  value: cdb
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 075885bfd41d43aba7861ae49e9abbee
               name: 'Oracle Database ''{#DBNAME}'': Force logging'
               type: DEPENDENT
@@ -2133,13 +2049,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DBNAME==''{#DBNAME}'')].FORCE_LOGGING.first()'
+                    - $.FORCE_LOGGING
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2168,13 +2084,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DBNAME==''{#DBNAME}'')].LOG_MODE.first()'
+                    - $.LOG_MODE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2203,13 +2119,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DBNAME==''{#DBNAME}'')].OPEN_MODE.first()'
+                    - $.OPEN_MODE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2267,13 +2183,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DBNAME==''{#DBNAME}'')].ROLE.first()'
+                    - $.ROLE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_cdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2332,6 +2248,36 @@ zabbix_export:
           description: 'Scanning a pluggable database (PDB) in DBMS.'
           item_prototypes:
             -
+              uuid: cedcebd0b7ce474c9681022fcc75df1c
+              name: 'Oracle Database ''{#DBNAME}'': Get PDB info'
+              type: ODBC
+              key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT
+                name as DBNAME,
+                DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode
+                FROM v$pdbs
+                WHERE name = '{#DBNAME}';
+              username: '{$ORACLE.USER}'
+              password: '{$ORACLE.PASSWORD}'
+              description: 'It gets the information about the PDB database on an instance.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: component
+                  value: raw
+            -
               uuid: 975d302e3e9a4316b6d63256b88b5006
               name: 'Oracle Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
@@ -2349,13 +2295,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.DBNAME==''{#DBNAME}'')].OPEN_MODE.first()'
+                    - $.OPEN_MODE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
               master_item:
-                key: 'db.odbc.get[get_pdb_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2416,6 +2362,93 @@ zabbix_export:
           description: 'Scanning tablespaces in DBMS.'
           item_prototypes:
             -
+              uuid: 972be2e777e44c539d0ddd7918b79e88
+              name: 'Oracle TBS ''{#TABLESPACE}'': Get tablespaces stats'
+              type: ODBC
+              key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              params: |
+                SELECT df.tablespace_name                                                                         AS TABLESPACE,
+                       df.type                                                                                    AS TYPE,
+                       NVL(SUM(df.BYTES), 0)                                                                      AS FILE_BYTES,
+                       NVL(SUM(df.MAX_BYTES), 0)                                                                  AS MAX_BYTES,
+                       NVL(SUM(f.FREE), 0)                                                                        AS FREE_BYTES,
+                       SUM(df.BYTES) - SUM(f.FREE)                                                                AS USED_BYTES,
+                       ROUND(DECODE(SUM(df.MAX_BYTES), 0, 0, (SUM(df.BYTES) / SUM(df.MAX_BYTES) * 100)), 2)       AS USED_PCT_MAX,
+                       ROUND(DECODE(SUM(df.BYTES), 0, 0, (SUM(df.BYTES) - SUM(f.FREE)) / SUM(df.BYTES) * 100), 2) AS USED_FILE_PCT,
+                       DECODE(df.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0)                            AS STATUS
+                FROM (SELECT ddf.file_id,
+                             dt.contents                              AS TYPE,
+                             dt.STATUS,
+                             ddf.file_name,
+                             ddf.tablespace_name,
+                             TRUNC(ddf.bytes)                         AS bytes,
+                             TRUNC(GREATEST(ddf.bytes, ddf.maxbytes)) AS max_bytes
+                      FROM dba_data_files ddf,
+                           dba_tablespaces dt
+                      WHERE ddf.tablespace_name = '{#TABLESPACE}'
+                          AND dt.contents = '{#CONTENTS}'
+                      ) df,
+                     (SELECT TRUNC(SUM(bytes)) AS FREE, file_id
+                      FROM dba_free_space
+                      GROUP BY file_id) f
+                WHERE df.file_id = f.file_id (+)
+                GROUP BY df.tablespace_name, df.TYPE, df.status
+                UNION ALL
+                SELECT Y.name                                                                                        AS TABLESPACE,
+                       Y.type                                                                                        AS TYPE,
+                       NVL(SUM(Y.BYTES), 0)                                                                          AS FILE_BYTES,
+                       NVL(SUM(Y.MAX_BYTES), 0)                                                                      AS MAX_BYTES,
+                       NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0)                                                             AS FREE,
+                       SUM(Y.BYTES) - MAX(Y.FREE_BYTES)                                                              AS USED_BYTES,
+                       ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2)             AS USED_PCT_MAX,
+                       ROUND(DECODE(SUM(Y.BYTES), 0, 0, (SUM(Y.BYTES) - MAX(Y.FREE_BYTES)) / SUM(Y.BYTES) * 100), 2) AS USED_FILE_PCT,
+                       DECODE(Y.TBS_STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0)                            AS STATUS
+                FROM (SELECT dtf.tablespace_name                             AS name,
+                             dt.contents                                     AS TYPE,
+                             dt.STATUS                                       AS tbs_status,
+                             dtf.status                                      AS status,
+                             dtf.bytes                                       AS bytes,
+                             (SELECT ((f.total_blocks - s.tot_used_blocks) * vp.value)
+                              FROM (SELECT tablespace_name, SUM(used_blocks) tot_used_blocks
+                                    FROM gv$sort_segment
+                                    WHERE tablespace_name != 'DUMMY'
+                                    GROUP BY tablespace_name) s,
+                                   (SELECT tablespace_name, SUM(blocks) total_blocks
+                                    FROM dba_temp_files
+                                    WHERE tablespace_name != 'DUMMY'
+                                    GROUP BY tablespace_name) f,
+                                   (SELECT value FROM v$parameter WHERE name = 'db_block_size') vp
+                              WHERE f.tablespace_name = s.tablespace_name
+                                AND f.tablespace_name = dtf.tablespace_name) AS free_bytes,
+                             CASE
+                                 WHEN dtf.maxbytes = 0 THEN dtf.bytes
+                                 ELSE dtf.maxbytes END                       AS max_bytes
+                      FROM sys.dba_temp_files dtf,
+                           sys.dba_tablespaces dt
+                      WHERE dtf.tablespace_name = '{#TABLESPACE}'
+                          AND dt.contents = '{#CONTENTS}'
+                      ) Y
+                GROUP BY Y.name, Y.TYPE, Y.tbs_status;
+              username: '{$ORACLE.USER}'
+              password: '{$ORACLE.PASSWORD}'
+              description: 'It gets the statistics of the tablespace.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.first()
+                  error_handler: DISCARD_VALUE
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: tablespaces
+            -
               uuid: 46956fd7e5d8462798b85cd7b425a794
               name: 'Oracle TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
               type: DEPENDENT
@@ -2428,9 +2461,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].FILE_BYTES.first()'
+                    - $.FILE_BYTES
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2454,9 +2487,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].FREE_BYTES.first()'
+                    - $.FREE_BYTES
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2480,9 +2513,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].MAX_BYTES.first()'
+                    - $.MAX_BYTES
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2511,9 +2544,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].STATUS.first()'
+                    - $.STATUS
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2564,9 +2597,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_BYTES.first()'
+                    - $.USED_BYTES
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2591,9 +2624,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_FILE_PCT.first()'
+                    - $.USED_FILE_PCT
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
@@ -2643,9 +2676,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.TABLESPACE==''{#TABLESPACE}'')].USED_PCT_MAX.first()'
+                    - $.USED_PCT_MAX
               master_item:
-                key: 'db.odbc.get[get_tablespaces_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
+                key: 'db.odbc.get[get_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               tags:
                 -
                   tag: component
