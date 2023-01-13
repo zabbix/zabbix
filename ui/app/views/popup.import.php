@@ -122,6 +122,7 @@ foreach ($titles as $key => $title) {
 		$checkbox_delete = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('js-delete');
+
 	}
 
 	switch ($key) {
