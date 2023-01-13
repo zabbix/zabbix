@@ -22,7 +22,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_rtc_constants.h"
 
-int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(result);
@@ -33,16 +33,6 @@ int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, int code, const unsigned char
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			return SUCCEED;
 	}
-
-	return FAIL;
-}
-
-int	rtc_process_request_ex_active(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
-{
-	ZBX_UNUSED(rtc);
-	ZBX_UNUSED(code);
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(result);
 
 	return FAIL;
 }
