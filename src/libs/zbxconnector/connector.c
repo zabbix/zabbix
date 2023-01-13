@@ -65,9 +65,9 @@ void	zbx_connector_object_free(zbx_connector_object_t connector_object)
  * Parameters: availability - [IN] interface availability data                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_object_data)
+void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_data_point)
 {
-	zbx_free(connector_object_data.str);
+	zbx_free(connector_data_point.str);
 }
 
 ZBX_PTR_VECTOR_IMPL(connector_object, zbx_connector_object_t)

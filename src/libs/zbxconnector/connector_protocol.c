@@ -74,14 +74,14 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 }
 
 void	zbx_connector_serialize_object_data(unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		const zbx_connector_data_point_t *connector_data)
+		const zbx_connector_data_point_t *connector_data_point)
 {
 	zbx_uint32_t	data_len = 0, error_len;
 	unsigned char	*ptr;
 
-	zbx_serialize_prepare_value(data_len, connector_data->ts.sec);
-	zbx_serialize_prepare_value(data_len, connector_data->ts.ns);
-	zbx_serialize_prepare_str_len(data_len, connector_data->str, error_len);
+	zbx_serialize_prepare_value(data_len, connector_data_point->ts.sec);
+	zbx_serialize_prepare_value(data_len, connector_data_point->ts.ns);
+	zbx_serialize_prepare_str_len(data_len, connector_data_point->str, error_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -94,26 +94,26 @@ void	zbx_connector_serialize_object_data(unsigned char **data, size_t *data_allo
 	ptr = *data + *data_offset;
 	*data_offset += data_len;
 
-	ptr += zbx_serialize_value(ptr, connector_data->ts.sec);
-	ptr += zbx_serialize_value(ptr, connector_data->ts.ns);
-	ptr += zbx_serialize_str(ptr, connector_data->str, error_len);
+	ptr += zbx_serialize_value(ptr, connector_data_point->ts.sec);
+	ptr += zbx_serialize_value(ptr, connector_data_point->ts.ns);
+	ptr += zbx_serialize_str(ptr, connector_data_point->str, error_len);
 }
 
 void	zbx_connector_deserialize_object_data(const unsigned char *data, zbx_uint32_t size,
-		zbx_vector_connector_data_point_t *connector_data)
+		zbx_vector_connector_data_point_t *connector_data_points)
 {
 	const unsigned char	*end = data + size;
 
 	while (data < end)
 	{
-		zbx_connector_data_point_t	connector_object;
+		zbx_connector_data_point_t	connector_data_point;
 		zbx_uint32_t			deserialize_str_len;
 
-		data += zbx_deserialize_value(data, &connector_object.ts.sec);
-		data += zbx_deserialize_value(data, &connector_object.ts.ns);
-		data += zbx_deserialize_str(data, &connector_object.str, deserialize_str_len);
+		data += zbx_deserialize_value(data, &connector_data_point.ts.sec);
+		data += zbx_deserialize_value(data, &connector_data_point.ts.ns);
+		data += zbx_deserialize_str(data, &connector_data_point.str, deserialize_str_len);
 
-		zbx_vector_connector_data_point_append(connector_data, connector_object);
+		zbx_vector_connector_data_point_append(connector_data_points, connector_data_point);
 	}
 }
 
@@ -169,7 +169,7 @@ void	zbx_connector_serialize_connector(unsigned char **data, size_t *data_alloc,
 }
 
 void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t size,
-		zbx_connector_t *connector, zbx_vector_connector_data_point_t *connector_objects)
+		zbx_connector_t *connector, zbx_vector_connector_data_point_t *connector_data_points)
 {
 	zbx_uint32_t		url_len, timeout_len, token_len, http_proxy_len, username_len, password_len,
 				ssl_cert_file_len, ssl_key_file_len, ssl_key_password_len;
@@ -191,5 +191,5 @@ void	zbx_connector_deserialize_connector(const unsigned char *data, zbx_uint32_t
 	data += zbx_deserialize_str(data, &connector->ssl_key_file, ssl_key_file_len);
 	data += zbx_deserialize_str(data, &connector->ssl_key_password, ssl_key_password_len);
 
-	zbx_connector_deserialize_object_data(data, size - (data - start), connector_objects);
+	zbx_connector_deserialize_object_data(data, size - (data - start), connector_data_points);
 }

@@ -66,7 +66,7 @@ zbx_connector_manager_t;
 typedef struct
 {
 	zbx_uint64_t				objectid;
-	zbx_vector_connector_data_point_t	connector_data;
+	zbx_vector_connector_data_point_t	connector_data_points;
 }
 zbx_object_link_t;
 
@@ -89,8 +89,8 @@ static void	connector_clear(zbx_connector_t *connector)
 
 static void	object_link_clean(zbx_object_link_t *object_link)
 {
-	zbx_vector_connector_data_point_clear_ext(&object_link->connector_data, zbx_connector_data_point_free);
-	zbx_vector_connector_data_point_destroy(&object_link->connector_data);
+	zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points, zbx_connector_data_point_free);
+	zbx_vector_connector_data_point_destroy(&object_link->connector_data_points);
 }
 
 /******************************************************************************
@@ -194,7 +194,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 		if (NULL == data)
 			zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
 
-		for (i = 0; i < object_link->connector_data.values_num; i++, records++)
+		for (i = 0; i < object_link->connector_data_points.values_num; i++, records++)
 		{
 			if ((records == connector->max_records && 0 != connector->max_records) ||
 					data_offset > ZBX_DATA_JSON_RECORD_LIMIT)
@@ -204,28 +204,28 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 			}
 
 			zbx_connector_serialize_object_data(&data, &data_alloc, &data_offset,
-					&object_link->connector_data.values[i]);
+					&object_link->connector_data_points.values[i]);
 		}
 
-		if (i != object_link->connector_data.values_num)
+		if (i != object_link->connector_data_points.values_num)
 		{
 			zbx_vector_connector_data_point_t	connector_objects_remaining;
 
 			zbx_vector_connector_data_point_create(&connector_objects_remaining);
 
 			zbx_vector_connector_data_point_append_array(&connector_objects_remaining,
-					&object_link->connector_data.values[i],
-					object_link->connector_data.values_num - i);
+					&object_link->connector_data_points.values[i],
+					object_link->connector_data_points.values_num - i);
 
-			object_link->connector_data.values_num = i;
-			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data,
+			object_link->connector_data_points.values_num = i;
+			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points,
 					zbx_connector_data_point_free);
-			zbx_vector_connector_data_point_destroy(&object_link->connector_data);
-			object_link->connector_data = connector_objects_remaining;
+			zbx_vector_connector_data_point_destroy(&object_link->connector_data_points);
+			object_link->connector_data_points = connector_objects_remaining;
 		}
 		else
 		{
-			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data,
+			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points,
 					zbx_connector_data_point_free);
 		}
 
@@ -332,7 +332,7 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 
 				object_link = (zbx_object_link_t *)zbx_hashset_insert(
 						&connector->object_link, &object_link_local, sizeof(object_link_local));
-				zbx_vector_connector_data_point_create(&object_link->connector_data);
+				zbx_vector_connector_data_point_create(&object_link->connector_data_points);
 
 				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
 			}
@@ -340,7 +340,7 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 			connector_data_point.ts = connector_objects->values[i].ts;
 			connector_data_point.str = connector_objects->values[i].str;
 
-			zbx_vector_connector_data_point_append(&object_link->connector_data, connector_data_point);
+			zbx_vector_connector_data_point_append(&object_link->connector_data_points, connector_data_point);
 
 			if (j == connector_objects->values[i].ids.values_num - 1)
 				connector_objects->values[i].str = NULL;
@@ -396,7 +396,7 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 				continue;
 			}
 
-			if (0 == object_link->connector_data.values_num)
+			if (0 == object_link->connector_data_points.values_num)
 			{
 				zbx_hashset_remove_direct(&connector->object_link, object_link);
 			}
