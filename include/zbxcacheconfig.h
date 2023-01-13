@@ -27,6 +27,7 @@
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
+#include "zbxtagfilter.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -620,19 +621,9 @@ zbx_connector_t;
 
 typedef struct
 {
-	char		*tag;
-	char		*value;
-	unsigned char	op;		/* condition operator */
-}
-zbx_connector_tag_t;
-
-ZBX_PTR_VECTOR_DECL(connector_tag, zbx_connector_tag_t)
-
-typedef struct
-{
-	zbx_uint64_t			connectorid;
-	int				tags_evaltype;
-	zbx_vector_connector_tag_t	connector_tags;
+	zbx_uint64_t		connectorid;
+	int			tags_evaltype;
+	zbx_vector_match_tags_t	connector_tags;
 }
 zbx_connector_filter_t;
 
