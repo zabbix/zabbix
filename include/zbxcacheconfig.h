@@ -614,6 +614,7 @@ typedef struct
 	zbx_list_t		queue;
 	zbx_hashset_t		object_link;
 	int			time_flush;
+	int			senders;
 }
 zbx_connector_t;
 

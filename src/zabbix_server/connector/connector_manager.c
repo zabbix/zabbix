@@ -236,10 +236,11 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 	message->data = data;
 	message->size = data_offset;
 
-	worker->reschedule = FAIL == ret ? ZBX_CONNECTOR_RESCHEDULE_TRUE : ZBX_CONNECTOR_RESCHEDULE_FALSE;
-
 	if (0 != worker->ids.values_num)
+	{
+		worker->reschedule = FAIL == ret ? ZBX_CONNECTOR_RESCHEDULE_TRUE : ZBX_CONNECTOR_RESCHEDULE_FALSE;
 		worker->taskid = connector->connectorid;
+	}
 
 #undef ZBX_DATA_JSON_RESERVED
 #undef ZBX_DATA_JSON_RECORD_LIMIT
@@ -274,24 +275,29 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 		if (connector->time_flush > now)
 			continue;
 
-		connector_get_next_task(connector, &message, worker);
-
 		connector->time_flush = now + ZBX_CONNECTOR_FLUSH_INTERVAL;
-
-		if (NULL == message.data)
-			continue;
-
-		if (FAIL == zbx_ipc_client_send(worker->client, message.code, message.data, message.size))
+		zabbix_log(LOG_LEVEL_INFORMATION, "connector->senders:%d", connector->senders);
+		while (connector->senders < connector->max_senders)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing worker");
-			exit(EXIT_FAILURE);
+			connector_get_next_task(connector, &message, worker);
+
+			if (NULL == message.data)
+				break;
+
+			if (FAIL == zbx_ipc_client_send(worker->client, message.code, message.data, message.size))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector worker");
+				exit(EXIT_FAILURE);
+			}
+
+			zbx_ipc_message_clean(&message);
+			connector->senders++;
+
+			if (NULL == (worker = connector_get_free_worker(manager)))
+				break;
 		}
-
-		zbx_ipc_message_clean(&message);
 	}
-	while (NULL != (worker = connector_get_free_worker(manager)) &&
-			NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)));
-
+	while (NULL != worker && NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&manager->iter)));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -397,16 +403,14 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 			else
 				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
 		}
-	}
 
-	zbx_vector_uint64_clear(&worker->ids);
+		connector->senders--;
 
-	if (ZBX_CONNECTOR_RESCHEDULE_TRUE == worker->reschedule)
-	{
-		if (NULL != connector)
+		if (ZBX_CONNECTOR_RESCHEDULE_TRUE == worker->reschedule)
 			connector->time_flush = now;
 	}
 
+	zbx_vector_uint64_clear(&worker->ids);
 }
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)

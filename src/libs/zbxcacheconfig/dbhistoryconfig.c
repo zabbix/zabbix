@@ -906,9 +906,11 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC, object_link_clean,
 					ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 					ZBX_DEFAULT_MEM_FREE_FUNC);
+
+			connector->senders = 0;
+			connector->time_flush = 0;
 		}
 
-		connector->time_flush = 0;
 		connector->revision = config->revision.connector;
 		connector->protocol = dc_connector->protocol;
 		connector->data_type = dc_connector->data_type;
