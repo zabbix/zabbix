@@ -1290,12 +1290,10 @@ int	str2uint64whole(const char *str, zbx_uint64_t *value);
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
-#elif defined(__MINGW32__)
-typedef struct _stat64	zbx_stat_t;
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */

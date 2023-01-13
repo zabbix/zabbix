@@ -297,6 +297,23 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$result = DBfetch(DBselect($query));
 
-		return (bool) $result['chunks'];
+		return $result ? (bool) $result['chunks'] : $result;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists($table_name, $field_name) {
+		global $DB;
+
+		$schema = $DB['SCHEMA'] ? $DB['SCHEMA'] : 'public';
+
+		return (bool) DBFetch(DBselect(
+			'SELECT 1'.
+			' FROM information_schema.columns'.
+			' WHERE table_name='.zbx_dbstr($table_name).
+				' AND column_name='.zbx_dbstr($field_name).
+				' AND table_schema='.zbx_dbstr($schema)
+		));
 	}
 }

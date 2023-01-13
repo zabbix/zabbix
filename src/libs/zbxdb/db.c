@@ -97,7 +97,8 @@ static ub4	OCI_DBserver_status(void);
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
-static int			ZBX_PG_SVERSION = 0, ZBX_TSDB_VERSION = -1;
+static int			ZBX_PG_SVERSION = 0;
+int					ZBX_TSDB_VERSION = -1;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
@@ -105,6 +106,7 @@ static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
 #endif
 
 #if defined(HAVE_ORACLE)
+static void	OCI_DBclean_result_handle(DB_RESULT result);
 static void	OCI_DBclean_result(DB_RESULT result);
 #endif
 
@@ -952,7 +954,7 @@ void	zbx_db_close(void)
 		for (i = 0; i < oracle.db_results.values_num; i++)
 		{
 			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result(oracle.db_results.values[i]);
+			OCI_DBclean_result_handle(oracle.db_results.values[i]);
 		}
 	}
 
@@ -2110,19 +2112,14 @@ int	zbx_db_is_null(const char *field)
 }
 
 #ifdef HAVE_ORACLE
-static void	OCI_DBclean_result(DB_RESULT result)
+static void	OCI_DBclean_result_handle(DB_RESULT result)
 {
-	if (NULL == result)
-		return;
-
 	if (NULL != result->values)
 	{
 		int	i;
 
 		for (i = 0; i < result->ncolumn; i++)
 		{
-			zbx_free(result->values[i]);
-
 			/* deallocate the lob locator variable */
 			if (NULL != result->clobs[i])
 			{
@@ -2130,16 +2127,31 @@ static void	OCI_DBclean_result(DB_RESULT result)
 				result->clobs[i] = NULL;
 			}
 		}
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
 	}
 
 	if (result->stmthp)
 	{
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 		result->stmthp = NULL;
+	}
+}
+static void	OCI_DBclean_result(DB_RESULT result)
+{
+	if (NULL == result)
+		return;
+
+	OCI_DBclean_result_handle(result);
+
+	if (NULL != result->values)
+	{
+		int	i;
+
+		for (i = 0; i < result->ncolumn; i++)
+			zbx_free(result->values[i]);
+
+		zbx_free(result->values);
+		zbx_free(result->clobs);
+		zbx_free(result->values_alloc);
 	}
 }
 #endif

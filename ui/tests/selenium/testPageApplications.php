@@ -83,7 +83,7 @@ class testPageApplications extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->checkValue([
 			'Hosts' => 'ЗАББИКС Сервер',
-			'Host groups' => []
+			'Host groups' => ''
 		]);
 
 		$filter->getField('Hosts')->clear();

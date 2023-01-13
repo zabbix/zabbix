@@ -65,38 +65,6 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$(function() {
-			$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
-			$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
-		});
-
-		$('#filter_show').change(function() {
-			var	filter_show = jQuery('input[name=filter_show]:checked').val();
-
-			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
-				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>);
-		});
-
-		$('#filter_show').trigger('change');
-
-		$('#filter_compact_view').change(function() {
-			if ($(this).is(':checked')) {
-				$('#filter_show_timeline, #filter_details').prop('disabled', true);
-				$('input[name=filter_show_opdata]').prop('disabled', true);
-				$('#filter_highlight_row').prop('disabled', false);
-			}
-			else {
-				$('#filter_show_timeline, #filter_details').prop('disabled', false);
-				$('input[name=filter_show_opdata]').prop('disabled', false);
-				$('#filter_highlight_row').prop('disabled', true);
-			}
-		});
-
-		$('#filter_show_tags').change(function() {
-			var disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
-			$('#filter_tag_priority').prop('disabled', disabled);
-			$('#filter_tag_name_format input').prop('disabled', disabled);
-		});
 
 		$(document).on({
 			mouseenter: function() {
@@ -118,10 +86,21 @@
 				chkbxRange.clearSelectedOnFilterChange();
 			}
 
-			window.flickerfreeScreen.refresh('problem');
+			window.problems_page.refreshNow();
 
 			clearMessages();
 			addMessage(makeMessageBox('good', [], response.message, true, false));
+		});
+
+		$.subscribe('timeselector.rangeupdate', function(event, response) {
+			let refresh_url = new Curl(window.problems_page.refresh_url);
+
+			refresh_url.setArgument('from', response.from);
+			refresh_url.setArgument('to', response.to);
+			refresh_url.setArgument('page', 1);
+
+			window.problems_page.refresh_url = refresh_url.getUrl();
+			window.problems_page.refreshNow();
 		});
 
 		$(document).on('submit', '#problem_form', function(e) {
@@ -129,5 +108,146 @@
 
 			acknowledgePopUp({eventids: chkbxRange.selectedIds}, this);
 		});
+	});
+
+	function problemsPage() {
+		this.refresh_url = '<?= $data['refresh_url'] ?>';
+		this.refresh_interval = <?= $data['refresh_interval'] ?>;
+		this.running = false;
+		this.timeout = null;
+	}
+
+	problemsPage.prototype.addMessages = function(messages) {
+		$('.wrapper main').before(messages);
+	};
+
+	problemsPage.prototype.removeMessages = function() {
+		$('.wrapper .msg-bad').remove();
+	};
+
+	problemsPage.prototype.getCurrentResultsTable = function() {
+		return $('#flickerfreescreen_problem');
+	};
+
+	problemsPage.prototype.getCurrentDebugBlock = function() {
+		return $('.wrapper > .debug-output');
+	};
+
+	problemsPage.prototype.setLoading = function() {
+		this.getCurrentResultsTable().addClass('is-loading is-loading-fadein delayed-15s');
+	};
+
+	problemsPage.prototype.clearLoading = function() {
+		this.getCurrentResultsTable().removeClass('is-loading is-loading-fadein delayed-15s');
+	};
+
+	problemsPage.prototype.refreshBody = function(body) {
+		this.getCurrentResultsTable().replaceWith(body);
+		chkbxRange.init();
+	};
+
+	problemsPage.prototype.refreshDebug = function(debug) {
+		this.getCurrentDebugBlock().replaceWith(debug);
+	};
+
+	problemsPage.prototype.refresh = function() {
+		this.setLoading();
+
+		const deferred = $.getJSON(this.refresh_url);
+
+		return this.bindDataEvents(deferred);
+	};
+
+	problemsPage.prototype.refreshNow = function() {
+		this.unscheduleRefresh();
+		this.refresh();
+	};
+
+	problemsPage.prototype.scheduleRefresh = function() {
+		this.unscheduleRefresh();
+		this.timeout = setTimeout((function() {
+			this.timeout = null;
+			this.refresh();
+		}).bind(this), this.refresh_interval);
+	};
+
+	problemsPage.prototype.unscheduleRefresh = function() {
+		if (this.timeout !== null) {
+			clearTimeout(this.timeout);
+			this.timeout = null;
+		}
+	};
+
+	problemsPage.prototype.start = function() {
+		if (this.refresh_interval != 0) {
+			this.running = true;
+			this.scheduleRefresh();
+		}
+	};
+
+	problemsPage.prototype.bindDataEvents = function(deferred) {
+		const that = this;
+
+		deferred
+			.done(function(response) {
+				that.onDataDone.call(that, response);
+			})
+			.always(this.onDataAlways.bind(this));
+
+		return deferred;
+	};
+
+	problemsPage.prototype.onDataAlways = function() {
+		if (this.running) {
+			this.scheduleRefresh();
+		}
+	};
+
+	problemsPage.prototype.onDataDone = function(response) {
+		this.clearLoading();
+		this.removeMessages();
+		this.refreshBody(response.body);
+		('messages' in response) && this.addMessages(response.messages);
+		('debug' in response) && this.refreshDebug(response.debug);
+	};
+
+	problemsPage.prototype.liveFilter = function() {
+		$('#filter-inventory').dynamicRows({template: '#filter-inventory-row'});
+		$('#filter-tags').dynamicRows({template: '#filter-tag-row-tmpl'});
+
+		$('#filter_show').change(function() {
+			const filter_show = $('input[name=filter_show]:checked').val();
+
+			$('#filter_age').closest('li').toggle(filter_show == <?= TRIGGERS_OPTION_RECENT_PROBLEM ?>
+				|| filter_show == <?= TRIGGERS_OPTION_IN_PROBLEM ?>
+			);
+		});
+
+		$('#filter_show').trigger('change');
+
+		$('#filter_compact_view').change(function() {
+			if ($(this).is(':checked')) {
+				$('#filter_show_timeline, #filter_details').prop('disabled', true);
+				$('input[name=filter_show_opdata]').prop('disabled', true);
+				$('#filter_highlight_row').prop('disabled', false);
+			}
+			else {
+				$('#filter_show_timeline, #filter_details').prop('disabled', false);
+				$('input[name=filter_show_opdata]').prop('disabled', false);
+				$('#filter_highlight_row').prop('disabled', true);
+			}
+		});
+
+		$('#filter_show_tags').change(function() {
+			const disabled = $(this).find('[value = "<?= PROBLEMS_SHOW_TAGS_NONE ?>"]').is(':checked');
+
+			$('#filter_tag_priority').prop('disabled', disabled);
+			$('#filter_tag_name_format input').prop('disabled', disabled);
+		});
+	};
+
+	$(function() {
+		window.problems_page = new problemsPage();
+		window.problems_page.liveFilter();
 	});
 </script>

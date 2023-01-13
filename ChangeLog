@@ -1,8 +1,90 @@
+Changes for 5.0.31rc1
+
+New features:
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense and PFSense templates (drasikhov)
+...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
+.......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
+
+Bug fixes:
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
+.........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
+.........T [ZBX-22071] extended description for OPSGenie media type (atocko)
+.......PS. [ZBX-20845] fixed SNMP interface availability in case of wrong credentials (akozlovs)
+.........T [ZBX-21441] added override to skip metadata collection on zfs and btrfs for nix templates (atocko)
+.......PS. [ZBX-21927] fixed crash on Oracle database when connection is lost (vso)
+...G...... [ZBX-21696] fixed windows Agent 2 unicode path support for log* items (MVekslers)
+...G...... [ZBX-21903] fixed Agent 2 timeout behavior for net.tcp.port item (MVekslers)
+.........T [ZBX-21039] fixed readme in PostgreSQL by Zabbix agent 2 template (atocko)
+..F....... [ZBX-21806] fixed fatal PHP error in case incorrect variable type for controller action is given (Ivo)
+A......... [ZBX-21799] fixed undefined offset error during host import process (rdetlavs)
+...G...... [ZBX-21206] reverted postgresql connection to be per database for Zabbix agent 2 postgresql plugin (esneiders)
+..F....... [ZBX-20397] fixed draggable object alignment (rdetlavs)
+...G...... [ZBX-20356] fixed Zabbix agent 2 to remove and re-add performance counters on failed collection and to keep query always open (vso)
+...G.....T [ZBX-21296] updated ORACLE plugin and ORACLE agent 2 template documentation grant select variables and added new grant (esneiders, knaglis)
+..F....... [ZBX-21884] changed system.sw.packages[<package>,<manager>,<format>] to system.sw.packages[<regexp>,<manager>,<format>] (acikuns)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.30
+
+5.0.30rc1 was released as 5.0.30 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.30rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added JSONPath optimizations (wiper)
+
+Bug fixes:
+A.F....... [ZBX-16432] removed the ability to import a graph with an empty name and added graph name length validation up to 128 characters (kkuzmina)
+..F....... [ZBX-21816] fixed the "i" icon alignment in the Info column in Problems section with compact view (kkuzmina)
+........S. [ZBX-21825] improved history syncer performance (vso)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
+.........T [ZBX-21844] fixed script in OPSgenie media (atocko)
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29
+
+5.0.29rc2 was released as 5.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc2
+
+5.0.29rc2 was released as 5.0.29rc1 including missing templates
+
+--------------------------------------------------------------------------------
 Changes for 5.0.29rc1
 
 New features:
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
+..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+.........T [ZBX-20296] fixed swap and available memory trigger functions for os templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28
@@ -2618,6 +2700,7 @@ Changes for 4.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22050] fixed spoofing X-Forwarded-For request header allows to access Frontend in maintenace mode (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44

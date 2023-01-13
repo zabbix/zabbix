@@ -18,11 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * @backup dashboard
- * @backup profiles
+ * @dataSource LoginUsers
  */
 class testPageDashboardWidgets extends CWebTest {
 
@@ -169,39 +170,6 @@ class testPageDashboardWidgets extends CWebTest {
 			$this->assertEquals($problems, $row['Without problems']);
 			$this->assertEquals($problems, $row['Total']);
 		}
-	}
-
-	/**
-	 * Check empty dashboard.
-	 */
-	public function testPageDashboardWidgets_checkEmptyDashboard() {
-		$this->page->login()->open('zabbix.php?action=dashboard.list');
-
-		// Create a new dashboard.
-		$this->query('button:Create dashboard')->one()->click();
-		$this->page->waitUntilReady();
-
-		// Wait until overlay dialog is visible and ready.
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-
-		// Check title of a dialog.
-		$this->assertEquals('Dashboard properties', $dialog->getTitle());
-		// Close the dialog.
-		$dialog->close();
-
-		$dashboard = CDashboardElement::find()->one();
-		// Check if dashboard is empty.
-		$this->assertTrue($dashboard->isEmpty());
-
-		// Open a new widget form.
-		$overlay = $dashboard->edit()->addWidget();
-		// Wait until add widget dialog is shown and close it.
-		$overlay->close();
-
-		// Check if dashboard is still empty.
-		$this->assertTrue($dashboard->isEmpty());
-		// Cancel dashboard editing.
-		$dashboard->cancelEditing();
 	}
 
 	/**

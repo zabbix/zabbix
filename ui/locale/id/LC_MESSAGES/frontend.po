@@ -6297,6 +6297,11 @@ msgstr ""
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -12815,6 +12820,10 @@ msgstr "Hanya sekitar 20%% indikator yang ditampilkan."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung."
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -16837,6 +16846,16 @@ msgstr "Kolom layar ini tidak kosong. Hapus?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "Baris layar ini tidak kosong. Hapus?"
 
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "Minggu ini"
@@ -19983,6 +20002,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035

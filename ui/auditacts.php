@@ -36,7 +36,7 @@ $fields = [
 	// filter
 	'filter_rst' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
 	'filter_set' =>		[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
-	'filter_userids' =>	[T_ZBX_STR,			O_OPT, P_SYS,	null,	null],
+	'filter_userids' =>	[T_ZBX_STR,			O_OPT, P_SYS|P_ONLY_ARRAY,	null,	null],
 	'from' =>			[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null],
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,	null]
 ];

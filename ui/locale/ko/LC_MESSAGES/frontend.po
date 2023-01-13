@@ -6293,6 +6293,11 @@ msgstr "스크린 \"%2$s\" 을 위한 필드 \"%1$s\" 가 설정되어 있지 �
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "항목 \"%1$s\"의 설정이 올바르지 않습니다: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -12808,6 +12813,10 @@ msgstr "상위 20%%의 영역이 표시되어 있습니다."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -16830,6 +16839,16 @@ msgstr "스크린의 열은 공백이 아닙니다. 삭제합니까?"
 msgid "This screen row is not empty. Delete it?"
 msgstr "스크린의 행은 공백이 아닙니다. 삭제합니까?"
 
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "이번주"
@@ -19978,6 +19997,10 @@ msgstr "주소 범위 \"%1$s\"가 올바르지 않습니다"
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

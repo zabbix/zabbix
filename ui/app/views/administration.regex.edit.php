@@ -37,6 +37,7 @@ if ($data['regexid'] != 0) {
 }
 
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('regex')
 	->setAction($action->getUrl())
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
@@ -132,7 +133,7 @@ $test_tab = (new CFormList())
 	);
 
 $reg_exp_view = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$reg_exp_view->setSelected(0);
 }
 

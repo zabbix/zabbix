@@ -198,4 +198,15 @@ class MysqlDbBackend extends DbBackend {
 	public function init() {
 		DBexecute('SET NAMES utf8');
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function dbFieldExists($table_name, $field_name) {
+		return (bool) DBFetch(DBselect(
+			'SHOW COLUMNS'.
+			' FROM '.$table_name.
+			' LIKE '.zbx_dbstr($field_name)
+		));
+	}
 }

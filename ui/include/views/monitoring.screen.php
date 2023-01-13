@@ -117,6 +117,7 @@ $controls
 
 $widget->setControls((new CTag('nav', true, (new CList())
 	->addItem((new CForm('get'))
+		->cleanItems()
 		->setName('headerForm')
 		->addItem($controls)
 	)))

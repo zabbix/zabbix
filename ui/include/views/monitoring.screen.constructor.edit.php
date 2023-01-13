@@ -30,6 +30,7 @@ if (isset($_REQUEST['screenitemid'])) {
 }
 
 $form = (new CForm('post', $action))
+	->addVar('form_refresh', getRequest('form_refresh', 0) + 1)
 	->setName('screen_item_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('screenid', getRequest('screenid'));

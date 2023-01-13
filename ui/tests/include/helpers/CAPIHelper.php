@@ -19,6 +19,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../../include/defines.inc.php';
@@ -75,12 +76,13 @@ class CAPIHelper {
 			]
 		];
 
-		$handle = fopen($URL, 'rb', false, stream_context_create($params));
+		$handle = @fopen($URL, 'rb', false, stream_context_create($params));
 		if ($handle) {
 			$response = @stream_get_contents($handle);
 			fclose($handle);
 		}
 		else {
+			$php_errormsg = CTestArrayHelper::get(error_get_last(), 'message');
 			$response = false;
 		}
 

@@ -33,7 +33,7 @@ class CControllerPopupMedia extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dstfrm' =>			'string|fatal',
+			'dstfrm' =>			'required|string',
 			'media' =>			'int32',
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
