@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-11-12 13:27+0000\n"
+"PO-Revision-Date: 2023-01-08 02:31+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -6307,7 +6307,7 @@ msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "フィールド\"%1$s\"の設定が正しくありません: %2$s"
 
 #: include/validate.inc.php:167
 #, c-format
@@ -20013,7 +20013,7 @@ msgstr "UTF-8のバイトシーケンスが正しくありません"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "データタイプが正しくありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
