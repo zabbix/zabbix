@@ -510,7 +510,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel([
 			_('Media type mapping'),
 			makeHelpIcon(
-				_('Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications.')
+				_("Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications.")
 			)
 		]))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)

@@ -23,9 +23,7 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "cfg.h"
 #include "log.h"
-#include "control.h"
 #include "pid.h"
 #include "zbx_rtc_constants.h"
 
@@ -42,14 +40,11 @@ static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
 extern pid_t	*threads;
 extern int	threads_num;
 
-#ifdef HAVE_SIGQUEUE
-extern unsigned char	program_type;
-#endif
-
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
 
-static void	(*zbx_sigusr_handler)(int flags);
+static zbx_signal_handler_f	sigusr_handler;
+static zbx_signal_redirect_f	signal_redirect_handler;
 
 #ifdef HAVE_SIGQUEUE
 /******************************************************************************
@@ -92,8 +87,8 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		default:
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
+			if (NULL != sigusr_handler)
+				sigusr_handler(flags);
 			break;
 	}
 }
@@ -202,9 +197,9 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 
 #endif
 
-void	zbx_set_sigusr_handler(void (*handler)(int flags))
+void	zbx_set_sigusr_handler(zbx_signal_handler_f handler)
 {
-	zbx_sigusr_handler = handler;
+	sigusr_handler = handler;
 }
 
 /******************************************************************************
@@ -216,7 +211,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
 	int	flags;
-	int	scope;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -242,44 +236,8 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		return;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_AGENTD))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: runtime control signals are supported only by agent");
-		return;
-	}
-
-	switch (ZBX_RTC_GET_MSG(flags))
-	{
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
-		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			scope = ZBX_RTC_GET_SCOPE(flags);
-
-			if ((ZBX_RTC_LOG_SCOPE_FLAG | ZBX_RTC_LOG_SCOPE_PID) == scope)
-			{
-				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags, NULL);
-			}
-			else
-			{
-				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
-				{
-					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
-							flags, NULL);
-				}
-			}
-
-			/* call custom sigusr handler to handle log level changes for non worker processes */
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
-
-			break;
-		case ZBX_RTC_USER_PARAMETERS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
-			break;
-		default:
-			if (NULL != zbx_sigusr_handler)
-				zbx_sigusr_handler(flags);
-	}
+	if(signal_redirect_handler != NULL)
+		signal_redirect_handler(flags, sigusr_handler);
 #endif
 }
 
@@ -302,10 +260,11 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
  ******************************************************************************/
-static void	set_daemon_signal_handlers(void)
+static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 {
 	struct sigaction	phan;
 
+	signal_redirect_handler = signal_redirect_cb;
 	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);
@@ -322,23 +281,25 @@ static void	set_daemon_signal_handlers(void)
  *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
- * Parameters: allow_root - allow root permission for application             *
- *             user       - user on the system to which to drop the           *
- *                          privileges                                        *
- *             flags      - daemon startup flags                              *
- *        get_pid_file_cb - callback function for getting absolute path and   *
- *                          name of PID file                                  *
- *       zbx_on_exit_cb_arg - callback function called when terminating       *
- *                            signal handler                                  *
- *        config_log_type - [IN]                                              *
- *        config_log_file - [IN]                                              *
+ * Parameters: allow_root         - [IN] allow root permission for            *
+ *                     application                                            *
+ *             user               - [IN] user on the system to which to drop  *
+ *                     the privileges                                         *
+ *             flags              - [IN] daemon startup flags                 *
+ *             get_pid_file_cb    - [IN] callback function for getting        *
+ *                     absolute path and name of PID file                     *
+ *             zbx_on_exit_cb_arg - [IN] callback function called when        *
+ *                     terminating signal handler                             *
+ *             config_log_type    - [IN]                                      *
+ *             config_log_file    - [IN]                                      *
+ *             signal_redirect_cb - [IN] USR1 handling callback               *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
-		const char *config_log_file)
+		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb)
 {
 	struct passwd	*pwd;
 
@@ -444,7 +405,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 	parent_pid = (int)getpid();
 
 	zbx_set_common_signal_handlers(zbx_on_exit_cb_arg);
-	set_daemon_signal_handlers();
+	set_daemon_signal_handlers(signal_redirect_cb);
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
 	/* sigaction() is called. To avoid problems when scripts exit in zbx_execute() and */
