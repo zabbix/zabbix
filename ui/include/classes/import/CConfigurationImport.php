@@ -517,7 +517,7 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedTemplateDashboards() as $host => $dashboards) {
 			foreach ($dashboards as $dashboard) {
-				$template_dashboards_refs[$dashboard['uuid']] = [];
+				$template_dashboards_refs[$dashboard['uuid']]['name'] = $dashboard['name'];
 
 				if (!$dashboard['pages']) {
 					continue;
@@ -615,7 +615,11 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTemplateGroups() as $group) {
 			$groupid = $this->referencer->findTemplateGroupidByUuid($group['uuid']);
 
-			if ($groupid) {
+			if ($groupid === null) {
+				$groupid = $this->referencer->findTemplateGroupidByName($group['name']);
+			}
+
+			if ($groupid !== null) {
 				$groups_to_update[] = $group + ['groupid' => $groupid];
 			}
 			else {
@@ -624,10 +628,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['template_groups']['updateExisting'] && $groups_to_update) {
-			API::TemplateGroup()->update(array_map(function($group) {
-				unset($group['uuid']);
-				return $group;
-			}, $groups_to_update));
+			API::TemplateGroup()->update($groups_to_update, true);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbTemplateGroup($group['groupid'], $group);
@@ -657,7 +658,11 @@ class CConfigurationImport {
 		foreach ($this->getFormattedHostGroups() as $group) {
 			$groupid = $this->referencer->findHostGroupidByUuid($group['uuid']);
 
-			if ($groupid) {
+			if ($groupid === null) {
+				$groupid = $this->referencer->findHostGroupidByName($group['name']);
+			}
+
+			if ($groupid !== null) {
 				$groups_to_update[] = $group + ['groupid' => $groupid];
 			}
 			else {
@@ -666,10 +671,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['host_groups']['updateExisting'] && $groups_to_update) {
-			API::HostGroup()->update(array_map(function($group) {
-				unset($group['uuid']);
-				return $group;
-			}, $groups_to_update));
+			API::HostGroup()->update($groups_to_update, true);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbHostGroup($group['groupid'], $group);
@@ -795,7 +797,7 @@ class CConfigurationImport {
 						));
 					}
 
-					$master_itemid = $this->referencer->findItemidByKey($hostid, $item[$master_item_key]['key']);
+					$master_itemid = $this->referencer->findItemidByKey($hostid, $item[$master_item_key]['key'], true);
 
 					if ($master_itemid !== null) {
 						$item['master_itemid'] = $master_itemid;
@@ -830,9 +832,15 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
-				$itemid = array_key_exists('uuid', $item)
-					? $this->referencer->findItemidByUuid($item['uuid'])
-					: $this->referencer->findItemidByKey($hostid, $item['key_']);
+				$itemid = null;
+
+				if (array_key_exists('uuid', $item)) {
+					$itemid = $this->referencer->findItemidByUuid($item['uuid']);
+				}
+
+				if ($itemid === null) {
+					$itemid = $this->referencer->findItemidByKey($hostid, $item['key_']);
+				}
 
 				if ($itemid !== null) {
 					$item['itemid'] = $itemid;
@@ -883,7 +891,7 @@ class CConfigurationImport {
 			foreach ($items_to_create as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
-						$item[$master_item_key]['key']
+						$item[$master_item_key]['key'], true
 					);
 
 					if ($item['master_itemid'] === null) {
@@ -920,7 +928,7 @@ class CConfigurationImport {
 			foreach ($items_to_update as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
-						$item[$master_item_key]['key']
+						$item[$master_item_key]['key'], true
 					);
 
 					if ($item['master_itemid'] === null) {
@@ -933,10 +941,7 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$updated_items = $api_service->update(array_map(function($item) {
-				unset($item['uuid']);
-				return $item;
-			}, $items_to_update));
+			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
@@ -985,9 +990,15 @@ class CConfigurationImport {
 			foreach ($discovery_rules as $discovery_rule) {
 				$discovery_rule['hostid'] = $hostid;
 
-				$itemid = array_key_exists('uuid', $discovery_rule)
-					? $this->referencer->findItemidByUuid($discovery_rule['uuid'])
-					: $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				$itemid = null;
+
+				if (array_key_exists('uuid', $discovery_rule)) {
+					$itemid = $this->referencer->findItemidByUuid($discovery_rule['uuid']);
+				}
+
+				if ($itemid === null) {
+					$itemid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				}
 
 				unset($discovery_rule['item_prototypes'], $discovery_rule['trigger_prototypes'],
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
@@ -1031,7 +1042,7 @@ class CConfigurationImport {
 					}
 
 					$discovery_rule['master_itemid'] = $this->referencer->findItemidByKey($hostid,
-						$discovery_rule[$master_item_key]['key']
+						$discovery_rule[$master_item_key]['key'], true
 					);
 				}
 
@@ -1074,7 +1085,6 @@ class CConfigurationImport {
 
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
-					unset($discovery_rule['uuid']);
 					$discovery_rules_to_update[] = $discovery_rule;
 				}
 				else {
@@ -1126,7 +1136,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// if rule was not processed we should not create/update any of its prototypes
-				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (!array_key_exists($hostid, $processed_discovery_rules)
+						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
@@ -1186,7 +1197,7 @@ class CConfigurationImport {
 						}
 
 						$master_item_prototypeid = $this->referencer->findItemidByKey($hostid,
-							$item_prototype[$master_item_key]['key']
+							$item_prototype[$master_item_key]['key'], true
 						);
 
 						if ($master_item_prototypeid !== null) {
@@ -1216,9 +1227,15 @@ class CConfigurationImport {
 						$item_prototype['query_fields'] = $query_fields;
 					}
 
-					$item_prototypeid = array_key_exists('uuid', $item_prototype)
-						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
-						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
+					$item_prototypeid = null;
+
+					if (array_key_exists('uuid', $item_prototype)) {
+						$item_prototypeid = $this->referencer->findItemidByUuid($item_prototype['uuid']);
+					}
+
+					if($item_prototypeid === null) {
+						$item_prototypeid = $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
+					}
 
 					$item_prototype['rule'] = [
 						'hostid' => $hostid,
@@ -1292,11 +1309,17 @@ class CConfigurationImport {
 
 					$host_prototype['templates'] = $templates;
 
-					$host_prototypeid = array_key_exists('uuid', $host_prototype)
-						? $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid'])
-						: $this->referencer->findHostPrototypeidByHost($hostid, $itemid,
+					$host_prototypeid = null;
+
+					if (array_key_exists('uuid', $host_prototype)) {
+						$host_prototypeid = $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid']);
+					}
+
+					if($host_prototypeid === null) {
+						$host_prototypeid = $this->referencer->findHostPrototypeidByHost($hostid, $itemid,
 							$host_prototype['host']
 						);
+					}
 
 					if ($host_prototypeid !== null) {
 						if (array_key_exists('macros', $host_prototype)) {
@@ -1313,7 +1336,6 @@ class CConfigurationImport {
 						}
 
 						$host_prototype['hostid'] = $host_prototypeid;
-						unset($host_prototype['uuid']);
 						$host_prototypes_to_update[] = $host_prototype;
 					}
 					else {
@@ -1364,16 +1386,23 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// If rule was not processed we should not create/update any of its prototypes.
-				if (!array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (array_key_exists($hostid, $processed_discovery_rules)
+						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
 				foreach ($discovery_rule['trigger_prototypes'] as $trigger) {
-					$triggerid = array_key_exists('uuid', $trigger)
-						? $this->referencer->findTriggeridByUuid($trigger['uuid'])
-						: $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-							$trigger['recovery_expression']
+					$triggerid = null;
+
+					if (array_key_exists('uuid', $trigger)) {
+						$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
+					}
+
+					if ($triggerid === null) {
+						$triggerid = $this->referencer->findTriggeridByName($trigger['description'],
+							$trigger['expression'], $trigger['recovery_expression']
 						);
+					}
 
 					$triggers[] = $trigger;
 					unset($trigger['dependencies']);
@@ -1392,7 +1421,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 
 						$itemid = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+							? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'], true)
 							: null;
 
 						if ($itemid === null) {
@@ -1413,7 +1442,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 
 						$itemid = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+							? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'], true)
 							: null;
 
 						if ($itemid === null) {
@@ -1434,7 +1463,7 @@ class CConfigurationImport {
 						$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
 
 						$item['itemid'] = ($hostid !== null)
-							? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+							? $this->referencer->findItemidByKey($hostid, $item['item']['key'], true)
 							: null;
 
 						if ($item['itemid'] === null) {
@@ -1450,13 +1479,18 @@ class CConfigurationImport {
 					}
 					unset($item);
 
-					$graphid = array_key_exists('uuid', $graph)
-						? $this->referencer->findGraphidByUuid($graph['uuid'])
-						: $this->referencer->findGraphidByName($hostid, $graph['name']);
+					$graphid = null;
+
+					if (array_key_exists('uuid', $graph)) {
+						$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
+					}
+
+					if ($graphid === null) {
+						$graphid = $this->referencer->findGraphidByName($hostid, $graph['name']);
+					}
 
 					if ($graphid !== null) {
 						$graph['graphid'] = $graphid;
-						unset($graph['uuid']);
 						$graphs_to_update[] = $graph;
 					}
 					else {
@@ -1467,10 +1501,7 @@ class CConfigurationImport {
 		}
 
 		if ($triggers_to_update) {
-			$updated_triggers = API::TriggerPrototype()->update(array_map(function($trigger) {
-				unset($trigger['uuid']);
-				return $trigger;
-			}, $triggers_to_update));
+			$updated_triggers = API::TriggerPrototype()->update($triggers_to_update);
 
 			foreach ($updated_triggers['triggerids'] as $index => $triggerid) {
 				$trigger = $triggers_to_update[$index];
@@ -1522,7 +1553,7 @@ class CConfigurationImport {
 
 			foreach ($trigger['dependencies'] as $dependency) {
 				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
-					$dependency['expression'], $dependency['recovery_expression']
+					$dependency['expression'], $dependency['recovery_expression'], true
 				);
 
 				if ($dependent_triggerid === null) {
@@ -1569,9 +1600,15 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = array_key_exists('uuid', $httptest)
-					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
-					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+				$httptestid = null;
+
+				if (array_key_exists('uuid', $httptest)) {
+					$httptestid = $this->referencer->findHttpTestidByUuid($httptest['uuid']);
+				}
+
+				if ($httptestid === null) {
+					$httptestid = $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+				}
 
 				if ($httptestid !== null) {
 					foreach ($httptest['steps'] as &$httpstep) {
@@ -1584,8 +1621,6 @@ class CConfigurationImport {
 					unset($httpstep);
 
 					$httptest['httptestid'] = $httptestid;
-					unset($httptest['uuid']);
-
 					$httptests_to_update[] = $httptest;
 				}
 				else {
@@ -1623,7 +1658,7 @@ class CConfigurationImport {
 			if ($graph['ymin_item_1']) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymin_item_1']['host']);
 				$itemid = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'])
+					? $this->referencer->findItemidByKey($hostid, $graph['ymin_item_1']['key'], true)
 					: null;
 
 				if ($itemid === null) {
@@ -1641,7 +1676,7 @@ class CConfigurationImport {
 			if ($graph['ymax_item_1']) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($graph['ymax_item_1']['host']);
 				$itemid = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'])
+					? $this->referencer->findItemidByKey($hostid, $graph['ymax_item_1']['key'], true)
 					: null;
 
 				if ($itemid === null) {
@@ -1661,7 +1696,7 @@ class CConfigurationImport {
 			foreach ($graph['gitems'] as &$item) {
 				$hostid = $this->referencer->findTemplateidOrHostidByHost($item['item']['host']);
 				$item['itemid'] = ($hostid !== null)
-					? $this->referencer->findItemidByKey($hostid, $item['item']['key'])
+					? $this->referencer->findItemidByKey($hostid, $item['item']['key'], true)
 					: null;
 
 				if ($item['itemid'] === null) {
@@ -1677,6 +1712,10 @@ class CConfigurationImport {
 
 			if ($this->isTemplateGraph($graph)) {
 				$graphid = $this->referencer->findGraphidByUuid($graph['uuid']);
+
+				if ($graphid === null) {
+					$graphid = $this->referencer->findGraphidByName($hostid, $graph['name']);
+				}
 			}
 			else {
 				unset($graph['uuid']);
@@ -1685,7 +1724,6 @@ class CConfigurationImport {
 
 			if ($graphid !== null) {
 				$graph['graphid'] = $graphid;
-				unset($graph['uuid']);
 				$graphs_to_update[] = $graph;
 			}
 			else {
@@ -1746,6 +1784,12 @@ class CConfigurationImport {
 
 			if ($is_template_trigger && array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
+
+				if ($triggerid === null) {
+					$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+						$trigger['recovery_expression']
+					);
+				}
 			}
 			elseif (!$is_template_trigger) {
 				unset($trigger['uuid']);
@@ -1759,7 +1803,7 @@ class CConfigurationImport {
 					$triggers_to_process_dependencies[] = $trigger;
 
 					$trigger['triggerid'] = $triggerid;
-					unset($trigger['dependencies'], $trigger['uuid']);
+					unset($trigger['dependencies']);
 					$triggers_to_update[] = $trigger;
 				}
 			}
@@ -1841,7 +1885,7 @@ class CConfigurationImport {
 
 			foreach ($trigger['dependencies'] as $dependency) {
 				$dependent_triggerid = $this->referencer->findTriggeridByName($dependency['name'],
-					$dependency['expression'], $dependency['recovery_expression']
+					$dependency['expression'], $dependency['recovery_expression'], true
 				);
 
 				if ($dependent_triggerid === null) {
@@ -2015,11 +2059,17 @@ class CConfigurationImport {
 			}
 
 			foreach ($items as $item) {
-				$itemid = array_key_exists('uuid', $item)
-					? $this->referencer->findItemidByUuid($item['uuid'])
-					: $this->referencer->findItemidByKey($hostid, $item['key_']);
+				$itemid = null;
 
-				if ($itemid) {
+				if (array_key_exists('uuid', $item)) {
+					$itemid = $this->referencer->findItemidByUuid($item['uuid']);
+				}
+
+				if ($itemid === null) {
+					$itemid = $this->referencer->findItemidByKey($hostid, $item['key_']);
+				}
+
+				if ($itemid !== null) {
 					$itemids[$itemid] = [];
 				}
 			}
@@ -2154,7 +2204,10 @@ class CConfigurationImport {
 				// In import file host graph can have UUID assigned after conversion, such should be searched by name.
 				foreach ($graph['gitems'] as $gitem) {
 					$gitem_hostid = $this->referencer->findTemplateidOrHostidByHost($gitem['item']['host']);
-					$graphid = $this->referencer->findGraphidByName($gitem_hostid, $graph['name']);
+
+					if ($gitem_hostid !== null) {
+						$graphid = $this->referencer->findGraphidByName($gitem_hostid, $graph['name']);
+					}
 
 					if ($graphid !== null) {
 						$graphids[$graphid] = [];
@@ -2211,9 +2264,15 @@ class CConfigurationImport {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discoveryid = array_key_exists('uuid', $discovery_rule)
-					? $this->referencer->findItemidByUuid($discovery_rule['uuid'])
-					: $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				$discoveryid = null;
+
+				if (array_key_exists('uuid', $discovery_rule)) {
+					$discoveryid = $this->referencer->findItemidByUuid($discovery_rule['uuid']);
+				}
+
+				if ($discoveryid === null) {
+					$discoveryid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				}
 
 				if ($discoveryid === null) {
 					continue;
@@ -2222,9 +2281,17 @@ class CConfigurationImport {
 				$discovery_ruleids[$discoveryid] = [];
 
 				foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
-					$host_prototypeid = array_key_exists('uuid', $host_prototype)
-						? $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid'])
-						: $this->referencer->findHostPrototypeidByHost($hostid, $discoveryid, $host_prototype['host']);
+					$host_prototypeid = null;
+
+					if (array_key_exists('uuid', $host_prototype)) {
+						$host_prototypeid = $this->referencer->findHostPrototypeidByUuid($host_prototype['uuid']);
+					}
+
+					if ($host_prototypeid === null) {
+						$host_prototypeid = $this->referencer->findHostPrototypeidByHost($hostid, $discoveryid,
+							$host_prototype['host']
+						);
+					}
 
 					if ($host_prototypeid !== null) {
 						$host_prototypeids[$host_prototypeid] = [];
@@ -2232,11 +2299,17 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['trigger_prototypes'] as $trigger_prototype) {
-					$trigger_prototypeid = array_key_exists('uuid', $trigger_prototype)
-						? $this->referencer->findTriggeridByUuid($trigger_prototype['uuid'])
-						: $this->referencer->findTriggeridByName($trigger_prototype['description'],
+					$trigger_prototypeid = null;
+
+					if (array_key_exists('uuid', $trigger_prototype)) {
+						$trigger_prototypeid = $this->referencer->findTriggeridByUuid($trigger_prototype['uuid']);
+					}
+
+					if ($trigger_prototypeid === null) {
+						$trigger_prototypeid = $this->referencer->findTriggeridByName($trigger_prototype['description'],
 							$trigger_prototype['expression'], $trigger_prototype['recovery_expression']
 						);
+					}
 
 					if ($trigger_prototypeid !== null) {
 						$trigger_prototypeids[$trigger_prototypeid] = [];
@@ -2244,9 +2317,15 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['graph_prototypes'] as $graph_prototype) {
-					$graph_prototypeid = array_key_exists('uuid', $graph_prototype)
-						? $this->referencer->findGraphidByUuid($graph_prototype['uuid'])
-						: $this->referencer->findGraphidByName($hostid, $graph_prototype['name']);
+					$graph_prototypeid = null;
+
+					if (array_key_exists('uuid', $graph_prototype)) {
+						$graph_prototypeid = $this->referencer->findGraphidByUuid($graph_prototype['uuid']);
+					}
+
+					if ($graph_prototypeid === null) {
+						$graph_prototypeid = $this->referencer->findGraphidByName($hostid, $graph_prototype['name']);
+					}
 
 					if ($graph_prototypeid !== null) {
 						$graph_prototypeids[$graph_prototypeid] = [];
@@ -2254,9 +2333,15 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
-					$item_prototypeid = array_key_exists('uuid', $item_prototype)
-						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
-						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
+					$item_prototypeid = null;
+
+					if (array_key_exists('uuid', $item_prototype)) {
+						$item_prototypeid = $this->referencer->findItemidByUuid($item_prototype['uuid']);
+					}
+
+					if ($item_prototypeid === null) {
+						$item_prototypeid = $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
+					}
 
 					if ($item_prototypeid !== null) {
 						$item_prototypeids[$item_prototypeid] = [];
@@ -2357,9 +2442,15 @@ class CConfigurationImport {
 			}
 
 			foreach ($httptests as $httptest) {
-				$httptestid = array_key_exists('uuid', $httptest)
-					? $this->referencer->findHttpTestidByUuid($httptest['uuid'])
-					: $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+				$httptestid = null;
+
+				if (array_key_exists('uuid', $httptest)) {
+					$httptestid = $this->referencer->findHttpTestidByUuid($httptest['uuid']);
+				}
+
+				if ($httptestid === null) {
+					$httptestid = $this->referencer->findHttpTestidByName($hostid, $httptest['name']);
+				}
 
 				if ($httptestid !== null) {
 					$httptestids[$httptestid] = [];
@@ -2428,9 +2519,15 @@ class CConfigurationImport {
 			}
 
 			foreach ($discovery_rules as $discovery_rule) {
-				$discovery_ruleid = array_key_exists('uuid', $discovery_rule)
-					? $this->referencer->findItemidByUuid($discovery_rule['uuid'])
-					: $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				$discovery_ruleid = null;
+
+				if (array_key_exists('uuid', $discovery_rule)) {
+					$discovery_ruleid =  $this->referencer->findItemidByUuid($discovery_rule['uuid']);
+				}
+
+				if ($discovery_ruleid === null) {
+					$discovery_ruleid = $this->referencer->findItemidByKey($hostid, $discovery_rule['key_']);
+				}
 
 				if ($discovery_ruleid !== null) {
 					$discovery_ruleids[$discovery_ruleid] = [];
@@ -2669,6 +2766,12 @@ class CConfigurationImport {
 		$entities_order = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				continue;
+			}
+
 			foreach ($discovery_rules as $discovery_rule) {
 				if ($discovery_rule['item_prototypes']) {
 					$item_prototypes = [$host => $discovery_rule['item_prototypes']];
