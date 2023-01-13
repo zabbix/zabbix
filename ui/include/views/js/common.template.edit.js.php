@@ -228,10 +228,31 @@
 				proxy_form.submit();
 			}, {passive: false});
 
-		let csrf_token = '';
-		let csrf_tokens = <?= json_encode($data['csrf_tokens'])?>;
+		let csrf_tokens = <?= json_encode($data['csrf_tokens']) ?>;
 
 		document.addEventListener('click', (e) => {
+			let csrf_token = '';
+			let template_action = '';
+			const form = document.templatesForm;
+
+			if (e.target.classList.contains('js-unlink-template')) {
+				template_action = `unlink[${e.target.dataset.templateid}]`;
+				csrf_token = csrf_tokens['templates.php unlink'];
+			}
+			else if (e.target.classList.contains('js-unlinkandclear-template')) {
+				template_action = `unlink_and_clear[${e.target.dataset.templateid}]`;
+				csrf_token = csrf_tokens['templates.php unlink_and_clear'];
+			}
+
+			if (template_action != '') {
+				create_var(form, <?= json_encode(CController::CSRF_TOKEN_NAME) ?>, csrf_token, false);
+				submitFormWithParam(form.name, template_action, 1);
+			}
+		})
+
+		document.addEventListener('click', (e) => {
+			let csrf_token = '';
+
 			if (e.target.id === 'clone') {
 				csrf_token = csrf_tokens['templates.php clone'];
 			}

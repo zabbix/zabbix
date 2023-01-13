@@ -312,15 +312,6 @@ $button_list = [
 ];
 
 if ($data['context'] === 'host') {
-	$massclearhistory = [
-		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?')
-	];
-
-	if ($data['config']['compression_status']) {
-		unset($massclearhistory['confirm']);
-	}
-
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))

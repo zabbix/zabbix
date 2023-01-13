@@ -101,20 +101,14 @@ if ($data['linked_templates']) {
 			$template_link,
 			(new CCol(
 				new CHorList([
-					(new CSimpleButton(_('Unlink')))
+					(new CSimpleButton('unlink', _('Unlink')))
 						->setAttribute('data-templateid', $template['templateid'])
-						->onClick('
-							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
-						')
+						->addClass('js-unlink-template')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
 						? (new CSimpleButton(_('Unlink and clear')))
 							->setAttribute('data-templateid', $template['templateid'])
-							->onClick('
-								submitFormWithParam("'.$form->getName().'",
-									`unlink_and_clear[${this.dataset.templateid}]`, 1
-								);
-							')
+							->addClass('js-unlinkandclear-template')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
