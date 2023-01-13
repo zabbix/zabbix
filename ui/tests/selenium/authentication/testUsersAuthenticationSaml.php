@@ -39,9 +39,163 @@ class testUsersAuthenticationSaml extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
+		return ['class' => CMessageBehavior::class];
+	}
+
+	public function testUsersAuthenticationSaml_Layout() {
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->selectTab('SAML settings');
+		$this->page->assertHeader('Authentication');
+
+		$enable_saml = $form->getField('Enable SAML authentication');
+		$this->assertTrue($enable_saml->isEnabled());
+		$this->assertTrue($enable_saml->isVisible());
+		$form->checkValue(['Enable SAML authentication' => false]);
+
+		// Check that Update button is clickable and no other buttons present.
+		$this->assertTrue($form->query('button:Update')->one()->isClickable());
+		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+
+		// Check SAML form default values.
+		$saml_fields = [
+			'Enable JIT provisioning' => ['value' => false, 'visible' => true],
+			'IdP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024, 'mandatory' => true],
+			'SSO service URL' => ['value' => '', 'visible' => true, 'maxlength' => 2048, 'mandatory' => true],
+			'SLO service URL' => ['value' => '', 'visible' => true, 'maxlength' => 2048],
+			'Username attribute' => ['value' => '', 'visible' => true, 'maxlength' => 128, 'mandatory' => true],
+			'SP entity ID' => ['value' => '', 'visible' => true, 'maxlength' => 1024, 'mandatory' => true],
+			'SP name ID format' => ['value' => '', 'visible' => true, 'maxlength' => 2048,
+					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+			],
+			'id:sign_messages' => ['value' => false, 'visible' => true],
+			'id:sign_assertions' => ['value' => false, 'visible' => true],
+			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
+			'id:sign_logout_requests' => ['value' => false, 'visible' => true],
+			'id:sign_logout_responses' => ['value' => false, 'visible' => true],
+			'id:encrypt_nameid' => ['value' => false, 'visible' => true],
+			'id:encrypt_assertions' => ['value' => false, 'visible' => true],
+			'Case-sensitive login' => ['value' => false, 'visible' => true],
+			'Configure JIT provisioning' => ['value' => false, 'visible' => true],
+			'Group name attribute' => ['value' => '',  'visible' => false, 'maxlength' => 255, 'mandatory' => true],
+			'User name attribute' => ['value' => '','visible' => false, 'maxlength' => 255],
+			'User last name attribute' => ['value' => '','visible' => false, 'maxlength' => 255],
+			'User group mapping' => ['visible' => false, 'mandatory' => true],
+			'Media type mapping' => ['visible' => false],
+			'Enable SCIM provisioning' => ['value' => false, 'visible' => false]
 		];
+
+		foreach ($saml_fields as $field => $attributes) {
+			$this->assertEquals($attributes['visible'], $form->getField($field)->isVisible());
+			$this->assertFalse($form->getField($field)->isEnabled());
+
+			if (array_key_exists('value', $attributes)) {
+				$this->assertEquals($attributes['value'], $form->getField($field)->getValue());
+			}
+
+			if (array_key_exists('maxlength', $attributes)) {
+				$this->assertEquals($attributes['maxlength'], $form->getField($field)->getAttribute('maxlength'));
+			}
+
+			if (array_key_exists('placeholder', $attributes)) {
+				$this->assertEquals($attributes['placeholder'], $form->getField($field)->getAttribute('placeholder'));
+			}
+
+			if (array_key_exists('mandatory', $attributes)) {
+				$this->assertStringContainsString('form-label-asterisk', $form->getLabel($field)->getAttribute('class'));
+			}
+		}
+
+		// Enable SAML and check that fields become enabled.
+		$form->fill(['Enable SAML authentication' => true]);
+
+		foreach (array_keys($saml_fields) as $label) {
+			$this->assertTrue($form->getField($label)->isEnabled());
+		}
+
+		// Check that JIT fields remain invisible and depend on "Configure JIT" checkbox.
+		$jit_fields = array_slice($saml_fields, 16);
+
+
+		foreach ([false, true] as $jit_status) {
+			$form->fill(['Configure JIT provisioning' => $jit_status]);
+
+			foreach (array_keys($jit_fields) as $label) {
+				$this->assertTrue($form->getField($label)->isVisible($jit_status));
+			}
+		}
+
+		$this->checkHint('Media type mapping', 'Map user’s SAML media attributes (e.g. email) to Zabbix user media for'.
+				' sending notifications.', $form
+		);
+
+		// Check Group mapping dialog.
+		$group_mapping_dialog = $this->checkMapping('User group mapping', 'New user group mapping', $form,
+				['SAML group pattern', 'User groups', 'User role']
+		);
+
+		// Check hint in group mapping popup.
+		$this->checkHint('SAML group pattern', "Naming requirements:\ngroup name must match SAML group name".
+				"\nwildcard patterns with '*' may be used", $group_mapping_dialog->asForm()
+		);
+
+		// Close Group mapping dialog.
+		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
+
+		// Check Media mapping dialog.
+		$media_mapping_dialog = $this->checkMapping('Media type mapping', 'New media type mapping',
+				$form, ['Name', 'Media type', 'Attribute']
+		);
+
+		// Close Media mapping dialog.
+		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
+	}
+
+	/**
+	 * Check mapping form in dialog.
+	 *
+	 * @param string          $field	 field which mapping is checked
+	 * @param string          $title     title in dialog
+	 * @param CFormElement    $form      SAML form
+	 * @param array           $labels    labels in mapping form
+	 */
+	private function checkMapping($field, $title, $form, $labels) {
+		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
+		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals($title, $mapping_dialog->getTitle());
+		$mapping_form = $mapping_dialog->asForm();
+
+		foreach ($labels as $label) {
+			$mapping_field = $mapping_form->getField($label);
+			$this->assertTrue($mapping_field->isVisible());
+			$this->assertTrue($mapping_field->isEnabled());
+			$this->assertStringContainsString('form-label-asterisk', $mapping_form->getLabel($label)->getAttribute('class'));
+		}
+
+		$values = ($field === 'Media type mapping')
+			? ['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']
+			: ['SAML group pattern' => '', 'User groups' => '', 'User role' => ''];
+
+		$mapping_form->checkValue($values);
+
+		// Check group mapping popup footer buttons.
+		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
+
+		return $mapping_dialog;
+	}
+
+	/**
+	 * Check hints for labels in form.
+	 *
+	 * @param string           $label	label which hint is checked
+	 * @param string           $text    hint's text
+	 * @param CFormElement     $form    given form
+	 */
+	private function checkHint($label, $text, $form) {
+		$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']/a')->one()->click();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+		$this->assertEquals($text, $hint->getText());
+		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 	}
 
 	public function getSamlData() {
@@ -184,6 +338,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 	/**
 	 * @backup config
+	 *
 	 * @dataProvider getSamlData
 	 */
 	public function testUsersAuthenticationSaml_Configure($data) {
@@ -230,17 +385,20 @@ class testUsersAuthenticationSaml extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
 		$this->configureSamlAuthentication($settings);
+
 		// Logout and check that SAML authentication was enabled.
 		$this->page->logout();
 		$this->page->open('index.php')->waitUntilReady();
 		$link = $this->query('link:Sign in with Single Sign-On (SAML)')->one()->waitUntilClickable();
 		$this->assertStringContainsString('index_sso.php', $link->getAttribute('href'));
+
 		// Login and disable SAML authentication.
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('SAML settings');
 		$form->getField('Enable SAML authentication')->uncheck();
 		$form->submit();
+
 		// Logout and check that SAML authentication was disabled.
 		$this->page->logout();
 		$this->page->open('index.php')->waitUntilReady();
@@ -333,8 +491,10 @@ class testUsersAuthenticationSaml extends CWebTest {
 	}
 
 	/**
-	 * @ignoreBrowserErrors
+	 * ignoreBrowserErrors
+	 *
 	 * @backup config
+	 *
 	 * @dataProvider getAuthenticationDetails
 	 */
 	public function testUsersAuthenticationSaml_Authenticate($data) {
@@ -347,6 +507,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 			'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
 			'Case-sensitive login' => false
 		];
+
 		// Override particular SAML settings with values from data provider.
 		if (array_key_exists('custom_settings', $data)) {
 			foreach ($data['custom_settings'] as $key => $value) {
@@ -358,6 +519,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 		// Logout and check that SAML authentication was enabled.
 		$this->page->logout();
+
 		// Login to a particular url, if such is defined in data provider.
 		if (array_key_exists('url', $data)) {
 			$this->page->open($data['url'])->waitUntilReady();
@@ -367,6 +529,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 		else {
 			$this->page->open('index.php')->waitUntilReady();
 		}
+
 		// Login via regular Sing-in form or via SAML.
 		if (CTestArrayHelper::get($data, 'regular_login', false)) {
 			$this->query('id:name')->waitUntilVisible()->one()->fill($data['username']);
@@ -380,7 +543,9 @@ class testUsersAuthenticationSaml extends CWebTest {
 			$this->query('id:password')->one()->waitUntilVisible()->fill('zabbix');
 			$this->query('button:Login')-> one()->click();
 		}
+
 		$this->page->waitUntilReady();
+
 		// Check error message in case of negative test.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
@@ -406,7 +571,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
-			foreach($fields as $name => $value){
+			foreach(arrayKeys($fields) as $name){
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
