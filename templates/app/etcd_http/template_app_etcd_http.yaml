@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-13T11:33:54Z'
+  date: '2023-01-13T15:26:35Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -361,7 +361,7 @@ zabbix_export:
               name: 'Etcd: Node healthcheck failed'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check'
+              description: 'See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.'
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
@@ -379,7 +379,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The number of handle failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `4XX`.'
+          description: 'The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `4XX`.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -415,7 +415,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The number of handle failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `5XX`.'
+          description: 'The number of handled failures of requests (non-watches), by the method (`GET/PUT` etc.), and the code `5XX`.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -928,7 +928,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: rps
-          description: 'The number of read action by `get/getRecursive`, local to this member.'
+          description: 'The number of read actions by `get/getRecursive`, local to this member.'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1366,7 +1366,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of receive failures from a peer with the ID `{#ETCD.PEER}`.'
+              description: 'The number of received failures from a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1401,7 +1401,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of send failures from a peer with the ID `{#ETCD.PEER}`.'
+              description: 'The number of sent failures from a peer with the ID `{#ETCD.PEER}`.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
@@ -1479,7 +1479,7 @@ zabbix_export:
         -
           macro: '{$ETCD.PORT}'
           value: '2379'
-          description: 'The port of etcd API endpoint.'
+          description: 'The port of `etcd` API endpoint.'
         -
           macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
           value: '2'
@@ -1491,7 +1491,7 @@ zabbix_export:
         -
           macro: '{$ETCD.SCHEME}'
           value: http
-          description: 'The request scheme which may be http or https.'
+          description: 'The request scheme which may be `http` or `https`.'
         -
           macro: '{$ETCD.USER}'
       valuemaps:
@@ -1533,8 +1533,8 @@ zabbix_export:
       event_name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: |
-        Heavy usage of a file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.
-        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.
+        Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.
+        If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.
       tags:
         -
           tag: scope
