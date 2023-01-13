@@ -33,7 +33,7 @@ Follow these instructions:
 3. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it,  run `curl -L  http://<etcd_node_address>:2379/metrics`.
 4. Add the template to each `etcd node`. By default, the template uses a client's port.
 You can configure metrics endpoint location by adding `--listen-metrics-urls flag`.
-(For more details, see [etcd docs](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
+(For more details, see [etcd documentation](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
 
 Additional points to consider:
 
