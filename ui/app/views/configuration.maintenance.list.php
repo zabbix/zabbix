@@ -124,7 +124,9 @@ if ($data['maintenances']) {
 
 		$maintenance_list->addRow([
 			new CCheckBox('maintenanceids[' . $maintenanceid . ']', $maintenanceid),
-			new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid=' . $maintenanceid),
+			(new CLink($maintenance['name']))
+				->addClass('js-maintenance-edit')
+				->setAttribute('data-maintenanceid', $maintenance['maintenanceid']),
 			$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
 			zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),

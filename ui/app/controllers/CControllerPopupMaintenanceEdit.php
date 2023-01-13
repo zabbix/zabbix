@@ -64,15 +64,20 @@ class CControllerPopupMaintenanceEdit extends CController {
 
 	protected function doAction(): void {
 		if ($this->maintenance !== null) {
-			$data['maintenanceid'] = $this->maintenance['maintenanceid'];
-			$data['mname'] = $this->maintenance['name'];
-			$data['maintenance_type'] = $this->maintenance['maintenance_type'];
-			$data['active_since'] = date(ZBX_DATE_TIME, $this->maintenance['active_since']);
-			$data['active_till'] = date(ZBX_DATE_TIME, $this->maintenance['active_till']);
-			$data['description'] = $this->maintenance['description'];
+			$data = [
+				'maintenanceid' => $this->maintenance['maintenanceid'],
+				'mname' => $this->maintenance['name'],
+				'maintenance_type' => $this->maintenance['maintenance_type'],
+				'active_since' => date(ZBX_DATE_TIME, $this->maintenance['active_since']),
+				'active_till' => date(ZBX_DATE_TIME, $this->maintenance['active_till']),
+				'description' => $this->maintenance['description'],
+				'timeperiods' => $this->maintenance['timeperiods'],
+				'tags_evaltype' => $this->maintenance['tags_evaltype'],
+				'tags' => $this->maintenance['tags']
+			];
 
-			$data['timeperiods'] = $this->maintenance['timeperiods'];
 			CArrayHelper::sort($data['timeperiods'], ['timeperiod_type', 'start_date']);
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 			foreach ($data['timeperiods'] as &$timeperiod) {
 				$timeperiod['start_date'] = date(ZBX_DATE_TIME, $timeperiod['start_date']);
@@ -90,10 +95,6 @@ class CControllerPopupMaintenanceEdit extends CController {
 				'maintenanceids' => $data['maintenanceid'],
 				'editable' => true
 			]);
-
-			$data['tags_evaltype'] = $this->maintenance['tags_evaltype'];
-			$data['tags'] = $this->maintenance['tags'];
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 		else {
 			$data = [
@@ -127,6 +128,8 @@ class CControllerPopupMaintenanceEdit extends CController {
 				])
 				: [];
 		}
+
+		$data['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 
 		$data['hosts_ms'] = CArrayHelper::renameObjectsKeys($db_hosts, ['hostid' => 'id']);
 		CArrayHelper::sort($data['hosts_ms'], ['name']);
