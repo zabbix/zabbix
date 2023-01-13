@@ -491,7 +491,7 @@ class testUsersAuthenticationSaml extends CWebTest {
 	}
 
 	/**
-	 * @ignoreBrowserErrors
+	 * ignoreBrowserErrors
 	 * This annotation is put here for avoiding the following errors:
 	 * /favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found).
 	 *
@@ -566,6 +566,10 @@ class testUsersAuthenticationSaml extends CWebTest {
 	/**
 	 * Function checks that SAML settings are disabled by default, if the corresponding flag is specified, enables and
 	 * fills SAML settings, and submits the form.
+	 *
+	 * @param array      $fields	       given SAML settings
+	 * @param boolean    $check_enabled    check SAML fields dependency from
+	 * @param array      $data             data provider
 	 */
 	private function configureSamlAuthentication($fields, $check_enabled = false, $data = null) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
