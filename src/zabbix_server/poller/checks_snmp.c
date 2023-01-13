@@ -1180,7 +1180,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		{
 			/* The logic of iteratively reducing request size here is the same as in function */
 			/* zbx_snmp_get_values(). Please refer to the description there for explanation.  */
-
+reduce_max_vars:
 			if (*min_fail > max_vars)
 				*min_fail = max_vars;
 
@@ -1199,6 +1199,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
+			if (1 >= level)
+				goto reduce_max_vars;
+
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
@@ -1588,7 +1591,12 @@ halve:
 		}
 	}
 	else
+	{
+		if (1 <= level)
+			goto halve;
+
 		ret = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error, max_error_len);
+	}
 exit:
 	if (NULL != response)
 		snmp_free_pdu(response);
@@ -2476,7 +2484,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
 	}
-	else if (0 == strncmp(items[j].snmp_oid, "snmp.walk[", 10))
+	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
 	{
 		err = zbx_snmp_process_snmp_bulkwalk(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error));
 	}

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,19 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_PREPROCESSING_STATS_H
+#define ZABBIX_PREPROCESSING_STATS_H
 
-/**
- * Converters for convert XML values to values that API can accept.
- */
-class CTransformImportConverter extends CConverter {
+#include "zbxjson.h"
 
-	protected $rules;
+void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg);
 
-	public function __construct(array $schema) {
-		$this->rules = $schema;
-	}
-
-	public function convert($data) {
-		return $data;
-	}
-}
+#endif

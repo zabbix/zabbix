@@ -37,6 +37,9 @@ int	zbx_coredump_disable(void);
 #endif
 
 typedef void	(*zbx_on_exit_t)(int);
+typedef void	(*zbx_signal_handler_f)(int flags);
+typedef void	(*zbx_signal_redirect_f)(int flags, zbx_signal_handler_f signal_handler_cb);
+
 void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
@@ -47,7 +50,7 @@ typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
-		const char *config_log_file);
+		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb);
 void	zbx_daemon_stop(void);
 
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);

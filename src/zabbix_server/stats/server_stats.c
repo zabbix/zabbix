@@ -19,34 +19,32 @@
 
 #include "zabbix_stats.h"
 
-#include "zbxcommon.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxha.h"
-#include "zbxcomms.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
- * Parameters: json             - [IN/OUT]                                    *
- *             zbx_config_comms - [IN] server configuration for communication *
+ * Parameters: json         - [IN/OUT]                                        *
+ *             arg          - [IN] anonymous argument provided by register    *
  *                                                                            *
  * Comments: This function is used to gather server specific internal         *
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms)
+void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 {
-	zbx_vc_stats_t		vc_stats;
-	zbx_uint64_t		queue_size;
-	char			*value, *error = NULL;
-	zbx_tfc_stats_t		tcache_stats;
+	zbx_vc_stats_t			vc_stats;
+	zbx_uint64_t			queue_size;
+	char				*value, *error = NULL;
+	zbx_tfc_stats_t			tcache_stats;
 
-	ZBX_UNUSED(zbx_config_comms);
+	ZBX_UNUSED(arg);
 
 	/* zabbix[lld_queue] */
 	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))

@@ -175,16 +175,18 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item             - [IN] item we are interested in              *
- *             result           - [OUT] value of the requested item           *
- *             zbx_config_comms - [IN] Zabbix server/proxy configuration for  *
- *                                     communication                          *
+ * Parameters: item                - [IN] item we are interested in           *
+ *             result              - [OUT] value of the requested item        *
+ *             config_comms        - [IN] Zabbix server/proxy configuration   *
+ *                        for communication                                   *
+ *             config_startup_time - [IN] program startup time                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config_comms)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -306,7 +308,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, time(NULL) - config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
@@ -316,7 +318,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
+		SET_UI64_RESULT(result, config_startup_time);
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",*] */
 	{
@@ -430,9 +432,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	{
 		int	res;
 
-		zbx_alarm_on(zbx_config_comms->config_timeout);
+		zbx_alarm_on(config_comms->config_timeout);
 		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
-				zbx_config_comms->config_timeout);
+				config_comms->config_timeout);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)
@@ -769,7 +771,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_zabbix_stats_get(&json, zbx_config_comms);
+				zbx_zabbix_stats_get(&json, config_startup_time);
 
 				zbx_json_close(&json);
 

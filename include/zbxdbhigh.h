@@ -194,6 +194,14 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_SORT_ASC(field)	field " asc"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc"
+#else
+#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -480,7 +488,7 @@ void	DBinit_autoincrement_options(void);
 int	DBconnect(int flag);
 void	DBclose(void);
 
-int	zbx_db_validate_config_features(void);
+int	zbx_db_validate_config_features(unsigned char program_type);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(void);
 #endif
@@ -831,7 +839,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #define ZBX_MAX_HRECORDS	1000
