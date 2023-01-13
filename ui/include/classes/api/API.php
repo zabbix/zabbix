@@ -144,6 +144,13 @@ class API {
 	}
 
 	/**
+	 * @return CConnector
+	 */
+	public static function Connector() {
+		return self::getApi('connector');
+	}
+
+	/**
 	 * @return CCorrelation
 	 */
 	public static function Correlation() {
