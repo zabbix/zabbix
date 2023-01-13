@@ -313,8 +313,6 @@ int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step)
 			zbx_variant_clear(value);
 			zbx_variant_set_error(value, zbx_strdup(NULL, step->error_handler_params));
 			break;
-		default:
-
 	}
 
 	return step->error_handler;
