@@ -46,7 +46,7 @@ $fields = [
 	'status'          => [T_ZBX_STR, O_OPT, null,  null,                    null],
 	'agent'           => [T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'],
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
-		'(isset({add}) || isset({update})) && {agent} == '.ZBX_AGENT_OTHER
+		'(isset({add}) || isset({update})) && isset({agent}) && {agent} == '.ZBX_AGENT_OTHER
 	],
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    null],
 	'steps'           => [null,      O_OPT, P_NO_TRIM|P_ONLY_TD_ARRAY,  null,                    'isset({add}) || isset({update})', _('Steps')],
