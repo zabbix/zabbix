@@ -45,7 +45,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	size_t		str_alloc = 0, str_offset = 0;
 	char		delim = '\0';
 
-	zbx_connector_deserialize_connector(message->data, message->size, &connector, connector_objects);
+	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector, connector_objects);
 
 	zbx_vector_connector_data_point_sort(connector_objects, connector_object_compare_func);
 	for (i = 0; i < connector_objects->values_num; i++)

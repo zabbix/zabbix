@@ -203,7 +203,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 				break;
 			}
 
-			zbx_connector_serialize_object_data(&data, &data_alloc, &data_offset,
+			zbx_connector_serialize_data_point(&data, &data_alloc, &data_offset,
 					&object_link->connector_data_points.values[i]);
 		}
 
