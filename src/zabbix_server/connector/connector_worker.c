@@ -37,7 +37,7 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 }
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
-		zbx_vector_connector_data_point_t *connector_objects)
+		zbx_vector_connector_data_point_t *connector_data_points)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -45,17 +45,18 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	size_t		str_alloc = 0, str_offset = 0;
 	char		delim = '\0';
 
-	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector, connector_objects);
+	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector,
+			connector_data_points);
 
-	zbx_vector_connector_data_point_sort(connector_objects, connector_object_compare_func);
-	for (i = 0; i < connector_objects->values_num; i++)
+	zbx_vector_connector_data_point_sort(connector_data_points, connector_object_compare_func);
+	for (i = 0; i < connector_data_points->values_num; i++)
 	{
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, delim);
-		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, connector_objects->values[i].str);
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, connector_data_points->values[i].str);
 		delim = '\n';
 	}
 
-	zbx_vector_connector_data_point_clear_ext(connector_objects, zbx_connector_data_point_free);
+	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
 			str, ZBX_RETRIEVE_MODE_BOTH, connector.http_proxy, 0,
@@ -97,7 +98,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_connector_data_point_t	connector_objects;
+	zbx_vector_connector_data_point_t	connector_data_points;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -120,7 +121,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	zbx_vector_connector_data_point_create(&connector_objects);
+	zbx_vector_connector_data_point_create(&connector_data_points);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -138,7 +139,7 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
-				worker_process_request(&socket, &message, &connector_objects);
+				worker_process_request(&socket, &message, &connector_data_points);
 				break;
 		}
 

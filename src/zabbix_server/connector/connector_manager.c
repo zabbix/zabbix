@@ -209,11 +209,11 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 
 		if (i != object_link->connector_data_points.values_num)
 		{
-			zbx_vector_connector_data_point_t	connector_objects_remaining;
+			zbx_vector_connector_data_point_t	connector_data_points_remaining;
 
-			zbx_vector_connector_data_point_create(&connector_objects_remaining);
+			zbx_vector_connector_data_point_create(&connector_data_points_remaining);
 
-			zbx_vector_connector_data_point_append_array(&connector_objects_remaining,
+			zbx_vector_connector_data_point_append_array(&connector_data_points_remaining,
 					&object_link->connector_data_points.values[i],
 					object_link->connector_data_points.values_num - i);
 
@@ -221,7 +221,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 			zbx_vector_connector_data_point_clear_ext(&object_link->connector_data_points,
 					zbx_connector_data_point_free);
 			zbx_vector_connector_data_point_destroy(&object_link->connector_data_points);
-			object_link->connector_data_points = connector_objects_remaining;
+			object_link->connector_data_points = connector_data_points_remaining;
 		}
 		else
 		{
