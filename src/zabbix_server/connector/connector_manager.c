@@ -276,7 +276,7 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now)
 			continue;
 
 		connector->time_flush = now + ZBX_CONNECTOR_FLUSH_INTERVAL;
-		zabbix_log(LOG_LEVEL_INFORMATION, "connector->senders:%d", connector->senders);
+
 		while (connector->senders < connector->max_senders)
 		{
 			connector_get_next_task(connector, &message, worker);
@@ -466,7 +466,6 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 			time_idle = 0;
 			processed_num = 0;
 		}
-
 
 		connector_assign_tasks(&manager, time_now);
 
