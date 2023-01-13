@@ -137,7 +137,7 @@ static void	timekeeper_thread_unlock(void *data)
  * Return value: The created sync object.                                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_timekeeper_sync_t	*timekeeper_create_thread_sync()
+static zbx_timekeeper_sync_t	*timekeeper_create_thread_sync(void)
 {
 	zbx_timekeeper_sync_t	*sync = (zbx_timekeeper_sync_t *)zbx_malloc(NULL, sizeof(zbx_timekeeper_sync_t));
 	pthread_mutex_t		*mutex;

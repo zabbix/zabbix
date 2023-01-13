@@ -531,7 +531,7 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 		zabbix_log(LOG_LEVEL_TRACE, "  preprocessing steps:");
 		for (int i = 0; i < item->preproc->steps_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "    type:%u params:'%s' err_handler:%u err_params:'%s'",
+			zabbix_log(LOG_LEVEL_TRACE, "    type:%d params:'%s' err_handler:%d err_params:'%s'",
 					item->preproc->steps[i].type,
 					ZBX_NULL2EMPTY_STR(item->preproc->steps[i].params),
 					item->preproc->steps[i].error_handler,

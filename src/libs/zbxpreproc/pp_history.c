@@ -19,7 +19,7 @@
 
 #include "pp_history.h"
 
-ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t);
+ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 
 /******************************************************************************
  *                                                                            *

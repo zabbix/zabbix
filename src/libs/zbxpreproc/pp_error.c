@@ -22,7 +22,7 @@
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 
-ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *);
+ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *)
 
 /******************************************************************************
  *                                                                            *

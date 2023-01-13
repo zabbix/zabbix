@@ -112,7 +112,7 @@ int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **e
 
 	ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector.monitor:%p", __func__, collector.monitor);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() collector.monitor:%p", __func__, (void *)collector.monitor);
 
 	return ret;
 }
@@ -124,7 +124,7 @@ int	zbx_init_selfmon_collector(zbx_get_config_forks_f get_config_forks, char **e
  ******************************************************************************/
 void	zbx_free_selfmon_collector(void)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector.monitor:%p", __func__, collector.monitor);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector.monitor:%p", __func__, (void *)collector.monitor);
 
 	if (NULL == collector.monitor)
 		return;

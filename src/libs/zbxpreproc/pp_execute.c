@@ -916,8 +916,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, unsigned char 
 
 	pp_cache_copy_value(cache, step->type, value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%u params:'%s' value:'%s' cache:%p", __func__, step->type,
-			ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), cache);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__, step->type,
+			ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
 
 	switch (step->type)
 	{
@@ -1030,7 +1030,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 {
 	zbx_pp_result_t		*results;
 	zbx_pp_history_t	*history;
-	int			quote_error;
+	int			quote_error, results_num, action;
+	zbx_variant_t		value_raw;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
@@ -1051,10 +1052,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * (size_t)preproc->steps_num);
 	history = (0 != preproc->history_num ? zbx_pp_history_create(preproc->history_num) : NULL);
-
-	int		results_num = 0;
-	zbx_variant_t	value_raw;
-	int		action;
+	results_num = 0;
 
 	zbx_variant_set_none(&value_raw);
 

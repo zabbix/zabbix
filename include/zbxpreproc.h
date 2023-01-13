@@ -35,7 +35,7 @@ typedef struct
 }
 zbx_pp_step_history_t;
 
-ZBX_VECTOR_DECL(pp_step_history, zbx_pp_step_history_t);
+ZBX_VECTOR_DECL(pp_step_history, zbx_pp_step_history_t)
 
 /* item preprocessing history for preprocessing steps using previous values */
 typedef struct
@@ -128,7 +128,7 @@ typedef struct
 }
 zbx_pp_result_t;
 
-ZBX_PTR_VECTOR_DECL(pp_result_ptr, zbx_pp_result_t *);
+ZBX_PTR_VECTOR_DECL(pp_result_ptr, zbx_pp_result_t *)
 
 void	zbx_pp_result_free(zbx_pp_result_t *result);
 
