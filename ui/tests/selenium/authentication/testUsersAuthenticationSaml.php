@@ -125,8 +125,8 @@ class testUsersAuthenticationSaml extends CWebTest {
 			}
 		}
 
-		$this->checkHint('Media type mapping', 'Map user’s SAML media attributes (e.g. email) to Zabbix user media for'.
-				' sending notifications.', $form
+		$this->checkHint('Media type mapping', "Map user's SAML media attributes (e.g. email) to Zabbix user media for".
+				" sending notifications.", $form
 		);
 
 		// Check Group mapping dialog.

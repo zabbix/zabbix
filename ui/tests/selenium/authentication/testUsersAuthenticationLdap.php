@@ -181,8 +181,8 @@ class testUsersAuthenticationLdap extends CWebTest {
 			'Group configuration' => 'memberOf is a preferable way to configure groups because it is faster. '.
 					'Use groupOfNames if your LDAP server does not support memberOf or group filtering is required.',
 			'Reference attribute' => 'Use %{ref} in group filter to reference value of this user attribute.',
-			'Media type mapping' => 'Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending '.
-					'notifications.'
+			'Media type mapping' => "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending".
+					" notifications."
 		];
 
 		$this->checkHints($hintboxes, $server_form);
