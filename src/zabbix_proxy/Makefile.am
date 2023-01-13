@@ -91,6 +91,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_builddir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	rtc/libzbxrtc_proxy.a \

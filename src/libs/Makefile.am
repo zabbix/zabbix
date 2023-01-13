@@ -54,6 +54,7 @@ DIST_SUBDIRS = \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxthreads \
 	zbxtime \
@@ -101,6 +102,7 @@ SERVER_SUBDIRS = \
 	zbxshmem \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
 	zbxtrends \
@@ -142,6 +144,7 @@ PROXY_SUBDIRS = \
 	zbxshmem \
 	zbxstats \
 	zbxstr \
+	zbxtagfilter \
 	zbxtasks \
 	zbxtime \
 	zbxtrends \
