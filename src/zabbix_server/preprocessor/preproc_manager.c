@@ -182,7 +182,7 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
  *             value_opt  - [IN] the optional value data                      *
  *                                                                            *
  ******************************************************************************/
-void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
+static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -407,8 +407,8 @@ static void	preprocessor_reply_diag_info(zbx_pp_manager_t *manager, zbx_ipc_clie
 
 static int	preprocessor_compare_sequence_stats(const void *d1, const void *d2)
 {
-	zbx_pp_sequence_stats_t *s1 = *(zbx_pp_sequence_stats_t **)d1;
-	zbx_pp_sequence_stats_t *s2 = *(zbx_pp_sequence_stats_t **)d2;
+	const zbx_pp_sequence_stats_t *s1 = *(const zbx_pp_sequence_stats_t * const *)d1;
+	const zbx_pp_sequence_stats_t *s2 = *(const zbx_pp_sequence_stats_t * const *)d2;
 
 	return s2->tasks_num - s1->tasks_num;
 }
@@ -587,7 +587,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 
 		if (0 < tasks.values_num)
 		{
-			processed_num += tasks.values_num;
+			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
 			zbx_pp_tasks_clear(&tasks);
 		}

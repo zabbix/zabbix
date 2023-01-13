@@ -464,7 +464,7 @@ zbx_uint32_t	zbx_preprocessor_pack_test_result(unsigned char **data, const zbx_p
 	offset += preprocessor_pack_history(offset, history, &history_num);
 
 	zbx_ipc_message_init(&message);
-	size = message_pack_data(&message, fields, offset - fields);
+	size = message_pack_data(&message, fields, (int)(offset - fields));
 	*data = message.data;
 
 	zbx_free(fields);
@@ -521,7 +521,7 @@ zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_v
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len;
 
-	data_len = (zbx_uint32_t)(usage->values_num * sizeof(double) + sizeof(int));
+	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int));
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
 
@@ -658,7 +658,7 @@ zbx_uint32_t	zbx_preprocessor_unpack_value(zbx_preproc_item_value_t *value, unsi
 
 	value->result = agent_result;
 
-	return (int)(offset - data);
+	return (zbx_uint32_t)(offset - data);
 }
 
 /******************************************************************************
@@ -725,13 +725,13 @@ void	zbx_preprocessor_unpack_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t 
  *             data  - [IN] the input data                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, const unsigned char *data)
+static void	preprocessor_unpack_usage_stats(zbx_vector_dbl_t *usage, const unsigned char *data)
 {
 	const unsigned char	*offset = data;
 	int			usage_num;
 
 	offset += zbx_deserialize_value(offset, &usage_num);
-	zbx_vector_dbl_reserve(usage, usage_num);
+	zbx_vector_dbl_reserve(usage, (size_t)usage_num);
 
 	for (int i = 0; i < usage_num; i++)
 	{
@@ -960,7 +960,7 @@ static zbx_uint32_t	preprocessor_pack_test_request(unsigned char **data, unsigne
 		offset += preprocessor_pack_step(offset, steps->values[i]);
 
 	zbx_ipc_message_init(&message);
-	size = message_pack_data(&message, fields, offset - fields);
+	size = message_pack_data(&message, fields, (int)(offset - fields));
 	*data = message.data;
 	zbx_free(fields);
 
@@ -1111,7 +1111,7 @@ int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, char **error)
 		return FAIL;
 	}
 
-	zbx_preprocessor_unpack_usage_stats(usage, result);
+	preprocessor_unpack_usage_stats(usage, result);
 	zbx_free(result);
 
 	return SUCCEED;

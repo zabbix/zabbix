@@ -77,7 +77,7 @@ static int	pp_execute_multiply(unsigned char value_type, zbx_variant_t *value, c
  * Purpose: return preprocessing 'trim' step descriptions for error messages  *
  *                                                                            *
  ******************************************************************************/
-static const char	*pp_trim_desc(unsigned char type)
+static const char	*pp_trim_desc(int type)
 {
 	switch (type)
 	{
@@ -102,7 +102,7 @@ static const char	*pp_trim_desc(unsigned char type)
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_trim(unsigned char type, zbx_variant_t *value, const char *params)
+static int	pp_execute_trim(int type, zbx_variant_t *value, const char *params)
 {
 	char	*errmsg = NULL, *characters;
 
@@ -143,7 +143,7 @@ static int	pp_check_not_error(const zbx_variant_t *value)
  * Purpose: return preprocessing 'delta' step descriptions for error messages *
  *                                                                            *
  ******************************************************************************/
-static const char	*pp_delta_desc(unsigned char type)
+static const char	*pp_delta_desc(int type)
 {
 	switch (type)
 	{
@@ -172,7 +172,7 @@ static const char	*pp_delta_desc(unsigned char type)
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_delta(unsigned char type, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
+static int	pp_execute_delta(int type, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
 		zbx_variant_t *history_value, zbx_timespec_t *history_ts)
 {
 	char	*errmsg = NULL;
@@ -208,9 +208,9 @@ static int	pp_execute_regsub(zbx_variant_t *value, const char *params)
 		return SUCCEED;
 
 	if (NULL == (ptr = strchr(params, '\n')))
-		len = strlen(params);
+		len = (int)strlen(params);
 	else
-		len = ptr - params;
+		len = (int)(ptr - params);
 
 	zbx_variant_clear(value);
 	zbx_variant_set_error(value, zbx_dsprintf(NULL, "cannot perform regular expression \"%.*s\""
@@ -334,7 +334,7 @@ static int	pp_execute_jsonpath(zbx_pp_cache_t *cache, zbx_variant_t *value, cons
  * Purpose: return 'to dec' step descriptions for error messages              *
  *                                                                            *
  ******************************************************************************/
-static const char	*pp_2dec_desc(unsigned char type)
+static const char	*pp_2dec_desc(int type)
 {
 	switch (type)
 	{
@@ -361,7 +361,7 @@ static const char	*pp_2dec_desc(unsigned char type)
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_2dec(unsigned char type, zbx_variant_t *value)
+static int	pp_execute_2dec(int type, zbx_variant_t *value)
 {
 	char	*errmsg = NULL, *value_desc;
 
@@ -1049,12 +1049,12 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		goto out;
 	}
 
-	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * preproc->steps_num);
+	results = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t) * (size_t)preproc->steps_num);
 	history = (0 != preproc->history_num ? zbx_pp_history_create(preproc->history_num) : NULL);
 
 	int		results_num = 0;
 	zbx_variant_t	value_raw;
-	unsigned char	action;
+	int		action;
 
 	zbx_variant_set_none(&value_raw);
 

@@ -9131,7 +9131,8 @@ void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, in
 static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, zbx_uint64_t hostid,
 		const ZBX_DC_PREPROCITEM *preprocitem)
 {
-	preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) * preprocitem->preproc_ops.values_num);
+	preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) *
+			(size_t)preprocitem->preproc_ops.values_num);
 
 	for (int i = 0; i < preprocitem->preproc_ops.values_num; i++)
 	{
@@ -9160,7 +9161,8 @@ static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, const ZBX
 	for (int i = 0; i < masteritem->dep_itemids.values_num; i++)
 		preproc->dep_itemids[i] = masteritem->dep_itemids.values[i].first;
 
-	qsort(preproc->dep_itemids, preproc->dep_itemids_num, sizeof(zbx_uint64_t), ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	qsort(preproc->dep_itemids, (size_t)preproc->dep_itemids_num, sizeof(zbx_uint64_t),
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	preproc->dep_itemids_num = masteritem->dep_itemids.values_num;
 }

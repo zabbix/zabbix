@@ -2286,8 +2286,8 @@ zbx_history_dupl_select_t;
 
 static int	history_value_compare_func(const void *d1, const void *d2)
 {
-	const ZBX_DC_HISTORY	*i1 = *(const ZBX_DC_HISTORY **)d1;
-	const ZBX_DC_HISTORY	*i2 = *(const ZBX_DC_HISTORY **)d2;
+	const ZBX_DC_HISTORY	*i1 = *(const ZBX_DC_HISTORY * const *)d1;
+	const ZBX_DC_HISTORY	*i2 = *(const ZBX_DC_HISTORY * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->itemid, i2->itemid);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->value_type, i2->value_type);

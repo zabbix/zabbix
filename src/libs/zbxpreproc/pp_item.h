@@ -27,7 +27,5 @@
 void	pp_item_clear(zbx_pp_item_t *item);
 
 zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
-int	zbx_pp_preproc_has_history(unsigned char type);
-
 
 #endif

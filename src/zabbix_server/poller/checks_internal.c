@@ -36,7 +36,7 @@ extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
-	const DC_INTERFACE2	*i1 = (DC_INTERFACE2 *)p1, *i2 = (DC_INTERFACE2 *)p2;
+	const DC_INTERFACE2	*i1 = (const DC_INTERFACE2 *)p1, *i2 = (const DC_INTERFACE2 *)p2;
 
 	if (i1->type > i2->type)		/* 1st criterion: 'type' in ascending order */
 		return 1;
@@ -492,7 +492,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	{
 		int	res;
 
-		zbx_alarm_on(zbx_config_comms->config_timeout);
+		zbx_alarm_on((unsigned int)zbx_config_comms->config_timeout);
 		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
 				zbx_config_comms->config_timeout);
 		zbx_alarm_off();
@@ -518,7 +518,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		process_type = get_process_type_by_name(get_rparam(&request, 1));
+		process_type = (unsigned char)get_process_type_by_name(get_rparam(&request, 1));
 
 		switch (process_type)
 		{
@@ -782,7 +782,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			else if (0 == strcmp(tmp1, "pfree"))
 			{
 				SET_DBL_RESULT(result, (double)(stats.memory_total - stats.memory_used) /
-						stats.memory_total * 100);
+						(double)stats.memory_total * 100);
 			}
 			else if (0 == strcmp(tmp1, "total"))
 			{
@@ -794,7 +794,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			}
 			else if (0 == strcmp(tmp1, "pused"))
 			{
-				SET_DBL_RESULT(result, (double)stats.memory_used / stats.memory_total * 100);
+				SET_DBL_RESULT(result, (double)stats.memory_used / (double)stats.memory_total * 100);
 			}
 			else
 			{
@@ -892,7 +892,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 
 					zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
+					zbx_json_addint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
 							DCget_item_queue(NULL, from, to));
 
 					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
@@ -979,19 +979,19 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.misses / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "phits"))
 		{
 			zbx_uint64_t	total = stats.hits + stats.misses;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.hits / (double)total * 100));
 		}
 		else if (0 == strcmp(tmp, "pitems"))
 		{
 			zbx_uint64_t	total = stats.items_num + stats.requests_num;
 
-			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / total * 100));
+			SET_DBL_RESULT(result, (0 == total ? 0 : (double)stats.items_num / (double)total * 100));
 		}
 		else
 		{

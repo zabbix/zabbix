@@ -36,8 +36,7 @@ ZBX_PTR_VECTOR_IMPL(pp_result_ptr, zbx_pp_result_t *);
  *                              'moved' over to result.                       *
  *                                                                            *
  ******************************************************************************/
-void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, unsigned char action,
-		zbx_variant_t *value_raw)
+void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, int action, zbx_variant_t *value_raw)
 {
 	zbx_variant_copy(&result->value, value);
 	result->value_raw = *value_raw;
@@ -121,7 +120,7 @@ static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text
 
 	if (-1 != field->bytes_num)
 	{
-		bytes_num = strlen(text);
+		bytes_num = (int)strlen(text);
 		if (bytes_num > field->bytes_num)
 			return FAIL;
 	}
@@ -130,7 +129,7 @@ static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text
 
 	if (-1 != field->chars_num)
 	{
-		chars_num = zbx_strlen_utf8(text);
+		chars_num = (int)zbx_strlen_utf8(text);
 		if (chars_num > field->chars_num)
 			return FAIL;
 	}

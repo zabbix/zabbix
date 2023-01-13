@@ -382,7 +382,7 @@ static void	diag_add_preproc_sequences(struct zbx_json *json, const char *field,
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, "itemid", sequences->values[i]->itemid);
-		zbx_json_adduint64(json, "tasks", sequences->values[i]->tasks_num);
+		zbx_json_addint64(json, "tasks", sequences->values[i]->tasks_num);
 		zbx_json_close(json);
 	}
 
@@ -458,10 +458,10 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 					zbx_vector_pp_sequence_stats_ptr_create(&sequences);
 					time1 = zbx_time();
 
-					if (SUCCEED != (ret = zbx_preprocessor_get_top_sequences(map->value, &sequences,
-							error)))
+					if (SUCCEED != (ret = zbx_preprocessor_get_top_sequences((int)map->value,
+							&sequences, error)))
 					{
-						zbx_vector_ptr_destroy(&sequences);
+						zbx_vector_pp_sequence_stats_ptr_destroy(&sequences);
 						goto out;
 					}
 

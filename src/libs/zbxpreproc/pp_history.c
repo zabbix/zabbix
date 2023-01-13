@@ -37,7 +37,7 @@ zbx_pp_history_t	*zbx_pp_history_create(int history_num)
 	zbx_vector_pp_step_history_create(&history->step_history);
 
 	if (0 != history_num)
-		zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
+		zbx_vector_pp_step_history_reserve(&history->step_history, (size_t)history_num);
 
 	return history;
 }
@@ -68,7 +68,7 @@ void	pp_history_free(zbx_pp_history_t *history)
  ******************************************************************************/
 void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num)
 {
-	zbx_vector_pp_step_history_reserve(&history->step_history, history_num);
+	zbx_vector_pp_step_history_reserve(&history->step_history, (size_t)history_num);
 }
 
 /******************************************************************************

@@ -155,7 +155,7 @@ int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant_t *val
 			if (SUCCEED == zbx_is_uint64(params, &multiplier_ui64))
 				value_ui64 = value_num.data.ui64 * multiplier_ui64;
 			else
-				value_ui64 = (double)value_num.data.ui64 * atof(params);
+				value_ui64 = (zbx_uint64_t)((double)value_num.data.ui64 * atof(params));
 
 			zbx_variant_clear(value);
 			zbx_variant_set_ui64(value, value_ui64);
@@ -181,7 +181,7 @@ int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant_t *val
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *ts, unsigned char op_type,
+static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *ts, int op_type,
 		const zbx_variant_t *history_value, const zbx_timespec_t *history_ts)
 {
 	if (0 == history_ts->sec || history_value->data.dbl > value->data.dbl)
@@ -219,7 +219,7 @@ static int	item_preproc_delta_float(zbx_variant_t *value, const zbx_timespec_t *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t *ts, unsigned char op_type,
+static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t *ts, int op_type,
 		const zbx_variant_t *history_value, const zbx_timespec_t *history_ts)
 {
 	if (0 == history_ts->sec || history_value->data.ui64 > value->data.ui64)
@@ -231,9 +231,9 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
 			if (0 <= zbx_timespec_compare(history_ts, ts))
 				return FAIL;
 
-			value->data.ui64 = (value->data.ui64 - history_value->data.ui64) /
+			value->data.ui64 = (zbx_uint64_t)((double)(value->data.ui64 - history_value->data.ui64) /
 					((ts->sec - history_ts->sec) +
-						(double)(ts->ns - history_ts->ns) / 1000000000);
+						(double)(ts->ns - history_ts->ns) / 1000000000));
 			break;
 		case ZBX_PREPROC_DELTA_VALUE:
 			value->data.ui64 = value->data.ui64 - history_value->data.ui64;
@@ -260,7 +260,7 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *                                                                            *
  ******************************************************************************/
 int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		unsigned char op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
+		int op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
 {
 	zbx_variant_t			value_num;
 
@@ -311,7 +311,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
  *             out     - [OUT] the value to process                           *
  *                                                                            *
  ******************************************************************************/
-static void	unescape_param(int op_type, const char *in, int len, char *out)
+static void	unescape_param(int op_type, const char *in, size_t len, char *out)
 {
 	const char	*end = in + len;
 
@@ -364,7 +364,7 @@ static void	unescape_param(int op_type, const char *in, int len, char *out)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg)
+int	item_preproc_trim(zbx_variant_t *value, int op_type, const char *params, char **errmsg)
 {
 	char	params_raw[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
@@ -502,7 +502,7 @@ static int	is_uhex(const char *str)
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg)
+int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg)
 {
 #define OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
 #define HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
@@ -894,12 +894,12 @@ int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *para
 		goto out;
 	}
 
-	if (NULL == (doc = xmlReadMemory(value_str.data.str, strlen(value_str.data.str), "noname.xml", NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(value_str.data.str, (int)strlen(value_str.data.str), "noname.xml", NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)params, xpathCtx)))
 	{
 		pErr = xmlGetLastError();
 		*error = zbx_dsprintf(*error, "cannot parse xpath \"%s\": %s", params, pErr->message);
@@ -1066,7 +1066,7 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
 {
 	int	ret, timeout, period = 0;
 
-	if (FAIL == zbx_is_time_suffix(params, &timeout, strlen(params)))
+	if (FAIL == zbx_is_time_suffix(params, &timeout, (int)strlen(params)))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
 		zbx_variant_clear(history_value);
@@ -1123,11 +1123,11 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 			goto fail;
 
 		zbx_variant_clear(bytecode);
-		zbx_variant_set_bin(bytecode, zbx_variant_data_bin_create(code, size));
+		zbx_variant_set_bin(bytecode, zbx_variant_data_bin_create(code, (zbx_uint32_t)size));
 		zbx_free(code);
 	}
 
-	size = zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
+	size = (int)zbx_variant_data_bin_get(bytecode->data.bin, (void **)&code);
 
 	if (SUCCEED == zbx_es_execute(es, params, code, size, value->data.str, &output, errmsg))
 	{
@@ -1556,7 +1556,7 @@ int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg)
  ******************************************************************************/
 int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	unsigned int	len_search, len_replace;
+	size_t		len_search, len_replace;
 	const char	*ptr;
 	char		*new_string, search_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 			replace_str[ZBX_ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
@@ -1568,7 +1568,7 @@ int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **er
 		return FAIL;
 	}
 
-	if (0 == (len_search = ptr - params))
+	if (0 == (len_search = (size_t)(ptr - params)))
 	{
 		*errmsg = zbx_strdup(*errmsg, "first parameter is expected");
 		return FAIL;

@@ -133,7 +133,7 @@ void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pp_preproc_has_history(unsigned char type)
+int	zbx_pp_preproc_has_history(int type)
 {
 	switch (type)
 	{

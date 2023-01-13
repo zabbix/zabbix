@@ -59,10 +59,10 @@ zbx_pp_process_mode_t;
 
 typedef struct
 {
-	unsigned char	type;
-	unsigned char	error_handler;
-	char		*params;
-	char		*error_handler_params;
+	int	type;
+	int	error_handler;
+	char	*params;
+	char	*error_handler_params;
 }
 zbx_pp_step_t;
 
@@ -124,7 +124,7 @@ typedef struct
 {
 	zbx_variant_t	value;
 	zbx_variant_t	value_raw;
-	unsigned char	action;
+	int		action;
 }
 zbx_pp_result_t;
 
@@ -161,7 +161,7 @@ void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
 zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(unsigned char type, unsigned char value_type, unsigned char flags);
 void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
-int	zbx_pp_preproc_has_history(unsigned char type);
+int	zbx_pp_preproc_has_history(int type);
 
 typedef struct zbx_pp_manager zbx_pp_manager_t;
 

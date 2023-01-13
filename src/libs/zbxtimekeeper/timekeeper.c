@@ -547,7 +547,7 @@ int	zbx_timekeeper_get_usage(zbx_timekeeper_t *timekeeper, zbx_vector_dbl_t *usa
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_dbl_reserve(usage, timekeeper->units_num);
+	zbx_vector_dbl_reserve(usage, (size_t)timekeeper->units_num);
 
 	timekeeper->sync->lock(timekeeper->sync->data);
 

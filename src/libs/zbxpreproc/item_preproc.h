@@ -34,11 +34,11 @@ int	item_preproc_convert_value(zbx_variant_t *value, unsigned char type, char **
 
 int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant_t *value, const char *params,
 		char **errmsg);
-int	item_preproc_trim(zbx_variant_t *value, unsigned char op_type, const char *params, char **errmsg);
+int	item_preproc_trim(zbx_variant_t *value, int op_type, const char *params, char **errmsg);
 int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		unsigned char op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg);
+		int op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg);
 int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg);
-int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char **errmsg);
+int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg);
 int	item_preproc_validate_range(unsigned char value_type, const zbx_variant_t *value, const char *params,
 		char **errmsg);
 int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, char **error);

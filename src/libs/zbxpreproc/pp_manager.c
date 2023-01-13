@@ -119,7 +119,7 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, char **error)
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
 
 	manager->workers_num = workers_num;
-	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, workers_num, sizeof(zbx_pp_worker_t));
+	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_pp_worker_t));
 
 	for (i = 0; i < workers_num; i++)
 	{

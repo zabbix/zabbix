@@ -78,7 +78,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		*error = zbx_strdup(NULL, "Missing value type field.");
 		goto out;
 	}
-	*value_type = atoi(buffer);
+	*value_type = (unsigned char)atoi(buffer);
 
 	if (FAIL == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_SINGLE, buffer, sizeof(buffer), NULL))
 		*single = 0;
@@ -119,7 +119,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		{
 			int	delay;
 
-			if ('-' != *ptr || FAIL == zbx_is_time_suffix(ptr + 1, &delay, strlen(ptr + 1)))
+			if ('-' != *ptr || FAIL == zbx_is_time_suffix(ptr + 1, &delay, (int)strlen(ptr + 1)))
 			{
 				*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", buffer);
 				goto out;
@@ -148,7 +148,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_steps, ptr));)
 	{
 		zbx_pp_step_t	*step;
-		unsigned char	step_type, error_handler;
+		int		step_type, error_handler;
 
 		if (FAIL == zbx_json_brackets_open(ptr, &jp_step))
 		{
@@ -242,8 +242,8 @@ out:
 int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	char				*values[2] = {NULL, NULL}, *preproc_error = NULL;
-	int				i, single, state, bypass_first, ret = FAIL, values_num = 0;
-	unsigned char			value_type, first_step_type;
+	int				i, single, state, bypass_first, ret = FAIL, values_num = 0, first_step_type;
+	unsigned char			value_type;
 	zbx_vector_pp_step_ptr_t	steps;
 	zbx_timespec_t			ts[2];
 	zbx_pp_result_t			*result;
@@ -338,7 +338,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 			if (ZBX_PREPROC_FAIL_DEFAULT != result->action)
 			{
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_ACTION, result->action);
+				zbx_json_addint64(json, ZBX_PROTO_TAG_ACTION, result->action);
 				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value_raw.data.err,
 						ZBX_JSON_TYPE_STRING);
 
