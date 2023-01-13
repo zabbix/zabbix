@@ -900,9 +900,9 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 
 			connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
 					sizeof(connector_local));
-			zbx_list_create(&connector->queue);
+			zbx_list_create(&connector->object_link_queue);
 
-			zbx_hashset_create_ext(&connector->object_link, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			zbx_hashset_create_ext(&connector->object_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC, object_link_clean,
 					ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 					ZBX_DEFAULT_MEM_FREE_FUNC);
@@ -926,7 +926,6 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		connector->password = zbx_strdup(connector->password, dc_connector->password);
 		connector->verify_peer = dc_connector->verify_peer;
 		connector->verify_host = dc_connector->verify_host;
-
 		connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
 		connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
 		connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);

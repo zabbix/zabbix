@@ -611,8 +611,8 @@ typedef struct
 	char			*ssl_key_file;
 	char			*ssl_key_password;
 
-	zbx_list_t		queue;
-	zbx_hashset_t		object_link;
+	zbx_hashset_t		object_links;
+	zbx_list_t		object_link_queue;
 	int			time_flush;
 	int			senders;
 }

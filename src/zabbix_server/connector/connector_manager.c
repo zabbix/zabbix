@@ -83,8 +83,8 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_free(connector->ssl_cert_file);
 	zbx_free(connector->ssl_key_file);
 	zbx_free(connector->ssl_key_password);
-	zbx_list_destroy(&connector->queue);
-	zbx_hashset_destroy(&connector->object_link);
+	zbx_list_destroy(&connector->object_link_queue);
+	zbx_hashset_destroy(&connector->object_links);
 }
 
 static void	object_link_clean(zbx_object_link_t *object_link)
@@ -189,7 +189,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_ipc_message_
 	zbx_object_link_t	*object_link;
 	int			i, records = 0, ret = SUCCEED;
 
-	while (SUCCEED == ret && SUCCEED == zbx_list_pop(&connector->queue, (void **)&object_link))
+	while (SUCCEED == ret && SUCCEED == zbx_list_pop(&connector->object_link_queue, (void **)&object_link))
 	{
 		if (NULL == data)
 			zbx_connector_serialize_connector(&data, &data_alloc, &data_offset, connector);
@@ -324,17 +324,17 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 				}
 			}
 
-			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_link,
+			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_links,
 					&connector_objects->values[i].objectid)))
 			{
 				zbx_object_link_t	object_link_local = {.objectid =
 						connector_objects->values[i].objectid};
 
 				object_link = (zbx_object_link_t *)zbx_hashset_insert(
-						&connector->object_link, &object_link_local, sizeof(object_link_local));
+						&connector->object_links, &object_link_local, sizeof(object_link_local));
 				zbx_vector_connector_data_point_create(&object_link->connector_data_points);
 
-				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
+				zbx_list_insert_after(&connector->object_link_queue, NULL, object_link, NULL);
 			}
 
 			connector_data_point.ts = connector_objects->values[i].ts;
@@ -390,7 +390,7 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 		{
 			zbx_object_link_t	*object_link;
 
-			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_link,
+			if (NULL == (object_link = (zbx_object_link_t *)zbx_hashset_search(&connector->object_links,
 					&worker->ids.values[i])))
 			{
 				continue;
@@ -398,10 +398,10 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 
 			if (0 == object_link->connector_data_points.values_num)
 			{
-				zbx_hashset_remove_direct(&connector->object_link, object_link);
+				zbx_hashset_remove_direct(&connector->object_links, object_link);
 			}
 			else
-				zbx_list_insert_after(&connector->queue, NULL, object_link, NULL);
+				zbx_list_insert_after(&connector->object_link_queue, NULL, object_link, NULL);
 		}
 
 		connector->senders--;
