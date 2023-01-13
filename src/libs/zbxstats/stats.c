@@ -26,9 +26,10 @@
 #include "zbxself.h"
 #include "preproc.h"
 
-static zbx_get_program_type_f		get_program_type_cb;
-static zbx_vector_stats_ext_func_t	stats_ext_funcs;
-static zbx_vector_stats_ext_func_t	stats_data_funcs;
+static zbx_get_program_type_f			get_program_type_cb;
+static zbx_vector_stats_ext_func_t		stats_ext_funcs;
+static zbx_vector_stats_ext_func_t		stats_data_funcs;
+static zbx_zabbix_stats_procinfo_func_t		procinfo_funcs[ZBX_PROCESS_TYPE_COUNT];
 
 ZBX_PTR_VECTOR_IMPL(stats_ext_func, zbx_stats_ext_func_entry_t *)
 
@@ -78,54 +79,46 @@ void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_
 	zbx_vector_stats_ext_func_append(&stats_data_funcs, entry);
 }
 
-static void	add_preprocessor_worker_stats(struct zbx_json *json)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register process information callback for the specified process   *
+ *          type                                                              *
+ *                                                                            *
+ * Parameters: proc_type   - [IN] the process type                            *
+ *             procinfo_cb - [IN] the process information callback            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_register_stats_procinfo_func(int proc_type, zbx_zabbix_stats_procinfo_func_t procinfo_cb)
 {
-	zbx_vector_dbl_t	usage;
-	char			*error = NULL;
-	double			min, max, total;
-
-	zbx_vector_dbl_create(&usage);
-
-	if (SUCCEED != zbx_preprocessor_get_usage_stats(&usage, &error))
+	if (0 <= proc_type && proc_type < ZBX_PROCESS_TYPE_COUNT)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get preprocessor usage statistics: %s", error);
-		zbx_free(error);
-		goto out;
+		procinfo_funcs[proc_type] = procinfo_cb;
 	}
+}
 
-	if (0 == usage.values_num)
-		goto out;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add process information to json                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	stats_add_procinfo(struct zbx_json *json, int proc_type, zbx_process_info_t *info)
+{
+	if (0 == info->count)
+		return;
 
-	min = max = total = usage.values[0];
-
-	for (int i = 1; i < usage.values_num; i++)
-	{
-		if (usage.values[i] < min)
-			min = usage.values[i];
-
-		if (usage.values[i] > max)
-			max = usage.values[i];
-
-		total += usage.values[i];
-	}
-
-	total /= usage.values_num;
-
-	zbx_json_addobject(json, get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR));
+	zbx_json_addobject(json, get_process_type_string((unsigned char)proc_type));
 	zbx_json_addobject(json, "busy");
-	zbx_json_addfloat(json, "avg", total);
-	zbx_json_addfloat(json, "max", max);
-	zbx_json_addfloat(json, "min", min);
+	zbx_json_addfloat(json, "avg", info->busy_avg);
+	zbx_json_addfloat(json, "max", info->busy_max);
+	zbx_json_addfloat(json, "min", info->busy_min);
 	zbx_json_close(json);
 	zbx_json_addobject(json, "idle");
-	zbx_json_addfloat(json, "avg", 100.0 - total);
-	zbx_json_addfloat(json, "max", 100.0 - max);
-	zbx_json_addfloat(json, "min", 100.0 - min);
+	zbx_json_addfloat(json, "avg", info->idle_avg);
+	zbx_json_addfloat(json, "max", info->idle_max);
+	zbx_json_addfloat(json, "min", info->idle_min);
 	zbx_json_close(json);
-	zbx_json_addint64(json, "count", usage.values_num);
+	zbx_json_addint64(json, "count", info->count);
 	zbx_json_close(json);
-out:
-	zbx_vector_dbl_destroy(&usage);
 }
 
 /******************************************************************************
@@ -239,27 +232,15 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 	{
 		for (proc_type = 0; proc_type < ZBX_PROCESS_TYPE_COUNT; proc_type++)
 		{
-			if (ZBX_PROCESS_TYPE_PREPROCESSOR != proc_type)
+			if (NULL != procinfo_funcs[proc_type])
 			{
-				if (0 == process_stats[proc_type].count)
-					continue;
+				zbx_process_info_t	info;
 
-				zbx_json_addobject(json, get_process_type_string((unsigned char)proc_type));
-				zbx_json_addobject(json, "busy");
-				zbx_json_addfloat(json, "avg", process_stats[proc_type].busy_avg);
-				zbx_json_addfloat(json, "max", process_stats[proc_type].busy_max);
-				zbx_json_addfloat(json, "min", process_stats[proc_type].busy_min);
-				zbx_json_close(json);
-				zbx_json_addobject(json, "idle");
-				zbx_json_addfloat(json, "avg", process_stats[proc_type].idle_avg);
-				zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
-				zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
-				zbx_json_close(json);
-				zbx_json_addint64(json, "count", process_stats[proc_type].count);
-				zbx_json_close(json);
+				procinfo_funcs[proc_type](&info);
+				stats_add_procinfo(json, proc_type, &info);
 			}
 			else
-				add_preprocessor_worker_stats(json);
+				stats_add_procinfo(json, proc_type, &process_stats[proc_type]);
 		}
 	}
 

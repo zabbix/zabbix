@@ -476,7 +476,6 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, zbx_ipc_cl
 	zbx_vector_dbl_destroy(&usage);
 }
 
-
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
