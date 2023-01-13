@@ -47,6 +47,10 @@ class testUsersAuthenticationLdap extends CWebTest {
 		$this->page->assertHeader('Authentication');
 		$this->assertTrue($form->getField('Enable LDAP authentication')->isEnabled());
 
+		// Check that Update button is clickable and no other buttons present.
+		$this->assertTrue($form->query('button:Update')->one()->isClickable());
+		$this->assertEquals(1, $form->query('xpath:.//ul[@class="table-forms"]//button')->all()->count());
+
 		// Check LDAP form default values.
 		$form->checkValue([
 			'Enable LDAP authentication' => false,
@@ -181,65 +185,78 @@ class testUsersAuthenticationLdap extends CWebTest {
 					'notifications.'
 		];
 
+		$this->checkHints($hintboxes, $server_form);
+
+		// Check group mapping popup.
+		$group_mapping_dialog = $this->checkMapping('User group mapping', 'New user group mapping', $server_form,
+				['LDAP group pattern', 'User groups', 'User role']
+		);
+
+		// Check hint in group mapping popup.
+		$this->checkHints(['LDAP group pattern' => "Naming requirements:\ngroup name must match LDAP group name".
+				"\nwildcard patterns with '*' may be used"], $group_mapping_dialog->asForm()
+		);
+
+		// Close Group mapping dialog.
+		$group_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
+
+		// Check media type mapping popup.
+		$media_mapping_dialog = $this->checkMapping('Media type mapping', 'New media type mapping',
+				$server_form, ['Name', 'Media type', 'Attribute']
+		);
+
+		// Close Media mapping dialog.
+		$media_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
+
+		$server_dialog->close();
+	}
+
+	/**
+	 * Check mapping form in dialog.
+	 *
+	 * @param string          $field	 field which mapping is checked
+	 * @param string          $title     title in dialog
+	 * @param CFormElement    $form      LDAP form
+	 * @param array           $labels    labels in mapping form
+	 */
+	private function checkMapping($field, $title, $form, $labels) {
+		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
+		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals($title, $mapping_dialog->getTitle());
+		$mapping_form = $mapping_dialog->asForm();
+
+		foreach ($labels as $label) {
+			$mapping_field = $mapping_form->getField($label);
+			$this->assertTrue($mapping_field->isVisible());
+			$this->assertTrue($mapping_field->isEnabled());
+			$this->assertStringContainsString('form-label-asterisk', $mapping_form->getLabel($label)->getAttribute('class'));
+		}
+
+		$values = ($field === 'Media type mapping')
+			? ['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']
+			: ['LDAP group pattern' => '', 'User groups' => '', 'User role' => ''];
+
+		$mapping_form->checkValue($values);
+
+		// Check group mapping popup footer buttons.
+		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
+
+		return $mapping_dialog;
+	}
+
+	/**
+	 * Check hints for labels in form.
+	 *
+	 * @param array			   $hintboxes	label which hint is checked
+	 * @param CFormElement     $form        given form
+	 */
+	private function checkHints($hintboxes, $form) {
 		foreach ($hintboxes as $field => $text) {
-			$server_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+			$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
 			$this->assertEquals($text, $hint->getText());
 			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 		}
-
-		// Check group mapping popup.
-		$server_form->getFieldContainer('User group mapping')->query('button:Add')->waitUntilClickable()->one()->click();
-		$group_mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$this->assertEquals('New user group mapping', $group_mapping_dialog->getTitle());
-		$group_mapping_form = $group_mapping_dialog->asForm();
-
-		foreach (['LDAP group pattern', 'User groups', 'User role'] as $label) {
-			$field = $group_mapping_form->getField($label);
-			$this->assertTrue($field->isVisible());
-			$this->assertTrue($field->isEnabled());
-			$this->assertEquals('', $field->getValue());
-			$this->assertStringContainsString('form-label-asterisk', $group_mapping_form->getLabel($label)->getAttribute('class'));
-		}
-
-		// Check hint in group mapping popup.
-		$group_mapping_form->query('xpath:.//label[text()="LDAP group pattern"]/a')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
-		$text = "Naming requirements:".
-				"\ngroup name must match LDAP group name".
-				"\nwildcard patterns with '*' may be used";
-		$this->assertEquals($text, $hint->getText());
-		$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
-
-		// Check group mapping popup footer buttons.
-		$group_mapping_footer = $group_mapping_dialog->getFooter();
-		$this->assertTrue($group_mapping_footer->query('button:Add')->one()->isClickable());
-		$group_mapping_footer->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		// Check media type mapping popup.
-		$server_form->getFieldContainer('Media type mapping')->query('button:Add')->waitUntilClickable()->one()->click();
-		$media_mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$this->assertEquals('New media type mapping', $media_mapping_dialog->getTitle());
-		$media_mapping_form = $media_mapping_dialog->asForm();
-
-		foreach (['Name', 'Media type', 'Attribute'] as $label) {
-			$field = $media_mapping_form->getField($label);
-			$this->assertTrue($field->isVisible());
-			$this->assertTrue($field->isEnabled());
-			$this->assertStringContainsString('form-label-asterisk',
-					$media_mapping_form->getLabel($label)->getAttribute('class')
-			);
-		}
-
-		// Check default values in  media type mapping popup.
-		$media_mapping_form->checkValue(['Name' => '', 'id:mediatypeid' => 'Brevis.one', 'Attribute' => '']);
-
-		// Check media mapping popup footer buttons.
-		$media_mapping_footer = $media_mapping_dialog->getFooter();
-		$this->assertTrue($media_mapping_footer->query('button:Add')->one()->isClickable());
-		$media_mapping_footer->query('button:Cancel')->waitUntilClickable()->one()->click();
-
-		$server_dialog->close();
 	}
 
 	public function getTestData() {
