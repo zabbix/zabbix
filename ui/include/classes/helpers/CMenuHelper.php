@@ -354,6 +354,9 @@ class CMenuHelper {
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Geographical maps')))
 							->setAction('geomaps.edit'),
+						(new CMenuItem(_('Connectors')))
+							->setAction('connector.list')
+							->setAliases(['connector.edit']),
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),

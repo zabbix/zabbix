@@ -869,6 +869,10 @@ function getAdministrationGeneralSubmenu() {
 		->setArgument('action', 'module.list')
 		->getUrl();
 
+	$connectors_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'connector.list')
+		->getUrl();
+
 	$miscconfig_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
@@ -884,6 +888,7 @@ function getAdministrationGeneralSubmenu() {
 				$trigdisplay_url    => _('Trigger displaying options'),
 				$geomap_url			=> _('Geographical maps'),
 				$modules_url        => _('Modules'),
+				$connectors_url     => _('Connectors'),
 				$miscconfig_url     => _('Other')
 			])
 		]
