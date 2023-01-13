@@ -2307,10 +2307,17 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.31rc1
 
 New features:
+.........T [ZBXNEXT-7962] fixed interfaces discovery rules in OPNsense and PFSense templates (drasikhov)
 ...G...... [ZBXNEXT-6119] added option to retrieve all JSON data from container info key in Zabbix agent 2 docker plugin (esneiders)
 .......PS. [ZBXNEXT-8058] reduced locking between history syncers, trappers and proxy pollers (vso)
 
 Bug fixes:
+...G...... [ZBX-21862] updated tablespaces query for oracle plugin in Zabbix agent 2 (esneiders)
+...G...... [ZBX-21665] fixed SMART plugin infinite loop for Zabbix agent 2 (esneiders)
+...G...... [ZBX-19138] fixed Redis plugin configuration in Zabbix agent 2 configuration files (esneiders)
+..F.....S. [ZBX-21563] changed the order in which escalation steps and recovery operations are executed (asitals, rlataria)
+.......... [ZBX-21783] fixed Zabbix JS timeout validation (asestakovs)
+........S. [ZBX-22126] fixed trends being deleted from cache and retrieved from database when data older than 1 hour is received (vso)
 A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
 .........T [ZBX-21540] moved some static items under LLD rules to improve performance in Oracle by Zabbix agent 2 template (knaglis)
 .........T [ZBX-22071] extended description for OPSGenie media type (atocko)
