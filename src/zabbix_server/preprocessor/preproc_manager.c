@@ -337,7 +337,7 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
  *             tasks   - [IN] the processed tasks                             *
  *                                                                            *
  ******************************************************************************/
-static void	prpeprocessor_reply_test_result(zbx_pp_task_t *task)
+static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
 {
 	unsigned char		*data;
 	zbx_uint32_t		len;
@@ -374,7 +374,7 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 				prpeprocessor_flush_value_result(manager, tasks->values[i]);
 				break;
 			case ZBX_PP_TASK_TEST:
-				prpeprocessor_reply_test_result(tasks->values[i]);
+				preprocessor_reply_test_result(tasks->values[i]);
 				break;
 			default:
 				/* the internal tasks (dependent/sequence) shouldn't get here */
