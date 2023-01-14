@@ -457,7 +457,6 @@ class CHistoryManager {
 			'size' => 1
 		];
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$filters = [
 			[
 				[
@@ -487,8 +486,9 @@ class CHistoryManager {
 				[
 					'range' => [
 						'clock' => [
-							'lt' => $clock
-						] + ($history_period ? ['gte' => $clock - $history_period] : [])
+							'lt' => $clock,
+							'gte' => $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+						]
 					]
 				]
 			]
@@ -544,8 +544,7 @@ class CHistoryManager {
 			return $row;
 		}
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$time_from = $history_period !== null ? $clock - $history_period : null;
+		$time_from = $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 		if ($hk_history_global == 1) {
 			$time_from = max($time_from, time() - $hk_history + 1);
@@ -607,8 +606,7 @@ class CHistoryManager {
 		}
 
 		if ($max_clock == 0) {
-			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-			$time_from = $history_period !== null ? $clock - $history_period : null;
+			$time_from = $clock - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
 			if ($hk_history_global == 1) {
 				$time_from = max($time_from, time() - $hk_history + 1);
