@@ -535,12 +535,11 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		const char *timeout, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
 		unsigned char verify_peer, unsigned char verify_host, unsigned char authtype, const char *username,
 		const char *password, unsigned char post_type, char *status_codes, unsigned char output_format,
-		char **out)
+		char **out, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *headers_ptr, *line, *buffer,
-				*error = NULL;
+	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *headers_ptr, *line, *buffer;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
@@ -556,7 +555,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		*out = zbx_strdup(NULL, "Cannot initialize cURL library");;
+		*error = zbx_strdup(NULL, "Cannot initialize cURL library");;
 		goto clean;
 	}
 
@@ -571,65 +570,59 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			*out = zbx_strdup(NULL, "Invalid retrieve mode");
+			*error = zbx_strdup(NULL, "Invalid retrieve mode");
 			goto clean;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb, curl_body_cb, errbuf,
-			&error))
+			error))
 	{
-		*out = error;
 		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, http_proxy)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
 			0 == follow_redirects ? 0L : 1L)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot set follow redirects: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set follow redirects: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (0 != follow_redirects &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (FAIL == zbx_is_time_suffix(timeout, &timeout_seconds, strlen(timeout)))
 	{
-		*out = zbx_dsprintf(NULL, "Invalid timeout: %s", timeout);
+		*error = zbx_dsprintf(NULL, "Invalid timeout: %s", timeout);
 		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)timeout_seconds)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
-			verify_peer, verify_host, &error))
+			verify_peer, verify_host, error))
 	{
-		*out = error;
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_auth(easyhandle, authtype, username, password, &error))
-	{
-		*out = error;
+	if (SUCCEED != zbx_http_prepare_auth(easyhandle, authtype, username, password, error))
 		goto clean;
-	}
 
-	if (SUCCEED != http_prepare_request(easyhandle, posts, request_method, &error))
+	if (SUCCEED != http_prepare_request(easyhandle, posts, request_method, error))
 	{
-		*out = error;
 		goto clean;
 	}
 
@@ -656,7 +649,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -664,7 +657,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 #endif
@@ -672,13 +665,13 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	zbx_snprintf(url_buffer, sizeof(url_buffer),"%s%s", url, query_fields);
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url_buffer)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
@@ -688,11 +681,11 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	{
 		if (CURLE_WRITE_ERROR == err)
 		{
-			*out = zbx_strdup(NULL, "The requested value is too large");
+			*error = zbx_strdup(NULL, "The requested value is too large");
 		}
 		else
 		{
-			*out = zbx_dsprintf(NULL, "Cannot perform request: %s",
+			*error = zbx_dsprintf(NULL, "Cannot perform request: %s",
 					'\0' == *errbuf ? curl_easy_strerror(err) : errbuf);
 		}
 		goto clean;
@@ -700,35 +693,22 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 
 	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
 	{
-		*out = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
-		goto clean;
-	}
-
-	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, response_code))
-	{
-		*out = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-				" required status codes \"%s\"", response_code, status_codes);
+		*error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
 	if (NULL == header.data)
 	{
-		*out = zbx_dsprintf(NULL, "Server returned empty header");
+		*error = zbx_dsprintf(NULL, "Server returned empty header");
 		goto clean;
 	}
 
 	switch (retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL == body.data)
+			if (NULL != body.data && FAIL == zbx_is_utf8(body.data))
 			{
-				*out = zbx_dsprintf(NULL, "Server returned empty content");
-				goto clean;
-			}
-
-			if (FAIL == zbx_is_utf8(body.data))
-			{
-				*out = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
 				goto clean;
 			}
 
@@ -739,14 +719,19 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			}
 			else
 			{
-				*out = body.data;
-				body.data = NULL;
+				if (NULL != body.data)
+				{
+					*out = body.data;
+					body.data = NULL;
+				}
+				else
+					*out = zbx_strdup(NULL, "");
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
 			if (FAIL == zbx_is_utf8(header.data))
 			{
-				*out = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
 				goto clean;
 			}
 
@@ -772,7 +757,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		case ZBX_RETRIEVE_MODE_BOTH:
 			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
 			{
-				*out = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
 				goto clean;
 			}
 
@@ -789,6 +774,13 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 				header.data = NULL;
 			}
 			break;
+	}
+
+	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, response_code))
+	{
+		*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
+				" required status codes \"%s\"", response_code, status_codes);
+		goto clean;
 	}
 
 	ret = SUCCEED;

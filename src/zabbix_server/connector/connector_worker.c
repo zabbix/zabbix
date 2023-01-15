@@ -41,7 +41,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 {
 	zbx_connector_t	connector;
 	int		i;
-	char		*str = NULL, *out = NULL;
+	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 	char		delim = '\0';
 
@@ -59,16 +59,49 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
-			str, ZBX_RETRIEVE_MODE_BOTH, connector.http_proxy, 0,
+			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
 			connector.timeout, connector.ssl_cert_file, connector.ssl_key_file, connector.ssl_key_password,
 			connector.verify_peer, connector.verify_host, connector.authtype, connector.username,
-			connector.password, ZBX_POSTTYPE_NDJSON, "", HTTP_STORE_RAW,
-			&out))
+			connector.password, ZBX_POSTTYPE_NDJSON, "200", HTTP_STORE_RAW,
+			&out, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, out);
+		char	*info = NULL;
+
+		if (NULL != out)
+		{
+			struct zbx_json_parse	jp;
+			size_t			info_alloc = 0;
+
+			if (SUCCEED != zbx_json_open(out, &jp))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve error from \"%s\": %s response: %s",
+						connector.url, zbx_json_strerror(), out);
+			}
+			else
+			{
+				if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_ERROR, &info, &info_alloc,
+					NULL))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot find error tag in response from \"%s\""
+							" response: %s", connector.url, out);
+					info = NULL;
+				}
+			}
+		}
+
+		if (NULL != info)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s: %s", connector.url,
+					error, info);
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
+
+		zbx_free(info);
 	}
 
 	zbx_free(str);
+	zbx_free(error);
 	zbx_free(out);
 
 	zbx_free(connector.url);

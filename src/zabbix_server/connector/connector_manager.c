@@ -179,7 +179,7 @@ static zbx_connector_worker_t	*connector_get_free_worker(zbx_connector_manager_t
 	return NULL;
 }
 
-static void	connector_get_next_task(zbx_connector_t *connector,  zbx_connector_worker_t *worker,
+static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_worker_t *worker,
 		unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -412,23 +412,22 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
-	zbx_ipc_service_t			service;
-	char					*error = NULL;
-	zbx_ipc_client_t			*client;
-	zbx_ipc_message_t			*message;
-	int					ret, processed_num = 0;
-	double					time_stat, time_idle = 0, time_now, sec;
-	zbx_timespec_t				timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
-	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_vector_connector_object_t		connector_objects;
-	zbx_connector_manager_t			manager;
+	zbx_ipc_service_t		service;
+	char				*error = NULL;
+	zbx_ipc_client_t		*client;
+	zbx_ipc_message_t		*message;
+	int				ret, processed_num = 0;
+	double				time_stat, time_idle = 0, time_now, sec;
+	zbx_timespec_t			timeout = {ZBX_CONNECTOR_MANAGER_DELAY, 0};
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_vector_connector_object_t	connector_objects;
+	zbx_connector_manager_t		manager;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-#define	FLUSH_INTERVAL	1
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 				server_num, get_process_type_string(process_type), process_num);
