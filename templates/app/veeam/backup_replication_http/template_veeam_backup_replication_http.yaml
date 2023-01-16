@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-13T06:36:37Z'
+  date: '2023-01-16T06:20:30Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -52,7 +52,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: raw
+              value: status
           triggers:
             -
               uuid: 502cb582546046a29267715763c46bff
