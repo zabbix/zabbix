@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-13T15:51:50Z'
+  date: '2023-01-16T11:05:06Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -50,7 +50,7 @@ zabbix_export:
               name: 'Etcd: Cluster version has changed'
               event_name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Etcd version has changed. Acknowledge (Ack) to close manually.'
+              description: 'The Etcd version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1008,7 +1008,7 @@ zabbix_export:
               name: 'Etcd: Server version has changed'
               event_name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Etcd version has changed. Acknowledge (Ack) to close manually.'
+              description: 'The Etcd version has changed. Acknowledge to close manually.'
               manual_close: 'YES'
               tags:
                 -
