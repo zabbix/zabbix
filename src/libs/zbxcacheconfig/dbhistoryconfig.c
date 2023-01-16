@@ -957,8 +957,12 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_hashset_iter_reset(connectors, connector_iter);
 	}
 
-	if (dc_global_revision != *global_revision)
+	if (dc_global_revision != *global_revision || SUCCEED == connectors_updated)
 	{
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
+
 		zbx_hashset_iter_reset(connectors, &iter);
 		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
@@ -977,6 +981,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 			}
 		}
 
+		zbx_dc_close_user_macros(um_handle);
 		*global_revision = dc_global_revision;
 	}
 }
