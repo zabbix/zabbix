@@ -210,8 +210,7 @@ static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_match_tags(unsigned char eval_type, const zbx_vector_match_tags_t *match_tags,
-		const zbx_vector_tags_t *entity_tags)
+int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, const zbx_vector_tags_t *entity_tags)
 {
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR != eval_type && ZBX_CONDITION_EVAL_TYPE_OR != eval_type)
 	{

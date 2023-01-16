@@ -32,8 +32,7 @@ zbx_match_tag_t;
 
 ZBX_PTR_VECTOR_DECL(match_tags, zbx_match_tag_t*)
 
-int	zbx_match_tags(unsigned char eval_type, const zbx_vector_match_tags_t *match_tags,
-		const zbx_vector_tags_t *entity_tags);
+int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, const zbx_vector_tags_t *entity_tags);
 
 void	zbx_sort_tags(zbx_vector_tags_t *tags);
 void	zbx_sort_match_tags(zbx_vector_match_tags_t *tags);
