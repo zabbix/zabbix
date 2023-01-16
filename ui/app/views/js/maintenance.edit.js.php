@@ -20,7 +20,7 @@
 ?>
 
 
-window.maintenance_edit_popup = new class {
+window.maintenance_edit = new class {
 
 	init() {}
 

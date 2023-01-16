@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupMaintenanceEdit extends CController {
+class CControllerMaintenanceEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [

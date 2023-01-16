@@ -26,7 +26,7 @@
 $form = (new CForm())
 	->cleanItems()
 	->setId('maintenance_period_form')
-	->addVar('action', 'popup.maintenance.period')
+	->addVar('action', 'maintenance.period')
 	->addVar('refresh', 1)
 	->addVar('update', $data['update'])
 	->addVar('index', $data['index']);
@@ -194,7 +194,7 @@ $output = [
 		]
 	],
 	'params' => $data['params'],
-	'script_inline' => $this->readJsFile('popup.maintenance.period.js.php')
+	'script_inline' => $this->readJsFile('maintenance.period.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

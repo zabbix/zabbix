@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('configuration.maintenance.list.js.php');
+$this->includeJsFile('maintenance.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maintenance periods'))

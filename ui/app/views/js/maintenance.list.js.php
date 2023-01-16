@@ -46,7 +46,7 @@
 		}
 
 		_edit(parameters = {}) {
-			const overlay = PopUp('popup.maintenance.edit', parameters, {
+			const overlay = PopUp('maintenance.edit', parameters, {
 				dialogueid: 'maintenance-edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true

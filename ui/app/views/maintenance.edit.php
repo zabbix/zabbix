@@ -272,7 +272,7 @@ $maintenance_tab = (new CFormGrid())
 $form
 	->addItem($maintenance_tab)
 	->addItem(
-		(new CScriptTag('maintenance_edit_popup.init();'))->setOnDocumentReady()
+		(new CScriptTag('maintenance_edit.init();'))->setOnDocumentReady()
 	);
 
 if ($data['maintenanceid'] !== 0) {
@@ -281,14 +281,14 @@ if ($data['maintenanceid'] !== 0) {
 			'title' => _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'maintenance_edit_popup.submit();'
+			'action' => 'maintenance_edit.submit();'
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'maintenance_edit_popup.clone();'
+			'action' => 'maintenance_edit.clone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -296,7 +296,7 @@ if ($data['maintenanceid'] !== 0) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'maintenance_edit_popup.delete();'
+			'action' => 'maintenance_edit.delete();'
 		]
 	];
 }
@@ -307,7 +307,7 @@ else {
 			'class' => 'js-add',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'maintenance_edit_popup.submit();'
+			'action' => 'maintenance_edit.submit();'
 		]
 	];
 }
@@ -318,7 +318,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.maintenance.edit.js.php')
+		$this->readJsFile('maintenance.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
