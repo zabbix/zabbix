@@ -27,7 +27,7 @@ class CHistoryManager {
 	/**
 	 * @var bool
 	 */
-	private bool $primary_keys_enabled = false;
+	private $primary_keys_enabled = false;
 
 	/**
 	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
