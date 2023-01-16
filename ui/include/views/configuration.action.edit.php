@@ -29,6 +29,7 @@ $widget = (new CWidget())->setTitle(_('Actions'));
 
 // create form
 $actionForm = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('action.edit')
 	->setName('action.edit')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -496,7 +497,7 @@ $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$action_tabs->setSelected(0);
 }
 

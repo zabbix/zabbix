@@ -26,6 +26,7 @@
 $output = [
 	'header' => $data['title'],
 	'body' => (new CForm())
+		->cleanItems()
 		->addItem([
 			$data['errors'],
 			(new CTabView())->addTab('scriptTab', null,

@@ -137,6 +137,7 @@ class CScreenHostgroupTriggers extends CScreenHostTriggers {
 			$header = (new CDiv([
 				new CTag('h4', true, _('Host group issues')),
 				(new CForm('get', $this->pageFile))
+					->cleanItems()
 					->addItem(
 						(new CList())
 							->addItem([new CLabel(_('Group'), $groups_select->getFocusableElementId()), '&nbsp;',

@@ -6381,6 +6381,11 @@ msgstr "Für Feld \"%1$s\"fehlt ein Wert für Screen \"%2$s\"."
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr "Das Feld \"%1$s\" ist nicht korrekt: %2$s"
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -20152,6 +20157,10 @@ msgstr "Ungültige Adressbereich \"%1$s\""
 #: include/classes/validators/CApiInputValidator.php:279
 msgid "invalid byte sequence in UTF-8"
 msgstr "ungültigen Byte-Sequenz in UTF-8"
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"

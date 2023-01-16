@@ -33,6 +33,7 @@ if (!empty($data['hostid'])) {
 
 // Create form.
 $form = (new CForm())
+	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('itemForm')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -857,11 +858,11 @@ $itemTab = (new CTabView())
 	->addTab('preprocTab', _('Preprocessing'),
 		(new CFormList('item_preproc_list'))
 			->addRow(_('Preprocessing steps'),
-				getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+				getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 			)
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$itemTab->setSelected(0);
 }
 

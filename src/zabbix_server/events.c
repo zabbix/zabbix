@@ -161,7 +161,7 @@ static void	get_item_tags_by_expression(const char *expression, zbx_vector_ptr_t
 
 	zbx_vector_uint64_create(&functionids);
 	get_functionids(&functionids, expression);
-	zbx_dc_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
+	zbx_dc_config_history_sync_get_item_tags_by_functionids(functionids.values, functionids.values_num, item_tags);
 	zbx_vector_uint64_destroy(&functionids);
 }
 
