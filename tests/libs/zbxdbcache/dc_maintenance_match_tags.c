@@ -37,14 +37,6 @@ static int	dc_compare_maintenance_tags(const void *d1, const void *d2)
 	return strcmp(tag1->tag, tag2->tag);
 }
 
-static int	dc_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
 static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tags)
 {
 	zbx_mock_error_t		mock_err;
@@ -94,7 +86,7 @@ static void	get_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tags)
 		zbx_vector_ptr_append(tags, tag);
 	}
 
-	zbx_vector_ptr_sort(tags, dc_compare_tags);
+	zbx_vector_ptr_sort(tags, zbx_compare_tags);
 }
 
 static void	get_maintenance(zbx_dc_maintenance_t *maintenance)

@@ -233,19 +233,6 @@ int	zbx_match_tags(unsigned char eval_type, const zbx_vector_match_tags_t *match
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare entity tags by tag name for sorting                       *
- *                                                                            *
- ******************************************************************************/
-static int	compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t * const *)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t * const *)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compare filter tags by tag name for sorting                       *
  *                                                                            *
  ******************************************************************************/
@@ -264,7 +251,7 @@ static int	compare_match_tags(const void *d1, const void *d2)
  ******************************************************************************/
 void	zbx_sort_tags(zbx_vector_tags_t *tags)
 {
-	zbx_vector_tags_sort(tags, compare_tags);
+	zbx_vector_tags_sort(tags, zbx_compare_tags);
 }
 
 /******************************************************************************

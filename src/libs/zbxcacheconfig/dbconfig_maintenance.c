@@ -1386,19 +1386,6 @@ static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, co
 		return dc_maintenance_match_tags_or(maintenance, tags);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: compare maintenance tags by tag name for sorting                  *
- *                                                                            *
- ******************************************************************************/
-static int	dc_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
 static void	host_event_maintenance_clean(zbx_host_event_maintenance_t *host_event_maintenance)
 {
 	zbx_vector_ptr_destroy(&host_event_maintenance->maintenances);
@@ -1440,7 +1427,7 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 	{
 		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 		if (0 != query->tags.values_num)
-			zbx_vector_ptr_sort(&query->tags, dc_compare_tags);
+			zbx_vector_ptr_sort(&query->tags, zbx_compare_tags);
 	}
 
 	RDLOCK_CACHE;
