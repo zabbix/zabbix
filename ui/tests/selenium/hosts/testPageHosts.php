@@ -177,11 +177,12 @@ class testPageHosts extends CLegacyWebTest {
 					]
 				]
 			],
-			// Wrong name in filter field "Name".
+			// Apply filtering with no results in output.
 			[
 				[
 					'filter' => [
-						'Name' => 'No data should be returned'
+						'Name' => 'Disabled status',
+						'Status' => 'Enabled'
 					]
 				]
 			],
