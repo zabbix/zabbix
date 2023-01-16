@@ -268,4 +268,5 @@ void	zbx_match_tag_free(zbx_match_tag_t *tag)
 {
 	zbx_free(tag->tag);
 	zbx_free(tag->value);
+	zbx_free(tag);
 }
