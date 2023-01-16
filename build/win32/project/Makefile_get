@@ -29,6 +29,7 @@ ADD_RFLAGS = /d "ZABBIX_GET"
 OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
@@ -43,9 +44,11 @@ OBJS = \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
+	..\..\..\src\libs\zbxjson\jsonobj.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxsys\mutexs.o \
 	..\..\..\src\libs\zbxsys\symbols.o \

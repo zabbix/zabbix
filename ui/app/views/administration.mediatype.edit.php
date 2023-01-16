@@ -37,6 +37,7 @@ if ($data['form_refresh'] == 0) {
 
 // create form
 $mediaTypeForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('media-type-form')
 	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])

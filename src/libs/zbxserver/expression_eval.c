@@ -924,11 +924,12 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
 		size_t len, int args_num, const zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
-	char			func_name[MAX_STRING_LEN], *params = NULL;
-	size_t			params_alloc = 0, params_offset = 0;
-	DC_ITEM			*item;
-	int			i, ret = FAIL;
+	char				func_name[MAX_STRING_LEN], *params = NULL;
+	size_t				params_alloc = 0, params_offset = 0;
+	DC_ITEM				*item;
+	int				i, ret = FAIL;
 	zbx_expression_query_one_t	*data;
+	DC_EVALUATE_ITEM		evaluate_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %.*s(/%s/%s?[%s],...)", __func__, (int )len, name,
 			ZBX_NULL2EMPTY_STR(query->ref.host), ZBX_NULL2EMPTY_STR(query->ref.key),
@@ -977,9 +978,15 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		goto out;
 	}
 
+	evaluate_item.itemid = item->itemid;
+	evaluate_item.value_type = item->value_type;
+	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.host = item->host.host;
+	evaluate_item.key_orig = item->key_orig;
+
 	if (0 == args_num)
 	{
-		ret = evaluate_function2(value, item, func_name, "", ts, error);
+		ret = evaluate_function2(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -1010,7 +1017,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = evaluate_function2(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
@@ -1924,11 +1931,11 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 typedef struct
 {
 	int	num;
-	char	*host;
+	char	*macro;
 }
-zbx_host_index_t;
+zbx_macro_index_t;
 
-static int	host_index_compare(const void *d1, const void *d2)
+static int	macro_index_compare(const void *d1, const void *d2)
 {
 	const int	*i1 = *(const int **)d1;
 	const int	*i2 = *(const int **)d2;
@@ -1936,16 +1943,46 @@ static int	host_index_compare(const void *d1, const void *d2)
 	return *i1 - *i2;
 }
 
-static void	host_index_free(zbx_host_index_t *index)
+static void	macro_index_free(zbx_macro_index_t *index)
 {
-	zbx_free(index->host);
+	zbx_free(index->macro);
 	zbx_free(index);
+}
+
+static int	resolve_expression_query_macro(const DB_TRIGGER *trigger, int request, int func_num,
+		zbx_expression_query_t *query, char **entity, zbx_vector_ptr_t *indices)
+{
+	int			id;
+	zbx_macro_index_t	*index;
+
+	if (FAIL == (id = zbx_vector_ptr_search(indices, &func_num, macro_index_compare)))
+	{
+		index = (zbx_macro_index_t *)zbx_malloc(NULL, sizeof(zbx_macro_index_t));
+		index->num = func_num;
+		index->macro = NULL;
+		DBget_trigger_value(trigger, &index->macro, func_num, request);
+		zbx_vector_ptr_append(indices, index);
+	}
+	else
+		index = (zbx_macro_index_t *)indices->values[id];
+
+	if (NULL == index->macro)
+	{
+		query->flags = ZBX_ITEM_QUERY_ERROR;
+		query->error = zbx_dsprintf(NULL, ZBX_REQUEST_HOST_HOST == request ? "invalid host \"%s\"" :
+				"invalid item key \"%s\"", ZBX_NULL2EMPTY_STR(*entity));
+		return FAIL;
+	}
+
+	*entity = zbx_strdup(*entity, index->macro);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
 *                                                                             *
-* Purpose: resolve expression with an empty host macro (default host)         *
-*          and macro host references, like:                                   *
+* Purpose: resolve expression with an empty host macro (default host),        *
+*          macro host references and item key references, like:               *
 *          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
 *          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
 *                                                                             *
@@ -1955,51 +1992,45 @@ static void	host_index_free(zbx_host_index_t *index)
 *******************************************************************************/
 void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
 {
-	int			i, func_num, index;
-	zbx_vector_ptr_t	hosts;
-	zbx_host_index_t	*hi;
+	int			i, func_num;
+	zbx_vector_ptr_t	hosts, item_keys;
 
 	zbx_vector_ptr_create(&hosts);
+	zbx_vector_ptr_create(&item_keys);
 
 	for (i = 0; i < eval->queries.values_num; i++)
 	{
 		zbx_expression_query_t	*query = (zbx_expression_query_t *)eval->queries.values[i];
 
+		/* resolve host */
+
 		if (0 != (ZBX_ITEM_QUERY_HOST_ONE & query->flags))
-			func_num = zbx_host_macro_index(query->ref.host);
+			func_num = zbx_expr_macro_index(query->ref.host);
 		else if (0 != (ZBX_ITEM_QUERY_HOST_SELF & query->flags))
 			func_num = 1;
 		else
 			func_num = -1;
 
-		if (-1 == func_num)
+		if (-1 != func_num && FAIL == resolve_expression_query_macro(trigger, ZBX_REQUEST_HOST_HOST, func_num,
+				query, &query->ref.host, &hosts))
+		{
 			continue;
-
-		if (FAIL == (index = zbx_vector_ptr_search(&hosts, &func_num, host_index_compare)))
-		{
-			hi = (zbx_host_index_t *)zbx_malloc(NULL, sizeof(zbx_host_index_t));
-			hi->num = func_num;
-			hi->host = NULL;
-			DBget_trigger_value(trigger, &hi->host, func_num, ZBX_REQUEST_HOST_HOST);
-			zbx_vector_ptr_append(&hosts, hi);
 		}
-		else
-			hi = (zbx_host_index_t *)hosts.values[index];
 
-		if (NULL != hi->host)
+		/* resolve item key */
+
+		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
+				-1 != (func_num = zbx_expr_macro_index(query->ref.key)))
 		{
-			query->ref.host = zbx_strdup(query->ref.host, hi->host);
-			DBget_trigger_value(trigger, &query->ref.key, func_num, ZBX_REQUEST_ITEM_KEY);
-		}
-		else
-		{
-			query->error = zbx_dsprintf(NULL, "invalid host \"%s\"", ZBX_NULL2EMPTY_STR(query->ref.host));
-			query->flags = ZBX_ITEM_QUERY_ERROR;
+			resolve_expression_query_macro(trigger, ZBX_REQUEST_ITEM_KEY, func_num, query, &query->ref.key,
+					&item_keys);
 		}
 	}
 
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_index_free);
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)macro_index_free);
+	zbx_vector_ptr_clear_ext(&item_keys, (zbx_clean_func_t)macro_index_free);
 	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_ptr_destroy(&item_keys);
 }
 
 /******************************************************************************

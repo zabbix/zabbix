@@ -130,7 +130,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 

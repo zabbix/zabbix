@@ -39,6 +39,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/vector.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/hashset.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxregexp.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/persistent_state.o
@@ -46,6 +47,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json_parser.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonpath.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonobj.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sha256crypt.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
