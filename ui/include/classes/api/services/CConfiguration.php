@@ -60,7 +60,7 @@ class CConfiguration extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateExport(array $params, bool $with_unlinked_parent_templates = false): void {
+	private function validateExport(array &$params, bool $with_unlinked_parent_templates = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
