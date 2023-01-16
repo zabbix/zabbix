@@ -21,7 +21,9 @@
 
 class CControllerWebView extends CController {
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [

@@ -35,7 +35,7 @@ abstract class CController {
 	 *
 	 * @var int
 	 */
-	protected int $post_content_type = self::POST_CONTENT_TYPE_FORM;
+	private $post_content_type = self::POST_CONTENT_TYPE_FORM;
 
 	/**
 	 * Action name, so that controller knows what action he is executing.
@@ -77,7 +77,7 @@ abstract class CController {
 	 *
 	 * @var bool
 	 */
-	protected bool $validate_csrf_token = true;
+	private bool $validate_csrf_token = true;
 
 	public function __construct() {
 		$this->init();
@@ -88,6 +88,24 @@ abstract class CController {
 	 * Initialization function that can be overridden later.
 	 */
 	protected function init() {
+	}
+
+	/**
+	 * Get content type of the POST request.
+	 *
+	 * @return int
+	 */
+	protected function getPostContentType(): int {
+		return $this->post_content_type;
+	}
+
+	/**
+	 * Set content type of the POST request.
+	 *
+	 * @param int $post_content_type
+	 */
+	protected function setPostContentType(int $post_content_type): void {
+		$this->post_content_type = $post_content_type;
 	}
 
 	/**
@@ -153,6 +171,15 @@ abstract class CController {
 	 */
 	protected function checkAccess(string $rule_name): bool {
 		return CWebUser::checkAccess($rule_name);
+	}
+
+	/**
+	 * Disables CSRF token validation.
+	 *
+	 * @return void
+	 */
+	protected function disableCsrfValidation(): void {
+		$this->validate_csrf_token = false;
 	}
 
 	/**
@@ -462,7 +489,7 @@ abstract class CController {
 	 * @return CControllerResponse|null
 	 */
 	final public function run(): ?CControllerResponse {
-		if ($this->validate_csrf_token && !$this->checkCsrfToken()) {
+		if ($this->validate_csrf_token && !CCsrfTokenHelper::checkCsrfToken($this->raw_input, $this->action)) {
 			throw new CAccessDeniedException();
 		}
 

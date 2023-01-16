@@ -21,9 +21,10 @@
 
 class CControllerPopupMedia extends CController {
 	private $severities = [];
-	protected bool $validate_csrf_token = false;
 
 	protected function init() {
+		$this->disableCsrfValidation();
+
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->severities[$severity] = CSeverityHelper::getName($severity);
 		}

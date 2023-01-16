@@ -26,7 +26,9 @@ class CControllerGuiEdit extends CController {
 	 */
 	protected $timezones;
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function init() {
 		$this->timezones = [

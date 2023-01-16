@@ -47,7 +47,9 @@ class ColumnEdit extends CController {
 		'thresholds' => []
 	];
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList

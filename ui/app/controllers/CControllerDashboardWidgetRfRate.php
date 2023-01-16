@@ -21,7 +21,9 @@
 
 class CControllerDashboardWidgetRfRate extends CController {
 
-	protected int $post_content_type = self::POST_CONTENT_TYPE_JSON;
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
 
 	protected function checkInput() {
 		$fields = [

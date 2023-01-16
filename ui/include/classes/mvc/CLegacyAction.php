@@ -23,7 +23,9 @@ use CController as CAction;
 
 class CLegacyAction extends CAction {
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	public function doAction(): void {
 	}

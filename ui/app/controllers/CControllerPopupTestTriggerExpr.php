@@ -35,9 +35,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 		CExpressionParserResult::TOKEN_TYPE_LLD_MACRO,
 		CExpressionParserResult::TOKEN_TYPE_STRING
 	];
-	protected bool $validate_csrf_token = false;
 
 	protected function init() {
+		$this->disableCsrfValidation();
+
 		define('ZBX_PAGE_NO_MENU', true);
 		define('NO_LINK_IN_TESTING', true);
 

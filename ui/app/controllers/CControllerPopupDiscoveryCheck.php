@@ -29,7 +29,9 @@ class CControllerPopupDiscoveryCheck extends CController {
 	 */
 	const DEFAULT_TYPE = SVC_FTP;
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [

@@ -23,7 +23,9 @@ require_once __DIR__.'/../../include/actions.inc.php';
 
 class CControllerPopupActionConditionEdit extends CController {
 
-	protected bool $validate_csrf_token = false;
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput(): bool {
 		$fields = [

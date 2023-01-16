@@ -22,7 +22,10 @@
 class CControllerDiscoveryEdit extends CController {
 
 	private $drule = [];
-	protected bool $validate_csrf_token = false;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [

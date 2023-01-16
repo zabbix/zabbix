@@ -22,7 +22,10 @@
 class CControllerRegExEdit extends CController {
 
 	protected $db_regex = [];
-	protected bool $validate_csrf_token = false;
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
 		$fields = [
