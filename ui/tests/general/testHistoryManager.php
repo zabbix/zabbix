@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../../include/profiles.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/api/managers/CHistoryManager.php';
 require_once dirname(__FILE__).'/../../include/classes/core/CRegistryFactory.php';
 require_once dirname(__FILE__).'/../../include/classes/core/Manager.php';
