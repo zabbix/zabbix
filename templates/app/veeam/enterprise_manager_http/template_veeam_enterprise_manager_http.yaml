@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-13T07:15:14Z'
+  date: '2023-01-13T15:22:47Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -86,7 +86,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: raw
+              value: status
           triggers:
             -
               uuid: 83316e2168414042aeb9d98857534baa
@@ -147,14 +147,24 @@ zabbix_export:
             
                 getMetricsData: function() {
                     var data = {};
+                    endpoints = {
+                        'backupFiles': 'backupFiles',
+                    };
                     reports_summary = Veeam.request(Veeam.params.api_endpoint + 'reports/summary')
+                    if (typeof reports_summary !== 'object' || reports_summary.hasOwnProperty('Links') === false)
+                        throw 'Failed response parse. Check debug log for more information.';
                     reports_summary.Links.forEach(function (field)  {
                             data[field.Name] = Veeam.request(field.Href)
                         })
-                    data.backupFiles = Veeam.request(Veeam.params.api_endpoint + 'backupFiles')
-                    data.backupFiles.Refs.forEach(function (field) {
-                            data[field.Name] = Veeam.request(field.Href + '?format=Entity')
+                    Object.keys(endpoints).forEach(function (key) {
+                        data[key] = Veeam.request(Veeam.params.api_endpoint + endpoints[key]);
+                        if (typeof data[key] !== 'object' || data[key].hasOwnProperty('Refs') === false)
+                            throw 'Failed response parse. Check debug log for more information.';
+                        data[key].Refs.forEach(function (field) {
+                            data[field.Name] = Veeam.request(field.Href)
                         })
+                    
+                    })
                     return data;
                 }
             
