@@ -26,6 +26,7 @@ require_once __DIR__.'/../../include/classes/api/API.php';
 require_once __DIR__.'/../../include/classes/api/CApiServiceFactory.php';
 require_once __DIR__.'/../../include/classes/api/managers/CHistoryManager.php';
 require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
+require_once __DIR__.'/../../include/classes/api/services/CHousekeeping.php';
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CConfigGeneralHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
