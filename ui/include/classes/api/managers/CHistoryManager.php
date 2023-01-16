@@ -554,7 +554,7 @@ class CHistoryManager {
 			' FROM '.$history_table.
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock<'.zbx_dbstr($clock).
-				($time_from !== null ? ' AND clock>='.zbx_dbstr($time_from) : '').
+				' AND clock>='.zbx_dbstr($time_from).
 			' ORDER BY clock DESC, ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
@@ -616,7 +616,7 @@ class CHistoryManager {
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock<'.zbx_dbstr($clock).
-						($time_from !== null ? ' AND clock>='.zbx_dbstr($time_from) : '');
+						' AND clock>='.zbx_dbstr($time_from);
 
 			if (($row = DBfetch(DBselect($sql))) !== false) {
 				$max_clock = $row['clock'];
