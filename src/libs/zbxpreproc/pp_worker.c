@@ -31,6 +31,8 @@
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
 
+ZBX_THREAD_LOCAL int	__zbxthread__;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process preprocessing testing task                                *
@@ -106,11 +108,15 @@ static void	*pp_worker_entry(void *arg)
 	zbx_pp_worker_t	*worker = (zbx_pp_worker_t *)arg;
 	zbx_pp_queue_t	*queue = worker->queue;
 	zbx_pp_task_t	*in;
+	char		*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() id:%d", __func__, worker->id);
+	__zbxthread__ = worker->id;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "[%d] In %s()", __zbxthread__, __func__);
 
 	worker->stop = 0;
 
+	pp_context_init(&worker->execute_ctx);
 	pp_task_queue_register_worker(queue);
 	pp_task_queue_lock(queue);
 
@@ -120,8 +126,8 @@ static void	*pp_worker_entry(void *arg)
 		{
 			pp_task_queue_unlock(queue);
 
-			zabbix_log(LOG_LEVEL_TRACE, "%s() worker:%d process task type:%u itemid:" ZBX_FS_UI64, __func__,
-					worker->id, in->type, in->itemid);
+			zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() process task type:%u itemid:" ZBX_FS_UI64, __zbxthread__,
+					__func__, in->type, in->itemid);
 
 			switch (in->type)
 			{
@@ -148,8 +154,12 @@ static void	*pp_worker_entry(void *arg)
 
 		zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
 
-		if (SUCCEED != pp_task_queue_wait(queue))
+		if (SUCCEED != pp_task_queue_wait(queue, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
+			zbx_free(error);
 			worker->stop = 1;
+		}
 
 		zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 	}
@@ -157,7 +167,7 @@ static void	*pp_worker_entry(void *arg)
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ", __zbxthread__, __func__);
 
 	return (void *)0;
 }
@@ -192,8 +202,6 @@ int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_t
 		goto out;
 	}
 	worker->init_flags |= PP_WORKER_INIT_THREAD;
-
-	pp_context_init(&worker->execute_ctx);
 
 	ret = SUCCEED;
 out:

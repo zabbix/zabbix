@@ -369,6 +369,7 @@ zbx_pp_task_t	*pp_task_queue_pop_finished(zbx_pp_queue_t *queue)
  * Purpose: wait for queue notifications                                      *
  *                                                                            *
  * Parameters: queue - [IN] the task queue                                    *
+ *             error - [IN] the error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the wait succeeded                                 *
  *               FAIL    - an error has occurred                              *
@@ -376,13 +377,13 @@ zbx_pp_task_t	*pp_task_queue_pop_finished(zbx_pp_queue_t *queue)
  * Comments: This function is used by workers to wait for new tasks.          *
  *                                                                            *
  ******************************************************************************/
-int	pp_task_queue_wait(zbx_pp_queue_t *queue)
+int	pp_task_queue_wait(zbx_pp_queue_t *queue, char **error)
 {
 	int	err;
 
 	if (0 != (err = pthread_cond_wait(&queue->event, &queue->lock)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot wait for conditional variable: %s", zbx_strerror(err));
+		*error = zbx_dsprintf(NULL, "cannot wait for conditional variable: %s", zbx_strerror(err));
 		return FAIL;
 	}
 
