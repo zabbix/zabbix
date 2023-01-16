@@ -66,9 +66,11 @@ if ($data['readonly'] == true) {
 // Create form.
 $user_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken($csrf_token_action)))
+		->removeId()
+	)
 	->setId('user-form')
 	->setName('user_form')
-	->addCsrfToken($csrf_token_action)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);

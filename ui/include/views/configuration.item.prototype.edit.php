@@ -39,9 +39,15 @@ $url = (new CUrl('disc_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken((!empty($data['itemid']))
+			? 'disc_prototypes.php update'
+			: 'disc_prototypes.php add'
+		)
+	))->removeId())
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->addCsrfToken((!empty($data['itemid'])) ? 'disc_prototypes.php update' : 'disc_prototypes.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);

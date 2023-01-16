@@ -30,14 +30,16 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITLOG_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('audit.settings.update')))
+		->removeId()
+	)
 	->setId('audit-settings')
 	->setAction(
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'audit.settings.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addCsrfToken('audit.settings.update');
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([

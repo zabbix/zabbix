@@ -30,12 +30,14 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_HOUSEKEEPING_EDIT));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('housekeeping.update')))
+		->removeId()
+	)
 	->setId('housekeeping')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'housekeeping.update')
 		->getUrl()
 	)
-	->addCsrfToken('housekeeping.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())

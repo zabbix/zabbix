@@ -38,12 +38,16 @@ if ($data['form_refresh'] == 0) {
 // Create sysmap form.
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(
+			(array_key_exists('sysmapid', $data['sysmap']) && $data['sysmap']['sysmapid'] != '')
+				? 'sysmaps.php update'
+				: 'sysmaps.php add'
+		)
+	))->removeId())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
-	->addCsrfToken((array_key_exists('sysmapid', $data['sysmap']) && $data['sysmap']['sysmapid'] != '')
-		? 'sysmaps.php update'
-		: 'sysmaps.php add'
-	)
 	->addVar('form', getRequest('form', 1))
 	->addVar('current_user_userid', $data['current_user_userid'])
 	->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));

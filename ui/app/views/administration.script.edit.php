@@ -54,9 +54,12 @@ $html_page->addItem($row_template);
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['scriptid'] == 0 ? 'script.create' : 'script.update')
+	))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->addCsrfToken($data['scriptid'] == 0 ? 'script.create' : 'script.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);

@@ -28,11 +28,13 @@ $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('authentication.update')))
+		->removeId()
+	)
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 	->setId('authentication-form')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
-	->addCsrfToken('authentication.update')
 	->disablePasswordAutofill();
 
 // Authentication general fields.

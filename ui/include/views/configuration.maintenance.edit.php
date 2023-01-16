@@ -31,12 +31,15 @@ $html_page = (new CHtmlPage())
 
 $maintenance_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken((array_key_exists('maintenanceid', $data) && $data['maintenanceid'])
+			? 'maintenance.php update'
+			: 'maintenance.php add'
+		)
+	))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenanceForm')
-	->addCsrfToken((array_key_exists('maintenanceid', $data) && $data['maintenanceid'])
-		? 'maintenance.php update'
-		: 'maintenance.php add'
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 

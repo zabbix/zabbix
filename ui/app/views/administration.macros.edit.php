@@ -100,10 +100,12 @@ $save_button = (new CSubmit('update', _('Update')))->setAttribute('data-removed-
 $tab_view->setFooter(makeFormFooter($save_button));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('macros.update')))
+		->removeId()
+	)
 	->setName('macrosForm')
 	->disablePasswordAutofill()
 	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'macros.update')->getUrl())
-	->addCsrfToken('macros.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem($tab_view);
 

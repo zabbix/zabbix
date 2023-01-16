@@ -184,12 +184,14 @@ $from_list = (new CFormList())
 	);
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('miscconfig.update')))
+		->removeId()
+	)
 	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
 	)
-	->addCsrfToken('miscconfig.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())

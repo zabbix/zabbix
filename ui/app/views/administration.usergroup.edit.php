@@ -32,9 +32,12 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
+	))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
-	->addCsrfToken($data['usrgrpid'] == 0 ? 'usergroup.create' : 'usergroup.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['usrgrpid'] != 0) {

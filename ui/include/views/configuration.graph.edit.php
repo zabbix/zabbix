@@ -45,9 +45,12 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($data['graphid'] != 0) ? 'graphs.php update' : 'graphs.php add')
+	))->removeId())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
-	->addCsrfToken(($data['graphid'] != 0) ? 'graphs.php update' : 'graphs.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);

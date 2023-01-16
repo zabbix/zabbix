@@ -36,6 +36,10 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
+	))->removeId())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
 	->setAction(
@@ -43,7 +47,6 @@ $form = (new CForm())
 			->setArgument('action', ($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 			->getUrl()
 	)
-	->addCsrfToken(($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['reportid'] != 0) {

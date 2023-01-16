@@ -192,8 +192,8 @@ $form_grid = (new CFormGrid())
 	->addItem([new CLabel(_('Rules')), new CFormField($rules_table)]);
 
 $form = (new CForm('post', null, 'multipart/form-data'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.import')))->removeId())
 	->setId('import-form')
-	->addCsrfToken('popup.import')
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
 	->addItem($form_grid)

@@ -28,8 +28,8 @@ $action = $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.mass
 
 // Create form.
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken($action)))->removeId())
 	->setId('massupdate-form')
-	->addCsrfToken($action)
 	->addVar('action', $action)
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')

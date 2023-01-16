@@ -47,9 +47,15 @@ $url = (new CUrl('host_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($host_prototype['hostid'] != 0)
+			? 'host_prototypes.php update'
+			: 'host_prototypes.php add'
+		)
+	))->removeId())
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
-	->addCsrfToken(($host_prototype['hostid'] != 0) ? 'host_prototypes.php update' : 'host_prototypes.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])

@@ -24,9 +24,11 @@
  */
 
 $form = (new CForm('post'))
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('dashboard.share.update')))
+		->removeId()
+	)
 	->setId('dashboard-share-form')
 	->setName('dashboard_share_form')
-	->addCsrfToken('dashboard.share.update')
 	->addItem(getMessages());
 
 $table_user_groups = (new CTable())

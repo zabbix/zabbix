@@ -156,12 +156,14 @@ $form_list = (new CFormList())
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('trigdisplay.update')))
+		->removeId()
+	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'trigdisplay.update')
 		->getUrl()
 	)
-	->addCsrfToken('trigdisplay.update')
 	->addItem(
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $form_list)

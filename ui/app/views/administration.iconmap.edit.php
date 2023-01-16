@@ -41,12 +41,15 @@ $name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
 $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $form = (new CForm())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['iconmapid'] == 0 ? 'iconmap.create' : 'iconmap.update')
+	))->removeId())
 	->setId('iconmap')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
 		->getUrl()
 	)
-	->addCsrfToken($data['iconmapid'] == 0 ? 'iconmap.create' : 'iconmap.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1);
 

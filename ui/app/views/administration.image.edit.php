@@ -31,12 +31,15 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_EDIT));
 
 $form = (new CForm('post', (new CUrl('zabbix.php'))
-		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
-		->getUrl(), 'multipart/form-data')
-	)
-		->addCsrfToken($data['imageid'] == 0 ? 'image.create' : 'image.update')
-		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-		->addVar('imagetype', $data['imagetype']);
+	->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
+	->getUrl(), 'multipart/form-data')
+)
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['imageid'] == 0 ? 'image.create' : 'image.update')
+		))->removeId())
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addVar('imagetype', $data['imagetype']);
 
 if ($data['imageid'] != 0) {
 	$form->addVar('imageid', $data['imageid']);

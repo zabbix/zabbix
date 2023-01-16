@@ -39,9 +39,12 @@ $url = (new CUrl('httpconf.php'))
 // create form
 $http_form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($this->data['httptestid'] != '' ? 'httpconf.php update' : 'httpconf.php add')
+	))->removeId())
 	->setId('http-form')
 	->setName('httpForm')
-	->addCsrfToken($this->data['httptestid'] != '' ? 'httpconf.php update' : 'httpconf.php add')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $this->data['form'])
 	->addVar('hostid', $this->data['hostid'])

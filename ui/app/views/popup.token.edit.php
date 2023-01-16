@@ -29,9 +29,12 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $token_form = (new CForm('post', $url))
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($data['tokenid'] == 0) ? 'token.create' : 'token.update')
+	))->removeId())
 	->setId('token_form')
 	->setName('token')
-	->addCsrfToken(($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('admin_mode', $data['admin_mode'])
 	->addVar('tokenid', $data['tokenid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));

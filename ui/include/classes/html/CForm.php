@@ -73,17 +73,4 @@ class CForm extends CTag {
 
 		return $this;
 	}
-
-	/**
-	 * Adds hidden input field with CSRF token generated for specific action.
-	 *
-	 * @param string $action  action that the controller should perform after form is submitted.
-	 *
-	 * @return CForm
-	 */
-	public function addCsrfToken(string $action): CForm {
-		$this->addItem((new CVar(CController::CSRF_TOKEN_NAME, CController::generateCsrfToken($action)))->removeId());
-
-		return $this;
-	}
 }

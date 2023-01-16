@@ -31,6 +31,9 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTOREG_EDIT));
 
 $autoreg_form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('autoreg.update')))
+		->removeId()
+	)
 	->setId('autoreg-form')
 	->setName('autoreg-form')
 	->setAction((new CUrl('zabbix.php'))
@@ -38,7 +41,6 @@ $autoreg_form = (new CForm())
 		->getUrl()
 	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addCsrfToken('autoreg.update')
 	->addVar('tls_accept', $data['tls_accept']);
 
 $autoreg_tab = (new CFormList())

@@ -32,9 +32,12 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['roleid'] == null ? 'userrole.create' : 'userrole.update')
+	))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
-	->addCsrfToken($data['roleid'] == null ? 'userrole.create' : 'userrole.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['roleid'] !== null) {

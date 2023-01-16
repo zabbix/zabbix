@@ -29,13 +29,16 @@ $this->includeJsFile('configuration.host.edit.html.js.php');
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['hostid'] == 0 ? 'host.create' : 'host.update')
+	))->removeId())
 	->setId($data['form_name'])
 	->setName($data['form_name'])
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', $data['form_action'])
 		->getUrl()
 	)
-	->addCsrfToken($data['hostid'] == 0 ? 'host.create' : 'host.update')
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('full_clone', $data['full_clone'])

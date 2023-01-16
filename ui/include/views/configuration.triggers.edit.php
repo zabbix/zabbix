@@ -41,9 +41,13 @@ $url = (new CUrl('triggers.php'))
 // Create form.
 $triggersForm = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($data['triggerid'] !== null) ? 'triggers.php update' : 'triggers.php add')
+	))->removeId())
 	->setid('triggers-form')
 	->setName('triggersForm')
-	->addCsrfToken(($data['triggerid'] !== null) ? 'triggers.php update' : 'triggers.php add')
+
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])

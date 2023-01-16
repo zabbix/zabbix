@@ -149,12 +149,12 @@ $gui_view = (new CTabView())
 	));
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('gui.update')))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.update')
 		->getUrl()
 	)
-	->addCsrfToken('gui.update')
 	->addItem($gui_view);
 
 $html_page

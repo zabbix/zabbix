@@ -32,13 +32,14 @@ $html_page = (new CHtmlPage())
 // create form
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('module.update')))
+		->removeId())
 	->setName('module-form')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'module.update')
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->addCsrfToken('module.update')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create module tab

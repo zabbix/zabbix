@@ -41,12 +41,15 @@ if ($data['form_refresh'] == 0) {
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken(($data['templateid'] != 0 && $data['form'] !== 'full_clone')
+			? 'templates.php update'
+			: 'templates.php add'
+		)
+	))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm')
-	->addCsrfToken(($data['templateid'] != 0 && $data['form'] !== 'full_clone')
-		? 'templates.php update'
-		: 'templates.php add'
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form']);
 

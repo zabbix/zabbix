@@ -32,14 +32,17 @@ $html_page = (new CHtmlPage())
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
+	->addItem((new CVar(
+		CCsrfTokenHelper::CSRF_TOKEN_NAME,
+		CCsrfTokenHelper::getCsrfToken($data['correlationid'] == 0 ? 'correlation.create' : 'correlation.update')
+	))->removeId())
 	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'correlation.condition.add')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addCsrfToken($data['correlationid'] == 0 ? 'correlation.create' : 'correlation.update');
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);

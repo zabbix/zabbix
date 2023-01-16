@@ -24,9 +24,11 @@
  */
 
 $form = (new CForm())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::getCsrfToken('popup.acknowledge.create')))
+		->removeId()
+	)
 	->cleanItems()
 	->setId('acknowledge_form')
-	->addCsrfToken('popup.acknowledge.create')
 	->addVar('action', 'popup.acknowledge.create')
 	->addVar('eventids', $data['eventids']);
 
