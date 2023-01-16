@@ -488,6 +488,17 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getClassesPresentCondition($classes) {
+		$target = $this;
+
+		return function () use ($target, $classes) {
+			return $target->hasClass($classes);
+		};
+	}
+
+	/**
 	 * Check if element is ready.
 	 *
 	 * @return boolean
@@ -717,7 +728,7 @@ class CElement extends CBaseElement implements IWaitable {
 				$expected = json_encode($expected);
 			}
 
-			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
+			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
 		}
 
 		return ($expected == $value);

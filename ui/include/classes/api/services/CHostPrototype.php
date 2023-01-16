@@ -48,18 +48,8 @@ class CHostPrototype extends CHostBase {
 			// filter
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])],
-				'templateid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'inventory_mode' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -376,7 +366,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionId('gp.groupid', [0], true)
+				' AND gp.groupid IS NOT NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -418,7 +408,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT '.implode(',', $output).
 			' FROM group_prototype gp'.
 			' WHERE '.dbConditionId('gp.hostid', array_keys($result)).
-				' AND '.dbConditionString('gp.name', [''], true)
+				' AND gp.groupid IS NULL'
 		);
 
 		while ($db_group_prototype = DBfetch($db_group_prototypes)) {
@@ -562,6 +552,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateUpdate(array &$host_prototypes, array &$db_host_prototypes = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+			'uuid' => 	['type' => API_UUID],
 			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'ruleid' => ['type' => API_UNEXPECTED]
 		]];
@@ -637,6 +628,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'fields' => [
+			'uuid' =>				['type' => API_UUID],
 			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -673,6 +665,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'fields' => [
+			'uuid' =>				['type' => API_UUID],
 			'hostid' =>				['type' => API_ID],
 			'host' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -885,11 +878,12 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'groupid', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'name' => '']
-		];
-		$db_links = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.groupid,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NOT NULL'
+		);
 
 		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupLinks'][$db_link['group_prototypeid']] =
@@ -915,13 +909,14 @@ class CHostPrototype extends CHostBase {
 			return;
 		}
 
-		$options = [
-			'output' => ['group_prototypeid', 'hostid', 'name', 'templateid'],
-			'filter' => ['hostid' => $hostids, 'groupid' => '0']
-		];
-		$db_groups = DBselect(DB::makeSql('group_prototype', $options));
+		$db_links = DBselect(
+			'SELECT gp.group_prototypeid,gp.hostid,gp.name,gp.templateid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionId('gp.hostid', $hostids).
+				' AND gp.groupid IS NULL'
+		);
 
-		while ($db_link = DBfetch($db_groups)) {
+		while ($db_link = DBfetch($db_links)) {
 			$db_host_prototypes[$db_link['hostid']]['groupPrototypes'][$db_link['group_prototypeid']] =
 				array_diff_key($db_link, array_flip(['hostid']));
 		}

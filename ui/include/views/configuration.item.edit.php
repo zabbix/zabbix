@@ -38,6 +38,7 @@ $url = (new CUrl('items.php'))
 
 // Create form.
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('item-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -625,10 +626,6 @@ if ($data['display_interfaces']) {
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
 
-		if ($readonly) {
-			$select_interface->setAttribute('readonly', 'readonly');
-		}
-
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 				->setAsteriskMark()
@@ -1043,7 +1040,7 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($form, $data['preprocessing'], $readonly, $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
 				)
 			])
 			->addItem([
@@ -1059,7 +1056,7 @@ $item_tabs = (new CTabView())
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$item_tabs->setSelected(0);
 }
 

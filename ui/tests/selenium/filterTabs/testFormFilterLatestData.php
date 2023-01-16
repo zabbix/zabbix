@@ -24,8 +24,6 @@ require_once dirname(__FILE__).'/../common/testFormFilter.php';
  * @backup profiles
  *
  * @onBefore prepareUserData, pepareFilterTabsData
- *
- * @onAfter clearData
  */
 class testFormFilterLatestData extends testFormFilter {
 
@@ -241,16 +239,5 @@ class testFormFilterLatestData extends testFormFilter {
 	 */
 	public function testFormFilterLatestData_UpdateProperties() {
 		$this->updateFilterProperties('latest-filter-update', 'Update_filter_passw0rd');
-	}
-
-	/**
-	 * Delete created user data after test.
-	 */
-	public static function clearUsersData() {
-		// Delete Hosts.
-		CDataHelper::call('user.delete', [
-				self::$data['user-delete'],
-				self::$data['user-update']
-		]);
 	}
 }

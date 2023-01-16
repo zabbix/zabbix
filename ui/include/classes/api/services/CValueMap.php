@@ -47,14 +47,8 @@ class CValueMap extends CApiService {
 			// filter
 			'valuemapids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'valuemapid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'hostid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['valuemapid', 'hostid', 'name']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -179,6 +173,13 @@ class CValueMap extends CApiService {
 			if (array_key_exists('name', $valuemap) && $valuemap['name'] !== $db_valuemap['name']) {
 				$upd_valuemaps[] = [
 					'values' => ['name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+
+			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
+				$upd_valuemaps[] = [
+					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
 					'where' => ['valuemapid' => $valuemap['valuemapid']]
 				];
 			}
@@ -461,6 +462,7 @@ class CValueMap extends CApiService {
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+			'uuid' => 		['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -496,13 +498,14 @@ class CValueMap extends CApiService {
 				'newvalue' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap_mapping', 'newvalue')]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $valuemaps, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$this->validateValuemapMappings($valuemaps);
 		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
+			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
 			'valuemapids' => array_column($valuemaps, 'valuemapid'),
 			'editable' => true,
 			'preservekeys' => true

@@ -288,7 +288,6 @@ class CItemPrototype extends CItemGeneral {
 			return $result;
 		}
 
-		// add other related objects
 		if ($result) {
 			if (self::dbDistinct($sqlParts)) {
 				$result = $this->addNclobFieldValues($options, $result);
@@ -296,6 +295,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['name_upper']);
 		}
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
@@ -339,8 +339,8 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array  $items										an array of items passed by reference
-	 * @param bool	 $update
+	 * @param array $items
+	 * @param bool  $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		parent::checkInput($items, $update);
@@ -739,6 +739,12 @@ class CItemPrototype extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectHosts'] !== null) {

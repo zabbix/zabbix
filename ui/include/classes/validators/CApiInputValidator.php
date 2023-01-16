@@ -102,6 +102,15 @@ class CApiInputValidator {
 			case API_UINTS64:
 				return self::validateUInts64($rule, $data, $path, $error);
 
+			case API_FILTER:
+				return self::validateFilter($rule, $data, $path, $error);
+
+			case API_FILTER_VALUES:
+				return self::validateFilterValues($rule, $data, $path, $error);
+
+			case API_FILTER_VALUE:
+				return self::validateFilterValue($rule, $data, $path, $error);
+
 			case API_FLOAT:
 				return self::validateFloat($rule, $data, $path, $error);
 
@@ -256,6 +265,9 @@ class CApiInputValidator {
 			case API_INT32_RANGES:
 			case API_UINT64:
 			case API_UINTS64:
+			case API_FILTER:
+			case API_FILTER_VALUES:
+			case API_FILTER_VALUE:
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
@@ -657,7 +669,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (bccomp($data, ZBX_MIN_INT32) == -1 || bccomp($data, ZBX_MAX_INT32) == 1) {
+		if ($data < ZBX_MIN_INT32 || $data > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
 		}
@@ -757,6 +769,97 @@ class CApiInputValidator {
 			}
 		}
 		unset($value);
+
+		return true;
+	}
+
+	/**
+	 * Filter validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param array  $rule['fields']
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFilter($rule, &$data, $path, &$error) {
+		$rule['fields'] = array_flip($rule['fields']);
+
+		foreach ($rule['fields'] as &$field_rule) {
+			$field_rule = ['type' => API_FILTER_VALUES, 'flags' => API_ALLOW_NULL | API_NORMALIZE];
+		}
+		unset($field_rule);
+
+		return self::validateData(['type' => API_OBJECT] + $rule, $data, $path, $error);
+	}
+
+	/**
+	 * Filter values validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFilterValues($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateFilterValue([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_FILTER_VALUE];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
+	/**
+	 * Filter value validator.
+	 *
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFilterValue($rule, &$data, $path, &$error) {
+		if (!is_string($data) && !is_double($data) && !is_int($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('a character string, integer or floating point value is expected')
+			);
+			return false;
+		}
+
+		if (is_string($data) &&  mb_check_encoding($data, 'UTF-8') !== true) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid byte sequence in UTF-8'));
+			return false;
+		}
 
 		return true;
 	}

@@ -38,11 +38,8 @@
 #	endif
 #endif
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
-#	define PATH_SEPARATOR	'\\'
-#elif defined(__MINGW32__)
-#	define zbx_open(pathname, flags)	open(pathname, flags | O_BINARY)
 #	define PATH_SEPARATOR	'\\'
 #else
 #	define zbx_open(pathname, flags)	open(pathname, flags)
@@ -106,7 +103,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_uint64_t	uint64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_UI64	"%llu"
 #			define ZBX_FS_UO64	"%llo"
@@ -129,7 +126,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_int64_t	int64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_I64	"%lld"
 #			define ZBX_FS_O64	"%llo"
@@ -163,7 +160,7 @@ typedef __int64	zbx_offset_t;
 #	define zbx_lseek(fd, offset, whence)	_lseeki64(fd, (zbx_offset_t)(offset), whence)
 
 #elif defined(__MINGW32__)
-#	define zbx_stat(path, buf)		_stat64(path, buf)
+#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
 #	define zbx_fstat(fd, buf)		_fstat64(fd, buf)
 
 typedef off64_t	zbx_offset_t;

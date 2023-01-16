@@ -18,30 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup users
- *
- * @onBefore prepareLdapUserData
- **/
+ * @dataSource LoginUsers
+ */
 class testFormLogin extends CWebTest {
-
-	public function prepareLdapUserData() {
-		CDataHelper::call('user.create', [
-			[
-				'username' => 'LDAP user',
-				'passwd' => 'zabbix12345',
-				'roleid' => 3,
-				'usrgrps' => [
-					[
-						'usrgrpid' => 16
-					]
-				]
-			]
-		]);
-	}
 
 	public static function getLoginLogoutData() {
 		return [
@@ -56,7 +40,7 @@ class testFormLogin extends CWebTest {
 			[
 				[
 					'login' => 'disabled-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'No permissions for system access.'
 				]
@@ -64,7 +48,7 @@ class testFormLogin extends CWebTest {
 			[
 				[
 					'login' => 'no-access-to-the-frontend',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'GUI access disabled.'
 				]
@@ -161,27 +145,30 @@ class testFormLogin extends CWebTest {
 		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
 			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
-			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
-					->waitUntilVisible()->one()->getText());
+			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
+					$this->query('class:red')->waitUntilVisible()->one()->getText()
+			);
 			$this->assertEquals($i, CDBHelper::getValue('SELECT attempt_failed FROM users WHERE username='.zbx_dbstr($user)));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE username='.zbx_dbstr($user).' AND attempt_clock>0'));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
 		}
 
 		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
-		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
-				->waitUntilVisible()->one()->getText());
+		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
+				$this->query('class:red')->waitUntilVisible()->one()->getText()
+		);
 
 		// Account is blocked, waiting 30 sec and trying to login.
 		sleep(30);
-		$this->page->userLogin($user, 'zabbix');
+		$this->page->userLogin($user, 'zabbix12345');
 		$this->page->assertHeader('Global view');
-		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
-				->waitUntilVisible()->one()->getText());
+		$this->assertStringContainsString('5 failed login attempts logged.',
+				$this->query('class:msg-bad')->waitUntilVisible()->one()->getText()
+		);
 	}
 
 	/**
-	 * Function makes two authentications with different data to different Zabbix views, separately clicking on
+	 * Function makes two authentifications with different data to different Zabbix views, separately clicking on
 	 * sign in button and checking by views header, if correct url is opened.
 	 **/
 	public function testFormLogin_LoginWithRequest() {

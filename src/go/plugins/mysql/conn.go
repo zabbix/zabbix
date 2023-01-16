@@ -28,8 +28,8 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
+	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
-	"zabbix.com/pkg/tlsconfig"
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"

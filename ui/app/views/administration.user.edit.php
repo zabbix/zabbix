@@ -51,6 +51,7 @@ if ($data['form_refresh'] == 0) {
 
 // Create form.
 $user_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
@@ -280,7 +281,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);

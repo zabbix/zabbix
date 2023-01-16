@@ -109,7 +109,7 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_CheckLayout() {
-		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -145,7 +145,7 @@ class testPageLatestData extends CWebTest {
 		}
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
+		$subfilter->waitUntilReloaded();
 
 		// Check table headers.
 		$details_headers = [
@@ -157,7 +157,7 @@ class testPageLatestData extends CWebTest {
 		foreach ($details_headers as $status => $headers) {
 			$this->query('name:show_details')->one()->asCheckbox()->set($status);
 			$form->submit();
-			$this->page->waitUntilReady();
+			$subfilter->waitUntilReloaded();
 			$this->assertEquals($headers, $this->getTable()->getHeadersText());
 		}
 
@@ -463,9 +463,11 @@ class testPageLatestData extends CWebTest {
 	public function testPageLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -480,7 +482,7 @@ class testPageLatestData extends CWebTest {
 		$form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
 
 		$form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		// Check filtered result.
 		$this->assertTableData($data['result'], $this->getTableSelector());
@@ -494,6 +496,7 @@ class testPageLatestData extends CWebTest {
 
 		// Reset filter not to impact the results of next tests.
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 	}
 
 	public static function getSubfilterData() {
@@ -817,9 +820,11 @@ class testPageLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {

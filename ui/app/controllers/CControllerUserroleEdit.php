@@ -183,6 +183,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'serviceids' => array_column($data['rules']['service_write_list'], 'serviceid')
 		]);
 
+		$data['form_refresh'] = $this->getInput('form_refresh', 0);
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);

@@ -165,6 +165,8 @@ class testDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'update interface set');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 
+		$this->reloadConfigurationCache();
+
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],
 			'hostids' => self::$hostids['agent'],

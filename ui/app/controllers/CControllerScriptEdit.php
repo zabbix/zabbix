@@ -83,6 +83,7 @@ class CControllerScriptEdit extends CController {
 	protected function doAction() {
 		// Default values.
 		$data = [
+			'form_refresh' => $this->getInput('form_refresh', 0),
 			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',

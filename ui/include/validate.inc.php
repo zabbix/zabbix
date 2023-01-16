@@ -148,11 +148,30 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		$caption = $field;
 	}
 
-	if (is_array($var) && $type != T_ZBX_RANGE_TIME) {
+	$is_array_flag = ($flags & P_ONLY_ARRAY);
+	$is_td_array_flag = ($flags & P_ONLY_TD_ARRAY);
+	$has_array_flag = $is_array_flag || $is_td_array_flag;
+
+	if (is_array($var) && $type != T_ZBX_RANGE_TIME && $has_array_flag) {
 		$err = ZBX_VALID_OK;
 
-		foreach ($var as $v) {
-			$err |= check_type($field, $flags, $v, $type);
+		if ($flags & P_ONLY_ARRAY) {
+			$flags &= ~P_ONLY_ARRAY;
+		}
+
+		if ($flags & P_ONLY_TD_ARRAY) {
+			$flags &= ~P_ONLY_TD_ARRAY;
+			$flags |= P_ONLY_ARRAY;
+		}
+
+		if ($flags & P_ONLY_ARRAY || $type !== null) {
+			foreach ($var as $v) {
+				$err = check_type($field, $flags, $v, $type);
+
+				if ($err != ZBX_VALID_OK) {
+					break;
+				}
+			}
 		}
 
 		return $err;
@@ -160,6 +179,17 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 	$error = false;
 	$message = '';
+
+	if ($has_array_flag) {
+		if (!is_array($var)) {
+			error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('an array is expected')));
+			return ZBX_VALID_ERROR;
+		}
+	}
+	elseif (is_array($var)) {
+		error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('invalid data type')));
+		return ZBX_VALID_ERROR;
+	}
 
 	if ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
@@ -200,6 +230,10 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		if (!is_string($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not string.', $caption);
+		}
+		elseif (mb_check_encoding($var, 'UTF-8') !== true) {
+			error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('invalid byte sequence in UTF-8')));
+			return ZBX_VALID_ERROR;
 		}
 	}
 	elseif ($type == T_ZBX_TU) {
