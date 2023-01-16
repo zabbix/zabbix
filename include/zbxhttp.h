@@ -62,10 +62,10 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 
 int	zbx_http_request(unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
-		const char *timeout, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
-		unsigned char verify_peer, unsigned char verify_host, unsigned char authtype, const char *username,
-		const char *password, const char *token, unsigned char post_type, char *status_codes,
-		unsigned char output_format, char **out, char **error);
+		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
+		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
+		unsigned char authtype, const char *username, const char *password, const char *token,
+		unsigned char post_type, char *status_codes, unsigned char output_format, char **out, char **error);
 #endif
 
 #endif

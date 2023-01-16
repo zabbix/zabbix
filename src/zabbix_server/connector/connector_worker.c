@@ -60,10 +60,10 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 
 	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, "", "",
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
-			connector.timeout, connector.ssl_cert_file, connector.ssl_key_file, connector.ssl_key_password,
-			connector.verify_peer, connector.verify_host, connector.authtype, connector.username,
-			connector.password, connector.token, ZBX_POSTTYPE_NDJSON, "200", HTTP_STORE_RAW,
-			&out, &error))
+			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
+			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
+			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, "200",
+			HTTP_STORE_RAW, &out, &error))
 	{
 		char	*info = NULL;
 
