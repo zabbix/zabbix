@@ -25,7 +25,6 @@ libzbxpoller_a_SOURCES = \
 	checks_simple_vmware.h \
 	checks_snmp.c \
 	checks_snmp.h \
-	ssh_run.c \
 	ssh_run.h \
 	checks_ssh.c \
 	checks_ssh.h \
@@ -35,6 +34,14 @@ libzbxpoller_a_SOURCES = \
 	checks_telnet.h \
 	poller.c \
 	poller.h
+
+if HAVE_SSH
+libzbxpoller_a_SOURCES += ssh_run.c
+endif
+
+if HAVE_SSH2
+libzbxpoller_a_SOURCES += ssh2_run.c
+endif
 
 libzbxpoller_server_a_SOURCES = \
 	checks_internal.h \
