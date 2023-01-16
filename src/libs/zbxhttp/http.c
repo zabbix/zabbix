@@ -196,13 +196,28 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 }
 
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
-		char **error)
+		const char *token, char **error)
 {
+	CURLcode	err;
+
+	if ('\0' != *token)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "setting CURLOPT_XOAUTH2_BEARER");
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_XOAUTH2_BEARER, token)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot set HTTP server authentication method: %s",
+					curl_easy_strerror(err));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
 	if (HTTPTEST_AUTH_NONE != authtype)
 	{
 		long		curlauth = 0;
 		char		auth[MAX_STRING_LEN];
-		CURLcode	err;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "setting HTTPAUTH [%d]", authtype);
 
@@ -534,8 +549,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
 		unsigned char verify_peer, unsigned char verify_host, unsigned char authtype, const char *username,
-		const char *password, unsigned char post_type, char *status_codes, unsigned char output_format,
-		char **out, char **error)
+		const char *password, const char *token, unsigned char post_type, char *status_codes,
+		unsigned char output_format, char **out, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -618,7 +633,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_auth(easyhandle, authtype, username, password, error))
+	if (SUCCEED != zbx_http_prepare_auth(easyhandle, authtype, username, password, token, error))
 		goto clean;
 
 	if (SUCCEED != http_prepare_request(easyhandle, posts, request_method, error))

@@ -268,7 +268,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_auth(easyhandle, item->authtype, item->username, item->password, &error))
+	if (SUCCEED != zbx_http_prepare_auth(easyhandle, item->authtype, item->username, item->password, "", &error))
 	{
 		SET_MSG_RESULT(result, error);
 		goto clean;
