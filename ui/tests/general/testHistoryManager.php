@@ -30,6 +30,7 @@ require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CConfigGeneralHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
 require_once __DIR__.'/../../include/classes/validators/CApiInputValidator.php';
+require_once __DIR__.'/../../include/classes/helpers/CHousekeepingHelper.php';
 
 /**
  * @backup history_uint
