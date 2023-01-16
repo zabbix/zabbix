@@ -383,7 +383,7 @@ out:
  * Parameters:  itemid        - [IN] the itemid                                     *
  *              value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs)    *
  *              values        - [OUT] the item history data values                  *
- *              count         - [IN] the number of values to read                   *
+ *              count         - [IN] the number of values to read + 1               *
  *              end_timestamp - [IN] the value timestamp to start reading with      *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
@@ -408,16 +408,18 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
-	const int		periods[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH, 0, -1};
+	const int		periods[] = {SEC_PER_HOUR, 12 * SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY, SEC_PER_WEEK,
+					SEC_PER_MONTH, 0, -1};
 
 	clock_to = end_timestamp;
 
-	while (-1 != periods[step] && 0 < count)
+	while (-1 != periods[step] && 1 < count)
 	{
 		if (0 > (clock_from = clock_to - periods[step]))
 		{
 			clock_from = clock_to;
-			step = 4;
+
+			step = ARRSIZE(periods) - 1;
 		}
 
 		sql_offset = 0;

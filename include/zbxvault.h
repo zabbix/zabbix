@@ -22,9 +22,21 @@
 
 #include "zbxkvs.h"
 
-int	zbx_vault_init(char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, char **error);
-int	zbx_vault_db_credentials_get(char **dbuser, char **dbpassword, char **error);
+typedef struct
+{
+	char	*name;
+	char	*url;
+	char	*token;
+	char	*tls_cert_file;
+	char	*tls_key_file;
+	char	*db_path;
+}
+zbx_config_vault_t;
+
+int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error);
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault, char **error);
+int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
+		char **error);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
 

@@ -339,9 +339,11 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		let valuemap_table = element.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
+
 		PopUp('popup.generic', {
-			srctbl: 'valuemaps',
+			srctbl: element.dataset.context === 'host' ? 'valuemaps' : 'template_valuemaps',
 			srcfld1: 'valuemapid',
+			context: element.dataset.context,
 			disable_names: disable_names,
 			editable: true
 		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});

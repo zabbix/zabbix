@@ -137,6 +137,8 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+static int	config_timeout = 3;
+
 static int	CONFIG_SENDER_TIMEOUT = GET_SENDER_TIMEOUT;
 
 #define CONFIG_SENDER_TIMEOUT_MIN	1
@@ -699,7 +701,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	}
 #endif
 	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
-			CONFIG_TIMEOUT, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
+			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
 		{
@@ -1499,6 +1501,8 @@ int	main(int argc, char **argv)
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
+
+	zbx_init_library_cfg(program_type);
 
 	parse_commandline(argc, argv);
 

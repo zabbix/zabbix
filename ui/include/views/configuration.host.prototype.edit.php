@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 
 $tabs = new CTabView();
 
-if (!hasRequest('form_refresh')) {
+if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
 
@@ -46,6 +46,7 @@ $url = (new CUrl('host_prototypes.php'))
 	->getUrl();
 
 $form = (new CForm('post', $url))
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

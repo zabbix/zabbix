@@ -33,8 +33,6 @@
 #	include <sys/utsname.h>
 #endif
 
-extern int	CONFIG_TIMEOUT;
-
 typedef struct
 {
 	pid_t		pid;
@@ -1006,7 +1004,7 @@ int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	zbx_timespec(&ts_timeout);
-	ts_timeout.sec += CONFIG_TIMEOUT;
+	ts_timeout.sec += sysinfo_get_config_timeout();
 
 	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value, &errmsg))
 	{

@@ -30,8 +30,8 @@
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
-extern char    *CONFIG_SOURCE_IP;
-extern char    *CONFIG_SSH_KEY_LOCATION;
+extern char	*CONFIG_SOURCE_IP;
+extern char	*CONFIG_SSH_KEY_LOCATION;
 
 static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const char *key_str, const char *value,
 		char **err_msg)

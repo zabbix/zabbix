@@ -43,7 +43,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
 
 static int	connection_failure;
-extern unsigned char	program_type;
 
 static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
 
@@ -52,7 +51,7 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
-int	zbx_db_validate_config_features(void)
+int	zbx_db_validate_config_features(unsigned char program_type)
 {
 	int	err = 0;
 
@@ -75,6 +74,8 @@ int	zbx_db_validate_config_features(void)
 			ZBX_DB_TLS_CONNECT_VERIFY_CA_TXT, get_program_type_string(program_type));
 		err |= 1;
 	}
+#else
+	ZBX_UNUSED(program_type);
 #endif
 
 #if !(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS))
@@ -768,7 +769,7 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	if (NULL == (result = DBselect("select db_extension from config")))
 		goto out;
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
 
 	version_info->extension = zbx_strdup(NULL, row[0]);
@@ -805,10 +806,13 @@ void	zbx_db_flush_version_requirements(const char *version)
  * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
  *          and configuration                                                    *
  *                                                                               *
- * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ * Parameters: info              - [IN] DB version information                   *
+ *             allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *             program_type      - [IN]                                          *
  *                                                                               *
  *********************************************************************************/
-int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
+int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
+		unsigned char program_type)
 {
 	zbx_db_extract_version_info(info);
 

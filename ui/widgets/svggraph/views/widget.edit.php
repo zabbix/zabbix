@@ -69,16 +69,13 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDatasetTab(CWidgetFormView $form, array $fields): CFormGrid {
+function getDatasetTab(CWidgetFormView $form, array $fields): array {
 	$dataset = new CWidgetFieldGraphDataSetView($fields['ds']);
 
-	return new CFormGrid(
-		$form->makeCustomField($dataset, [
-			$dataset->getLabel(),
-			(new CFormField($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
-			(new CFormField($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
-		])
-	);
+	return $form->makeCustomField($dataset, [
+		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+		(new CDiv($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
+	]);
 }
 
 function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {

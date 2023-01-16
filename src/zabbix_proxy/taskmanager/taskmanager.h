@@ -28,8 +28,9 @@
 
 typedef struct
 {
-	const zbx_config_comms_args_t	*zbx_config_comms;
+	const zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	int				config_startup_time;
 }
 zbx_thread_taskmanager_args;
 

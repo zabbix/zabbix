@@ -32,7 +32,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".</p> |ZABBIX_PASSIVE |vfs.fs.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p> |
+|Mounted filesystem discovery |<p>Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.</p> |DEPENDENT |vfs.fs.dependent.discovery<p>**Filter**:</p> <p>- {#FSTYPE} MATCHES_REGEX `@File systems for discovery`</p><p>**Overrides:**</p><p>Exclude dmg<br> - {#FSOPTIONS} EXISTS  - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)noowners\b` - {#FSOPTIONS} MATCHES_REGEX `(?:^|,)read-only\b` - {#FSTYPE} MATCHES_REGEX `hfs`<br>  - ITEM_PROTOTYPE REGEXP `.+`<br>  - NO_DISCOVER</p><p>Skip metadata collection for dynamic FS<br> - {#FSTYPE} MATCHES_REGEX `^(btrfs|zfs)$`<br>  - ITEM_PROTOTYPE LIKE `inode`<br>  - NO_DISCOVER</p> |
 
 ## Items collected
 
@@ -56,13 +56,15 @@ There are no template links in this template.
 |macOS |Total memory |<p>-</p> |ZABBIX_PASSIVE |vm.memory.size[total] |
 |macOS |Host name of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |macOS |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.</p> |ZABBIX_PASSIVE |agent.ping |
-|macOS |{#FSNAME}: Free inodes (percentage) |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.inode[{#FSNAME},pfree] |
-|macOS |{#FSNAME}: Free disk space |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},free] |
-|macOS |{#FSNAME}: Free disk space (percentage) |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},pfree] |
-|macOS |{#FSNAME}: Total disk space |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},total] |
-|macOS |{#FSNAME}: Used disk space |<p>-</p> |ZABBIX_PASSIVE |vfs.fs.size[{#FSNAME},used] |
+|macOS |{#FSNAME}: Free inodes, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.inode[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.inodes.pfree`</p> |
+|macOS |{#FSNAME}: Free disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},free]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.free`</p> |
+|macOS |{#FSNAME}: Free disk space, % |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},pfree]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.pfree`</p> |
+|macOS |{#FSNAME}: Total disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.total`</p> |
+|macOS |{#FSNAME}: Used disk space |<p>-</p> |DEPENDENT |vfs.fs.dependent.size[{#FSNAME},used]<p>**Preprocessing**:</p><p>- JSONPATH: `$.bytes.used`</p> |
 |Monitoring agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_PASSIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Status |Zabbix agent availability |<p>Monitoring the availability status of the agent.</p> |INTERNAL |zabbix[host,agent,available] |
+|Zabbix raw items |Get filesystems |<p>The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.</p> |ZABBIX_PASSIVE |vfs.fs.get |
+|Zabbix raw items |{#FSNAME}: Get filesystem data |<p>-</p> |DEPENDENT |vfs.fs.dependent[{#FSNAME},data]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@.fsname=='{#FSNAME}')].first()`</p> |
 
 ## Triggers
 
@@ -76,8 +78,8 @@ There are no template links in this template.
 |Server has just been restarted |<p>-</p> |`change(/macOS/system.uptime)<0` |INFO | |
 |/etc/passwd has been changed |<p>-</p> |`last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
 |Lack of available memory on server |<p>-</p> |`last(/macOS/vm.memory.size[available])<20M` |AVERAGE | |
-|{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
-|{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
+|{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.dependent.inode[{#FSNAME},pfree])<20` |WARNING | |
+|{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/macOS/vfs.fs.dependent.size[{#FSNAME},pfree])<20` |WARNING | |
 |Zabbix agent is not available |<p>For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.</p> |`max(/macOS/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
