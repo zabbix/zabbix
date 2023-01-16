@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2023-01-16T11:05:06Z'
+  date: '2023-01-16T11:45:12Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -702,7 +702,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent from gRPC clients clients per second.'
+          description: 'The number of bytes sent from gRPC clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
