@@ -20,6 +20,7 @@
 
 
 require_once __DIR__.'/../include/CTest.php';
+require_once __DIR__.'/../../include/profiles.inc.php';
 require_once __DIR__.'/../../include/classes/core/CRegistryFactory.php';
 require_once __DIR__.'/../../include/classes/core/Manager.php';
 require_once __DIR__.'/../../include/classes/api/API.php';
