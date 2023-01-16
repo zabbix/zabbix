@@ -709,6 +709,10 @@ class ZBase {
 	private function setServerAddress(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+		if ($ZBX_SERVER !== null && !$ZBX_SERVER_PORT) {
+			$ZBX_SERVER_PORT = ZBX_SERVER_PORT_DEFAULT;
+		}
+
 		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
 			return;
 		}
