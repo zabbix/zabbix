@@ -39,6 +39,14 @@ const (
 	pluginName = "Oracle"
 	hkInterval = 10
 	sqlExt     = ".sql"
+
+	sysdbaExtension  = " as sysdba"
+	sysasmExtension  = " as sysoper"
+	sysoperExtension = " as sysasm"
+
+	sysdbaPrivelage  = "sysdba"
+	sysasmPrivelage  = "sysoper"
+	sysoperPrivelage = "sysasm"
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -75,7 +83,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri, privilege)
+	conn, err := p.connMgr.GetConnection(connDetails{*uri, privilege})
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -131,19 +139,19 @@ func splitUserPrivilege(params map[string]string) (user, privilege string, err e
 		return "", "", errors.New("missing parameter 'User'")
 	}
 
-	var trim int
+	var extension string
 
 	switch true {
-	case strings.HasSuffix(strings.ToLower(user), " as sysdba"):
-		privilege = "sysdba"
-		trim = 10
-	case strings.HasSuffix(strings.ToLower(user), " as sysoper"):
-		privilege = "sysoper"
-		trim = 11
-	case strings.HasSuffix(strings.ToLower(user), " as sysasm"):
-		privilege = "sysasm"
-		trim = 10
+	case strings.HasSuffix(strings.ToLower(user), sysdbaExtension):
+		privilege = sysdbaPrivelage
+		extension = sysdbaExtension
+	case strings.HasSuffix(strings.ToLower(user), sysoperExtension):
+		privilege = sysoperPrivelage
+		extension = sysoperExtension
+	case strings.HasSuffix(strings.ToLower(user), sysasmExtension):
+		privilege = sysasmPrivelage
+		extension = sysasmExtension
 	}
 
-	return user[:len(user)-trim], privilege, nil
+	return user[:len(user)-len(extension)], privilege, nil
 }
