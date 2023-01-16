@@ -30,8 +30,8 @@
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
-extern char    *CONFIG_SOURCE_IP;
-extern char    *CONFIG_SSH_KEY_LOCATION;
+extern char	*CONFIG_SOURCE_IP;
+extern char	*CONFIG_SSH_KEY_LOCATION;
 
 /* example ssh.run["ls /"] */
 int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
