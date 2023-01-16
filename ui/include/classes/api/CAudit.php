@@ -249,6 +249,9 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => [
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
+		self::RESOURCE_CONNECTOR => [
+			'paths' => ['connector.password', 'connector.ssl_key_password']
+		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
