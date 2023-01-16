@@ -24,7 +24,6 @@
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL
-
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	char	*out = NULL, *error = NULL;
