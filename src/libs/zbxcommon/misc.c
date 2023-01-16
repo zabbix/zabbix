@@ -667,31 +667,3 @@ zbx_uint64_t	suffix2factor(char c)
 			return 1;
 	}
 }
-
-void	zbx_free_tag(zbx_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	zbx_free(tag->value);
-	zbx_free(tag);
-}
-
-int	zbx_compare_tags(const void *d1, const void *d2)
-{
-	const zbx_tag_t *tag1 = *(const zbx_tag_t * const *)d1;
-	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
-
-	return strcmp(tag1->tag, tag2->tag);
-}
-
-int	zbx_compare_tags_and_values(const void *d1, const void *d2)
-{
-	int ret;
-
-	const zbx_tag_t *tag1 = *(const zbx_tag_t * const *)d1;
-	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
-
-	if (0 == (ret = strcmp(tag1->tag, tag2->tag)))
-		ret = strcmp(tag1->value, tag2->value);
-
-	return ret;
-}

@@ -783,10 +783,6 @@ typedef struct
 }
 zbx_tag_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
-int	zbx_compare_tags(const void *d1, const void *d2);
-int	zbx_compare_tags_and_values(const void *d1, const void *d2);
-
 #define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
 #define ZBX_CONST_STRING(str) "" str
