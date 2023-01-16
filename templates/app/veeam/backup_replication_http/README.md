@@ -15,7 +15,7 @@ For Zabbix version: 6.0 and higher.
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create a user to monitor the service or use an existing read-only account.
-> See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
+> See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
 2. Link the template to a host.
 3. Configure macros `{$VEEAM.API.URL}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
 
@@ -48,9 +48,9 @@ No specific Zabbix configuration is required.
 |{$SESSION.TYPE.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`CHANGE_IF_NEEDED` |
 |{$VEEAM.API.URL} |<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9419/api` |
 |{$VEEAM.DATA.TIMEOUT} |<p>A response timeout for the API.</p> |`10` |
-|{$VEEAM.HTTP.PROXY} |<p>Sets HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
-|{$VEEAM.PASSWORD} |<p>It defines a password. It is is required if the `grant_type` value is `password`.</p> |`` |
-|{$VEEAM.USER} |<p>It defines a user name. It is is required if the `grant_type` value is `password`.</p> |`` |
+|{$VEEAM.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
+|{$VEEAM.PASSWORD} |<p>Grants a password. It is is required if the `grant_type` value is `password`.</p> |`` |
+|{$VEEAM.USER} |<p>Grants a user name. It is is required if the `grant_type` value is `password`.</p> |`` |
 
 ### Template links
 
@@ -71,20 +71,20 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Veeam |Veeam: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Veeam |Veeam: Get server data by [{#NAME}] |<p>It gets raw data of the proxy server.</p> |DEPENDENT |veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p> |
-|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>It gets raw data of the proxy `[{#NAME}]` `[{#TYPE}]`.</p> |DEPENDENT |veeam.proxy.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Get server data by [{#NAME}] |<p>Gets raw data of the proxy server.</p> |DEPENDENT |veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p> |
+|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Gets raw data of the proxy `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.proxy.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p> |
 |Veeam |Veeam: Max task count by [{#NAME}] [{#TYPE}] |<p>The maximum number of concurrent tasks.</p> |DEPENDENT |veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.server.maxTaskCount`</p> |
 |Veeam |Veeam: Host name by [{#NAME}] [{#TYPE}] |<p>The name of the proxy server.</p> |DEPENDENT |veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.name`</p> |
 |Veeam |Veeam: Host type by [{#NAME}] [{#TYPE}] |<p>The type of the proxy server.</p> |DEPENDENT |veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.type`</p> |
-|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>It gets raw data of `[{#NAME}]` `[{#TYPE}]`.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Gets raw data of `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
 |Veeam |Veeam: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Used space by repositories expressed in gigabytes (GB).</p> |DEPENDENT |veeam.repository.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.usedSpaceGB`</p> |
 |Veeam |Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Free space of repositories expressed in GB.</p> |DEPENDENT |veeam.repository.free.space[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.freeGB`</p> |
-|Veeam |Veeam: Get sessions data [{#NAME}] [{#TYPE}] |<p>It gets raw data of sessions `[{#NAME}]` `[{#TYPE}]`.</p> |DEPENDENT |veeam.sessions.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Veeam |Veeam: Session state [{#NAME}] [{#TYPE}] |<p>The state of the session. The enumerators (enums) used: `"Stopped"`, `"Starting"`, `"Stopping"`, `"Working"`, `"Pausing"`, `"Resuming"`, `"WaitingTape"`, `"Idle"`, `"Postprocessing"`, `"WaitingRepository"`, `"WaitingSlot"`.</p> |DEPENDENT |veeam.sessions.state[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
+|Veeam |Veeam: Get sessions data [{#NAME}] [{#TYPE}] |<p>Gets raw data of sessions `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.sessions.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Veeam |Veeam: Session state [{#NAME}] [{#TYPE}] |<p>The state of the session. The enums used: `"Stopped"`, `"Starting"`, `"Stopping"`, `"Working"`, `"Pausing"`, `"Resuming"`, `"WaitingTape"`, `"Idle"`, `"Postprocessing"`, `"WaitingRepository"`, `"WaitingSlot"`.</p> |DEPENDENT |veeam.sessions.state[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
 |Veeam |Veeam: Session result [{#NAME}] [{#TYPE}] |<p>The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.</p> |DEPENDENT |veeam.sessions.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.result`</p> |
 |Veeam |Veeam: Session message [{#NAME}] [{#TYPE}] |<p>A message that explains the session result.</p> |DEPENDENT |veeam.sessions.message[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.message`</p> |
 |Veeam |Veeam: Session progress percent [{#NAME}] [{#TYPE}] |<p>The progress of the session expressed as percentage.</p> |DEPENDENT |veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.progressPercent`</p> |
-|Veeam |Veeam: Get jobs states data [{#NAME}] |<p>It gets raw data of the jobs states `[{#NAME}]`.</p> |DEPENDENT |veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Get jobs states data [{#NAME}] |<p>Gets raw data of the jobs states `[{#NAME}]`.</p> |DEPENDENT |veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p> |
 |Veeam |Veeam: Job status [{#NAME}] [{#TYPE}] |<p>The current status of the job. The enums used: `"running"`, `"inactive"`, `"disabled"`.</p> |DEPENDENT |veeam.jobs.status[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p> |
 |Veeam |Veeam: Job last result [{#NAME}] [{#TYPE}] |<p>The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.</p> |DEPENDENT |veeam.jobs.last.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lastResult`</p> |
 
