@@ -872,74 +872,112 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
-		zbx_uint64_t *revision, zbx_clean_func_t object_link_clean)
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
+		zbx_clean_func_t object_link_clean)
 {
 	zbx_dc_connector_t	*dc_connector;
 	zbx_connector_t		*connector;
 	zbx_hashset_iter_t	iter;
+	int			connectors_updated = FAIL;
+	zbx_uint64_t		dc_global_revision = *global_revision;
 
-	if (config->revision.connector == *revision)
+	if (config->revision.config == *config_revision)
 		return;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(&config->connectors, &iter);
-	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
+	*config_revision = config->revision.config;
+
+	if (config->revision.connector != *connector_revision)
 	{
-		if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
-			continue;
-
-		if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(connectors,
-				&dc_connector->connectorid)))
+		zbx_hashset_iter_reset(&config->connectors, &iter);
+		while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
-			zbx_connector_t	connector_local = {.connectorid = dc_connector->connectorid};
+			if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
+				continue;
 
-			connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
-					sizeof(connector_local));
-			zbx_list_create(&connector->object_link_queue);
+			if (NULL == (connector = (zbx_connector_t *)zbx_hashset_search(connectors,
+					&dc_connector->connectorid)))
+			{
+				zbx_connector_t	connector_local = {.connectorid = dc_connector->connectorid};
 
-			zbx_hashset_create_ext(&connector->object_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC, object_link_clean,
-					ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
-					ZBX_DEFAULT_MEM_FREE_FUNC);
+				connector = (zbx_connector_t *)zbx_hashset_insert(connectors, &connector_local,
+						sizeof(connector_local));
+				zbx_list_create(&connector->object_link_queue);
 
-			connector->senders = 0;
-			connector->time_flush = 0;
+				zbx_hashset_create_ext(&connector->object_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC, object_link_clean,
+						ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+						ZBX_DEFAULT_MEM_FREE_FUNC);
+
+				connector->senders = 0;
+				connector->time_flush = 0;
+			}
+
+			connector->revision = config->revision.connector;
+			connector->protocol = dc_connector->protocol;
+			connector->data_type = dc_connector->data_type;
+			connector->url_orig = zbx_strdup(connector->url_orig, dc_connector->url);
+			connector->url = zbx_strdup(connector->url, dc_connector->url);
+			connector->max_records = dc_connector->max_records;
+			connector->max_senders = dc_connector->max_senders;
+			connector->timeout = zbx_strdup(connector->timeout, dc_connector->timeout);
+			connector->max_attempts = dc_connector->max_attempts;
+			connector->token_orig = zbx_strdup(connector->token_orig, dc_connector->token);
+			connector->token = zbx_strdup(connector->token, dc_connector->token);
+			connector->http_proxy = zbx_strdup(connector->http_proxy, dc_connector->http_proxy);
+			connector->authtype = dc_connector->authtype;
+			connector->username = zbx_strdup(connector->username, dc_connector->username);
+			connector->password = zbx_strdup(connector->password, dc_connector->password);
+			connector->verify_peer = dc_connector->verify_peer;
+			connector->verify_host = dc_connector->verify_host;
+			connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
+			connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
+			connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);
 		}
 
-		connector->revision = config->revision.connector;
-		connector->protocol = dc_connector->protocol;
-		connector->data_type = dc_connector->data_type;
-		connector->url = zbx_strdup(connector->url, dc_connector->url);
-		connector->max_records = dc_connector->max_records;
-		connector->max_senders = dc_connector->max_senders;
-		connector->timeout = zbx_strdup(connector->timeout, dc_connector->timeout);
-		connector->max_attempts = dc_connector->max_attempts;
-		connector->token = zbx_strdup(connector->token, dc_connector->token);
-		connector->http_proxy = zbx_strdup(connector->http_proxy, dc_connector->http_proxy);
-		connector->authtype = dc_connector->authtype;
-		connector->username = zbx_strdup(connector->username, dc_connector->username);
-		connector->password = zbx_strdup(connector->password, dc_connector->password);
-		connector->verify_peer = dc_connector->verify_peer;
-		connector->verify_host = dc_connector->verify_host;
-		connector->ssl_cert_file = zbx_strdup(connector->ssl_cert_file, dc_connector->ssl_cert_file);
-		connector->ssl_key_file = zbx_strdup(connector->ssl_key_file, dc_connector->ssl_key_file);
-		connector->ssl_key_password = zbx_strdup(connector->ssl_key_password, dc_connector->ssl_key_password);
+		*connector_revision = config->revision.connector;
+		connectors_updated = SUCCEED;
 	}
 
-	*revision = config->revision.connector;
+	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &dc_global_revision))
+		dc_global_revision = 0;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(connectors, &iter);
-	while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+	if (SUCCEED == connectors_updated)
 	{
-		if (connector->revision == *revision)
-			continue;
+		zbx_hashset_iter_reset(connectors, &iter);
+		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (connector->revision != *connector_revision)
+				zbx_hashset_iter_remove(&iter);
+		}
 
-		zbx_hashset_iter_remove(&iter);
+		zbx_hashset_iter_reset(connectors, connector_iter);
 	}
 
-	zbx_hashset_iter_reset(connectors, connector_iter);
+	if (dc_global_revision != *global_revision)
+	{
+		zbx_hashset_iter_reset(connectors, &iter);
+		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (NULL != strstr(connector->url_orig, "{$"))
+			{
+				connector->url = zbx_strdup(connector->url, connector->url_orig);
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						NULL, NULL, NULL, NULL, &connector->url, MACRO_TYPE_COMMON, NULL, 0);
+			}
+
+			if (NULL != strstr(connector->token_orig, "{$"))
+			{
+				connector->token = zbx_strdup(connector->token, connector->token_orig);
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+						NULL, NULL, NULL, NULL, &connector->token, MACRO_TYPE_COMMON, NULL, 0);
+			}
+		}
+
+		*global_revision = dc_global_revision;
+	}
 }
 #undef ZBX_CONNECTOR_STATUS_ENABLED

@@ -56,7 +56,9 @@ typedef struct
 	int				worker_count;	/* preprocessing worker count */
 	zbx_hashset_t			connectors;
 	zbx_hashset_iter_t		iter;
-	zbx_uint64_t			revision;	/* the configuration revision */
+	zbx_uint64_t			config_revision;	/* the configuration revision */
+	zbx_uint64_t			connector_revision;
+	zbx_uint64_t			global_revision;
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
@@ -72,11 +74,11 @@ zbx_object_link_t;
 
 static void	connector_clear(zbx_connector_t *connector)
 {
-	int	i;
-
 	zbx_free(connector->url);
+	zbx_free(connector->url_orig);
 	zbx_free(connector->timeout);
 	zbx_free(connector->token);
+	zbx_free(connector->token_orig);
 	zbx_free(connector->http_proxy);
 	zbx_free(connector->username);
 	zbx_free(connector->password);
@@ -477,7 +479,8 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 		if (NULL != message)
 		{
 			zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
-					&manager.revision, (zbx_clean_func_t)object_link_clean);
+					&manager.config_revision, &manager.connector_revision, &manager.global_revision,
+					(zbx_clean_func_t)object_link_clean);
 
 			switch (message->code)
 			{

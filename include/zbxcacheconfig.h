@@ -596,12 +596,12 @@ typedef struct
 	zbx_uint64_t		revision;
 	unsigned char		protocol;
 	unsigned char		data_type;
-	char			*url;
+	char			*url_orig, *url;
 	int			max_records;
 	int			max_senders;
 	char			*timeout;
 	unsigned char		max_attempts;
-	char			*token;
+	char			*token_orig, *token;
 	char			*http_proxy;
 	unsigned char		authtype;
 	char			*username;
@@ -711,7 +711,8 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filter_t *connector_filters_history,
 		zbx_vector_connector_filter_t *connector_filters_events);
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
-		zbx_uint64_t *revision, zbx_clean_func_t object_link_clean);
+		zbx_uint64_t *config_revision, zbx_uint64_t *connector_revision, zbx_uint64_t *global_revision,
+		zbx_clean_func_t object_link_clean);
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
