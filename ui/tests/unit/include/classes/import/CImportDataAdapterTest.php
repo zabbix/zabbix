@@ -4306,7 +4306,6 @@ class CImportDataAdapterTest extends TestCase {
 		$source = (new CConstantImportConverter($schema))->convert($source);
 		$source = (new CDefaultImportConverter($schema))->convert($source);
 		$source = (new CImportDataNormalizer($schema))->normalize($source);
-		$source = (new CTransformImportConverter($schema))->convert($source);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($source);

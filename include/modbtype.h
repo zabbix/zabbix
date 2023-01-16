@@ -22,8 +22,6 @@
 
 #include "zbxsysinfo.h"
 
-extern int	CONFIG_TIMEOUT;
-
 #define ZBX_MODBUS_TCP_PORT_DEFAULT		502
 
 #define ZBX_MODBUS_FUNCTION_EMPTY		0

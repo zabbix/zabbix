@@ -31,6 +31,7 @@ $html_page = (new CHtmlPage())
 
 // Create form.
 $discoveryForm = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('discoveryForm')
 	->setName('discoveryForm')
 	->addCsrfToken(!empty($this->data['druleid']) ? 'discovery.update' : 'discovery.create')

@@ -204,6 +204,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		$data['csrf_tokens'] = self::generateCsrfTokens(['userrole.create']);
 
+		$data['form_refresh'] = $this->getInput('form_refresh', 0);
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));
 		$this->setResponse($response);

@@ -116,7 +116,10 @@
 				rules_preset: "template",
 				'<?= CController::CSRF_TOKEN_NAME ?>': this.csrf_tokens['popup.import']
 			},
-				{dialogue_class: "modal-popup-generic"}
+				{
+					dialogueid: "popup_import",
+					dialogue_class: "modal-popup-generic"
+				}
 			);
 		}
 	};

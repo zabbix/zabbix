@@ -160,7 +160,7 @@ out:
 static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,
 		double time_first_query_started, double *time_previous_query_finished)
 {
-	double	time_left = CONFIG_TIMEOUT - (*time_previous_query_finished - time_first_query_started);
+	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished - time_first_query_started);
 
 	if (0 >= time_left)
 		return;
@@ -204,7 +204,7 @@ int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result)
 	get_wmi_check_timeout(wmi_namespace, "select AddressWidth from Win32_Processor", &proc_addresswidth, start_time,
 			&time_previous_query_finished);
 
-	if (0 >= CONFIG_TIMEOUT - (time_previous_query_finished - start_time))
+	if (0 >= sysinfo_get_config_timeout() - (time_previous_query_finished - start_time))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "WMI aggregate query timeout"));
 	}

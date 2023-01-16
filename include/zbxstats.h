@@ -20,12 +20,26 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
+#include "zbxalgo.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms);
+typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const void *arg);
 
-void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb);
-void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config_comms);
+typedef struct
+{
+	const void			*arg;
+	zbx_zabbix_stats_ext_get_func_t	stats_ext_get_cb;
+}
+zbx_stats_ext_func_entry_t;
+
+ZBX_PTR_VECTOR_DECL(stats_ext_func, zbx_stats_ext_func_entry_t *)
+
+void	zbx_init_library_stats(zbx_get_program_type_f get_program_type);
+
+void	zbx_register_stats_ext_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg);
+void	zbx_register_stats_data_func(zbx_zabbix_stats_ext_get_func_t stats_ext_get_cb, const void *arg);
+
+void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time);
 
 #endif

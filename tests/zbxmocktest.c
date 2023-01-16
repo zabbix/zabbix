@@ -120,8 +120,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
-
 /* how often Zabbix server sends configuration data to proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
@@ -175,6 +173,12 @@ char	**CONFIG_USER_PARAMETERS	= NULL;
 char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
+
+static int	config_timeout = 3;
+int		get_config_timeout(void)
+{
+	return config_timeout;
+}
 
 /* test itself */
 

@@ -65,6 +65,7 @@ if ($data['readonly'] == true) {
 
 // Create form.
 $user_form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->addCsrfToken($csrf_token_action)

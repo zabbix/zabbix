@@ -37,6 +37,7 @@ if ($data['regexid'] != 0) {
 }
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())
 	->addCsrfToken($data['regexid'] == 0 ? 'regex.create' : 'regex.update')
@@ -134,7 +135,7 @@ $test_tab = (new CFormList())
 	);
 
 $reg_exp_view = new CTabView();
-if (!$data['form_refresh']) {
+if ($data['form_refresh'] == 0) {
 	$reg_exp_view->setSelected(0);
 }
 

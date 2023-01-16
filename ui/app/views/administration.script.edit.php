@@ -53,6 +53,7 @@ $row_template = (new CTag('script', true))
 $html_page->addItem($row_template);
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('script-form')
 	->setName('scripts')
 	->addCsrfToken($data['scriptid'] == 0 ? 'script.create' : 'script.update')

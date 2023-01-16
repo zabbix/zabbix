@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"strings"
 	"syscall"
+
+	"zabbix.com/util"
 )
 
 func getUname(params []string) (uname string, err error) {
@@ -36,8 +38,9 @@ func getUname(params []string) (uname string, err error) {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
 		return
 	}
-	uname = fmt.Sprintf("%s %s %s %s %s", arrayToString(&utsname.Sysname), arrayToString(&utsname.Nodename),
-		arrayToString(&utsname.Release), arrayToString(&utsname.Version), arrayToString(&utsname.Machine))
+	uname = fmt.Sprintf("%s %s %s %s %s", util.UnameArrayToString(&utsname.Sysname),
+		util.UnameArrayToString(&utsname.Nodename), util.UnameArrayToString(&utsname.Release),
+		util.UnameArrayToString(&utsname.Version), util.UnameArrayToString(&utsname.Machine))
 
 	return uname, nil
 }
@@ -64,9 +67,9 @@ func getHostname(params []string) (hostname string, err error) {
 
 	switch mode {
 	case "host", "":
-		hostname = arrayToString(&utsname.Nodename)
+		hostname = util.UnameArrayToString(&utsname.Nodename)
 	case "shorthost":
-		hostname = arrayToString(&utsname.Nodename)
+		hostname = util.UnameArrayToString(&utsname.Nodename)
 		if idx := strings.Index(hostname, "."); idx > 0 {
 			hostname = hostname[:idx]
 		}
@@ -99,5 +102,5 @@ func getSwArch(params []string) (uname string, err error) {
 		return
 	}
 
-	return arrayToString(&utsname.Machine), nil
+	return util.UnameArrayToString(&utsname.Machine), nil
 }
