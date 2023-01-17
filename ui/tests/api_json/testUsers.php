@@ -28,7 +28,247 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testUsers extends CAPITest {
 
-	private static $users_data = [];
+	private static $data = [
+		'userids' => [
+			'user_with_not_authorized_session' => null,
+			'user_with_expired_session' => null,
+			'user_with_passive_session' => null,
+			'user_with_disabled_usergroup' => null,
+			'user_for_token_tests' => null,
+			'user_with_valid_session' => null,
+			'user_for_extend_parameter_tests' => null
+		],
+		'sessionids' => [
+			'not_authorized_session' => null,
+			'expired_session' => null,
+			'passive_session' => null,
+			'valid_for_user_with_disabled_usergroup' => null,
+			'valid' => null,
+			'for_extend_parameter_tests' => null
+		],
+		'tokens' => [
+			'not_authorized' => null,
+			'expired' => null,
+			'disabled' => null,
+			'valid' => null,
+			'valid_for_user_with_disabled_usergroup' => null
+			]
+	];
+
+	/**
+	 * Prepare data for user.checkAuthentication tests.
+	 */
+	public function prepareUsersData() {
+		$usergroup_data = [
+			[
+				'name' => 'API test users status enabled',
+				'users_status' => GROUP_STATUS_ENABLED
+			],
+			[
+				'name' => 'API test users status disabled',
+				'users_status' => GROUP_STATUS_DISABLED
+			]
+		];
+
+		$usergroups = CDataHelper::call('usergroup.create', $usergroup_data);
+		$this->assertArrayHasKey('usrgrpids', $usergroups, 'prepareUsersData() failed: Could not create user groups.');
+
+		$usergroupids['users_status_enabled'] = $usergroups['usrgrpids'][0];
+		$usergroupids['users_status_disabled'] = $usergroups['usrgrpids'][1];
+
+		$roleids = CDataHelper::call('role.create', [
+			[
+				'name' => 'test',
+				'type' => USER_TYPE_ZABBIX_ADMIN
+			]
+		]);
+		$this->assertArrayHasKey('roleids', $roleids, 'prepareUsersData() failed: Could not create user role.');
+		$admin_roleid = $roleids['roleids'][0];
+
+		$users_data = [
+			[
+				'username' => 'API test user with expired session',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['users_status_enabled']]
+				]
+			],
+			[
+				'username' => 'API test user with passive session',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['users_status_enabled']]
+				]
+			],
+			[
+				'username' => 'API test user with disabled group',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['users_status_enabled']]
+				]
+			],
+			[
+				'username' => 'API test user with valid session',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['users_status_enabled']]
+				]
+			],
+			[
+				'username' => 'API test user for extend parameter tests',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['users_status_enabled']]
+				]
+			]
+		];
+
+		$users = CDataHelper::call('user.create', $users_data);
+		$this->assertArrayHasKey('userids', $users, 'prepareUsersData() failed: Could not create users.');
+
+		self::$data['userids']['user_with_not_authorized_session'] = $users['userids'][0];
+		self::$data['userids']['user_with_expired_session'] = $users['userids'][0];
+		self::$data['userids']['user_with_passive_session'] = $users['userids'][1];
+		self::$data['userids']['user_with_disabled_usergroup'] = $users['userids'][2];
+		self::$data['userids']['user_with_valid_session'] = $users['userids'][3];
+		self::$data['userids']['user_for_extend_parameter_tests'] = $users['userids'][4];
+		self::$data['userids']['user_for_token_tests'] = $users['userids'][0];
+
+		$login_data = [
+			[
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => 'API test user with expired session',
+					'password' => 'zabbix123456'
+				],
+				'id' => self::$data['userids']['user_with_expired_session']
+			],
+			[
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => 'API test user with passive session',
+					'password' => 'zabbix123456'
+				],
+				'id' => self::$data['userids']['user_with_passive_session']
+			],
+			[
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => 'API test user with disabled group',
+					'password' => 'zabbix123456'
+				],
+				'id' => self::$data['userids']['user_with_disabled_usergroup']
+			],
+			[
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => 'API test user with valid session',
+					'password' => 'zabbix123456'
+				],
+				'id' => self::$data['userids']['user_with_valid_session']
+			],
+			[
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => 'API test user for extend parameter tests',
+					'password' => 'zabbix123456'
+				],
+				'id' => self::$data['userids']['user_for_extend_parameter_tests']
+			]
+		];
+
+		$login = CDataHelper::callRaw($login_data);
+		$this->assertArrayHasKey(0, $login, 'prepareUsersData() failed: Could not login users.');
+
+		self::$data['sessionids']['not_authorized_session'] = 'InvalidSessionID';
+		self::$data['sessionids']['expired_session'] = $login[0]['result'];
+		self::$data['sessionids']['passive_session'] = $login[1]['result'];
+		self::$data['sessionids']['valid_for_user_with_disabled_usergroup'] = $login[2]['result'];
+		self::$data['sessionids']['valid'] = $login[3]['result'];
+		self::$data['sessionids']['for_extend_parameter_tests'] = $login[4]['result'];
+
+		// Add disabled user group to authenticated user.
+		CDataHelper::call('user.update', [
+			'userid' => self::$data['userids']['user_with_disabled_usergroup'],
+			'usrgrps' => [
+				['usrgrpid' => $usergroupids['users_status_disabled']]
+			]
+		]);
+
+		$now = time();
+		self::$data['lastacess_time_for_sessionid_with_extend_tests'] = $now - 1;
+
+		// Data for updating sessions to have different states.
+		$session_data = [
+			[
+				// Update session lastaccess time to expire sessions default active time - 15minutes (900 seconds).
+				'values' => ['lastaccess' => $now - 901],
+				'where' => ['sessionid' => self::$data['sessionids']['expired_session']]
+			],
+			[
+				// Update session status to passive state.
+				'values' => ['status' => ZBX_SESSION_PASSIVE],
+				'where' => ['sessionid' => self::$data['sessionids']['passive_session']]
+			],
+			[
+				// Update sessions lastaccess time for test case when user.checkAuthentication extends session time.
+				'values' => ['lastaccess' => self::$data['lastacess_time_for_sessionid_with_extend_tests']],
+				'where' => ['sessionid' => self::$data['sessionids']['for_extend_parameter_tests']]
+			]
+		];
+
+		DB::update('sessions', $session_data);
+
+		$token_data = [
+			[
+				'name' => 'API test expired token',
+				'userid' => self::$data['userids']['user_for_token_tests'],
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'expires_at' => $now - 100
+			],
+			[
+				'name' => 'API test disabled token',
+				'userid' => self::$data['userids']['user_for_token_tests'],
+				'status' => ZBX_AUTH_TOKEN_DISABLED,
+				'expires_at' => $now + 100
+			],
+			[
+				'name' => 'API test valid token',
+				'userid' => self::$data['userids']['user_with_valid_session'],
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'expires_at' => $now + 100
+			],
+			[
+				'name' => 'API test valid token for user with disabled user group',
+				'userid' => self::$data['userids']['user_with_disabled_usergroup'],
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'expires_at' => $now + 100
+			]
+		];
+
+		$tokenids = CDataHelper::call('token.create', $token_data);
+		$this->assertArrayHasKey('tokenids', $tokenids, 'prepareUsersData() failed: Could not create tokens.');
+
+		$tokens = CDataHelper::call('token.generate', $tokenids['tokenids']);
+		$this->assertArrayHasKey(0, $tokens, 'prepareUsersData() failed: Could not generate tokens.');
+
+		self::$data['tokens']['not_authorized'] = 'NotAuthorizedTokenString';
+		self::$data['tokens']['expired'] = $tokens[0]['token'];
+		self::$data['tokens']['disabled'] = $tokens[1]['token'];
+		self::$data['tokens']['valid'] = $tokens[2]['token'];
+		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
+	}
+
 
 	public static function user_create() {
 		return [
@@ -2229,256 +2469,68 @@ class testUsers extends CAPITest {
 		);
 	}
 
-	public function prepareUsersData() {
-		$usergroup_data = [
-			[
-				'name' => 'Users status enabled',
-				'users_status' => GROUP_STATUS_ENABLED
-			],
-			[
-				'name' => 'Users status disabled',
-				'users_status' => GROUP_STATUS_DISABLED
-			]
-		];
-
-		$usergroups = CDataHelper::call('usergroup.create', $usergroup_data);
-
-		self::$users_data['usergroupids']['users_status_enabled'] = $usergroups['usrgrpids'][0];
-		self::$users_data['usergroupids']['users_status_disabled'] = $usergroups['usrgrpids'][1];
-
-		$users_data = [
-			[
-				'username' => 'user-expired-session',
-				'roleid' => 2,
-				'passwd' => 'zabbix123456',
-				'usrgrps' => [
-					['usrgrpid' => self::$users_data['usergroupids']['users_status_enabled']]
-				]
-			],
-			[
-				'username' => 'user-passive-session',
-				'roleid' => 2,
-				'passwd' => 'zabbix123456',
-				'usrgrps' => [
-					['usrgrpid' => self::$users_data['usergroupids']['users_status_enabled']]
-				]
-			],
-			[
-				'username' => 'user-with-disabled-group',
-				'roleid' => 2,
-				'passwd' => 'zabbix123456',
-				'usrgrps' => [
-					['usrgrpid' => self::$users_data['usergroupids']['users_status_enabled']]
-				]
-			],
-			[
-				'username' => 'user-valid',
-				'roleid' => 2,
-				'passwd' => 'zabbix123456',
-				'usrgrps' => [
-					['usrgrpid' => self::$users_data['usergroupids']['users_status_enabled']]
-				]
-			],
-			[
-				'username' => 'user-valid-extend',
-				'roleid' => 2,
-				'passwd' => 'zabbix123456',
-				'usrgrps' => [
-					['usrgrpid' => self::$users_data['usergroupids']['users_status_enabled']]
-				]
-			]
-		];
-
-		$users = CDataHelper::call('user.create', $users_data);
-
-		self::$users_data['user_expired_session']['userid'] = $users['userids'][0];
-		self::$users_data['user_passive_session']['userid'] = $users['userids'][1];
-		self::$users_data['user_with_disabled_usergroup']['userid'] = $users['userids'][2];
-		self::$users_data['user_valid']['userid'] = $users['userids'][3];
-		self::$users_data['user_valid_extend']['userid'] = $users['userids'][4];
-		self::$users_data['user_not_authorized_session']['userid'] = $users['userids'][0];
-		self::$users_data['user_for_token_tests']['userid'] = $users['userids'][0];
-
-		$login_data = [
-			[
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => 'user-expired-session',
-					'password' => 'zabbix123456'
-				],
-				'id' => self::$users_data['user_expired_session']['userid']
-			],
-			[
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => 'user-passive-session',
-					'password' => 'zabbix123456'
-				],
-				'id' => self::$users_data['user_passive_session']['userid']
-			],
-			[
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => 'user-with-disabled-group',
-					'password' => 'zabbix123456'
-				],
-				'id' => self::$users_data['user_with_disabled_usergroup']['userid']
-			],
-			[
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => 'user-valid',
-					'password' => 'zabbix123456'
-				],
-				'id' => self::$users_data['user_valid']['userid']
-			],
-			[
-				'jsonrpc' => '2.0',
-				'method' => 'user.login',
-				'params' => [
-					'username' => 'user-valid-extend',
-					'password' => 'zabbix123456'
-				],
-				'id' => self::$users_data['user_valid_extend']['userid']
-			]
-		];
-
-		$login = CDataHelper::callRaw($login_data);
-
-		self::$users_data['user_expired_session']['sessionid'] = $login[0]['result'];
-		self::$users_data['user_passive_session']['sessionid'] = $login[1]['result'];
-		self::$users_data['user_with_disabled_usergroup']['sessionid'] = $login[2]['result'];
-		self::$users_data['user_valid']['sessionid'] = $login[3]['result'];
-		self::$users_data['user_valid_extend']['sessionid'] = $login[4]['result'];
-		self::$users_data['user_not_authorized_session']['sessionid'] = 'InvalidSessionID';
-
-		$user_data =[
-			'userid' => self::$users_data['user_with_disabled_usergroup']['userid'],
-			'usrgrps' => [
-				['usrgrpid' => self::$users_data['usergroupids']['users_status_disabled']]
-			]
-		];
-
-		CDataHelper::call('user.update', $user_data);
-
-		$now = time();
-		self::$users_data['user_valid_extend']['session_lastaccess'] = $now - 5;
-
-		$session_data = [
-			[
-				'values' => ['lastaccess' => $now - 1000],
-				'where' => ['sessionid' => self::$users_data['user_expired_session']['sessionid']]
-			],
-			[
-				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => self::$users_data['user_passive_session']['sessionid']]
-			],
-			[
-				'values' => ['lastaccess' => self::$users_data['user_valid_extend']['session_lastaccess']],
-				'where' => ['sessionid' => self::$users_data['user_valid_extend']['sessionid']]
-			]
-		];
-
-		DB::update('sessions', $session_data);
-
-		$token_data = [
-			[
-				'name' => 'Expired token',
-				'userid' => self::$users_data['user_for_token_tests']['userid'],
-				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now- 100
-			],
-			[
-				'name' => 'Disabled token',
-				'userid' => self::$users_data['user_for_token_tests']['userid'],
-				'status' => ZBX_AUTH_TOKEN_DISABLED,
-				'expires_at' => $now + 100
-			],
-			[
-				'name' => 'Valid token',
-				'userid' => self::$users_data['user_valid']['userid'],
-				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
-			],
-			[
-				'name' => 'Valid token for user with disabled user group',
-				'userid' => self::$users_data['user_with_disabled_usergroup']['userid'],
-				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
-			]
-		];
-
-		$tokenids = CDataHelper::call('token.create', $token_data);
-		$tokens = CDataHelper::call('token.generate', $tokenids['tokenids']);
-
-		self::$users_data['user_for_token_tests']['not_authorized_token'] = 'NotAuthorizedTokenString';
-		self::$users_data['user_for_token_tests']['expired_token'] = $tokens[0]['token'];
-		self::$users_data['user_for_token_tests']['disabled_token'] = $tokens[1]['token'];
-		self::$users_data['user_valid']['token'] = $tokens[2]['token'];
-		self::$users_data['user_with_disabled_usergroup']['token'] = $tokens[3]['token'];
-	}
-
-	public static function users_checkAuthentication_InvalidParametersData(): array	{
+	/**
+	 * Data provider for user.checkAuthentication testing. Array contains common invalid parameter data.
+	 *
+	 * @return array
+	 */
+	public static function getUsersCheckAuthenticationDataInvalidParameters(): array {
 		return [
-			'Error expected if sessionid integer' => [
-				'params' => [
-					'sessionid' => 123456
-				],
-				'expected_error' => 'Invalid parameter "/sessionid": a character string is expected.'
+			'Test user.checkAuthentication invalid case when missing "sessionid" or "token" parameter' => [
+				'params' => [],
+				'expected_error' => 'Session ID or token is expected.'
 			],
-			'Error expected if sessionid boolean' => [
-				'params' => [
-					'sessionid' => true
-				],
-				'expected_error' => 'Invalid parameter "/sessionid": a character string is expected.'
-			],
-			'Error expected if extend string' => [
-				'params' => [
-					'extend' => 'Boolean expected'
-				],
-				'expected_error' => 'Invalid parameter "/extend": a boolean is expected.'
-			],
-			'Error expected if extend integer' => [
-				'params' => [
-					'extend' => 123456
-				],
-				'expected_error' => 'Invalid parameter "/extend": a boolean is expected.'
-			],
-			'Error expected if token integer' => [
-				'params' => [
-					'token' => 123456
-				],
-				'expected_error' => 'Invalid parameter "/token": a character string is expected.'
-			],
-			'Error expected if token boolean' => [
-				'params' => [
-					'token' => true
-				],
-				'expected_error' => 'Invalid parameter "/token": a character string is expected.'
-			],
-			'Error expected if token and sessionid given' => [
+			'Test user.checkAuthentication invalid case when "sessionid" and "token" parameters given' => [
 				'params' => [
 					'token' => 'string',
 					'sessionid' => 'string'
 				],
 				'expected_error' => 'Session ID or token is expected.'
 			],
-			'Error expected if not sessionid or token given' => [
-				'params' => [],
-				'expected_error' => 'Session ID or token is expected.'
-			],
-			'Error expected if token and extend given' => [
+			'Test user.checkAuthentication invalid case when "token" and "extend" parameters given' => [
 				'params' => [
 					'token' => 'string',
 					'extend' => true
 				],
 				'expected_error' => 'Extend not compatible with token.'
 			],
-			'Error expected if random parameter given' => [
+			'Test user.checkAuthentication invalid "sessionid" parameter (integer)' => [
+				'params' => [
+					'sessionid' => 123456
+				],
+				'expected_error' => 'Invalid parameter "/sessionid": a character string is expected.'
+			],
+			'Test user.checkAuthentication invalid "sessionid" parameter (boolean)' => [
+				'params' => [
+					'sessionid' => true
+				],
+				'expected_error' => 'Invalid parameter "/sessionid": a character string is expected.'
+			],
+			'Test user.checkAuthentication invalid "extend" parameter (string)' => [
+				'params' => [
+					'extend' => 'Boolean expected'
+				],
+				'expected_error' => 'Invalid parameter "/extend": a boolean is expected.'
+			],
+			'Test user.checkAuthentication invalid "extend" parameter (integer)' => [
+				'params' => [
+					'extend' => 123456
+				],
+				'expected_error' => 'Invalid parameter "/extend": a boolean is expected.'
+			],
+			'Test user.checkAuthentication invalid "token" parameter (integer)' => [
+				'params' => [
+					'token' => 123456
+				],
+				'expected_error' => 'Invalid parameter "/token": a character string is expected.'
+			],
+			'Test user.checkAuthentication invalid "token" parameter (boolean)' => [
+				'params' => [
+					'token' => true
+				],
+				'expected_error' => 'Invalid parameter "/token": a character string is expected.'
+			],
+			'Test user.checkAuthentication invalid case when unexpected parameter given' => [
 				'params' => [
 					'unexpected_parameter' => 'expect error'
 				],
@@ -2488,127 +2540,145 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	 * @dataProvider users_checkAuthentication_InvalidParametersData
+	 * Test user.checkAuthentication with invalid parameter data.
+	 *
+	 * @dataProvider getUsersCheckAuthenticationDataInvalidParameters
 	 */
-	public function testUsers_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
+	public function testUser_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
 			'params' => $params,
-			'id' => self::$users_data['user_valid']['userid']
+			'id' => 1
 		]);
 
 		$this->checkResult($res, $expected_error);
 	}
 
-	public static function users_checkAuthentication_NotValidAuthorizationData(): array {
+	/**
+	 * Data provider for user.checkAuthentication. Array contains paths to data for invalid users authentication cases.
+	 *
+	 * @return array
+	 */
+	public static function getUsersCheckAuthenticationDataInvalidAuthorization(): array {
 		return [
-			'Not authorized session ID' => [
-				'data' => ['user_not_authorized_session' => 'sessionid'],
+			'Test user.checkAuthentication not authorized session ID' => [
+				'data' => ['sessionids' => 'not_authorized_session'],
 				'expected_error' => 'Session terminated, re-login, please.'
 			],
-			'Expired active session ID' => [
-				'data' => ['user_expired_session' => 'sessionid'],
+			'Test user.checkAuthentication expired active session ID' => [
+				'data' => ['sessionids' => 'expired_session'],
 				'expected_error' => 'Session terminated, re-login, please.'
 			],
-			'Passive session ID' => [
-				'data' => ['user_passive_session' => 'sessionid'],
+			'Test user.checkAuthentication passive session ID' => [
+				'data' => ['sessionids' => 'passive_session'],
 				'expected_error' => 'Session terminated, re-login, please.'
 			],
-			'Not authorized token' => [
-				'data' => ['user_for_token_tests' => 'not_authorized_token'],
+			'Test user.checkAuthentication not authorized token' => [
+				'data' => ['tokens' => 'not_authorized'],
 				'expected_error' => 'Not authorized.'
 			],
-			'Expired token' => [
-				'data' => ['user_for_token_tests' => 'expired_token'],
+			'Test user.checkAuthentication expired token' => [
+				'data' => ['tokens' => 'expired'],
 				'expected_error' => 'API token expired.'
 			],
-			'Disabled token' => [
-				'data' => ['user_for_token_tests' => 'disabled_token'],
+			'Test user.checkAuthentication disabled token' => [
+				'data' => ['tokens' => 'disabled'],
 				'expected_error' => 'Not authorized.'
 			],
-			'User with active session ID and disabled user group' => [
-				'data' => ['user_with_disabled_usergroup' => 'sessionid'],
+			'Test user.checkAuthentication user with active session ID and disabled user group' => [
+				'data' => ['sessionids' => 'valid_for_user_with_disabled_usergroup'],
 				'expected_error' => 'Session terminated, re-login, please.'
 			],
-			'User with active token and disabled user group' => [
-				'data' => ['user_with_disabled_usergroup' => 'token'],
+			'Test user.checkAuthentication user with active token and disabled user group' => [
+				'data' => ['tokens' => 'valid_for_user_with_disabled_usergroup'],
 				'expected_error' => 'Not authorized.'
 			]
 		];
 	}
 
-	public static function users_checkAuthentication_ValidAuthorizationData(): array	{
+	/**
+	 * Data provider for user.checkAuthentication testing. Array contains authorized users data.
+	 *
+	 * @return array
+	 */
+	public static function getUsersCheckAuthenticationDataValidAuthorization(): array	{
 		return [
-			'Authorized session ID' => [
-				'data' => ['user_valid' => 'sessionid'],
+			'Test user.checkAuthentication user with valid session ID' => [
+				'data' => ['sessionids' => 'valid'],
 				'expected_error' => null
 			],
-			'Valid token' => [
-				'data' => ['user_valid' => 'token'],
+			'Test user.checkAuthentication user with valid token' => [
+				'data' => ['tokens' => 'valid'],
 				'expected_error' => null
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider users_checkAuthentication_NotValidAuthorizationData
-	 * @dataProvider users_checkAuthentication_ValidAuthorizationData
+	 * Test user.checkAuthentication with various valid and invalid user authorization cases.
+	 *
+	 * @dataProvider getUsersCheckAuthenticationDataInvalidAuthorization
+	 * @dataProvider getUsersCheckAuthenticationDataValidAuthorization
 	 */
-	public function testUsers_checkAuthentication_NotValidAuthorization(array $data, ?string $expected_error) {
-		foreach ($data as $user => $parameter) {
-			$parameter_key = $parameter == 'sessionid' ? 'sessionid' : 'token';
+	public function testUser_checkAuthentication_Authorization(array $data, ?string $expected_error) {
+		foreach ($data as $parameter => $name) {
+			$parameter_key = $parameter == 'sessionids' ? 'sessionid' : 'token';
 
 			$res = $this->callRaw([
 				'jsonrpc' => '2.0',
 				'method' => 'user.checkAuthentication',
 				'params' => [
-					$parameter_key => self::$users_data[$user][$parameter]
+					$parameter_key => self::$data[$parameter][$name]
 				],
-				'id' => self::$users_data[$user]['userid']
+				'id' => 1
 			]);
 
 			$this->checkResult($res, $expected_error);
 		}
 	}
 
-	public static function users_checkAuthentication_SessionIDWithExtendData(): array {
+	/**
+	 * Data provider for user.checkAuthentication testing. Array contains various valid extend parameter options.
+	 *
+	 * @return array
+	 */
+	public static function getUsersCheckAuthenticationDataValidSessionIDWithExtend(): array {
 		return [
-			'User extends session ID' => [
+			'Test user.checkAuthentication user does not extend session' => [
 				'extend' => false
 			],
-			'User does not extend session ID' => [
+			'Test user.checkAuthentication user extends session' => [
 				'extend' => true
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider users_checkAuthentication_SessionIDWithExtendData
+	 * Test user.checkAuthentication parameter extend effect for user with active session ID.
+	 *
+	 * @dataProvider getUsersCheckAuthenticationDataValidSessionIDWithExtend
 	 */
-	public function testUsers_checkAuthentication_SessionIDWithExtend(bool $extend) {
+	public function testUser_checkAuthentication_SessionIDWithExtend(bool $extend) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
 			'params' => [
-				'sessionid' => self::$users_data['user_valid_extend']['sessionid'],
+				'sessionid' => self::$data['sessionids']['for_extend_parameter_tests'],
 				'extend' => $extend
 			],
-			'id' => self::$users_data['user_valid_extend']['userid']
+			'id' => 1
 		]);
 
 		$this->checkResult($res);
 
-		[['lastaccess' => $lastaccess]] = DB::select('sessions', [
-			'output' => ['lastaccess'],
-			'filter' => [
-				'sessionid' =>  self::$users_data['user_valid_extend']['sessionid']
-			]
-		]);
+		$lastaccess = CDBHelper::getValue('SELECT lastaccess FROM sessions WHERE sessionid='
+			.zbx_dbstr(self::$data['sessionids']['for_extend_parameter_tests'])
+		);
 
 		$extend
-			? $this->assertGreaterThan(self::$users_data['user_valid_extend']['session_lastaccess'], $lastaccess)
-			: $this->assertEquals(self::$users_data['user_valid_extend']['session_lastaccess'], $lastaccess);
+			? $this->assertGreaterThan(self::$data['lastacess_time_for_sessionid_with_extend_tests'], $lastaccess)
+			: $this->assertEquals(self::$data['lastacess_time_for_sessionid_with_extend_tests'], $lastaccess);
 	}
 
 	/**
