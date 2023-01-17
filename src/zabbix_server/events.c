@@ -1766,6 +1766,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 	zbx_vector_uint64_t	hostids;
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*recovery;
+	zbx_connector_object_t	connector_object;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events.values_num);
 
@@ -1776,6 +1777,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_hashset_create(&hosts, events.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&connector_object.ids);
 
 	for (i = 0; i < events.values_num; i++)
 	{
@@ -1789,6 +1791,20 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
+
+		if (0 != connector_filters->values_num)
+		{
+			int	k;
+
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				zbx_vector_uint64_append(&connector_object.ids,
+						connector_filters->values[k].connectorid);
+			}
+
+			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
+				continue;
+		}
 
 		zbx_json_clean(&json);
 
@@ -1850,29 +1866,16 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		zbx_hashset_clear(&hosts);
 		zbx_vector_uint64_clear(&hostids);
 
-		if (0 != connector_filters->values_num)
+		if (0 != connector_object.ids.values_num)
 		{
-			int			k;
-			zbx_connector_object_t	connector_object;
-
-			zbx_vector_uint64_create(&connector_object.ids);
 			connector_object.objectid = event->trigger.triggerid;
 			connector_object.ts.sec = event->clock;
 			connector_object.ts.ns = event->ns;
 			connector_object.str = json.buffer;
 
-			for (k = 0; k < connector_filters->values_num; k++)
-			{
-				zbx_vector_uint64_append(&connector_object.ids,
-						connector_filters->values[k].connectorid);
-			}
+			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
 
-			if (0 != connector_object.ids.values_num)
-			{
-				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
-			}
-
-			zbx_vector_uint64_destroy(&connector_object.ids);
+			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
 		if (SUCCEED == events_export_enabled)
@@ -1885,6 +1888,20 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		if (EVENT_SOURCE_TRIGGERS != recovery->r_event->source)
 			continue;
 
+		if (0 != connector_filters->values_num)
+		{
+			int	k;
+
+			for (k = 0; k < connector_filters->values_num; k++)
+			{
+				zbx_vector_uint64_append(&connector_object.ids,
+						connector_filters->values[k].connectorid);
+			}
+
+			if (0 == connector_object.ids.values_num && FAIL == events_export_enabled)
+				continue;
+		}
+
 		zbx_json_clean(&json);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, recovery->r_event->clock);
@@ -1893,29 +1910,14 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_EVENTID, recovery->r_event->eventid);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PROBLEM_EVENTID, recovery->eventid);
 
-		if (0 != connector_filters->values_num)
+		if (0 != connector_object.ids.values_num)
 		{
-			int			k;
-			zbx_connector_object_t	connector_object;
-
-			zbx_vector_uint64_create(&connector_object.ids);
 			connector_object.objectid = recovery->r_event->trigger.triggerid;
 			connector_object.ts.sec = recovery->r_event->clock;
 			connector_object.ts.ns = recovery->r_event->ns;
 			connector_object.str = json.buffer;
-
-			for (k = 0; k < connector_filters->values_num; k++)
-			{
-				zbx_vector_uint64_append(&connector_object.ids,
-						connector_filters->values[k].connectorid);
-			}
-
-			if (0 != connector_object.ids.values_num)
-			{
-				zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
-			}
-
-			zbx_vector_uint64_destroy(&connector_object.ids);
+			zbx_connector_serialize_object(data, data_alloc, data_offset, &connector_object);
+			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
 		if (SUCCEED == events_export_enabled)
@@ -1925,6 +1927,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 	if (SUCCEED == events_export_enabled)
 		zbx_problems_export_flush();
 
+	zbx_vector_uint64_destroy(&connector_object.ids);
 	zbx_hashset_destroy(&hosts);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
