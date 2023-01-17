@@ -408,6 +408,21 @@ class testPageReportsActionLog extends CWebTest {
 					],
 					'result_amount' => 1
 				]
+			],
+			// #31
+			[
+				[
+					'result_amount' => 9
+				]
+			],
+			// #32
+			[
+				[
+					'fields' => [
+						'Search string' => ' '
+					],
+					'result_amount' => 9
+				]
 			]
 		];
 	}
@@ -460,7 +475,7 @@ class testPageReportsActionLog extends CWebTest {
 					// $values are array - what we search in action log.
 					foreach ($values as $value) {
 						foreach ($column_values as $column_value) {
-							// If "column value" contain "value" that we search - we remove this column value from array.
+							// If "column value" contains "value" that we search - we remove this column value from array.
 							if (str_contains($column_value, $value)) {
 								$column_values = array_values(array_diff($column_values, [$column_value]));
 							}
@@ -469,7 +484,7 @@ class testPageReportsActionLog extends CWebTest {
 				}
 
 				// If everything are correct - in table result were displayed only searched values.
-				// And we removed those result values from $column_values array. So - there should be 0 values at the end.
+				// And we remove those result values from $column_values array. So - there should be 0 values at the end.
 				$this->assertEquals(0, count($column_values));
 			}
 
