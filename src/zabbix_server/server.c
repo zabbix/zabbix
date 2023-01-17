@@ -1653,7 +1653,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(availability_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
 				zbx_thread_start(connector_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORWORKER:

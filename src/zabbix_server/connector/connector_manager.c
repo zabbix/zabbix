@@ -119,6 +119,23 @@ static void	connector_init_manager(zbx_connector_manager_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	connector_destroy_manager(zbx_connector_manager_t *manager)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers: %d", __func__, CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER]);
+
+	for (i = 0; i < manager->worker_count; i++)
+		zbx_vector_uint64_destroy(&manager->workers[i].ids);
+
+	zbx_free(manager->workers);
+	zbx_hashset_destroy(&manager->connectors);
+
+	memset(manager, 0, sizeof(zbx_connector_manager_t));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: registers preprocessing worker                                    *
@@ -449,7 +466,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	zbx_vector_connector_object_create(&connector_objects);
 
-	while (ZBX_IS_RUNNING())
+	for (;;)
 	{
 		time_now = zbx_time();
 
@@ -506,10 +523,36 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 		if (NULL != client)
 			zbx_ipc_client_release(client);
+
+		if (!ZBX_IS_RUNNING() && NULL == message)
+		{
+			zbx_connector_t		*connector;
+			zbx_hashset_iter_t	iter;
+			int			num = 0;
+
+			zbx_hashset_iter_reset(&manager.connectors, &iter);
+			while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (0 != connector->object_links.num_data)
+				{
+					num = connector->object_links.num_data;
+					break;
+				}
+			}
+
+			if (0 == num)
+			{
+				if (0 == timeout.sec)
+					break;
+
+				timeout.sec = 0;
+				timeout.ns = 100000000;
+			}
+		}
 	}
 
-	zbx_block_signals(&orig_mask);
-	zbx_unblock_signals(&orig_mask);
+	connector_destroy_manager(&manager);
+	zbx_ipc_service_close(&service);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

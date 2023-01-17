@@ -156,14 +156,19 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 
 	zbx_vector_connector_data_point_create(&connector_data_points);
 
-	while (ZBX_IS_RUNNING())
+	for (;;)
 	{
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read connector service request");
-			exit(EXIT_FAILURE);
+			if (ZBX_IS_RUNNING())
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read connector service request");
+				exit(EXIT_FAILURE);
+			}
+
+			break;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -179,8 +184,6 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		zbx_ipc_message_clean(&message);
 	}
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zbx_vector_connector_data_point_destroy(&connector_data_points);
+	exit(EXIT_SUCCESS);
 }
