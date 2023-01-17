@@ -102,8 +102,6 @@ class CLink extends CTag {
 			}
 		}
 
-
-
 		return parent::toString($destroy);
 	}
 }
