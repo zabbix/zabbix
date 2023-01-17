@@ -90,6 +90,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_manage_scheduled_reports' => 			'in 0,1',
 			'actions_manage_sla' => 						'in 0,1',
 			'actions_invoke_execute_now' =>					'in 0,1',
+			'actions_change_problem_ranking' =>				'in 0,1',
 			'ui_default_access' => 							'in 0,1',
 			'modules_default_access' => 					'in 0,1',
 			'actions_default_access' => 					'in 0,1',
@@ -203,6 +204,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'output' => ['serviceid', 'name'],
 			'serviceids' => array_column($data['rules']['service_write_list'], 'serviceid')
 		]);
+
+		$data['form_refresh'] = $this->getInput('form_refresh', 0);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));

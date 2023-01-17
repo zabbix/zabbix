@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-19 14:20+0000\n"
-"Last-Translator: Natalija <natalija.burisina@zabbix.com>\n"
+"PO-Revision-Date: 2022-12-24 09:05+0000\n"
+"Last-Translator: Edgars <edgars.voroboks@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -951,6 +951,14 @@ msgstr "Pievienot apakšservisus"
 msgid "Add from"
 msgstr "Pievienot no"
 
+#: app/partials/configuration.valuemap.php:51
+msgid "Add from host"
+msgstr "Pievienot no iekārtas"
+
+#: app/partials/configuration.valuemap.php:47
+msgid "Add from template"
+msgstr "Pievienot no veidnes"
+
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Pievienot mezglu"
@@ -1086,6 +1094,10 @@ msgstr "Padziļināta konfigurācija"
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
 msgstr "Uzlabotas etiķetes"
+
+#: app/views/popup.import.php:175
+msgid "Advanced options"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
@@ -1255,6 +1267,10 @@ msgstr "Atļautās iekārtas"
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
 msgstr "Atļautās metodes"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
+msgid "Also used as legend label for aggregated data sets."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -3776,6 +3792,10 @@ msgstr[0] "Nevar atjaunināt notikumu"
 msgstr[1] "Nevar atjaunināt notikumus"
 msgstr[2] "Nevar atjaunināt notikumus"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:134
+msgid "Cannot update events"
+msgstr ""
+
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
 msgstr "Grafiku nav iespējams atjaunot"
@@ -4020,6 +4040,11 @@ msgstr "Notver visus SNMP trapus, kas atbilst regulārai izteiksmei. Ja regexp n
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Notver visus SNMP trapus, kurus neuztvēra neviens no snmptrap[] vienumiem."
 
+#: include/actions.inc.php:2036 include/classes/screens/CScreenProblem.php:1153
+#: include/events.inc.php:256
+msgid "Cause"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormItem.php:92
 #: include/classes/widgets/forms/CWidgetFormItem.php:173
 #: include/classes/widgets/forms/CWidgetFormItem.php:296
@@ -4076,6 +4101,10 @@ msgstr "Mainīt paroli"
 #: include/items.inc.php:1844
 msgid "Change per second"
 msgstr "Izmaiņas sekundē"
+
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Change problem ranking"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
@@ -4652,6 +4681,10 @@ msgstr "Konfigurēt DB savienojumu"
 msgid "Configure JIT provisioning"
 msgstr ""
 
+#: app/views/js/administration.authentication.edit.js.php:137
+msgid "Confirm changes"
+msgstr ""
+
 #: app/views/administration.script.edit.php:256
 msgid "Confirmation text"
 msgstr "Apstiprinājuma teksts"
@@ -4882,6 +4915,14 @@ msgstr "Līguma numurs"
 #: include/views/configuration.item.prototype.edit.php:444
 msgid "Convert to JSON"
 msgstr "Konvertēt uz JSON"
+
+#: app/views/popup.acknowledge.edit.php:134
+msgid "Convert to cause"
+msgstr ""
+
+#: app/views/popup.acknowledge.edit.php:135
+msgid "Converts a symptom event back to cause event"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:307
 #: include/views/js/monitoring.sysmaps.js.php:442
@@ -5243,6 +5284,15 @@ msgstr "Pašreizējais"
 msgid "Current host"
 msgstr "Pašreizējā iekārta"
 
+#: app/controllers/CControllerUserUpdateGeneral.php:85
+#: app/views/administration.user.edit.php:174
+msgid "Current password"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:474
+msgid "Current password is mandatory."
+msgstr ""
+
 #: app/views/popup.scheduledreport.subscription.php:103
 msgid "Current user"
 msgstr "Pašreizējais lietotājs"
@@ -5479,6 +5529,10 @@ msgstr "Datu pārskats"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "Datu kopa"
+
+#: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
+msgid "Data set label"
+msgstr ""
 
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
@@ -5905,6 +5959,10 @@ msgstr "Vai dzēst atlasīto SLA?"
 msgid "Delete selected SLAs?"
 msgstr "Vai dzēst atlasītos SLA?"
 
+#: app/views/js/action.list.js.php:124
+msgid "Delete selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:172
 msgid "Delete selected actions?"
 msgstr "Vai dzēst atlasītās darbības?"
@@ -6100,11 +6158,11 @@ msgstr "Dzēst trigeri?"
 
 #: include/views/configuration.httpconf.edit.php:268
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Dzēst tīmekļa scenāriju?"
 
 #: app/controllers/CControllerAuditLogList.php:359
 msgid "Deleted"
-msgstr ""
+msgstr "Izdzēsts"
 
 #: app/views/administration.regex.edit.php:50
 msgid "Delimiter"
@@ -6207,6 +6265,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Apraksts"
+
+#: include/classes/data/CItemData.php:1167
+msgid "Detailed listing of installed packages. Returns text in JSON format"
+msgstr ""
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.list.php:87
@@ -6328,6 +6390,10 @@ msgstr ""
 msgid "Disable selected SLAs?"
 msgstr ""
 
+#: app/views/js/action.list.js.php:109
+msgid "Disable selected action?"
+msgstr ""
+
 #: include/views/configuration.action.list.php:171
 msgid "Disable selected actions?"
 msgstr ""
@@ -6339,7 +6405,7 @@ msgstr ""
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
-msgstr ""
+msgstr "Vai atspējot atlasītos atklāšanas noteikumus?"
 
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
@@ -6478,12 +6544,12 @@ msgstr ""
 #: include/views/inventory.host.view.php:198
 #: include/views/inventory.host.view.php:216
 msgid "Discovery"
-msgstr ""
+msgstr "Atklāšana"
 
 #: include/classes/helpers/CMenuHelper.php:204
 #: include/views/configuration.action.list.php:35
 msgid "Discovery actions"
-msgstr ""
+msgstr "Atklāšanas darbības"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -6492,19 +6558,19 @@ msgstr ""
 #: app/controllers/CControllerPopupDiscoveryCheck.php:109
 #: app/views/popup.condition.common.php:420 include/actions.inc.php:53
 msgid "Discovery check"
-msgstr ""
+msgstr "Atklāšanas pārbaude"
 
 #: app/controllers/CControllerPopupGeneric.php:313
 msgid "Discovery checks"
-msgstr ""
+msgstr "Atklāšanas pārbaudes"
 
 #: include/html.inc.php:432
 msgid "Discovery list"
-msgstr ""
+msgstr "Atklāšanas saraksts"
 
 #: app/views/popup.condition.common.php:438 include/actions.inc.php:54
 msgid "Discovery object"
-msgstr ""
+msgstr "Atklāšanas objekts"
 
 #: include/classes/data/CItemData.php:1222
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
@@ -7035,6 +7101,10 @@ msgstr "Iespējot"
 msgid "Enable HTTP authentication"
 msgstr "Iespējot HTTP autentifikāciju"
 
+#: app/views/js/administration.authentication.edit.js.php:140
+msgid "Enable HTTP authentication for all users."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:202
 #: app/views/administration.authentication.edit.php:276
 msgid "Enable JIT provisioning"
@@ -7121,6 +7191,10 @@ msgstr ""
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
+msgstr ""
+
+#: app/views/js/action.list.js.php:94
+msgid "Enable selected action?"
 msgstr ""
 
 #: include/views/configuration.action.list.php:170
@@ -7788,6 +7862,11 @@ msgstr ""
 msgid "Field \"%1$s\" is not correct: %2$s"
 msgstr ""
 
+#: include/validate.inc.php:185 include/validate.inc.php:190
+#, c-format
+msgid "Field \"%1$s\" is not correct: %2$s."
+msgstr ""
+
 #: include/validate.inc.php:167
 #, c-format
 msgid "Field \"%1$s\" is not integer."
@@ -7801,6 +7880,13 @@ msgstr ""
 #: include/validate.inc.php:298
 #, c-format
 msgid "Field \"%1$s\" must be missing."
+msgstr ""
+
+#: include/forms.inc.php:1471 include/forms.inc.php:1506
+#: include/views/js/item.preprocessing.js.php:153
+#: include/views/js/item.preprocessing.js.php:164
+#: include/views/js/item.preprocessing.js.php:210
+msgid "Field name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1150
@@ -9364,6 +9450,10 @@ msgstr ""
 msgid "Identification of the system. Returns string"
 msgstr ""
 
+#: app/views/administration.authentication.edit.php:150
+msgid "If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal) will be authenticated by the web server, not by Zabbix."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:83
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
@@ -9512,6 +9602,11 @@ msgstr "Imports veiksmīgs"
 #: hostinventories.php:192
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
+msgstr ""
+
+#: app/views/js/administration.user.edit.js.php:61
+#: app/views/js/administration.userprofile.edit.js.php:69
+msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
 msgstr ""
 
 #: include/html.inc.php:277 include/maps.inc.php:409
@@ -9884,6 +9979,10 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:468
+msgid "Incorrect current password."
 msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
@@ -12109,6 +12208,13 @@ msgstr "MAC adrese A"
 msgid "MAC address B"
 msgstr "MAC adrese B"
 
+#: include/forms.inc.php:1454 include/forms.inc.php:1486
+#: include/views/js/item.preprocessing.js.php:141
+#: include/views/js/item.preprocessing.js.php:178
+#: include/views/js/item.preprocessing.js.php:224
+msgid "MAC from Hex-STRING"
+msgstr ""
+
 #: include/hosts.inc.php:33
 msgid "MD2"
 msgstr "MD2"
@@ -12347,6 +12453,14 @@ msgid "Map update failed."
 msgstr ""
 
 #: app/views/popup.ldap.edit.php:257
+msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:513
+msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:257
 msgid "Map user’s LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
 msgstr ""
 
@@ -12390,6 +12504,10 @@ msgstr "Mar"
 msgid "March"
 msgstr "Marts"
 
+#: jsLoader.php:361
+msgid "Mark as cause"
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:148
 msgid "Mark elements on trigger status change"
 msgstr ""
@@ -12401,6 +12519,10 @@ msgstr "Atzīmēt pārējos"
 #: include/views/monitoring.history.php:175
 msgid "Mark selected"
 msgstr "Iekrāsot izvēlētās"
+
+#: jsLoader.php:362
+msgid "Mark selected as symptoms"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -12473,6 +12595,23 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTest.php:1313
+#: app/controllers/CControllerPopupItemTest.php:1319
+#: app/controllers/CControllerPopupItemTest.php:1325
+#: app/controllers/CControllerPopupItemTest.php:1331
+#: app/partials/configuration.host.interface.row.php:105
+#: app/views/popup.itemtestedit.view.php:154
+msgid "Max repetition count"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and snmp.walk only."
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:106
+msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
 #: app/views/administration.geomaps.edit.php:98
@@ -13315,6 +13454,11 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
+msgstr ""
+
+#: app/views/js/popup.action.edit.js.php:413
+#: app/views/popup.action.edit.php:302
+msgid "New action"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:94
@@ -14248,6 +14392,17 @@ msgstr "Skaitlis (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
+#: include/forms.inc.php:1447 include/views/js/item.preprocessing.js.php:134
+msgid "OID"
+msgstr ""
+
+#: include/forms.inc.php:1477 include/forms.inc.php:1507
+#: include/views/js/item.preprocessing.js.php:154
+#: include/views/js/item.preprocessing.js.php:169
+#: include/views/js/item.preprocessing.js.php:215
+msgid "OID prefix"
+msgstr ""
+
 #: app/views/js/popup.import.js.php:51 app/views/js/popup.import.js.php:151
 #: app/views/js/reports.scheduledreport.edit.js.php:78
 #: app/views/popup.service.edit.php:220 app/views/service.list.edit.php:80
@@ -14454,6 +14609,10 @@ msgstr "Opera"
 
 #: include/classes/data/CItemData.php:1094
 msgid "Operating system information. Returns string"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1165
+msgid "Operating system version information. Returns JSON"
 msgstr ""
 
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
@@ -15090,6 +15249,10 @@ msgstr "Parole"
 msgid "Password (once again)"
 msgstr "Parole (vēlreiz)"
 
+#: app/views/administration.user.edit.php:199
+msgid "Password can only be changed for users using the internal Zabbix authentication."
+msgstr ""
+
 #: app/views/administration.user.edit.php:173
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
@@ -15132,6 +15295,10 @@ msgstr ""
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:477
 msgid "Pause operations for suppressed problems"
+msgstr ""
+
+#: app/views/popup.action.edit.php:227
+msgid "Pause operations for symptom problems"
 msgstr ""
 
 #: include/classes/debug/CProfiler.php:163
@@ -15328,6 +15495,10 @@ msgstr "Pozīcija"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
+#: include/classes/core/ZBase.php:764
+msgid "Possibly the session has expired or the password was changed."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -15825,6 +15996,10 @@ msgstr ""
 #: include/hosts.inc.php:37
 msgid "RMCP+"
 msgstr "RMCP+"
+
+#: include/events.inc.php:256 include/events.inc.php:272
+msgid "Rank"
+msgstr ""
 
 #: app/views/popup.httpstep.php:86 app/views/popup.massupdate.item.php:93
 #: include/views/configuration.host.discovery.edit.php:299
@@ -16907,6 +17082,14 @@ msgstr ""
 msgid "SNMP version"
 msgstr ""
 
+#: include/items.inc.php:1802
+msgid "SNMP walk to JSON"
+msgstr ""
+
+#: include/items.inc.php:1798
+msgid "SNMP walk value"
+msgstr ""
+
 #: include/items.inc.php:1299
 #, c-format
 msgid "SNMPv%1$d"
@@ -17820,6 +18003,11 @@ msgstr ""
 msgid "Show suppressed problems"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:129
+#: widgets/problems/includes/WidgetForm.php:120
+msgid "Show symptoms"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:168
 #: app/partials/monitoring.problem.filter.php:232
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
@@ -18487,6 +18675,11 @@ msgstr "Zviedru (sv_SE)"
 
 #: app/views/js/administration.authentication.edit.js.php:36
 msgid "Switching authentication method will reset all except this session! Continue?"
+msgstr ""
+
+#: include/actions.inc.php:2041 include/classes/screens/CScreenProblem.php:1479
+#: include/events.inc.php:274 widgets/problems/includes/WidgetProblems.php:375
+msgid "Symptom"
 msgstr ""
 
 #: app/controllers/CControllerGuiEdit.php:33
@@ -19950,6 +20143,10 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr "NEZINĀMS"
 
+#: include/events.inc.php:336 include/events.inc.php:343
+msgid "UPDATING"
+msgstr ""
+
 #: app/views/popup.httpstep.php:52 app/views/popup.massupdate.item.php:83
 #: disc_prototypes.php:152 host_discovery.php:127
 #: include/classes/widgets/CWidgetConfig.php:73
@@ -20009,6 +20206,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:316
 #: include/views/monitoring.sysmap.edit.php:313 jsLoader.php:385
 msgid "URLs"
+msgstr ""
+
+#: include/forms.inc.php:1453 include/forms.inc.php:1485
+#: include/views/js/item.preprocessing.js.php:140
+#: include/views/js/item.preprocessing.js.php:177
+#: include/views/js/item.preprocessing.js.php:223
+msgid "UTF-8 from Hex-STRING"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2638
@@ -20113,6 +20317,13 @@ msgstr ""
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Vai atbloķēt iezīmētos lietotājus?"
+
+#: include/forms.inc.php:1452 include/forms.inc.php:1484
+#: include/views/js/item.preprocessing.js.php:139
+#: include/views/js/item.preprocessing.js.php:176
+#: include/views/js/item.preprocessing.js.php:222
+msgid "Unchanged"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
@@ -20480,6 +20691,10 @@ msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:207
+msgid "Use combined requests"
 msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:36
@@ -23203,6 +23418,12 @@ msgstr ""
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
+#: include/classes/api/services/CItemGeneralOld.php:1724
+#: include/classes/api/services/CItemGeneralOld.php:1761
+#: include/classes/api/services/CItemGeneral.php:2066
+msgid "incorrect value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
@@ -23237,6 +23458,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:357
 msgid "invalid byte sequence in UTF-8"
+msgstr ""
+
+#: include/validate.inc.php:190
+msgid "invalid data type"
 msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:116 include/items.inc.php:2066
@@ -23680,6 +23905,14 @@ msgstr ""
 
 #: include/classes/api/services/CEvent.php:757
 msgid "no permissions to close problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1054
+msgid "no permissions to convert cause problems to symptom problems"
+msgstr ""
+
+#: include/classes/api/services/CEvent.php:1053
+msgid "no permissions to convert symptom problems to cause problems"
 msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:168

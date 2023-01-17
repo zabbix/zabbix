@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-24T17:40:54Z'
+  date: '2022-12-19T09:58:38Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -452,6 +452,18 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 897f991e6f8f433bbd52a958f4f54c08
+          name: 'Get filesystems'
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 6888f0dd6b2e418f8c28a0ee59648fa3
           name: 'Available memory'
           key: 'vm.memory.size[available]'
@@ -592,8 +604,9 @@ zabbix_export:
         -
           uuid: 3abf31160b404cf095daca79f2a03188
           name: 'Mounted filesystem discovery'
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             conditions:
               -
@@ -604,11 +617,20 @@ zabbix_export:
           item_prototypes:
             -
               uuid: aa40b3df2229405193c373b00064e420
-              name: '{#FSNAME}: Free inodes (percentage)'
-              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free inodes, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.inodes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -619,7 +641,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a56d85c866814b5e9273815beafba98c
-                  expression: 'last(/Solaris/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/Solaris/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
                   tags:
@@ -632,9 +654,18 @@ zabbix_export:
             -
               uuid: e4c935091c6c49f185ef0e93963388ff
               name: '{#FSNAME}: Free disk space'
-              key: 'vfs.fs.size[{#FSNAME},free]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.free
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -644,11 +675,20 @@ zabbix_export:
                   value: '{#FSNAME}'
             -
               uuid: e2805fb218d64ddd8ea58beae73e1343
-              name: '{#FSNAME}: Free disk space (percentage)'
-              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              name: '{#FSNAME}: Free disk space, %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -659,7 +699,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e93165ebd8d94064836405c8c377bf62
-                  expression: 'last(/Solaris/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/Solaris/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
                   tags:
@@ -672,10 +712,18 @@ zabbix_export:
             -
               uuid: e15cfb60494944db8e9b2fe929d91fef
               name: '{#FSNAME}: Total disk space'
-              key: 'vfs.fs.size[{#FSNAME},total]'
-              delay: 1h
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -686,9 +734,18 @@ zabbix_export:
             -
               uuid: 0da8a65250ec4027b3093772f5c26532
               name: '{#FSNAME}: Used disk space'
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 7d
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -696,6 +753,79 @@ zabbix_export:
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
+            -
+              uuid: 2076c4c4799646d9b42f881369a36f7d
+              name: '{#FSNAME}: Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: de8a43c30de44e83b381b75254735a10
+              name: '{#FSNAME}: Filesystem is read-only'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},readonly]'
+              delay: '0'
+              history: 7d
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.options
+                  error_handler: DISCARD_VALUE
+                -
+                  type: REGEX
+                  parameters:
+                    - '(?:^|,)ro\b'
+                    - '1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: cbbcf1204cf345ceaaf2a9b12996f52f
+                  expression: 'last(/Solaris/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/Solaris/vfs.fs.dependent[{#FSNAME},readonly])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Solaris/vfs.fs.dependent[{#FSNAME},readonly])=0'
+                  name: '{#FSNAME}: Filesystem became read-only'
+                  priority: AVERAGE
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: ba1e86d39b2d4f61892228add27101f2
@@ -712,13 +842,38 @@ zabbix_export:
                   type: GRAPH_SUM
                   item:
                     host: Solaris
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: 00C800
                   item:
                     host: Solaris
-                    key: 'vfs.fs.size[{#FSNAME},free]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

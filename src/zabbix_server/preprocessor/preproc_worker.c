@@ -28,9 +28,8 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
+#include "preproc_snmp.h"
 #include "zbxtime.h"
-
-extern unsigned char			program_type;
 
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
 
@@ -684,7 +683,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_PREPROCESSOR_WORKER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -705,7 +704,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		zbx_update_env(zbx_time());
+		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 		switch (message.code)
 		{
@@ -733,4 +732,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_sleep(SEC_PER_MIN);
 
 	zbx_es_destroy(&es_engine);
+#ifdef HAVE_NETSNMP
+	zbx_preproc_shutdown_snmp();
+#endif
 }

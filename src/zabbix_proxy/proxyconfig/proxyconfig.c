@@ -34,14 +34,13 @@
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
-extern unsigned char			program_type;
-
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *zbx_config_tls, const zbx_thread_info_t *thread_info, int config_timeout)
+		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
+		const zbx_thread_info_t *thread_info, int config_timeout)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -74,7 +73,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
 	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
-			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, zbx_config_tls))	/* retry till have a connection */
+			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, config_tls)) /* retry till have a connection */
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 		goto out;
@@ -124,11 +123,11 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL);
+		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, config_vault);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			DCsync_kvs_paths(&jp_kvs_paths);
+			DCsync_kvs_paths(&jp_kvs_paths, config_vault);
 
 		DCupdate_interfaces_availability();
 	}
@@ -249,12 +248,11 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
-			get_program_type_string(proxyconfig_args_in->zbx_get_program_type_cb_arg()),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
 
 	zbx_rtc_subscribe(process_type, process_num, proxyconfig_args_in->config_timeout, &rtc);
@@ -264,11 +262,11 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault);
 
 	zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
-	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : 0);
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -287,15 +285,15 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		}
 
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type)
+		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{
 			if (0 != config_cache_reload)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL);
+				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL, proxyconfig_args_in->config_vault);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
@@ -319,8 +317,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls, info,
-				proxyconfig_args_in->config_timeout);
+		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->config_tls,
+				proxyconfig_args_in->config_vault, info, proxyconfig_args_in->config_timeout);
+
 		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

@@ -27,7 +27,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-extern unsigned char			program_type;
 static sigset_t				orig_mask;
 
 typedef struct
@@ -257,7 +256,7 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 	zbx_vector_uint64_destroy(&hostids);
 }
 
-static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
+static void	init_active_availability(zbx_avail_active_hb_cache_t *cache, unsigned char program_type)
 {
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
@@ -425,7 +424,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 				server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -453,7 +452,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	init_active_availability(&active_hb_cache);
+	init_active_availability(&active_hb_cache, info->program_type);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -475,7 +474,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
@@ -541,7 +540,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 						zbx_interface_availability_free);
 			}
 
-			if (0 != active_hb_cache.queue.num_data && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 != active_hb_cache.queue.num_data && 0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				flush_active_hb_queue(&active_hb_cache);
 				zbx_hashset_clear(&active_hb_cache.queue);
@@ -549,13 +548,14 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		}
 
 		if (ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC < time_now -
-				active_hb_cache.last_proxy_avail_refresh && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				active_hb_cache.last_proxy_avail_refresh &&
+				0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			active_hb_cache.last_proxy_avail_refresh = time_now;
 			active_checks_calculate_proxy_availability(&active_hb_cache);
 		}
 
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) &&
+		if (0 != (info->program_type & ZBX_PROGRAM_TYPE_PROXY) &&
 				last_proxy_flush + ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AUTOFLUSH_DELAY <= time_now)
 		{
 			flush_all_hosts(&active_hb_cache);

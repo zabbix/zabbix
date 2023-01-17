@@ -41,6 +41,7 @@ abstract class CControllerProblem extends CController {
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'show_tags' => SHOW_TAGS_3,
+		'show_symptoms' => 0,
 		'show_suppressed' => 0,
 		'unacknowledged' => 0,
 		'compact_view' => 0,
@@ -71,7 +72,7 @@ abstract class CControllerProblem extends CController {
 		$range_time_parser->parse($filter['to']);
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$data = CScreenProblem::getData($filter);
+		$data = CScreenProblem::getData($filter, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 
 		return count($data['problems']);
 	}

@@ -53,6 +53,7 @@ $row_template = (new CTag('script', true))
 $html_page->addItem($row_template);
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setId('script-form')
 	->setName('scripts')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)

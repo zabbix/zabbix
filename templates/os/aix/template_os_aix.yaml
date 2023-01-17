@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-10-24T17:38:06Z'
+  date: '2022-12-19T09:58:40Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -569,6 +569,18 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 95e14453e9ee4b6ea036fab09bf2b194
+          name: 'Get filesystems'
+          key: vfs.fs.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 6d4d9deab17b42f4a953c5210acac6f1
           name: 'Available memory'
           key: 'vm.memory.size[available]'
@@ -706,8 +718,9 @@ zabbix_export:
         -
           uuid: 4a0b17decdf1449d9463cf00720a843d
           name: 'Mounted filesystem discovery'
-          key: vfs.fs.discovery
-          delay: 1h
+          type: DEPENDENT
+          key: vfs.fs.dependent.discovery
+          delay: '0'
           filter:
             conditions:
               -
@@ -719,10 +732,19 @@ zabbix_export:
             -
               uuid: ee5ae5de6f7b40b4a9b064bdc733de91
               name: '{#FSNAME}: Free inodes, %'
-              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
+              delay: '0'
               history: 1w
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.inodes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -733,7 +755,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6ce467d05e8745409a177799bed34bb3
-                  expression: 'last(/AIX by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free inodes is less than 20%'
                   priority: WARNING
                   tags:
@@ -746,9 +768,18 @@ zabbix_export:
             -
               uuid: 13e212598f744a7fa535c23731190c61
               name: '{#FSNAME}: Free disk space'
-              key: 'vfs.fs.size[{#FSNAME},free]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+              delay: '0'
               history: 1w
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.free
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -759,10 +790,19 @@ zabbix_export:
             -
               uuid: 428b0314dd574df1970dd2cae7e8889b
               name: '{#FSNAME}: Free disk space, %'
-              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
+              delay: '0'
               history: 1w
               value_type: FLOAT
               units: '%'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.pfree
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -773,7 +813,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 74a1fc62bfe24b7eabe4e244c70dc384
-                  expression: 'last(/AIX by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20'
+                  expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
                   name: '{#FSNAME}: Free disk space is less than 20%'
                   priority: WARNING
                   tags:
@@ -786,10 +826,18 @@ zabbix_export:
             -
               uuid: 6f6c92bc72014612b2efb92d12d8c425
               name: '{#FSNAME}: Total disk space'
-              key: 'vfs.fs.size[{#FSNAME},total]'
-              delay: 1h
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},total]'
+              delay: '0'
               history: 1w
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.total
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -800,9 +848,18 @@ zabbix_export:
             -
               uuid: 915e72271f134684b2d10d05d4035962
               name: '{#FSNAME}: Used disk space'
-              key: 'vfs.fs.size[{#FSNAME},used]'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+              delay: '0'
               history: 1w
               units: B
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.bytes.used
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 -
                   tag: component
@@ -810,6 +867,79 @@ zabbix_export:
                 -
                   tag: filesystem
                   value: '{#FSNAME}'
+            -
+              uuid: 0c21ec9b14884057bdd2080b4871756e
+              name: '{#FSNAME}: Get filesystem data'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},data]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.fsname==''{#FSNAME}'')].first()'
+              master_item:
+                key: vfs.fs.get
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: cd96a2d7e708495cbc5d11a14ea9c876
+              name: '{#FSNAME}: Filesystem is read-only'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent[{#FSNAME},readonly]'
+              delay: '0'
+              history: 7d
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.options
+                  error_handler: DISCARD_VALUE
+                -
+                  type: REGEX
+                  parameters:
+                    - '(?:^|,)ro\b'
+                    - '1'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 05ec0e80333d4f7688b71a2865d0365e
+                  expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0'
+                  name: '{#FSNAME}: Filesystem became read-only'
+                  priority: AVERAGE
+                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
           graph_prototypes:
             -
               uuid: 460b553fcd924b6abbde0b00a5525445
@@ -819,13 +949,38 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'AIX by Zabbix agent'
-                    key: 'vfs.fs.size[{#FSNAME},total]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'AIX by Zabbix agent'
-                    key: 'vfs.fs.size[{#FSNAME},free]'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+          master_item:
+            key: vfs.fs.get
+          lld_macro_paths:
+            -
+              lld_macro: '{#FSNAME}'
+              path: $.fsname
+            -
+              lld_macro: '{#FSTYPE}'
+              path: $.fstype
+          overrides:
+            -
+              name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: inode
+                  discover: NO_DISCOVER
       tags:
         -
           tag: class

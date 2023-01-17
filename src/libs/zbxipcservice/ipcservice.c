@@ -25,8 +25,6 @@ static size_t	ipc_path_root_len = 0;
 #define ZBX_IPC_ASYNC_SOCKET_STATE_TIMEOUT	1
 #define ZBX_IPC_ASYNC_SOCKET_STATE_ERROR	2
 
-extern unsigned char	program_type;
-
 /* IPC client, providing nonblocking connections through socket */
 struct zbx_ipc_client
 {
@@ -103,6 +101,9 @@ static const char	*ipc_get_path(void)
 #define ZBX_IPC_CLASS_PREFIX_PROXY	"proxy_"
 #define ZBX_IPC_CLASS_PREFIX_AGENT	"agent_"
 
+static const char	*ipc_path_prefix = ZBX_IPC_CLASS_PREFIX_NONE;
+static size_t		ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE);
+
 /******************************************************************************
  *                                                                            *
  * Purpose: makes socket path from the service name                           *
@@ -116,46 +117,24 @@ static const char	*ipc_get_path(void)
  ******************************************************************************/
 static const char	*ipc_make_path(const char *service_name, char **error)
 {
-	const char	*prefix;
-	size_t		path_len, offset, prefix_len;
+	size_t		path_len, offset;
 
 	path_len = strlen(service_name);
 
-	switch (program_type)
-	{
-		case ZBX_PROGRAM_TYPE_SERVER:
-			prefix = ZBX_IPC_CLASS_PREFIX_SERVER;
-			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_SERVER);
-			break;
-		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
-		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
-			prefix = ZBX_IPC_CLASS_PREFIX_PROXY;
-			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_PROXY);
-			break;
-		case ZBX_PROGRAM_TYPE_AGENTD:
-			prefix = ZBX_IPC_CLASS_PREFIX_AGENT;
-			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_AGENT);
-			break;
-		default:
-			prefix = ZBX_IPC_CLASS_PREFIX_NONE;
-			prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE);
-			break;
-	}
-
 	if (ZBX_IPC_PATH_MAX < ipc_path_root_len + path_len + 1 + ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX) +
-			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + prefix_len)
+			ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + ipc_path_prefix_len)
 	{
 		*error = zbx_dsprintf(*error,
 				"Socket path \"%s%s%s%s%s\" exceeds maximum length of unix domain socket path.",
-				ipc_path, ZBX_IPC_SOCKET_PREFIX, prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
+				ipc_path, ZBX_IPC_SOCKET_PREFIX, ipc_path_prefix, service_name, ZBX_IPC_SOCKET_SUFFIX);
 		return NULL;
 	}
 
 	offset = ipc_path_root_len;
 	memcpy(ipc_path + offset , ZBX_IPC_SOCKET_PREFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX));
 	offset += ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_PREFIX);
-	memcpy(ipc_path + offset, prefix, prefix_len);
-	offset += prefix_len;
+	memcpy(ipc_path + offset, ipc_path_prefix, ipc_path_prefix_len);
+	offset += ipc_path_prefix_len;
 	memcpy(ipc_path + offset, service_name, path_len);
 	offset += path_len;
 	memcpy(ipc_path + offset, ZBX_IPC_SOCKET_SUFFIX, ZBX_CONST_STRLEN(ZBX_IPC_SOCKET_SUFFIX) + 1);
@@ -2081,6 +2060,30 @@ fail:
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 	return ret;
+}
+
+void	zbx_init_library_ipcservice(unsigned char program_type)
+{
+	switch (program_type)
+	{
+		case ZBX_PROGRAM_TYPE_SERVER:
+			ipc_path_prefix = ZBX_IPC_CLASS_PREFIX_SERVER;
+			ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_SERVER);
+			break;
+		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
+			ipc_path_prefix = ZBX_IPC_CLASS_PREFIX_PROXY;
+			ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_PROXY);
+			break;
+		case ZBX_PROGRAM_TYPE_AGENTD:
+			ipc_path_prefix = ZBX_IPC_CLASS_PREFIX_AGENT;
+			ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_AGENT);
+			break;
+		default:
+			ipc_path_prefix = ZBX_IPC_CLASS_PREFIX_NONE;
+			ipc_path_prefix_len = ZBX_CONST_STRLEN(ZBX_IPC_CLASS_PREFIX_NONE);
+			break;
+	}
 }
 
 #endif

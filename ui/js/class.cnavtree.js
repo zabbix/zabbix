@@ -347,6 +347,11 @@ if (typeof addPopupValues === 'undefined') {
 				this._clear(event, noPropagation);
 			}
 			else {
+				const parent_id = this.placeholder.parent().closest('.tree-item').data('id');
+				const item_id = $(this.currentItem[0]).data('id');
+
+				$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
+
 				if (this.options.revert) {
 					const self = this,
 						cur = self.placeholder.offset();

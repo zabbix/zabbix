@@ -109,8 +109,8 @@ class CControllerHintboxEventlist extends CController {
 		) ? $url : '';
 
 		$options = [
-			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged'],
-			'select_acknowledges' => ['action'],
+			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged', 'cause_eventid'],
+			'select_acknowledges' => ['action', 'taskid'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventid_till' => $this->getInput('eventid_till'),

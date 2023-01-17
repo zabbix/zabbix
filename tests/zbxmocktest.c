@@ -93,19 +93,12 @@ int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= 0;
-char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULT			= NULL;
-char	*CONFIG_VAULTURL		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
-char	*CONFIG_VAULTTLSCERTFILE	= NULL;
-char	*CONFIG_VAULTTLSKEYFILE		= NULL;
-char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
 char	*CONFIG_DB_TLS_CERT_FILE	= NULL;
@@ -126,8 +119,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 /* how often Zabbix server sends configuration data to proxy, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;
@@ -182,6 +173,12 @@ char	**CONFIG_USER_PARAMETERS	= NULL;
 char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
+
+static int	config_timeout = 3;
+int		get_config_timeout(void)
+{
+	return config_timeout;
+}
 
 /* test itself */
 

@@ -56,13 +56,13 @@ $fields = [
 	'ymax_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
 	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (left)')],
 	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN_DBL(0, 100, 4), null, _('Percentile line (right)')],
-	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
-	'items' =>				[T_ZBX_STR, O_OPT, null,		null,			null],
+	'visible' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	BETWEEN(0, 1),	null],
+	'items' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'discover' =>			[T_ZBX_INT, O_OPT, null,		IN([ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]), null],
 	'show_work_period' =>	[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
-	'group_graphid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
-	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
+	'group_graphid' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
+	'copy_targetids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,		null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	'readonly' =>			[T_ZBX_INT, O_OPT, null,		IN('1'),		null],
 	// actions
@@ -74,14 +74,14 @@ $fields = [
 	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,		null,			null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, P_SYS,		null,			null],
 	// filter
-	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_groupids' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
-	'filter_hostids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,	null],
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
+	'filter_groupids' =>	[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// sort and sortorder
-	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),					null],
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"graphtype","name","discover"'),			null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 $percentVisible = getRequest('visible', []);

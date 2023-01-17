@@ -38,8 +38,6 @@ static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
 
-extern unsigned char			program_type;
-
 static void	DBget_lastsize(void)
 {
 	DB_RESULT	result;
@@ -594,7 +592,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, CONFIG_SNMPTRAP_FILE);
@@ -613,7 +611,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 

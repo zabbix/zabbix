@@ -459,7 +459,7 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	$src_dep_items = [];
 	$dep_itemids = [];
 
-	foreach ($src_items as $itemid => &$item) {
+	foreach ($src_items as $itemid => $item) {
 		if ($item['valuemapid'] != 0) {
 			$src_valuemapids[$item['valuemapid']] = true;
 		}
@@ -479,7 +479,6 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 			}
 		}
 	}
-	unset($item);
 
 	$valuemap_links = [];
 
@@ -1794,6 +1793,14 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('Structured data'),
 			'name' => _('XML to JSON')
 		],
+		ZBX_PREPROC_SNMP_WALK_VALUE => [
+			'group' => _('SNMP'),
+			'name' => _('SNMP walk value')
+		],
+		ZBX_PREPROC_SNMP_WALK_TO_JSON => [
+			'group' => _('SNMP'),
+			'name' => _('SNMP walk to JSON')
+		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'group' => _('Arithmetic'),
 			'name' => _('Custom multiplier')
@@ -2101,6 +2108,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 				$step['params'] = $step['params'][0];
 				break;
 
+			case ZBX_PREPROC_SNMP_WALK_VALUE:
 			case ZBX_PREPROC_VALIDATE_RANGE:
 				foreach ($step['params'] as &$param) {
 					$param = trim($param);
@@ -2140,6 +2148,14 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 					$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
 				}
 				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
+				$step['params'] = array_values($step['params']);
+
+				$step['params'] = implode("\n", array_map(function (string $value): string {
+					return trim($value);
+				}, $step['params']));
 				break;
 
 			default:
