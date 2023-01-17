@@ -106,7 +106,10 @@ class testConnector extends CAPITest {
 			],
 			'update_custom_defaults' => [
 				'name' => 'API test connector.update with custom defaults',
-				'url' => 'http://localhost/'
+				'url' => 'http://localhost/',
+				'ssl_cert_file' => 'ssl_cert_file',
+				'ssl_key_file' => 'ssl_key_file',
+				'ssl_key_password' => 'ssl_key_password'
 			],
 			'update_authtype_basic' => [
 				'name' => 'API test connector.update with authtype (basic), username and password',
@@ -536,12 +539,38 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
+			'Test connector.create: missing "ssl_cert_file"' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'ssl_key_file' => 'ssl_key_file'
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "ssl_cert_file" is missing.'
+			],
+			'Test connector.create: invalid "ssl_cert_file" (empty)' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'ssl_cert_file' => '',
+					'ssl_key_file' => 'ssl_key_file'
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": cannot be empty.'
+			],
 
 			// Check "ssl_key_file".
+			'Test connector.create: missing "ssl_key_file"' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'ssl_key_password' => 'ssl_key_password'
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_key_file": cannot be empty.'
+			],
 			'Test connector.create: invalid "ssl_key_file" (boolean)' => [
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
+					'ssl_cert_file' => 'ssl_cert_file',
 					'ssl_key_file' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": a character string is expected.'
@@ -550,6 +579,7 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
+					'ssl_cert_file' => 'ssl_cert_file',
 					'ssl_key_file' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_file') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
@@ -560,6 +590,8 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
+					'ssl_cert_file' => 'ssl_cert_file',
+					'ssl_key_file' => 'ssl_key_file',
 					'ssl_key_password' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": a character string is expected.'
@@ -568,6 +600,8 @@ class testConnector extends CAPITest {
 				'connector' => [
 					'name' => 'API create connector',
 					'url' => 'http://localhost/',
+					'ssl_cert_file' => 'ssl_cert_file',
+					'ssl_key_file' => 'ssl_key_file',
 					'ssl_key_password' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_password') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_password": value is too long.'
@@ -1695,6 +1729,13 @@ class testConnector extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": value is too long.'
 			],
+			'Test connector.update: invalid "ssl_cert_file" (empty)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'ssl_cert_file' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_cert_file": cannot be empty.'
+			],
 
 			// Check "ssl_key_file".
 			'Test connector.update: invalid "ssl_key_file" (boolean)' => [
@@ -1710,6 +1751,13 @@ class testConnector extends CAPITest {
 					'ssl_key_file' => str_repeat('a', DB::getFieldLength('connector', 'ssl_key_file') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/ssl_key_file": value is too long.'
+			],
+			'Test connector.update: invalid "ssl_key_file" (empty)' => [
+				'connector' => [
+					'connectorid' => 'update_custom_defaults',
+					'ssl_key_file' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/ssl_key_file": cannot be empty.'
 			],
 
 			// Check "ssl_key_password".
