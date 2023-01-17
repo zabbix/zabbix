@@ -702,7 +702,7 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
- * @param {bool}   options['update']                  (optional) Whether to show "Update problem" section.
+ * @param {bool}   options['update_problem']          (optional) Whether to show "Update problem" section.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
@@ -729,7 +729,6 @@ function getMenuPopupTrigger(options, trigger_element) {
 		});
 	}
 
-	console.log(options);
 	if ('update_problem' in options) {
 		items.push({
 			label: t('Update problem'),
