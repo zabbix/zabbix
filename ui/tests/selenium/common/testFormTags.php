@@ -964,7 +964,7 @@ class testFormTags extends CWebTest {
 				->asTable()->waitUntilReady()->one();
 		$table->findRow('Name', $this->clone_name)->select();
 		$this->query('button:Copy')->one()->click();
-		$copy_form = $this->query('name:elements_form')->asForm()->waitUntilPresent()->one();
+		$copy_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$copy_form->fill(['Target type' => $target_type.'s', 'Target' => $parent]);
 		$copy_form->submit();
 		$this->page->waitUntilReady();
