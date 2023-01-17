@@ -19,15 +19,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup alerts
  *
- *
+ * @onBefore prepareInsertActionsData
  */
-class testPageReportsActionLog extends CLegacyWebTest {
+class testPageReportsActionLog extends CWebTest {
 
 	use TableTrait;
 
@@ -77,11 +77,6 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->assertEquals(['In progress', 'Sent/Executed', 'Failed'], $this->query('id:filter_status')
 				->asCheckboxList()->one()->getLabels()->asText()
 		);
-
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
 	}
 
 	public static function getCheckFilterData() {
@@ -392,6 +387,25 @@ class testPageReportsActionLog extends CLegacyWebTest {
 					'fields' => [
 						'Search string' => '10:00:40'
 					],
+					'result_amount' => 1,
+					'result_status' => ["In progress:\n3 retries left"]
+				]
+			],
+			// #29
+			[
+				[
+					'fields' => [
+						'Search string' => '.'
+					],
+					'result_amount' => 5
+				]
+			],
+			// #30
+			[
+				[
+					'fields' => [
+						'Search string' => '5'
+					],
 					'result_amount' => 1
 				]
 			]
@@ -403,9 +417,13 @@ class testPageReportsActionLog extends CLegacyWebTest {
 	 */
 	public function testPageReportsActionLog_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
-				'filter_messages=&filter_set=1');
+				'filter_messages=&filter_set=1')->waitUntilReady();
 
-		$table = $this->query('class:list-table')->asTable()->one();
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		if (array_key_exists('fields', $data)) {
@@ -425,7 +443,13 @@ class testPageReportsActionLog extends CLegacyWebTest {
 
 			if (array_key_exists('fields', $data)) {
 				foreach ($data['fields'] as $column => $values) {
-					$column = ($column === 'Search string') ? 'Message' : substr($column, 0, -1);
+					if ($column === 'Search string') {
+						$column = 'Message';
+						$values = [$values];
+					} else {
+						$column = substr($column, 0, -1);
+					}
+
 					$column_values = $this->getTableColumnData($column);
 					foreach ($values as $value) {
 						foreach ($column_values as $column_value) {
