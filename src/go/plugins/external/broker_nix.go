@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,37 +20,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package external
 
 import (
-	"fmt"
+	"errors"
 	"net"
-
-	"github.com/Microsoft/go-winio"
-	"zabbix.com/plugins/external"
 )
 
-func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = winio.ListenPipe(socket, nil)
-	if err != nil {
-		err = fmt.Errorf(
-			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),
-		)
-
-		return
-	}
-
-	return
+func isErrConnectionClosed(err error) bool {
+	return errors.Is(err, net.ErrClosed)
 }
-
-func cleanUpExternal() {}
-
-func checkExternalExits() error {
-	return nil
-}
-
-func checkExternalExit() error {
-	return nil
-}
-
-func listenOnPluginFail(p *external.Plugin, name string) {}
