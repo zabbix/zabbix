@@ -104,6 +104,42 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: export duktape data at the index into buffer                      *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is non buffer object   *
+ *               - if the value stack is empty                                *
+ *           The returned buffer must be freed by the caller.                 *
+ *                                                                            *
+ ******************************************************************************/
+static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+{
+	duk_int_t	type;
+	const char	*ptr;
+	char		*buf = NULL;
+
+	type = duk_get_type(ctx, index);
+
+	switch (type)
+	{
+		case DUK_TYPE_BUFFER:
+		case DUK_TYPE_OBJECT:
+			ptr = duk_require_buffer_data(ctx, index, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+		default:
+			ptr = duk_require_lstring(ctx, index, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+	}
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compute a md5 checksum                                            *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -115,13 +151,13 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
  ******************************************************************************/
 static duk_ret_t	es_md5(duk_context *ctx)
 {
-	const char	*str;
+	char		*str;
 	md5_state_t	state;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
 	char		*md5sum;
 	duk_size_t	len;
 
-	str = duk_require_lstring(ctx, 0, &len);
+	str = es_get_buffer_dyn(ctx, 0, &len);
 
 	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
@@ -133,6 +169,8 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	duk_push_string(ctx, md5sum);
 	zbx_free(md5sum);
+	zbx_free(str);
+
 	return 1;
 }
 
@@ -149,16 +187,19 @@ static duk_ret_t	es_md5(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_sha256(duk_context *ctx)
 {
-	const char	*str;
+	char		*str;
 	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	duk_size_t	len;
 
-	str = duk_require_lstring(ctx, 0, &len);
+	str = es_get_buffer_dyn(ctx, 0, &len);
 
 	zbx_sha256_hash_len(str, len, hash_res);
 	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
 
 	duk_push_string(ctx, hash_res_stringhexes);
+
+	zbx_free(str);
+
 	return 1;
 }
 
@@ -175,10 +216,11 @@ static duk_ret_t	es_sha256(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_hmac(duk_context *ctx)
 {
-	char			*out = NULL;
-	const char		*type, *key, *text;
+	char			*out = NULL, *key, *text;
+	const char		*type;
 	duk_size_t		key_len, text_len;
 	zbx_crypto_hash_t	hash_type;
+	int			ret;
 
 	type = duk_require_string(ctx, 0);
 	if (0 == strcmp(type, "md5"))
@@ -188,14 +230,20 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	else
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function");
 
-	key = duk_require_lstring(ctx, 1, &key_len);
-	text = duk_require_lstring(ctx, 2, &text_len);
+	key = es_get_buffer_dyn(ctx, 1, &key_len);
+	text = es_get_buffer_dyn(ctx, 2, &text_len);
 
-	if (FAIL == zbx_hmac(hash_type, key, key_len, text, text_len, &out))
+	ret = zbx_hmac(hash_type, key, key_len, text, text_len, &out);
+
+	zbx_free(text);
+	zbx_free(key);
+
+	if (SUCCEED != ret)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot calculate HMAC");
 
 	duk_push_string(ctx, out);
 	zbx_free(out);
+
 	return 1;
 }
 
