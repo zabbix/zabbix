@@ -220,7 +220,7 @@ static int	check_mib_existence(zbx_preproc_op_t *op)
 			if ('\n' == *ptr)
 				line_idx++;
 
-			*ptr++;
+			ptr++;
 		}
 
 		zbx_strsplit_first(ptr, '\n', &oid, &right);

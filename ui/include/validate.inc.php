@@ -231,6 +231,10 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$error = true;
 			$message = _s('Field "%1$s" is not string.', $caption);
 		}
+		elseif (mb_check_encoding($var, 'UTF-8') !== true) {
+			error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('invalid byte sequence in UTF-8')));
+			return ZBX_VALID_ERROR;
+		}
 	}
 	elseif ($type == T_ZBX_TU) {
 		$simple_interval_parser = new CSimpleIntervalParser([
