@@ -428,7 +428,7 @@ class CConnector extends CApiService {
 
 				if ($db_tag) {
 					$tag['connector_tagid'] = $db_tag['connector_tagid'];
-					unset($db_tag[$tag['connector_tagid']]);
+					unset($db_tags[$tag['connector_tagid']]);
 				}
 				else {
 					$ins_tags[] = ['connectorid' => $connector['connectorid']] + $tag;
