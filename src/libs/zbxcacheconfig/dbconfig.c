@@ -6782,8 +6782,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	zbx_dbsync_init(&httpstep_sync, changelog_sync_mode);
 	zbx_dbsync_init(&httpstep_field_sync, changelog_sync_mode);
 
-	zbx_dbsync_init(&connector_sync, mode);
-	zbx_dbsync_init(&connector_tag_sync, mode);
+	zbx_dbsync_init(&connector_sync, changelog_sync_mode);
+	zbx_dbsync_init(&connector_tag_sync, changelog_sync_mode);
 
 #ifdef HAVE_ORACLE
 	/* With Oracle fetch statements can fail before all data has been fetched. */
