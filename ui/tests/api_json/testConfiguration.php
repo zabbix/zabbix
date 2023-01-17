@@ -21,6 +21,9 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+/**
+ * @backup hosts, hosts_templates, hosts_groups, hstgrp, valuemap
+ */
 class testConfiguration extends CAPITest {
 
 	public static function export_fail_data() {
