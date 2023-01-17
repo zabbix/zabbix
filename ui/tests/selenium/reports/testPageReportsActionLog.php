@@ -430,6 +430,7 @@ class testPageReportsActionLog extends CWebTest {
 			$form->fill($data['fields']);
 		}
 
+		// Status checked - In progress, Sent/Executed, Failed.
 		if (array_key_exists('status', $data)) {
 			$this->query('id:filter_status')->asCheckboxList()->one()->check($data['status']);
 		}
@@ -438,21 +439,28 @@ class testPageReportsActionLog extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (array_key_exists('result_amount', $data)) {
+			// Check result amount.
 			$this->assertEquals($data['result_amount'], $this->query('class:list-table')->asTable()->one()->getRows()->count());
 			$this->assertTableStats($data['result_amount']);
 
 			if (array_key_exists('fields', $data)) {
 				foreach ($data['fields'] as $column => $values) {
+					// Using Search string field in filter - Message column checked.
 					if ($column === 'Search string') {
 						$column = 'Message';
 						$values = [$values];
 					} else {
+						// We remove last character from filter field label (so it is same as column name now).
 						$column = substr($column, 0, -1);
 					}
 
+					// We get all column data from table result as array.
 					$column_values = $this->getTableColumnData($column);
+
+					// $values are array - what we search in action log.
 					foreach ($values as $value) {
 						foreach ($column_values as $column_value) {
+							// If "column value" contain "value" that we search - we remove this column value from array.
 							if (str_contains($column_value, $value)) {
 								$column_values = array_values(array_diff($column_values, [$column_value]));
 							}
@@ -460,9 +468,12 @@ class testPageReportsActionLog extends CWebTest {
 					}
 				}
 
+				// If everything are correct - in table result were displayed only searched values.
+				// And we removed those result values from $column_values array. So - there should be 0 values at the end.
 				$this->assertEquals(0, count($column_values));
 			}
 
+			// Checking status column if needed.
 			if (array_key_exists('result_status', $data)) {
 				$this->assertEquals($data['result_status'], $this->getTableColumnData('Status'));
 			}
