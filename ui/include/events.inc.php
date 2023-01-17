@@ -138,23 +138,15 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param array  $event                              An array of event data.
  * @param string $event['eventid']                   Event ID.
  * @param string $event['r_eventid']                 OK event ID.
- * @param string $event['objectid']                  Object ID.
+ * @param string $event['cause_eventid']             Cause event ID.
  * @param string $event['correlationid']             OK Event correlation ID.
  * @param string $event['userid']                    User ID who generated the OK event.
  * @param string $event['name']                      Event name.
  * @param string $event['acknowledged']              State of acknowledgement.
- * @param array  $event['acknowledges']              List of problem updates.
- * @param string $event['acknowledges'][]['action']  Action performed in update.
  * @param CCOl   $event['opdata']                    Operational data with expanded macros.
  * @param string $event['comments']                  Trigger description with expanded macros.
  * @param array  $allowed                            An array of user role rules.
  * @param bool   $allowed['ui_correlation']          Whether user is allowed to visit event correlation page.
- * @param bool   $allowed['add_comments']            Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']                   Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
- * @param bool   $allowed['rank_change']             Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
