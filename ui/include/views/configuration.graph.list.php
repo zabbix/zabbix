@@ -229,6 +229,7 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('context', $data['context'])
 					->getUrl()
 			))
+				->addCsrfToken(CCsrfTokenHelper::getCsrfToken('graph.updatediscover'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}

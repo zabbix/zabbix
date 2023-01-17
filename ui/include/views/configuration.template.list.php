@@ -285,8 +285,8 @@ $form->addItem([
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.template', {".
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
-						CCsrfTokenHelper::getCsrfToken('popup.massupdate.template').
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
+							CCsrfTokenHelper::getCsrfToken('popup.massupdate.template').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this

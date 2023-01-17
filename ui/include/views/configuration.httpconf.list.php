@@ -206,6 +206,9 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken(($httpTest['status'] == HTTPTEST_STATUS_DISABLED)
+				? 'httptest.massenable'
+				: 'httptest.massdisable'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(httptest_status2style($httpTest['status'])),
 		$data['tags'][$httpTest['httptestid']],

@@ -28,7 +28,6 @@
 	const view = {
 		checkbox_object: null,
 		checkbox_hash: null,
-		csrf_tokens: null,
 
 		init({checkbox_hash, checkbox_object}) {
 			this.checkbox_hash = checkbox_hash;

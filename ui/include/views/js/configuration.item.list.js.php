@@ -33,7 +33,6 @@
 		checkbox_object: null,
 		checkbox_hash: null,
 		csrf_tokens: null,
-		compression_status: null,
 
 		init({checkbox_hash, checkbox_object, csrf_tokens}) {
 			this.checkbox_hash = checkbox_hash;

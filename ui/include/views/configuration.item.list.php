@@ -168,6 +168,10 @@ foreach ($data['items'] as $item) {
 				->setArgument('checkbox_hash', $data['checkbox_hash'])
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken(($item['status'] == ITEM_STATUS_DISABLED)
+				? 'item.massenable'
+				: 'item.massdisable'
+			))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($item['status'], $item['state']))
 	);
