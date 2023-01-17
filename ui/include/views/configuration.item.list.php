@@ -295,23 +295,25 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => [
-		'content' => (new CSubmitButton(_('Enable'), 'action', 'item.massenable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massenable-item')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('item.massenable')
 	],
-	'item.massdisable' => [
-		'content' => (new CSubmitButton(_('Disable'), 'action', 'item.massdisable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdisable-item')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('item.massdisable')
 	]
 ];
 
 if ($data['context'] === 'host') {
+	$massclearhistory = [
+		'name' => _('Clear history'),
+		'confirm' => _('Delete history of selected items?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('item.massclearhistory')
+	];
+
+	if ($data['config']['compression_status']) {
+		unset($massclearhistory['confirm']);
+	}
+
 	$button_list += [
 		'item.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
@@ -320,29 +322,17 @@ if ($data['context'] === 'host') {
 				->addClass('no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		],
-		'item.massclearhistory' => [
-			'content' => (new CSubmitButton(_('Clear history'), 'action', 'item.massclearhistory'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massclearhistory-item')
-				->addClass('no-chkbxrange')
-				->removeid()
-		]
+		'item.massclearhistory' => $massclearhistory
 	];
 }
 
 $button_list += [
-	'item.masscopyto' => [
-		'content' => (new CSubmitButton(_('Copy'), 'action', 'item.masscopyto'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-masscopyto-item')
-			->addClass('no-chkbxrange')
-			->removeid()
-	],
+	'item.masscopyto' => ['name' => _('Copy'), 'csrf_token' => CCsrfTokenHelper::getCsrfToken('item.masscopyto')],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
-					CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.item'] .
+					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::getCsrfToken('popup.massupdate.item').
 				"'}, {
 					dialogue_class: 'modal-popup-preprocessing',
 					trigger_element: this
@@ -351,12 +341,8 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => [
-		'content' => (new CSubmitButton(_('Delete'), 'action', 'item.massdelete'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-item')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('item.massdelete')
 	]
 ];
 
@@ -373,8 +359,7 @@ $html_page
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'group_itemid',
-		'csrf_tokens' => $data['csrf_tokens'],
-		'compression_status' => $data['config']['compression_status']
+		'csrf_tokens' => CCsrfTokenHelper::getCsrfTokens(['item.masscheck_now'])
 	]).');
 '))
 	->setOnDocumentReady()

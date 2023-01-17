@@ -198,26 +198,20 @@ $triggersForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'triggerprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'triggerprototype.massenable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-triggerprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'triggerprototype.massenable' => ['name' => _('Create enabled'),
+				'confirm' => _('Create triggers from selected prototypes as enabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massenable')
 			],
-			'triggerprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Create disable'), 'action', 'triggerprototype.massdisable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-triggerprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
+				'confirm' => _('Create triggers from selected prototypes as disabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massdisable')
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
-							CController::CSRF_TOKEN_NAME . ": '" .
-							$data['csrf_tokens']['popup.massupdate.triggerprototype'] .
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
+							CCsrfTokenHelper::getCsrfToken('popup.massupdate.triggerprototype').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -226,12 +220,9 @@ $triggersForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'triggerprototype.massdelete' => [
-				'content' => (new CSubmitButton(_('Delete'), 'action', 'triggerprototype.massdelete'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-triggerprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'triggerprototype.massdelete' => ['name' => _('Delete'),
+				'confirm' => _('Delete selected trigger prototypes?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('triggerprototype.massdelete')
 			]
 		],
 		$this->data['parent_discoveryid']
@@ -240,12 +231,4 @@ $triggersForm->addItem([
 
 $html_page
 	->addItem($triggersForm)
-	->show();
-
-(new CScriptTag('
-	view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');
-'))
-	->setOnDocumentReady()
 	->show();

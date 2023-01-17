@@ -26,67 +26,6 @@
 
 <script>
 	const view = {
-
-		init({csrf_tokens, is_host}) {
-			this.csrf_tokens = csrf_tokens;
-			this.is_host = is_host;
-
-			this._initActionButtons();
-		},
-
-		_initActionButtons() {
-			document.addEventListener('click', (e) => {
-				let prevent_event = false;
-
-				if (e.target.classList.contains('js-masscopyto-graph')) {
-					this.massCopyGraph(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdelete-graph')) {
-					prevent_event = !this.massDeleteGraph(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-
-				if (prevent_event) {
-					e.preventDefault();
-					e.stopPropagation();
-					return false;
-				}
-			});
-		},
-
-		massCopyGraph(target) {
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['graph.masscopyto'], false
-			);
-
-			return true;
-		},
-
-		massDeleteGraph(target, graphids) {
-			let confirmation = '';
-
-			switch(this.is_host) {
-				case true:
-					confirmation = graphids.length > 1
-						? <?= json_encode(_('Delete selected graphs?')) ?>
-						: <?= json_encode(_('Delete selected graph?')) ?>;
-						break;
-				case false:
-					confirmation = graphids.length > 1
-						? <?= json_encode(_('Delete selected graph prototypes?')) ?>
-						: <?= json_encode(_('Delete selected graph prototype?')) ?>;
-			}
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['graph.massdelete'], false
-			);
-
-			return true;
-		},
-
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};

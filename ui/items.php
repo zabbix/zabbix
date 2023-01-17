@@ -1381,10 +1381,6 @@ else {
 
 	$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter_tags);
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['item.massenable', 'item.massdisable',
-		'popup.massupdate.item', 'item.masscheck_now', 'item.massclearhistory', 'item.masscopyto', 'item.massdelete'
-	]);
-
 	// render view
 	echo (new CView('configuration.item.list', $data))->getOutput();
 }

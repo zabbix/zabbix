@@ -214,41 +214,27 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 }
 
 $button_list = [
-	'httptest.massenable' => [
-		'content' => (new CSubmitButton(_('Enable'), 'action', 'httptest.massenable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massenable-httptest')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massenable')
 	],
-	'httptest.massdisable' => [
-		'content' => (new CSubmitButton(_('Disable'), 'action', 'httptest.massdisable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdisable-httptest')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massdisable')
 	]
 ];
 
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'content' => (new CSubmitButton(_('Clear history'), 'action', 'httptest.massclearhistory'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massclearhistory-httptest')
-				->addClass('no-chkbxrange')
-				->removeid()
+			'name' => _('Clear history'),
+			'confirm' => _('Delete history of selected web scenarios?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massclearhistory')
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => [
-		'content' => (new CSubmitButton(_('Delete'), 'action', 'httptest.massdelete'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-httptest')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('httptest.massdelete')
 	]
 ];
 
@@ -261,8 +247,6 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

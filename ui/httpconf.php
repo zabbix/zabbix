@@ -891,10 +891,6 @@ else {
 		]];
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['httptest.massenable', 'httptest.massdisable',
-		'httptest.massclearhistory', 'httptest.massdelete'
-	]);
-
 	// render view
 	echo (new CView('configuration.httpconf.list', $data))->getOutput();
 }

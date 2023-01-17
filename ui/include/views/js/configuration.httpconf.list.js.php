@@ -30,13 +30,7 @@
 
 <script>
 	const view = {
-		csrf_tokens: null,
-
-		init({csrf_tokens}) {
-			this.csrf_tokens = csrf_tokens;
-
-			this._initActionButtons();
-
+		init() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function()  {
@@ -47,95 +41,6 @@
 
 			// Init existing fields once loaded.
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => new CTagFilterItem(row));
-		},
-
-		_initActionButtons() {
-			document.addEventListener('click', (e) => {
-				let prevent_event = false;
-
-				if (e.target.classList.contains('js-massenable-httptest')) {
-					prevent_event = !this.massEnableHttptest(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdisable-httptest')) {
-					prevent_event = !this.massDisableHttptest(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massclearhistory-httptest')) {
-					prevent_event = !this.massClearHistoryHttptest(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdelete-httptest')) {
-					prevent_event = !this.massDeleteHttptest(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-
-				if (prevent_event) {
-					e.preventDefault();
-					e.stopPropagation();
-					return false;
-				}
-			});
-		},
-
-		massEnableHttptest(target, httptestids) {
-			const confirmation = httptestids.length > 1
-				? <?= json_encode(_('Enable selected web scenarios?')) ?>
-				: <?= json_encode(_('Enable selected web scenario?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['httptest.massenable'], false
-			);
-
-			return true;
-		},
-
-		massDisableHttptest(target, httptestids) {
-			const confirmation = httptestids.length > 1
-				? <?= json_encode(_('Disable selected web scenarios?')) ?>
-				: <?= json_encode(_('Disable selected web scenario?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['httptest.massdisable'], false
-			);
-
-			return true;
-		},
-
-		massClearHistoryHttptest(target, httptestids) {
-			const confirmation = httptestids.length > 1
-				? <?= json_encode(_('Delete history of selected web scenarios?')) ?>
-				: <?= json_encode(_('Delete history of selected web scenario?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['httptest.massclearhistory'], false
-			);
-
-			return true;
-		},
-
-		massDeleteHttptest(target, httptestids) {
-			const confirmation = httptestids.length > 1
-				? <?= json_encode(_('Delete selected web scenarios?')) ?>
-				: <?= json_encode(_('Delete selected web scenario?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['httptest.massdelete'], false
-			);
-
-			return true;
 		},
 
 		editHost(e, hostid) {

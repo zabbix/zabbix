@@ -354,32 +354,21 @@ $triggers_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'trigger.massenable' => [
-				'content' => (new CSubmitButton(_('Enable'), 'action', 'trigger.massenable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-trigger')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massenable')
 			],
-			'trigger.massdisable' => [
-				'content' => (new CSubmitButton(_('Disable'), 'action', 'trigger.massdisable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-trigger')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massdisable')
 			],
-			'trigger.masscopyto' => [
-				'content' => (new CSubmitButton(_('Copy'), 'action', 'trigger.masscopyto'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-masscopyto-trigger')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'trigger.masscopyto' => ['name' => _('Copy'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.masscopyto')
 			],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
-							CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.trigger'] .
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '" .
+							CCsrfTokenHelper::getCsrfToken('popup.massupdate.trigger').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -388,12 +377,8 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'trigger.massdelete' => [
-				'content' => (new CSubmitButton(_('Delete'), 'action', 'trigger.massdelete'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-trigger')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('trigger.massdelete')
 			]
 		],
 		$data['checkbox_hash']
@@ -404,8 +389,6 @@ $html_page
 	->addItem($triggers_form)
 	->show();
 
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

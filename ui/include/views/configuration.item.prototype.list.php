@@ -200,26 +200,20 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
-			'itemprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'itemprototype.massenable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-itemprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'itemprototype.massenable' => ['name' => _('Create enabled'),
+				'confirm' => _('Create items from selected prototypes as enabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('itemprototype.massenable')
 			],
-			'itemprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Create disabled'), 'action', 'itemprototype.massdisable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-itemprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'itemprototype.massdisable' => ['name' => _('Create disabled'),
+				'confirm' => _('Create items from selected prototypes as disabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('itemprototype.massdisable')
 			],
 			'popup.massupdate.itemprototype' => [
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.itemprototype', {".
-							CController::CSRF_TOKEN_NAME . ": '".
-							$data['csrf_tokens']['popup.massupdate.itemprototype'].
+							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
+							CCsrfTokenHelper::getCsrfToken('popup.massupdate.itemprototype').
 						"'}, {
 							dialogue_class: 'modal-popup-preprocessing',
 							trigger_element: this
@@ -228,12 +222,9 @@ $itemForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'itemprototype.massdelete' => [
-				'content' => (new CSubmitButton(_('Delete'), 'action', 'itemprototype.massdelete'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-itemprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'itemprototype.massdelete' => ['name' => _('Delete'),
+				'confirm' => _('Delete selected item prototypes?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('itemprototype.massdelete')
 			]
 		],
 		$data['parent_discoveryid']
@@ -242,12 +233,4 @@ $itemForm->addItem([
 
 $html_page
 	->addItem($itemForm)
-	->show();
-
-(new CScriptTag('
-	view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');
-'))
-	->setOnDocumentReady()
 	->show();

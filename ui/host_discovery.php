@@ -958,9 +958,6 @@ else {
 
 	$data['parent_templates'] = getItemParentTemplates($data['discoveries'], ZBX_FLAG_DISCOVERY_RULE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['discoveryrule.massenable', 'discoveryrule.massdisable',
-		'discoveryrule.massdelete'
-	]);
 
 	// render view
 	echo (new CView('configuration.host.discovery.list', $data))->getOutput();

@@ -156,10 +156,11 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
-			->setArgumentSID()
 			->getUrl()
 	))
-		->addSID()
+		->addCsrfToken(CCsrfTokenHelper::getCsrfToken(($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED)
+			? 'hostprototype.massenable'
+			: 'hostprototype.massdisable'))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($hostPrototype['status']));
 
@@ -173,6 +174,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('context', $data['context'])
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('hostprototype.updatediscover'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
@@ -192,26 +194,17 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
-			'hostprototype.massenable' => [
-				'content' => (new CSubmitButton(_('Create enabled'), 'action', 'hostprototype.massenable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-hostprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'hostprototype.massenable' => ['name' => _('Create enabled'),
+				'confirm' => _('Create hosts from selected prototypes as enabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massenable')
 			],
-			'hostprototype.massdisable' => [
-				'content' => (new CSubmitButton(_('Create disabled'), 'action', 'hostprototype.massdisable'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-hostprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'hostprototype.massdisable' => ['name' => _('Create disabled'),
+				'confirm' => _('Create hosts from selected prototypes as disabled?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massdisable')
 			],
-			'hostprototype.massdelete' => [
-				'content' => (new CSubmitButton(_('Delete'), 'action', 'hostprototype.massdelete'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-hostprototype')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'hostprototype.massdelete' => ['name' => _('Delete'),
+				'confirm' => _('Delete selected host prototypes?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('hostprototype.massdelete')
 			]
 		],
 		$data['discovery_rule']['itemid']
@@ -220,12 +213,4 @@ $itemForm->addItem([
 
 $html_page
 	->addItem($itemForm)
-	->show();
-
-(new CScriptTag('
-	view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');
-'))
-	->setOnDocumentReady()
 	->show();

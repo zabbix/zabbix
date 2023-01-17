@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-$this->includeJsFile('monitoring.sysmap.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Maps'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_SYSMAP_LIST))
@@ -41,7 +39,11 @@ $html_page = (new CHtmlPage())
 				->addItem(
 					(new CButton('form', _('Import')))
 						->onClick(
-							'return PopUp("popup.import", {rules_preset: "map"}, {
+							'return PopUp("popup.import", {
+								rules_preset: "map", '.
+								CCsrfTokenHelper::CSRF_TOKEN_NAME.': "' .
+								CCsrfTokenHelper::getCsrfToken('popup.import').
+						'"}, {
 								dialogueid: "popup_import",
 								dialogue_class: "modal-popup-generic"
 							});'
@@ -120,23 +122,13 @@ $sysmapForm->addItem([
 					->getUrl()
 			)
 		],
-		'map.massdelete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'map.massdelete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-map')
-				->addClass('no-chkbxrange')
-				->setEnabled($data['allowed_edit'])
-				->removeid()
+		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
+			'disabled' => $data['allowed_edit'] ? null : 'disabled',
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('map.massdelete')
 		]
 	])
 ]);
 
 $html_page
 	->addItem($sysmapForm)
-	->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
 	->show();

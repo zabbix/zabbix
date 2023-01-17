@@ -96,7 +96,13 @@ $html_page = (new CHtmlPage())
 			)
 			->addItem(
 				(new CButton('form', _('Import')))
-					->addClass('js-import-template')
+					->onClick('return PopUp("popup.import", {
+						rules_preset: "template", "'.
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::getCsrfToken('popup.import').'"
+					}, {
+						dialogueid: "popup_import",
+						dialogue_class: "modal-popup-generic"
+					});')
 					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -279,7 +285,8 @@ $form->addItem([
 				'content' => (new CButton('', _('Mass update')))
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.template', {".
-						CController::CSRF_TOKEN_NAME . ": '" . $data['csrf_tokens']['popup.massupdate.template'] .
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".
+						CCsrfTokenHelper::getCsrfToken('popup.massupdate.template').
 						"'}, {
 							dialogue_class: 'modal-popup-static',
 							trigger_element: this
@@ -288,19 +295,12 @@ $form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'template.massdelete' => [
-				'content' => (new CSubmitButton(_('Delete'), 'action', 'template.massdelete'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-template')
-					->addClass('no-chkbxrange')
-					->removeid()
+			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('template.massdelete')
 			],
-			'template.massdeleteclear' => [
-				'content' => (new CSubmitButton(_('Delete and clear'), 'action', 'template.massdeleteclear'))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdeleteclear-template')
-					->addClass('no-chkbxrange')
-					->removeid(),
+			'template.massdeleteclear' => ['name' => _('Delete and clear'),
+				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
+				'csrf_token' => CCsrfTokenHelper::getCsrfToken('template.massdeleteclear')
 			]
 		]
 	)
@@ -308,12 +308,4 @@ $form->addItem([
 
 $html_page
 	->addItem($form)
-	->show();
-
-(new CScriptTag('
-	view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens'],
-	]).');
-'))
-	->setOnDocumentReady()
 	->show();

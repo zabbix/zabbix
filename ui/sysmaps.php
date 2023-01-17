@@ -450,8 +450,6 @@ else {
 		unset($map);
 	}
 
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['map.massdelete']);
-
 	// render view
 	echo (new CView('monitoring.sysmap.list', $data))->getOutput();
 }

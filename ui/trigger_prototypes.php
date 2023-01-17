@@ -654,9 +654,6 @@ else {
 
 	$data['parent_templates'] = getTriggerParentTemplates($data['triggers'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-	$data['csrf_tokens'] = CController::generateCsrfTokens(['triggerprototype.massenable',
-		'triggerprototype.massdisable', 'popup.massupdate.triggerprototype', 'triggerprototype.massdelete'
-	]);
 
 	// Render view.
 	echo (new CView('configuration.trigger.prototype.list', $data))->getOutput();

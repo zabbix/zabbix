@@ -336,19 +336,11 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => [
-		'content' => (new CSubmitButton(_('Enable'), 'action', 'discoveryrule.massenable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massenable-discoveryrule')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massenable')
 	],
-	'discoveryrule.massdisable' => [
-		'content' => (new CSubmitButton(_('Disable'), 'action', 'discoveryrule.massdisable'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdisable-discoveryrule')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massdisable')
 	]
 ];
 
@@ -365,12 +357,8 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => [
-		'content' => (new CSubmitButton(_('Delete'), 'action', 'discoveryrule.massdelete'))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-discoveryrule')
-			->addClass('no-chkbxrange')
-			->removeid()
+	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
+		'csrf_token' => CCsrfTokenHelper::getCsrfToken('discoveryrule.massdelete')
 	]
 ];
 
@@ -386,8 +374,7 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_hostdruleid',
-		'csrf_tokens' => $data['csrf_tokens']
+		'checkbox_object' => 'g_hostdruleid'
 	]).');
 '))
 	->setOnDocumentReady()
