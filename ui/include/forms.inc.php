@@ -1856,7 +1856,7 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
-	if ($data['show_inherited_tags'] == 1) {
+	if ($data['show_inherited_tags']) {
 		$inherited_tags = [];
 		$conditions = [];
 

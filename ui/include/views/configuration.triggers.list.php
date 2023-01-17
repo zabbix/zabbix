@@ -254,7 +254,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			}
 		}
 
-		$description[] = [$parent_template_names, NAME_DELIMITER];
+		$parent_template_names[] = NAME_DELIMITER;
+
+		$description[] = $parent_template_names;
 	}
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');

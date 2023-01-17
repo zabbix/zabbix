@@ -109,7 +109,9 @@ foreach ($data['triggers'] as $trigger) {
 			}
 		}
 
-		$description[] = [$parent_template_names, NAME_DELIMITER];
+		$parent_template_names[] = NAME_DELIMITER;
+
+		$description[] = $parent_template_names;
 	}
 
 	$description[] = new CLink(
