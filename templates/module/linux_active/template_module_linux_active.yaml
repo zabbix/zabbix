@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-12-19T10:43:22Z'
+  date: '2023-01-12T06:39:13Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -2259,12 +2259,6 @@ zabbix_export:
           item:
             host: 'Linux generic by Zabbix agent active'
             key: 'proc.num[,,run]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux generic by Zabbix agent active'
-            key: kernel.maxproc
     -
       uuid: d3169f2fa1b341e3a7527a305814a0ab
       name: 'Swap usage'
