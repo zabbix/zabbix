@@ -27,23 +27,23 @@ class CApiTagHelper {
 	/**
 	 * Returns SQL condition for tag filters.
 	 *
-	 * @param array  $tags
-	 * @param string $tags[]['tag']
-	 * @param int    $tags[]['operator']
-	 * @param string $tags[]['value']
-	 * @param int    $evaltype
-	 * @param string $parent_alias
-	 * @param string $table
-	 * @param string $field
-	 * @param string $parent_field
+	 * @param array       $tags
+	 * @param string      $tags[]['tag']
+	 * @param int         $tags[]['operator']
+	 * @param string      $tags[]['value']
+	 * @param int         $evaltype
+	 * @param string      $parent_alias
+	 * @param string      $table
+	 * @param string      $field
+	 * @param string|null $join_alias
+	 * @param string|null $join_field
 	 *
 	 * @return string
 	 */
 	public static function addWhereCondition(array $tags, $evaltype, string $parent_alias, string $table,
-			string $field, string $parent_field = null): string {
-		$parent_field = $parent_field === null ? $field : $parent_field;
-
+			string $field, string $join_alias = null, string $join_field = null): string {
 		$values_by_tag = [];
+		$join_glue = [];
 
 		foreach ($tags as $tag) {
 			$operator = array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE;
@@ -99,9 +99,26 @@ class CApiTagHelper {
 					$values_by_tag[$tag['tag']][$slot][] = $table.'.value='.zbx_dbstr($value);
 					break;
 			}
+
+			if ($join_alias !== null) {
+				switch ($operator) {
+					case TAG_OPERATOR_LIKE:
+					case TAG_OPERATOR_EXISTS:
+					case TAG_OPERATOR_EQUAL:
+						$join_glue[$tag['tag']] = ' OR ';
+						break;
+
+					case TAG_OPERATOR_NOT_LIKE:
+					case TAG_OPERATOR_NOT_EXISTS:
+					case TAG_OPERATOR_NOT_EQUAL:
+						$join_glue[$tag['tag']] = ' AND ';
+						break;
+				}
+			}
 		}
 
 		$sql_where = [];
+
 		foreach ($values_by_tag as $tag => $filters) {
 			// Tag operators TAG_OPERATOR_EXISTS/TAG_OPERATOR_NOT_EXISTS are both canceling explicit values of same tag.
 			if ($filters['EXISTS'] === false) {
@@ -112,21 +129,33 @@ class CApiTagHelper {
 			}
 
 			$_where = [];
+
 			foreach ($filters as $prefix => $values) {
 				if ($values === []) {
 					continue;
 				}
 
 				$statement = $table.'.tag='.zbx_dbstr($tag);
+
 				if ($values) {
 					$statement .= count($values) == 1 ? ' AND '.$values[0] : ' AND ('.implode(' OR ', $values).')';
 				}
 
-				$_where[] = $prefix.' ('.
+				$condition = $prefix.' ('.
 					'SELECT NULL'.
 					' FROM '.$table.
-					' WHERE '.$parent_alias.'.'.$parent_field.'='.$table.'.'.$field.' AND '.$statement.
+					' WHERE '.$parent_alias.'.'.$field.'='.$table.'.'.$field.' AND '.$statement.
 				')';
+
+				if ($join_alias !== null) {
+					$condition .= $join_glue[$tag].$prefix.' ('.
+						'SELECT NULL'.
+						' FROM '.$table.
+						' WHERE '.$join_alias.'.'.$join_field.'='.$table.'.'.$field.' AND '.$statement.
+					')';
+				}
+
+				$_where[] = $condition;
 			}
 
 			$sql_where[] = count($_where) == 1 ? $_where[0] : '('.$_where[0].' OR '.$_where[1].')';
