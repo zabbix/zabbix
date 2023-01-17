@@ -269,7 +269,6 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
 	}
 
-
 	public static function user_create() {
 		return [
 			// Check user password.
