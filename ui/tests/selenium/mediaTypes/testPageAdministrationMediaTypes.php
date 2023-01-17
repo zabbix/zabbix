@@ -18,8 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
@@ -29,23 +31,106 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	use TableTrait;
 
 	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
+	private static $media_name = 'Email';
+
+	/**
 	 * Check basic elements on page.
 	 */
 	public function testPageAdministrationMediaTypes_Layout() {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->assertEquals('Media types', $this->query('tag:h1')->one()->getText());
+		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
 
-		foreach (['Enable', 'Disable', 'Delete'] as $button) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled(false));
+		$this->page->assertTitle('Configuration of media types');
+		$this->page->assertHeader('Media types');
+
+		$buttons = [
+			'Create media type' => true,
+			'Import' => true,
+			'Apply' => true,
+			'Reset' => true,
+			'Enable' => false,
+			'Disable' => false,
+			'Export' => false,
+			'Delete' => false
+		];
+		foreach ($buttons as $button => $enabled) {
+			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
 		}
 
-		$count = CDBHelper::getCount('SELECT NULL FROM media_type');
-		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
+		// Check filter fields.
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_fields = [
+			'Name' => '',
+			'Status' => 'Any'
+		];
+		$filter->checkValue($filter_fields);
 
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
+		$this->assertEquals(255, $filter->getField('Name')->getAttribute('maxlength'));
+		$this->assertEquals(['Any', 'Enabled', 'Disabled'], $filter->getField('Status')->asSegmentedRadio()
+				->getLabels()->asText()
+		);
 
+		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertSame(['', 'Name', 'Type', 'Status', 'Used in actions', 'Details', 'Action'], $table->getHeadersText());
+		$headers = $table->getHeadersText();
+
+		// Remove the empty header that is associated with the Select all checkbox.
+		unset($headers[0]);
+		$this->assertSame(['Name', 'Type', 'Status', 'Used in actions', 'Details', 'Action'], array_values($headers));
+
+		foreach ($headers as $header) {
+			if (in_array($header, ['Name', 'Type'])) {
+				$this->assertTrue($table->query('link', $header)->one()->isClickable());
+			}
+			else {
+				$this->assertFalse($table->query('link', $header)->one(false)->isValid());
+			}
+		}
+
+		// Check table stats and selected mediatype counter.
+		$this->assertTableStats(CDBHelper::getCount('SELECT NULL FROM media_type'));
+		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
+	}
+
+	/**
+	 * Check sorting of media types in list.
+	 *
+	 * @onAfterOnce resetFilter
+	 */
+	public function testPageAdministrationMediaTypes_Sort() {
+		$this->page->login()->open('zabbix.php?action=mediatype.list&sortorder=DESC');
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		foreach (['Name', 'Type'] as $column) {
+			$values = $this->getTableColumnData($column);
+
+			$values_asc = $values;
+			$values_desc = $values;
+
+			// Sort column contents ascending.
+			usort($values_asc, function($a, $b) {
+				return strcasecmp($a, $b);
+			});
+
+			// Sort column contents descending.
+			usort($values_desc, function($a, $b) {
+				return strcasecmp($b, $a);
+			});
+
+			// Check ascending and descending sorting in column.
+			foreach ([$values_asc, $values_desc] as $reference_values) {
+				$table->query('link', $column)->waitUntilClickable()->one()->click();
+				$table->waitUntilReloaded();
+				$this->assertTableDataColumn($reference_values, $column);
+			}
+		}
 	}
 
 	public static function getFilterData() {
@@ -62,8 +147,24 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'none result'
+						'Name' => 'Jira '
+					],
+					'result' => ['Jira ServiceDesk', 'Jira with CustomFields']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => ' Jira '
 					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'a w'
+					],
+					'result' => ['Jira with CustomFields']
 				]
 			],
 			// Filter by status.
@@ -108,20 +209,22 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * Check media types filtering.
 	 *
 	 * @dataProvider getFilterData
-	 * @onAfter resetFilter
+	 *
+	 * @onAfterOnce resetFilter
 	 */
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		if (CTestArrayHelper::get($data, 'get_db_result', false)) {
+		if (CTestArrayHelper::get($data, 'get_db_result')) {
 			$db_status = (CTestArrayHelper::get($data['filter'], 'Status') === 'Enabled')
-					? MEDIA_TYPE_STATUS_ACTIVE
-					: MEDIA_TYPE_STATUS_DISABLED;
+				? MEDIA_TYPE_STATUS_ACTIVE
+				: MEDIA_TYPE_STATUS_DISABLED;
 
 			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.$db_status.
 					' ORDER BY LOWER(name) ASC') as $name) {
@@ -131,68 +234,41 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 	}
 
-	public function resetFilter() {
-		DBexecute('DELETE FROM profiles WHERE idx LIKE \'%web.media_types%\'');
-	}
-
-	/*
-	 * Check sorting of media types by Name column.
-	 *
-	 * @onAfter resetFilter
-	 */
-	public function testPageAdministrationMediaTypes_TableSorting() {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		foreach (['DESC', 'ASC'] as $sorting) {
-			// Change sorting by Name column.
-			$table->query('link:Name')->one()->click();
-			$this->page->waitUntilReady();
-			// Get all media names from DB and check result on frontend.
-			$names = CDBHelper::getAll('SELECT name FROM media_type ORDER BY LOWER(name) '.$sorting);
-			$result = [];
-			foreach ($names as $name) {
-				$result[] = $name['name'];
-			}
-			$this->assertTableDataColumn($result);
-		}
-	}
-
 	/**
 	 * Disable and enable media type by link in column Status.
 	 */
 	public function testPageAdministrationMediaTypes_StatusLink() {
-		$media_name = 'Email';
-
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by column Name.
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $media_name);
-		$status_link = $row->getColumn('Status')->query('xpath:./a')->one();
-		$test_button = $row->query('button:Test')->one();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::$media_name);
 
-		// Check that Media type and Test link are disabled by default.
-		$this->assertEquals('Disabled', $status_link->getText());
-		$this->assertTrue($test_button->isEnabled(false));
-
-		// Check media type status change.
-		foreach (['enabled' => true, 'disabled' => false] as $new_status => $enabled) {
-			$status_link->click();
+		$statuses = ['Disabled', 'Enabled'];
+		foreach($statuses as $old_status) {
+			$new_status = array_values(array_diff($statuses, [$old_status]))[0];
+			// Change media type status.
+			$row->query('link', $old_status)->one()->click();
 			$this->page->waitUntilReady();
 
-			// Check result on frontend.
-			$message = CMessageElement::find()->one();
-			$this->assertTrue($message->isGood());
-			$this->assertEquals('Media type '.$new_status, $message->getTitle());
+			// Check result on fronted.
+			$this->assertMessage(TEST_GOOD, 'Media type '.lcfirst($new_status));
 
-			// Check that Test link changed status.
-			$this->assertTrue($test_button->isEnabled($enabled));
+			if ($new_status === 'Enabled') {
+				$enabled = true;
+				$db_status = MEDIA_TYPE_STATUS_ACTIVE;
+			}
+			else {
+				$enabled = false;
+				$db_status = MEDIA_TYPE_STATUS_DISABLED;
+			}
+
+			// Check that Test link is disabled.
+			$this->assertTrue($row->query('button:Test')->one()->isEnabled($enabled));
 
 			// Check result in DB.
-			$db_status = ($enabled) ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.$db_status.' AND name='
-					.CDBHelper::escape($media_name)
-			));
+			$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM media_type WHERE '.
+					'name='.zbx_dbstr(self::$media_name))
+			);
 		}
 	}
 
@@ -209,8 +285,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// Select several.
 			[
 				[
-					'rows' => ['SMS'],
-					'db_name' => ['SMS']
+					'rows' => ['SMS', 'Discord'],
+					'db_name' => ['SMS', 'Discord']
 				]
 			],
 			// Select all.
@@ -230,42 +306,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getSelectedMediaTypeData
 	 */
 	public function testPageAdministrationMediaTypes_Disable($data) {
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
-
-		// Check number of all selected media types.
-		if (array_key_exists('select_all', $data)) {
-			$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM media_type').' selected',
-					$this->query('id:selected_count')->one()->getText());
-		}
-		else {
-			$this->assertEquals(count($data['rows']).' selected', $this->query('id:selected_count')->one()->getText());
-		}
-
-		$this->query('button:Disable')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-
-		// Check the results in frontend.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$message_text = (array_key_exists('rows', $data) && count($data['rows']) === 1)
-				? 'Media type disabled'
-				: 'Media types disabled';
-		$this->assertEquals($message_text, $message->getTitle());
-
-		// Check the results in DB.
-		if (array_key_exists('rows', $data)) {
-			$this->assertEquals(count($data['rows']), CDBHelper::getCount(
-				'SELECT NULL'.
-				' FROM media_type'.
-				' WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
-			));
-		}
-		else {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE));
-		}
+		$this->checkStatusChangeButton($data);
 	}
 
 	/**
@@ -274,42 +315,54 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getSelectedMediaTypeData
 	 */
 	public function testPageAdministrationMediaTypes_Enable($data) {
+		$this->checkStatusChangeButton($data, 'enable');
+	}
+
+	/**
+	 * Check that status of selected media types is changed when clicking on the corresponding control button.
+	 *
+	 * @param array		$data		data provider
+	 * @param string	$action		action to be performed with the selected media types
+	 */
+	private function checkStatusChangeButton($data, $action = 'disable') {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 
+		// Check number of all selected media types.
 		if (array_key_exists('select_all', $data)) {
-			// Check number of all selected media types.
 			$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM media_type').' selected',
-					$this->query('id:selected_count')->one()->getText());
+					$this->query('id:selected_count')->one()->getText()
+			);
 		}
 		else {
 			$this->assertEquals(count($data['rows']).' selected', $this->query('id:selected_count')->one()->getText());
 		}
 
-		$this->query('button:Enable')->one()->click();
+		$this->query('button', ucfirst($action))->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check the results in frontend.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$message_text = (array_key_exists('rows', $data) && count($data['rows']) === 1)
-				? 'Media type enabled'
-				: 'Media types enabled. Not enabled: Gmail, Office365. Incomplete configuration.';
-		$this->assertEquals($message_text, $message->getTitle());
+		$message_title = (count(CTestArrayHelper::get($data, 'rows', [])) === 1)
+			? 'Media type '.$action.'d'
+			: (($action === 'enable' && CTestArrayHelper::get($data, 'select_all'))
+				? 'Media types '.$action.'d. Not enabled: Gmail, Office365. Incomplete configuration.'
+				: 'Media types '.$action.'d'
+			);
+		$this->assertMessage(TEST_GOOD, $message_title);
 
 		// Check the results in DB.
+		$status = ($action === 'enable') ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
+
 		if (array_key_exists('rows', $data)) {
-			$this->assertEquals(count($data['rows']), CDBHelper::getCount(
-				'SELECT NULL'.
-				' FROM media_type'.
-				' WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
-			));
+			$this->assertEquals(count($data['rows']), CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.
+					$status.' AND name IN ('.CDBHelper::escape($data['db_name']).')')
+			);
 		}
 		else {
 			// Gmail and Office365 media types cannot be mass updated as they have an empty mandatory password by default.
-			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED));
+			$expected_count = ($action === 'enable' && CTestArrayHelper::get($data, 'select_all')) ? 2 : 0;
+			$this->assertEquals($expected_count, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status<>'.$status));
 		}
 	}
 
@@ -319,6 +372,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'name' => 'Email',
+					'check_title' => true,
+					'check_params' => true,
 					'error' => 'Incorrect value for field "sendto": cannot be empty.'
 				]
 			],
@@ -461,24 +516,33 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	}
 
 	/**
-	 * Check Test form of media type.
+	 * Check media type test form.
 	 *
 	 * @dataProvider getTestFormData
+	 *
 	 * @depends testPageAdministrationMediaTypes_Enable
 	 */
 	public function testPageAdministrationMediaTypes_TestMediaType($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by media Name and click on Test button.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $data['name']);
-		$row->query('button:Test')->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Test media type "'.$data['name'].'"', $dialog->getTitle());
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'])->query('button:Test')
+				->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
+		if (CTestArrayHelper::get($data, 'check_title')) {
+			$this->assertEquals('Test media type "'.$data['name'].'"', $dialog->getTitle());
+		}
+
 		$form = $dialog->asForm();
-		$fields = CTestArrayHelper::get($data, 'parameters', ['Send to', 'Subject', 'Message']);
-		$this->assertEquals($fields, $form->getLabels()->asText());
-		if (CTestArrayHelper::get($data, 'webhook', false)) {
+
+		if (CTestArrayHelper::get($data, 'check_params')) {
+			$fields = CTestArrayHelper::get($data, 'parameters', ['Send to', 'Subject', 'Message']);
+			$this->assertEquals($fields, $form->getLabels()->asText());
+		}
+
+		if (CTestArrayHelper::get($data, 'webhook')) {
 			$this->assertTrue($form->getField('Response')->isEnabled(false));
 		}
 
@@ -489,22 +553,25 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$form->submit();
 
 		// Check error message.
-		$message = $form->getOverlayMessage();
-		$this->assertTrue($message->isBad());
-		$this->assertEquals('Media type test failed.', $message->getTitle());
-		$this->assertTrue($message->hasLine($data['error']));
+		$this->assertMessage(TEST_BAD, 'Media type test failed.', $data['error']);
 
-		if (CTestArrayHelper::get($data, 'webhook', false)) {
+		if (CTestArrayHelper::get($data, 'webhook')) {
 			$form->checkValue(['Response' => 'false']);
 			$this->assertEquals($form->query('id:webhook_response_type')->one()->getText(), 'Response type: String');
 		}
 	}
 
 	/**
+	 * Function removes saved media_type filters in order to avoid dependencies between this class test cases.
+	 */
+	public function resetFilter() {
+		DBexecute('DELETE FROM profiles WHERE idx LIKE \'%web.media_types%\'');
+	}
+
+	/**
 	 * Check Test form canceling functionality.
 	 */
 	public function testPageAdministrationMediaTypes_CancelTest() {
-		$media = 'Email';
 		$fields = [
 			'Send to' => 'zabbix@zabbix.com',
 			'Subject' => 'new subject',
@@ -514,16 +581,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by media Name and click on Test button.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $media);
-		$row->query('button:Test')->one()->click();
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::$media_name)
+				->query('button:Test')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Test media type "'.$media.'"', $dialog->getTitle());
-		$form = $dialog->asForm();
-		$form->fill($fields);
+		$this->assertEquals('Test media type "'.self::$media_name.'"', $dialog->getTitle());
+		$dialog->asForm()->fill($fields);
 
 		$dialog->getFooter()->query('button:Cancel')->one()->click();
-		$dialog->waitUntilNotVisible();
+		$dialog->ensureNotPresent();
 	}
 
 	/**
@@ -532,8 +597,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getSelectedMediaTypeData
 	 */
 	public function testPageAdministrationMediaTypes_Delete($data) {
-		$sql = 'SELECT NULL FROM media_type';
-		$old_hash = CDBHelper::getHash($sql);
+		if (array_key_exists('used_by_action', $data)) {
+			$sql = 'SELECT NULL FROM media_type';
+			$old_hash = CDBHelper::getHash($sql);
+		}
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
@@ -542,28 +609,22 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
-		$message = CMessageElement::find()->one();
-
 		// Check the results in frontend and in DB.
 		if (array_key_exists('used_by_action', $data)) {
-			$this->assertTrue($message->isBad());
-			$message_text = (array_key_exists('rows', $data) && count($data['rows']) === 1)
+			$message_title = (count(CTestArrayHelper::get($data, 'rows', [])) === 1)
 				? 'Cannot delete media type'
 				: 'Cannot delete media types';
-			$this->assertEquals($message_text, $message->getTitle());
-			$this->assertTrue($message->hasLine('Media types used by action "'.$data['used_by_action']));
+			$this->assertMessage(TEST_BAD, $message_title, 'Media types used by action "'.$data['used_by_action']);
+
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 		else {
-			$this->assertTrue($message->isGood());
-			$this->assertEquals((count($data['rows']) === 1) ? 'Media type deleted' : 'Media types deleted',
-				$message->getTitle()
+			$message_title = (count($data['rows']) === 1) ? 'Media type deleted' : 'Media types deleted';
+			$this->assertMessage(TEST_GOOD, $message_title);
+
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM media_type WHERE name IN ('.
+					CDBHelper::escape($data['db_name']).')')
 			);
-			$this->assertEquals(0, CDBHelper::getCount(
-				'SELECT NULL'.
-				' FROM media_type'.
-				' WHERE name IN ('.CDBHelper::escape($data['db_name']).')'
-			));
 		}
 	}
 }

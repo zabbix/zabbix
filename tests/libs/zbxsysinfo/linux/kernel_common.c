@@ -66,6 +66,7 @@ void	zbx_mock_test_entry_kernel_common(void **state, int kernel_func)
 
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
+	zbx_init_library_sysinfo(get_config_timeout);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)
 		actual_result = kernel_maxproc(&request, &param_result);

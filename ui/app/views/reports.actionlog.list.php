@@ -191,6 +191,7 @@ foreach ($data['alerts'] as $alert) {
 	->addItem($filter)
 	->addItem(
 		(new CForm('get'))
+			->cleanItems()
 			->setName('auditForm')
 			->addItem([$actionlog_list, $data['paging']])
 	)

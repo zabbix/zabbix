@@ -769,10 +769,10 @@
                     <key>zabbix[boottime]</key>
                 </item>
                 <item>
-                    <name>snmp.walk</name>
+                    <name>walk</name>
                     <type>SNMP_AGENT</type>
-                    <snmp_oid>snmp.walk[.1.3.6.1.2.1.1.9.1.3]</snmp_oid>
-                    <key>snmp.walk</key>
+                    <snmp_oid>walk[.1.3.6.1.2.1.1.9.1.3]</snmp_oid>
+                    <key>walk</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <interface_ref>if4</interface_ref>

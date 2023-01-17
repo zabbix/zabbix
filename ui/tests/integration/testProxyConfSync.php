@@ -372,11 +372,11 @@ class testProxyConfSync extends CIntegrationTest
 			"hostmacros" =>
 			[
 				"insert" =>
-				"0",
+				"2",
 				"update" =>
 				"2",
 				"delete" =>
-				"0"
+				"2"
 			]
 		],
 		[
@@ -396,7 +396,7 @@ class testProxyConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"37",
+				"49",
 				"delete" =>
 				"0"
 			]
@@ -638,7 +638,7 @@ class testProxyConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"1",
+				"3",
 				"delete" =>
 				"0"
 			]
@@ -1606,9 +1606,9 @@ class testProxyConfSync extends CIntegrationTest
 					'deleteMissing' => false
 				],
 				'triggers' => [
-					'createMissing' => true,
+					'createMissing' => false,
 					'updateExisting' => true,
-					'deleteMissing' => true
+					'deleteMissing' => false
 				],
 				'templateLinkage' => [
 					'createMissing' => false

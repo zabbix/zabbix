@@ -36,9 +36,10 @@ $fields = [
 	'tpl_triggerid' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
 	'triggerid' =>			[T_ZBX_INT,			O_OPT,	P_SYS|P_NZERO,	DB_ID,		null],
 	// filter
-	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
-	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,			DB_ID,		null],
+	'filter_groupid' =>		[T_ZBX_INT,			O_OPT,	P_SYS,				DB_ID,	null],
+	'filter_groups' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>		[T_ZBX_INT,			O_OPT,	P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_templateid' =>	[T_ZBX_INT,			O_OPT,	P_SYS,				DB_ID,	null],
 	'filter_rst'=>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>			[T_ZBX_STR,			O_OPT,	P_SYS,			null,		null],
 	'from' =>				[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,			null,		null],
@@ -57,7 +58,7 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (getRequest('hostgroupid') && !isReadableHostGroups([getRequest('hostgroupid')])) {
 		access_deny();
 	}
-	if (getRequest('filter_groups') && !isReadableTemplateGroups([getRequest('filter_groups')])) {
+	if (getRequest('filter_groupid') && !isReadableTemplateGroups([getRequest('filter_groupid')])) {
 		access_deny();
 	}
 	if (getRequest('filter_templateid') && !isReadableTemplates([getRequest('filter_templateid')])) {
@@ -74,14 +75,6 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		}
 	}
 }
-else {
-	if (getRequest('filter_groupid') && !isReadableHostGroups([getRequest('filter_groupid')])) {
-		access_deny();
-	}
-	if (getRequest('filter_hostid') && !isReadableHosts([getRequest('filter_hostid')])) {
-		access_deny();
-	}
-}
 if (getRequest('triggerid') && !isReadableTriggers([getRequest('triggerid')])) {
 	access_deny();
 }
@@ -93,7 +86,7 @@ $key_prefix = 'web.avail_report.'.$report_mode;
 
 if (hasRequest('filter_set')) {
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		CProfile::update($key_prefix.'.groupid', getRequest('filter_groups', 0), PROFILE_TYPE_ID);
+		CProfile::update($key_prefix.'.groupid', getRequest('filter_groupid', 0), PROFILE_TYPE_ID);
 		CProfile::update($key_prefix.'.hostid', getRequest('filter_templateid', 0), PROFILE_TYPE_ID);
 		CProfile::update($key_prefix.'.tpl_triggerid', getRequest('tpl_triggerid', 0), PROFILE_TYPE_ID);
 		CProfile::update($key_prefix.'.hostgroupid', getRequest('hostgroupid', 0), PROFILE_TYPE_ID);
@@ -120,7 +113,7 @@ elseif (hasRequest('filter_rst')) {
 $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 	? [
 		// 'Template group' field.
-		'groups' => getRequest('filter_groups', CProfile::get($key_prefix.'.groupid', 0)),
+		'groups' => getRequest('filter_groupid', CProfile::get($key_prefix.'.groupid', 0)),
 		// 'Template' field.
 		'hostids' => getRequest('filter_templateid', CProfile::get($key_prefix.'.hostid', 0)),
 		// 'Template trigger' field.
@@ -375,7 +368,7 @@ else {
 			$triggers = [];
 		}
 
-		$select_filter_groupid = (new CSelect('filter_groups'))
+		$select_filter_groupid = (new CSelect('filter_groupid'))
 			->setAttribute('autofocus', 'autofocus')
 			->setValue($data['filter']['groups'])
 			->setFocusableElementId('filter-groups')
@@ -523,14 +516,6 @@ else {
 			$data['filter']['timeline']['to_ts']
 		);
 
-		$url = (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']);
-		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-			$url->setArgument('filter_templateid', $data['filter']['hostids']);
-		}
-		else {
-			$url->setArgument('filter_hostids', $trigger['hosts'][0]['hostid']);
-		}
-
 		$triggerTable->addRow([
 			$trigger['host_name'],
 			$allowed_ui_problems
@@ -547,7 +532,7 @@ else {
 			($availability['false'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
-			new CLink(_('Show'), $url)
+			new CLink(_('Show'), (new CUrl('report2.php'))->setArgument('triggerid', $trigger['triggerid']))
 		]);
 	}
 

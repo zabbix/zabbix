@@ -267,12 +267,14 @@ class testSlaReport extends CWebTest {
 
 				case 'Weekly':
 					for ($i = 1; $i <= 20; $i++) {
-						$start = strtotime('next Sunday '.-$i.' week');
-						$end = strtotime(date('M-d', $start).' + 6 days');
+						// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
+						$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
 
-						$period_values[$i]['value'] = date('Y-m-d', $start).' – '.date('m-d', $end);
-						$period_values[$i]['start'] = $start;
-						$period_values[$i]['end'] = strtotime(date("M-d", $start)." + 1 week - 1 second");
+						$period_values[$i]['start'] = strtotime($start_string.-$i.' week');
+						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 7 days - 1 second');
+
+						$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
+								date('m-d', $period_values[$i]['end']);
 					}
 					break;
 
@@ -282,7 +284,7 @@ class testSlaReport extends CWebTest {
 
 					$months = ($months > 20) ? 20 : $months;
 
-					for ($i = 0; $i <= $months; $i++) {
+					for ($i = 0; $i < $months; $i++) {
 						$month = strtotime('first day of this month '.-$i.' month');
 						$period_values[$i]['value'] = date('Y-m', $month);
 						$period_values[$i]['start'] = strtotime(date('Y-m').' '.-$i.' month');

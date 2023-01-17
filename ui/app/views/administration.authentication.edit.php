@@ -27,6 +27,7 @@
 $this->includeJsFile('administration.authentication.edit.js.php');
 
 $form = (new CForm())
+	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 	->setId('authentication-form')
@@ -509,7 +510,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel([
 			_('Media type mapping'),
 			makeHelpIcon(
-				_('Map user’s SAML media attributes (e.g. email) to Zabbix user media for sending notifications.')
+				_("Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications.")
 			)
 		]))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
@@ -559,7 +560,7 @@ $saml_tab = (new CFormGrid())
 	]);
 
 	$form->addItem((new CTabView())
-		->setSelected($data['form_refresh'] ? null : 0)
+		->setSelected($data['form_refresh'] != 0 ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
 		->addTab('ldap', _('LDAP settings'), $ldap_tab, TAB_INDICATOR_AUTH_LDAP)
