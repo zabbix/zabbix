@@ -1164,8 +1164,7 @@ class CImportReferencer {
 			if (array_key_exists($uuid, $uuids)
 				|| (array_key_exists($description, $this->triggers)
 					&& array_key_exists($expression, $this->triggers[$description])
-					&& ($recovery_expression === ''
-							|| array_key_exists($recovery_expression, $this->triggers[$description][$expression])))) {
+					&& array_key_exists($recovery_expression, $this->triggers[$description][$expression]))) {
 				$this->db_triggers[$db_trigger['triggerid']] = $db_trigger;
 			}
 		}
