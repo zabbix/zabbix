@@ -49,8 +49,8 @@ No specific Zabbix configuration is required.
 |{$VEEAM.API.URL} |<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9419/api` |
 |{$VEEAM.DATA.TIMEOUT} |<p>A response timeout for the API.</p> |`10` |
 |{$VEEAM.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
-|{$VEEAM.PASSWORD} |<p>Grants a password. It is is required if the `grant_type` value is `password`.</p> |`` |
-|{$VEEAM.USER} |<p>Grants a user name. It is is required if the `grant_type` value is `password`.</p> |`` |
+|{$VEEAM.PASSWORD} |<p>Grants a password. It is required if the `grant_type` value is `password`.</p> |`` |
+|{$VEEAM.USER} |<p>Grants a user name. It is required if the `grant_type` value is `password`.</p> |`` |
 
 ### Template links
 
