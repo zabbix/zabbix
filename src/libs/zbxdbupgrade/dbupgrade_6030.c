@@ -21,6 +21,7 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
+#include "zbxexpr.h"
 
 /*
  * 6.4 development database patches
@@ -1473,6 +1474,67 @@ static int	DBpatch_6030158(void)
 {
 	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
 }
+
+static int	DBpatch_6030159(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* functions table contains history functions used in trigger expressions */
+	result = DBselect("select functionid,parameter from functions where length(parameter) > 1");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		const char	*ptr;
+		char		*buf, *param = NULL;
+		int		escaped;
+		size_t		param_pos, param_len, sep_pos, buf_alloc, buf_offset = 0;
+
+		buf_alloc  = strlen(row[1]);
+		buf = zbx_malloc(NULL, buf_alloc);
+
+		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
+		{
+			zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+			param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &escaped);
+
+			if (SUCCEED == zbx_function_param_escape(&param, escaped))
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
+			else
+				ret = FAIL;
+
+			if (',' == ptr[sep_pos])
+				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
+
+			zbx_free(param);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update functions set parameter='%s' where functionid=%s;\n", buf, row[0]);
+		zbx_free(buf);
+
+		if (SUCCEED == ret)
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBfree_result(result);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
 #endif
 
 DBPATCH_START(6030)
@@ -1638,5 +1700,6 @@ DBPATCH_ADD(6030155, 0, 1)
 DBPATCH_ADD(6030156, 0, 1)
 DBPATCH_ADD(6030157, 0, 1)
 DBPATCH_ADD(6030158, 0, 1)
+DBPATCH_ADD(6030159, 0, 1)
 
 DBPATCH_END()
