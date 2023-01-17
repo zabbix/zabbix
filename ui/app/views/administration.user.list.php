@@ -169,6 +169,7 @@ foreach ($data['users'] as $user) {
 		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('user.unblock'))
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	order_result($user['usrgrps'], 'name');

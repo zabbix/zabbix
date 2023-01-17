@@ -79,8 +79,6 @@ $discoveryTable = (new CTableInfo())
 		_('Status')
 	]);
 
-
-
 foreach ($data['drules'] as $drule) {
 	$action = $drule['status'] == DRULE_STATUS_ACTIVE ? 'discovery.disable' : 'discovery.enable';
 	$status = new CCol(
