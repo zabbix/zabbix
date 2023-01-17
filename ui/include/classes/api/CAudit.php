@@ -250,7 +250,15 @@ class CAudit {
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
 		self::RESOURCE_CONNECTOR => [
-			'paths' => ['connector.password', 'connector.ssl_key_password']
+			[
+				'paths' => ['connector.password'],
+				'conditions' => [
+					'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
+						HTTPTEST_AUTH_DIGEST
+					]
+				]
+			],
+			['paths' => ['connector.ssl_key_password']]
 		],
 		self::RESOURCE_HOST_PROTOTYPE => [
 			'paths' => ['hostprototype.macros.value'],

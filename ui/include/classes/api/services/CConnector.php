@@ -250,8 +250,12 @@ class CConnector extends CApiService {
 		$this->validateUpdate($connectors, $db_connectors);
 
 		$upd_connectors = [];
+		$upd_connectorids = [];
 
-		foreach ($connectors as $connector) {
+		$internal_fields = array_flip(['connectorid', 'authtype']);
+		$nested_object_fields = array_flip(['tags']);
+
+		foreach ($connectors as $i => &$connector) {
 			$upd_connector = DB::getUpdatedValues('connector', $connector, $db_connectors[$connector['connectorid']]);
 
 			if ($upd_connector) {
@@ -259,14 +263,25 @@ class CConnector extends CApiService {
 					'values' => $upd_connector,
 					'where' => ['connectorid' => $connector['connectorid']]
 				];
+
+				$connector = array_intersect_key($connector, $internal_fields + $upd_connector + $nested_object_fields);
+
+				$upd_connectorids[$i] = $connector['connectorid'];
+			}
+			else {
+				$connector = array_intersect_key($connector, $internal_fields + $nested_object_fields);
 			}
 		}
+		unset($connector);
 
 		if ($upd_connectors) {
 			DB::update('connector', $upd_connectors);
 		}
 
-		self::updateTags($connectors, $db_connectors);
+		self::updateTags($connectors, $db_connectors, $upd_connectorids);
+
+		$connectors = array_intersect_key($connectors, $upd_connectorids);
+		$db_connectors = array_intersect_key($db_connectors, array_flip($upd_connectorids));
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_CONNECTOR, $connectors, $db_connectors);
 
@@ -298,7 +313,9 @@ class CConnector extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype']);
+		$connectors = $this->extendObjectsByKey($connectors, $db_connectors, 'connectorid', ['authtype',
+			'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
+		]);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['connectorid'], ['name']], 'fields' => [
 			'connectorid' =>		['type' => API_ID],
@@ -425,20 +442,23 @@ class CConnector extends CApiService {
 	/**
 	 * @param array      $connectors
 	 * @param array|null $db_connectors
+	 * @param array|null $upd_connectorids
 	 */
-	private static function updateTags(array &$connectors, array $db_connectors = null): void {
+	private static function updateTags(array &$connectors, array $db_connectors = null,
+			array &$upd_connectorids = null): void {
 		$ins_tags = [];
 		$del_tagids = [];
 
-		foreach ($connectors as &$connector) {
+		foreach ($connectors as $i => &$connector) {
 			if (!array_key_exists('tags', $connector)) {
 				continue;
 			}
 
+			$changed = false;
 			$db_tags = $db_connectors !== null ? $db_connectors[$connector['connectorid']]['tags'] : [];
 
 			foreach ($connector['tags'] as &$tag) {
-				$db_tag = current(
+				$db_tagid = key(
 					array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
 						return $tag['tag'] === $db_tag['tag']
 							&& $tag['operator'] == $db_tag['operator']
@@ -446,17 +466,30 @@ class CConnector extends CApiService {
 					})
 				);
 
-				if ($db_tag) {
-					$tag['connector_tagid'] = $db_tag['connector_tagid'];
-					unset($db_tags[$tag['connector_tagid']]);
+				if ($db_tagid !== null) {
+					$tag['connector_tagid'] = $db_tagid;
+					unset($db_tags[$db_tagid]);
 				}
 				else {
 					$ins_tags[] = ['connectorid' => $connector['connectorid']] + $tag;
+					$changed = true;
 				}
 			}
 			unset($tag);
 
-			$del_tagids = array_merge($del_tagids, array_keys($db_tags));
+			if ($db_tags) {
+				$del_tagids = array_merge($del_tagids, array_keys($db_tags));
+				$changed = true;
+			}
+
+			if ($db_connectors !== null) {
+				if ($changed) {
+					$upd_connectorids[$i] = $connector['connectorid'];
+				}
+				else {
+					unset($connector['tags']);
+				}
+			}
 		}
 		unset($connector);
 
