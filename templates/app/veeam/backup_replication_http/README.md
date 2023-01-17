@@ -34,14 +34,14 @@ No specific Zabbix configuration is required.
 |{$JOB.STATUS.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate the states of jobs.</p> |`CHANGE_IF_NEEDED` |
 |{$JOB.TYPE.MATCHES} |<p>This macro is used in discovery rule to evaluate the states of jobs.</p> |`.*` |
 |{$JOB.TYPE.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate the states of jobs.</p> |`CHANGE_IF_NEEDED` |
-|{$PROXIES.NAME.MATCHES} |<p>This macro is used in discovery rule to evaluate proxies.</p> |`.*` |
-|{$PROXIES.NAME.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate proxies.</p> |`CHANGE_IF_NEEDED` |
-|{$PROXIES.TYPE.MATCHES} |<p>This macro is used in discovery rule to evaluate proxies.</p> |`.*` |
-|{$PROXIES.TYPE.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate proxies.</p> |`CHANGE_IF_NEEDED` |
-|{$REPOSITORIES.NAME.MATCHES} |<p>This macro is used in discovery rule to evaluate repositories.</p> |`.*` |
-|{$REPOSITORIES.NAME.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate repositories.</p> |`CHANGE_IF_NEEDED` |
-|{$REPOSITORIES.TYPE.MATCHES} |<p>This macro is used in discovery rule to evaluate repositories.</p> |`.*` |
-|{$REPOSITORIES.TYPE.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate repositories.</p> |`CHANGE_IF_NEEDED` |
+|{$PROXIES.NAME.MATCHES} |<p>This macro is used in proxies discovery rule.</p> |`.*` |
+|{$PROXIES.NAME.NOT_MATCHES} |<p>This macro is used in proxies discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$PROXIES.TYPE.MATCHES} |<p>This macro is used in proxies discovery rule.</p> |`.*` |
+|{$PROXIES.TYPE.NOT_MATCHES} |<p>This macro is used in proxies discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$REPOSITORIES.NAME.MATCHES} |<p>This macro is used in repositories discovery rule.</p> |`.*` |
+|{$REPOSITORIES.NAME.NOT_MATCHES} |<p>This macro is used in repositories discovery rule.</p> |`CHANGE_IF_NEEDED` |
+|{$REPOSITORIES.TYPE.MATCHES} |<p>This macro is used in repositories discovery rule.</p> |`.*` |
+|{$REPOSITORIES.TYPE.NOT_MATCHES} |<p>This macro is used in repositories discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$SESSION.NAME.MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`.*` |
 |{$SESSION.NAME.NOT_MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`CHANGE_IF_NEEDED` |
 |{$SESSION.TYPE.MATCHES} |<p>This macro is used in discovery rule to evaluate sessions.</p> |`.*` |
@@ -49,8 +49,8 @@ No specific Zabbix configuration is required.
 |{$VEEAM.API.URL} |<p>The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9419/api` |
 |{$VEEAM.DATA.TIMEOUT} |<p>A response timeout for the API.</p> |`10` |
 |{$VEEAM.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
-|{$VEEAM.PASSWORD} |<p>Grants a password. It is is required if the `grant_type` value is `password`.</p> |`` |
-|{$VEEAM.USER} |<p>Grants a user name. It is is required if the `grant_type` value is `password`.</p> |`` |
+|{$VEEAM.PASSWORD} |<p>Veeam Backup and Replication account `password`. Used to obtain an access token.</p> |`` |
+|{$VEEAM.USER} |<p>Veeam Backup and Replication account `username`. Used to obtain an access token.</p> |`` |
 
 ### Template links
 
@@ -76,9 +76,9 @@ There are no template links in this template.
 |Veeam |Veeam: Max task count by [{#NAME}] [{#TYPE}] |<p>The maximum number of concurrent tasks.</p> |DEPENDENT |veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.server.maxTaskCount`</p> |
 |Veeam |Veeam: Host name by [{#NAME}] [{#TYPE}] |<p>The name of the proxy server.</p> |DEPENDENT |veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.name`</p> |
 |Veeam |Veeam: Host type by [{#NAME}] [{#TYPE}] |<p>The type of the proxy server.</p> |DEPENDENT |veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.type`</p> |
-|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Gets raw data of `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
+|Veeam |Veeam: Get data [{#NAME}] [{#TYPE}] |<p>Gets raw data of repositories `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.repositories.raw[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p> |
 |Veeam |Veeam: Used space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Used space by repositories expressed in gigabytes (GB).</p> |DEPENDENT |veeam.repository.capacity[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.usedSpaceGB`</p> |
-|Veeam |Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Free space of repositories expressed in GB.</p> |DEPENDENT |veeam.repository.free.space[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.freeGB`</p> |
+|Veeam |Veeam: Free space [{#NAME}] [{#HOSTNAME}] [{#PATH}] |<p>Free space of repositories expressed in gigabytes (GB).</p> |DEPENDENT |veeam.repository.free.space[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.freeGB`</p> |
 |Veeam |Veeam: Get sessions data [{#NAME}] [{#TYPE}] |<p>Gets raw data of sessions `[{#NAME}]`, `[{#TYPE}]`.</p> |DEPENDENT |veeam.sessions.raw[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam: Session state [{#NAME}] [{#TYPE}] |<p>The state of the session. The enums used: `"Stopped"`, `"Starting"`, `"Stopping"`, `"Working"`, `"Pausing"`, `"Resuming"`, `"WaitingTape"`, `"Idle"`, `"Postprocessing"`, `"WaitingRepository"`, `"WaitingSlot"`.</p> |DEPENDENT |veeam.sessions.state[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
 |Veeam |Veeam: Session result [{#NAME}] [{#TYPE}] |<p>The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.</p> |DEPENDENT |veeam.sessions.result[{#ID}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.result.result`</p> |

@@ -3,7 +3,7 @@
 
 ## Overview
 
-This template is designed to monitor Veeam Backup & Replication used Veeam Backup Enterprise Manager REST API.
+This template is designed to monitor Veeam Backup and Replication used Veeam Backup Enterprise Manager REST API.
 Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
 It works without any external scripts and uses the script item. 
 
@@ -17,9 +17,9 @@ For Zabbix version: 6.0 and higher.
 
 1. Create a user to monitor the service or use an existing read-only account.
 You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
-> See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
+> See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
 2. Link the template to a host.
-3. Configure macros {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
+3. Configure macros `{$VEEAM.MANAGER.API.URL}`, `{$VEEAM.MANAGER.USER}`, `{$VEEAM.MANAGER.PASSWORD}`.
 
 ## Configuration
 
@@ -33,13 +33,13 @@ No specific Zabbix configuration is required.
 |{$BACKUP.NAME.NOT_MATCHES} |<p>This macro is used in backup discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$BACKUP.TYPE.MATCHES} |<p>This macro is used in backup discovery rule.</p> |`.*` |
 |{$BACKUP.TYPE.NOT_MATCHES} |<p>This macro is used in backup discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint URL in the format <scheme>://<host>:<port>.</p> |`https://localhost:9398/api` |
+|{$VEEAM.MANAGER.API.URL} |<p>Veeam Backup Enterprise Manager API endpoint is a URL in the format `<scheme>://<host>:<port>`.</p> |`https://localhost:9398/api` |
 |{$VEEAM.MANAGER.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`10` |
-|{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.</p> |`` |
+|{$VEEAM.MANAGER.HTTP.PROXY} |<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p> |`` |
 |{$VEEAM.MANAGER.JOB.MAX.FAIL} |<p>Maximum failed job's score (for trigger expression).</p> |`5` |
 |{$VEEAM.MANAGER.JOB.MAX.WARN} |<p>Maximum warning job's score (for trigger expression).</p> |`10` |
-|{$VEEAM.MANAGER.PASSWORD} |<p>Password of the account to be used for authentication..</p> |`` |
-|{$VEEAM.MANAGER.USER} |<p>Username of the account to be used for authentication..</p> |`` |
+|{$VEEAM.MANAGER.PASSWORD} |<p>Veeam Backup Enterprise Manager account `password`.</p> |`` |
+|{$VEEAM.MANAGER.USER} |<p>Veeam Backup Enterprise Manager account `user name`.</p> |`` |
 
 ### Template links
 
@@ -56,7 +56,7 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |Veeam |Veeam Manager: Get metrics |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |veeam.manager.get.metrics<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Veeam |Veeam Manager: Get errors |<p>The errors from API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Veeam |Veeam Manager: Get errors |<p>The errors from the API requests.</p> |DEPENDENT |veeam.manager.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Veeam |Veeam Manager: Running Jobs |<p>The informing about of the running jobs.</p> |DEPENDENT |veeam.manager.running.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.RunningJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam Manager: Scheduled Jobs |<p>The informing about of the scheduled jobs.</p> |DEPENDENT |veeam.manager.scheduled.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Veeam |Veeam Manager: Scheduled Backup Jobs |<p>The informing about of the scheduled backup jobs.</p> |DEPENDENT |veeam.manager.scheduled.backup.jobs<p>**Preprocessing**:</p><p>- JSONPATH: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |

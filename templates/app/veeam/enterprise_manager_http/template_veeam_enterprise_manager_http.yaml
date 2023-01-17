@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-16T06:21:02Z'
+  date: '2023-01-17T14:49:46Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -11,16 +11,16 @@ zabbix_export:
       template: 'Veeam Backup Enterprise Manager by HTTP'
       name: 'Veeam Backup Enterprise Manager by HTTP'
       description: |
-        This template is designed to monitor Veeam Backup & Replication used Veeam Backup Enterprise Manager REST API.
+        This template is designed to monitor Veeam Backup and Replication used Veeam Backup Enterprise Manager REST API.
         Veeam Backup Enterprise Manager REST API lets communicate with Zabbix to query information about Veeam Backup Enterprise Manager objects.      
         It works without any external scripts and uses the script item. 
         
         Setup:
           1. Create a user to monitor the service or use an existing read-only account.
           You can obtain a collection of jobs if you are logged in under an account with the `Portal Administrator` role only.
-          See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
+          See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/em_rest/http_authentication.html?ver=110) for more details.
           2. Link the template to a host.
-          3. Configure macros {$VEEAM.MANAGER.API.URL}, {$VEEAM.MANAGER.USER}, {$VEEAM.MANAGER.PASSWORD}.
+          3. Configure macros `{$VEEAM.MANAGER.API.URL}`, `{$VEEAM.MANAGER.USER}`, `{$VEEAM.MANAGER.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -70,7 +70,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'The errors from API requests.'
+          description: 'The errors from the API requests.'
           preprocessing:
             -
               type: JSONPATH
@@ -506,14 +506,14 @@ zabbix_export:
         -
           macro: '{$VEEAM.MANAGER.API.URL}'
           value: 'https://localhost:9398/api'
-          description: 'Veeam Backup Enterprise Manager API endpoint URL in the format <scheme>://<host>:<port>.'
+          description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
         -
           macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           value: '10'
           description: 'A response timeout for API.'
         -
           macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
-          description: 'Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
         -
           macro: '{$VEEAM.MANAGER.JOB.MAX.FAIL}'
           value: '5'
@@ -525,8 +525,8 @@ zabbix_export:
         -
           macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Password of the account to be used for authentication..'
+          description: 'Veeam Backup Enterprise Manager account `password`.'
         -
           macro: '{$VEEAM.MANAGER.USER}'
           type: SECRET_TEXT
-          description: 'Username of the account to be used for authentication..'
+          description: 'Veeam Backup Enterprise Manager account `user name`.'

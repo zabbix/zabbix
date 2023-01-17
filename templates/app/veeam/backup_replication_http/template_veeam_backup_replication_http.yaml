@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-01-16T06:20:30Z'
+  date: '2023-01-17T14:49:17Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -11,14 +11,14 @@ zabbix_export:
       template: 'Veeam Backup and Replication by HTTP'
       name: 'Veeam Backup and Replication by HTTP'
       description: |
-        This template is designed to monitor Veeam Backup & Replication 11.0.
+        This template is designed to monitor Veeam Backup and Replication version 11.0.
         It works without any external scripts and uses the script item.
         
         Setup:
           1. Create a user to monitor the service or use an existing read-only account.
-          See [VEEAM HELP CENTER](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
+          See [Veeam Help Center](https://helpcenter.veeam.com/docs/backup/vbr_rest/reference/vbr-rest-v1-rev2.html?ver=110#tag/Login/operation/CreateToken!path=grant_type&t=request) for more details. 
           2. Link the template to a host.
-          3. Configure macros {$VEEAM.API.URL}, {$VEEAM.USER}, {$VEEAM.PASSWORD}.
+          3. Configure macros `{$VEEAM.API.URL}`, `{$VEEAM.USER}`, and `{$VEEAM.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -239,7 +239,7 @@ zabbix_export:
                 value: '{$JOB.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery jobs states.'
+          description: 'Discovery of the jobs states.'
           item_prototypes:
             -
               uuid: 120a6bf888e74e0c9b054c3bdd50473f
@@ -250,7 +250,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`.'
+              description: 'The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -289,7 +289,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get jobs states [{#NAME}] raw data.'
+              description: 'Gets raw data of the jobs states `[{#NAME}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -313,7 +313,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'Current status of the job. Enum: `"running"` `"inactive"` `"disabled"`.'
+              description: 'The current status of the job. The enums used: `"running"`, `"inactive"`, `"disabled"`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -388,7 +388,7 @@ zabbix_export:
                 value: '{$PROXIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery Proxies.'
+          description: 'Discovery of proxies.'
           item_prototypes:
             -
               uuid: 1daea1ba8ac144fc9e22296720af0b22
@@ -397,7 +397,7 @@ zabbix_export:
               key: 'veeam.proxy.maxtask[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Maximum number of concurrent tasks.'
+              description: 'The maximum number of concurrent tasks.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -421,7 +421,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get proxy [{#NAME}] [{#TYPE}] raw data.'
+              description: 'Gets raw data of the proxy `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -448,7 +448,7 @@ zabbix_export:
               history: 1d
               trends: '0'
               value_type: TEXT
-              description: 'The proxy server name.'
+              description: 'The name of the proxy server.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -472,7 +472,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get proxy server raw data.'
+              description: 'Gets raw data of the proxy server.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -499,7 +499,7 @@ zabbix_export:
               history: 1d
               trends: '0'
               value_type: TEXT
-              description: 'The proxy server type.'
+              description: 'The type of the proxy server.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -568,7 +568,7 @@ zabbix_export:
                 value: '{$REPOSITORIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery repositories.'
+          description: 'Discovery of repositories.'
           item_prototypes:
             -
               uuid: 1c925cfa0a2b46838588471aa58a1591
@@ -579,7 +579,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get repositories [{#NAME}] [{#TYPE}] raw data.'
+              description: 'Gets raw data of repositories `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -606,7 +606,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!GB'
-              description: 'Repository used space in GB.'
+              description: 'Used space by repositories expressed in gigabytes (GB).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -630,7 +630,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!GB'
-              description: 'Repository free space in GB.'
+              description: 'Free space of repositories expressed in gigabytes (GB).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -705,7 +705,7 @@ zabbix_export:
                 value: '{$SESSION.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery sessions.'
+          description: 'Discovery of sessions.'
           item_prototypes:
             -
               uuid: 7224f41e5c614268bf6997ad8a49710b
@@ -716,7 +716,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'Message that explains the session result.'
+              description: 'A message that explains the session result.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -743,7 +743,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Progress percentage of the session.'
+              description: 'The progress of the session expressed as percentage.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -770,7 +770,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Get sessions [{#NAME}] [{#TYPE}] raw data.'
+              description: 'Gets raw data of sessions `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -795,7 +795,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'Result of the session. Enum: `"None"` `"Success"` `"Warning"` `"Failed"`'
+              description: 'The result of the session. The enums used: `"None"`, `"Success"`, `"Warning"`, `"Failed"`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -834,7 +834,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'State of the session. Enum: `"Stopped"` `"Starting"` `"Stopping"` `"Working"` `"Pausing"` `"Resuming"` `"WaitingTape"` `"Idle"` `"Postprocessing"` `"WaitingRepository"` `"WaitingSlot"`.'
+              description: 'The state of the session. The enums used: `"Stopped"`, `"Starting"`, `"Stopping"`, `"Working"`, `"Pausing"`, `"Resuming"`, `"WaitingTape"`, `"Idle"`, `"Postprocessing"`, `"WaitingRepository"`, `"WaitingSlot"`.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -903,27 +903,27 @@ zabbix_export:
         -
           macro: '{$JOB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$JOB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$JOB.STATUS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$JOB.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$JOB.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$JOB.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Jobs states discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate the states of jobs.'
         -
           macro: '{$PROXIES.NAME.MATCHES}'
           value: '.*'
@@ -959,35 +959,35 @@ zabbix_export:
         -
           macro: '{$SESSION.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in session discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
         -
           macro: '{$SESSION.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in session discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
         -
           macro: '{$SESSION.TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in session discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
         -
           macro: '{$SESSION.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in session discovery rule.'
+          description: 'This macro is used in discovery rule to evaluate sessions.'
         -
           macro: '{$VEEAM.API.URL}'
           value: 'https://localhost:9419/api'
-          description: 'Veeam API endpoint URL in the format <scheme>://<host>:<port>.'
+          description: 'The Veeam API endpoint is a URL in the format `<scheme>://<host>:<port>`.'
         -
           macro: '{$VEEAM.DATA.TIMEOUT}'
           value: '10'
-          description: 'A response timeout for API.'
+          description: 'A response timeout for the API.'
         -
           macro: '{$VEEAM.HTTP.PROXY}'
-          description: 'Sets HTTP proxy to "http_proxy" value. If this parameter is empty then no proxy is used.'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
         -
           macro: '{$VEEAM.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Password. Required if the `grant_type` value is `password`.'
+          description: 'Veeam Backup and Replication account `password`. Used to obtain an access token.'
         -
           macro: '{$VEEAM.USER}'
           type: SECRET_TEXT
-          description: 'User name. Required if the `grant_type` value is `password`.'
+          description: 'Veeam Backup and Replication account `username`. Used to obtain an access token.'
