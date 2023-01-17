@@ -28,8 +28,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('modules');
 }
 
-$this->includeJsFile('administration.module.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Modules'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
@@ -131,19 +129,11 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
-		'module.enable' => [
-			'content' => (new CSubmitButton(_('Enable'), 'action', 'module.enable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massenable-module')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'module.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected modules?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('module.enable')
 		],
-		'module.disable' => [
-			'content' => (new CSubmitButton(_('Disable'), 'action', 'module.disable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdisable-module')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'module.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected modules?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('module.disable')
 		]
 	], 'modules')
 ]);
@@ -152,9 +142,3 @@ $form->addItem([
 $html_page->addItem($form);
 
 $html_page->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
-	->show();

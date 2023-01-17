@@ -27,29 +27,10 @@
 <script>
 	const view = new class {
 
-		init({csrf_tokens}) {
-			this.csrf_tokens = csrf_tokens;
-
+		init() {
 			document.addEventListener('click', (e) => {
-				let prevent_event = false;
-
 				if (e.target.classList.contains('js-action-edit')) {
 					this._edit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
-				}
-				else if (e.target.classList.contains('js-massenable-mediatype')) {
-					prevent_event = !this.massEnableMediatype(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdisable-mediatype')) {
-					prevent_event = !this.massDisableMediatype(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.classList.contains('js-massdelete-mediatype')) {
-					prevent_event = !this.massDeleteMediatype(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-
-				if (prevent_event) {
-					e.preventDefault();
-					e.stopPropagation();
-					return false;
 				}
 			})
 		}
@@ -80,54 +61,6 @@
 
 				location.href = location.href;
 			});
-		}
-
-		massEnableMediatype(target, mediatypeids) {
-			const confirmation = mediatypeids.length > 1
-				? <?= json_encode(_('Enable selected media types?')) ?>
-				: <?= json_encode(_('Enable selected media type?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['mediatype.enable'], false
-			);
-
-			return true;
-		}
-
-		massDisableMediatype(target, mediatypeids) {
-			const confirmation = mediatypeids.length > 1
-				? <?= json_encode(_('Disable selected media types?')) ?>
-				: <?= json_encode(_('Disable selected media type?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['mediatype.disable'], false
-			);
-
-			return true;
-		}
-
-		massDeleteMediatype(target, mediatypeids) {
-			const confirmation = mediatypeids.length > 1
-				? <?= json_encode(_('Delete selected media types?')) ?>
-				: <?= json_encode(_('Delete selected media type?')) ?>;
-
-			if (!window.confirm(confirmation)) {
-				return false;
-			}
-
-			create_var(target.closest('form'), '<?= CController::CSRF_TOKEN_NAME ?>',
-				this.csrf_tokens['mediatype.delete'], false
-			);
-
-			return true;
 		}
 
 		_post(target, actionids, url) {

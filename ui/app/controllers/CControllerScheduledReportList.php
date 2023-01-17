@@ -143,9 +143,6 @@ class CControllerScheduledReportList extends CController {
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['reports'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
-		$data['csrf_tokens'] = self::generateCsrfTokens(['scheduledreport.enable', 'scheduledreport.disable',
-			'scheduledreport.delete'
-		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Scheduled reports'));

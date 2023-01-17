@@ -44,8 +44,7 @@ class CControllerRegExList extends CController {
 				'selectExpressions' => ['expression', 'expression_type'],
 				'preservekeys' => true
 			]),
-			'uncheck' => $this->hasInput('uncheck'),
-			'csrf_tokens' => self::generateCsrfTokens(['regex.delete'])
+			'uncheck' => $this->hasInput('uncheck')
 		];
 
 		order_result($data['regexs'], 'name');

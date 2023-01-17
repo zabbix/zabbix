@@ -218,13 +218,8 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'script.delete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-script')
-				->addClass('no-chkbxrange')
-				->removeid()
-		]
+		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('script.delete')]
 	], 'script')
 ]);
 
@@ -233,8 +228,6 @@ $html_page
 	->addItem($scriptsForm)
 	->show();
 
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

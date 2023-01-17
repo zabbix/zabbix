@@ -27,8 +27,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('discovery');
 }
 
-$this->includeJsFile('configuration.discovery.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Discovery rules'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_DISCOVERY_LIST))
@@ -117,36 +115,18 @@ $discoveryForm->addItem([
 	$discoveryTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
-		'discovery.enable' => [
-			'content' => (new CSubmitButton(_('Enable'), 'action', 'discovery.enable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massenable-discovery')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'discovery.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected discovery rules?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.enable')
 		],
-		'discovery.disable' => [
-			'content' => (new CSubmitButton(_('Disable'), 'action', 'discovery.disable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdisable-discovery')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'discovery.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected discovery rules?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.disable')
 		],
-		'discovery.delete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'discovery.delete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-discovery')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'discovery.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected discovery rules?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('discovery.delete')
 		]
 	], 'discovery')
 ]);
 
 $html_page
 	->addItem($discoveryForm)
-	->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
 	->show();

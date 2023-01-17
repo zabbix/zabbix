@@ -27,8 +27,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('userrole');
 }
 
-$this->includeJsFile('administration.usserrole.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_LIST))
@@ -128,22 +126,11 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'roleids', [
-		'userrole.delete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'userrole.delete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-userrole')
-				->addClass('no-chkbxrange')
-				->removeid()
-		]
+		'userrole.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected roles?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('userrole.delete')]
 	], 'userrole')
 ]);
 
 $html_page
 	->addItem($form)
-	->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
 	->show();

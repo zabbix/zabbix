@@ -132,7 +132,6 @@ class CControllerUserTokenList extends CController {
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['tokens'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
-		$data['csrf_tokens'] = self::generateCsrfTokens(['token.enable', 'token.disable', 'token.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('API tokens'));

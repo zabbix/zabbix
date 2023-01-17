@@ -123,7 +123,6 @@ class CControllerDiscoveryList extends CController {
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['drules'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
-		$data['csrf_tokens'] = self::generateCsrfTokens(['discovery.enable', 'discovery.disable', 'discovery.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

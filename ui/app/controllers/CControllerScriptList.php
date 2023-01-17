@@ -192,7 +192,6 @@ class CControllerScriptList extends CController {
 		$data['config'] = [
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		];
-		$data['csrf_tokens'] = self::generateCsrfTokens(['script.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));

@@ -198,19 +198,11 @@ $token_form->addItem([
 	$token_table,
 	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
-		'token.enable' => [
-			'content' => (new CSubmitButton(_('Enable'), 'action', 'token.enable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massenable-token')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'token.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected API tokens?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('token.enable')
 		],
-		'token.disable' => [
-			'content' => (new CSubmitButton(_('Disable'), 'action', 'token.disable'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdisable-token')
-				->addClass('no-chkbxrange')
-				->removeid()
+		'token.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected API tokens?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('token.disable')
 		],
 		'token.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
@@ -227,7 +219,7 @@ $html_page
 	->show();
 
 (new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
+		'csrf_tokens' => CCsrfTokenHelper::getCsrfTokens(['token.delete'])
 	]).');'))
 	->setOnDocumentReady()
 	->show();

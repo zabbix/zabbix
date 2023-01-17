@@ -27,8 +27,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('regex');
 }
 
-$this->includeJsFile('administration.regex.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
@@ -80,20 +78,9 @@ foreach($data['regexs'] as $regexid => $regex) {
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexids', [
-		'regex.delete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'regex.delete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-regex')
-				->addClass('no-chkbxrange')
-				->removeid()
-		]
+		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('regex.delete')]
 	], 'regex')
 ]);
 
 $html_page->addItem($form)->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
-	->show();

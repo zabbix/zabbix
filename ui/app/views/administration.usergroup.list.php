@@ -27,8 +27,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('usergroup');
 }
 
-$this->includeJsFile('administration.usergroup.list.js.php');
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_LIST))
@@ -242,22 +240,11 @@ $form->addItem([
 				->addCsrfToken('usergroup.massupdate')
 				->getUrl()
 		],
-		'regex.delete' => [
-			'content' => (new CSubmitButton(_('Delete'), 'action', 'usergroup.delete'))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-usergroup')
-				->addClass('no-chkbxrange')
-				->removeid()
-		]
+		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?'),
+			'csrf_token' => CCsrfTokenHelper::getCsrfToken('usergroup.delete')]
 	], 'usergroup')
 ]);
 
 $html_page
 	->addItem($form)
-	->show();
-
-(new CScriptTag('view.init('.json_encode([
-		'csrf_tokens' => $data['csrf_tokens']
-	]).');'))
-	->setOnDocumentReady()
 	->show();

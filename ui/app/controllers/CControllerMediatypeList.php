@@ -136,7 +136,6 @@ class CControllerMediatypeList extends CController {
 		$data['paging'] = CPagerHelper::paginate($data['page'], $data['mediatypes'], $sortOrder,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
-		$data['csrf_tokens'] = self::generateCsrfTokens(['mediatype.enable', 'mediatype.disable', 'mediatype.delete']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
