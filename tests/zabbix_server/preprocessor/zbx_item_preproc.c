@@ -31,6 +31,9 @@
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 
 #ifdef HAVE_NETSNMP
+#define SNMP_NO_DEBUGGING
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
 #include "../../../src/zabbix_server/preprocessor/preproc_snmp.h"
 #endif
 
@@ -182,6 +185,59 @@ static int	is_step_supported(int type)
 	}
 }
 
+#ifdef HAVE_NETSNMP
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if MIB can be translated to OID by the system. Absence of  *
+ *          MIB files in the system will cause failures of MIB translation    *
+ *          tests, and such tests should be skipped if MIB was not found.     *
+ *          configuration or other settings                                   *
+ *                                                                            *
+ * Parameters: op [IN] the preprocessing step operation                       *
+ *                                                                            *
+ * Return value: SUCCEED - MIB can be translated / MIB file exists            *
+ *               FAIL    - MIB cannot be translated / MIB file doesn't exist  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_mib_existence(zbx_preproc_op_t *op)
+{
+	int		ret = FAIL;
+	oid		oid_tmp[MAX_OID_LEN];
+	size_t		oid_len = MAX_OID_LEN;
+	char		*oid = NULL, *right = NULL;
+
+	if (ZBX_PREPROC_SNMP_WALK_TO_VALUE == op->type)
+	{
+		zbx_strsplit_first(op->params, '\n', &oid, &right);
+	}
+	else if (ZBX_PREPROC_SNMP_WALK_TO_JSON == op->type)
+	{
+		char	*ptr = op->params;
+		int	line_idx = 0;
+
+		while (line_idx != 1 && '\0' != *ptr)
+		{
+			if ('\n' == *ptr)
+				line_idx++;
+
+			ptr++;
+		}
+
+		zbx_strsplit_first(ptr, '\n', &oid, &right);
+	}
+	else
+		fail_msg("processing operation type %i is not compatible with SNMP preprocessing", op->type);
+
+	if (0 != get_node(oid, oid_tmp, &oid_len))
+		ret = SUCCEED;
+
+	zbx_free(oid);
+	zbx_free(right);
+
+	return ret;
+}
+#endif
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_variant_t			value, history_value;
@@ -190,18 +246,32 @@ void	zbx_mock_test_entry(void **state)
 	zbx_preproc_op_t		op;
 	int				returned_ret, expected_ret;
 	char				*error = NULL;
-
-	ZBX_UNUSED(state);
-
 #ifdef HAVE_NETSNMP
+	int				mib_translation_case = 0;
+
 	zbx_preproc_init_snmp();
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
+		mib_translation_case = 1;
 #else
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		skip();
 #endif
 
+	ZBX_UNUSED(state);
+
 	read_value("in.value", &value_type, &value, &ts);
 	read_step("in.step", &op);
+
+#ifdef HAVE_NETSNMP
+	/* MIB translation test cases will fail if system lacks MIBs - in this case test case should be skipped */
+	if (1 == mib_translation_case && FAIL == check_mib_existence(&op))
+	{
+		zbx_preproc_shutdown_snmp();
+		zbx_variant_clear(&value);
+		skip();
+	}
+#endif
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{

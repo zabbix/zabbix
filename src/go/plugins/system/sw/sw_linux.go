@@ -38,6 +38,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
+	"zabbix.com/util"
 )
 
 const timeFmt = "Mon Jan _2 15:04:05 2006"
@@ -790,8 +791,8 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 
 	u := syscall.Utsname{}
 	if syscall.Uname(&u) == nil {
-		info.Kernel = charArray2String(u.Release[:])
-		info.Architecture = charArray2String(u.Machine[:])
+		info.Kernel += util.UnameArrayToString(&u.Release)
+		info.Architecture += util.UnameArrayToString(&u.Machine)
 
 		if len(info.ProductName) > 0 {
 			info.VersionPretty += info.ProductName

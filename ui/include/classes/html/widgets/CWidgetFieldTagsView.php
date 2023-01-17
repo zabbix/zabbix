@@ -37,7 +37,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		$tags_table = (new CTable())
 			->setId('tags_table_'.$this->field->getName())
 			->addClass('table-tags')
-			->addClass('table-initial-width');
+			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
 		$i = 0;
 

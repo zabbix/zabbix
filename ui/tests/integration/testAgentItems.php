@@ -835,7 +835,7 @@ class testAgentItems extends CIntegrationTest {
 		}
 
 		$data = [];
-		$wait_iterations = 5;
+		$wait_iterations = 10;
 		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {

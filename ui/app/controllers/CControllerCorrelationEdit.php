@@ -89,11 +89,12 @@ class CControllerCorrelationEdit extends CController {
 			'correlationid' => $this->getInput('correlationid', 0),
 			'op_close_new' => false,
 			'op_close_old' => false,
-			'conditions' => []
+			'conditions' => [],
+			'form_refresh' => 0
 		];
 
 		$this->getInputs($data, ['correlationid', 'name', 'description', 'status', 'op_close_new', 'op_close_old',
-			'evaltype', 'formula', 'conditions'
+			'evaltype', 'formula', 'conditions', 'form_refresh'
 		]);
 
 		foreach ($data['conditions'] as $row_index => &$condition) {

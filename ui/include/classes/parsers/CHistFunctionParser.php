@@ -391,7 +391,7 @@ class CHistFunctionParser extends CParser {
 	 * @return string
 	 */
 	public static function unquoteParam(string $param): string {
-		return strtr(substr($param, 1, -1), ['\\"' => '"', '\\\\' => '\\']);
+		return strtr(substr($param, 1, -1), ['\\"' => '"']);
 	}
 
 	/*
@@ -400,7 +400,7 @@ class CHistFunctionParser extends CParser {
 	 * @return string
 	 */
 	public static function quoteParam(string $param): string {
-		return '"'.strtr($param, ['\\' => '\\\\', '"' => '\\"']).'"';
+		return '"'.strtr($param, ['"' => '\\"']).'"';
 	}
 
 	/**

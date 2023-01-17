@@ -35,6 +35,7 @@ typedef struct
 	zbx_config_vault_t	*config_vault;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	zbx_socket_t		*listen_sock;
+	int			config_startup_time;
 }
 zbx_thread_trapper_args;
 

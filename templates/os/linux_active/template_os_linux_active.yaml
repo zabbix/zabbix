@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-12-19T09:58:33Z'
+  date: '2023-01-16T07:04:36Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.42
+        Template tooling version used: 0.43
       groups:
         -
           name: 'Templates/Operating systems'
@@ -459,7 +459,7 @@ zabbix_export:
           triggers:
             -
               uuid: c2fc80044fa94f0d97c72bd1d749b731
-              expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+              expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -541,7 +541,7 @@ zabbix_export:
           triggers:
             -
               uuid: e27cb7063ca841a2b78aa547ec0d001c
-              expression: 'last(/Linux by Zabbix agent active/system.sw.os,#1)<>last(/Linux by Zabbix agent active/system.sw.os,#2) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
+              expression: 'change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Ack to close the problem manually.'
@@ -549,29 +549,42 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
                   value: notice
         -
           uuid: 16b1e5ab950040ef8c29139e0649d622
-          name: 'Software installed'
+          name: 'Number of installed packages'
           type: ZABBIX_ACTIVE
-          key: system.sw.packages
+          key: system.sw.packages.get
           delay: 1h
-          history: 2w
-          trends: '0'
-          value_type: TEXT
+          history: 7d
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
+                - 12h
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
           tags:
             -
               tag: component
               value: os
+          triggers:
+            -
+              uuid: bd57d37531ac48f5b96a9f45453f3c35
+              expression: 'change(/Linux by Zabbix agent active/system.sw.packages.get)<>0'
+              name: 'Number of installed packages has been changed'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f08e1de57cbd4b08b9fd3294d0d95906
           name: 'Free swap space'
@@ -703,10 +716,10 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Operating system description has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.sw.os,#1)<>last(/Linux by Zabbix agent active/system.sw.os,#2) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0'
                 -
                   name: 'System name has changed'
-                  expression: 'last(/Linux by Zabbix agent active/system.hostname,#1)<>last(/Linux by Zabbix agent active/system.hostname,#2) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
+                  expression: 'change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0'
               tags:
                 -
                   tag: scope
@@ -2670,12 +2683,6 @@ zabbix_export:
           item:
             host: 'Linux by Zabbix agent active'
             key: 'proc.num[,,run]'
-        -
-          sortorder: '2'
-          color: F63100
-          item:
-            host: 'Linux by Zabbix agent active'
-            key: kernel.maxproc
     -
       uuid: a70c0c13381a4fb68eaeb66226ffe2bb
       name: 'Swap usage'

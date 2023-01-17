@@ -412,7 +412,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 	 *
 	 * @return array
 	 */
-	public function update($items) {
+	public function update(array $items) {
 		$items = zbx_toArray($items);
 
 		$db_items = $this->get([
