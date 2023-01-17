@@ -256,9 +256,9 @@ foreach ($data['discoveries'] as $discovery) {
 			->setArgument('g_hostdruleid[]', $discovery['itemid'])
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
-			->addCsrfToken($status_action)
 			->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($status_action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 

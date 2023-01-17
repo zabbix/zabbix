@@ -91,9 +91,9 @@ foreach ($data['drules'] as $drule) {
 			(new CUrl('zabbix.php'))
 				->setArgument('druleids', (array) $drule['druleid'])
 				->setArgument('action', $action)
-				->addCsrfToken($action)
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(discovery_status2style($drule['status']))
 	);

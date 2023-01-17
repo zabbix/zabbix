@@ -103,12 +103,14 @@ foreach ($data['modules'] as $moduleid => $module) {
 		->getUrl();
 
 	if ($module['status'] == MODULE_STATUS_ENABLED) {
-		$status = (new CLink(_('Enabled'), (new CUrl($status_url))->addCsrfToken('module.disable')->getUrl()))
+		$status = (new CLink(_('Enabled'), (new CUrl($status_url))->getUrl()))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('module.disable'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN);
 	}
 	else {
-		$status = (new CLink(_('Disabled'), (new CUrl($status_url))->addCsrfToken('module.enable')->getUrl()))
+		$status = (new CLink(_('Disabled'), (new CUrl($status_url))->getUrl()))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken('module.enable'))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED);
 	}

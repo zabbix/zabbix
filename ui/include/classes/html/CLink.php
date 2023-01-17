@@ -21,6 +21,7 @@
 
 class CLink extends CTag {
 
+	private $csrf_token = '';
 	private	$confirm_message = '';
 	private $url;
 
@@ -31,6 +32,20 @@ class CLink extends CTag {
 			$this->addItem($item);
 		}
 		$this->url = $url;
+	}
+
+	/**
+	 * Adds CSRF token into the URL.
+	 * POST method will be used for '_csrf_token' argument.
+	 *
+	 * @param string $csrf_token  already generated CSRF token string.
+	 *
+	 * @return $this
+	 */
+	public function addCsrfToken(string $csrf_token) {
+		$this->csrf_token = $csrf_token;
+
+		return $this;
 	}
 
 	/*
@@ -66,11 +81,28 @@ class CLink extends CTag {
 			$this->setAttribute('role', 'button');
 		}
 
-		$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
-
-		if ($this->confirm_message !== '') {
-			$this->onClick('javascript: return Confirm('.json_encode($this->confirm_message).');');
+		if ($this->csrf_token != '') {
+			if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
+				$url .= CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.$this->csrf_token;
+			}
+			$confirm_script = ($this->confirm_message !== '')
+				? 'Confirm('.CHtml::encode(json_encode($this->confirm_message)).') && '
+				: '';
+			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', '".
+				CCsrfTokenHelper::CSRF_TOKEN_NAME."', true)"
+			);
+			$this->setAttribute('href', 'javascript:void(0)');
 		}
+		else {
+			$this->setAttribute('href', ($url == null) ? 'javascript:void(0)' : $url);
+
+			if ($this->confirm_message !== '') {
+				$this->onClick('javascript: return Confirm('.json_encode($this->confirm_message).');');
+			}
+		}
+
+
 
 		return parent::toString($destroy);
 	}

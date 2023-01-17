@@ -132,9 +132,9 @@ foreach ($data['items'] as $item) {
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('action', $status_action)
 			->setArgument('context', $data['context'])
-			->addCsrfToken($status_action)
 			->getUrl()
 	))
+		->addCsrfToken(CCsrfTokenHelper::getCsrfToken($status_action))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status']));
 
@@ -173,9 +173,9 @@ foreach ($data['items'] as $item) {
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('action', $discover_action)
 				->setArgument('context', $data['context'])
-				->addCsrfToken($discover_action)
 				->getUrl()
 		))
+			->addCsrfToken(CCsrfTokenHelper::getCsrfToken($discover_action))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
