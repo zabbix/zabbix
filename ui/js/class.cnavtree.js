@@ -251,24 +251,26 @@ if (typeof addPopupValues === 'undefined') {
 
 			if (direction_moved === 'right' && levels_moved) {
 				const drop_to = prev_item,
-					uiObj = this;
+					uiObj = this,
+					hovered_branch_depth = drop_to[0].getElementsByClassName('tree-list')[0].dataset.depth;
 
 				this._isAllowed(prev_item, level, level + child_levels);
 
-				this.changing_parent = setTimeout(function() {
-					$(drop_to)
-						.addClass('highlighted-parent opened')
-						.removeClass('closed');
+				if (hovered_branch_depth < this.max_depth+1) {
+					this.changing_parent = setTimeout(function() {
+						$(drop_to)
+							.addClass('highlighted-parent opened')
+							.removeClass('closed');
 
-					if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
-						$('>.tree-list', drop_to).prepend(uiObj.placeholder);
-					}
-					else {
-						$('>.tree-list', drop_to).append(uiObj.placeholder);
-					}
-
-					uiObj.refreshPositions();
-				}, o.parent_change_delay);
+						if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
+							$('>.tree-list', drop_to).prepend(uiObj.placeholder);
+						}
+						else {
+							$('>.tree-list', drop_to).append(uiObj.placeholder);
+						}
+						uiObj.refreshPositions();
+					}, o.parent_change_delay);
+				}
 			}
 
 			else if (direction_moved === 'left' && levels_moved) {
@@ -374,8 +376,8 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_isAllowed: function(parentItem, level, levels) {
-			if (this.options.max_depth != 0 && (this.options.max_depth+1 < levels
-					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth)
+			if (this.options.max_depth+1 != 0 && (this.options.max_depth+1 < levels
+					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth+1)
 			) {
 				this.placeholder.addClass('sortable-error');
 				this.beyondMaxLevels = levels - (this.options.max_depth+1);
