@@ -153,6 +153,7 @@ class CApiTagHelper {
 						' FROM '.$table.
 						' WHERE '.$join_alias.'.'.$join_field.'='.$table.'.'.$field.' AND '.$statement.
 					')';
+					$condition = '('.$condition.')';
 				}
 
 				$_where[] = $condition;
