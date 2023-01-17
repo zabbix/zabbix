@@ -555,13 +555,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Item prototypes');
 
 		if (isset($templateid)) {
-			$this->zbxTestTextPresent('Parent items');
+			$this->zbxTestTextPresent('Parent item');
 			if (isset($data['hostTemplate'])) {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$data['hostTemplate']."']");
 			}
 		}
 		else {
-			$this->zbxTestTextNotPresent('Parent items');
+			$this->zbxTestTextNotPresent('Parent item');
 		}
 
 		$this->zbxTestTextPresent('Name');

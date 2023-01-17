@@ -2825,7 +2825,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		if ($templated) {
 			// Check that right templated item is opened.
-			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent items';
+			$label = ($item === 'Discovery rule') ? 'Parent discovery rules' : 'Parent item';
 			$this->assertEquals('Inheritance test template', $form->getField($label)->getText());
 		}
 
