@@ -28,7 +28,7 @@
 #include "zbxvariant.h"
 
 #define ZBX_ELASTIC_MIN_VERSION				70000
-#define ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY		"7.x"
+#define ZBX_ELASTIC_SUPPORTED_VERSION_STR		"7.x"
 #define ZBX_ELASTIC_MAX_VERSION				79999
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
@@ -1096,8 +1096,8 @@ out:
 
 	db_version_info.database = "ElasticDB";
 	db_version_info.friendly_current_version = version_friendly;
-	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
-	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_FRIENDLY;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
+	db_version_info.friendly_max_version = ZBX_ELASTIC_SUPPORTED_VERSION_STR;
 	db_version_info.friendly_min_supported_version = NULL;
 
 	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,

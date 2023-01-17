@@ -41,32 +41,32 @@
 #endif
 
 #define ZBX_MYSQL_MIN_VERSION				50728
-#define ZBX_MYSQL_MIN_VERSION_FRIENDLY			"5.07.28"
+#define ZBX_MYSQL_MIN_VERSION_STR			"5.07.28"
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80000
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY	"8.00.0"
+#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR		"8.00.0"
 #define ZBX_MYSQL_MAX_VERSION				80099
-#define ZBX_MYSQL_MAX_VERSION_FRIENDLY			"8.00.x"
+#define ZBX_MYSQL_MAX_VERSION_STR			"8.00.x"
 
 #define ZBX_MARIA_MIN_VERSION				100200
-#define ZBX_MARIA_MIN_VERSION_FRIENDLY			"10.02.00"
+#define ZBX_MARIA_MIN_VERSION_STR			"10.02.00"
 #define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY	"10.05.00"
+#define ZBX_MARIA_MIN_SUPPORTED_VERSION_STR		"10.05.00"
 #define ZBX_MARIA_MAX_VERSION				101099
-#define ZBX_MARIA_MAX_VERSION_FRIENDLY			"10.10.xx"
+#define ZBX_MARIA_MAX_VERSION_STR			"10.10.xx"
 
 #define ZBX_POSTGRESQL_MIN_VERSION			100009
-#define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY		"10.9"
+#define ZBX_POSTGRESQL_MIN_VERSION_STR			"10.9"
 #define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY	"13.0"
+#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR	"13.0"
 #define ZBX_POSTGRESQL_MAX_VERSION			159999
-#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"15.x"
+#define ZBX_POSTGRESQL_MAX_VERSION_STR			"15.x"
 
 #define ZBX_ORACLE_MIN_VERSION				1201000200
-#define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
+#define ZBX_ORACLE_MIN_VERSION_STR			"Database 12c Release 12.01.00.02.x"
 #define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY	"Database 19c Release 19.x.x"
+#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR		"Database 19c Release 19.x.x"
 #define ZBX_ORACLE_MAX_VERSION				2199000000
-#define ZBX_ORACLE_MAX_VERSION_FRIENDLY			"Database 21c Release 21.x.x"
+#define ZBX_ORACLE_MAX_VERSION_STR			"Database 21c Release 21.x.x"
 
 struct zbx_db_result
 {
@@ -2753,9 +2753,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->max_version = ZBX_MARIA_MAX_VERSION;
 		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{
@@ -2765,9 +2765,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 		version_info->max_version = ZBX_MYSQL_MAX_VERSION;
 		version_info->min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_FRIENDLY;
-		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_FRIENDLY;
-		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+		version_info->friendly_min_version = ZBX_MYSQL_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MYSQL_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR;
 	}
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
@@ -2799,9 +2799,9 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 				RIGHT2(ZBX_PG_SVERSION));
 	}
 
-	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -2887,9 +2887,9 @@ out:
 	version_info->min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION;
 
 	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
-	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_FRIENDLY;
-	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_FRIENDLY;
-	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_STR;
+	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_STR;
+	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
@@ -3008,9 +3008,9 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 	version_info->ext_friendly_current_version = zbx_dsprintf(NULL, "%d.%d.%d", RIGHT2(tsdb_ver/10000),
 			RIGHT2(tsdb_ver/100), RIGHT2(tsdb_ver));
 
-	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_FRIENDLY;
-	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_FRIENDLY;
-	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY;
+	version_info->ext_friendly_min_version = ZBX_TIMESCALE_MIN_VERSION_STR;
+	version_info->ext_friendly_max_version = ZBX_TIMESCALE_MAX_VERSION_STR;
+	version_info->ext_friendly_min_supported_version = ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->ext_flag = zbx_db_version_check(version_info->extension, version_info->ext_current_version,
 			version_info->ext_min_version, version_info->ext_max_version,
