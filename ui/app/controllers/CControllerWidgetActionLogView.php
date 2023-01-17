@@ -68,7 +68,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 */
 	private function getAlerts($sortfield, $sortorder, $show_lines) {
 		$alerts = [];
-		$config = select_config();
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		foreach (eventSourceObjects() as $eventsource) {
 			$alerts = array_merge($alerts, API::Alert()->get([
@@ -80,7 +80,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				'eventobject' => $eventsource['object'],
 				'sortfield' => 'alertid',
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $config['search_limit']
+				'limit' => $search_limit
 			]));
 		}
 
