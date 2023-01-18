@@ -23,9 +23,7 @@
 #include "log.h"
 #include "zbxip.h"
 
-extern unsigned char	program_type;
-
-int	CONFIG_TIMEOUT		= 3;
+static const char	*program_type_str = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
@@ -559,6 +557,11 @@ error:
 	return FAIL;
 }
 
+void	zbx_init_library_cfg(unsigned char program_type)
+{
+	program_type_str = get_program_type_string(program_type);
+}
+
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
@@ -569,7 +572,7 @@ int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
 	if (0 != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 
@@ -581,7 +584,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	if (NULL != value)
 	{
 		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
-				parameter, get_program_type_string(program_type), feature);
+				parameter, program_type_str, feature);
 		return FAIL;
 	}
 

@@ -39,8 +39,6 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-extern unsigned char			program_type;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process new item value                                            *
@@ -389,7 +387,8 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count)
+static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int *icmp_items_count,
+		int config_timeout)
 {
 	DC_ITEM			item, *items;
 	int			i, num, count, interval, size, timeout, rc, errcode = SUCCEED;
@@ -403,7 +402,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	um_handle = zbx_dc_open_user_macros();
 
 	items = &item;
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, &items);
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, &items);
 
 	for (i = 0; i < num; i++)
 	{
@@ -547,8 +546,9 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_pinger_args	*pinger_args_in = (zbx_thread_pinger_args *)(((zbx_thread_args_t *)args)->args);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -559,11 +559,11 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
-		zbx_update_env(sec);
+		zbx_update_env(get_process_type_string(process_type), sec);
 
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
-		get_pinger_hosts(&items, &items_alloc, &items_count);
+		get_pinger_hosts(&items, &items_alloc, &items_count, pinger_args_in->config_timeout);
 		process_pinger_hosts(items, items_count, process_num, process_type);
 		sec = zbx_time() - sec;
 		itc = items_count;

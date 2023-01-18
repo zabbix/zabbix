@@ -69,6 +69,9 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 		new CWidgetFieldRadioButtonListView($data['fields']['show_opdata'])
 	)
 	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['show_symptoms'])
+	)
+	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
 	->addField(

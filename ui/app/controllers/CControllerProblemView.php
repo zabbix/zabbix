@@ -42,6 +42,7 @@ class CControllerProblemView extends CControllerProblem {
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
+			'show_symptoms' =>			'in 0,1',
 			'show_suppressed' =>		'in 0,1',
 			'unacknowledged' =>			'in 0,1',
 			'compact_view' =>			'in 0,1',

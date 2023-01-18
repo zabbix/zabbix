@@ -45,7 +45,9 @@ window.ZABBIX = Object.create({
 	/**
 	 * Logs user out, also, handles side effects before that.
 	 */
-	logout: function() {
+	logout: function(event) {
+		cancelEvent(event);
+
 		var ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
@@ -285,6 +287,11 @@ jQuery(function($) {
 		}, data.options || {});
 
 		if (isServerRequestRequired(data.type)) {
+			if (data.type === 'trigger') {
+				// Add additional IDs from checkboxes and pass them to popup menu.
+				data.data.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
+
 			var url = new Curl('zabbix.php');
 
 			url.setArgument('action', 'menu.popup');

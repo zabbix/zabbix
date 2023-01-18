@@ -23,8 +23,8 @@
 #include "zbxrtc.h"
 #include "zbxipcservice.h"
 
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
-int	rtc_process(const char *option, char **error);
+int	rtc_process_request_ex_server(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process(const char *option, int config_timeout, char **error);
 void	rtc_reset(zbx_rtc_t *rtc);
 int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
 #endif

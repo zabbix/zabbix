@@ -31,20 +31,14 @@ class CGridFormElement extends CFormElement {
 	const TABLE_FORM_FIELD = 'following-sibling::div[1]';
 
 	/**
-	 * Get collection of form label elements.
-	 *
-	 * @return CElementCollection
+	 * @inheritDoc
 	 */
-	public function getLabels() {
+	public function getLabels($filter = null, $filter_params = []) {
 		$labels = $this->query("xpath:.//div/div/".self::TABLE_FORM."/label|./".self::TABLE_FORM.
 				"/label|./div/div/div/div/".self::TABLE_FORM."/label"
 		)->all();
 
-		if ($this->filter !== null) {
-			return $labels->filter($this->filter);
-		}
-
-		return $labels;
+		return $this->filterCollection($labels, $filter, $filter_params);
 	}
 
 	/**

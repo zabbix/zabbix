@@ -103,7 +103,7 @@ int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
+	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int)))
 		SET_UI64_RESULT(result, value_int);
 
 	return ret;

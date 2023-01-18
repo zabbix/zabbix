@@ -1029,6 +1029,10 @@ class testUsersPasswordComplexity extends CWebTest {
 			$this->assertFalse($user_form->query('xpath://label[text()="Password"]//a')->exists());
 		}
 
+		if ($own || $userid === 1) {
+			$user_form->fill(['Current password' => ($userid === 1) ? self::$admin_password : self::$user_password]);
+		}
+
 		$user_form->fill([
 			'Password' => $data['Password'],
 			'Password (once again)' => $data['Password']
@@ -1041,12 +1045,23 @@ class testUsersPasswordComplexity extends CWebTest {
 
 		$user_form->submit();
 
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
+			if ($own || $userid === 1) {
+				// If user updates his own password he is being logged out, so check Login screen.
+				$this->page->assertTitle('Zabbix');
+				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'User '.($update ? 'updated' : 'added'));
+			}
 
 			// Check user saved in db.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM users WHERE username ='.zbx_dbstr($username)));
