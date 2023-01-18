@@ -2077,8 +2077,8 @@ FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|max_records	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|max_senders	|t_integer	|'1'	|NOT NULL	|0
-FIELD		|timeout	|t_varchar(255)	|'5s'	|NOT NULL	|0
 FIELD		|max_attempts	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|timeout	|t_varchar(255)	|'5s'	|NOT NULL	|0
 FIELD		|token		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|0
@@ -2092,6 +2092,7 @@ FIELD		|ssl_key_password|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|tags_evaltype	|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|name
 CHANGELOG	|17
 
 TABLE|connector_tag|connector_tagid|0
