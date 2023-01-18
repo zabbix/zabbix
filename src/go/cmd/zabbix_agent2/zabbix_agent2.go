@@ -348,6 +348,21 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
+	if remoteCommand != "" {
+		if agent.Options.ControlSocket == "" {
+			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
+			os.Exit(0)
+		}
+
+		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
+			remoteCommandSendingTimeout); err != nil {
+			log.Errf("Cannot send remote command: %s", err)
+		} else {
+			log.Infof(reply)
+		}
+		os.Exit(0)
+	}
+
 	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register plugins", err)
 	}
@@ -412,21 +427,6 @@ func main() {
 
 	if argVerbose {
 		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
-	}
-
-	if remoteCommand != "" {
-		if agent.Options.ControlSocket == "" {
-			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
-			os.Exit(0)
-		}
-
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-			remoteCommandSendingTimeout); err != nil {
-			log.Errf("Cannot send remote command: %s", err)
-		} else {
-			log.Infof(reply)
-		}
-		os.Exit(0)
 	}
 
 	var logType, logLevel int
