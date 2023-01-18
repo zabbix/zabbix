@@ -162,21 +162,11 @@ function getParentHttpTests(array $httptests, bool $allowed_ui_conf_templates) {
 
 	foreach ($parent_httptests as $httptestid => &$parent_httptest) {
 		if (array_key_exists($httptestid, $db_httptests)) {
-			if ($allowed_ui_conf_templates && array_key_exists($httptestid, $editable_httptests)) {
-				$parent_httptest = [
-					'editable' => true,
-					'template_name' => $db_httptests[$httptestid]['hosts'][0]['name'],
-					'templateid' => $db_httptests[$httptestid]['hosts'][0]['hostid'],
-					'httptestid' => $httptestid
-				];
-			}
-			else {
-				$parent_httptest = [
-					'editable' => false,
-					'template_name' => $db_httptests[$httptestid]['hosts'][0]['name'],
-					'templateid' => $db_httptests[$httptestid]['hosts'][0]['hostid']
-				];
-			}
+			$parent_httptest = [
+				'editable' => $allowed_ui_conf_templates && array_key_exists($httptestid, $editable_httptests),
+				'template_name' => $db_httptests[$httptestid]['hosts'][0]['name'],
+				'templateid' => $db_httptests[$httptestid]['hosts'][0]['hostid']
+			];
 		}
 		else {
 			$parent_httptest = [
@@ -323,91 +313,4 @@ function userAgents() {
 			'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' => 'Googlebot 2.1'
 		]
 	];
-}
-
-/**
- * Get direct or inherited tags for web scenario edit form.
- *
- * @param array  $data
- * @param string $data['parent_httptests'][<templateid>]
- * @param string $data['hostid']
- * @param array  $data['tags']
- * @param string $data['tags'][]['tag']
- * @param string $data['tags'][]['value']
- * @param int    $data['show_inherited_tags']
- *
- * @return array
- */
-function getHttpTestInheritedTags(array $data): array {
-	$inherited_tags = [];
-
-	if ($data['parent_httptests']) {
-		$db_templates = API::Template()->get([
-			'output' => ['name'],
-			'selectTags' => ['tag', 'value'],
-			'templateids' => array_column($data['parent_httptests'], 'templateid', 'templateid'),
-			'preservekeys' => true
-		]);
-
-		foreach ($data['parent_httptests'] as $parent_httptest) {
-			if (array_key_exists('templateid', $parent_httptest)
-					&& array_key_exists($parent_httptest['templateid'], $db_templates)) {
-				$templateid = $parent_httptest['templateid'];
-
-				foreach ($db_templates[$templateid]['tags'] as $tag) {
-					if (array_key_exists($tag['tag'], $inherited_tags)
-							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-						$inherited_tags[$tag['tag']][$tag['value']]['templateids'][] = $templateid;
-						$inherited_tags[$tag['tag']][$tag['value']]['parent_object']['template_names'][$templateid]
-							= $db_templates[$templateid]['name'];
-					}
-					else {
-						$parent_httptest['template_names'] = [$templateid => $parent_httptest['template_name']];
-						unset($parent_httptest['template_name']);
-
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-							'templateids' => [$templateid],
-							'parent_object' => $parent_httptest,
-							'type' => ZBX_PROPERTY_INHERITED
-						];
-					}
-				}
-			}
-		}
-	}
-
-	$db_hosts = API::Host()->get([
-		'output' => [],
-		'selectTags' => ['tag', 'value'],
-		'hostids' => $data['hostid'],
-		'templated_hosts' => true
-	]);
-
-	// Overwrite and attach host level tags.
-	if ($db_hosts) {
-		foreach ($db_hosts[0]['tags'] as $tag) {
-			$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_INHERITED];
-		}
-	}
-
-	// Overwrite and attach http test's own tags.
-	foreach ($data['tags'] as $tag) {
-		if (array_key_exists($tag['tag'], $inherited_tags)
-				&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-			$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-		}
-		else {
-			$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-		}
-	}
-
-	$tags = [];
-
-	foreach ($inherited_tags as $tag) {
-		foreach ($tag as $value) {
-			$tags[] = $value;
-		}
-	}
-
-	return $tags;
 }

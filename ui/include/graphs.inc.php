@@ -178,7 +178,7 @@ function getParentGraphs(array $graphs, bool $allowed_ui_conf_templates): array 
 
 	$db_graphs = API::Graph()->get([
 		'output' => [],
-		'selectHosts' => ['name'],
+		'selectHosts' => ['hostid', 'name'],
 		'graphids' => array_keys($parent_graphs),
 		'preservekeys' => true
 	]);
@@ -186,7 +186,6 @@ function getParentGraphs(array $graphs, bool $allowed_ui_conf_templates): array 
 	if ($allowed_ui_conf_templates && $db_graphs) {
 		$editable_graphs = API::Graph()->get([
 			'output' => [],
-			'selectHosts' => ['hostid'],
 			'graphids' => array_keys($parent_graphs),
 			'editable' => true,
 			'preservekeys' => true
@@ -199,8 +198,7 @@ function getParentGraphs(array $graphs, bool $allowed_ui_conf_templates): array 
 				$parent_graph = [
 					'editable' => true,
 					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
-					'hostid' => $editable_graphs[$graphid]['hosts'][0]['hostid'],
-					'templateid' => $graphid
+					'templateid' => $db_graphs[$graphid]['hosts'][0]['hostid']
 				];
 			}
 			else {
@@ -245,7 +243,7 @@ function getParentGraphPrototypes(array $graphs, bool $allowed_ui_conf_templates
 
 	$db_graphs = API::GraphPrototype()->get([
 		'output' => [],
-		'selectHosts' => ['name'],
+		'selectHosts' => ['hostid', 'name'],
 		'graphids' => array_keys($parent_graphs),
 		'preservekeys' => true
 	]);
@@ -253,7 +251,6 @@ function getParentGraphPrototypes(array $graphs, bool $allowed_ui_conf_templates
 	if ($allowed_ui_conf_templates && $db_graphs) {
 		$editable_graphs = API::GraphPrototype()->get([
 			'output' => [],
-			'selectHosts' => ['hostid'],
 			'selectDiscoveryRule' => ['itemid'],
 			'editable' => true,
 			'graphids' => array_keys($parent_graphs),
@@ -267,9 +264,8 @@ function getParentGraphPrototypes(array $graphs, bool $allowed_ui_conf_templates
 				$parent_graph = [
 					'editable' => true,
 					'template_name' => $db_graphs[$graphid]['hosts'][0]['name'],
-					'hostid' => $editable_graphs[$graphid]['hosts'][0]['hostid'],
-					'ruleid' => $editable_graphs[$graphid]['discoveryRule']['itemid'],
-					'templateid' => $graphid
+					'templateid' => $db_graphs[$graphid]['hosts'][0]['hostid'],
+					'ruleid' => $editable_graphs[$graphid]['discoveryRule']['itemid']
 				];
 			}
 			else {

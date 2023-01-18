@@ -64,7 +64,7 @@ if (array_key_exists('parent_httptest', $this->data)) {
 				->setArgument('form', 'update')
 				->setArgument('context', 'template')
 				->setArgument('hostid', $parent_httptest['templateid'])
-				->setArgument('httptestid', $parent_httptest['httptestid'])
+				->setArgument('httptestid', $data['templateid'])
 		);
 	}
 	else {

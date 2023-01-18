@@ -2205,60 +2205,6 @@ function getParentTriggers(array $triggers, bool $allowed_ui_conf_templates): ar
 }
 
 /**
- * Returns trigger template elements.
- *
- * @param string $triggerid
- * @param array  $parent_templates  The list of the templates, prepared by getTriggerParentTemplates() function.
- * @param int    $flag              Origin of the trigger (ZBX_FLAG_DISCOVERY_NORMAL or ZBX_FLAG_DISCOVERY_PROTOTYPE).
- * @param bool   $provide_links     If this parameter is false, prefix will not contain links.
- *
- * @return array
- */
-function makeTriggerTemplateHtml(string $triggerid, array $parent_templates, int $flag, bool $provide_links): array {
-	$list = [];
-
-	if (!array_key_exists($triggerid, $parent_templates['links'])) {
-		return $list;
-	}
-
-	$templates = [];
-
-	foreach ($parent_templates['links'][$triggerid]['hostids'] as $hostid) {
-		$templates[] = $parent_templates['templates'][$hostid];
-	}
-
-	foreach ($templates as $template) {
-		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('trigger_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-					->setArgument('context', 'template');
-			}
-			// ZBX_FLAG_DISCOVERY_NORMAL
-			else {
-				$url = (new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-					->setArgument('hostid', $template['hostid'])
-					->setArgument('context', 'template');
-			}
-
-			$list[] = new CLink(CHtml::encode($template['name']), $url);
-		}
-		else {
-			$list[] = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
-		}
-
-		$list[] = ', ';
-	}
-	array_pop($list);
-
-	return $list;
-}
-
-/**
  * Check if user has read permissions for triggers.
  *
  * @param $triggerids

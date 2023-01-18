@@ -469,7 +469,7 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => $hostid,
 		'normal_only' => getRequest('normal_only'),
 		'context' => getRequest('context'),
-		'readonly' => getRequest('readonly', 0)
+		'readonly' => getRequest('readonly', 0) == 1
 	];
 
 	if ($data['graphid'] != 0 && ($data['readonly'] || !$data['form_refresh'])) {
@@ -509,11 +509,16 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
+		$data['readonly'] = $graph['templateid'] != 0;
 
 		if ($data['parent_discoveryid'] === null) {
 			$data['flags'] = $graph['flags'];
 			$data['discoveryRule'] = $graph['discoveryRule'];
 			$data['graphDiscovery'] = $graph['graphDiscovery'];
+
+			if ($graph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$data['readonly'] = true;
+			}
 		}
 		else {
 			$data['discover'] = $graph['discover'];
@@ -528,7 +533,7 @@ elseif (isset($_REQUEST['form'])) {
 		if ($graph['templateid'] != 0) {
 			$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-			$parent_graphs = $data['parent_discoveryid'] == null
+			$parent_graphs = $data['parent_discoveryid'] === null
 				? getParentGraphs([$graph], $allowed_ui_conf_templates)
 				: getParentGraphPrototypes([$graph], $allowed_ui_conf_templates);
 

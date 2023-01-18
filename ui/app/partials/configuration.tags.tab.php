@@ -28,7 +28,7 @@ if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'] == 1;
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 $parent_template_header = null;
 

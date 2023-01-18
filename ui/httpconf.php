@@ -497,15 +497,6 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
-
-		if ($db_httptest['templateid'] != 0) {
-			$parent_httptests = getParentHttpTests([$db_httptest],
-				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
-
-			$data['parent_httptest'] = reset($parent_httptests);
-		}
-
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -587,6 +578,7 @@ if (isset($_REQUEST['form'])) {
 		}
 		unset($step);
 
+		$tags = $db_httptest['tags'];
 	}
 	else {
 		if (isset($_REQUEST['form_refresh'])) {
@@ -644,22 +636,19 @@ if (isset($_REQUEST['form'])) {
 		$data['steps'][$stepid]['no'] = $i++;
 	}
 
-	$parent_httptests = [];
-
-	if ($db_httptest) {
+	if ($db_httptest && $db_httptest['templateid'] != 0) {
 		$parent_httptests = getParentHttpTests([$db_httptest],
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
-		$tags = hasRequest('form_refresh') ? $tags : $db_httptest['tags'];
+		$data['templateid'] = $db_httptest['templateid'];
+		$data['parent_httptest'] = reset($parent_httptests);
 	}
 
-	if ($data['show_inherited_tags'] == 1) {
-		$tags = getHttpTestInheritedTags([
-			'parent_httptests' => $parent_httptests,
-			'hostid' => getRequest('hostid'),
-			'tags' => $tags
-		]);
+	if ($data['show_inherited_tags']) {
+		CTagHelper::addInheritedTags($tags, $data['context'], [$data['hostid']],
+			array_key_exists('parent_httptest', $data) ? $data['parent_httptest'] : []
+		);
 	}
 
 	if ($tags) {

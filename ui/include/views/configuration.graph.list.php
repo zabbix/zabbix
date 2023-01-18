@@ -193,7 +193,7 @@ foreach ($data['graphs'] as $graph) {
 
 	$name = [];
 
-	if ($graph['templateid'] != 0) {
+	if (array_key_exists($graph['templateid'], $data['parent_graphs'])) {
 		$parent_graph = $data['parent_graphs'][$graph['templateid']];
 
 		if ($parent_graph['editable']) {
@@ -202,7 +202,7 @@ foreach ($data['graphs'] as $graph) {
 			if ($data['parent_discoveryid'] === null) {
 				$url
 					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$parent_graph['hostid']]);
+					->setArgument('filter_hostids', [$parent_graph['templateid']]);
 			}
 			else {
 				$url->setArgument('parent_discoveryid', $parent_graph['ruleid']);

@@ -1143,7 +1143,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if (!$data['is_discovery_rule']) {
 		if ($data['show_inherited_tags']) {
-			$inherited_tags = [];
+			$parent_item = [];
 
 			if ($data['context'] === 'host' && array_key_exists('item', $data)) {
 				if ($data['parent_discoveryid'] == 0 && $data['item']['discoveryRule']) {
@@ -1153,76 +1153,19 @@ function getItemFormData(array $item = [], array $options = []) {
 
 					$parent_item = reset($parent_items);
 				}
-				else {
-					$parent_item = array_key_exists('parent_item', $data) ? $data['parent_item'] : false;
-				}
-
-				if ($parent_item && array_key_exists('templateid', $parent_item)) {
-					$db_templates = API::Template()->get([
-						'output' => [],
-						'selectTags' => ['tag', 'value'],
-						'templateids' => $parent_item['templateid']
-					]);
-
-					$parent_item['template_names'][$parent_item['templateid']] = $parent_item['template_name'];
-					unset($parent_item['templateid'], $parent_item['template_name']);
-
-					foreach ($db_templates[0]['tags'] as $tag) {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-							'parent_object' => $parent_item,
-							'type' => ZBX_PROPERTY_INHERITED
-						];
-					}
+				elseif (array_key_exists('parent_item', $data)) {
+					$parent_item = $data['parent_item'];
 				}
 			}
 
-			if ($data['context'] === 'template') {
-				$db_templates = API::Template()->get([
-					'output' => [],
-					'selectTags' => ['tag', 'value'],
-					'templateids' => $data['hostid']
-				]);
-
-				$db_host_tags = $db_templates[0]['tags'];
-			}
-			else {
-				$db_hosts = API::Host()->get([
-					'output' => [],
-					'selectTags' => ['tag', 'value'],
-					'hostids' => $data['hostid']
-				]);
-
-				$db_host_tags = $db_hosts[0]['tags'];
-			}
-
-			foreach ($db_host_tags as $tag) {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_INHERITED];
-			}
-
-			foreach ($data['tags'] as &$tag) {
-				if (array_key_exists($tag['tag'], $inherited_tags)
-						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-					$tag += ['type' => ZBX_PROPERTY_BOTH];
-					unset($inherited_tags[$tag['tag']][$tag['value']]);
-				}
-				else {
-					$tag += ['type' => ZBX_PROPERTY_OWN];
-				}
-			}
-			unset($tag);
-
-			foreach ($inherited_tags as $value_tag) {
-				foreach ($value_tag as $tag) {
-					$data['tags'][] = $tag;
-				}
-			}
+			CTagHelper::addInheritedTags($data['tags'], $data['context'], [$data['hostid']], $parent_item);
 		}
 
-		if (!$data['tags']) {
-			$data['tags'] = [['tag' => '', 'value' => '']];
+		if ($data['tags']) {
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 		else {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+			$data['tags'] = [['tag' => '', 'value' => '']];
 		}
 	}
 
@@ -1857,8 +1800,8 @@ function getTriggerFormData(array $data) {
 	}
 
 	if ($data['show_inherited_tags']) {
-		$inherited_tags = [];
-		$conditions = [];
+		$parent_trigger = [];
+		$hostids = [];
 
 		if ($data['context'] === 'host' && $data['triggerid'] !== null) {
 			if ($data['parent_discoveryid'] === null && $trigger['triggerDiscovery']) {
@@ -1877,45 +1820,16 @@ function getTriggerFormData(array $data) {
 				$parent_trigger = array_key_exists('parent_trigger', $data) ? $data['parent_trigger'] : false;
 			}
 
-			if ($parent_trigger && !array_key_exists(0, $parent_trigger['template_names'])) {
-				$db_templates = API::Template()->get([
-					'output' => [],
-					'selectTags' => ['tag', 'value'],
-					'templateids' => array_keys($parent_trigger['template_names']),
-					'preservekeys' => true
-				]);
-
-				foreach ($db_templates as $templateid => $template) {
-					foreach ($template['tags'] as $tag) {
-						if (array_key_exists($tag['tag'], $inherited_tags)
-								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-							$inherited_tags[$tag['tag']][$tag['value']]['templateids'][] = $templateid;
-						}
-						else {
-							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-								'templateids' => [$templateid],
-								'parent_object' => $parent_trigger,
-								'type' => ZBX_PROPERTY_INHERITED
-							];
-						}
-					}
-				}
-
-				$conditions = $data['context'] === 'template'
-					? ['templateids' => array_column($trigger['hosts'], 'hostid')]
-					: ['hostids' => array_column($trigger['hosts'], 'hostid')];
+			if ($parent_trigger || !hasRequest('form_refresh')) {
+				$hostids = array_column($trigger['hosts'], 'hostid');
 			}
 		}
 
-		if (!$conditions) {
-			if ($data['expression'] === ''
-					&& ($data['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-						|| $data['recovery_expression'] === '')) {
-				$conditions = $data['context'] === 'template'
-					? ['templateids' => $data['hostid']]
-					: ['hostids' => $data['hostid']];
-			}
-			else {
+		if (!$hostids) {
+			$hostids = [$data['hostid']];
+
+			if ($data['expression'] !== '' || $data['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
+					|| $data['recovery_expression'] !== '') {
 				$expression_parser = new CExpressionParser([
 					'usermacros' => true,
 					'lldmacros' => $data['parent_discoveryid'] ? true : false
@@ -1932,61 +1846,36 @@ function getTriggerFormData(array $data) {
 					$hosts += $expression_parser->getResult()->getHosts();
 				}
 
-				if (!$hosts) {
-					$conditions = $data['context'] === 'template'
-						? ['templateids' => $data['hostid']]
-						: ['hostids' => $data['hostid']];
+				if ($hosts) {
+					if ($data['context'] === 'template') {
+						$db_templates = API::Template()->get([
+							'output' => ['templateid'],
+							'filter' => ['host' => array_values($hosts)]
+						]);
+
+						$hostids = array_column($db_templates, 'templateid');
+					}
+					else {
+						$db_hosts = API::Host()->get([
+							'output' => ['hostid'],
+							'filter' => ['host' => array_values($hosts)]
+						]);
+
+						$hostids = array_column($db_hosts, 'hostid');
+					}
 				}
-				else {
-					$conditions = ['filter' => ['host' => array_values($hosts)]];
-				}
 			}
 		}
 
-		if ($data['context'] === 'template') {
-			$db_hosts = API::Template()->get([
-				'output' => [],
-				'selectTags' => ['tag', 'value']
-			] + $conditions);
-		}
-		else {
-			$db_hosts = API::Host()->get([
-				'output' => [],
-				'selectTags' => ['tag', 'value']
-			] + $conditions);
-		}
-
-		foreach ($db_hosts as $db_host) {
-			foreach ($db_host['tags'] as $tag) {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_INHERITED];
-			}
-		}
-
-		foreach ($data['tags'] as &$tag) {
-			if (array_key_exists($tag['tag'], $inherited_tags)
-					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-				$tag += ['type' => ZBX_PROPERTY_BOTH];
-				unset($inherited_tags[$tag['tag']][$tag['value']]);
-			}
-			else {
-				$tag += ['type' => ZBX_PROPERTY_OWN];
-			}
-		}
-		unset($tag);
-
-		foreach ($inherited_tags as $value_tag) {
-			foreach ($value_tag as $tag) {
-				$data['tags'][] = $tag;
-			}
-		}
+		CTagHelper::addInheritedTags($data['tags'], $data['context'], $hostids, $parent_trigger);
 	}
 
 	// tags
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
+	if ($data['tags']) {
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 	}
 	else {
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		$data['tags'] = [['tag' => '', 'value' => '']];
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
