@@ -341,8 +341,8 @@ function getEventStatusUpdateIcon(array $event): ?Ctag {
 
 	foreach ($event['acknowledges'] as $acknowledge) {
 		// If currently is symptom and there is an active task to convert to cause, set icon style to cause.
-		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
-				ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE && $acknowledge['taskid'] != 0) {
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+				&& $acknowledge['taskid'] != 0) {
 			$icon_class = ZBX_STYLE_ACTION_ICON_CAUSE;
 			break;
 		}
