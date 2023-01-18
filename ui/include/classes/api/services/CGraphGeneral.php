@@ -66,7 +66,9 @@ abstract class CGraphGeneral extends CApiService {
 			// Cannot update templated graph.
 			if ($dbGraphs[$graph['graphid']]['templateid'] != 0
 					&& $dbGraphs[$graph['graphid']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update a templated graph.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update a templated graph "%1$s".',
+					$graph['name']
+				));
 			}
 
 			// cannot update discovered graphs
