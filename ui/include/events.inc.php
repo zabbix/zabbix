@@ -311,7 +311,7 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
 					ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
 
-				// If currently is symptom and there is an active task.
+				// If currently is cause or symptom and there is an active task.
 				if ($acknowledge['taskid'] != 0) {
 					$in_updating = true;
 					break;
@@ -321,6 +321,48 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 	}
 
 	return $in_updating;
+}
+
+/**
+ * Calculate and return a rank change icon depending on current event rank change. If event is currently a cause event
+ * and it is undergoing a rank change, return cause event icon. If event is currently a symptom event and it is
+ * undergoing a rank change, return symptom event icon. Icon can be displayed regarless if current status is in closing.
+ *
+ * @param array  $event                              Event data.
+ * @param array  $event['acknowledges']              List of event acknowledges.
+ * @param int    $event['acknowledges'][]['action']  Event action type.
+ * @param string $event['acknowledges'][]['taskid']  Task ID.
+ *
+ * @return Ctag|null
+ */
+function getEventStatusUpdateIcon(array $event): ?Ctag {
+	$icon = null;
+	$icon_class = '';
+
+	foreach ($event['acknowledges'] as $acknowledge) {
+		// If currently is symptom and there is an active task to convert to cause, set icon style to cause.
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) ==
+				ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE && $acknowledge['taskid'] != 0) {
+			$icon_class = ZBX_STYLE_ACTION_ICON_CAUSE;
+			break;
+		}
+
+		// If currently is cause and there is an active task to convert to symptom, set icon style to symptom.
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
+				ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM && $acknowledge['taskid'] != 0) {
+			$icon_class = ZBX_STYLE_ACTION_ICON_SYMPTOM;
+			break;
+		}
+	}
+
+	if ($icon_class !== '') {
+		$icon = (new CSpan())
+			->addClass($icon_class)
+			->addClass('blink')
+			->setTitle(_('Updating'));
+	}
+
+	return $icon;
 }
 
 /**

@@ -146,6 +146,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param array      $data['users']                         List of users.
 	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['fields']                        Problem widget filter fields.
+	 * @param int        $data['fields']['show']                "Show" filter option.
 	 * @param int        $data['fields']['show_tags']           "Show tags" filter option.
 	 * @param int        $data['fields']['show_opdata']         "Show operational data" filter option.
 	 * @param array      $data['fields']['tags']                "Tags" filter.
@@ -243,6 +244,11 @@ class WidgetProblems extends CTableInfo {
 
 			// Info.
 			$info_icons = [];
+
+			if ($data['fields']['show'] == TRIGGERS_OPTION_IN_PROBLEM) {
+				$info_icons[] = getEventStatusUpdateIcon($problem);
+			}
+
 			if ($problem['r_eventid'] != 0) {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
