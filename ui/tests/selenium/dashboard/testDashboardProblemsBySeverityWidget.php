@@ -1640,7 +1640,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				'Time' => '2020-10-23 15:33:48',
 				'Host' => 'ЗАББИКС Сервер',
 				'Problem' => 'Test trigger to check tag filter on problem page',
-				'Ack' => 'No'
+				'Update' => 'Update'
 			],
 			'Tags' => ['Database', 'Service: abc', 'service: abcdef'],
 			'rows' => [
