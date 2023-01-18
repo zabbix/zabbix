@@ -185,7 +185,7 @@ class testDashboardURLWidget extends CWebTest {
 
 	public function testDashboardURLWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dialog = CDashboardElement::find()->waitUntilReady()->one()->edit()->addWidget();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
 
@@ -232,7 +232,7 @@ class testDashboardURLWidget extends CWebTest {
 		CDashboardElement::find()->one()->save();
 
 		// Check parameter 'Enable host selection' true/false state.
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
 				->query('class:nothing-to-show')->one()->getText());
@@ -279,6 +279,24 @@ class testDashboardURLWidget extends CWebTest {
 						'URL' => 'message://zabbix.com'
 					],
 					'error' => ['Invalid parameter "URL": unacceptable URL.']
+				]
+			],
+			// The 'Refresh interval' value depends on the previous test case value = 'No refresh'.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'URL' => 'http://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Refresh interval' => 'Default (No refresh)',
+						'URL' => 'http://zabbix.com'
+					]
 				]
 			],
 			[
@@ -435,8 +453,8 @@ class testDashboardURLWidget extends CWebTest {
 			$saved_form = $dashboard->getWidget($header)->edit();
 			$this->assertEquals($values, $saved_form->getValues());
 
-			if (array_key_exists('show_header', $data['fields'])) {
-				$saved_form->checkValue(['Show header' => $data['fields']['show_header']]);
+			if (array_key_exists('Show header', $data['fields'])) {
+				$saved_form->checkValue(['Show header' => $data['fields']['Show header']]);
 			}
 
 			$saved_form->submit();
@@ -448,7 +466,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-				? '15 minutes'
+				? 'No refresh'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
 			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
 		}
@@ -535,6 +553,7 @@ class testDashboardURLWidget extends CWebTest {
 
 			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		}
+
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
 			$dashboard->save();
@@ -657,8 +676,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Check widget content when the host match dynamic option criteria.
 		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
-		$visible_value = $this->query($data['result']['element'])->one()->getValue();
-		$this->assertEquals($data['result']['value'], $visible_value);
+		$this->assertEquals($data['result']['value'], $this->query($data['result']['element'])->one()->getValue());
 
 		// Check iframe source link
 		$this->page->switchTo();
@@ -667,7 +685,7 @@ class testDashboardURLWidget extends CWebTest {
 	}
 
 	/**
-	 * Modify ifrme sandboxing and exception configuration. Parameters determine whether retrieved URL content
+	 * Modify iframe sandboxing and exception configuration. Parameters determine whether retrieved URL content
 	 * should be put into the sandbox or not.
 	 */
 	public function testDashboardURLWidget_IframeSandboxing() {
@@ -717,7 +735,7 @@ class testDashboardURLWidget extends CWebTest {
 
 	/**
 	 * Modify value of 'HTTP X-Frame-options header' and check widget content with changed Xframe options.
-	 * Todo: new test cases should be added after ZBX-21973 fix
+	 * TODO: new test cases should be added after ZBX-21973 fix.
 	 */
 	public function testDashboardURLWidget_XframeOptions() {
 		// Change Xframe options.
@@ -767,7 +785,7 @@ class testDashboardURLWidget extends CWebTest {
 		$broken_form = $dashboard->getWidget('URL')->edit();
 
 		// Check that the widget URL field is empty.
-		$this->assertEquals('', $broken_form->getField('URL')->getValue());
+		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
 		$this->assertEquals(self::$default_widget, $broken_form->getField('Name')->getValue());
 		COverlayDialogElement::find()->one()->close();
 		$this->query('button:Save changes')->one()->click();
